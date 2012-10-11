@@ -4,3 +4,36 @@
 *.jar
 *.war
 *.ear
+
+# IntelliJ Files
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# NetBeans
+nbproject
+
+# Eclipse
+.classpath
+.project
+.settings
+
+# Buildtools
+build.properties
+mvn.properties
+.checkstyle
+maven-ant-tasks-*.jar
+
+# General
+logs
+output
+target
+work
+*.tmp
+thumbs.db
+Thumbs.db
+bin/setenv.*
+
+
+
