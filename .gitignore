@@ -9,7 +9,7 @@
 *.iml
 *.ipr
 *.iws
-.idea/
+/*/.idea
 
 # NetBeans
 nbproject
