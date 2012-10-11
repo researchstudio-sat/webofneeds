@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application>
+  <component name="AppserversManager">
+    <LibraryTable />
+  </component>
+  <component name="CodeStyleSchemes">
+    <option name="CURRENT_SCHEME_NAME" value="won" />
+  </component>
+  <component name="DebuggerSettings">
+    <option name="TRACING_FILTERS_ENABLED" value="true" />
+    <option name="VALUE_LOOKUP_DELAY" value="700" />
+    <option name="DEBUGGER_TRANSPORT" value="0" />
+    <option name="FORCE_CLASSIC_VM" value="true" />
+    <option name="DISABLE_JIT" value="false" />
+    <option name="HIDE_DEBUGGER_ON_PROCESS_TERMINATION" value="false" />
+    <option name="HOTSWAP_IN_BACKGROUND" value="true" />
+    <option name="SKIP_SYNTHETIC_METHODS" value="true" />
+    <option name="SKIP_CONSTRUCTORS" value="false" />
+    <option name="SKIP_GETTERS" value="false" />
+    <option name="SKIP_CLASSLOADERS" value="true" />
+    <option name="EVALUATION_DIALOG_TYPE" value="EvaluateExpression" />
+    <option name="RUN_HOTSWAP_AFTER_COMPILE" value="RunHotswapAsk" />
+    <option name="COMPILE_BEFORE_HOTSWAP" value="true" />
+    <option name="HOTSWAP_HANG_WARNING_ENABLED" value="true" />
+    <option name="WATCH_RETURN_VALUES" value="false" />
+    <option name="AUTO_VARIABLES_MODE" value="false" />
+    <option name="SHOW_LIBRARY_STACKFRAMES" value="true" />
+    <filter>
+      <option name="PATTERN" value="com.sun.*" />
+      <option name="ENABLED" value="true" />
+    </filter>
+    <filter>
+      <option name="PATTERN" value="java.*" />
+      <option name="ENABLED" value="true" />
+    </filter>
+    <filter>
+      <option name="PATTERN" value="javax.*" />
+      <option name="ENABLED" value="true" />
+    </filter>
+    <filter>
+      <option name="PATTERN" value="org.omg.*" />
+      <option name="ENABLED" value="true" />
+    </filter>
+    <filter>
+      <option name="PATTERN" value="sun.*" />
+      <option name="ENABLED" value="true" />
+    </filter>
+    <filter>
+      <option name="PATTERN" value="junit.*" />
+      <option name="ENABLED" value="true" />
+    </filter>
+    <filter>
+      <option name="PATTERN" value="com.intellij.rt.*" />
+      <option name="ENABLED" value="true" />
+    </filter>
+    <filter>
+      <option name="PATTERN" value="com.yourkit.runtime.*" />
+      <option name="ENABLED" value="true" />
+    </filter>
+  </component>
+  <component name="Error Report Configurable">
+    <option name="JIRA_LOGIN" value="" />
+    <option name="JIRA_PASSWORD_CRYPT" value="" />
+    <option name="KEEP_JIRA_PASSWORD" value="false" />
+  </component>
+  <component name="FindSettings">
+    <option name="SEARCH_OVERLOADED_METHODS" value="false" />
+    <option name="SEARCH_IN_LIBRARIES" value="false" />
+    <option name="SKIP_RESULTS_WHEN_ONE_USAGE" value="false" />
+    <option name="FIND_DIRECTION" value="forward" />
+    <option name="FIND_ORIGIN" value="from_cursor" />
+    <option name="FIND_SCOPE" value="global" />
+    <option name="FIND_CUSTOM_SCOPE" />
+    <option name="CASE_SENSITIVE_SEARCH" value="false" />
+    <option name="LOCAL_CASE_SENSITIVE_SEARCH" value="true" />
+    <option name="PRESERVE_CASE_REPLACE" value="false" />
+    <option name="WHOLE_WORDS_ONLY" value="false" />
+    <option name="COMMENTS_ONLY" value="false" />
+    <option name="STRING_LITERALS_ONLY" value="false" />
+    <option name="LOCAL_WHOLE_WORDS_ONLY" value="true" />
+    <option name="REGULAR_EXPRESSIONS" value="false" />
+    <option name="LOCAL_REGULAR_EXPRESSIONS" value="false" />
+    <option name="WITH_SUBDIRECTORIES" value="true" />
+    <option name="SEARCH_SCOPE" value="Project Files" />
+    <option name="FILE_MASK" />
+    <option name="RECENT_FIND_STRINGS">
+      <value>
+        <list size="30">
+          <item index="0" class="java.lang.String" itemvalue="&amp;linkedin;voc#" />
+          <item index="1" class="java.lang.String" itemvalue="payolution:voc" />
+          <item index="2" class="java.lang.String" itemvalue="item" />
+          <item index="3" class="java.lang.String" itemvalue="klee" />
+          <item index="4" class="java.lang.String" itemvalue="isw" />
+          <item index="5" class="java.lang.String" itemvalue="packa" />
+          <item index="6" class="java.lang.String" itemvalue="wikif" />
+          <item index="7" class="java.lang.String" itemvalue="pass" />
+          <item index="8" class="java.lang.String" itemvalue="point" />
+          <item index="9" class="java.lang.String" itemvalue="a" />
+          <item index="10" class="java.lang.String" itemvalue="replace" />
+          <item index="11" class="java.lang.String" itemvalue="silk" />
+          <item index="12" class="java.lang.String" itemvalue="silk#" />
+          <item index="13" class="java.lang.String" itemvalue="lowerBound:0." />
+          <item index="14" class="java.lang.String" itemvalue="Wrote" />
+          <item index="15" class="java.lang.String" itemvalue="probability: 0.5" />
+          <item index="16" class="java.lang.String" itemvalue="probability: 0.7" />
+          <item index="17" class="java.lang.String" itemvalue="probability: " />
+          <item index="18" class="java.lang.String" itemvalue="collectedData" />
+          <item index="19" class="java.lang.String" itemvalue="profession" />
+          <item index="20" class="java.lang.String" itemvalue="to select" />
+          <item index="21" class="java.lang.String" itemvalue="payolution:ontology#academicTitle" />
+          <item index="22" class="java.lang.String" itemvalue="SrcAsc" />
+          <item index="23" class="java.lang.String" itemvalue="warning" />
+          <item index="24" class="java.lang.String" itemvalue="SrcDesc" />
+          <item index="25" class="java.lang.String" itemvalue="doctor" />
+          <item index="26" class="java.lang.String" itemvalue="logg" />
+          <item index="27" class="java.lang.String" itemvalue="type" />
+          <item index="28" class="java.lang.String" itemvalue="MainDataNode" />
+          <item index="29" class="java.lang.String" itemvalue="arffDatasetFile" />
+        </list>
+      </value>
+    </option>
+    <option name="RECENT_REPLACE_STRINGS">
+      <value>
+        <list size="28">
+          <item index="0" class="java.lang.String" itemvalue="MatchingCli" />
+          <item index="1" class="java.lang.String" itemvalue="(mädchen|bursche?)" />
+          <item index="2" class="java.lang.String" itemvalue="($1|$2)" />
+          <item index="3" class="java.lang.String" itemvalue="($1ier|$1ière)" />
+          <item index="4" class="java.lang.String" itemvalue="$1(er|in)" />
+          <item index="5" class="java.lang.String" itemvalue="(pfleger|schwester)" />
+          <item index="6" class="java.lang.String" itemvalue="$1$2(er|in)" />
+          <item index="7" class="java.lang.String" itemvalue="$1(mann|frau)" />
+          <item index="8" class="java.lang.String" itemvalue="$1" />
+          <item index="9" class="java.lang.String" itemvalue="\n" />
+          <item index="10" class="java.lang.String" itemvalue="($1mann|$1frau)" />
+          <item index="11" class="java.lang.String" itemvalue="DataProperty" />
+          <item index="12" class="java.lang.String" itemvalue="&lt;main:" />
+          <item index="13" class="java.lang.String" itemvalue="&lt;/main:" />
+          <item index="14" class="java.lang.String" itemvalue="&amp;input;" />
+          <item index="15" class="java.lang.String" itemvalue=":MainDataNode" />
+          <item index="16" class="java.lang.String" itemvalue="?main" />
+          <item index="17" class="java.lang.String" itemvalue=", ?" />
+          <item index="18" class="java.lang.String" itemvalue="magnetic" />
+          <item index="19" class="java.lang.String" itemvalue="magneticDataNodeProperty" />
+          <item index="20" class="java.lang.String" itemvalue="input:" />
+          <item index="21" class="java.lang.String" itemvalue="Person" />
+          <item index="22" class="java.lang.String" itemvalue="payolution:ontology#forInput" />
+          <item index="23" class="java.lang.String" itemvalue="voc#" />
+          <item index="24" class="java.lang.String" itemvalue="&amp;linkedin;" />
+          <item index="25" class="java.lang.String" itemvalue="rdf:type" />
+          <item index="26" class="java.lang.String" itemvalue="AscSrc" />
+          <item index="27" class="java.lang.String" itemvalue="DescSrc" />
+        </list>
+      </value>
+    </option>
+    <option name="RECENT_DIR_STRINGS">
+      <value>
+        <list size="5">
+          <item index="0" class="java.lang.String" itemvalue="C:\DATA\fkleedorfer\workspace\studiohomepage\system\intern" />
+          <item index="1" class="java.lang.String" itemvalue="C:\DATA\fkleedorfer\workspace\studiohomepage\system" />
+          <item index="2" class="java.lang.String" itemvalue="C:\DATA\fkleedorfer\workspace\studiohomepage" />
+          <item index="3" class="java.lang.String" itemvalue="C:\DATA\fkleedorfer\workspace\sat-payolution\sat-payolution-idcheck\src\main\resources" />
+          <item index="4" class="java.lang.String" itemvalue="C:\DATA\fkleedorfer\workspace\sat-payolution\sat-payolution-idcheck\src\main\scala" />
+        </list>
+      </value>
+    </option>
+    <option name="RECENT_FILE_MASKS">
+      <value>
+        <list size="12">
+          <item index="0" class="java.lang.String" itemvalue="*.properties" />
+          <item index="1" class="java.lang.String" itemvalue="*.html" />
+          <item index="2" class="java.lang.String" itemvalue="*.jsp" />
+          <item index="3" class="java.lang.String" itemvalue="*.xml" />
+          <item index="4" class="java.lang.String" itemvalue="*.java" />
+          <item index="5" class="java.lang.String" itemvalue="*.php" />
+          <item index="6" class="java.lang.String" itemvalue="*.js" />
+          <item index="7" class="java.lang.String" itemvalue="*.as" />
+          <item index="8" class="java.lang.String" itemvalue="*.css" />
+          <item index="9" class="java.lang.String" itemvalue="*.mxml" />
+          <item index="10" class="java.lang.String" itemvalue="*.py" />
+          <item index="11" class="java.lang.String" itemvalue="*.rb" />
+        </list>
+      </value>
+    </option>
+  </component>
+  <component name="GlobalAntConfiguration">
+    <filtersTableLayout />
+    <propertiesTableLayout />
+    <registeredAnts />
+  </component>
+  <component name="HttpConfigurable">
+    <option name="USE_HTTP_PROXY" value="false" />
+    <option name="PROXY_HOST" value="" />
+    <option name="PROXY_PORT" value="80" />
+    <option name="PROXY_AUTHENTICATION" value="false" />
+    <option name="PROXY_LOGIN" value="" />
+    <option name="PROXY_PASSWORD_CRYPT" value="" />
+    <option name="KEEP_PROXY_PASSWORD" value="false" />
+  </component>
+  <component name="RecentProjectsManager">
+    <option name="recentPaths">
+      <list>
+        <option value="C:\DATA\fkleedorfer\workspace\webofneeds\needserver" />
+        <option value="C:\DATA\fkleedorfer\workspace\sat-payolution\sat-payolution-idcheck" />
+        <option value="C:\DATA\fkleedorfer\workspace\easyrec-sf" />
+        <option value="C:\DATA\fkleedorfer\private\Dropbox\desideratum\sandbox\programming\wonp" />
+        <option value="C:\DATA\fkleedorfer\workspace\sat-payolution\sat-payolution-spring-app" />
+        <option value="C:\DATA\fkleedorfer\workspace\silk2-sf2\silk2\silk2\silk.ipr" />
+        <option value="C:\DATA\fkleedorfer\workspace\studiohomepage" />
+        <option value="C:\DATA\fkleedorfer\workspace\sat-speclog\sat-speclog.ipr" />
+        <option value="C:\DATA\fkleedorfer\workspace\sat-gaminside" />
+        <option value="C:\DATA\fkleedorfer\workspace\sat-payolution\sat-payolution-idcheck\sat-payolution-json2rdf.ipr" />
+        <option value="C:\DATA\fkleedorfer\workspace\sat-gaminside\sat-gaminside.ipr" />
+      </list>
+    </option>
+    <option name="names">
+      <map>
+        <entry key="C:\DATA\fkleedorfer\private\Dropbox\desideratum\sandbox\programming\wonp" value="" />
+        <entry key="C:\DATA\fkleedorfer\workspace\easyrec-sf" value="" />
+        <entry key="C:\DATA\fkleedorfer\workspace\sat-gaminside" value="" />
+        <entry key="C:\DATA\fkleedorfer\workspace\sat-gaminside\sat-gaminside.ipr" value="" />
+        <entry key="C:\DATA\fkleedorfer\workspace\sat-payolution\sat-payolution-idcheck" value="" />
+        <entry key="C:\DATA\fkleedorfer\workspace\sat-payolution\sat-payolution-idcheck\sat-payolution-json2rdf.ipr" value="" />
+        <entry key="C:\DATA\fkleedorfer\workspace\sat-payolution\sat-payolution-spring-app" value="" />
+        <entry key="C:\DATA\fkleedorfer\workspace\sat-speclog\sat-speclog.ipr" value="" />
+        <entry key="C:\DATA\fkleedorfer\workspace\silk2-sf2\silk2\silk2\silk.ipr" value="" />
+        <entry key="C:\DATA\fkleedorfer\workspace\studiohomepage" value="" />
+      </map>
+    </option>
+    <option name="lastPath" value="C:\DATA\fkleedorfer\workspace\webofneeds\needserver" />
+  </component>
+  <component name="RefactoringSettings">
+    <option name="renameParameterInHierarchy" value="false" />
+    <option name="RENAME_SEARCH_IN_COMMENTS_FOR_VARIABLE" value="false" />
+    <option name="RENAME_PARAMETER_IN_HIERARCHY" value="false" />
+  </component>
+  <component name="Registry">
+    <entry key="ide.firstStartup" value="false" />
+  </component>
+  <component name="TemplateSettings">
+    <defaultShortcut shortcut="TAB" />
+  </component>
+  <component name="TodoConfiguration">
+    <pattern icon="default" useCustomColors="false" case-sensitive="false" pattern="\btodo\b.*">
+      <option name="FOREGROUND" value="ff" />
+      <option name="BACKGROUND" />
+      <option name="FONT_TYPE" value="3" />
+      <option name="EFFECT_COLOR" />
+      <option name="EFFECT_TYPE" value="0" />
+      <option name="ERROR_STRIPE_COLOR" value="ff" />
+    </pattern>
+  </component>
+  <component name="UpdatesConfigurable">
+    <option name="myPluginHosts">
+      <value>
+        <list size="0" />
+      </value>
+    </option>
+    <option name="myKnownUpdateChannels">
+      <value>
+        <list size="7">
+          <item index="0" class="java.lang.String" itemvalue="idea90" />
+          <item index="1" class="java.lang.String" itemvalue="IDEA10EAP" />
+          <item index="2" class="java.lang.String" itemvalue="IDEA10" />
+          <item index="3" class="java.lang.String" itemvalue="IDEA11" />
+          <item index="4" class="java.lang.String" itemvalue="IDEA11EAP" />
+          <item index="5" class="java.lang.String" itemvalue="IDEA11dot1EAP" />
+          <item index="6" class="java.lang.String" itemvalue="ledaEAP" />
+        </list>
+      </value>
+    </option>
+    <option name="myIgnoredBuildNumbers">
+      <value>
+        <list size="2">
+          <item index="0" class="java.lang.String" itemvalue="111.277" />
+          <item index="1" class="java.lang.String" itemvalue="117.117" />
+        </list>
+      </value>
+    </option>
+    <option name="CHECK_NEEDED" value="true" />
+    <option name="LAST_TIME_CHECKED" value="1349881540384" />
+    <option name="LAST_BUILD_CHECKED" value="IU-117.798" />
+    <option name="UPDATE_CHANNEL_TYPE" value="release" />
+  </component>
+  <component name="WebServicesPluginSettings" WebServicesUrlPathPrefix="/services" PathToXmlBeans="C:\Users\fkleedorfer\.IntelliJIdea11\system\webservices\xmlbeans-2.3.0" RestClientHost="http://localhost:9998" ASK_TO_INSTALL_SOAPUI="true">
+    <Libs>
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.1.3\plugins\WebServices\lib\xmlbeans-2.3.0\xbean.jar.pack.gz" size="639476" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.0.1\plugins\WebServices\lib\xmlbeans-2.3.0\xmlbeans-qname.jar.pack.gz" size="1173" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.1.3\plugins\WebServices\lib\xmlbeans-2.3.0\xmlpublic.jar.pack.gz" size="89723" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.1.3\plugins\WebServices\docs\axis1_4\documentation.jar.pack.gz" size="615245" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.0.1\plugins\WebServices\lib\xmlbeans-2.3.0\xmlpublic.jar.pack.gz" size="89723" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.0.1\plugins\WebServices\lib\xmlbeans-2.3.0\xbean_xpath.jar.pack.gz" size="2430" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.1.3\plugins\WebServices\lib\xmlbeans-2.3.0\xmlbeans-qname.jar.pack.gz" size="1173" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.0.1\plugins\WebServices\lib\xmlbeans-2.3.0\xbean.jar.pack.gz" size="639476" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.1.3\plugins\WebServices\lib\xmlbeans-2.3.0\resolver.jar.pack.gz" size="21195" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.0.1\plugins\WebServices\lib\xmlbeans-2.3.0\resolver.jar.pack.gz" size="21195" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.1.3\plugins\WebServices\lib\xmlbeans-2.3.0\jsr173_1.0_api.jar.pack.gz" size="5348" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.1.3\plugins\WebServices\lib\xmlbeans-2.3.0\xbean_xpath.jar.pack.gz" size="2430" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.0.1\plugins\WebServices\lib\xmlbeans-2.3.0\jsr173_1.0_api.jar.pack.gz" size="5348" />
+      <Lib path="C:\Program Files (x86)\JetBrains\IntelliJ IDEA 11.0.1\plugins\WebServices\docs\axis1_4\documentation.jar.pack.gz" size="615245" />
+    </Libs>
+  </component>
+  <component name="XDebuggerSettings">
+    <data-views />
+    <debuggers>
+      <debugger id="groovy_debugger">
+        <configuration />
+      </debugger>
+      <debugger id="javascript">
+        <configuration>
+          <custom-object-presentation />
+        </configuration>
+      </debugger>
+    </debuggers>
+  </component>
+  <component name="XPathView.XPathViewPlugin">
+    <option name="SHOW_IN_TOOLBAR" value="true" />
+    <option name="SHOW_IN_MAIN_MENU" value="true" />
+    <option name="OPEN_NEW_TAB" value="false" />
+    <option name="HIGHLIGHT_RESULTS" value="true" />
+    <option name="SHOW_USAGE_VIEW" value="false" />
+    <option name="SEARCH_SCOPE">
+      <value type="PROJECT" />
+    </option>
+    <option name="MATCH_RECURSIVELY" value="false" />
+    <option name="attributes">
+      <value>
+        <option name="FOREGROUND" />
+        <option name="BACKGROUND" value="ffd578" />
+        <option name="FONT_TYPE" value="0" />
+        <option name="EFFECT_COLOR" />
+        <option name="EFFECT_TYPE" value="-1" />
+        <option name="ERROR_STRIPE_COLOR" />
+      </value>
+    </option>
+    <option name="contextAttributes">
+      <value>
+        <option name="FOREGROUND" />
+        <option name="BACKGROUND" value="c2ffd4" />
+        <option name="FONT_TYPE" value="0" />
+        <option name="EFFECT_COLOR" />
+        <option name="EFFECT_TYPE" value="-1" />
+        <option name="ERROR_STRIPE_COLOR" />
+      </value>
+    </option>
+    <option name="scrollToFirst" value="true" />
+    <option name="bUseContextAtCursor" value="true" />
+    <option name="bHighlightStartTagOnly" value="true" />
+    <option name="bAddErrorStripe" value="true" />
+  </component>
+  <component name="XSLT-Support.Configuration">
+    <option name="SHOW_LINKED_FILES" value="true" />
+  </component>
+  <component name="com.intellij.ide.fileTemplates.impl.FileTemplateManagerImpl">
+    <recent_templates>
+      <option name="RECENT_TEMPLATES">
+        <value>
+          <list size="0" />
+        </value>
+      </option>
+    </recent_templates>
+    <default_templates />
+    <internal_templates />
+    <includes_templates />
+    <code_templates />
+    <j2ee_templates />
+  </component>
+  <component name="com.intellij.javaee.ExternalResourceManagerImpl">
+    <ignored-resource url="urn:idea:xslt-plugin#extensions" />
+    <ignored-resource url="http://relaxng.org/ns/compatibility/annotations/1.0" />
+    <ignored-resource url="http://www.w3.org/1998/Math/MathML" />
+    <ignored-resource url="http://www.w3.org/2000/svg" />
+    <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
+  </component>
+  <component name="com.intellij.openapi.diff.impl.external.DiffManagerImpl" COMPARISON_POLICY="Ignore spaces">
+    <enableFiles value="false" />
+    <enableFolders value="false" />
+    <filesTool value="" newValue="" />
+    <foldersTool value="" newValue="" />
+  </component>
+</application>
+
