@@ -35,5 +35,7 @@ thumbs.db
 Thumbs.db
 bin/setenv.*
 
+#application specific
+/needserver/repository
 
 
