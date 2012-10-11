@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/needserver.iml" filepath="$PROJECT_DIR$/needserver.iml" />
+      <module fileurl="file://$PROJECT_DIR$/needserver-core/needserver-core.iml" filepath="$PROJECT_DIR$/needserver-core/needserver-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/needserver-need/needserver-need.iml" filepath="$PROJECT_DIR$/needserver-need/needserver-need.iml" />
+      <module fileurl="file://$PROJECT_DIR$/needserver-webapp/needserver-webapp.iml" filepath="$PROJECT_DIR$/needserver-webapp/needserver-webapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/needserver-ws/needserver-ws.iml" filepath="$PROJECT_DIR$/needserver-ws/needserver-ws.iml" />
+      <module fileurl="file://$PROJECT_DIR$/needserver-xmpp/needserver-xmpp.iml" filepath="$PROJECT_DIR$/needserver-xmpp/needserver-xmpp.iml" />
+    </modules>
+  </component>
+</project>
+
