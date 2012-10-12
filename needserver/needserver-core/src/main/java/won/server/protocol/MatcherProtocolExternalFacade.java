@@ -19,9 +19,8 @@ package won.server.protocol;
 import java.net.URI;
 
 /**
- *  Interface defining the external methods for the matcher protocol, i.e. those methods
- *  that are directly or indirectly exposed via Web Service.
- *
+ * Interface defining the external methods for the matcher protocol, i.e. those methods
+ * that are directly or indirectly exposed via Web Service.
  */
 public interface MatcherProtocolExternalFacade
 {

@@ -23,6 +23,7 @@ package won.server.need;
  * Time: 14:13
  * To change this template use File | Settings | File Templates.
  */
-public enum NeedState {
-    DRAFT, PUBLISHED, CLOSED;
+public enum NeedState
+{
+  DRAFT, PUBLISHED, CLOSED;
 }

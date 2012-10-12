@@ -23,10 +23,11 @@ package won.server.need;
  * Time: 11:27
  * To change this template use File | Settings | File Templates.
  */
-public interface Need {
+public interface Need
+{
 
-    public String getID();
+  public String getID();
 
-    public void setState(NeedState state);
+  public void setState(NeedState state);
 
 }
