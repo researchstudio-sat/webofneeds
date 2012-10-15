@@ -25,14 +25,17 @@ import java.util.Collection;
  * Interface defining the external methods for the owner protocol on the need side, i.e. those methods
  * that are directly or indirectly exposed via Web Service toward the end user application.
  * <p/>
- * This interface contains the methods required for client-pull operations only. No pull operations are declared here.
+ * This interface contains the methods required for client-pull operations only. No push operations are declared here.
  * <p/>
  * This interface is need-oriented: all methods relate to one need. No bulk operations are declared here.
  * <p/>
+ * This interface does not deal with authentication and authorization, yet. It is assumed that the caller is authorized
+ * and authenticated where necessary.
  * TODO: missing: how will the owner get the chat-messages? However this is solved, it should be declared in this interface.
  */
 public interface OwnerProtocolExternalFacade
 {
+
   /**
    * Creates a new need with the specified content.
    * TODO replace String with the type used to hold the need content
@@ -68,6 +71,12 @@ public interface OwnerProtocolExternalFacade
   public void deleteNeed(URI needURI);
 
   /**
+   * Retrieves a list of all needs on the needserver.
+   * @return a collection of all need URIs.
+   */
+  public Collection<URI> listNeedURIs();
+
+  /**
    * Returns all matches for the specified need.
    *
    * @param needURI the URI of the need to get the matches for
@@ -77,13 +86,22 @@ public interface OwnerProtocolExternalFacade
 
   /**
    * Initiates a connection from the need identified by localNeedURI to the need identified by remoteNeedURI.
-   * The former must be controlled by the local needserver, the latter may reside anywhere.
+   * The former must be controlled by the local needserver, the latter may reside anywhere. A short message
+   * (max 140 chars) can be sent with the request.
    *
    * @param localNeedURI  the local need to connect from
    * @param remoteNeedURI the remote need to connect to
+   * @param message (optional) a message for the remote need's owner
    * @return an URI identifying the transaction
    */
-  public URI connect(URI localNeedURI, URI remoteNeedURI);
+  public URI connect(URI localNeedURI, URI remoteNeedURI, String message);
+
+  /**
+   * TODO document!
+   * @param remoteNeedURI
+   * @param transactionURI
+   */
+  void acceptConnect(URI remoteNeedURI, URI transactionURI);
 
   /**
    * Aborts the transaction identified by the specified URI, indicating failure.
@@ -98,5 +116,22 @@ public interface OwnerProtocolExternalFacade
    * @param transactionURI the URI that uniquely identifies the transaction
    */
   public void close(URI transactionURI);
+
+  /**
+   * Retrieves all transaction URIs (regardless of state) for the specified local need URI.
+   * @param localNeedURI the local need to get transaction URIs for
+   * @return a collection of transaction URIs.
+   */
+  public Collection<URI> listTransactionURIs(URI localNeedURI);
+
+  /**
+   * Retrieves a representation of the transaction with the specified URI.
+   * TODO replace String with the type used to hold the transaction content
+   * @param transactionURI the URI of the transaction
+   * @return a representation of the transaction
+   */
+  public String readTransaction(URI transactionURI);
+
+
 
 }
