@@ -26,9 +26,19 @@
         <servlet-class>org.springframework.ws.transport.http.MessageDispatcherServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>NeedProtocolWS</servlet-name>
+        <servlet-class>won.server.ws.NeedProtocolWSImpl</servlet-class>
+    </servlet>
+
+
     <servlet-mapping>
         <servlet-name>spring-ws</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NeedProtocolWS</servlet-name>
+        <url-pattern>/needProtocol</url-pattern>
     </servlet-mapping>
 
 </web-app>
