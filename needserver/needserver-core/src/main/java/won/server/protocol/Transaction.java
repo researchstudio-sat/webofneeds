@@ -27,7 +27,12 @@ public interface Transaction
   /**
    * Owner-facing method; accepts a connection initiated by a connect().
    */
-  public URI acceptConnection();
+  public void acceptConnection();
+
+  /**
+   * Owner-facing method; deny a connection initiated by a connect().
+   */
+  public void denyConnection();
 
   /**
    * Owner-facing method; Aborts the transaction identified by the specified URI, indicating failure.
@@ -44,6 +49,12 @@ public interface Transaction
    * has been accepted by the other side.
    */
   public void connectionAccepted();
+
+  /**
+   * Need-facing (i.e. transaction-facing) method; Informs the transaction object of the fact that the connection
+   * has been denied by the other side.
+   */
+  public void connectionDenied();
 
   /**
    * Need-facing (i.e. transaction-facing) method; Informs the transaction object of the fact that the connection

@@ -99,7 +99,7 @@ public interface Need
    * @param otherTransactionURI
    * @param message
    */
-  public void requestConnection(URI otherNeedURI, URI otherTransactionURI, String message);
+  public void connectionRequested(URI otherNeedURI, URI otherTransactionURI, String message);
 
   /**
    * Retrieves all transaction URIs (regardless of state) for the specified local need URI.

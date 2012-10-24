@@ -43,6 +43,12 @@ public interface Owner
   public void connectionAccepted(URI ownTransactionURI);
 
   /**
+   * Informs the owner of the fact that their connection request has been denied by the other side.
+   * @param ownTransactionURI
+   */
+  public void connectionDenied(URI ownTransactionURI);
+
+  /**
    * Informs the owner of the fact that the connection has been aborted by the other side, indicating failure.
    * @param ownTransactionURI
    */
