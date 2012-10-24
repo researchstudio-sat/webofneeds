@@ -25,19 +25,37 @@ import java.net.URI;
 public interface Transaction
 {
   /**
-   * Accepts a connection initiated by a connect().
+   * Owner-facing method; accepts a connection initiated by a connect().
    */
   public URI acceptConnection();
 
   /**
-   * Aborts the transaction identified by the specified URI, indicating failure.
+   * Owner-facing method; Aborts the transaction identified by the specified URI, indicating failure.
    */
   public void abort();
 
   /**
-   * Closes the transaction identified by the specified URI, indicating success.
+   * Owner-facing method; closes the transaction identified by the specified URI, indicating success.
    */
   public void close();
+
+  /**
+   * Need-facing (i.e. transaction-facing) method; Informs the transaction object of the fact that the connection
+   * has been accepted by the other side.
+   */
+  public void connectionAccepted();
+
+  /**
+   * Need-facing (i.e. transaction-facing) method; Informs the transaction object of the fact that the connection
+   * has been aborted by the other side, indicating failure.
+   */
+  public void connectionAborted();
+
+  /**
+   * Need-facing (i.e. transaction-facing) method; Informs the transaction object of the fact that the connection
+   * has been closed by the other side, indicating success.
+   */
+  public void connectionClosed();
 
   /**
    * Retrieves a representation of the transaction with the specified URI.
