@@ -23,7 +23,7 @@ import java.util.Collection;
  * User: fkleedorfer
  * Date: 23.10.12
  */
-public interface NeedContainer
+public interface NeedContainerService
 {
   /**
    * Creates a new need with the specified content.

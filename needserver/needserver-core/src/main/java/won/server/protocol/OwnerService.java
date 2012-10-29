@@ -22,41 +22,49 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 23.10.12
  */
-public interface Owner
+public interface OwnerService
 {
 
   /**
+   * Informs the owner of a hint that has been received for the need.
+   * @param otherNeed
+   * @param score
+   * @param originator
+   */
+  public void hintReceived(URI ownNeed, URI otherNeed, double score, URI originator);
+
+  /**
    * Informs the owner of a connection initiated by the need identified by otherNeedURI to the
-   * need identified by ownNeedURI. The transaction URI ownTransactionURI has been created automatically by the
+   * need identified by ownNeedURI. The connection URI ownConnectionURI has been created automatically by the
    * needserver upon being contacted and is passed here to serve as a connection handle.
    *
    * @param ownNeedURI
    * @param otherNeedURI
-   * @param ownTransactionURI
+   * @param ownConnectionURI
    */
-  public void connectionRequested(URI ownNeedURI, URI otherNeedURI, URI ownTransactionURI);
+  public void connectionRequested(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI);
 
   /**
    * Informs the owner of the fact that their connection request has been accepted by the other side.
-   * @param ownTransactionURI
+   * @param ownConnectionURI
    */
-  public void connectionAccepted(URI ownTransactionURI);
+  public void connectionAccepted(URI ownConnectionURI);
 
   /**
    * Informs the owner of the fact that their connection request has been denied by the other side.
-   * @param ownTransactionURI
+   * @param ownConnectionURI
    */
-  public void connectionDenied(URI ownTransactionURI);
+  public void connectionDenied(URI ownConnectionURI);
 
   /**
    * Informs the owner of the fact that the connection has been aborted by the other side, indicating failure.
-   * @param ownTransactionURI
+   * @param ownConnectionURI
    */
-  public void connectionAborted(URI ownTransactionURI);
+  public void connectionAborted(URI ownConnectionURI);
 
   /**
    * Informs the owner of the fact that the connection has been closed by the other side, indicating success.
-   * @param ownTransactionURI
+   * @param ownConnectionURI
    */
-  public void connectionClosed(URI ownTransactionURI);
+  public void connectionClosed(URI ownConnectionURI);
 }
