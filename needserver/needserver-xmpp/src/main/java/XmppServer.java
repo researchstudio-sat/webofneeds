@@ -173,6 +173,7 @@ public class XmppServer implements XMPPServerService {
         }
     }
 
+    //TODO: Ich brauche Referenzen auf die JabberID(UserID + Serverdomain) der betroffenen Needs
     public void startGroupChatSession(NeedTransaction transaction, Need n1,  Need n2) {
         try {
             Room r = conf.createRoom(EntityImpl.parse(transaction.getContextID()+"room"), "need",RoomType.MembersOnly);
@@ -212,6 +213,7 @@ public class XmppServer implements XMPPServerService {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    //TODO: Brauche Referenzen auf die JabberID's(UserID + Serverdomain) der betroffenen Needs
     @Override
     public void setupPrivateChannels(NeedTransaction transaction) {
         //To change body of implemented methods use File | Settings | File Templates.
