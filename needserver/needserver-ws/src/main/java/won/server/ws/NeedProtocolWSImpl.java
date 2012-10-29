@@ -16,15 +16,26 @@
 
 package won.server.ws;
 
+import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.mw.wst11.BusinessActivityManagerFactory;
+import com.arjuna.wst.SystemException;
+import com.arjuna.wst11.BAParticipantManager;
+import com.arjuna.mw.wst11.BusinessActivityManager;
+
 import javax.jws.*;
 import javax.jws.soap.SOAPBinding;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+/**
+ * @author Fabian Salcher
+ * @version 2012/10/29
+ */
+
 @WebService(serviceName = "NeedProtocolWSClientService", portName = "NeedProtocolWSImpl",
     name = "IProtocolService", targetNamespace = "http://webofneeds.org/needProtocol",
     wsdlLocation = "/WEB-INF/wsdl/NeedProtocol.wsdl")
-//@HandlerChain(file = "/context-handlers.xml", name = "Context Handlers")
+@HandlerChain(file = "/context-handlers.xml", name = "Context Handlers")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 public class NeedProtocolWSImpl implements NeedProtocolWS
 {
@@ -36,26 +47,59 @@ public class NeedProtocolWSImpl implements NeedProtocolWS
       String remoteNeedUriString,
 
       @WebParam(name = "remoteNeedProtocolEndpointUri", partName = "remoteNeedProtocolEndpointUri")
-      String remoteNeedProtocolEndpointUriString,
+      String remoteNeedProtocolEndpointUriString)
 
-      @WebParam(name = "transactionID", partName = "transactionID")
-      String transactionIDString)
   {
+
+    System.out.println("[WS] connect has been called...");
+
     URI remoteNeedUri;
     URI remoteNeedProtocolEndpointUri;
     URI transactionID;
     try {
       remoteNeedUri = new URI(remoteNeedUriString);
       remoteNeedProtocolEndpointUri = new URI(remoteNeedProtocolEndpointUriString);
-      transactionID = new URI(transactionIDString);
+//      transactionID = new URI(transactionIDString);
     } catch (URISyntaxException e) {
       //ToDo: implement proper error handling
       e.printStackTrace();
       return false;
     }
 
+
+    BusinessActivityManager activityManager = BusinessActivityManagerFactory.businessActivityManager();
+    // get the transaction context of this thread:
+    String transactionId = null;
+    try {
+      transactionId = activityManager.currentTransaction().toString();
+    } catch (SystemException e) {
+      e.printStackTrace(System.err);
+      return false;
+    }
+    System.out.println("[WS] transactionId: " + transactionId);
+    NeedProtocolBAParticipant needProtocolBAParticipant = NeedProtocolBAParticipant.getParticipant(transactionId);
+
+    if (needProtocolBAParticipant != null) {
+
+      System.err.println("[WS] request failed");
+      return false;
+    }
+
+    BAParticipantManager participantManager;
+
+    // enlist the Participant for this service:
+    try {
+      needProtocolBAParticipant = new NeedProtocolBAParticipant();
+      participantManager = activityManager.enlistForBusinessAgreementWithParticipantCompletion(needProtocolBAParticipant, "org.webofneeds:needProtocol:" + new Uid().toString());
+      NeedProtocolBAParticipant.recordParticipant(transactionId, needProtocolBAParticipant);
+    } catch (Exception e) {
+      System.err.println("Participant enlistment failed");
+      e.printStackTrace(System.err);
+      return false;
+    }
+
     NeedProtocol needProtocol = NeedProtocol.getSingleton();
-    needProtocol.receiveConnectionRequest(remoteNeedUri, remoteNeedProtocolEndpointUri, transactionID);
+    needProtocol.receiveConnectionRequest(remoteNeedUri, remoteNeedProtocolEndpointUri, null);
 
     return true;
   }

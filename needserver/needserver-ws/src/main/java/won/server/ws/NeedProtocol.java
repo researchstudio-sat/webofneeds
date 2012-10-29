@@ -16,13 +16,45 @@
 
 package won.server.ws;
 
-import java.net.URI;
+import com.arjuna.mw.wst11.UserBusinessActivity;
+import com.arjuna.mw.wst11.UserBusinessActivityFactory;
+import com.arjuna.mw.wst11.client.JaxWSHeaderContextProcessor;
+import com.arjuna.wst.SystemException;
+import com.arjuna.wst.TransactionRolledBackException;
+import com.arjuna.wst.UnknownTransactionException;
+import com.arjuna.wst.WrongStateException;
 
+import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Service;
+import javax.xml.ws.handler.Handler;
+import java.net.URI;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * @author Fabian Salcher
+ * @version 2012/10/29
+ */
 
 public class NeedProtocol implements NeedProtocolExternalFacade, NeedProtocolInternalFacade
 {
 
   private static NeedProtocol singleton;
+  private boolean initialized;
+
+  public NeedProtocol()
+  {
+
+  }
+
+  private synchronized void initialize()
+  {
+
+
+    initialized = true;
+  }
 
 
   public static NeedProtocol getSingleton()
@@ -35,36 +67,104 @@ public class NeedProtocol implements NeedProtocolExternalFacade, NeedProtocolInt
 
   public NeedTransaction receiveConnectionRequest(URI remoteNeedUri, URI remoteNeedProtocolEndpointUri, URI transactionID)
   {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return null;
   }
 
   public void compensate(URI transactionID)
   {
-    //To change body of implemented methods use File | Settings | File Templates.
+
   }
 
   public void closed(URI transactionID)
   {
-    //To change body of implemented methods use File | Settings | File Templates.
+
   }
 
   public void faulted(URI transactionID)
   {
-    //To change body of implemented methods use File | Settings | File Templates.
+
   }
 
   public NeedTransaction connectWithNeed(URI needProtocolEndpointUri)
   {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+
+    UserBusinessActivity userBusinessActivity = UserBusinessActivityFactory.userBusinessActivity();
+
+    try {
+
+      userBusinessActivity.begin();
+      System.out.println(userBusinessActivity.transactionIdentifier());
+
+      NeedProtocolWS needProtocolWS = getService(needProtocolEndpointUri.toString());
+      // ToDo: do we need the parameters?
+      needProtocolWS.connect("http://localhost/need1", "http://localhost/needProtocol/");
+
+
+    } catch (WrongStateException e) {
+      e.printStackTrace();
+      return null;
+    } catch (SystemException e) {
+      e.printStackTrace();
+      return null;
+    }
+
+    return null;
   }
 
   public void abort(URI transactionID)
   {
-    //To change body of implemented methods use File | Settings | File Templates.
+    UserBusinessActivity userBusinessActivity = UserBusinessActivityFactory.userBusinessActivity();
+    try {
+      userBusinessActivity.cancel();
+    } catch (UnknownTransactionException e) {
+      e.printStackTrace();
+    } catch (SystemException e) {
+      e.printStackTrace();
+    } catch (WrongStateException e) {
+      e.printStackTrace();
+    }
   }
 
   public void close(URI transactionID)
   {
-    //To change body of implemented methods use File | Settings | File Templates.
+    UserBusinessActivity userBusinessActivity = UserBusinessActivityFactory.userBusinessActivity();
+    try {
+      userBusinessActivity.close();
+    } catch (UnknownTransactionException e) {
+      e.printStackTrace();
+    } catch (SystemException e) {
+      e.printStackTrace();
+    } catch (WrongStateException e) {
+      e.printStackTrace();
+    } catch (TransactionRolledBackException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private NeedProtocolWS getService(String address)
+  {
+
+
+    QName serviceName = new QName(
+        "http://webofneeds.org/needProtocol",
+        "NeedProtocolWSClientService",
+        "wonnp");
+
+    QName endpointName = new QName(
+        "http://webofneeds.org/needProtocol",
+        "NeedProtocolWSImpl",
+        "wonnp");
+
+    URL url = NeedProtocol.class.getResource("/wsdl/NeedProtocol.wsdl");
+    Service service = Service.create(url, serviceName);
+    NeedProtocolWS port = service.getPort(endpointName, NeedProtocolWS.class);
+    BindingProvider bindingProvider = ((BindingProvider) port);
+    bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
+
+    Handler handler = new JaxWSHeaderContextProcessor();
+    List<Handler> handlers = Collections.singletonList(handler);
+    bindingProvider.getBinding().setHandlerChain(handlers);
+
+    return port;
   }
 }

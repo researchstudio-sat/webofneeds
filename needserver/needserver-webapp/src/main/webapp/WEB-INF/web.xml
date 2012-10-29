@@ -22,23 +22,37 @@
     <display-name>Archetype Created Web Application</display-name>
 
     <servlet>
-        <servlet-name>spring-ws</servlet-name>
-        <servlet-class>org.springframework.ws.transport.http.MessageDispatcherServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>NeedProtocolWS</servlet-name>
         <servlet-class>won.server.ws.NeedProtocolWSImpl</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>mvc-dispatcher</servlet-name>
+        <servlet-class>
+            org.springframework.web.servlet.DispatcherServlet
+        </servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
-    <servlet-mapping>
-        <servlet-name>spring-ws</servlet-name>
-        <url-pattern>/home</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>NeedProtocolWS</servlet-name>
         <url-pattern>/needProtocol</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>mvc-dispatcher</servlet-name>
+        <url-pattern>/test/*</url-pattern>
+    </servlet-mapping>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/mvc-dispatcher-servlet.xml</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
 
 </web-app>

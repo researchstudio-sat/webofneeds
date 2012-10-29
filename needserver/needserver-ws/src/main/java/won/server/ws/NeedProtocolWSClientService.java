@@ -24,6 +24,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
 
+/**
+ * @author Fabian Salcher
+ * @version 2012/10/29
+ */
+
 @WebServiceClient(name = "NeedProtocolWSClientService", targetNamespace = "http://webofneeds.org/needProtocol", wsdlLocation = "/WEB-INF/wsdl/NeedProtocol.wsdl")
 public class NeedProtocolWSClientService extends Service
 {

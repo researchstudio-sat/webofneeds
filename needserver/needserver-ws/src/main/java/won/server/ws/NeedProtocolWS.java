@@ -22,7 +22,12 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-import java.net.URI;
+
+/**
+ * @author Fabian Salcher
+ * @version 2012/10/29
+ */
+
 
 @WebService(name = "NeedProtocolWS", targetNamespace = "http://webofneeds.org/needProtocol")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
@@ -37,10 +42,7 @@ public interface NeedProtocolWS
       String remoteNeedUriString,
 
       @WebParam(name = "remoteNeedProtocolEndpointUri", partName = "remoteNeedProtocolEndpointUri")
-      String remoteNeedProtocolEndpointUriString,
-
-      @WebParam(name = "transactionID", partName = "transactionID")
-      String transactionIDString);
+      String remoteNeedProtocolEndpointUriString);
 
 //  @WebMethod
 //  @WebResult(name = "acceptConnectResponse", partName = "acceptConnectResponse")

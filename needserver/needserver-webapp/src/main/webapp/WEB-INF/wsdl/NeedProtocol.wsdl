@@ -25,8 +25,6 @@
 
         <wsdl:part name="remoteNeedProtocolEndpointUri" type="xsd:string"/>
 
-        <wsdl:part name="transactionID" type="xsd:string"/>
-
     </wsdl:message>
 
     <wsdl:message name="connectResponse">
@@ -37,7 +35,7 @@
 
     <wsdl:portType name="NeedProtocolWS">
 
-        <wsdl:operation name="connect" parameterOrder="remoteNeedUri remoteNeedProtocolEndpointUri transactionID">
+        <wsdl:operation name="connect" parameterOrder="remoteNeedUri remoteNeedProtocolEndpointUri">
 
             <wsdl:input name="connectRequest" message="wonnp:connectRequest"/>
 
