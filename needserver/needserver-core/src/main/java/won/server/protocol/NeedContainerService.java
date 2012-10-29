@@ -14,12 +14,30 @@
  * limitations under the License.
  */
 
-package won.server.need;
+package won.server.protocol;
+
+import java.net.URI;
+import java.util.Collection;
 
 /**
- *
+ * User: fkleedorfer
+ * Date: 23.10.12
  */
-public class Need
+public interface NeedContainerService
 {
+  /**
+   * Creates a new need with the specified content.
+   * TODO replace String with the type used to hold the need content
+   *
+   * @param content
+   * @return the URI of the newly created need
+   */
+  public URI createNeed(String content);
+
+  /**
+   * Retrieves a list of all needs on the needserver.
+   * @return a collection of all need URIs.
+   */
+  public Collection<URI> listNeedURIs();
 
 }
