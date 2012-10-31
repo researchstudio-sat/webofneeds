@@ -29,7 +29,7 @@ public class Need
   /* The state of the need */
   private NeedState state;
   /* The owner protocol endpoint URI where the owner of the need can be reached */
-  private URI needOwnerWSEndpointURI;
+  private URI ownerURI;
 
   public URI getURI()
   {
@@ -39,17 +39,6 @@ public class Need
   public void setURI(final URI URI)
   {
     this.URI = URI;
-  }
-
-
-  public URI getNeedOwnerWSEndpointURI()
-  {
-    return needOwnerWSEndpointURI;
-  }
-
-  public void setNeedOwnerWSEndpointURI(final URI needOwnerWSEndpointURI)
-  {
-    this.needOwnerWSEndpointURI = needOwnerWSEndpointURI;
   }
 
   public NeedState getState()
@@ -62,6 +51,16 @@ public class Need
     this.state = state;
   }
 
+  public URI getOwnerURI()
+  {
+    return ownerURI;
+  }
+
+  public void setOwnerURI(final URI ownerURI)
+  {
+    this.ownerURI = ownerURI;
+  }
+
   @Override
   public boolean equals(final Object o)
   {
@@ -71,8 +70,7 @@ public class Need
     final Need need = (Need) o;
 
     if (URI != null ? !URI.equals(need.URI) : need.URI != null) return false;
-    if (needOwnerWSEndpointURI != null ? !needOwnerWSEndpointURI.equals(need.needOwnerWSEndpointURI) : need.needOwnerWSEndpointURI != null)
-      return false;
+    if (ownerURI != null ? !ownerURI.equals(need.ownerURI) : need.ownerURI != null) return false;
     if (state != need.state) return false;
 
     return true;
@@ -83,7 +81,7 @@ public class Need
   {
     int result = URI != null ? URI.hashCode() : 0;
     result = 31 * result + (state != null ? state.hashCode() : 0);
-    result = 31 * result + (needOwnerWSEndpointURI != null ? needOwnerWSEndpointURI.hashCode() : 0);
+    result = 31 * result + (ownerURI != null ? ownerURI.hashCode() : 0);
     return result;
   }
 }

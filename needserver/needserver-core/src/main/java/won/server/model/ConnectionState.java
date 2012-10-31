@@ -31,6 +31,7 @@ public enum ConnectionState
   REQUEST_SENT,           /* initiator: connection request was sent to other need */
   REQUEST_RECEIVED,       /* target: connection request was received from other need, passing on to owner  */
   REQUEST_ACCEPTED,       /* target: connection request was accepted by owner               */
+  REQUEST_DENIED,       /* target: connection request was accepted by owner               */
   ESTABLISHED,    /* target: connection accept was sent to initiating connection    */
                  /* initiator: connection accept was received, passing on to owner */
   CLOSING,        /* owner or other side sent close signal, passing on to owner */
