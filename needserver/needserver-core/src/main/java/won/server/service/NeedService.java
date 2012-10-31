@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package won.server.protocol;
+package won.server.service;
 
-import won.server.model.Match;
+import won.protocol.model.Match;
 
 import java.net.URI;
 import java.util.Collection;
@@ -24,16 +24,28 @@ import java.util.Collection;
 /**
  * Interface defining the external methods for the owner protocol on the need side, i.e. those methods
  * that are directly or indirectly exposed via Web Service toward the end user application.
- *
- * This is the contract of a single need object
  * <p/>
  * This interface does not deal with authentication and authorization, yet. It is assumed that the caller is authorized
  * and authenticated where necessary.
- * TODO: missing: how will the owner get the chat-messages? However this is solved, it should be declared in this interface.
  */
 public interface NeedService
 {
-  
+
+  /**
+   * Creates a new need with the specified content.
+   * TODO replace String with the type used to hold the need content
+   *
+   * @param content
+   * @return the URI of the newly created need
+   */
+  public URI createNeed(String content);
+
+  /**
+   * Retrieves a list of all needs on the needserver.
+   * @return a collection of all need URIs.
+   */
+  public Collection<URI> listNeedURIs();
+
   /**
    * Notifies the need of the fact that it attains the specified match score with otherNeed. Originator
    * identifies the entity making the call. Normally, originator is a matching service.
@@ -44,16 +56,6 @@ public interface NeedService
    * @param originator an URI identifying the calling entity
    */
   public void hint(URI need, URI otherNeed, double score, URI originator);
-
-  /**
-   *
-   * Returns a representation of the need object.
-   * TODO: replace String with the type used to hold the content.
-   *
-   * @param need the URI of the need
-   * @return a representation of the need.
-   */
-  public String read(URI need);
 
   /**
    * Replace the content of the need with the specified content.

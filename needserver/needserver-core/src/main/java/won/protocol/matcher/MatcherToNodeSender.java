@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package won.server.xmpp;
+package won.protocol.matcher;
+
+import java.net.URI;
 
 /**
- * Created with IntelliJ IDEA.
- * User: fsalcher
- * Date: 10.10.12
- * Time: 12:21
- * To change this template use File | Settings | File Templates.
+ * User: fkleedorfer
+ * Date: 31.10.12
  */
-public interface XMPPReceiveMessageCB {
-    public void receiveMessage(String message);
+public interface MatcherToNodeSender
+{
+  /**
+   * Sends a hint message to the specified need.
+   *
+   * @param need the need to send the hint to
+   * @param otherNeed the need that the match is about
+   * @param score the score for the match (between 0 and 1)
+   * @param originator the URI of the matching service
+   */
+  public void sendHint(URI need, URI otherNeed, double score, URI originator);
 }

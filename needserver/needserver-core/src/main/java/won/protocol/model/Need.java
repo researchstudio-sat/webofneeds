@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package won.server.model;
+package won.protocol.model;
 
 import java.net.URI;
-import java.util.Collection;
 
 /**
  *

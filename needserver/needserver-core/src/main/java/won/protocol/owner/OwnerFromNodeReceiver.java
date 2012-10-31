@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package won.server.protocol;
+package won.protocol.owner;
 
 import java.net.URI;
 
 /**
  * User: fkleedorfer
- * Date: 23.10.12
+ * Date: 31.10.12
  */
-public interface OwnerService
+public interface OwnerFromNodeReceiver
 {
-
   /**
    * Informs the owner of a hint that has been received for the need.
    * @param otherNeed
@@ -67,4 +66,12 @@ public interface OwnerService
    * @param ownConnectionURI
    */
   public void connectionClosed(URI ownConnectionURI);
+
+  /**
+   * Informs the owner of the specified chat message received via the specified connection.
+   * to the remote partner.
+   * @param ownConnectionURI the local connection
+   * @param message the chat message received via the connection
+   */
+  public void messageReceived(URI ownConnectionURI, String message);
 }

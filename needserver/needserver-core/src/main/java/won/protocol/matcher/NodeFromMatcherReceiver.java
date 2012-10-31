@@ -14,30 +14,25 @@
  * limitations under the License.
  */
 
-package won.server.protocol;
+package won.protocol.matcher;
 
 import java.net.URI;
-import java.util.Collection;
 
 /**
  * User: fkleedorfer
- * Date: 23.10.12
+ * Date: 31.10.12
  */
-public interface NeedContainerService
+public interface NodeFromMatcherReceiver
 {
   /**
-   * Creates a new need with the specified content.
-   * TODO replace String with the type used to hold the need content
+   * Notifies the need of the fact that it attains the specified match score with otherNeed. Originator
+   * identifies the entity making the call. Normally, originator is a matching service.
    *
-   * @param content
-   * @return the URI of the newly created need
+   * @param need the URI of the need
+   * @param otherNeed URI of the other need (may be on the local needserver)
+   * @param score      match score between 0.0 (bad) and 1.0 (good). Implementations treat lower values as 0.0 and higher values as 1.0.
+   * @param originator an URI identifying the calling entity
    */
-  public URI createNeed(String content);
-
-  /**
-   * Retrieves a list of all needs on the needserver.
-   * @return a collection of all need URIs.
-   */
-  public Collection<URI> listNeedURIs();
+  public void hint(URI need, URI otherNeed, double score, URI originator);
 
 }

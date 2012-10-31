@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.server.protocol;
+package won.server.service;
 
 import java.net.URI;
 
@@ -48,6 +48,15 @@ public interface ConnectionService
    */
   public void close(URI connectionURI);
 
+
+  /**
+   * OwnerService-facing method; sends a chat message via the local connection identified by the specified connectionURI
+   * to the remote partner.
+   * @param connectionURI the local connection
+   * @param message the chat message
+   */
+  public void sendMessage(URI connectionURI, String message);
+
   /**
    * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been accepted by the other side.
@@ -77,11 +86,12 @@ public interface ConnectionService
   public void connectionClosed(URI connectionURI);
 
   /**
-   * Retrieves a representation of the connection with the specified URI.
-   * TODO replace String with the type used to hold the connection content
-   * @param connectionURI the URI of the connection
-   * @return a representation of the connection
+   * NeedService-facing method; receives a chat message from the remote connection.
+   * to the remote partner.
+   * @param connectionURI the local connection
+   * @param message the chat message received from the remote connection
    */
-  public String read(URI connectionURI);
+  public void messageReceived(URI connectionURI, String message);
+
 
 }

@@ -17,11 +17,10 @@
 package won.server.core.protocol;
 
 import org.junit.Test;
-import won.server.model.Match;
-import won.server.protocol.ConnectionService;
-import won.server.protocol.NeedContainerService;
-import won.server.protocol.NeedService;
-import won.server.protocol.OwnerService;
+import won.protocol.model.Match;
+import won.server.service.ConnectionService;
+import won.server.service.NeedService;
+import won.app.protocol.OwnerService;
 
 import java.net.URI;
 import java.util.Collection;
@@ -36,7 +35,6 @@ import static org.junit.Assert.assertEquals;
 
 public class IntegrationTests
 {
-  private NeedContainerService needContainerService;
   private NeedService needService;
   private OwnerService ownerService;
   private ConnectionService connectionService;
@@ -51,14 +49,14 @@ public class IntegrationTests
    * TODO: needContainerService representation has to be changed
    */
   @Test
-  public void simpleTransactionTest1() {
+  public void simpleConnectionTest1() {
     //simulate owner1: create needContainerService
     String need1Content = "Replace me with something useful!";
-    URI need1URI = needContainerService.createNeed(need1Content);
+    URI need1URI = needService.createNeed(need1Content);
 
     //simulate owner2: create needContainerService
     String need2Content = "Replace me with something useful, too!";
-    URI need2URI = needContainerService.createNeed(need2Content);
+    URI need2URI = needService.createNeed(need2Content);
 
     //TODO: inside the server, how do we instantiate need objects?
 
@@ -84,19 +82,19 @@ public class IntegrationTests
     assertEquals(need1URI, match21.toNeed);
 
     //simulate owner2: check status and find out about connection request
-    Collection<URI> transactionList2 = needService.listConnectionURIs(need2URI);
-    //simulate owner2: read transaction description
-    URI transaction2URI = transactionList2.iterator().next();
-    String transaction2 = connectionService.read(transaction2URI);
-    //TODO: from transaction representation the connection request can be read. Do that to get need1URI
+    Collection<URI> connectionList2 = needService.listConnectionURIs(need2URI);
+    //simulate owner2: read connection description
+    URI connection2URI = connectionList2.iterator().next();
+    String connection2 = connectionService.read(connection2URI);
+    //TODO: from connection representation the connection request can be read. Do that to get need1URI
     //simulate owner2: accept connection
-    connectionService.accept(transaction2URI);
+    connectionService.accept(connection2URI);
     //simulate owner1: send message
     //TODO: continue here!
     //simulate owner2: send message
 
-    //simulate owner1: finish transaction
-    //simulate owner2: finish transaction
+    //simulate owner1: finish connection
+    //simulate owner2: finish connection
   }
 
 }
