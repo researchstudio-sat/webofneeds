@@ -17,14 +17,18 @@
 package won.server.model;
 
 import java.net.URI;
+import java.util.Collection;
 
 /**
  *
  */
 public class Need
 {
+  /* The URI of the need */
   private URI URI;
+  /* The state of the need */
   private NeedState state;
+  /* The owner protocol endpoint URI where the owner of the need can be reached */
   private URI needOwnerWSEndpointURI;
 
   public URI getURI()
