@@ -16,7 +16,7 @@
 
 package won.server.protocol;
 
-import won.server.need.Match;
+import won.server.model.Match;
 
 import java.net.URI;
 import java.util.Collection;

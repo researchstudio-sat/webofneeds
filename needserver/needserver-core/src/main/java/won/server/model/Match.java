@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package won.server.need;
+package won.server.model;
 
 
 import java.net.URI;

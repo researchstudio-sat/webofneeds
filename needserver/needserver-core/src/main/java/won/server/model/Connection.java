@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package won.server.need;
+package won.server.model;
+
+import java.net.URI;
 
 /**
- *
+ * User: fkleedorfer
+ * Date: 30.10.12
  */
-public class Need
+public class Connection
 {
+  private URI URI;
+  private URI needURI;
+  private URI remoteConnectionURI;
+  private URI remoteNeedURI;
+  private ConnectionState state;
 
 }

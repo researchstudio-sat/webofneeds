@@ -17,7 +17,7 @@
 package won.server.core.protocol;
 
 import org.junit.Test;
-import won.server.need.Match;
+import won.server.model.Match;
 import won.server.protocol.ConnectionService;
 import won.server.protocol.NeedContainerService;
 import won.server.protocol.NeedService;

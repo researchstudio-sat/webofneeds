@@ -16,7 +16,7 @@
 
 package won.server.xmpp;
 
-import won.server.need.Need;
+import won.server.model.Need;
 import won.server.ws.NeedTransaction;
 
 /**
