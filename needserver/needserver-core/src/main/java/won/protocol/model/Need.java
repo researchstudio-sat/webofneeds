@@ -16,28 +16,50 @@
 
 package won.protocol.model;
 
+import org.hibernate.cfg.Configuration;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
+
+import javax.persistence.*;
 import java.net.URI;
 
 /**
  *
  */
+@Entity
+@Table(name = "need")
 public class Need
 {
+  @Id
+  @GeneratedValue
+  @Column( name = "id" )
+  private Long id;
   /* The URI of the need */
-  private URI URI;
+  @Column( name = "needURI", unique = true, nullable = false)
+  private URI needURI;
   /* The state of the need */
+  @Column( name = "state")
   private NeedState state;
+
   /* The owner protocol endpoint URI where the owner of the need can be reached */
+  @Column( name = "ownerURI" )
   private URI ownerURI;
 
-  public URI getURI()
-  {
-    return URI;
+  public Long getId() {
+      return id;
   }
 
-  public void setURI(final URI URI)
+  public void setId(Long id) {
+     this.id = id;
+  }
+
+  public URI getNeedURI()
   {
-    this.URI = URI;
+    return needURI;
+  }
+
+  public void setNeedURI(final URI URI)
+  {
+     this.needURI = URI;
   }
 
   public NeedState getState()
@@ -68,7 +90,7 @@ public class Need
 
     final Need need = (Need) o;
 
-    if (URI != null ? !URI.equals(need.URI) : need.URI != null) return false;
+    if (needURI != null ? !needURI.equals(need.needURI) : need.needURI != null) return false;
     if (ownerURI != null ? !ownerURI.equals(need.ownerURI) : need.ownerURI != null) return false;
     if (state != need.state) return false;
 
@@ -78,9 +100,17 @@ public class Need
   @Override
   public int hashCode()
   {
-    int result = URI != null ? URI.hashCode() : 0;
+    int result = needURI != null ? needURI.hashCode() : 0;
     result = 31 * result + (state != null ? state.hashCode() : 0);
     result = 31 * result + (ownerURI != null ? ownerURI.hashCode() : 0);
     return result;
   }
+
+    public static void main(String args[]) {
+        Configuration config =
+                new Configuration();
+        config.addAnnotatedClass(Need.class);
+        config.configure();
+        new SchemaExport(config).create(true, true);
+    }
 }
