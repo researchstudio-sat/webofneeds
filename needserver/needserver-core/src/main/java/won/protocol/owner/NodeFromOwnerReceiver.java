@@ -16,6 +16,7 @@
 
 package won.protocol.owner;
 
+import com.hp.hpl.jena.graph.Graph;
 import won.protocol.exception.*;
 import won.protocol.model.Match;
 
@@ -30,14 +31,14 @@ public interface NodeFromOwnerReceiver
 {
   /**
    * Creates a new need with the specified content.
-   * TODO replace String with the type used to hold the need content
    *
+   * @param ownerURI the ownerService endpoint URI used to communicate with the owner
    * @param content
    * @param activate if true, the newly created need object will be active, else inactive
    * @return the URI of the newly created need
    * @throws IllegalNeedContentException if the content does not conform to the specification TODO: link to specification
    */
-  public URI createNeed(String content, boolean activate) throws IllegalNeedContentException;
+  public URI createNeed(URI ownerURI, Graph content, boolean activate) throws IllegalNeedContentException;
 
   /**
    * Activates the need object.
@@ -95,16 +96,6 @@ public interface NodeFromOwnerReceiver
    *                                   if the message is not allowed in the current connection state
    */
   public void deny(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-  /**
-   * OwnerService-facing method; Aborts the connection identified by the specified URI, indicating failure.
-   *
-   * @param connectionURI the URI of the connection
-   * @throws NoSuchConnectionException if connectionURI does not refer to a connection
-   * @throws IllegalMessageForConnectionStateException
-   *                                   if the message is not allowed in the current connection state
-   */
-  public void abort(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * OwnerService-facing method; closes the connection identified by the specified URI, indicating success.

@@ -52,14 +52,11 @@ public class IntegrationTests
   public void simpleConnectionTest1() {
     //simulate owner1: create needContainerService
     String need1Content = "Replace me with something useful!";
-    URI need1URI = needService.createNeed(need1Content);
+    URI need1URI = needService.createNeed(null, null, true);
 
     //simulate owner2: create needContainerService
     String need2Content = "Replace me with something useful, too!";
-    URI need2URI = needService.createNeed(need2Content);
-
-    //TODO: inside the server, how do we instantiate need objects?
-
+    URI need2URI = needService.createNeed(null, null, true);
 
     //simulate matcher: read needs, hint to both
     //NOTE: reading a needContainerService is assumed to be done through published linked data - so we don't needContainerService a call here

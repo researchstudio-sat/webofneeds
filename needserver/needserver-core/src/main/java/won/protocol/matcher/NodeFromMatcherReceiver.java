@@ -17,8 +17,10 @@
 package won.protocol.matcher;
 
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.model.Match;
 
 import java.net.URI;
+import java.util.Collection;
 
 /**
  * User: fkleedorfer
@@ -38,4 +40,19 @@ public interface NodeFromMatcherReceiver
    */
   public void hint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException;
 
+  /**
+   * Retrieves a list of all needs on the needserver.
+   *
+   * @return a collection of all need URIs.
+   */
+  public Collection<URI> listNeedURIs();
+
+  /**
+   * Retrieves all connection URIs (regardless of state) for the specified local need URI.
+   *
+   * @param needURI the URI of the need
+   * @return a collection of connection URIs.
+   * @throws NoSuchNeedException if needURI does not refer to an existing need
+   */
+  public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException;
 }

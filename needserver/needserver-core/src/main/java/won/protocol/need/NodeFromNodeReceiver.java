@@ -60,15 +60,6 @@ public interface NodeFromNodeReceiver
 
   /**
    * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
-   * has been aborted by the other side, indicating failure.
-   * @param connectionURI the URI of the connection
-   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
-   */
-  public void connectionAborted(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-  /**
-   * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been closed by the other side, indicating success.
    * @param connectionURI the URI of the connection
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection

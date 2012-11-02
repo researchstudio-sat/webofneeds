@@ -22,18 +22,29 @@ package won.protocol.model;
  */
 public enum ConnectionState
 {
-  /*
-    in the following,
-    'initiator' denotes the connection object on the initiating side,
-    'target' denotes the connection on the receiving side
-   */
-  NEW,                    /* any: connection has just been created */
-  REQUEST_SENT,           /* initiator: connection request was sent to other need */
-  REQUEST_RECEIVED,       /* target: connection request was received from other need, passing on to owner  */
-  REQUEST_ACCEPTED,       /* target: connection request was accepted by owner               */
-  REQUEST_DENIED,       /* target: connection request was accepted by owner               */
-  ESTABLISHED,    /* target: connection accept was sent to initiating connection    */
-                 /* initiator: connection accept was received, passing on to owner */
-  CLOSING,        /* owner or other side sent close signal, passing on to owner */
-  CLOSED         /* passed closing signal on to owner */
+  REQUEST_SENT,
+  REQUEST_RECEIVED,
+  ESTABLISHED,
+  CLOSED;
+
+  public ConnectionState transit(ConnectionMessage msg){
+    switch(this){
+      case REQUEST_SENT: //the owner has initiated the connection, the request was sent to the remote need
+        switch(msg){
+           case PARTNER_ACCEPT: return ESTABLISHED;  //the partner accepted
+           case PARTNER_DENY: return CLOSED;
+          }
+      case REQUEST_RECEIVED: //a remote need has requested a connection
+        switch(msg){
+          case OWNER_ACCEPT: return ESTABLISHED;
+          case OWNER_DENY: return CLOSED;
+        }
+      case ESTABLISHED: //the connection is established
+        switch(msg){
+          case PARTNER_CLOSE: return CLOSED;
+          case OWNER_CLOSE: return CLOSED;
+        }
+    }
+    return this;
+  }
 }

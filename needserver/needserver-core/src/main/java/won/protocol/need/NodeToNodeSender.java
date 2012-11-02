@@ -42,7 +42,7 @@ public interface NodeToNodeSender
    * @throws ConnectionAlreadyExistsException
    *                             if the two needs are already connected
    */
-  public void sendConnectionRequest(URI needURI, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+  public void sendConnectionRequested(URI needURI, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
 
   /**
@@ -51,7 +51,7 @@ public interface NodeToNodeSender
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendAccept(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void sendConnectionAccepted(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * OwnerService-facing method; deny a connection initiated by a connect().
@@ -59,15 +59,7 @@ public interface NodeToNodeSender
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendDeny(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-  /**
-   * OwnerService-facing method; Aborts the connection identified by the specified URI, indicating failure.
-   * @param connectionURI the URI of the connection
-   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
-   */
-  public void sendAbort(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void sendConnectionDenied(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * OwnerService-facing method; closes the connection identified by the specified URI, indicating success.
@@ -75,7 +67,7 @@ public interface NodeToNodeSender
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendClose(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void sendConnectionClosed(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * OwnerService-facing method; sends a chat message via the local connection identified by the specified connectionURI
@@ -85,6 +77,6 @@ public interface NodeToNodeSender
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void sendMessageReceived(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 }

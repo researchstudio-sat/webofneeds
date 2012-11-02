@@ -69,14 +69,6 @@ public interface NodeToOwnerSender
   public void sendConnectionDenied(URI ownConnectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
-   * Informs the owner of the fact that the connection has been aborted by the other side, indicating failure.
-   * @param ownConnectionURI
-   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
-   */
-  public void sendConnectionAborted(URI ownConnectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-  /**
    * Informs the owner of the fact that the connection has been closed by the other side, indicating success.
    * @param ownConnectionURI
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection

@@ -16,6 +16,7 @@
 
 package won.server.service;
 
+import com.hp.hpl.jena.graph.Graph;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.IllegalNeedContentException;
@@ -33,12 +34,30 @@ public interface NeedService
 
   /**
    * Creates a new need with the specified content.
-   * TODO replace String with the type used to hold the need content
    *
+   *
+   * @param ownerURI
    * @param content
+   * @param activate
    * @return the URI of the newly created need
    */
-  public URI createNeed(String content) throws IllegalNeedContentException;
+  public URI createNeed(final URI ownerURI, Graph content, final boolean activate) throws IllegalNeedContentException;
+
+  /**
+   * Activates the need object.
+   *
+   * @param needURI
+   * @throws NoSuchNeedException if needURI does not refer to an existing need
+   */
+  public void activate(URI needURI) throws NoSuchNeedException;
+
+  /**
+   * Deactivates the need object, closing all its established connections.
+   *
+   * @param needURI
+   * @throws NoSuchNeedException if needURI does not refer to an existing need
+   */
+  public void deactivate(URI needURI) throws NoSuchNeedException;
 
   /**
    * Retrieves a list of all needs on the needserver.
