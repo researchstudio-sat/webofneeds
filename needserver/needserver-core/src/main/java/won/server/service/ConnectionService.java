@@ -16,82 +16,114 @@
 
 package won.server.service;
 
+import won.protocol.exception.IllegalMessageForConnectionStateException;
+import won.protocol.exception.NoSuchConnectionException;
+
 import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 23.10.12
+ * Interface defining methods for connection manipulation.
  */
 public interface ConnectionService
 {
   /**
    * OwnerService-facing method; accepts a connection initiated by a connect().
+   *
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void accept(URI connectionURI);
+  public void accept(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * OwnerService-facing method; deny a connection initiated by a connect().
+   *
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void deny(URI connectionURI);
+  public void deny(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * OwnerService-facing method; Aborts the connection identified by the specified URI, indicating failure.
+   *
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void abort(URI connectionURI);
+  public void abort(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * OwnerService-facing method; closes the connection identified by the specified URI, indicating success.
+   *
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void close(URI connectionURI);
+  public void close(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 
   /**
    * OwnerService-facing method; sends a chat message via the local connection identified by the specified connectionURI
    * to the remote partner.
+   *
    * @param connectionURI the local connection
-   * @param message the chat message
+   * @param message       the chat message
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendMessage(URI connectionURI, String message);
+  public void sendMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been accepted by the other side.
+   *
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void connectionAccepted(URI connectionURI);
+  public void connectionAccepted(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been denied by the other side.
+   *
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void connectionDenied(URI connectionURI);
+  public void connectionDenied(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been aborted by the other side, indicating failure.
+   *
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void connectionAborted(URI connectionURI);
+  public void connectionAborted(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been closed by the other side, indicating success.
+   *
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void connectionClosed(URI connectionURI);
+  public void connectionClosed(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * NeedService-facing method; receives a chat message from the remote connection.
    * to the remote partner.
+   *
    * @param connectionURI the local connection
-   * @param message the chat message received from the remote connection
+   * @param message       the chat message received from the remote connection
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void messageReceived(URI connectionURI, String message);
+  public void messageReceived(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 
 }

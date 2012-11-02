@@ -16,6 +16,8 @@
 
 package won.protocol.owner;
 
+import won.protocol.exception.*;
+
 import java.net.URI;
 
 /**
@@ -29,8 +31,9 @@ public interface NodeToOwnerSender
    * @param otherNeed
    * @param score
    * @param originator
+   * @throws NoSuchNeedException ownNeedURI does not refer to a known need
    */
-  public void sendHintReceived(URI ownNeed, URI otherNeed, double score, URI originator);
+  public void sendHintReceived(URI ownNeed, URI otherNeed, double score, URI originator) throws NoSuchNeedException;
 
   /**
    * Informs the owner of a connection initiated by the need identified by otherNeedURI to the
@@ -40,38 +43,54 @@ public interface NodeToOwnerSender
    * @param ownNeedURI
    * @param otherNeedURI
    * @param ownConnectionURI
+   * @throws NoSuchNeedException if ownNeedURI or otherNeedURI does not denote a need
+   * @throws IllegalMessageForNeedStateException
+   *                             if one of the needs is inactive
+   * @throws ConnectionAlreadyExistsException
+   *                             if the two needs are already connected
+   *
    */
-  public void sendConnectionRequested(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI);
+  public void sendConnectionRequested(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
   /**
    * Informs the owner of the fact that their connection request has been accepted by the other side.
    * @param ownConnectionURI
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendConnectionAccepted(URI ownConnectionURI);
+  public void sendConnectionAccepted(URI ownConnectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * Informs the owner of the fact that their connection request has been denied by the other side.
    * @param ownConnectionURI
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendConnectionDenied(URI ownConnectionURI);
+  public void sendConnectionDenied(URI ownConnectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * Informs the owner of the fact that the connection has been aborted by the other side, indicating failure.
    * @param ownConnectionURI
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendConnectionAborted(URI ownConnectionURI);
+  public void sendConnectionAborted(URI ownConnectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * Informs the owner of the fact that the connection has been closed by the other side, indicating success.
    * @param ownConnectionURI
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendConnectionClosed(URI ownConnectionURI);
+  public void sendConnectionClosed(URI ownConnectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * Informs the owner of the specified chat message received via the specified connection.
    * to the remote partner.
    * @param ownConnectionURI the local connection
    * @param message the chat message received via the connection
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendMessageReceived(URI ownConnectionURI, String message);
+  public void sendMessageReceived(URI ownConnectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 }

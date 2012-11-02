@@ -103,4 +103,5 @@ public class ChatMessage
     result = 31 * result + (message != null ? message.hashCode() : 0);
     return result;
   }
+
 }

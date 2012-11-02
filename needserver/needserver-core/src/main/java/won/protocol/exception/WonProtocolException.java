@@ -14,26 +14,31 @@
  * limitations under the License.
  */
 
-package won.protocol.matcher;
-
-import won.protocol.exception.NoSuchNeedException;
-
-import java.net.URI;
+package won.protocol.exception;
 
 /**
  * User: fkleedorfer
- * Date: 31.10.12
+ * Date: 02.11.12
  */
-public interface MatcherToNodeSender
+public class WonProtocolException extends RuntimeException
 {
-  /**
-   * Sends a hint message to the specified need.
-   *
-   * @param needURI the need to send the hint to
-   * @param otherNeed the need that the match is about
-   * @param score the score for the match (between 0 and 1)
-   * @param originator the URI of the matching service
-   * @throws NoSuchNeedException if needURI does not refer to an existing need object
-   */
-  public void sendHint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException;
+  public WonProtocolException()
+  {
+    super();
+  }
+
+  public WonProtocolException(final String message)
+  {
+    super(message);
+  }
+
+  public WonProtocolException(final String message, final Throwable cause)
+  {
+    super(message, cause);
+  }
+
+  public WonProtocolException(final Throwable cause)
+  {
+    super(cause);
+  }
 }

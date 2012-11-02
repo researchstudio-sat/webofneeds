@@ -16,6 +16,8 @@
 
 package won.protocol.need;
 
+import won.protocol.exception.*;
+
 import java.net.URI;
 
 /**
@@ -25,35 +27,64 @@ import java.net.URI;
 public interface NodeToNodeSender
 {
   /**
+   * Requests a connection from the need otherNeedURI. The other need refers to the
+   * connection using the specified otherConnectionURI. A short message can be sent along with the
+   * request.
+   *
+   * @param needURI the URI of the need
+   * @param otherNeedURI
+   * @param otherConnectionURI
+   * @param message
+   *
+   * @throws NoSuchNeedException if needURI or otherNeedURI does not denote a need
+   * @throws IllegalMessageForNeedStateException
+   *                             if one of the needs is inactive
+   * @throws ConnectionAlreadyExistsException
+   *                             if the two needs are already connected
+   */
+  public void sendConnectionRequest(URI needURI, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+
+
+  /**
    * OwnerService-facing method; accepts a connection initiated by a connect().
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendAccept(URI connectionURI);
+  public void sendAccept(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * OwnerService-facing method; deny a connection initiated by a connect().
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendDeny(URI connectionURI);
+  public void sendDeny(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * OwnerService-facing method; Aborts the connection identified by the specified URI, indicating failure.
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendAbort(URI connectionURI);
+  public void sendAbort(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * OwnerService-facing method; closes the connection identified by the specified URI, indicating success.
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendClose(URI connectionURI);
+  public void sendClose(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * OwnerService-facing method; sends a chat message via the local connection identified by the specified connectionURI
    * to the remote partner.
    * @param connectionURI the local connection
    * @param message the chat message
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendMessage(URI connectionURI, String message);
+  public void sendMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 }

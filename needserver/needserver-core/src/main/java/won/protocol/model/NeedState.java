@@ -25,5 +25,5 @@ package won.protocol.model;
  */
 public enum NeedState
 {
-  DRAFT, PUBLISHED, CLOSED;
+  INACTIVE, ACTIVE;
 }

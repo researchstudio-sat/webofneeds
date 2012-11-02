@@ -16,6 +16,8 @@
 
 package won.protocol.matcher;
 
+import won.protocol.exception.NoSuchNeedException;
+
 import java.net.URI;
 
 /**
@@ -28,11 +30,12 @@ public interface NodeFromMatcherReceiver
    * Notifies the need of the fact that it attains the specified match score with otherNeed. Originator
    * identifies the entity making the call. Normally, originator is a matching service.
    *
-   * @param need the URI of the need
+   * @param needURI the URI of the need
    * @param otherNeed URI of the other need (may be on the local needserver)
    * @param score      match score between 0.0 (bad) and 1.0 (good). Implementations treat lower values as 0.0 and higher values as 1.0.
    * @param originator an URI identifying the calling entity
+   * @throws NoSuchNeedException if needURI is unknown
    */
-  public void hint(URI need, URI otherNeed, double score, URI originator);
+  public void hint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException;
 
 }

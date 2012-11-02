@@ -16,6 +16,8 @@
 
 package won.protocol.need;
 
+import won.protocol.exception.*;
+
 import java.net.URI;
 
 /**
@@ -34,43 +36,54 @@ public interface NodeFromNodeReceiver
    * @param otherNeedURI
    * @param otherConnectionURI
    * @param message
+   *
    */
-  public void connectionRequested(URI need, URI otherNeedURI, URI otherConnectionURI, String message);
+  public void connectionRequested(URI need, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
   /**
    * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been accepted by the other side.
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void connectionAccepted(URI connectionURI);
+  public void connectionAccepted(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been denied by the other side.
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void connectionDenied(URI connectionURI);
+  public void connectionDenied(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been aborted by the other side, indicating failure.
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void connectionAborted(URI connectionURI);
+  public void connectionAborted(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been closed by the other side, indicating success.
    * @param connectionURI the URI of the connection
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void connectionClosed(URI connectionURI);
+  public void connectionClosed(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * NeedService-facing method; receives a chat message from the remote partner.
    * @param connectionURI the local connection
    * @param message the chat message received from the remote connection
+   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void messageReceived(URI connectionURI, String message);
+  public void messageReceived(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 
 }

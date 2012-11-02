@@ -20,7 +20,7 @@ import org.junit.Test;
 import won.protocol.model.Match;
 import won.server.service.ConnectionService;
 import won.server.service.NeedService;
-import won.app.protocol.OwnerService;
+import won.protocol.owner.OwnerFromNodeReceiver;
 
 import java.net.URI;
 import java.util.Collection;
@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 public class IntegrationTests
 {
   private NeedService needService;
-  private OwnerService ownerService;
+  private OwnerFromNodeReceiver ownerService;
   private ConnectionService connectionService;
 
   private static final URI MATCHER_URI = URI.create("http://localhost/matcher");
@@ -85,7 +85,8 @@ public class IntegrationTests
     Collection<URI> connectionList2 = needService.listConnectionURIs(need2URI);
     //simulate owner2: read connection description
     URI connection2URI = connectionList2.iterator().next();
-    String connection2 = connectionService.read(connection2URI);
+    // TODO: here, we want to simulate owner2 reading the connection information, but that's in the linked data part, so we can't do it now.
+    // String connection2 = connectionService.read(connection2URI);
     //TODO: from connection representation the connection request can be read. Do that to get need1URI
     //simulate owner2: accept connection
     connectionService.accept(connection2URI);

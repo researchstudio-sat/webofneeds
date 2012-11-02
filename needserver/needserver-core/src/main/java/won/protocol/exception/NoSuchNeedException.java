@@ -14,26 +14,30 @@
  * limitations under the License.
  */
 
-package won.protocol.matcher;
-
-import won.protocol.exception.NoSuchNeedException;
+package won.protocol.exception;
 
 import java.net.URI;
+import java.text.MessageFormat;
 
 /**
  * User: fkleedorfer
- * Date: 31.10.12
+ * Date: 02.11.12
  */
-public interface MatcherToNodeSender
+public class NoSuchNeedException extends WonProtocolException
 {
-  /**
-   * Sends a hint message to the specified need.
-   *
-   * @param needURI the need to send the hint to
-   * @param otherNeed the need that the match is about
-   * @param score the score for the match (between 0 and 1)
-   * @param originator the URI of the matching service
-   * @throws NoSuchNeedException if needURI does not refer to an existing need object
-   */
-  public void sendHint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException;
+  private URI unknownNeedURI;
+
+
+  public URI getUnknownNeedURI()
+  {
+    return unknownNeedURI;
+  }
+
+  public NoSuchNeedException(final URI unknownNeedURI)
+  {
+    super(MessageFormat.format("No need with the URI '{0}' is known on this server.", unknownNeedURI));
+    this.unknownNeedURI = unknownNeedURI;
+  }
+
+
 }

@@ -16,17 +16,17 @@
 
 package won.server.service;
 
+import won.protocol.exception.ConnectionAlreadyExistsException;
+import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.IllegalNeedContentException;
+import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Match;
 
 import java.net.URI;
 import java.util.Collection;
 
 /**
- * Interface defining the external methods for the owner protocol on the need side, i.e. those methods
- * that are directly or indirectly exposed via Web Service toward the end user application.
- * <p/>
- * This interface does not deal with authentication and authorization, yet. It is assumed that the caller is authorized
- * and authenticated where necessary.
+ * Interface defining methods for need manipulation.
  */
 public interface NeedService
 {
@@ -38,7 +38,7 @@ public interface NeedService
    * @param content
    * @return the URI of the newly created need
    */
-  public URI createNeed(String content);
+  public URI createNeed(String content) throws IllegalNeedContentException;
 
   /**
    * Retrieves a list of all needs on the needserver.
@@ -50,37 +50,22 @@ public interface NeedService
    * Notifies the need of the fact that it attains the specified match score with otherNeed. Originator
    * identifies the entity making the call. Normally, originator is a matching service.
    *
-   * @param need the URI of the need
+   * @param needURI the URI of the need
    * @param otherNeed URI of the other need (may be on the local needserver)
    * @param score      match score between 0.0 (bad) and 1.0 (good). Implementations treat lower values as 0.0 and higher values as 1.0.
    * @param originator an URI identifying the calling entity
+   * @throws NoSuchNeedException if needURI is not a known need URI
    */
-  public void hint(URI need, URI otherNeed, double score, URI originator);
-
-  /**
-   * Replace the content of the need with the specified content.
-   * TODO replace String with the type used to hold the need content
-   *
-   * @param need the URI of the need
-   * @param content
-   * @return the URI of the newly created need
-   */
-  public void update(URI need, String content);
-
-  /**
-   * @param need the URI of the need
-   * Delete the need.
-   *
-   */
-  public void delete(URI need);
+  public void hint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException;
 
   /**
    * Returns all matches for the need.
    *
-   * @param need the URI of the need
+   * @param needURI the URI of the need
+   * @throws NoSuchNeedException if needURI is not a known need URI
    * @return a collection of matches
    */
-  public Collection<Match> getMatches(URI need);
+  public Collection<Match> getMatches(URI needURI) throws NoSuchNeedException;
 
   /**
    * OwnerService-facing method; causes a connectio to the need identified by otherNeedURI to be requested by this need.
@@ -91,12 +76,15 @@ public interface NeedService
    * remote need. When the connection is accepted by the other side, the remote need will generate
    * a connection URI in its own domain and link it to the URI generated here.
    *
-   * @param need the URI of the need
+   * @param needURI the URI of the need
    * @param otherNeedURI the remote need to connect to
    * @param message (optional) a message for the remote need's owner
+   * @throws NoSuchNeedException if needURI is not a known need URI
+   * @throws IllegalMessageForNeedStateException if the need is not in active state
+   * @throws ConnectionAlreadyExistsException if there already is a connection between the specified needs
    * @return an URI identifying the connection
    */
-  public URI connectTo(URI need, URI otherNeedURI, String message);
+  public URI connectTo(URI needURI, URI otherNeedURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
   /**
    * NeedService-facing method; requests a connection from the need otherNeedURI. The other need refers to the
@@ -104,19 +92,23 @@ public interface NeedService
    * request.
    *
    *
-   * @param need the URI of the need
+   * @param needURI the URI of the need
    * @param otherNeedURI
    * @param otherConnectionURI
    * @param message
+   * @throws NoSuchNeedException if needURI is not a known need URI
+   * @throws IllegalMessageForNeedStateException if the need is not in active state
+   * @throws ConnectionAlreadyExistsException if there already is a connection between the specified needs
    */
-  public void connectionRequested(URI need, URI otherNeedURI, URI otherConnectionURI, String message);
+  public void connectionRequested(URI needURI, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
   /**
    * Retrieves all connection URIs (regardless of state) for the specified local need URI.
-   * @param need the URI of the need
+   * @param needURI the URI of the need
+   * @throws NoSuchNeedException if needURI is not a known need URI
    * @return a collection of connection URIs.
    */
-  public Collection<URI> listConnectionURIs(URI need);
+  public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException;
 
 
 }
