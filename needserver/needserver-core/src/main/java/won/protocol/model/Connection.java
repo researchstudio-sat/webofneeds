@@ -16,24 +16,44 @@
 
 package won.protocol.model;
 
+import javax.persistence.*;
 import java.net.URI;
 
 /**
  * User: fkleedorfer
  * Date: 30.10.12
  */
+@Entity
+@Table(name = "connection")
 public class Connection
 {
+    @Id
+    @GeneratedValue
+    @Column( name = "id" )
+    private Long id;
   /* The public URI of this connection */
+  @Column( name = "connectionURI", unique = true)
   private URI URI;
   /* The uri of the connection's need object */
+  @Column( name = "needURI")
   private URI needURI;
   /* The URI of the remote connection */
+  @Column( name = "remoteConnectionURI")
   private URI remoteConnectionURI;
   /* The URI of the remote need */
+  @Column( name = "remoteNeedURI")
   private URI remoteNeedURI;
   /* The state of the connection */
+  @Column( name = "state")
   private ConnectionState state;
+
+  public Long getId() {
+      return id;
+  }
+
+  public void setId(Long id) {
+      this.id = id;
+  }
 
   public URI getURI()
   {

@@ -93,7 +93,7 @@
             <param name="path" value="${wsp.home}"/>
         </FileSystem>
         <!--
-            persistence manager of the workspace:
+            repository manager of the workspace:
             class: FQN of class implementing the PersistenceManager interface
         -->
         <PersistenceManager class="org.apache.jackrabbit.core.persistence.pool.DerbyPersistenceManager">
@@ -116,16 +116,16 @@
     <Versioning rootPath="${rep.home}/version">
         <!--
             Configures the filesystem to use for versioning for the respective
-            persistence manager
+            repository manager
         -->
         <FileSystem class="org.apache.jackrabbit.core.fs.local.LocalFileSystem">
             <param name="path" value="${rep.home}/version" />
         </FileSystem>
 
         <!--
-            Configures the persistence manager to be used for persisting version state.
+            Configures the repository manager to be used for persisting version state.
             Please note that the current versioning implementation is based on
-            a 'normal' persistence manager, but this could change in future
+            a 'normal' repository manager, but this could change in future
             implementations.
         -->
         <PersistenceManager class="org.apache.jackrabbit.core.persistence.pool.DerbyPersistenceManager">

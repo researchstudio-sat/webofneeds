@@ -69,8 +69,8 @@ public class IntegrationTests
     //simulate owner1: fetch matches
     Collection<Match> matches1 = needService.getMatches(need1URI);
     Match match12 = matches1.iterator().next();
-    assertEquals(need1URI, match12.fromNeed);
-    assertEquals(need2URI, match12.toNeed);
+    assertEquals(need1URI, match12.getFromNeed());
+    assertEquals(need2URI, match12.getToNeed());
 
     //simulate owner1: initiate connection
     needService.connectTo(need1URI, need2URI, "I'm interested!");
@@ -78,8 +78,8 @@ public class IntegrationTests
     //simulate owner2: check status and find out about match and connection request
     Collection<Match> matches2 = needService.getMatches(need1URI);
     Match match21 = matches2.iterator().next();
-    assertEquals(need2URI, match21.fromNeed);
-    assertEquals(need1URI, match21.toNeed);
+    assertEquals(need2URI, match21.getFromNeed());
+    assertEquals(need1URI, match21.getToNeed());
 
     //simulate owner2: check status and find out about connection request
     Collection<URI> connectionList2 = needService.listConnectionURIs(need2URI);
