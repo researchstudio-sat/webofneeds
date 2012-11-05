@@ -17,11 +17,15 @@
 package won.server.core.protocol;
 
 import org.junit.Test;
-import won.protocol.owner.OwnerProtocolOwnerService;
-import won.protocol.service.ConnectionCommunicationService;
+import won.protocol.model.Match;
+import won.server.service.ConnectionService;
+import won.server.service.NeedService;
+import won.protocol.owner.OwnerFromNodeReceiver;
 
 import java.net.URI;
-import java.security.acl.Owner;
+import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -31,9 +35,9 @@ import java.security.acl.Owner;
 
 public class IntegrationTests
 {
-  private Owner needService;
-  private OwnerProtocolOwnerService ownerService;
-  private ConnectionCommunicationService connectionCommunicationService;
+  private NeedService needService;
+  private OwnerFromNodeReceiver ownerService;
+  private ConnectionService connectionService;
 
   private static final URI MATCHER_URI = URI.create("http://localhost/matcher");
 
@@ -46,14 +50,16 @@ public class IntegrationTests
    */
   @Test
   public void simpleConnectionTest1() {
-/*
     //simulate owner1: create needContainerService
     String need1Content = "Replace me with something useful!";
-    URI need1URI = needService.createNeed(null, null, true);
+    URI need1URI = needService.createNeed(need1Content);
 
     //simulate owner2: create needContainerService
     String need2Content = "Replace me with something useful, too!";
-    URI need2URI = needService.createNeed(null, null, true);
+    URI need2URI = needService.createNeed(need2Content);
+
+    //TODO: inside the server, how do we instantiate need objects?
+
 
     //simulate matcher: read needs, hint to both
     //NOTE: reading a needContainerService is assumed to be done through published linked data - so we don't needContainerService a call here
@@ -63,8 +69,8 @@ public class IntegrationTests
     //simulate owner1: fetch matches
     Collection<Match> matches1 = needService.getMatches(need1URI);
     Match match12 = matches1.iterator().next();
-    assertEquals(need1URI, match12.fromNeed);
-    assertEquals(need2URI, match12.toNeed);
+    assertEquals(need1URI, match12.getFromNeed());
+    assertEquals(need2URI, match12.getToNeed());
 
     //simulate owner1: initiate connection
     needService.connectTo(need1URI, need2URI, "I'm interested!");
@@ -72,27 +78,24 @@ public class IntegrationTests
     //simulate owner2: check status and find out about match and connection request
     Collection<Match> matches2 = needService.getMatches(need1URI);
     Match match21 = matches2.iterator().next();
-    assertEquals(need2URI, match21.fromNeed);
-    assertEquals(need1URI, match21.toNeed);
+    assertEquals(need2URI, match21.getFromNeed());
+    assertEquals(need1URI, match21.getToNeed());
 
     //simulate owner2: check status and find out about connection request
     Collection<URI> connectionList2 = needService.listConnectionURIs(need2URI);
     //simulate owner2: read connection description
     URI connection2URI = connectionList2.iterator().next();
     // TODO: here, we want to simulate owner2 reading the connection information, but that's in the linked data part, so we can't do it now.
-    // String connection2 = connectionCommunicationService.read(connection2URI);
+    // String connection2 = connectionService.read(connection2URI);
     //TODO: from connection representation the connection request can be read. Do that to get need1URI
     //simulate owner2: accept connection
-    connectionCommunicationService.accept(connection2URI);
+    connectionService.accept(connection2URI);
     //simulate owner1: send message
     //TODO: continue here!
     //simulate owner2: send message
 
     //simulate owner1: finish connection
     //simulate owner2: finish connection
-
-
-    */
   }
 
 }

@@ -16,6 +16,7 @@
 
 package won.protocol.model;
 
+import javax.persistence.*;
 import java.net.URI;
 import java.util.Date;
 
@@ -23,19 +24,37 @@ import java.util.Date;
  * User: fkleedorfer
  * Date: 31.10.12
  */
+@Entity
+@Table(name = "chatmessage")
 public class ChatMessage
 {
+  @Id
+  @GeneratedValue
+  @Column( name = "id" )
+  private Long id;
   /* the date the message was first seen in the local system */
+  @Column( name = "creationDate" )
   private Date creationDate;
 
   /* the URI of the need that sent the message */
+  @Column( name = "originatorURI" )
   private URI originatorURI;
 
   /* the URI of the local connection */
+  @Column( name = "localConnectionURI" )
   private URI localConnectionURI;
 
   /* the message */
+  @Column( name = "message" )
   private String message;
+
+  public Long getId() {
+      return id;
+  }
+
+  public void setId(Long id) {
+      this.id = id;
+  }
 
   public Date getCreationDate()
   {
