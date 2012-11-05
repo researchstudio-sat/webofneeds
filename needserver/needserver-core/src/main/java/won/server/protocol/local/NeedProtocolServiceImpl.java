@@ -17,9 +17,9 @@
 package won.server.protocol.local;
 
 import won.protocol.exception.*;
-import won.protocol.need.NodeFromNodeReceiver;
-import won.server.service.ConnectionService;
-import won.server.service.NeedService;
+import won.protocol.need.NeedProtocolService;
+import won.protocol.service.ConnectionCommunicationService;
+import won.protocol.service.NeedFacingNeedCommunicationService;
 
 import java.net.URI;
 
@@ -27,58 +27,48 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 02.11.12
  */
-public class NodeFromNodeReceiverLocalImpl implements NodeFromNodeReceiver
+public class NeedProtocolServiceImpl implements NeedProtocolService
 {
-  private NeedService needService;
-  private ConnectionService connectionService;
+  private NeedFacingNeedCommunicationService needCommunicationService;
+  private ConnectionCommunicationService connectionCommunicationService;
 
   @Override
   public void connectionRequested(final URI need, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    this.needService.connectionRequested(need, otherNeedURI, otherConnectionURI, message);
+    this.needCommunicationService.connectionRequested(need, otherNeedURI, otherConnectionURI, message);
   }
 
   @Override
   public void connectionAccepted(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    this.connectionService.connectionAccepted(connectionURI);
+    this.connectionCommunicationService.accept(connectionURI);
   }
 
   @Override
   public void connectionDenied(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    this.connectionService.connectionDenied(connectionURI);
+    this.connectionCommunicationService.deny(connectionURI);
   }
 
   @Override
   public void connectionClosed(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    this.connectionService.connectionClosed(connectionURI);
+    this.connectionCommunicationService.close(connectionURI);
   }
 
   @Override
   public void textMessageReceived(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    this.connectionService.textMessageReceived(connectionURI, message);
+    this.connectionCommunicationService.sendTextMessage(connectionURI, message);
   }
 
-  public NeedService getNeedService()
+  public void setNeedCommunicationService(final NeedFacingNeedCommunicationService needCommunicationService)
   {
-    return needService;
+    this.needCommunicationService = needCommunicationService;
   }
 
-  public void setNeedService(final NeedService needService)
+  public void setConnectionCommunicationService(final ConnectionCommunicationService connectionCommunicationService)
   {
-    this.needService = needService;
-  }
-
-  public ConnectionService getConnectionService()
-  {
-    return connectionService;
-  }
-
-  public void setConnectionService(final ConnectionService connectionService)
-  {
-    this.connectionService = connectionService;
+    this.connectionCommunicationService = connectionCommunicationService;
   }
 }

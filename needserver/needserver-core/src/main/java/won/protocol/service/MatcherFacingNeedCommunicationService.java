@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package won.protocol.matcher;
+package won.protocol.service;
 
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 
 import java.net.URI;
-import java.util.Collection;
 
 /**
- * User: fkleedorfer
- * Date: 31.10.12
+ * Interface defining methods for need communication.
  */
-public interface NodeFromMatcherReceiver
+public interface MatcherFacingNeedCommunicationService
 {
+
+
+
   /**
    * Notifies the need of a matching otherNeed with the specified match score. Originator
    * identifies the entity making the call. Normally, originator is a matching service.
@@ -36,24 +37,9 @@ public interface NodeFromMatcherReceiver
    * @param otherNeed URI of the other need (may be on the local needserver)
    * @param score      match score between 0.0 (bad) and 1.0 (good). Implementations treat lower values as 0.0 and higher values as 1.0.
    * @param originator an URI identifying the calling entity
-   * @throws NoSuchNeedException if needURI is unknown
-   * @throws IllegalMessageForNeedStateException if the need is not active
+   * @throws won.protocol.exception.NoSuchNeedException if needURI is not a known need URI
+   * @throws won.protocol.exception.IllegalMessageForNeedStateException if the need is not active
    */
   public void hint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
-  /**
-   * Retrieves a list of all needs on the needserver.
-   *
-   * @return a collection of all need URIs.
-   */
-  public Collection<URI> listNeedURIs();
-
-  /**
-   * Retrieves all connection URIs (regardless of state) for the specified local need URI.
-   *
-   * @param needURI the URI of the need
-   * @return a collection of connection URIs.
-   * @throws NoSuchNeedException if needURI does not refer to an existing need
-   */
-  public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException;
 }

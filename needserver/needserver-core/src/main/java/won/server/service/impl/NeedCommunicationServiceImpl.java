@@ -16,89 +16,42 @@
 
 package won.server.service.impl;
 
-import com.hp.hpl.jena.graph.Graph;
-import won.protocol.exception.*;
+import won.protocol.exception.ConnectionAlreadyExistsException;
+import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.model.*;
-import won.protocol.owner.NodeToOwnerSender;
+import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.NeedRepository;
-import won.server.service.ConnectionService;
-import won.server.service.NeedService;
+import won.protocol.service.ConnectionCommunicationService;
+import won.protocol.service.MatcherFacingNeedCommunicationService;
+import won.protocol.service.NeedFacingNeedCommunicationService;
+import won.protocol.service.OwnerFacingNeedCommunicationService;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * User: fkleedorfer
  * Date: 02.11.12
  */
-public class NeedServiceImpl implements NeedService
+public class NeedCommunicationServiceImpl implements
+    OwnerFacingNeedCommunicationService,
+    NeedFacingNeedCommunicationService,
+    MatcherFacingNeedCommunicationService
 {
-  private NodeToOwnerSender ownerSender;
+  private OwnerProtocolOwnerService ownerClient;
   private NeedRepository needRepository;
-  private ConnectionService connectionService;
+  private ConnectionCommunicationService connectionCommunicationService;
 
-  @Override
-  public URI createNeed(final URI ownerURI, final Graph content, final boolean activate) throws IllegalNeedContentException
-  {
-
-    Need need = new Need();
-    need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
-    need.setOwnerURI(ownerURI);
-    need = needRepository.save(need);
-    return need.getNeedURI();
-  }
-
-  @Override
-  public void activate(final URI needURI) throws NoSuchNeedException
-  {
-    Need need = loadNeed(needURI);
-    need.setState(NeedState.ACTIVE);
-    need = needRepository.save(need);
-  }
-
-  @Override
-  public void deactivate(final URI needURI) throws NoSuchNeedException
-  {
-    Need need = loadNeed(needURI);
-    need.setState(NeedState.INACTIVE);
-    need = needRepository.save(need);
-    //close all connections
-    //TODO: add a filter to the method/repo to filter only non-closed connections
-    Collection<URI> connectionURIs = listConnectionURIs(need.getNeedURI());
-    for (URI connURI : connectionURIs){
-      connectionService.close(connURI);
-    }
-  }
-
-  @Override
-  public Collection<URI> listNeedURIs()
-  {
-    //TODO: provide a repository method for listing just the need URIs
-    List<Need> allNeeds = needRepository.findAll();
-    List<URI> needURIs = new ArrayList<URI>(allNeeds.size());
-    for (Need need: allNeeds) {
-      needURIs.add(need.getNeedURI());
-    }
-    return needURIs;
-  }
 
   @Override
   public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
     Need need = loadNeed(needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.HINT.name(), need.getState());
-    ownerSender.sendHintReceived(needURI,otherNeed,score,originator);
-  }
-
-  @Override
-  public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException
-  {
-    Need need = loadNeed(needURI);
-    //TODO: list matches!
-    return null;
+    ownerClient.hintReceived(needURI, otherNeed, score, originator);
   }
 
   @Override
@@ -132,14 +85,6 @@ public class NeedServiceImpl implements NeedService
     //TODO: save con in database - this will set the connection URI
     //Set connection
 
-  }
-
-  @Override
-  public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
-  {
-    Need need = loadNeed(needURI);
-    //TODO: list connections!
-    return null;
   }
 
   /**

@@ -21,9 +21,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionMessage;
 import won.protocol.model.ConnectionState;
-import won.protocol.need.NodeToNodeSender;
-import won.protocol.owner.NodeToOwnerSender;
-import won.server.service.ConnectionService;
+import won.protocol.service.ConnectionCommunicationService;
 
 import java.net.URI;
 
@@ -31,10 +29,9 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 02.11.12
  */
-public class ConnectionServiceImpl implements ConnectionService
+public class OwnerSideConnectionCommunicationServiceImpl implements ConnectionCommunicationService
 {
-  private NodeToNodeSender nodeSender;
-  private NodeToOwnerSender ownerSender;
+  private ConnectionCommunicationService needSideConnectionClient;
 
   @Override
   public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
@@ -46,7 +43,7 @@ public class ConnectionServiceImpl implements ConnectionService
     //set new state and save in the db
     con.setState(nextState);
     //TODO: save in the db
-    nodeSender.sendConnectionAccepted(con.getRemoteConnectionURI());
+    needSideConnectionClient.accept(con.getRemoteConnectionURI());
   }
 
 
@@ -61,7 +58,7 @@ public class ConnectionServiceImpl implements ConnectionService
     //set new state and save in the db
     con.setState(nextState);
     //TODO: save in the db
-    nodeSender.sendConnectionDenied(con.getRemoteConnectionURI());
+    needSideConnectionClient.deny(con.getRemoteConnectionURI());
   }
 
    @Override
@@ -74,7 +71,7 @@ public class ConnectionServiceImpl implements ConnectionService
     //set new state and save in the db
     con.setState(nextState);
     //TODO: save in the db
-    nodeSender.sendConnectionClosed(con.getRemoteConnectionURI());
+    needSideConnectionClient.close(con.getRemoteConnectionURI());
   }
 
   @Override
@@ -84,60 +81,14 @@ public class ConnectionServiceImpl implements ConnectionService
     Connection con = loadConnectionForMessage(connectionURI);
     //perform state transit (should not result in state change)
     ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_MESSAGE);
-    nodeSender.sendTextMessageReceived(con.getRemoteConnectionURI(), message);
-  }
-
-  @Override
-  public void connectionAccepted(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    //load connection, checking if it exists and the message is allowed in its state
-    Connection con = loadConnectionForMessage(connectionURI);
-    //perform state transit (should not result in state change)
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.PARTNER_ACCEPT);
-    con.setState(nextState);
-    //TODO: save in the db
-    ownerSender.sendConnectionAccepted(connectionURI);
-  }
-
-  @Override
-  public void connectionDenied(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    //load connection, checking if it exists and the message is allowed in its state
-    Connection con = loadConnectionForMessage(connectionURI);
-    //perform state transit (should not result in state change)
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.PARTNER_DENY);
-    con.setState(nextState);
-    //TODO: save in the db
-    ownerSender.sendConnectionDenied(connectionURI);
-  }
-
-   @Override
-  public void connectionClosed(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    //load connection, checking if it exists and the message is allowed in its state
-    Connection con = loadConnectionForMessage(connectionURI);
-    //perform state transit (should not result in state change)
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.PARTNER_CLOSE);
-    con.setState(nextState);
-    //TODO: save in the db
-    ownerSender.sendConnectionClosed(connectionURI);
-  }
-
-  @Override
-  public void textMessageReceived(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    //load connection, checking if it exists and the message is allowed in its state
-    Connection con = loadConnectionForMessage(connectionURI);
-    //perform state transit (should not result in state change)
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.PARTNER_MESSAGE);
-    ownerSender.sendTextMessageReceived(connectionURI, message);
+    needSideConnectionClient.sendTextMessage(con.getRemoteConnectionURI(), message);
   }
 
   /**
    * Loads the specified connection from the database and raises an exception if it is not found.
    *
    * @param connectionURI
-   * @throws NoSuchConnectionException
+   * @throws won.protocol.exception.NoSuchConnectionException
    * @return the connection
    */
   private Connection loadConnectionForMessage(final URI connectionURI) throws NoSuchConnectionException
@@ -154,7 +105,7 @@ public class ConnectionServiceImpl implements ConnectionService
    * @param con
    * @param msg
    * @return
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the connection's current state
+   * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the connection's current state
    */
   private ConnectionState performStateTransit(Connection con, ConnectionMessage msg) throws IllegalMessageForConnectionStateException{
     if (!msg.isMessageAllowed(con.getState())){

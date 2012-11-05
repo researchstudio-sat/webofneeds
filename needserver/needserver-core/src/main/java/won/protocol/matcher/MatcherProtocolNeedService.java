@@ -18,42 +18,27 @@ package won.protocol.matcher;
 
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.service.NeedInformationService;
 
 import java.net.URI;
-import java.util.Collection;
 
 /**
  * User: fkleedorfer
  * Date: 31.10.12
  */
-public interface MatcherToNodeSender
+public interface MatcherProtocolNeedService extends NeedInformationService
 {
   /**
    * Notifies the need of a matching otherNeed with the specified match score. Originator
    * identifies the entity making the call. Normally, originator is a matching service.
    *
-   * @param needURI the need to send the hint to
-   * @param otherNeed the need that the match is about
-   * @param score the score for the match (between 0 and 1)
-   * @param originator the URI of the matching service
-   * @throws NoSuchNeedException if needURI does not refer to an existing need object
+   * @param needURI the URI of the need
+   * @param otherNeed URI of the other need (may be on the local needserver)
+   * @param score      match score between 0.0 (bad) and 1.0 (good). Implementations treat lower values as 0.0 and higher values as 1.0.
+   * @param originator an URI identifying the calling entity
+   * @throws NoSuchNeedException if needURI is unknown
    * @throws IllegalMessageForNeedStateException if the need is not active
    */
-  public void sendHint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException;
+  public void hint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
-  /**
-   * Retrieves a list of all needs on the needserver.
-   *
-   * @return a collection of all need URIs.
-   */
-  public Collection<URI> sendListNeedURIs();
-
-  /**
-   * Retrieves all connection URIs (regardless of state) for the specified local need URI.
-   *
-   * @param needURI the URI of the need
-   * @return a collection of connection URIs.
-   * @throws NoSuchNeedException if needURI does not refer to an existing need
-   */
-  public Collection<URI> sendListConnectionURIs(URI needURI) throws NoSuchNeedException;
 }

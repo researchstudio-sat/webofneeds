@@ -24,13 +24,13 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 31.10.12
  */
-public interface NodeFromNodeReceiver
+public interface NeedProtocolService
 {
+
   /**
    * Requests a connection from the need otherNeedURI. The other need refers to the
    * connection using the specified otherConnectionURI. A short message can be sent along with the
    * request.
-   *
    *
    * @param need the URI of the need
    * @param otherNeedURI
@@ -41,7 +41,7 @@ public interface NodeFromNodeReceiver
   public void connectionRequested(URI need, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
   /**
-   * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
+   * NeedCommunicationService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been accepted by the other side.
    * @param connectionURI the URI of the connection
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
@@ -50,7 +50,7 @@ public interface NodeFromNodeReceiver
   public void connectionAccepted(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
-   * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
+   * NeedCommunicationService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been denied by the other side.
    * @param connectionURI the URI of the connection
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
@@ -59,7 +59,7 @@ public interface NodeFromNodeReceiver
   public void connectionDenied(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
-   * NeedService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
+   * NeedCommunicationService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
    * has been closed by the other side, indicating success.
    * @param connectionURI the URI of the connection
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
@@ -68,7 +68,7 @@ public interface NodeFromNodeReceiver
   public void connectionClosed(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
-   * NeedService-facing method; receives a chat message from the remote partner.
+   * NeedCommunicationService-facing method; receives a chat message from the remote partner.
    * @param connectionURI the local connection
    * @param message the chat message received from the remote connection
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection

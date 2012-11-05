@@ -17,17 +17,17 @@
 package won.owner.protocol.local;
 
 import won.protocol.exception.*;
-import won.protocol.owner.OwnerFromNodeReceiver;
-import won.protocol.owner.OwnerToNodeSender;
+import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.owner.OwnerProtocolOwnerService;
 
 import java.net.URI;
 
 /**
  * Implementation for testing purposes; communicates only with partners within the same VM.
  */
-public class OwnerFromNodeReceiverLocalImpl implements OwnerFromNodeReceiver
+public abstract class OwnerProtocolOwnerServiceLocalImpl implements OwnerProtocolOwnerService
 {
-  protected OwnerToNodeSender sender;
+  protected OwnerProtocolNeedService needClient;
 
   @Override
   public void hintReceived(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI) throws NoSuchNeedException
@@ -42,31 +42,31 @@ public class OwnerFromNodeReceiverLocalImpl implements OwnerFromNodeReceiver
   }
 
   @Override
-  public void connectionAccepted(final URI ownConnectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void connectionDenied(final URI ownConnectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void connectionClosed(final URI ownConnectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void messageReceived(final URI ownConnectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
-  public void setSender(final OwnerToNodeSender sender)
+  public void setNeedClient(final OwnerProtocolNeedService needClient)
   {
-    this.sender = sender;
+    this.needClient = needClient;
   }
 }

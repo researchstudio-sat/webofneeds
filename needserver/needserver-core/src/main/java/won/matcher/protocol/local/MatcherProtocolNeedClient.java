@@ -14,49 +14,43 @@
  * limitations under the License.
  */
 
-package won.server.protocol.local;
+package won.matcher.protocol.local;
 
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.matcher.NodeFromMatcherReceiver;
-import won.server.service.NeedService;
+import won.protocol.matcher.MatcherProtocolNeedService;
 
 import java.net.URI;
 import java.util.Collection;
 
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ * Implementation for testing purposes; communicates only with partners within the same VM.
  */
-public class NodeFromMatcherReceiverLocalImpl implements NodeFromMatcherReceiver
+public class MatcherProtocolNeedClient implements MatcherProtocolNeedService
 {
-  private NeedService needService;
+
+  private MatcherProtocolNeedService matcherProtocolNeedService;
 
   @Override
   public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    needService.hint(needURI,otherNeed,score,originator);
+    this.matcherProtocolNeedService.hint(needURI, otherNeed, score, originator);
   }
 
   @Override
   public Collection<URI> listNeedURIs()
   {
-    return needService.listNeedURIs();
+    return matcherProtocolNeedService.listNeedURIs();
   }
 
   @Override
   public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
   {
-    return needService.listConnectionURIs(needURI);
+    return matcherProtocolNeedService.listConnectionURIs(needURI);
   }
 
-  public NeedService getNeedService()
+  public void setMatcherProtocolNeedService(final MatcherProtocolNeedService matcherProtocolNeedService)
   {
-    return needService;
-  }
-
-  public void setNeedService(final NeedService needService)
-  {
-    this.needService = needService;
+    this.matcherProtocolNeedService = matcherProtocolNeedService;
   }
 }
