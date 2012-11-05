@@ -19,7 +19,6 @@ package won.server.protocol.local;
 import won.protocol.exception.*;
 import won.protocol.need.NodeFromNodeReceiver;
 import won.protocol.need.NodeToNodeSender;
-import won.server.service.NeedService;
 
 import java.net.URI;
 
@@ -57,9 +56,9 @@ public class NodeToNodeSenderLocalImpl implements NodeToNodeSender
   }
 
   @Override
-  public void sendMessageReceived(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void sendTextMessageReceived(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    this.receiver.messageReceived(connectionURI, message);
+    this.receiver.textMessageReceived(connectionURI, message);
   }
 
   public NodeFromNodeReceiver getReceiver()

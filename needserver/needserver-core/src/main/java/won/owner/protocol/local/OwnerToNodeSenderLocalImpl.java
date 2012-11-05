@@ -78,7 +78,7 @@ public class OwnerToNodeSenderLocalImpl implements OwnerToNodeSender
   @Override
   public void sendMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    receiver.sendMessage(connectionURI, message);
+    receiver.sendTextMessage(connectionURI, message);
   }
 
   @Override

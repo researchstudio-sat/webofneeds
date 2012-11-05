@@ -20,10 +20,15 @@ import com.hp.hpl.jena.graph.Graph;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.NodeToOwnerSender;
+import won.protocol.repository.NeedRepository;
+import won.server.service.ConnectionService;
 import won.server.service.NeedService;
 
 import java.net.URI;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -32,6 +37,8 @@ import java.util.Collection;
 public class NeedServiceImpl implements NeedService
 {
   private NodeToOwnerSender ownerSender;
+  private NeedRepository needRepository;
+  private ConnectionService connectionService;
 
   @Override
   public URI createNeed(final URI ownerURI, final Graph content, final boolean activate) throws IllegalNeedContentException
@@ -40,8 +47,8 @@ public class NeedServiceImpl implements NeedService
     Need need = new Need();
     need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
     need.setOwnerURI(ownerURI);
-    //TODO: save need in db - this will set the need URI
-    return need.getURI();
+    need = needRepository.save(need);
+    return need.getNeedURI();
   }
 
   @Override
@@ -49,7 +56,7 @@ public class NeedServiceImpl implements NeedService
   {
     Need need = loadNeed(needURI);
     need.setState(NeedState.ACTIVE);
-    //TODO: save need!
+    need = needRepository.save(need);
   }
 
   @Override
@@ -57,19 +64,32 @@ public class NeedServiceImpl implements NeedService
   {
     Need need = loadNeed(needURI);
     need.setState(NeedState.INACTIVE);
-    //TODO: save need!
+    need = needRepository.save(need);
+    //close all connections
+    //TODO: add a filter to the method/repo to filter only non-closed connections
+    Collection<URI> connectionURIs = listConnectionURIs(need.getNeedURI());
+    for (URI connURI : connectionURIs){
+      connectionService.close(connURI);
+    }
   }
 
   @Override
   public Collection<URI> listNeedURIs()
   {
-    //TODO: list need URIs from the db
-    return null;
+    //TODO: provide a repository method for listing just the need URIs
+    List<Need> allNeeds = needRepository.findAll();
+    List<URI> needURIs = new ArrayList<URI>(allNeeds.size());
+    for (Need need: allNeeds) {
+      needURIs.add(need.getNeedURI());
+    }
+    return needURIs;
   }
 
   @Override
-  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException
+  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
+    Need need = loadNeed(needURI);
+    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.HINT.name(), need.getState());
     ownerSender.sendHintReceived(needURI,otherNeed,score,originator);
   }
 
@@ -77,7 +97,7 @@ public class NeedServiceImpl implements NeedService
   public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException
   {
     Need need = loadNeed(needURI);
-    //TODO: list connections!
+    //TODO: list matches!
     return null;
   }
 
@@ -86,6 +106,7 @@ public class NeedServiceImpl implements NeedService
   {
     //Load need (throws exception if not found)
     Need need = loadNeed(needURI);
+    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECT_TO.name(), need.getState());
     //Create new connection object
     Connection con = new Connection();
     con.setNeedURI(needURI);
@@ -100,13 +121,25 @@ public class NeedServiceImpl implements NeedService
   @Override
   public void connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    //To change body of implemented methods use File | Settings | File Templates.
+    //Load need (throws exception if not found)
+    Need need = loadNeed(needURI);
+    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECTION_REQUESTED.name(), need.getState());
+    //Create new connection object on our side
+    Connection con = new Connection();
+    con.setNeedURI(needURI);
+    con.setState(ConnectionState.REQUEST_RECEIVED);
+    con.setRemoteNeedURI(otherNeedURI);
+    //TODO: save con in database - this will set the connection URI
+    //Set connection
+
   }
 
   @Override
   public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
   {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    Need need = loadNeed(needURI);
+    //TODO: list connections!
+    return null;
   }
 
   /**
@@ -118,10 +151,14 @@ public class NeedServiceImpl implements NeedService
    */
   private Need loadNeed(final URI needURI) throws NoSuchNeedException
   {
-    //TODO: load need object from db
-    Need need = new Need();
-    if (need == null) throw new NoSuchNeedException(needURI);
-    return need;
+    List<Need> needs = needRepository.findByNeedURI(needURI);
+    if (needs.size() == 0) throw new NoSuchNeedException(needURI);
+    if (needs.size() > 0) throw new WonProtocolException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}",needURI));
+    return needs.get(0);
+  }
+
+  private boolean isNeedActive(final Need need) {
+    return NeedState.ACTIVE == need.getState();
   }
 
 }

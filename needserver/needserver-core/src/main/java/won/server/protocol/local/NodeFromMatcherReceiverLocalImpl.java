@@ -16,6 +16,7 @@
 
 package won.server.protocol.local;
 
+import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.NodeFromMatcherReceiver;
 import won.server.service.NeedService;
@@ -32,7 +33,7 @@ public class NodeFromMatcherReceiverLocalImpl implements NodeFromMatcherReceiver
   private NeedService needService;
 
   @Override
-  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException
+  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
     needService.hint(needURI,otherNeed,score,originator);
   }

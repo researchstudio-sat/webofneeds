@@ -84,5 +84,5 @@ public interface NodeToOwnerSender
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendMessageReceived(URI ownConnectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void sendTextMessageReceived(URI ownConnectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 }

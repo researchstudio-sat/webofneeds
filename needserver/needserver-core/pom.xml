@@ -23,7 +23,6 @@
     <artifactId>needserver</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
-  <groupId>webofneeds</groupId>
   <artifactId>needserver-core</artifactId>
   <version>0.1-SNAPSHOT</version>
   <name>needserver-core</name>

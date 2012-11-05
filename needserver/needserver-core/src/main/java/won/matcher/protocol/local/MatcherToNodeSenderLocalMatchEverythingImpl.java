@@ -16,6 +16,7 @@
 
 package won.matcher.protocol.local;
 
+import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherToNodeSender;
 import won.protocol.matcher.NodeFromMatcherReceiver;
@@ -31,7 +32,7 @@ public class MatcherToNodeSenderLocalMatchEverythingImpl implements MatcherToNod
   private NodeFromMatcherReceiver receiver;
 
   @Override
-  public void sendHint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException
+  public void sendHint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
     this.receiver.hint(needURI,otherNeed,score,originator);
   }

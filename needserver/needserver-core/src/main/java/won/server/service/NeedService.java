@@ -33,7 +33,7 @@ public interface NeedService
 {
 
   /**
-   * Creates a new need with the specified content.
+   * Creates a new need with the specified content, ownerURI and active state.
    *
    *
    * @param ownerURI
@@ -66,7 +66,7 @@ public interface NeedService
   public Collection<URI> listNeedURIs();
 
   /**
-   * Notifies the need of the fact that it attains the specified match score with otherNeed. Originator
+   * Notifies the need of a matching otherNeed with the specified match score. Originator
    * identifies the entity making the call. Normally, originator is a matching service.
    *
    * @param needURI the URI of the need
@@ -74,8 +74,9 @@ public interface NeedService
    * @param score      match score between 0.0 (bad) and 1.0 (good). Implementations treat lower values as 0.0 and higher values as 1.0.
    * @param originator an URI identifying the calling entity
    * @throws NoSuchNeedException if needURI is not a known need URI
+   * @throws IllegalMessageForNeedStateException if the need is not active
    */
-  public void hint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException;
+  public void hint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
   /**
    * Returns all matches for the need.
@@ -87,7 +88,7 @@ public interface NeedService
   public Collection<Match> getMatches(URI needURI) throws NoSuchNeedException;
 
   /**
-   * OwnerService-facing method; causes a connectio to the need identified by otherNeedURI to be requested by this need.
+   * Causes the need identified by needURI to open a connection to the need identified by otherNeedURI.
    * A short message (max 140 chars) can be sent along with the request. The other need is contacted by calling
    * its requestConnection method.
    *
@@ -106,10 +107,9 @@ public interface NeedService
   public URI connectTo(URI needURI, URI otherNeedURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
   /**
-   * NeedService-facing method; requests a connection from the need otherNeedURI. The other need refers to the
-   * connection using the specified otherConnectionURI. A short message can be sent along with the
-   * request.
-   *
+   * Requests a connection to the need identified by needURI. The request is coming from the need otherNeedURI via its
+   * connection otherConnectionURI. A short message can be sent along with the request.
+   * A new connection will be created and the request will be forwarded to the owner of the need.
    *
    * @param needURI the URI of the need
    * @param otherNeedURI

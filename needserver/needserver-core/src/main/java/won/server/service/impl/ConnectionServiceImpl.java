@@ -78,13 +78,13 @@ public class ConnectionServiceImpl implements ConnectionService
   }
 
   @Override
-  public void sendMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //load connection, checking if it exists and the message is allowed in its state
     Connection con = loadConnectionForMessage(connectionURI);
     //perform state transit (should not result in state change)
     ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_MESSAGE);
-    nodeSender.sendMessageReceived(con.getRemoteConnectionURI(), message);
+    nodeSender.sendTextMessageReceived(con.getRemoteConnectionURI(), message);
   }
 
   @Override
@@ -124,13 +124,13 @@ public class ConnectionServiceImpl implements ConnectionService
   }
 
   @Override
-  public void messageReceived(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessageReceived(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //load connection, checking if it exists and the message is allowed in its state
     Connection con = loadConnectionForMessage(connectionURI);
     //perform state transit (should not result in state change)
     ConnectionState nextState = performStateTransit(con, ConnectionMessage.PARTNER_MESSAGE);
-    ownerSender.sendMessageReceived(connectionURI,message);
+    ownerSender.sendTextMessageReceived(connectionURI, message);
   }
 
   /**
@@ -158,7 +158,7 @@ public class ConnectionServiceImpl implements ConnectionService
    */
   private ConnectionState performStateTransit(Connection con, ConnectionMessage msg) throws IllegalMessageForConnectionStateException{
     if (!msg.isMessageAllowed(con.getState())){
-      throw new IllegalMessageForConnectionStateException(con.getURI(), ConnectionMessage.OWNER_ACCEPT.name(),con.getState());
+      throw new IllegalMessageForConnectionStateException(con.getURI(), msg.name(),con.getState());
     }
     return con.getState().transit(msg);
   }

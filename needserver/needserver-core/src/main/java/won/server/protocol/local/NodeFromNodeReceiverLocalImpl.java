@@ -57,9 +57,9 @@ public class NodeFromNodeReceiverLocalImpl implements NodeFromNodeReceiver
   }
 
   @Override
-  public void messageReceived(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessageReceived(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    this.connectionService.messageReceived(connectionURI, message);
+    this.connectionService.textMessageReceived(connectionURI, message);
   }
 
   public NeedService getNeedService()

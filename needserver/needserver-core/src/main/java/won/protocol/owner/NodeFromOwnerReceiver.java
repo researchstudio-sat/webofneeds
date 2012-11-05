@@ -117,7 +117,7 @@ public interface NodeFromOwnerReceiver
    * @throws IllegalMessageForConnectionStateException
    *                                   if the message is not allowed in the current connection state
    */
-  public void sendMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void sendTextMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * Retrieves a list of all needs on the needserver.

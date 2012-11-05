@@ -61,7 +61,7 @@ public class NodeToOwnerSenderLocalImpl implements NodeToOwnerSender
   }
 
   @Override
-  public void sendMessageReceived(final URI ownConnectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void sendTextMessageReceived(final URI ownConnectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     this.receiver.messageReceived(ownConnectionURI, message);
   }

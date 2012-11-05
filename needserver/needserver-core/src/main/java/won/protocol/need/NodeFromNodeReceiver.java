@@ -74,7 +74,7 @@ public interface NodeFromNodeReceiver
    * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void messageReceived(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void textMessageReceived(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 
 }

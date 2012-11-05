@@ -16,6 +16,7 @@
 
 package won.protocol.matcher;
 
+import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 
 import java.net.URI;
@@ -28,15 +29,17 @@ import java.util.Collection;
 public interface MatcherToNodeSender
 {
   /**
-   * Sends a hint message to the specified need.
+   * Notifies the need of a matching otherNeed with the specified match score. Originator
+   * identifies the entity making the call. Normally, originator is a matching service.
    *
    * @param needURI the need to send the hint to
    * @param otherNeed the need that the match is about
    * @param score the score for the match (between 0 and 1)
    * @param originator the URI of the matching service
    * @throws NoSuchNeedException if needURI does not refer to an existing need object
+   * @throws IllegalMessageForNeedStateException if the need is not active
    */
-  public void sendHint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException;
+  public void sendHint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
   /**
    * Retrieves a list of all needs on the needserver.
