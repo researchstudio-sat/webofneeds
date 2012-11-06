@@ -39,27 +39,27 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   }
 
   @Override
-  public void connectionAccepted(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    this.connectionCommunicationService.accept(connectionURI);
+    connectionCommunicationService.accept(connectionURI);
   }
 
   @Override
-  public void connectionDenied(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    this.connectionCommunicationService.deny(connectionURI);
+    connectionCommunicationService.deny(connectionURI);
   }
 
   @Override
-  public void connectionClosed(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    this.connectionCommunicationService.close(connectionURI);
+    connectionCommunicationService.close(connectionURI);
   }
 
   @Override
-  public void textMessageReceived(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    this.connectionCommunicationService.sendTextMessage(connectionURI, message);
+    connectionCommunicationService.sendTextMessage(connectionURI, message);
   }
 
   public void setNeedFacingNeedCommunicationService(final NeedFacingNeedCommunicationService needFacingNeedCommunicationService)

@@ -16,6 +16,7 @@
 
 package won.server.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.ChatMessage;
@@ -28,6 +29,7 @@ import won.protocol.service.ConnectionCommunicationService;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
 
 /**
  * User: fkleedorfer
@@ -35,8 +37,13 @@ import java.util.Date;
  */
 public class OwnerFacingConnectionCommunicationServiceImpl implements ConnectionCommunicationService
 {
-  private ConnectionCommunicationService needSideConnectionClient;
+  private ConnectionCommunicationService needFacingConnectionClient;
+
+  private ExecutorService executorService;
+
+  @Autowired
   private ConnectionRepository connectionRepository;
+  @Autowired
   private ChatMessageRepository chatMessageRepository;
 
   @Override
@@ -49,9 +56,17 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
-    con = connectionRepository.save(con);
+    final Connection connectionForRunnable = connectionRepository.save(con);
     //inform the other side
-    needSideConnectionClient.accept(con.getRemoteConnectionURI());
+    executorService.execute(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        needFacingConnectionClient.accept(connectionForRunnable.getRemoteConnectionURI());
+      }
+    });
+
   }
 
 
@@ -66,9 +81,16 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
-    con = connectionRepository.save(con);
+    final Connection connectionForRunnable = connectionRepository.save(con);
     //inform the other side
-    needSideConnectionClient.deny(con.getRemoteConnectionURI());
+    executorService.execute(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        needFacingConnectionClient.deny(connectionForRunnable.getRemoteConnectionURI());
+      }
+    });
   }
 
    @Override
@@ -81,9 +103,16 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
-    con = connectionRepository.save(con);
+    final Connection connectionForRunnable = connectionRepository.save(con);
     //inform the other side
-    needSideConnectionClient.close(con.getRemoteConnectionURI());
+    executorService.execute(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        needFacingConnectionClient.close(connectionForRunnable.getRemoteConnectionURI());
+      }
+    });
   }
 
   @Override
@@ -101,9 +130,32 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     chatMessage.setOriginatorURI(con.getNeedURI());
     //save in the db
     chatMessageRepository.save(chatMessage);
-
+    final URI remoteConnectionURI = con.getRemoteConnectionURI();
     //inform the other side
-    needSideConnectionClient.sendTextMessage(con.getRemoteConnectionURI(), message);
+    executorService.execute(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        needFacingConnectionClient.sendTextMessage(remoteConnectionURI, message);
+      }
+    });
+
+  }
+
+  public void setNeedFacingConnectionClient(final ConnectionCommunicationService needFacingConnectionClient)
+  {
+    this.needFacingConnectionClient = needFacingConnectionClient;
+  }
+
+  public void setConnectionRepository(final ConnectionRepository connectionRepository)
+  {
+    this.connectionRepository = connectionRepository;
+  }
+
+  public void setChatMessageRepository(final ChatMessageRepository chatMessageRepository)
+  {
+    this.chatMessageRepository = chatMessageRepository;
   }
 
   /**
@@ -121,5 +173,8 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     return con.getState().transit(msg);
   }
 
-
+  public void setExecutorService(final ExecutorService executorService)
+  {
+    this.executorService = executorService;
+  }
 }

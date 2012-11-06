@@ -30,6 +30,7 @@ import won.protocol.service.ConnectionCommunicationService;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
 
 /**
  * User: fkleedorfer
@@ -38,7 +39,10 @@ import java.util.Date;
 @Component
 public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionCommunicationService
 {
-  private ConnectionCommunicationService ownerSideConnectionClient;
+  private ConnectionCommunicationService ownerFacingConnectionClient;
+
+  private ExecutorService executorService;
+
   @Autowired
   private ConnectionRepository connectionRepository;
   @Autowired
@@ -56,7 +60,14 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     //save in the db
     con = connectionRepository.save(con);
     //inform the other side
-    ownerSideConnectionClient.accept(connectionURI);
+    executorService.execute(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        ownerFacingConnectionClient.accept(connectionURI);
+      }
+    });
   }
 
   @Override
@@ -70,7 +81,14 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     //save in the db
     con = connectionRepository.save(con);
     //inform the other side
-    ownerSideConnectionClient.deny(connectionURI);
+    executorService.execute(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        ownerFacingConnectionClient.deny(connectionURI);
+      }
+    });
   }
 
    @Override
@@ -84,7 +102,14 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     //save in the db
     con = connectionRepository.save(con);
     //inform the other side
-    ownerSideConnectionClient.close(connectionURI);
+    executorService.execute(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        ownerFacingConnectionClient.close(connectionURI);
+      }
+    });
   }
 
   @Override
@@ -103,7 +128,15 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     //save in the db
     chatMessageRepository.save(chatMessage);
     //send to the other side
-    ownerSideConnectionClient.sendTextMessage(connectionURI, message);
+    executorService.execute(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        ownerFacingConnectionClient.sendTextMessage(connectionURI, message);
+      }
+    });
+
   }
 
 
@@ -122,5 +155,23 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     return con.getState().transit(msg);
   }
 
+  public void setOwnerFacingConnectionClient(final ConnectionCommunicationService ownerFacingConnectionClient)
+  {
+    this.ownerFacingConnectionClient = ownerFacingConnectionClient;
+  }
 
+  public void setConnectionRepository(final ConnectionRepository connectionRepository)
+  {
+    this.connectionRepository = connectionRepository;
+  }
+
+  public void setChatMessageRepository(final ChatMessageRepository chatMessageRepository)
+  {
+    this.chatMessageRepository = chatMessageRepository;
+  }
+
+  public void setExecutorService(final ExecutorService executorService)
+  {
+    this.executorService = executorService;
+  }
 }

@@ -16,7 +16,6 @@
 
 package won.protocol.repository;
 
-import org.springframework.stereotype.Repository;
 import won.protocol.model.ChatMessage;
 
 /**
@@ -26,6 +25,5 @@ import won.protocol.model.ChatMessage;
  * Time: 16:56
  * To change this template use File | Settings | File Templates.
  */
-@Repository
 public interface ChatMessageRepository extends WonRepository<ChatMessage> {
 }

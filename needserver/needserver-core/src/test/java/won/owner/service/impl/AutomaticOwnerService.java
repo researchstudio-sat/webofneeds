@@ -20,6 +20,8 @@ import won.protocol.exception.*;
 import won.protocol.owner.OwnerProtocolNeedService;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: fkleedorfer
@@ -34,14 +36,19 @@ public class AutomaticOwnerService extends AbstractOwnerProtocolOwnerService
   private ConnectionAction onMessageAction = ConnectionAction.CLOSE;
   private ConnectionAction onDenyAction = ConnectionAction.NONE;
   private ConnectionAction onCloseAction = ConnectionAction.NONE;
+  private Map<Method,Integer> methodCallCounts = new HashMap<Method,Integer>();
 
   public enum ConnectionAction {ACCEPT, DENY, MESSAGE, CLOSE,NONE};
+  public enum Method  {hintReceived,connectionRequested,accept,deny,close,sendTextMessage};
 
-
+  public AutomaticOwnerService()
+  {
+  }
 
   @Override
   public void hintReceived(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI) throws NoSuchNeedException
   {
+    countMethodCall(Method.hintReceived);
     if (autoConnect) {
       this.ownerProtocolNeedService.connectTo(otherNeedURI,ownNeedURI,"I'm automatically interested, take " + (messageCount++) );
     }
@@ -50,31 +57,48 @@ public class AutomaticOwnerService extends AbstractOwnerProtocolOwnerService
   @Override
   public void connectionRequested(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final String message) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
   {
+    countMethodCall(Method.connectionRequested);
     performAutomaticAction(onConnectAction, ownConnectionURI);
   }
 
   @Override
   public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    countMethodCall(Method.accept);
     performAutomaticAction(onAcceptAction, connectionURI);
   }
 
   @Override
   public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    countMethodCall(Method.deny);
     performAutomaticAction(onDenyAction, connectionURI);
   }
 
   @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    countMethodCall(Method.close);
     performAutomaticAction(onCloseAction, connectionURI);
   }
 
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    countMethodCall(Method.sendTextMessage);
     performAutomaticAction(onMessageAction, connectionURI);
+  }
+
+  public int getMethodCallCount(Method m){
+    Integer count = this.methodCallCounts.get(m);
+    if (count == null) return 0;
+    return count;
+  }
+
+  private void countMethodCall(Method m){
+    Integer count = this.methodCallCounts.get(m);
+    if (count == null) count = 0;
+    this.methodCallCounts.put(m,count+1);
   }
 
   private void performAutomaticAction(ConnectionAction action, URI connectionURI ) {

@@ -38,7 +38,7 @@ import java.util.List;
  * @version 2012/10/29
  */
 
-public class NeedProtocol implements NeedProtocolExternalFacade, NeedProtocolInternalFacade
+public class NeedProtocol
 {
 
   private static NeedProtocol singleton;

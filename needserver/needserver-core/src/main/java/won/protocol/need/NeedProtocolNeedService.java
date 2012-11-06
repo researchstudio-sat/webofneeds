@@ -17,6 +17,7 @@
 package won.protocol.need;
 
 import won.protocol.exception.*;
+import won.protocol.service.ConnectionCommunicationService;
 
 import java.net.URI;
 
@@ -24,7 +25,7 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 31.10.12
  */
-public interface NeedProtocolNeedService
+public interface NeedProtocolNeedService extends ConnectionCommunicationService
 {
 
   /**
@@ -39,42 +40,5 @@ public interface NeedProtocolNeedService
    *
    */
   public URI connectionRequested(URI need, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
-
-  /**
-   * NeedCommunicationService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
-   * has been accepted by the other side.
-   * @param connectionURI the URI of the connection
-   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
-   */
-  public void connectionAccepted(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-  /**
-   * NeedCommunicationService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
-   * has been denied by the other side.
-   * @param connectionURI the URI of the connection
-   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
-   */
-  public void connectionDenied(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-  /**
-   * NeedCommunicationService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection
-   * has been closed by the other side, indicating success.
-   * @param connectionURI the URI of the connection
-   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
-   */
-  public void connectionClosed(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-  /**
-   * NeedCommunicationService-facing method; receives a chat message from the remote partner.
-   * @param connectionURI the local connection
-   * @param message the chat message received from the remote connection
-   * @throws NoSuchConnectionException if ownConnectionURI does not refer to an existing connection
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
-   */
-  public void textMessageReceived(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
 
 }

@@ -42,11 +42,14 @@ import java.util.Collection;
 public class NeedManagementServiceImpl implements NeedManagementService
 {
   private OwnerProtocolOwnerService ownerProtocolOwnerService;
-  private ConnectionCommunicationService connectionCommunicationService;
+  //used to close connections when a need is deactivated
+  private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
   private NeedInformationService needInformationService;
   private URIService URIService;
+
   @Autowired
   private NeedRepository needRepository;
+
   @Autowired
   private MatchRepository matchRepository;
 
@@ -83,7 +86,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     //TODO: add a filter to the method/repo to filter only non-closed connections
     Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());
     for (URI connURI : connectionURIs){
-      connectionCommunicationService.close(connURI);
+      ownerFacingConnectionCommunicationService.close(connURI);
     }
   }
 
@@ -100,4 +103,34 @@ public class NeedManagementServiceImpl implements NeedManagementService
     return NeedState.ACTIVE == need.getState();
   }
 
+
+  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerService ownerProtocolOwnerService)
+  {
+    this.ownerProtocolOwnerService = ownerProtocolOwnerService;
+  }
+
+  public void setOwnerFacingConnectionCommunicationService(final ConnectionCommunicationService ownerFacingConnectionCommunicationService)
+  {
+    this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
+  }
+
+  public void setNeedInformationService(final NeedInformationService needInformationService)
+  {
+    this.needInformationService = needInformationService;
+  }
+
+  public void setURIService(final URIService URIService)
+  {
+    this.URIService = URIService;
+  }
+
+  public void setNeedRepository(final NeedRepository needRepository)
+  {
+    this.needRepository = needRepository;
+  }
+
+  public void setMatchRepository(final MatchRepository matchRepository)
+  {
+    this.matchRepository = matchRepository;
+  }
 }

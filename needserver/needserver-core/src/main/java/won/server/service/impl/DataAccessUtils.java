@@ -46,7 +46,7 @@ public class DataAccessUtils
   {
     List<Need> needs = needRepository.findByNeedURI(needURI);
     if (needs.size() == 0) throw new NoSuchNeedException(needURI);
-    if (needs.size() > 0) throw new WonProtocolException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}", needURI));
+    if (needs.size() > 1) throw new WonProtocolException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}", needURI));
     return needs.get(0);
   }
 
@@ -61,7 +61,7 @@ public class DataAccessUtils
   {
     List<Connection> connections = connectionRepository.findByConnectionURI(connectionURI);
     if (connections.size() == 0) throw new NoSuchNeedException(connectionURI);
-    if (connections.size() > 0) throw new WonProtocolException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}",connectionURI));
+    if (connections.size() > 1) throw new WonProtocolException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}",connectionURI));
     return connections.get(0);
   }
 

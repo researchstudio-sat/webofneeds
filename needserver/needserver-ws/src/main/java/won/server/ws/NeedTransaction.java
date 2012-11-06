@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package won.protocol.repository;
-
-import won.protocol.model.Match;
-
-import java.net.URI;
-import java.util.List;
+package won.server.ws;
 
 /**
  * User: fkleedorfer
- * Date: 05.11.12
+ * Date: 06.11.12
  */
-
-public interface MatchRepository extends WonRepository<Match>
+public class NeedTransaction
 {
-  public List<Match> findByFromNeed(URI fromNeed);
 }

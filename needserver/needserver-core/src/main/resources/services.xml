@@ -19,8 +19,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <!-- protocol-level services -->
+
     <bean id="needProtocolNeedService" class="won.server.protocol.impl.NeedProtocolNeedServiceImpl">
-        <property name="needFacingNeedCommunicationService" ref="needCommunicationServiceImpl" />
+        <property name="needFacingNeedCommunicationService" ref="needCommunicationService" />
         <!-- the connection communication service injected here is need facing, not owner facing -->
         <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService" />
     </bean>
@@ -38,30 +40,50 @@
         <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
     </bean>
 
+    <!-- service-level services -->
+
     <bean id="needCommunicationService" class="won.server.service.impl.NeedCommunicationServiceImpl">
         <property name="needProtocolNeedService" ref="needProtocolNeedClient" />
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
+        <property name="URIService" ref="uriService" />
+        <property name="executorService" ref="threadPoolExecutor" />
     </bean>
 
     <bean id="needInformationService" class="won.server.service.impl.NeedInformationServiceImpl">
+
     </bean>
 
     <bean id="needManagementService" class="won.server.service.impl.NeedManagementServiceImpl">
+        <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
+        <property name="needInformationService" ref="needInformationService"/>
+        <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
+        <property name="URIService" ref="uriService" />
     </bean>
 
     <bean id="needFacingConnectionCommunicationService"
           class="won.server.service.impl.NeedFacingConnectionCommunicationServiceImpl">
+        <property name="ownerFacingConnectionClient" ref="ownerProtocolOwnerClient" />
+        <property name="executorService" ref="threadPoolExecutor" />
     </bean>
 
     <bean id="ownerFacingConnectionCommunicationService" class="won.server.service.impl.OwnerFacingConnectionCommunicationServiceImpl">
-
+        <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
     </bean>
 
-    <bean id="needProtocolNeedClient" class="won.server.protocol.impl.NeedProtocolNeedClientEmptyImpl">
-
+    <bean id="uriService" class="won.server.service.impl.URIService">
+        <property name="connectionURIPrefix" value="http://example.com/connection" />
+        <property name="needURIPrefix" value="http://example.com/need" />
     </bean>
 
-    <bean id="ownerProtocolOwnerClient" class="won.server.protocol.impl.OwnerProtocolOwnerClientEmptyImpl">
+    <bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg value="30" type="int" index="0"/>
+    </bean>
 
+    <bean id="threadPoolExecutor" class="java.util.concurrent.ThreadPoolExecutor">
+        <constructor-arg value="10" index="0"/>
+        <constructor-arg value="15" index="1"/>
+        <constructor-arg value="1" index="2"/>
+        <constructor-arg value="MINUTES" index="3"/>
+        <constructor-arg ref="workqueue" index="4"/>
     </bean>
 </beans>

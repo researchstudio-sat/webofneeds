@@ -33,25 +33,25 @@ public class NeedProtocolNeedClientEmptyImpl implements NeedProtocolNeedService
   }
 
   @Override
-  public void connectionAccepted(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void connectionDenied(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void connectionClosed(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void textMessageReceived(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
   }

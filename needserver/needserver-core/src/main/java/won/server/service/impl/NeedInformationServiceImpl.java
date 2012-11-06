@@ -23,10 +23,8 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 
 import java.net.URI;
@@ -41,9 +39,6 @@ import java.util.List;
 @Component
 public class NeedInformationServiceImpl implements NeedInformationService
 {
-  private OwnerProtocolOwnerService ownerProtocolOwnerService;
-  private ConnectionCommunicationService connectionCommunicationService;
-
   @Autowired
   private NeedRepository needRepository;
   @Autowired
@@ -55,7 +50,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
     //TODO: provide a repository method for listing just the need URIs
     List<Need> allNeeds = needRepository.findAll();
     List<URI> needURIs = new ArrayList<URI>(allNeeds.size());
-    for (Need need: allNeeds) {
+    for (Need need : allNeeds) {
       needURIs.add(need.getNeedURI());
     }
     return needURIs;
@@ -69,7 +64,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
     //TODO: provide a repository method for listing the connection URIs for a need
     List<Connection> allConnections = connectionRepository.findByNeedURI(need.getNeedURI());
     List<URI> connectionURIs = new ArrayList<URI>(allConnections.size());
-    for (Connection connection: allConnections) {
+    for (Connection connection : allConnections) {
       connectionURIs.add(connection.getConnectionURI());
     }
     return connectionURIs;
@@ -78,7 +73,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   @Override
   public Need readNeed(final URI needURI) throws NoSuchNeedException
   {
-    return(DataAccessUtils.loadNeed(needRepository, needURI));
+    return (DataAccessUtils.loadNeed(needRepository, needURI));
   }
 
   //TODO implement RDF handling!
@@ -102,10 +97,18 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
 
-
-
-  private boolean isNeedActive(final Need need) {
-    return NeedState.ACTIVE == need.getState();
+  public void setNeedRepository(final NeedRepository needRepository)
+  {
+    this.needRepository = needRepository;
   }
 
+  public void setConnectionRepository(final ConnectionRepository connectionRepository)
+  {
+    this.connectionRepository = connectionRepository;
+  }
+
+  private boolean isNeedActive(final Need need)
+  {
+    return NeedState.ACTIVE == need.getState();
+  }
 }

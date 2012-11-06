@@ -31,6 +31,7 @@ import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 
 import java.net.URI;
+import java.util.concurrent.ExecutorService;
 
 /**
  * User: fkleedorfer
@@ -53,6 +54,8 @@ public class NeedCommunicationServiceImpl implements
 
   private URIService URIService;
 
+  private ExecutorService executorService;
+
   @Autowired
   private NeedRepository needRepository;
   @Autowired
@@ -64,7 +67,14 @@ public class NeedCommunicationServiceImpl implements
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.HINT.name(), need.getState());
-    ownerProtocolOwnerService.hintReceived(needURI, otherNeed, score, originator);
+    executorService.execute(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        ownerProtocolOwnerService.hintReceived(needURI, otherNeed, score, originator);
+      }
+    });
   }
 
   @Override
@@ -84,10 +94,18 @@ public class NeedCommunicationServiceImpl implements
     con.setConnectionURI(URIService.createConnectionURI(con));
     con = connectionRepository.save(con);
 
+    final Connection connectionForRunnable = con;
     //send to need
-    URI remoteConnectionURI = needProtocolNeedService.connectionRequested(otherNeedURI, needURI, con.getConnectionURI(), message);
-    con.setRemoteConnectionURI(remoteConnectionURI);
-    con = connectionRepository.save(con);
+    executorService.execute(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        URI remoteConnectionURI = needProtocolNeedService.connectionRequested(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), message);
+        connectionForRunnable.setRemoteConnectionURI(remoteConnectionURI);
+        connectionRepository.save(connectionForRunnable);
+      }
+    });
     return con.getConnectionURI();
   }
 
@@ -111,7 +129,17 @@ public class NeedCommunicationServiceImpl implements
     con = connectionRepository.save(con);
 
     //TODO: do we save the connection message? where? as a chat message?
-    ownerProtocolOwnerService.connectionRequested(needURI, otherNeedURI, con.getConnectionURI(), message);
+
+    final Connection connectionForRunnable = con;
+    executorService.execute(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        ownerProtocolOwnerService.connectionRequested(needURI, otherNeedURI, connectionForRunnable.getConnectionURI(), message);
+      }
+    });
+
     //return the URI of the new connection
     return con.getConnectionURI();
   }
@@ -139,5 +167,15 @@ public class NeedCommunicationServiceImpl implements
   public void setNeedProtocolNeedService(final NeedProtocolNeedService needProtocolNeedService)
   {
     this.needProtocolNeedService = needProtocolNeedService;
+  }
+
+  public void setURIService(final URIService URIService)
+  {
+    this.URIService = URIService;
+  }
+
+  public void setExecutorService(final ExecutorService executorService)
+  {
+    this.executorService = executorService;
   }
 }

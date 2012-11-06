@@ -35,7 +35,7 @@ public class NoSuchNeedException extends WonProtocolException
 
   public NoSuchNeedException(final URI unknownNeedURI)
   {
-    super(MessageFormat.format("No need with the URI '{0}' is known on this server.", unknownNeedURI));
+    super(MessageFormat.format("No need with the URI {0} is known on this server.", unknownNeedURI));
     this.unknownNeedURI = unknownNeedURI;
   }
 
