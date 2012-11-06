@@ -44,15 +44,17 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    * need identified by ownNeedURI. The connection URI ownConnectionURI has been created automatically by the
    * needserver upon being contacted and is passed here to serve as a connection handle.
    *
+   *
    * @param ownNeedURI
    * @param otherNeedURI
    * @param ownConnectionURI
+   * @param message
    * @throws NoSuchNeedException if ownNeedURI or otherNeedURI does not denote a need
    * @throws IllegalMessageForNeedStateException
    *                             if one of the needs is inactive
    * @throws ConnectionAlreadyExistsException
    *                             if the two needs are already connected
    */
-  public void connectionRequested(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
+  public void connectionRequested(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI, final String message) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
 }

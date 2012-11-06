@@ -33,7 +33,7 @@ public class Connection
     private Long id;
   /* The public URI of this connection */
   @Column( name = "connectionURI", unique = true)
-  private URI URI;
+  private URI connectionURI;
   /* The uri of the connection's need object */
   @Column( name = "needURI")
   private URI needURI;
@@ -55,14 +55,14 @@ public class Connection
       this.id = id;
   }
 
-  public URI getURI()
+  public URI getConnectionURI()
   {
-    return URI;
+    return connectionURI;
   }
 
-  public void setURI(final URI URI)
+  public void setConnectionURI(final URI connectionURI)
   {
-    this.URI = URI;
+    this.connectionURI = connectionURI;
   }
 
   public URI getNeedURI()
@@ -113,7 +113,7 @@ public class Connection
 
     final Connection that = (Connection) o;
 
-    if (URI != null ? !URI.equals(that.URI) : that.URI != null) return false;
+    if (connectionURI != null ? !connectionURI.equals(that.connectionURI) : that.connectionURI != null) return false;
     if (needURI != null ? !needURI.equals(that.needURI) : that.needURI != null) return false;
     if (remoteConnectionURI != null ? !remoteConnectionURI.equals(that.remoteConnectionURI) : that.remoteConnectionURI != null)
       return false;
@@ -126,7 +126,7 @@ public class Connection
   @Override
   public int hashCode()
   {
-    int result = URI != null ? URI.hashCode() : 0;
+    int result = connectionURI != null ? connectionURI.hashCode() : 0;
     result = 31 * result + (needURI != null ? needURI.hashCode() : 0);
     result = 31 * result + (remoteConnectionURI != null ? remoteConnectionURI.hashCode() : 0);
     result = 31 * result + (remoteNeedURI != null ? remoteNeedURI.hashCode() : 0);

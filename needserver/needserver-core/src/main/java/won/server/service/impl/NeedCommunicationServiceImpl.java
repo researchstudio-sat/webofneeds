@@ -16,94 +16,128 @@
 
 package won.server.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.exception.WonProtocolException;
 import won.protocol.model.*;
+import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 
 import java.net.URI;
-import java.text.MessageFormat;
-import java.util.List;
 
 /**
  * User: fkleedorfer
  * Date: 02.11.12
  */
+@Component
 public class NeedCommunicationServiceImpl implements
     OwnerFacingNeedCommunicationService,
     NeedFacingNeedCommunicationService,
     MatcherFacingNeedCommunicationService
 {
-  private OwnerProtocolOwnerService ownerClient;
-  private NeedRepository needRepository;
-  private ConnectionCommunicationService connectionCommunicationService;
+  /**
+   * Client talking to the owner side via the owner protocol
+   */
+  private OwnerProtocolOwnerService ownerProtocolOwnerService;
+  /**
+   * Client talking another need via the need protocol
+   */
+  private NeedProtocolNeedService needProtocolNeedService;
 
+  private URIService URIService;
+
+  @Autowired
+  private NeedRepository needRepository;
+  @Autowired
+  private ConnectionRepository connectionRepository;
 
   @Override
   public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    Need need = loadNeed(needURI);
+    //Load need (throws exception if not found)
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.HINT.name(), need.getState());
-    ownerClient.hintReceived(needURI, otherNeed, score, originator);
+    ownerProtocolOwnerService.hintReceived(needURI, otherNeed, score, originator);
   }
 
   @Override
   public URI connectTo(final URI needURI, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
     //Load need (throws exception if not found)
-    Need need = loadNeed(needURI);
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECT_TO.name(), need.getState());
     //Create new connection object
     Connection con = new Connection();
     con.setNeedURI(needURI);
     con.setState(ConnectionState.REQUEST_SENT);
     con.setRemoteNeedURI(otherNeedURI);
-    //TODO: save con in database - this will set the connection URI
-    //Set connection
-    return null;
+    //save connection (this creates a new id)
+    con = connectionRepository.save(con);
+    //create and set new uri
+    con.setConnectionURI(URIService.createConnectionURI(con));
+    con = connectionRepository.save(con);
+
+    //send to need
+    URI remoteConnectionURI = needProtocolNeedService.connectionRequested(otherNeedURI, needURI, con.getConnectionURI(), message);
+    con.setRemoteConnectionURI(remoteConnectionURI);
+    con = connectionRepository.save(con);
+    return con.getConnectionURI();
   }
 
 
   @Override
-  public void connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public URI connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
     //Load need (throws exception if not found)
-    Need need = loadNeed(needURI);
+    Need need = DataAccessUtils.loadNeed(needRepository,needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECTION_REQUESTED.name(), need.getState());
     //Create new connection object on our side
     Connection con = new Connection();
     con.setNeedURI(needURI);
     con.setState(ConnectionState.REQUEST_RECEIVED);
     con.setRemoteNeedURI(otherNeedURI);
-    //TODO: save con in database - this will set the connection URI
-    //Set connection
+    con.setRemoteConnectionURI(otherConnectionURI);
+    //save connection (this creates a new URI)
+    con = connectionRepository.save(con);
+    //create and set new uri
+    con.setConnectionURI(URIService.createConnectionURI(con));
+    con = connectionRepository.save(con);
 
+    //TODO: do we save the connection message? where? as a chat message?
+    ownerProtocolOwnerService.connectionRequested(needURI, otherNeedURI, con.getConnectionURI(), message);
+    //return the URI of the new connection
+    return con.getConnectionURI();
   }
 
-  /**
-   * Loads the specified need from the database and raises an exception if it is not found.
-   *
-   * @param needURI
-   * @throws won.protocol.exception.NoSuchNeedException
-   * @return the connection
-   */
-  private Need loadNeed(final URI needURI) throws NoSuchNeedException
-  {
-    List<Need> needs = needRepository.findByNeedURI(needURI);
-    if (needs.size() == 0) throw new NoSuchNeedException(needURI);
-    if (needs.size() > 0) throw new WonProtocolException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}",needURI));
-    return needs.get(0);
-  }
 
   private boolean isNeedActive(final Need need) {
     return NeedState.ACTIVE == need.getState();
   }
 
+  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerService ownerProtocolOwnerService)
+  {
+    this.ownerProtocolOwnerService = ownerProtocolOwnerService;
+  }
+
+  public void setNeedRepository(final NeedRepository needRepository)
+  {
+    this.needRepository = needRepository;
+  }
+
+  public void setConnectionRepository(final ConnectionRepository connectionRepository)
+  {
+    this.connectionRepository = connectionRepository;
+  }
+
+  public void setNeedProtocolNeedService(final NeedProtocolNeedService needProtocolNeedService)
+  {
+    this.needProtocolNeedService = needProtocolNeedService;
+  }
 }

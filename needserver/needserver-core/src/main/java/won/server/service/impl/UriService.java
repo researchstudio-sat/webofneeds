@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-package won.protocol.exception;
+package won.server.service.impl;
 
+import won.protocol.model.Connection;
+import won.protocol.model.Need;
+
+import java.net.URI;
 
 /**
  * User: fkleedorfer
- * Date: 02.11.12
+ * Date: 06.11.12
  */
-public class IllegalNeedContentException extends WonProtocolException
+public class URIService
 {
-  public IllegalNeedContentException(final String message)
-  {
-    super(message);
+  private URI needURIPrefix;
+  private URI connectionURIPrefix;
+  public URI createNeedURI(Need need){
+    return URI.create(needURIPrefix.toString() + "/" + need.getId());
   }
 
-  public IllegalNeedContentException(final String message, final Throwable cause)
-  {
-    super(message, cause);
+  public URI createConnectionURI(Connection con){
+    return URI.create(needURIPrefix.toString() + "/" + con.getId());
   }
 }

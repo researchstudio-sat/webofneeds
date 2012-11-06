@@ -28,7 +28,7 @@ public interface ConnectionCommunicationService
 {
 
   /**
-   * OwnerService-facing method; accepts a connection initiated by a connect().
+   * Accepts a connection initiated by a connect().
    *
    * @param connectionURI the URI of the connection
    * @throws won.protocol.exception.NoSuchConnectionException if connectionURI does not refer to an existing connection

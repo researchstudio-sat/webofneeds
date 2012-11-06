@@ -37,8 +37,19 @@ public class Match
     @Column( name = "originator")
     private URI originator;
 
+  @Override
+  public String toString()
+  {
+    return "Match{" +
+        "id=" + id +
+        ", fromNeed=" + fromNeed +
+        ", toNeed=" + toNeed +
+        ", score=" + score +
+        ", originator=" + originator +
+        '}';
+  }
 
-    public Long getId() {
+  public Long getId() {
         return id;
     }
 

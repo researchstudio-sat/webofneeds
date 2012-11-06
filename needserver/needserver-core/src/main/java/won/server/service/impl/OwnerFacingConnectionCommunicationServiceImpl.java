@@ -18,31 +18,39 @@ package won.server.service.impl;
 
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionMessage;
 import won.protocol.model.ConnectionState;
+import won.protocol.repository.ChatMessageRepository;
+import won.protocol.repository.ConnectionRepository;
 import won.protocol.service.ConnectionCommunicationService;
 
 import java.net.URI;
+import java.util.Date;
 
 /**
  * User: fkleedorfer
  * Date: 02.11.12
  */
-public class OwnerSideConnectionCommunicationServiceImpl implements ConnectionCommunicationService
+public class OwnerFacingConnectionCommunicationServiceImpl implements ConnectionCommunicationService
 {
   private ConnectionCommunicationService needSideConnectionClient;
+  private ConnectionRepository connectionRepository;
+  private ChatMessageRepository chatMessageRepository;
 
   @Override
   public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    //load connection, checking if it exists and the message is allowed in its state
-    Connection con = loadConnectionForMessage(connectionURI);
+    //load connection, checking if it exists
+    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
     ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_ACCEPT);
     //set new state and save in the db
     con.setState(nextState);
-    //TODO: save in the db
+    //save in the db
+    con = connectionRepository.save(con);
+    //inform the other side
     needSideConnectionClient.accept(con.getRemoteConnectionURI());
   }
 
@@ -51,52 +59,51 @@ public class OwnerSideConnectionCommunicationServiceImpl implements ConnectionCo
   @Override
   public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    //load connection, checking if it exists and the message is allowed in its state
-    Connection con = loadConnectionForMessage(connectionURI);
+    //load connection, checking if it exists
+    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
     ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_DENY);
     //set new state and save in the db
     con.setState(nextState);
-    //TODO: save in the db
+    //save in the db
+    con = connectionRepository.save(con);
+    //inform the other side
     needSideConnectionClient.deny(con.getRemoteConnectionURI());
   }
 
    @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    //load connection, checking if it exists and the message is allowed in its state
-    Connection con = loadConnectionForMessage(connectionURI);
+    //load connection, checking if it exists
+    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
     ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_CLOSE);
     //set new state and save in the db
     con.setState(nextState);
-    //TODO: save in the db
+    //save in the db
+    con = connectionRepository.save(con);
+    //inform the other side
     needSideConnectionClient.close(con.getRemoteConnectionURI());
   }
 
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    //load connection, checking if it exists and the message is allowed in its state
-    Connection con = loadConnectionForMessage(connectionURI);
+    //load connection, checking if it exists
+    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)
     ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_MESSAGE);
-    needSideConnectionClient.sendTextMessage(con.getRemoteConnectionURI(), message);
-  }
+    //construct chatMessage object to store in the db
+    ChatMessage chatMessage = new ChatMessage();
+    chatMessage.setCreationDate(new Date());
+    chatMessage.setLocalConnectionURI(con.getConnectionURI());
+    chatMessage.setMessage(message);
+    chatMessage.setOriginatorURI(con.getNeedURI());
+    //save in the db
+    chatMessageRepository.save(chatMessage);
 
-  /**
-   * Loads the specified connection from the database and raises an exception if it is not found.
-   *
-   * @param connectionURI
-   * @throws won.protocol.exception.NoSuchConnectionException
-   * @return the connection
-   */
-  private Connection loadConnectionForMessage(final URI connectionURI) throws NoSuchConnectionException
-  {
-    //TODO: load connection object from db
-    Connection con = new Connection();
-    if (con == null) throw new NoSuchConnectionException(connectionURI);
-    return con;
+    //inform the other side
+    needSideConnectionClient.sendTextMessage(con.getRemoteConnectionURI(), message);
   }
 
   /**
@@ -109,7 +116,7 @@ public class OwnerSideConnectionCommunicationServiceImpl implements ConnectionCo
    */
   private ConnectionState performStateTransit(Connection con, ConnectionMessage msg) throws IllegalMessageForConnectionStateException{
     if (!msg.isMessageAllowed(con.getState())){
-      throw new IllegalMessageForConnectionStateException(con.getURI(), msg.name(),con.getState());
+      throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(),con.getState());
     }
     return con.getState().transit(msg);
   }

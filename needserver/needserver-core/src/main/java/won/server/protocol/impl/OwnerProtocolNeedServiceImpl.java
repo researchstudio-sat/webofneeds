@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.server.protocol.local;
+package won.server.protocol.impl;
 
 import com.hp.hpl.jena.graph.Graph;
 import won.protocol.exception.*;

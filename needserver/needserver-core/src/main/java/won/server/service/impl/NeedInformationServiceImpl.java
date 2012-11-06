@@ -17,19 +17,19 @@
 package won.server.service.impl;
 
 import com.hp.hpl.jena.graph.Graph;
-import won.protocol.exception.NoSuchConnectionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,12 +38,16 @@ import java.util.List;
  * User: fkleedorfer
  * Date: 02.11.12
  */
+@Component
 public class NeedInformationServiceImpl implements NeedInformationService
 {
-  private OwnerProtocolOwnerService ownerClient;
-  private NeedRepository needRepository;
+  private OwnerProtocolOwnerService ownerProtocolOwnerService;
   private ConnectionCommunicationService connectionCommunicationService;
 
+  @Autowired
+  private NeedRepository needRepository;
+  @Autowired
+  private ConnectionRepository connectionRepository;
 
   @Override
   public Collection<URI> listNeedURIs()
@@ -61,15 +65,20 @@ public class NeedInformationServiceImpl implements NeedInformationService
   @Override
   public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
   {
-    Need need = loadNeed(needURI);
-    //TODO: list connections!
-    return null;
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+    //TODO: provide a repository method for listing the connection URIs for a need
+    List<Connection> allConnections = connectionRepository.findByNeedURI(need.getNeedURI());
+    List<URI> connectionURIs = new ArrayList<URI>(allConnections.size());
+    for (Connection connection: allConnections) {
+      connectionURIs.add(connection.getConnectionURI());
+    }
+    return connectionURIs;
   }
 
   @Override
   public Need readNeed(final URI needURI) throws NoSuchNeedException
   {
-    return(loadNeed(needURI));
+    return(DataAccessUtils.loadNeed(needRepository, needURI));
   }
 
   //TODO implement RDF handling!
@@ -82,7 +91,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   @Override
   public Connection readConnection(final URI connectionURI) throws NoSuchNeedException
   {
-    return loadConnection(connectionURI);
+    return DataAccessUtils.loadConnection(connectionRepository, connectionURI);
   }
 
   //TODO implement RDF handling!
@@ -92,30 +101,8 @@ public class NeedInformationServiceImpl implements NeedInformationService
     return null;  //To change body of implemented methods use File | Settings | File Templates.
   }
 
-  /**
-   * Loads the specified need from the database and raises an exception if it is not found.
-   *
-   * @param needURI
-   * @throws won.protocol.exception.NoSuchNeedException
-   * @return the connection
-   */
-  private Need loadNeed(final URI needURI) throws NoSuchNeedException
-  {
-    List<Need> needs = needRepository.findByNeedURI(needURI);
-    if (needs.size() == 0) throw new NoSuchNeedException(needURI);
-    if (needs.size() > 0) throw new WonProtocolException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}",needURI));
-    return needs.get(0);
-  }
 
-  private Connection loadConnection(final URI connectionURI) throws NoSuchConnectionException
-  {
-    //TODO: load connections from repository!
-    //List<Connection> connections = connectionRepository.findByNeedURI(connectionURI);
-    List<Connection> connections = new ArrayList<Connection>();
-    if (connections.size() == 0) throw new NoSuchNeedException(connectionURI);
-    if (connections.size() > 0) throw new WonProtocolException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}",connectionURI));
-    return connections.get(0);
-  }
+
 
   private boolean isNeedActive(final Need need) {
     return NeedState.ACTIVE == need.getState();

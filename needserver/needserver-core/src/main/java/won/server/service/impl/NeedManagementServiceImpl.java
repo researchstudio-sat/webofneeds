@@ -17,33 +17,38 @@
 package won.server.service.impl;
 
 import com.hp.hpl.jena.graph.Graph;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * User: fkleedorfer
  * Date: 02.11.12
  */
+@Component
 public class NeedManagementServiceImpl implements NeedManagementService
 {
-  private OwnerProtocolOwnerService ownerClient;
-  private NeedRepository needRepository;
+  private OwnerProtocolOwnerService ownerProtocolOwnerService;
   private ConnectionCommunicationService connectionCommunicationService;
   private NeedInformationService needInformationService;
+  private URIService URIService;
+  @Autowired
+  private NeedRepository needRepository;
+  @Autowired
+  private MatchRepository matchRepository;
 
 
   @Override
@@ -54,13 +59,16 @@ public class NeedManagementServiceImpl implements NeedManagementService
     need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
     need.setOwnerURI(ownerURI);
     need = needRepository.save(need);
+    //now, create the need URI and save again
+    need.setNeedURI(URIService.createNeedURI(need));
+    need = needRepository.save(need);
     return need.getNeedURI();
   }
 
   @Override
   public void activate(final URI needURI) throws NoSuchNeedException
   {
-    Need need = loadNeed(needURI);
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     need.setState(NeedState.ACTIVE);
     need = needRepository.save(need);
   }
@@ -68,7 +76,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Override
   public void deactivate(final URI needURI) throws NoSuchNeedException
   {
-    Need need = loadNeed(needURI);
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     need.setState(NeedState.INACTIVE);
     need = needRepository.save(need);
     //close all connections
@@ -82,25 +90,11 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Override
   public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException
   {
-    Need need = loadNeed(needURI);
-    //TODO: list matches!
-    return null;
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+    return matchRepository.findByFromNeed(need.getNeedURI());
   }
 
-  /**
-   * Loads the specified need from the database and raises an exception if it is not found.
-   *
-   * @param needURI
-   * @throws won.protocol.exception.NoSuchNeedException
-   * @return the connection
-   */
-  private Need loadNeed(final URI needURI) throws NoSuchNeedException
-  {
-    List<Need> needs = needRepository.findByNeedURI(needURI);
-    if (needs.size() == 0) throw new NoSuchNeedException(needURI);
-    if (needs.size() > 0) throw new WonProtocolException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}",needURI));
-    return needs.get(0);
-  }
+
 
   private boolean isNeedActive(final Need need) {
     return NeedState.ACTIVE == need.getState();

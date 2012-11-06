@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package won.server.protocol.local;
+package won.server.protocol.impl;
 
 import won.protocol.exception.*;
-import won.protocol.need.NeedProtocolService;
+import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 
@@ -27,15 +27,15 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 02.11.12
  */
-public class NeedProtocolServiceImpl implements NeedProtocolService
+public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
 {
-  private NeedFacingNeedCommunicationService needCommunicationService;
+  private NeedFacingNeedCommunicationService needFacingNeedCommunicationService;
   private ConnectionCommunicationService connectionCommunicationService;
 
   @Override
-  public void connectionRequested(final URI need, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public URI connectionRequested(final URI need, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    this.needCommunicationService.connectionRequested(need, otherNeedURI, otherConnectionURI, message);
+    return this.needFacingNeedCommunicationService.connectionRequested(need, otherNeedURI, otherConnectionURI, message);
   }
 
   @Override
@@ -62,9 +62,9 @@ public class NeedProtocolServiceImpl implements NeedProtocolService
     this.connectionCommunicationService.sendTextMessage(connectionURI, message);
   }
 
-  public void setNeedCommunicationService(final NeedFacingNeedCommunicationService needCommunicationService)
+  public void setNeedFacingNeedCommunicationService(final NeedFacingNeedCommunicationService needFacingNeedCommunicationService)
   {
-    this.needCommunicationService = needCommunicationService;
+    this.needFacingNeedCommunicationService = needFacingNeedCommunicationService;
   }
 
   public void setConnectionCommunicationService(final ConnectionCommunicationService connectionCommunicationService)

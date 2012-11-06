@@ -34,7 +34,7 @@ public class Need
   @Column( name = "id" )
   private Long id;
   /* The URI of the need */
-  @Column( name = "needURI", unique = true)
+  @Column( name = "needURI", unique = true, nullable = false)
   private URI needURI;
   /* The state of the need */
   @Column( name = "state")

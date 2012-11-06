@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package won.protocol.exception;
+package won.protocol.repository;
 
+import won.protocol.model.Match;
+
+import java.net.URI;
+import java.util.List;
 
 /**
  * User: fkleedorfer
- * Date: 02.11.12
+ * Date: 05.11.12
  */
-public class IllegalNeedContentException extends WonProtocolException
+public interface MatchRepository extends WonRepository<Match>
 {
-  public IllegalNeedContentException(final String message)
-  {
-    super(message);
-  }
-
-  public IllegalNeedContentException(final String message, final Throwable cause)
-  {
-    super(message, cause);
-  }
+  public List<Match> findByFromNeed(URI fromNeed);
 }

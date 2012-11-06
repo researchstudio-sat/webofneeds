@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package won.owner.protocol.local;
+package won.server.protocol.impl;
 
 import won.protocol.exception.*;
-import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
 
 import java.net.URI;
 
 /**
- * Implementation for testing purposes; communicates only with partners within the same VM.
+ * TODO: Empty owner client implementation to be replaced by WS client.
  */
-public abstract class OwnerProtocolOwnerServiceLocalImpl implements OwnerProtocolOwnerService
+public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerService
 {
-  protected OwnerProtocolNeedService needClient;
-
   @Override
   public void hintReceived(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI) throws NoSuchNeedException
   {
@@ -36,7 +33,7 @@ public abstract class OwnerProtocolOwnerServiceLocalImpl implements OwnerProtoco
   }
 
   @Override
-  public void connectionRequested(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
+  public void connectionRequested(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final String message) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
   }
@@ -63,10 +60,5 @@ public abstract class OwnerProtocolOwnerServiceLocalImpl implements OwnerProtoco
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  public void setNeedClient(final OwnerProtocolNeedService needClient)
-  {
-    this.needClient = needClient;
   }
 }

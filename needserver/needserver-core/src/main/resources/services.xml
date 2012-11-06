@@ -17,15 +17,51 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-    <bean id="matcherProtocolNeedService" class="won.server.service.impl.NeedCommunicationServiceImpl">
-        <property name="connectionCommunicationService" ref="connectionCommunicationService"/>
-        <property name="needRepository" ref="needRepository" />
-    </bean>
-    <bean id="connectionCommunicationService" class="won.server.service.impl.ConnectionServiceImpl">
-        <property name="nodeToNodeSender" ref="nodeToNodeSender"/>
-        <property name="nodeToOwnerSender" ref="nodeToOwnerSender"/>
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="needProtocolNeedService" class="won.server.protocol.impl.NeedProtocolNeedServiceImpl">
+        <property name="needFacingNeedCommunicationService" ref="needCommunicationServiceImpl" />
+        <!-- the connection communication service injected here is need facing, not owner facing -->
+        <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService" />
     </bean>
 
+    <bean id="ownerProtocolNeedService" class="won.server.protocol.impl.OwnerProtocolNeedServiceImpl">
+        <!-- the connection communication service injected here is owner facing -->
+        <property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
+        <property name="needCommunicationService" ref="needCommunicationService" />
+        <property name="needInformationService" ref="needInformationService" />
+        <property name="needManagementService" ref="needManagementService" />
+    </bean>
+
+    <bean id="matcherProtocolNeedService" class="won.server.protocol.impl.MatcherProtocolNeedServiceImpl">
+        <property name="needInformationService" ref="needInformationService" />
+        <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
+    </bean>
+
+    <bean id="needCommunicationService" class="won.server.service.impl.NeedCommunicationServiceImpl">
+        <property name="needProtocolNeedService" ref="needProtocolNeedClient" />
+        <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
+    </bean>
+
+    <bean id="needInformationService" class="won.server.service.impl.NeedInformationServiceImpl">
+    </bean>
+
+    <bean id="needManagementService" class="won.server.service.impl.NeedManagementServiceImpl">
+    </bean>
+
+    <bean id="needFacingConnectionCommunicationService"
+          class="won.server.service.impl.NeedFacingConnectionCommunicationServiceImpl">
+    </bean>
+
+    <bean id="ownerFacingConnectionCommunicationService" class="won.server.service.impl.OwnerFacingConnectionCommunicationServiceImpl">
+
+    </bean>
+
+    <bean id="needProtocolNeedClient" class="won.server.protocol.impl.NeedProtocolNeedClientEmptyImpl">
+
+    </bean>
+
+    <bean id="ownerProtocolOwnerClient" class="won.server.protocol.impl.OwnerProtocolOwnerClientEmptyImpl">
+
+    </bean>
 </beans>

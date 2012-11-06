@@ -13,7 +13,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class JPATest {
     public static void main(final String[] args) {
 
-        final AbstractApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        final AbstractApplicationContext context = new ClassPathXmlApplicationContext("/applicationContext.xml");
         context.registerShutdownHook();
         final Executor executor = context.getBean(Executor.class);
         executor.execute();

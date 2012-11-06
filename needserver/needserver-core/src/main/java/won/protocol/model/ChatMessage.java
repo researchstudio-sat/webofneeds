@@ -48,6 +48,18 @@ public class ChatMessage
   @Column( name = "message" )
   private String message;
 
+  @Override
+  public String toString()
+  {
+    return "ChatMessage{" +
+        "id=" + id +
+        ", creationDate=" + creationDate +
+        ", originatorURI=" + originatorURI +
+        ", localConnectionURI=" + localConnectionURI +
+        ", message='" + message + '\'' +
+        '}';
+  }
+
   public Long getId() {
       return id;
   }

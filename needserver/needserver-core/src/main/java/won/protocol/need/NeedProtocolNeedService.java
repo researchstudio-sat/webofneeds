@@ -24,7 +24,7 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 31.10.12
  */
-public interface NeedProtocolService
+public interface NeedProtocolNeedService
 {
 
   /**
@@ -38,7 +38,7 @@ public interface NeedProtocolService
    * @param message
    *
    */
-  public void connectionRequested(URI need, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+  public URI connectionRequested(URI need, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
   /**
    * NeedCommunicationService-facing (i.e. connection-facing) method; Informs the connection object of the fact that the connection

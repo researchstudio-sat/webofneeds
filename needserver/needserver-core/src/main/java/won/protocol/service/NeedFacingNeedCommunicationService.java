@@ -32,6 +32,7 @@ public interface NeedFacingNeedCommunicationService
    * Requests a connection to the need identified by needURI. The request is coming from the need otherNeedURI via its
    * connection otherConnectionURI. A short message can be sent along with the request.
    * A new connection will be created and the request will be forwarded to the owner of the need.
+   * The URI of the newly created connection is returned.
    *
    * @param needURI the URI of the need
    * @param otherNeedURI
@@ -40,8 +41,9 @@ public interface NeedFacingNeedCommunicationService
    * @throws won.protocol.exception.NoSuchNeedException if needURI is not a known need URI
    * @throws won.protocol.exception.IllegalMessageForNeedStateException if the need is not in active state
    * @throws won.protocol.exception.ConnectionAlreadyExistsException if there already is a connection between the specified needs
+   * @return the URI of the newly created connection
    */
-  public void connectionRequested(URI needURI, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+  public URI connectionRequested(URI needURI, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
 
 }
