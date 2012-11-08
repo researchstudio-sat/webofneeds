@@ -68,6 +68,7 @@
 
     <bean id="ownerFacingConnectionCommunicationService" class="won.server.service.impl.OwnerFacingConnectionCommunicationServiceImpl">
         <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
+        <property name="executorService" ref="threadPoolExecutor" />
     </bean>
 
     <bean id="uriService" class="won.server.service.impl.URIService">

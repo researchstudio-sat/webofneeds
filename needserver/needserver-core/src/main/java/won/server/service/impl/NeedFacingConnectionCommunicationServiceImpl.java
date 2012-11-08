@@ -16,6 +16,8 @@
 
 package won.server.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
@@ -39,6 +41,7 @@ import java.util.concurrent.ExecutorService;
 @Component
 public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionCommunicationService
 {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   private ConnectionCommunicationService ownerFacingConnectionClient;
 
   private ExecutorService executorService;
@@ -52,14 +55,15 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Override
   public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    logger.info("ACCEPT received from the need side for connection {}",new Object[]{connectionURI});
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)
     ConnectionState nextState = performStateTransit(con, ConnectionMessage.PARTNER_ACCEPT);
     con.setState(nextState);
     //save in the db
-    con = connectionRepository.save(con);
-    //inform the other side
+    con = connectionRepository.saveAndFlush(con);
+    //inform the need side
     executorService.execute(new Runnable()
     {
       @Override
@@ -73,14 +77,15 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Override
   public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    logger.info("DENY received from the need side for connection {}",new Object[]{connectionURI});
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)
     ConnectionState nextState = performStateTransit(con, ConnectionMessage.PARTNER_DENY);
     con.setState(nextState);
     //save in the db
-    con = connectionRepository.save(con);
-    //inform the other side
+    con = connectionRepository.saveAndFlush(con);
+    //inform the need side
     executorService.execute(new Runnable()
     {
       @Override
@@ -94,14 +99,15 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
    @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    logger.info("CLOSE received from the need side for connection {}",new Object[]{connectionURI});
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)
     ConnectionState nextState = performStateTransit(con, ConnectionMessage.PARTNER_CLOSE);
     con.setState(nextState);
     //save in the db
-    con = connectionRepository.save(con);
-    //inform the other side
+    con = connectionRepository.saveAndFlush(con);
+    //inform the need side
     executorService.execute(new Runnable()
     {
       @Override
@@ -115,6 +121,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    logger.info("SEND_TEXT_MESSAGE received from the need side for connection {} with message '{}'",new Object[]{connectionURI,message});
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)
@@ -126,8 +133,8 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     chatMessage.setMessage(message);
     chatMessage.setOriginatorURI(con.getNeedURI());
     //save in the db
-    chatMessageRepository.save(chatMessage);
-    //send to the other side
+    chatMessageRepository.saveAndFlush(chatMessage);
+    //send to the need side
     executorService.execute(new Runnable()
     {
       @Override

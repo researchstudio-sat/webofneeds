@@ -23,16 +23,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.owner.service.impl.AutomaticOwnerService;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.matcher.MatcherProtocolNeedService;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.model.NeedState;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 
 import java.net.URI;
+import java.util.Collection;
 
 /**
  * User: fkleedorfer
@@ -96,14 +100,17 @@ public class NeedServerIntegrationTests
   }
 
   @Test
+  //Propagation.NEVER is required here because if transactions start here and propagate,
+  //code running in different threads won't inherit the transaction, and won't see changes to the database
+  //made within the transaction
+  @Transactional(propagation = Propagation.NEVER)
   public void testConnect() throws Exception{
     URI ownerURI = createOwnerURI();
     URI matcherURI = createMatcherURI();
 
-    //prepare a mockup owner service that connects, sends a message and closes
-
-
+    //configure the mockup owner service to connect, send a message and close
     mockOwnerService.setAutoConnect(true);
+    mockOwnerService.setOnConnectAction("ACCEPT");
     mockOwnerService.setOnAcceptAction("MESSAGE");
     mockOwnerService.setOnMessageAction("CLOSE");
     mockOwnerService.setOnCloseAction("NONE");
@@ -112,15 +119,65 @@ public class NeedServerIntegrationTests
     URI need1URI = ownerProtocolNeedService.createNeed(ownerURI,null,true);
     URI need2URI = ownerProtocolNeedService.createNeed(ownerURI,null,true);
     Assert.assertNotSame("Two consecutively created needs have the same URI", need1URI, need2URI);
-
     //try to connect the needs (both are inactive)
     URI connectionURI = ownerProtocolNeedService.connectTo(need1URI,need2URI,"Let's talk!");
     Assert.assertNotNull(connectionURI);
-    Thread.sleep(500);
+    Thread.sleep(500);  //wait for all communication to play out
     Assert.assertEquals(1,mockOwnerService.getMethodCallCount(AutomaticOwnerService.Method.accept));
     Assert.assertEquals(1,mockOwnerService.getMethodCallCount(AutomaticOwnerService.Method.sendTextMessage));
     Assert.assertEquals(1,mockOwnerService.getMethodCallCount(AutomaticOwnerService.Method.close));
+    //now check if connection listing works
+    Collection<URI> need1Connections = this.ownerProtocolNeedService.listConnectionURIs(need1URI);
+    Assert.assertEquals(1, need1Connections.size());
+    Assert.assertTrue(need1Connections.contains(connectionURI));
+    Collection<URI> need2Connections = this.ownerProtocolNeedService.listConnectionURIs(need2URI);
+    Assert.assertEquals(1, need2Connections.size());
+    URI conn2URI = need2Connections.iterator().next();
+    Connection conn1 = ownerProtocolNeedService.readConnection(connectionURI);
+    Assert.assertEquals(ConnectionState.CLOSED, conn1.getState());
+    Assert.assertEquals(connectionURI, conn1.getConnectionURI());
+    Assert.assertEquals(need1URI,conn1.getNeedURI());
+    Assert.assertEquals(need2URI,conn1.getRemoteNeedURI());
+    Assert.assertEquals(conn2URI,conn1.getRemoteConnectionURI());
+  }
 
+  @Test
+  //Propagation.NEVER is required here because if transactions start here and propagate,
+  //code running in different threads won't inherit the transaction, and won't see changes to the database
+  //made within the transaction
+  @Transactional(propagation = Propagation.NEVER)
+  public void testCommunicationErrors() throws Exception{
+    URI ownerURI = createOwnerURI();
+    URI matcherURI = createMatcherURI();
+
+    //configure the mockup to send a message directly when connected to (not allowed)
+    mockOwnerService.setAutoConnect(true);
+    mockOwnerService.setOnConnectAction("MESSAGE");
+    mockOwnerService.setOwnerProtocolNeedService(ownerProtocolNeedService);
+
+    URI need1URI = ownerProtocolNeedService.createNeed(ownerURI,null,true);
+    URI need2URI = ownerProtocolNeedService.createNeed(ownerURI,null,true);
+    Assert.assertNotSame("Two consecutively created needs have the same URI", need1URI, need2URI);
+    //try to connect the needs (both are inactive)
+    URI connectionURI = ownerProtocolNeedService.connectTo(need1URI,need2URI,"Let's talk!");
+    Assert.assertNotNull(connectionURI);
+    Thread.sleep(500);  //wait for all communication to play out
+    Assert.assertEquals(1,mockOwnerService.getMethodCallCount(AutomaticOwnerService.Method.accept));
+    Assert.assertEquals(1,mockOwnerService.getMethodCallCount(AutomaticOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(1,mockOwnerService.getMethodCallCount(AutomaticOwnerService.Method.close));
+    //now check if connection listing works
+    Collection<URI> need1Connections = this.ownerProtocolNeedService.listConnectionURIs(need1URI);
+    Assert.assertEquals(1, need1Connections.size());
+    Assert.assertTrue(need1Connections.contains(connectionURI));
+    Collection<URI> need2Connections = this.ownerProtocolNeedService.listConnectionURIs(need2URI);
+    Assert.assertEquals(1, need2Connections.size());
+    URI conn2URI = need2Connections.iterator().next();
+    Connection conn1 = ownerProtocolNeedService.readConnection(connectionURI);
+    Assert.assertEquals(ConnectionState.CLOSED, conn1.getState());
+    Assert.assertEquals(connectionURI, conn1.getConnectionURI());
+    Assert.assertEquals(need1URI,conn1.getNeedURI());
+    Assert.assertEquals(need2URI,conn1.getRemoteNeedURI());
+    Assert.assertEquals(conn2URI,conn1.getRemoteConnectionURI());
   }
 
   private URI createOwnerURI(){

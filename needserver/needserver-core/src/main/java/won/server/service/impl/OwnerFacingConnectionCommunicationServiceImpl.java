@@ -16,6 +16,8 @@
 
 package won.server.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
@@ -37,6 +39,7 @@ import java.util.concurrent.ExecutorService;
  */
 public class OwnerFacingConnectionCommunicationServiceImpl implements ConnectionCommunicationService
 {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   private ConnectionCommunicationService needFacingConnectionClient;
 
   private ExecutorService executorService;
@@ -49,6 +52,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   @Override
   public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    logger.info("ACCEPT received from the owner side for connection {}",new Object[]{connectionURI});
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
@@ -56,7 +60,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
-    final Connection connectionForRunnable = connectionRepository.save(con);
+    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
     //inform the other side
     executorService.execute(new Runnable()
     {
@@ -74,6 +78,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   @Override
   public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    logger.info("DENY received from the owner side for connection {}",new Object[]{connectionURI});
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
@@ -81,7 +86,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
-    final Connection connectionForRunnable = connectionRepository.save(con);
+    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
     //inform the other side
     executorService.execute(new Runnable()
     {
@@ -96,6 +101,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
    @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    logger.info("CLOSE received from the owner side for connection {}",new Object[]{connectionURI});
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
@@ -103,7 +109,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
-    final Connection connectionForRunnable = connectionRepository.save(con);
+    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
     //inform the other side
     executorService.execute(new Runnable()
     {
@@ -118,6 +124,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'",new Object[]{connectionURI,message});
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)
@@ -129,7 +136,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     chatMessage.setMessage(message);
     chatMessage.setOriginatorURI(con.getNeedURI());
     //save in the db
-    chatMessageRepository.save(chatMessage);
+    chatMessageRepository.saveAndFlush(chatMessage);
     final URI remoteConnectionURI = con.getRemoteConnectionURI();
     //inform the other side
     executorService.execute(new Runnable()

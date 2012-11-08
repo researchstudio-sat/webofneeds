@@ -25,7 +25,6 @@ import java.util.List;
  * User: fkleedorfer
  * Date: 05.11.12
  */
-
 public interface MatchRepository extends WonRepository<Match>
 {
   public List<Match> findByFromNeed(URI fromNeed);

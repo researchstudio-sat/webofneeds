@@ -64,7 +64,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     need = needRepository.save(need);
     //now, create the need URI and save again
     need.setNeedURI(URIService.createNeedURI(need));
-    need = needRepository.save(need);
+    need = needRepository.saveAndFlush(need);
     return need.getNeedURI();
   }
 
@@ -73,7 +73,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   {
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     need.setState(NeedState.ACTIVE);
-    need = needRepository.save(need);
+    need = needRepository.saveAndFlush(need);
   }
 
   @Override
@@ -81,7 +81,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   {
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     need.setState(NeedState.INACTIVE);
-    need = needRepository.save(need);
+    need = needRepository.saveAndFlush(need);
     //close all connections
     //TODO: add a filter to the method/repo to filter only non-closed connections
     Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());

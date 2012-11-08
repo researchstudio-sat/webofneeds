@@ -16,6 +16,8 @@
 
 package won.server.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.ConnectionAlreadyExistsException;
@@ -33,6 +35,7 @@ import won.protocol.service.OwnerFacingNeedCommunicationService;
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
 
+
 /**
  * User: fkleedorfer
  * Date: 02.11.12
@@ -43,6 +46,8 @@ public class NeedCommunicationServiceImpl implements
     NeedFacingNeedCommunicationService,
     MatcherFacingNeedCommunicationService
 {
+  final Logger logger = LoggerFactory.getLogger(NeedCommunicationServiceImpl.class);
+
   /**
    * Client talking to the owner side via the owner protocol
    */
@@ -64,6 +69,7 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
+    logger.info("HINT received for need {} referring to need {} with score {} from originator {}",new Object[]{needURI.toString(),otherNeed.toString(),score,originator.toString()});
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.HINT.name(), need.getState());
@@ -72,6 +78,8 @@ public class NeedCommunicationServiceImpl implements
       @Override
       public void run()
       {
+        //TODO: somewhere, we'll have to use the need's owner URI to determine where to send the request to..
+        //should we access the database again in the implementation of the owner protocol owner client?
         ownerProtocolOwnerService.hintReceived(needURI, otherNeed, score, originator);
       }
     });
@@ -80,6 +88,7 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public URI connectTo(final URI needURI, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
+    logger.info("CONNECT_TO received for need {} referring to need {} with message '{}'",new Object[]{needURI.toString(),otherNeedURI.toString(),message});
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECT_TO.name(), need.getState());
@@ -89,10 +98,10 @@ public class NeedCommunicationServiceImpl implements
     con.setState(ConnectionState.REQUEST_SENT);
     con.setRemoteNeedURI(otherNeedURI);
     //save connection (this creates a new id)
-    con = connectionRepository.save(con);
+    con = connectionRepository.saveAndFlush(con);
     //create and set new uri
     con.setConnectionURI(URIService.createConnectionURI(con));
-    con = connectionRepository.save(con);
+    con = connectionRepository.saveAndFlush(con);
 
     final Connection connectionForRunnable = con;
     //send to need
@@ -103,7 +112,7 @@ public class NeedCommunicationServiceImpl implements
       {
         URI remoteConnectionURI = needProtocolNeedService.connectionRequested(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), message);
         connectionForRunnable.setRemoteConnectionURI(remoteConnectionURI);
-        connectionRepository.save(connectionForRunnable);
+        connectionRepository.saveAndFlush(connectionForRunnable);
       }
     });
     return con.getConnectionURI();
@@ -113,6 +122,7 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public URI connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
+    logger.info("CONNECTION_REQUESTED received for need {} referring to need {} (connection {}) with message '{}'",new Object[]{needURI.toString(),otherNeedURI.toString(), otherConnectionURI,message});
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository,needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECTION_REQUESTED.name(), need.getState());
@@ -123,10 +133,10 @@ public class NeedCommunicationServiceImpl implements
     con.setRemoteNeedURI(otherNeedURI);
     con.setRemoteConnectionURI(otherConnectionURI);
     //save connection (this creates a new URI)
-    con = connectionRepository.save(con);
+    con = connectionRepository.saveAndFlush(con);
     //create and set new uri
     con.setConnectionURI(URIService.createConnectionURI(con));
-    con = connectionRepository.save(con);
+    con = connectionRepository.saveAndFlush(con);
 
     //TODO: do we save the connection message? where? as a chat message?
 

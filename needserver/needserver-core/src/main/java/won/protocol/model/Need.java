@@ -83,6 +83,17 @@ public class Need
   }
 
   @Override
+  public String toString()
+  {
+    return "Need{" +
+        "id=" + id +
+        ", needURI=" + needURI +
+        ", state=" + state +
+        ", ownerURI=" + ownerURI +
+        '}';
+  }
+
+  @Override
   public boolean equals(final Object o)
   {
     if (this == o) return true;

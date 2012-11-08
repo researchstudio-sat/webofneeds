@@ -120,9 +120,14 @@
       <surefire.usefile>false</surefire.usefile>
 
       <!-- versions for various dependencies -->
-      <jena.dependency.version>2.9.3</jena.dependency.version>
-      <junit.dependency.version>4.8.2</junit.dependency.version>
-      <spring.dependency.version>3.1.3.RELEASE</spring.dependency.version>
-      <cglib.dependency.version>2.2.2</cglib.dependency.version>
+      <cglib.version>2.2.2</cglib.version>
+      <junit.version>4.8.2</junit.version>
+      <log4j.version>1.2.17</log4j.version>
+      <org.apache.jena.version>2.9.3</org.apache.jena.version>
+      <org.hibernate.version>4.1.7.Final</org.hibernate.version>
+      <org.springframework.data.version>1.1.1.RELEASE</org.springframework.data.version>
+      <org.springframework.version>3.1.3.RELEASE</org.springframework.version>
+      <org.slf4j.version>1.6.6</org.slf4j.version>
+      <postgresql.version>9.1-901.jdbc4</postgresql.version>
   </properties>
 </project>

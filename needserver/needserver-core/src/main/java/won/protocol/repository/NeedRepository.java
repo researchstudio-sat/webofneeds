@@ -1,5 +1,7 @@
 package won.protocol.repository;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.protocol.model.Need;
 
 import java.net.URI;
@@ -14,5 +16,12 @@ import java.util.List;
  */
 
 public interface NeedRepository extends WonRepository<Need> {
-    List<Need> findByNeedURI(URI URI);
+
+  List<Need> findByNeedURI(URI URI);
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Override
+  Need saveAndFlush(Need need);
+
+
 }
