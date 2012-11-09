@@ -45,6 +45,8 @@
     <bean id="needCommunicationService" class="won.server.service.impl.NeedCommunicationServiceImpl">
         <property name="needProtocolNeedService" ref="needProtocolNeedClient" />
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
+        <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
+        <property name="needFacingConnectionCommunicationService" ref="needFacingConnectionCommunicationService" />
         <property name="URIService" ref="uriService" />
         <property name="executorService" ref="threadPoolExecutor" />
     </bean>
@@ -72,8 +74,8 @@
     </bean>
 
     <bean id="uriService" class="won.server.service.impl.URIService">
-        <property name="connectionURIPrefix" value="http://example.com/connection" />
-        <property name="needURIPrefix" value="http://example.com/need" />
+        <property name="connectionURIPrefix" value="http://first.com/connection" />
+        <property name="needURIPrefix" value="http://first.com/need" />
     </bean>
 
     <bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">

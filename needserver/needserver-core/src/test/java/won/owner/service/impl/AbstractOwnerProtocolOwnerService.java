@@ -16,11 +16,16 @@
 
 package won.owner.service.impl;
 
+import com.hp.hpl.jena.graph.Graph;
 import won.protocol.exception.*;
+import won.protocol.model.Connection;
+import won.protocol.model.Match;
+import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
 
 import java.net.URI;
+import java.util.Collection;
 
 /**
  * Implementation for testing purposes; communicates only with partners within the same VM.
@@ -63,6 +68,61 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public URI createNeed(final URI ownerURI, final Graph content, final boolean activate) throws IllegalNeedContentException
+  {
+    return ownerProtocolNeedService.createNeed(ownerURI, content, activate);
+  }
+
+  public Graph readNeedContent(final URI needURI) throws NoSuchNeedException
+  {
+    return ownerProtocolNeedService.readNeedContent(needURI);
+  }
+
+  public Need readNeed(final URI needURI) throws NoSuchNeedException
+  {
+    return ownerProtocolNeedService.readNeed(needURI);
+  }
+
+  public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException
+  {
+    return ownerProtocolNeedService.getMatches(needURI);
+  }
+
+  public Connection readConnection(final URI connectionURI) throws NoSuchNeedException
+  {
+    return ownerProtocolNeedService.readConnection(connectionURI);
+  }
+
+  public void activate(final URI needURI) throws NoSuchNeedException
+  {
+    ownerProtocolNeedService.activate(needURI);
+  }
+
+  public URI connectTo(final URI needURI, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  {
+    return ownerProtocolNeedService.connectTo(needURI, otherNeedURI, message);
+  }
+
+  public Graph readConnectionContent(final URI connectionURI) throws NoSuchNeedException
+  {
+    return ownerProtocolNeedService.readConnectionContent(connectionURI);
+  }
+
+  public void deactivate(final URI needURI) throws NoSuchNeedException
+  {
+    ownerProtocolNeedService.deactivate(needURI);
+  }
+
+  public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
+  {
+    return ownerProtocolNeedService.listConnectionURIs(needURI);
+  }
+
+  public Collection<URI> listNeedURIs()
+  {
+    return ownerProtocolNeedService.listNeedURIs();
   }
 
   public void setOwnerProtocolNeedService(final OwnerProtocolNeedService ownerProtocolNeedService)

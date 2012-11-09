@@ -69,6 +69,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       @Override
       public void run()
       {
+
         ownerFacingConnectionClient.accept(connectionURI);
       }
     });

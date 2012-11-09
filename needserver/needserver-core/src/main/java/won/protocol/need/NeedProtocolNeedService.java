@@ -32,6 +32,7 @@ public interface NeedProtocolNeedService extends ConnectionCommunicationService
    * Requests a connection from the need otherNeedURI. The other need refers to the
    * connection using the specified otherConnectionURI. A short message can be sent along with the
    * request.
+
    *
    * @param need the URI of the need
    * @param otherNeedURI

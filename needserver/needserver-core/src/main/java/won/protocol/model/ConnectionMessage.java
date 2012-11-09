@@ -22,13 +22,17 @@ package won.protocol.model;
  */
 public enum ConnectionMessage
 {
-  OWNER_ACCEPT(ConnectionState.REQUEST_RECEIVED),
-  OWNER_DENY(ConnectionState.REQUEST_RECEIVED),
-  OWNER_CLOSE(ConnectionState.ESTABLISHED),
+  //in general, be permissive about messages where possible. Don't care about duplicate messages
+
+  OWNER_ACCEPT(ConnectionState.REQUEST_RECEIVED,ConnectionState.ESTABLISHED),
+  OWNER_DENY(ConnectionState.REQUEST_RECEIVED,ConnectionState.CLOSED),
+  //close may always be called. It always closes the connnection.
+  OWNER_CLOSE(ConnectionState.ESTABLISHED, ConnectionState.REQUEST_SENT, ConnectionState.REQUEST_RECEIVED, ConnectionState.CLOSED),
   OWNER_MESSAGE(ConnectionState.ESTABLISHED),
-  PARTNER_ACCEPT(ConnectionState.REQUEST_SENT),
-  PARTNER_DENY(ConnectionState.REQUEST_SENT),
-  PARTNER_CLOSE(ConnectionState.ESTABLISHED),
+  PARTNER_ACCEPT(ConnectionState.REQUEST_SENT,ConnectionState.ESTABLISHED),
+  PARTNER_DENY(ConnectionState.REQUEST_SENT,ConnectionState.CLOSED),
+  //close may always be called. It always closes the connnection.
+  PARTNER_CLOSE(ConnectionState.ESTABLISHED, ConnectionState.REQUEST_SENT, ConnectionState.REQUEST_RECEIVED, ConnectionState.CLOSED),
   PARTNER_MESSAGE(ConnectionState.ESTABLISHED);
 
   private ConnectionState[] permittingStates;

@@ -36,6 +36,9 @@ public interface OwnerFacingNeedCommunicationService
    * remote need. When the connection is accepted by the other side, the remote need will generate
    * a connection URI in its own domain and link it to the URI generated here.
    *
+   * The other need object is contacted asynchronously. If the other need object is inactive, the owner of this
+   * need object will receive a deny message.
+   *
    * @param needURI the URI of the need
    * @param otherNeedURI the remote need to connect to
    * @param message (optional) a message for the remote need's owner

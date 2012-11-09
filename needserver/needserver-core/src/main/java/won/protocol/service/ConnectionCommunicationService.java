@@ -37,7 +37,7 @@ public interface ConnectionCommunicationService
   public void accept(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
-   * OwnerService-facing method; deny a connection initiated by a connect().
+   * Deny a connection initiated by a connect().
    *
    * @param connectionURI the URI of the connection
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
@@ -46,7 +46,7 @@ public interface ConnectionCommunicationService
   public void deny(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
-   * OwnerService-facing method; closes the connection identified by the specified URI, indicating success.
+   * Closes the connection identified by the specified URI, indicating success.
    *
    * @param connectionURI the URI of the connection
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
@@ -55,7 +55,7 @@ public interface ConnectionCommunicationService
   public void close(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
-   * OwnerService-facing method; sends a chat message via the local connection identified by the specified connectionURI
+   * Sends a chat message via the local connection identified by the specified connectionURI
    * to the remote partner.
    *
    * @param connectionURI the local connection

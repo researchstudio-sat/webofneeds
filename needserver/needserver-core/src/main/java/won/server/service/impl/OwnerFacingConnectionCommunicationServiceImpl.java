@@ -70,7 +70,6 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
         needFacingConnectionClient.accept(connectionForRunnable.getRemoteConnectionURI());
       }
     });
-
   }
 
 

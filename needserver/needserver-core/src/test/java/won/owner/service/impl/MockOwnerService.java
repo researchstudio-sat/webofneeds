@@ -27,30 +27,36 @@ import java.util.Map;
  * User: fkleedorfer
  * Date: 06.11.12
  */
-public class AutomaticOwnerService extends AbstractOwnerProtocolOwnerService
+public class MockOwnerService extends AbstractOwnerProtocolOwnerService
 {
   private static int messageCount = 0;
   private boolean autoConnect = true;
-  private ConnectionAction onConnectAction = ConnectionAction.ACCEPT;
-  private ConnectionAction onAcceptAction = ConnectionAction.MESSAGE;
-  private ConnectionAction onMessageAction = ConnectionAction.CLOSE;
-  private ConnectionAction onDenyAction = ConnectionAction.NONE;
-  private ConnectionAction onCloseAction = ConnectionAction.NONE;
-  private Map<Method,Integer> methodCallCounts = new HashMap<Method,Integer>();
+  private ConnectionAction onConnectAction;
+  private ConnectionAction onAcceptAction;
+  private ConnectionAction onMessageAction;
+  private ConnectionAction onDenyAction;
+  private ConnectionAction onCloseAction;
+  private Map<Method,Integer> methodCallCounts;
+  private URI lastConnectionURI;
 
-  public enum ConnectionAction {ACCEPT, DENY, MESSAGE, CLOSE,NONE};
-  public enum Method  {hintReceived,connectionRequested,accept,deny,close,sendTextMessage};
+  public enum ConnectionAction {ACCEPT, DENY, MESSAGE, CLOSE, NONE};
+  public enum Method  {hintReceived,connectionRequested,accept,deny,close,sendTextMessage,EXCEPTION_CAUGHT};
 
-  public AutomaticOwnerService()
+
+
+  public MockOwnerService()
   {
+    reset();
   }
+
+
 
   @Override
   public void hintReceived(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI) throws NoSuchNeedException
   {
     countMethodCall(Method.hintReceived);
     if (autoConnect) {
-      this.ownerProtocolNeedService.connectTo(otherNeedURI,ownNeedURI,"I'm automatically interested, take " + (messageCount++) );
+      this.lastConnectionURI = this.ownerProtocolNeedService.connectTo(ownNeedURI,otherNeedURI,"I'm automatically interested, take " + (messageCount++) );
     }
   }
 
@@ -58,6 +64,7 @@ public class AutomaticOwnerService extends AbstractOwnerProtocolOwnerService
   public void connectionRequested(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final String message) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
   {
     countMethodCall(Method.connectionRequested);
+    this.lastConnectionURI = ownConnectionURI;
     performAutomaticAction(onConnectAction, ownConnectionURI);
   }
 
@@ -95,26 +102,44 @@ public class AutomaticOwnerService extends AbstractOwnerProtocolOwnerService
     return count;
   }
 
+  public void reset(){
+    this.messageCount = 0;
+    this.autoConnect = false;
+    this.onConnectAction = ConnectionAction.NONE;
+    this.onAcceptAction = ConnectionAction.NONE;
+    this.onMessageAction = ConnectionAction.NONE;
+    this.onDenyAction = ConnectionAction.NONE;
+    this.onCloseAction = ConnectionAction.NONE;
+    this.methodCallCounts = new HashMap<Method,Integer>();
+    this.lastConnectionURI = null;
+  }
+
   private void countMethodCall(Method m){
     Integer count = this.methodCallCounts.get(m);
     if (count == null) count = 0;
     this.methodCallCounts.put(m,count+1);
   }
 
-  private void performAutomaticAction(ConnectionAction action, URI connectionURI ) {
-    switch (action){
-      case ACCEPT:
-        this.ownerProtocolNeedService.accept(connectionURI );
-        break;
-      case DENY:
-        this.ownerProtocolNeedService.deny(connectionURI );
-        break;
-      case MESSAGE:
-        this.ownerProtocolNeedService.sendTextMessage(connectionURI,"this is my automatic message #" + (messageCount++));
-        break;
-      case CLOSE:
-        this.ownerProtocolNeedService.close(connectionURI);
-        break;
+  public void performAutomaticAction(ConnectionAction action, URI connectionURI ) {
+    try{
+      switch (action){
+        case ACCEPT:
+          this.ownerProtocolNeedService.accept(connectionURI );
+          break;
+        case DENY:
+          this.ownerProtocolNeedService.deny(connectionURI );
+          break;
+        case MESSAGE:
+          this.ownerProtocolNeedService.sendTextMessage(connectionURI,"this is my automatic message #" + (messageCount++));
+          break;
+        case CLOSE:
+          this.ownerProtocolNeedService.close(connectionURI);
+          break;
+      }
+    } catch (WonProtocolException wpe) {
+      countMethodCall(Method.EXCEPTION_CAUGHT);
+      System.out.println("caught exception in automatic owner after executing " + action.name() + " action:");
+      wpe.printStackTrace();
     }
   }
 
@@ -152,5 +177,10 @@ public class AutomaticOwnerService extends AbstractOwnerProtocolOwnerService
   public void setOnCloseAction(final String action)
   {
     this.onCloseAction  = ConnectionAction.valueOf(action);
+  }
+
+  public URI getLastConnectionURI()
+  {
+    return lastConnectionURI;
   }
 }

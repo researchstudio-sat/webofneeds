@@ -23,11 +23,13 @@ import org.springframework.stereotype.Component;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.model.*;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
@@ -57,6 +59,16 @@ public class NeedCommunicationServiceImpl implements
    */
   private NeedProtocolNeedService needProtocolNeedService;
 
+  /**
+   * Client talking to this need service from the need side
+   */
+  private ConnectionCommunicationService needFacingConnectionCommunicationService;
+
+  /**
+   * Client talking to this need service from the owner side
+   */
+  private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
+
   private URIService URIService;
 
   private ExecutorService executorService;
@@ -80,6 +92,7 @@ public class NeedCommunicationServiceImpl implements
       {
         //TODO: somewhere, we'll have to use the need's owner URI to determine where to send the request to..
         //should we access the database again in the implementation of the owner protocol owner client?
+        //here, we don't really need to handle exceptions, as we don't want to flood matching services with error messages
         ownerProtocolOwnerService.hintReceived(needURI, otherNeed, score, originator);
       }
     });
@@ -110,9 +123,24 @@ public class NeedCommunicationServiceImpl implements
       @Override
       public void run()
       {
-        URI remoteConnectionURI = needProtocolNeedService.connectionRequested(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), message);
-        connectionForRunnable.setRemoteConnectionURI(remoteConnectionURI);
-        connectionRepository.saveAndFlush(connectionForRunnable);
+        try {
+          URI remoteConnectionURI = needProtocolNeedService.connectionRequested(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), message);
+          connectionForRunnable.setRemoteConnectionURI(remoteConnectionURI);
+          connectionRepository.saveAndFlush(connectionForRunnable);
+        } catch (WonProtocolException e){
+          // we can't open the connection. we send a deny back to the owner
+          // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
+          // For now, we call the close method as if it had been called from the remote side
+          // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
+          NeedCommunicationServiceImpl.this.needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
+          //and, just in case the owner believes that this connection is open, close it
+          try {
+            NeedCommunicationServiceImpl.this.ownerProtocolOwnerService.close(connectionForRunnable.getConnectionURI());
+          } catch (WonProtocolException e2){
+            //ignore this exception
+            logger.debug("swallowing this exception triggered by our dirty workaround for handling protocol errors", e2);
+          }
+        }
       }
     });
     return con.getConnectionURI();
@@ -146,7 +174,22 @@ public class NeedCommunicationServiceImpl implements
       @Override
       public void run()
       {
-        ownerProtocolOwnerService.connectionRequested(needURI, otherNeedURI, connectionForRunnable.getConnectionURI(), message);
+        try {
+          ownerProtocolOwnerService.connectionRequested(needURI, otherNeedURI, connectionForRunnable.getConnectionURI(), message);
+        } catch (WonProtocolException e) {
+          // we can't open the connection. we send a deny back to the owner
+          // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
+          // For now, we call the close method as if it had been called from the owner side
+          // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
+          NeedCommunicationServiceImpl.this.ownerFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
+          //and, just in case the remote need believes that this connection is open, close it
+          try {
+            NeedCommunicationServiceImpl.this.needProtocolNeedService.close(connectionForRunnable.getRemoteConnectionURI());
+          } catch (WonProtocolException e2){
+            //ignore this exception
+            logger.debug("swallowing this exception triggered by our dirty workaround for handling protocol errors", e2);
+          }
+        }
       }
     });
 
@@ -187,5 +230,15 @@ public class NeedCommunicationServiceImpl implements
   public void setExecutorService(final ExecutorService executorService)
   {
     this.executorService = executorService;
+  }
+
+  public void setNeedFacingConnectionCommunicationService(final ConnectionCommunicationService needFacingConnectionCommunicationService)
+  {
+    this.needFacingConnectionCommunicationService = needFacingConnectionCommunicationService;
+  }
+
+  public void setOwnerFacingConnectionCommunicationService(final ConnectionCommunicationService ownerFacingConnectionCommunicationService)
+  {
+    this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
   }
 }
