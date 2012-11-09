@@ -22,6 +22,7 @@ import won.protocol.owner.OwnerProtocolNeedService;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * User: fkleedorfer
@@ -37,11 +38,11 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
   private ConnectionAction onDenyAction;
   private ConnectionAction onCloseAction;
   private Map<Method,Integer> methodCallCounts;
-  private URI lastConnectionURI;
 
   public enum ConnectionAction {ACCEPT, DENY, MESSAGE, CLOSE, NONE};
   public enum Method  {hintReceived,connectionRequested,accept,deny,close,sendTextMessage,EXCEPTION_CAUGHT};
 
+  private CountDownLatch automaticActionsFinished;
 
 
   public MockOwnerService()
@@ -65,35 +66,35 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
   {
     countMethodCall(Method.connectionRequested);
     this.lastConnectionURI = ownConnectionURI;
-    performAutomaticAction(onConnectAction, ownConnectionURI);
+    performAction(onConnectAction, ownConnectionURI);
   }
 
   @Override
   public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     countMethodCall(Method.accept);
-    performAutomaticAction(onAcceptAction, connectionURI);
+    performAction(onAcceptAction, connectionURI);
   }
 
   @Override
   public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     countMethodCall(Method.deny);
-    performAutomaticAction(onDenyAction, connectionURI);
+    performAction(onDenyAction, connectionURI);
   }
 
   @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     countMethodCall(Method.close);
-    performAutomaticAction(onCloseAction, connectionURI);
+    performAction(onCloseAction, connectionURI);
   }
 
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     countMethodCall(Method.sendTextMessage);
-    performAutomaticAction(onMessageAction, connectionURI);
+    performAction(onMessageAction, connectionURI);
   }
 
   public int getMethodCallCount(Method m){
@@ -114,13 +115,13 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
     this.lastConnectionURI = null;
   }
 
-  private void countMethodCall(Method m){
+  private synchronized void countMethodCall(Method m){
     Integer count = this.methodCallCounts.get(m);
     if (count == null) count = 0;
     this.methodCallCounts.put(m,count+1);
   }
 
-  public void performAutomaticAction(ConnectionAction action, URI connectionURI ) {
+  public void performAction(ConnectionAction action, URI connectionURI) {
     try{
       switch (action){
         case ACCEPT:
@@ -135,12 +136,26 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
         case CLOSE:
           this.ownerProtocolNeedService.close(connectionURI);
           break;
+        case NONE:
+        default:
+          if (this.automaticActionsFinished != null){
+            this.automaticActionsFinished.countDown();
+          }
+          break;
       }
     } catch (WonProtocolException wpe) {
       countMethodCall(Method.EXCEPTION_CAUGHT);
       System.out.println("caught exception in automatic owner after executing " + action.name() + " action:");
       wpe.printStackTrace();
+      if (this.automaticActionsFinished != null){
+        this.automaticActionsFinished.countDown();
+      }
     }
+  }
+
+  public void setAutomaticActionsFinished(final CountDownLatch automaticActionsFinished)
+  {
+    this.automaticActionsFinished = automaticActionsFinished;
   }
 
   @Override

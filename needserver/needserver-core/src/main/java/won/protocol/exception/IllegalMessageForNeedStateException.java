@@ -33,7 +33,7 @@ public class IllegalMessageForNeedStateException extends WonProtocolException
 
   public IllegalMessageForNeedStateException(final URI needURI, final String methodName, final NeedState needState)
   {
-    super(MessageFormat.format("It's not allowed to call method '{0}' on need '{1}', as it is currently in state '{2}'.", methodName, needURI, needState));
+    super(MessageFormat.format("It's not allowed to call method {0} on need {1}, as it is currently in state {2}.", methodName, needURI, needState));
     this.methodName = methodName;
     this.needState = needState;
     this.needURI = needURI;

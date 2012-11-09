@@ -47,6 +47,19 @@ public class Connection
   @Column( name = "state")
   private ConnectionState state;
 
+  @Override
+  public String toString()
+  {
+    return "Connection{" +
+        "id=" + id +
+        ", connectionURI=" + connectionURI +
+        ", needURI=" + needURI +
+        ", remoteConnectionURI=" + remoteConnectionURI +
+        ", remoteNeedURI=" + remoteNeedURI +
+        ", state=" + state +
+        '}';
+  }
+
   public Long getId() {
       return id;
   }

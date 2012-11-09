@@ -107,4 +107,5 @@
     <!-- connect NeedProtcolNeedService1 to NeedProtcolNeedService2 and vice versa -->
     <alias name="needProtocolNeedService2" alias="needProtocolNeedClient" />
     <alias name="needProtocolNeedService" alias="needProtocolNeedClient2" />
+
 </beans>

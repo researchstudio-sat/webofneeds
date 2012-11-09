@@ -16,8 +16,8 @@
 
 package won.protocol.repository;
 
-import org.springframework.transaction.annotation.Transactional;
 import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 
 import java.net.URI;
 import java.util.List;
@@ -32,4 +32,5 @@ import java.util.List;
 public interface ConnectionRepository extends WonRepository<Connection> {
   List<Connection> findByConnectionURI(URI URI);
   List<Connection> findByNeedURI(URI URI);
+  List<Connection> findByNeedURIAndRemoteNeedURIAndState(URI needURI, URI remoteNeedURI, ConnectionState connectionState);
 }

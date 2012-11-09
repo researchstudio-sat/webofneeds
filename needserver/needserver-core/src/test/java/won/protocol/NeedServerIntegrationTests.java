@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.owner.service.impl.MockMatchingService;
 import won.owner.service.impl.MockOwnerService;
+import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
@@ -36,6 +37,8 @@ import won.protocol.model.NeedState;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * User: fkleedorfer
@@ -44,7 +47,6 @@ import java.util.Collection;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"/applicationContext.xml","/services.xml", "/additionalIntegrationTestServices.xml"})
 @TransactionConfiguration(transactionManager="transactionManager", defaultRollback=false)
-@Transactional
 public class NeedServerIntegrationTests
 {
 
@@ -107,27 +109,28 @@ public class NeedServerIntegrationTests
   //code running in different threads won't inherit the transaction, and won't see changes to the database
   //made within the transaction
   @Transactional(propagation = Propagation.NEVER)
-
   public void testNormalConversation() throws Exception{
     URI ownerURI = createOwnerURI();
     URI matcherURI = createMatcherURI();
-
+    CountDownLatch countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
 
     ownerProtocolOwnerClient.reset();
     ownerProtocolOwnerClient.setAutoConnect(true);
     ownerProtocolOwnerClient.setOnAcceptAction("MESSAGE");
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
 
     ownerProtocolOwnerClient2.reset();
     ownerProtocolOwnerClient2.setOnConnectAction("ACCEPT");
     ownerProtocolOwnerClient2.setOnMessageAction("CLOSE");
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
 
     URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
     URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
     Assert.assertNotSame("Two consecutively created needs have the same URI", needURI, needURI2);
 
     mockMatchingService.hint(needURI,needURI2,0.9); //causes ownwer1 to connect (as it is on auto-connect)
+    countDownLatch.await(10, TimeUnit.SECONDS);
 
-    Thread.sleep(500);  //wait for all communication to play out
 
     URI connectionURI = ownerProtocolOwnerClient.getLastConnectionURI();
     URI connectionURI2 = ownerProtocolOwnerClient2.getLastConnectionURI();
@@ -156,12 +159,12 @@ public class NeedServerIntegrationTests
     Collection<URI> needConnections2 = ownerProtocolOwnerClient2.listConnectionURIs(needURI2);
     Assert.assertEquals(1, needConnections2.size());
     Assert.assertTrue(needConnections2.contains(connectionURI2));
-    Connection conn2 = ownerProtocolOwnerClient.readConnection(connectionURI2);
+    Connection conn2 = ownerProtocolOwnerClient2.readConnection(connectionURI2);
     Assert.assertEquals(connectionURI2,conn2.getConnectionURI());
     Assert.assertEquals(connectionURI,conn2.getRemoteConnectionURI());
     Assert.assertEquals(needURI2,conn2.getNeedURI());
     Assert.assertEquals(needURI,conn2.getRemoteNeedURI());
-    Assert.assertEquals(ConnectionState.CLOSED,conn.getState());
+    Assert.assertEquals(ConnectionState.CLOSED,conn2.getState());
   }
 
   @Test
@@ -173,21 +176,22 @@ public class NeedServerIntegrationTests
   public void testDeniedConnection() throws Exception{
     URI ownerURI = createOwnerURI();
     URI matcherURI = createMatcherURI();
-
+    CountDownLatch countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
 
     ownerProtocolOwnerClient.reset();
     ownerProtocolOwnerClient.setAutoConnect(true);
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
 
     ownerProtocolOwnerClient2.reset();
     ownerProtocolOwnerClient2.setOnConnectAction("DENY");
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
 
     URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
     URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
     Assert.assertNotSame("Two consecutively created needs have the same URI", needURI, needURI2);
 
     mockMatchingService.hint(needURI,needURI2,0.9); //causes ownwer1 to connect (as it is on auto-connect)
-
-    Thread.sleep(500);  //wait for all communication to play out
+    countDownLatch.await(10, TimeUnit.SECONDS);
 
     URI connectionURI = ownerProtocolOwnerClient.getLastConnectionURI();
     URI connectionURI2 = ownerProtocolOwnerClient2.getLastConnectionURI();
@@ -224,29 +228,27 @@ public class NeedServerIntegrationTests
     Collection<URI> needConnections2 = ownerProtocolOwnerClient2.listConnectionURIs(needURI2);
     Assert.assertEquals(1, needConnections2.size());
     Assert.assertTrue(needConnections2.contains(connectionURI2));
-    Connection conn2 = ownerProtocolOwnerClient.readConnection(connectionURI2);
+    Connection conn2 = ownerProtocolOwnerClient2.readConnection(connectionURI2);
     Assert.assertEquals(connectionURI2,conn2.getConnectionURI());
     Assert.assertEquals(connectionURI,conn2.getRemoteConnectionURI());
     Assert.assertEquals(needURI2,conn2.getNeedURI());
     Assert.assertEquals(needURI,conn2.getRemoteNeedURI());
-    Assert.assertEquals(ConnectionState.CLOSED,conn.getState());
+    Assert.assertEquals(ConnectionState.CLOSED,conn2.getState());
   }
 
   @Test
-  //Propagation.NEVER is required here because if transactions start here and propagate,
-  //code running in different threads won't inherit the transaction, and won't see changes to the database
-  //made within the transaction
-  @Transactional(propagation = Propagation.NEVER)
   public void testAbortConnectionByDeactivate() throws Exception{
     URI ownerURI = createOwnerURI();
     URI matcherURI = createMatcherURI();
-
+    CountDownLatch countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
 
     ownerProtocolOwnerClient.reset();
     ownerProtocolOwnerClient.setAutoConnect(true);
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
 
     ownerProtocolOwnerClient2.reset();
     ownerProtocolOwnerClient2.setOnConnectAction("ACCEPT");
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
 
     URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
     URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
@@ -254,7 +256,7 @@ public class NeedServerIntegrationTests
 
     mockMatchingService.hint(needURI,needURI2,0.9); //causes ownwer1 to connect (as it is on auto-connect)
 
-    Thread.sleep(500);  //wait for all communication to play out
+    countDownLatch.await(10, TimeUnit.SECONDS);
 
     URI connectionURI = ownerProtocolOwnerClient.getLastConnectionURI();
     URI connectionURI2 = ownerProtocolOwnerClient2.getLastConnectionURI();
@@ -292,18 +294,363 @@ public class NeedServerIntegrationTests
     Collection<URI> needConnections2 = ownerProtocolOwnerClient2.listConnectionURIs(needURI2);
     Assert.assertEquals(1, needConnections2.size());
     Assert.assertTrue(needConnections2.contains(connectionURI2));
-    Connection conn2 = ownerProtocolOwnerClient.readConnection(connectionURI2);
+    Connection conn2 = ownerProtocolOwnerClient2.readConnection(connectionURI2);
     Assert.assertEquals(connectionURI2,conn2.getConnectionURI());
     Assert.assertEquals(connectionURI,conn2.getRemoteConnectionURI());
     Assert.assertEquals(needURI2,conn2.getNeedURI());
     Assert.assertEquals(needURI,conn2.getRemoteNeedURI());
-    Assert.assertEquals(ConnectionState.ESTABLISHED,conn.getState());
+    Assert.assertEquals(ConnectionState.ESTABLISHED,conn2.getState());
 
-    //now, owner1 deactivates the need:
-    ownerProtocolOwnerClient.deactivate(needURI);
-    Thread.sleep(500); //wait for communication to play out
+    //now, owner2 deactivates the need:
+    countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+    ownerProtocolOwnerClient2.deactivate(needURI);
+    countDownLatch.await(10, TimeUnit.SECONDS);
 
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+    //now check both need and connection states
+    needConnections = ownerProtocolOwnerClient.listConnectionURIs(needURI);
+    Assert.assertEquals(1, needConnections.size());
+    //Assert.assertTrue(needConnections.contains(connectionURI));
+    conn = ownerProtocolOwnerClient.readConnection(connectionURI);
+    Assert.assertEquals(connectionURI, conn.getConnectionURI());
+    Assert.assertEquals(connectionURI2,conn.getRemoteConnectionURI());
+    Assert.assertEquals(needURI,conn.getNeedURI());
+    Assert.assertEquals(needURI2,conn.getRemoteNeedURI());
+    Assert.assertEquals(ConnectionState.CLOSED,conn.getState());
+
+    needConnections2 = ownerProtocolOwnerClient2.listConnectionURIs(needURI2);
+    Assert.assertEquals(1, needConnections2.size());
+    Assert.assertTrue(needConnections2.contains(connectionURI2));
+    conn2 = ownerProtocolOwnerClient2.readConnection(connectionURI2);
+    Assert.assertEquals(connectionURI2,conn2.getConnectionURI());
+    Assert.assertEquals(connectionURI,conn2.getRemoteConnectionURI());
+    Assert.assertEquals(needURI2,conn2.getNeedURI());
+    Assert.assertEquals(needURI,conn2.getRemoteNeedURI());
+    Assert.assertEquals(ConnectionState.CLOSED,conn2.getState());
+    System.out.println(conn);
+    System.out.println(conn2);
+
+    //check that need1 is closed
+    Need need = ownerProtocolOwnerClient.readNeed(needURI);
+    Assert.assertEquals(needURI,need.getNeedURI());
+    Assert.assertEquals(NeedState.INACTIVE, need.getState());
+
+  }
+
+  @Test
+  public void testProtocolErrorThenNormal() throws Exception{
+    URI ownerURI = createOwnerURI();
+    URI matcherURI = createMatcherURI();
+    CountDownLatch countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
+
+    ownerProtocolOwnerClient.reset();
+    ownerProtocolOwnerClient.setAutoConnect(true);
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
+
+    ownerProtocolOwnerClient2.reset();
+    ownerProtocolOwnerClient2.setOnConnectAction("MESSAGE");
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+
+    URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
+    URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
+    Assert.assertNotSame("Two consecutively created needs have the same URI", needURI, needURI2);
+
+    mockMatchingService.hint(needURI,needURI2,0.9); //causes ownwer1 to connect (as it is on auto-connect)
+
+    countDownLatch.await(10, TimeUnit.SECONDS);
+
+    URI connectionURI = ownerProtocolOwnerClient.getLastConnectionURI();
+    URI connectionURI2 = ownerProtocolOwnerClient2.getLastConnectionURI();
+    Assert.assertNotNull(connectionURI);
+    Assert.assertNotNull(connectionURI2);
+
+
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+    //now check both need and connection states
+    Collection<URI> needConnections = ownerProtocolOwnerClient.listConnectionURIs(needURI);
+    Assert.assertEquals(1, needConnections.size());
+    //Assert.assertTrue(needConnections.contains(connectionURI));
+    Connection conn = ownerProtocolOwnerClient.readConnection(connectionURI);
+    Assert.assertEquals(connectionURI, conn.getConnectionURI());
+    Assert.assertEquals(connectionURI2,conn.getRemoteConnectionURI());
+    Assert.assertEquals(needURI,conn.getNeedURI());
+    Assert.assertEquals(needURI2,conn.getRemoteNeedURI());
+    Assert.assertEquals(ConnectionState.REQUEST_SENT,conn.getState());
+
+    Collection<URI> needConnections2 = ownerProtocolOwnerClient2.listConnectionURIs(needURI2);
+    Assert.assertEquals(1, needConnections2.size());
+    Assert.assertTrue(needConnections2.contains(connectionURI2));
+    Connection conn2 = ownerProtocolOwnerClient2.readConnection(connectionURI2);
+    Assert.assertEquals(connectionURI2,conn2.getConnectionURI());
+    Assert.assertEquals(connectionURI,conn2.getRemoteConnectionURI());
+    Assert.assertEquals(needURI2,conn2.getNeedURI());
+    Assert.assertEquals(needURI,conn2.getRemoteNeedURI());
+    Assert.assertEquals(ConnectionState.REQUEST_RECEIVED,conn2.getState());
+
+    //now, send the right message from owner2 (accept)
+    ownerProtocolOwnerClient.setOnAcceptAction("MESSAGE");
+    ownerProtocolOwnerClient2.setOnMessageAction("MESSAGE");
+    ownerProtocolOwnerClient.setOnMessageAction("CLOSE");
+    countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+
+    ownerProtocolOwnerClient2.performAction(MockOwnerService.ConnectionAction.ACCEPT, connectionURI2);
+    countDownLatch.await(10, TimeUnit.SECONDS);
+
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+    //now check both need and connection states
+    needConnections = ownerProtocolOwnerClient.listConnectionURIs(needURI);
+    Assert.assertEquals(1, needConnections.size());
+    //Assert.assertTrue(needConnections.contains(connectionURI));
+    Connection connAfter = ownerProtocolOwnerClient.readConnection(connectionURI);
+    Assert.assertEquals(connectionURI, connAfter.getConnectionURI());
+    Assert.assertEquals(connectionURI2,connAfter.getRemoteConnectionURI());
+    Assert.assertEquals(needURI,connAfter.getNeedURI());
+    Assert.assertEquals(needURI2,connAfter.getRemoteNeedURI());
+    Assert.assertEquals(ConnectionState.CLOSED,connAfter.getState());
+
+    needConnections2 = ownerProtocolOwnerClient2.listConnectionURIs(needURI2);
+    Assert.assertEquals(1, needConnections2.size());
+    Assert.assertTrue(needConnections2.contains(connectionURI2));
+    Connection connAfter2 = ownerProtocolOwnerClient2.readConnection(connectionURI2);
+    Assert.assertEquals(connectionURI2,connAfter2.getConnectionURI());
+    Assert.assertEquals(connectionURI,connAfter2.getRemoteConnectionURI());
+    Assert.assertEquals(needURI2,connAfter2.getNeedURI());
+    Assert.assertEquals(needURI,connAfter2.getRemoteNeedURI());
+    Assert.assertEquals(ConnectionState.CLOSED,connAfter2.getState());
+
+    System.out.println("conn:" + connAfter);
+    System.out.println("conn2:" + connAfter2);
+  }
+
+  @Test
+  public void testConnectToInactiveNeed() throws Exception{
+    URI ownerURI = createOwnerURI();
+    URI matcherURI = createMatcherURI();
+    CountDownLatch countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
+
+    ownerProtocolOwnerClient.reset();
+    ownerProtocolOwnerClient.setAutoConnect(true);
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
+
+    ownerProtocolOwnerClient2.reset();
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+
+    URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
+    URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,false); //leave need inactive!
+    Assert.assertNotSame("Two consecutively created needs have the same URI", needURI, needURI2);
+
+    mockMatchingService.hint(needURI,needURI2,0.9); //causes ownwer1 to connect (as it is on auto-connect)
+
+    countDownLatch.await(100, TimeUnit.SECONDS);
+
+    URI connectionURI = ownerProtocolOwnerClient.getLastConnectionURI();
+    URI connectionURI2 = ownerProtocolOwnerClient2.getLastConnectionURI();
+    Assert.assertNotNull(connectionURI);
+    Assert.assertNull(connectionURI2);
+
+
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+    //now check both need and connection states
+    Collection<URI> needConnections = ownerProtocolOwnerClient.listConnectionURIs(needURI);
+    Assert.assertEquals(1, needConnections.size());
+    //Assert.assertTrue(needConnections.contains(connectionURI));
+    Connection conn = ownerProtocolOwnerClient.readConnection(connectionURI);
+    Assert.assertEquals(connectionURI, conn.getConnectionURI());
+    Assert.assertEquals(connectionURI2,conn.getRemoteConnectionURI());
+    Assert.assertEquals(needURI,conn.getNeedURI());
+    Assert.assertEquals(needURI2,conn.getRemoteNeedURI());
+    Assert.assertEquals(ConnectionState.CLOSED,conn.getState());
+
+    Collection<URI> needConnections2 = ownerProtocolOwnerClient2.listConnectionURIs(needURI2);
+    Assert.assertEquals(0, needConnections2.size());
+  }
+
+
+  @Test
+  //Propagation.NEVER is required here because if transactions start here and propagate,
+  //code running in different threads won't inherit the transaction, and won't see changes to the database
+  //made within the transaction
+  public void testConnectTwice() throws Exception{
+    URI ownerURI = createOwnerURI();
+    URI matcherURI = createMatcherURI();
+
+
+    ownerProtocolOwnerClient.reset();
+    ownerProtocolOwnerClient2.reset();
+    ownerProtocolOwnerClient2.setOnConnectAction("ACCEPT");
+    CountDownLatch countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+
+    URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
+    URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
+    Assert.assertNotSame("Two consecutively created needs have the same URI", needURI, needURI2);
+
+    URI connectionURI = ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the first connection attempt");
+    countDownLatch.await(10, TimeUnit.SECONDS);
+    countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+    try {
+      connectionURI = ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the second connection attempt");
+      Assert.fail("exception expected");
+    } catch (ConnectionAlreadyExistsException e) {
+      Assert.assertEquals(connectionURI, e.getConnectionURI());
+      Assert.assertEquals(needURI, e.getFromNeedURI());
+      Assert.assertEquals(needURI2, e.getToNeedURI());
+      //ignore
+    } catch (Exception e) {
+      Assert.fail("wrong exception was thrown:"+e);
+    }
+  }
+
+  @Test
+  //Propagation.NEVER is required here because if transactions start here and propagate,
+  //code running in different threads won't inherit the transaction, and won't see changes to the database
+  //made within the transaction
+  public void testReconnect() throws Exception{
+    URI ownerURI = createOwnerURI();
+    URI matcherURI = createMatcherURI();
+
+
+    ownerProtocolOwnerClient.reset();
+    ownerProtocolOwnerClient2.reset();
+    ownerProtocolOwnerClient.setOnAcceptAction("CLOSE");
+    ownerProtocolOwnerClient2.setOnConnectAction("ACCEPT");
+
+    URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
+    URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
+    Assert.assertNotSame("Two consecutively created needs have the same URI", needURI, needURI2);
+    CountDownLatch countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+
+    ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the first connection attempt");
+    countDownLatch.await(10, TimeUnit.SECONDS);
+
+    URI connectionURI = ownerProtocolOwnerClient.getLastConnectionURI();
+    URI connectionURI2 = ownerProtocolOwnerClient2.getLastConnectionURI();
+    Assert.assertNotNull(connectionURI);
+    Assert.assertNotNull(connectionURI2);
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+    //now check both need and connection states
+    Collection<URI> needConnections = ownerProtocolOwnerClient.listConnectionURIs(needURI);
+    Assert.assertEquals(1, needConnections.size());
+    //Assert.assertTrue(needConnections.contains(connectionURI));
+    Connection conn = ownerProtocolOwnerClient.readConnection(connectionURI);
+    Assert.assertEquals(connectionURI, conn.getConnectionURI());
+    Assert.assertEquals(connectionURI2,conn.getRemoteConnectionURI());
+    Assert.assertEquals(needURI,conn.getNeedURI());
+    Assert.assertEquals(needURI2,conn.getRemoteNeedURI());
+    Assert.assertEquals(ConnectionState.CLOSED,conn.getState());
+
+    Collection<URI> needConnections2 = ownerProtocolOwnerClient2.listConnectionURIs(needURI2);
+    Assert.assertEquals(1, needConnections2.size());
+    Assert.assertTrue(needConnections2.contains(connectionURI2));
+    Connection connAfter2 = ownerProtocolOwnerClient2.readConnection(connectionURI2);
+    Assert.assertEquals(connectionURI2,connAfter2.getConnectionURI());
+    Assert.assertEquals(connectionURI,connAfter2.getRemoteConnectionURI());
+    Assert.assertEquals(needURI2,connAfter2.getNeedURI());
+    Assert.assertEquals(needURI,connAfter2.getRemoteNeedURI());
+    Assert.assertEquals(ConnectionState.CLOSED,connAfter2.getState());
+
+
+    ownerProtocolOwnerClient.reset();
+    ownerProtocolOwnerClient2.reset();
+    ownerProtocolOwnerClient.setOnAcceptAction("CLOSE");
+    ownerProtocolOwnerClient2.setOnConnectAction("ACCEPT");
+    countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+    connectionURI = ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the first connection attempt");
+    countDownLatch.await(10, TimeUnit.SECONDS);
+
+    connectionURI = ownerProtocolOwnerClient.getLastConnectionURI();
+    connectionURI2 = ownerProtocolOwnerClient2.getLastConnectionURI();
+    Assert.assertNotNull(connectionURI);
+    Assert.assertNotNull(connectionURI2);
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
@@ -321,7 +668,7 @@ public class NeedServerIntegrationTests
 
     //now check both need and connection states
     needConnections = ownerProtocolOwnerClient.listConnectionURIs(needURI);
-    Assert.assertEquals(1, needConnections.size());
+    Assert.assertEquals(2, needConnections.size());
     //Assert.assertTrue(needConnections.contains(connectionURI));
     conn = ownerProtocolOwnerClient.readConnection(connectionURI);
     Assert.assertEquals(connectionURI, conn.getConnectionURI());
@@ -331,21 +678,23 @@ public class NeedServerIntegrationTests
     Assert.assertEquals(ConnectionState.CLOSED,conn.getState());
 
     needConnections2 = ownerProtocolOwnerClient2.listConnectionURIs(needURI2);
-    Assert.assertEquals(1, needConnections2.size());
+    Assert.assertEquals(2, needConnections2.size());
     Assert.assertTrue(needConnections2.contains(connectionURI2));
-    conn2 = ownerProtocolOwnerClient.readConnection(connectionURI2);
-    Assert.assertEquals(connectionURI2,conn2.getConnectionURI());
-    Assert.assertEquals(connectionURI,conn2.getRemoteConnectionURI());
-    Assert.assertEquals(needURI2,conn2.getNeedURI());
-    Assert.assertEquals(needURI,conn2.getRemoteNeedURI());
-    Assert.assertEquals(ConnectionState.CLOSED,conn.getState());
+    connAfter2 = ownerProtocolOwnerClient2.readConnection(connectionURI2);
+    Assert.assertEquals(connectionURI2,connAfter2.getConnectionURI());
+    Assert.assertEquals(connectionURI,connAfter2.getRemoteConnectionURI());
+    Assert.assertEquals(needURI2,connAfter2.getNeedURI());
+    Assert.assertEquals(needURI,connAfter2.getRemoteNeedURI());
+    Assert.assertEquals(ConnectionState.CLOSED,connAfter2.getState());
+  }
 
-    //check that need1 is closed
-    Need need = ownerProtocolOwnerClient.readNeed(needURI);
-    Assert.assertEquals(needURI,need.getNeedURI());
-    Assert.assertEquals(NeedState.INACTIVE, need.getState());
+  @Test
+  public void testConnectSimultaneously() throws Exception{
+    //TODO continue here!
 
   }
+
+
 
   private URI createOwnerURI(){
     return URI.create("http://owner.com/op");

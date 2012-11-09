@@ -33,11 +33,15 @@ public enum ConnectionState
         switch(msg){
            case PARTNER_ACCEPT: return ESTABLISHED;  //the partner accepted
            case PARTNER_DENY: return CLOSED;
+           case OWNER_CLOSE: return CLOSED;
+           case PARTNER_CLOSE: return CLOSED;
           }
       case REQUEST_RECEIVED: //a remote need has requested a connection
         switch(msg){
           case OWNER_ACCEPT: return ESTABLISHED;
           case OWNER_DENY: return CLOSED;
+          case OWNER_CLOSE: return CLOSED;
+          case PARTNER_CLOSE: return CLOSED;
         }
       case ESTABLISHED: //the connection is established
         switch(msg){

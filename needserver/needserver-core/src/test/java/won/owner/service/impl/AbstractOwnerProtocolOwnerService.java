@@ -33,6 +33,7 @@ import java.util.Collection;
 public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocolOwnerService
 {
   protected OwnerProtocolNeedService ownerProtocolNeedService;
+  protected URI lastConnectionURI;
 
   @Override
   public void hintReceived(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI) throws NoSuchNeedException
@@ -90,8 +91,10 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
     return ownerProtocolNeedService.getMatches(needURI);
   }
 
+
   public Connection readConnection(final URI connectionURI) throws NoSuchNeedException
   {
+    this.lastConnectionURI = connectionURI;
     return ownerProtocolNeedService.readConnection(connectionURI);
   }
 
@@ -102,11 +105,14 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
 
   public URI connectTo(final URI needURI, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    return ownerProtocolNeedService.connectTo(needURI, otherNeedURI, message);
+    URI connUri = ownerProtocolNeedService.connectTo(needURI, otherNeedURI, message);
+    this.lastConnectionURI = connUri;
+    return connUri;
   }
 
   public Graph readConnectionContent(final URI connectionURI) throws NoSuchNeedException
   {
+    this.lastConnectionURI = connectionURI;
     return ownerProtocolNeedService.readConnectionContent(connectionURI);
   }
 

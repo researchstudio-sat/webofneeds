@@ -29,7 +29,7 @@ public class NeedInactiveExepction extends WonProtocolException
 
   public NeedInactiveExepction(final URI needURI)
   {
-    super(MessageFormat.format("Your request for need '{0}' is not processed as the need is currently inactive.", needURI));
+    super(MessageFormat.format("Your request for need {0} is not processed as the need is currently inactive.", needURI));
     this.needURI = needURI;
   }
 

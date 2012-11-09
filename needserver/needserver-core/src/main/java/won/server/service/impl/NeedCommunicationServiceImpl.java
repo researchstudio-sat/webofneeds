@@ -35,6 +35,7 @@ import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 
@@ -105,6 +106,12 @@ public class NeedCommunicationServiceImpl implements
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECT_TO.name(), need.getState());
+
+    //check if there already exists an established connection between those two
+    List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURIAndState(needURI, otherNeedURI, ConnectionState.ESTABLISHED);
+    if (existingConnections.size() > 0){
+      throw new ConnectionAlreadyExistsException(existingConnections.get(0).getConnectionURI(),needURI,otherNeedURI);
+    }
     //Create new connection object
     Connection con = new Connection();
     con.setNeedURI(needURI);
@@ -128,18 +135,11 @@ public class NeedCommunicationServiceImpl implements
           connectionForRunnable.setRemoteConnectionURI(remoteConnectionURI);
           connectionRepository.saveAndFlush(connectionForRunnable);
         } catch (WonProtocolException e){
-          // we can't open the connection. we send a deny back to the owner
+          // we can't open the connection. we send a close back to the owner
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
           // For now, we call the close method as if it had been called from the remote side
           // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
           NeedCommunicationServiceImpl.this.needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
-          //and, just in case the owner believes that this connection is open, close it
-          try {
-            NeedCommunicationServiceImpl.this.ownerProtocolOwnerService.close(connectionForRunnable.getConnectionURI());
-          } catch (WonProtocolException e2){
-            //ignore this exception
-            logger.debug("swallowing this exception triggered by our dirty workaround for handling protocol errors", e2);
-          }
         }
       }
     });
@@ -182,13 +182,6 @@ public class NeedCommunicationServiceImpl implements
           // For now, we call the close method as if it had been called from the owner side
           // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
           NeedCommunicationServiceImpl.this.ownerFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
-          //and, just in case the remote need believes that this connection is open, close it
-          try {
-            NeedCommunicationServiceImpl.this.needProtocolNeedService.close(connectionForRunnable.getRemoteConnectionURI());
-          } catch (WonProtocolException e2){
-            //ignore this exception
-            logger.debug("swallowing this exception triggered by our dirty workaround for handling protocol errors", e2);
-          }
         }
       }
     });
