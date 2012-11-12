@@ -542,9 +542,7 @@ public class NeedServerIntegrationTests
     ownerProtocolOwnerClient.reset();
     ownerProtocolOwnerClient2.reset();
     ownerProtocolOwnerClient2.setOnConnectAction("ACCEPT");
-    CountDownLatch countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
-    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
-    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+    CountDownLatch countDownLatch = resetCountDownLatchTo(1);
 
     URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
     URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
@@ -552,9 +550,7 @@ public class NeedServerIntegrationTests
 
     URI connectionURI = ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the first connection attempt");
     countDownLatch.await(10, TimeUnit.SECONDS);
-    countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
-    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
-    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+    countDownLatch = resetCountDownLatchTo(1);
     try {
       connectionURI = ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the second connection attempt");
       Assert.fail("exception expected");
@@ -585,9 +581,7 @@ public class NeedServerIntegrationTests
     URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
     URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
     Assert.assertNotSame("Two consecutively created needs have the same URI", needURI, needURI2);
-    CountDownLatch countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
-    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
-    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+    CountDownLatch countDownLatch = resetCountDownLatchTo(1);
 
     ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the first connection attempt");
     countDownLatch.await(10, TimeUnit.SECONDS);
@@ -639,9 +633,7 @@ public class NeedServerIntegrationTests
     ownerProtocolOwnerClient2.reset();
     ownerProtocolOwnerClient.setOnAcceptAction("CLOSE");
     ownerProtocolOwnerClient2.setOnConnectAction("ACCEPT");
-    countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
-    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
-    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+    countDownLatch = resetCountDownLatchTo(1);
     connectionURI = ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the first connection attempt");
     countDownLatch.await(10, TimeUnit.SECONDS);
 
@@ -689,11 +681,221 @@ public class NeedServerIntegrationTests
   }
 
   @Test
-  public void testConnectSimultaneously() throws Exception{
-    //TODO continue here!
+  public void testConnectFromBothSidesBeforeFirstAccept() throws Exception{
+    URI ownerURI = createOwnerURI();
+    URI matcherURI = createMatcherURI();
+
+    ownerProtocolOwnerClient.reset();
+    ownerProtocolOwnerClient2.reset();
+
+    URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
+    URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
+
+    Assert.assertNotSame("Two consecutively created needs have the same URI", needURI, needURI2);
+    CountDownLatch countDownLatch = resetCountDownLatchTo(1);
+
+    ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the first connection attempt");
+    countDownLatch.await(10,TimeUnit.SECONDS);
+    countDownLatch = resetCountDownLatchTo(1);
+    URI connectionURI = ownerProtocolOwnerClient.getLastConnectionURI();
+    try {
+      ownerProtocolOwnerClient2.connectTo(needURI2,needURI,"this is the concurrent connection attempt");
+      countDownLatch.await(10,TimeUnit.SECONDS);
+    } catch (ConnectionAlreadyExistsException e) {
+      Assert.assertEquals(needURI2,e.getFromNeedURI());
+      Assert.assertEquals(needURI,e.getToNeedURI());
+    }
+
+
+    URI connectionURI2 = ownerProtocolOwnerClient2.getLastConnectionURI();
+
+    Assert.assertNotNull(connectionURI);
+    Assert.assertNotNull(connectionURI2);
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
+ }
+
+  @Test
+  public void testConnectTwiceBeforeFirstAccept() throws Exception{
+    URI ownerURI = createOwnerURI();
+    URI matcherURI = createMatcherURI();
+
+    ownerProtocolOwnerClient.reset();
+    ownerProtocolOwnerClient2.reset();
+
+    URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
+    URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
+
+    Assert.assertNotSame("Two consecutively created needs have the same URI", needURI, needURI2);
+    CountDownLatch countDownLatch = resetCountDownLatchTo(1);
+
+    ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the first connection attempt");
+    countDownLatch.await(10,TimeUnit.SECONDS);
+    URI connectionURI = ownerProtocolOwnerClient.getLastConnectionURI();
+
+    countDownLatch = resetCountDownLatchTo(1);
+    try {
+      ownerProtocolOwnerClient.connectTo(needURI2,needURI,"this is the concurrent connection attempt");
+      countDownLatch.await(10,TimeUnit.SECONDS);
+    } catch (ConnectionAlreadyExistsException e) {
+      Assert.assertEquals(needURI2,e.getFromNeedURI());
+      Assert.assertEquals(needURI,e.getToNeedURI());
+    }
+
+
+
+
+    URI connectionURI2 = ownerProtocolOwnerClient2.getLastConnectionURI();
+
+    Assert.assertNotNull(connectionURI);
+    Assert.assertNotNull(connectionURI2);
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+  }
+
+  @Test
+  public void testConnectTwiceAfterFirstAccept() throws Exception{
+    URI ownerURI = createOwnerURI();
+    URI matcherURI = createMatcherURI();
+
+    ownerProtocolOwnerClient.reset();
+    ownerProtocolOwnerClient2.reset();
+    ownerProtocolOwnerClient2.setOnConnectAction("ACCEPT");
+
+    URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
+    URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
+
+    Assert.assertNotSame("Two consecutively created needs have the same URI", needURI, needURI2);
+    CountDownLatch countDownLatch = resetCountDownLatchTo(1);
+
+    ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the first connection attempt");
+    countDownLatch.await(10,TimeUnit.SECONDS);
+    URI connectionURI = ownerProtocolOwnerClient.getLastConnectionURI();
+
+    countDownLatch = resetCountDownLatchTo(1);
+
+    try {
+      ownerProtocolOwnerClient.connectTo(needURI2,needURI,"this is the concurrent connection attempt");
+    } catch (ConnectionAlreadyExistsException e){
+      Assert.assertEquals(needURI2,e.getFromNeedURI());
+      Assert.assertEquals(needURI,e.getToNeedURI());
+    }
+
+    countDownLatch.await(10,TimeUnit.SECONDS);
+
+    URI connectionURI2 = ownerProtocolOwnerClient2.getLastConnectionURI();
+
+    Assert.assertNotNull(connectionURI);
+    Assert.assertNotNull(connectionURI2);
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
 
   }
 
+  @Test
+  public void testConnectFromBothSidesAfterFirstAccept() throws Exception{
+    URI ownerURI = createOwnerURI();
+    URI matcherURI = createMatcherURI();
+
+    ownerProtocolOwnerClient.reset();
+    ownerProtocolOwnerClient2.reset();
+    ownerProtocolOwnerClient2.setOnConnectAction("ACCEPT");
+
+    URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
+    URI needURI2 = ownerProtocolOwnerClient2.createNeed(ownerURI,null,true);
+
+    Assert.assertNotSame("Two consecutively created needs have the same URI", needURI, needURI2);
+    CountDownLatch countDownLatch = resetCountDownLatchTo(1);
+
+    ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the first connection attempt");
+    countDownLatch.await(10,TimeUnit.SECONDS);
+    URI connectionURI = ownerProtocolOwnerClient.getLastConnectionURI();
+
+    countDownLatch = resetCountDownLatchTo(1);
+    try {
+      ownerProtocolOwnerClient2.connectTo(needURI2,needURI,"this is the concurrent connection attempt");
+    } catch (ConnectionAlreadyExistsException e){
+      Assert.assertEquals(needURI2,e.getFromNeedURI());
+      Assert.assertEquals(needURI,e.getToNeedURI());
+    }
+    countDownLatch.await(10,TimeUnit.SECONDS);
+
+
+    URI connectionURI2 = ownerProtocolOwnerClient2.getLastConnectionURI();
+
+    Assert.assertNotNull(connectionURI);
+    Assert.assertNotNull(connectionURI2);
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
+
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
+    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
+    Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
+
+
+
+  }
+
+
+  private CountDownLatch resetCountDownLatchTo(int n)
+  {
+    final CountDownLatch countDownLatch;
+    countDownLatch = new CountDownLatch(n); //we have 2 activities going on, and we want to wait for both
+    ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
+    ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
+    return countDownLatch;
+  }
 
 
   private URI createOwnerURI(){

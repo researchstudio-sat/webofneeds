@@ -51,6 +51,21 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
   }
 
 
+  @Override
+  public URI connectTo(final URI needURI, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  {
+    try {
+      return super.connectTo(needURI, otherNeedURI, message);
+    }  catch (WonProtocolException wpe) {
+      countMethodCall(Method.EXCEPTION_CAUGHT);
+      System.out.println("caught exception in automatic owner after executing connectTo:");
+      wpe.printStackTrace();
+      if (this.automaticActionsFinished != null){
+        this.automaticActionsFinished.countDown();
+      }
+      throw wpe;
+    }
+  }
 
   @Override
   public void hintReceived(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI) throws NoSuchNeedException

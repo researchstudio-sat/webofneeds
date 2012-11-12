@@ -107,10 +107,24 @@ public class NeedCommunicationServiceImpl implements
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECT_TO.name(), need.getState());
 
-    //check if there already exists an established connection between those two
-    List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURIAndState(needURI, otherNeedURI, ConnectionState.ESTABLISHED);
+    //check if there already exists a connection between those two
+    //we have multiple options:
+    //a) no connection exists -> create new
+    //b) a connection exists in state ESTABLISHED -> error message
+    //c) a connection exists in state REQUEST_SENT. The call must be a
+    //   duplicate (or re-sent after the remote end hasn't replied for some time) -> error message
+    //d) a connection exists in state REQUEST_RECEIVED. The remote end tried to connect before we did.
+    //   -> error message
+    //e) a connection exists in state CLOSED -> create new
+    List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
     if (existingConnections.size() > 0){
-      throw new ConnectionAlreadyExistsException(existingConnections.get(0).getConnectionURI(),needURI,otherNeedURI);
+      for(Connection conn: existingConnections){
+        if (ConnectionState.ESTABLISHED == conn.getState()
+            || ConnectionState.REQUEST_RECEIVED == conn.getState()
+            || ConnectionState.REQUEST_SENT == conn.getState()) {
+          throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),needURI,otherNeedURI);
+        }
+      }
     }
     //Create new connection object
     Connection con = new Connection();
@@ -155,6 +169,28 @@ public class NeedCommunicationServiceImpl implements
     Need need = DataAccessUtils.loadNeed(needRepository,needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECTION_REQUESTED.name(), need.getState());
     //Create new connection object on our side
+
+    //check if there already exists a connection between those two
+    //we have multiple options:
+    //a) no connection exists -> create new
+    //b) a connection exists in state ESTABLISHED -> error message
+    //c) a connection exists in state REQUEST_SENT. Our request was first, we won't accept a request
+    //   from the other side. They have to accept/deny ours! -> error message
+    //d) a connection exists in state REQUEST_RECEIVED. The remote side contacts us repeatedly, it seems.
+    //   -> error message
+    //e) a connection exists in state CLOSED -> create new
+    List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
+    if (existingConnections.size() > 0){
+      for(Connection conn: existingConnections){
+        if (ConnectionState.ESTABLISHED == conn.getState()
+            || ConnectionState.REQUEST_RECEIVED == conn.getState()
+            || ConnectionState.REQUEST_SENT == conn.getState()) {
+          throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),needURI,otherNeedURI);
+        }
+      }
+    }
+
+
     Connection con = new Connection();
     con.setNeedURI(needURI);
     con.setState(ConnectionState.REQUEST_RECEIVED);
