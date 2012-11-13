@@ -26,8 +26,7 @@
     <module>needserver-core</module>
     <module>needserver-ws</module>
     <module>needserver-xmpp</module>
-    <module>needserver-need</module>
-    <module>needserver-webapp</module>
+    <module>needserver-jboss-webapp</module>
   </modules>
   <build>
       <pluginManagement>
