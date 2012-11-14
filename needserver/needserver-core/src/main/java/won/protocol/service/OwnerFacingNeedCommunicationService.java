@@ -27,7 +27,8 @@ import java.net.URI;
  */
 public interface OwnerFacingNeedCommunicationService
 {
-/**
+
+  /**
    * Causes the need identified by needURI to open a connection to the need identified by otherNeedURI.
    * A short message (max 140 chars) can be sent along with the request. The other need is contacted by calling
    * its requestConnection method.

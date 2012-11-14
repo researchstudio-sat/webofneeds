@@ -17,6 +17,7 @@
 package won.server.protocol.impl;
 
 import com.hp.hpl.jena.graph.Graph;
+import org.springframework.stereotype.Service;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedService;
@@ -32,6 +33,7 @@ import java.util.Collection;
  * User: fkleedorfer
  * Date: 02.11.12
  */
+@Service
 public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedService
 {
   private MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService;

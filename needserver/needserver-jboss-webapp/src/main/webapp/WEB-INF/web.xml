@@ -26,6 +26,12 @@
         <servlet-class>won.server.ws.NeedProtocolWSImpl</servlet-class>
     </servlet>
 
+    <servlet-mapping>
+        <servlet-name>NeedProtocolWS</servlet-name>
+        <url-pattern>/needProtocol</url-pattern>
+    </servlet-mapping>
+
+
     <servlet>
         <servlet-name>mvc-dispatcher</servlet-name>
         <servlet-class>
@@ -34,10 +40,6 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <servlet-mapping>
-        <servlet-name>NeedProtocolWS</servlet-name>
-        <url-pattern>/needProtocol</url-pattern>
-    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>mvc-dispatcher</servlet-name>

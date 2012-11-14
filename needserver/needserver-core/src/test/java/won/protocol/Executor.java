@@ -1,7 +1,10 @@
 package won.protocol;
 
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -20,6 +23,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 
+@ContextConfiguration("/applicationContext.xml")
+@TransactionConfiguration(transactionManager="transactionManager", defaultRollback=false)
 @Component
 public class Executor {
 
@@ -32,6 +37,7 @@ public class Executor {
     @Autowired
     private ChatMessageRepository chatMessageRepository;
 
+    @Test
     public void execute() {
         final List<Need> needs = new ArrayList<Need>();
         try {

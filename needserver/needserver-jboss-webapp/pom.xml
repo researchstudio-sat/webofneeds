@@ -26,10 +26,10 @@
     </parent>
 
     <groupId>webofneeds</groupId>
-    <artifactId>needserver-webapp</artifactId>
+    <artifactId>needserver-jboss-webapp</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>needserver-webapp Spring-WS Application</name>
+    <name>needserver-jboss-webapp Spring-WS Application</name>
     <url>http://www.springframework.org/spring-ws</url>
 
     <dependencies>

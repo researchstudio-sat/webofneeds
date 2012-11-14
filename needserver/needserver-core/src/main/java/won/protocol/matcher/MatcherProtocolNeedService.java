@@ -16,29 +16,13 @@
 
 package won.protocol.matcher;
 
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedInformationService;
-
-import java.net.URI;
 
 /**
  * User: fkleedorfer
  * Date: 31.10.12
  */
-public interface MatcherProtocolNeedService extends NeedInformationService
+public interface MatcherProtocolNeedService extends NeedInformationService, MatcherFacingNeedCommunicationService
 {
-  /**
-   * Notifies the need of a matching otherNeed with the specified match score. Originator
-   * identifies the entity making the call. Normally, originator is a matching service.
-   *
-   * @param needURI the URI of the need
-   * @param otherNeed URI of the other need (may be on the local needserver)
-   * @param score      match score between 0.0 (bad) and 1.0 (good). Implementations treat lower values as 0.0 and higher values as 1.0.
-   * @param originator an URI identifying the calling entity
-   * @throws NoSuchNeedException if needURI is unknown
-   * @throws IllegalMessageForNeedStateException if the need is not active
-   */
-  public void hint(URI needURI, URI otherNeed, double score, URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException;
-
 }

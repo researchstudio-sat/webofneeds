@@ -16,30 +16,13 @@
 
 package won.protocol.need;
 
-import won.protocol.exception.*;
 import won.protocol.service.ConnectionCommunicationService;
-
-import java.net.URI;
+import won.protocol.service.NeedFacingNeedCommunicationService;
 
 /**
  * User: fkleedorfer
  * Date: 31.10.12
  */
-public interface NeedProtocolNeedService extends ConnectionCommunicationService
+public interface NeedProtocolNeedService extends ConnectionCommunicationService, NeedFacingNeedCommunicationService
 {
-
-  /**
-   * Requests a connection from the need otherNeedURI. The other need refers to the
-   * connection using the specified otherConnectionURI. A short message can be sent along with the
-   * request.
-
-   *
-   * @param need the URI of the need
-   * @param otherNeedURI
-   * @param otherConnectionURI
-   * @param message
-   *
-   */
-  public URI connectionRequested(URI need, URI otherNeedURI, URI otherConnectionURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
-
 }

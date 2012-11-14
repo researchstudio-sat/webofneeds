@@ -82,11 +82,23 @@
         <constructor-arg value="30" type="int" index="0"/>
     </bean>
 
-    <bean id="threadPoolExecutor" class="java.util.concurrent.ThreadPoolExecutor">
+    <bean id="threadPoolExecutor" class="java.util.concurrent.ThreadPoolExecutor" destroy-method="shutdown">
         <constructor-arg value="10" index="0"/>
         <constructor-arg value="15" index="1"/>
         <constructor-arg value="1" index="2"/>
         <constructor-arg value="MINUTES" index="3"/>
         <constructor-arg ref="workqueue" index="4"/>
+    </bean>
+
+
+    <!-- TODO: remove DUMMY IMPLEMENTATIONS below   -->
+
+    <bean name="ownerProtocolOwnerClient" class="won.server.protocol.impl.OwnerProtocolOwnerClientEmptyImpl">
+
+    </bean>
+
+
+    <bean name="needProtocolNeedClient" class="won.server.protocol.impl.NeedProtocolNeedClientEmptyImpl">
+
     </bean>
 </beans>

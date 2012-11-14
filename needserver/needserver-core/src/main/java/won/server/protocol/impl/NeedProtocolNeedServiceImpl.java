@@ -29,8 +29,8 @@ import java.net.URI;
  */
 public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
 {
-  private NeedFacingNeedCommunicationService needFacingNeedCommunicationService;
-  private ConnectionCommunicationService connectionCommunicationService;
+  protected NeedFacingNeedCommunicationService needFacingNeedCommunicationService;
+  protected ConnectionCommunicationService connectionCommunicationService;
 
   @Override
   public URI connectionRequested(final URI need, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
