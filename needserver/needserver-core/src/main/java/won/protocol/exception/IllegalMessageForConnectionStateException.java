@@ -33,7 +33,10 @@ public class IllegalMessageForConnectionStateException extends WonProtocolExcept
 
   public IllegalMessageForConnectionStateException(final URI connectionURI, final String methodName, final ConnectionState connectionState)
   {
-    super(MessageFormat.format("It is  not allowed to call method {0} on connection {1}, as it is currently in state {2}.",methodName, connectionURI.toString(), connectionState.toString()));
+    super(MessageFormat.format("It is  not allowed to call method {0} on connection {1}, as it is currently in state {2}.",
+        methodName,
+        safeToString(connectionURI),
+        safeToString(connectionState)));
     this.methodName = methodName;
     this.connectionState = connectionState;
     this. connectionURI = connectionURI;

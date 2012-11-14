@@ -60,6 +60,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   @Override
   public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
   {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     //TODO: provide a repository method for listing the connection URIs for a need
     List<Connection> allConnections = connectionRepository.findByNeedURI(need.getNeedURI());
@@ -73,6 +74,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   @Override
   public Need readNeed(final URI needURI) throws NoSuchNeedException
   {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     return (DataAccessUtils.loadNeed(needRepository, needURI));
   }
 
@@ -80,12 +82,14 @@ public class NeedInformationServiceImpl implements NeedInformationService
   @Override
   public Graph readNeedContent(final URI needURI) throws NoSuchNeedException
   {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     return null;
   }
 
   @Override
   public Connection readConnection(final URI connectionURI) throws NoSuchNeedException
   {
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     return DataAccessUtils.loadConnection(connectionRepository, connectionURI);
   }
 

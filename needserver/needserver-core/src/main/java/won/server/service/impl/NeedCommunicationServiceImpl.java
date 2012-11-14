@@ -28,6 +28,7 @@ import won.protocol.model.*;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
@@ -76,16 +77,36 @@ public class NeedCommunicationServiceImpl implements
 
   @Autowired
   private NeedRepository needRepository;
+
   @Autowired
   private ConnectionRepository connectionRepository;
 
+  @Autowired
+  private MatchRepository matchRepository;
+
   @Override
-  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
+  public void hint(final URI needURI, final URI otherNeedURI, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    logger.info("HINT received for need {} referring to need {} with score {} from originator {}",new Object[]{needURI.toString(),otherNeed.toString(),score,originator.toString()});
+    logger.info("HINT received for need {} referring to need {} with score {} from originator {}", new Object[]{needURI, otherNeedURI,score,originator});
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+    if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
+    if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
+    if (originator == null) throw new IllegalArgumentException("originator is not set");
+    if (needURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
+
+
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.HINT.name(), need.getState());
+
+    //save match
+    Match match = new Match();
+    match.setFromNeed(needURI);
+    match.setToNeed(otherNeedURI);
+    match.setScore(score);
+    match.setOriginator(originator);
+    matchRepository.saveAndFlush(match);
+
     executorService.execute(new Runnable()
     {
       @Override
@@ -94,7 +115,7 @@ public class NeedCommunicationServiceImpl implements
         //TODO: somewhere, we'll have to use the need's owner URI to determine where to send the request to..
         //should we access the database again in the implementation of the owner protocol owner client?
         //here, we don't really need to handle exceptions, as we don't want to flood matching services with error messages
-        ownerProtocolOwnerService.hintReceived(needURI, otherNeed, score, originator);
+        ownerProtocolOwnerService.hintReceived(needURI, otherNeedURI, score, originator);
       }
     });
   }
@@ -102,7 +123,11 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public URI connectTo(final URI needURI, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info("CONNECT_TO received for need {} referring to need {} with message '{}'",new Object[]{needURI.toString(),otherNeedURI.toString(),message});
+    logger.info("CONNECT_TO received for need {} referring to need {} with message {}",new Object[]{needURI,otherNeedURI,message});
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+    if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
+    if (needURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
+
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECT_TO.name(), need.getState());
@@ -164,7 +189,12 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public URI connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info("CONNECTION_REQUESTED received for need {} referring to need {} (connection {}) with message '{}'",new Object[]{needURI.toString(),otherNeedURI.toString(), otherConnectionURI,message});
+    logger.info("CONNECTION_REQUESTED received for need {} referring to need {} (connection {}) with message '{}'", new Object[]{needURI, otherNeedURI, otherConnectionURI, message});
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+    if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
+    if (otherConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
+    if (needURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
+
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository,needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECTION_REQUESTED.name(), need.getState());

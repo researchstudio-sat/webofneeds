@@ -56,6 +56,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("ACCEPT received from the need side for connection {}",new Object[]{connectionURI});
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)
@@ -79,6 +80,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("DENY received from the need side for connection {}",new Object[]{connectionURI});
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)
@@ -101,6 +103,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("CLOSE received from the need side for connection {}",new Object[]{connectionURI});
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)
@@ -123,6 +126,8 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("SEND_TEXT_MESSAGE received from the need side for connection {} with message '{}'",new Object[]{connectionURI,message});
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+    if (message == null) throw new IllegalArgumentException("message is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)

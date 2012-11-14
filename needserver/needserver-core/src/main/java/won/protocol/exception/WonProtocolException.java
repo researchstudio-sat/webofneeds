@@ -41,4 +41,8 @@ public class WonProtocolException extends RuntimeException
   {
     super(cause);
   }
+
+  protected static String safeToString(Object o){
+    return o == null ? "null" : o.toString();
+  }
 }

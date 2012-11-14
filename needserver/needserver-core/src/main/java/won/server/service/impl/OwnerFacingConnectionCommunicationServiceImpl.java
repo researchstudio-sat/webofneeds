@@ -53,6 +53,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("ACCEPT received from the owner side for connection {}",new Object[]{connectionURI});
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
@@ -78,6 +79,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("DENY received from the owner side for connection {}",new Object[]{connectionURI});
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
@@ -101,6 +103,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("CLOSE received from the owner side for connection {}",new Object[]{connectionURI});
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
@@ -110,20 +113,24 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //save in the db
     final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
     //inform the other side
-    executorService.execute(new Runnable()
-    {
-      @Override
-      public void run()
+    if (con.getRemoteConnectionURI() != null) {
+      executorService.execute(new Runnable()
       {
-        needFacingConnectionClient.close(connectionForRunnable.getRemoteConnectionURI());
-      }
-    });
+        @Override
+        public void run()
+        {
+          needFacingConnectionClient.close(connectionForRunnable.getRemoteConnectionURI());
+        }
+      });
+    }
   }
 
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'",new Object[]{connectionURI,message});
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+    if (message == null) throw new IllegalArgumentException("message is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)

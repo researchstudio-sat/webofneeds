@@ -16,43 +16,49 @@
 
 package won.server.protocol.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.exception.*;
 import won.protocol.need.NeedProtocolNeedService;
 
 import java.net.URI;
+import java.text.MessageFormat;
 
 /**
  * TODO: empty need client implementation to be replaced by WS client
  */
 public class NeedProtocolNeedClientEmptyImpl implements NeedProtocolNeedService
 {
+  final Logger logger = LoggerFactory.getLogger(getClass());
+
   @Override
-  public URI connectionRequested(final URI need, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public URI connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    logger.info(MessageFormat.format("need-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, other connection {2} and message {3}",needURI, otherNeedURI, otherConnectionURI, message));
+    return null;
   }
 
   @Override
   public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    //To change body of implemented methods use File | Settings | File Templates.
+    logger.info(MessageFormat.format("need-facing: ACCEPT called for connection {0}", connectionURI));
   }
 
   @Override
   public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    //To change body of implemented methods use File | Settings | File Templates.
+    logger.info(MessageFormat.format("need-facing: DENY called for connection {0}", connectionURI));
   }
 
   @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    //To change body of implemented methods use File | Settings | File Templates.
+    logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));
   }
 
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    //To change body of implemented methods use File | Settings | File Templates.
+    logger.info(MessageFormat.format("need-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI,message));
   }
 }

@@ -74,8 +74,8 @@
     </bean>
 
     <bean id="uriService" class="won.server.service.impl.URIService">
-        <property name="connectionURIPrefix" value="http://first.com/connection" />
-        <property name="needURIPrefix" value="http://first.com/need" />
+        <property name="connectionURIPrefix" value="${uri.prefix.connection}" />
+        <property name="needURIPrefix" value="${uri.prefix.need}" />
     </bean>
 
     <bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">

@@ -32,6 +32,7 @@ public class Match
     private URI fromNeed;
     @Column( name = "toNeed")
     private URI toNeed;
+    //TODO: there's no need for score to be a double. short should be sufficient
     @Column( name = "score")
     private double score;
     @Column( name = "originator")

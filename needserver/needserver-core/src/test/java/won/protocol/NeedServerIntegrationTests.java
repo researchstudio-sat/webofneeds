@@ -16,6 +16,7 @@
 
 package won.protocol;
 
+import com.hp.hpl.jena.graph.Graph;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +35,8 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
+import won.protocol.need.NeedProtocolNeedService;
+import won.protocol.owner.OwnerProtocolNeedService;
 
 import java.net.URI;
 import java.util.Collection;
@@ -61,11 +64,25 @@ public class NeedServerIntegrationTests
   @Autowired
   private MockMatchingService mockMatchingService;
 
+  @Autowired
+  private OwnerProtocolNeedService ownerProtocolNeedService;
+
+  @Autowired
+  private NeedProtocolNeedService needProtocolNeedService;
+
+
   @Test
   @Transactional(propagation = Propagation.NEVER)
   public void testNeedCreation(){
     URI ownerURI = createOwnerURI();
     URI matcherURI = createMatcherURI();
+
+    try {
+      ownerProtocolOwnerClient.createNeed(null,null,false);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){
+      //ignore
+    }
 
     URI need1URI = ownerProtocolOwnerClient.createNeed(ownerURI,null,false);
     URI need2URI = ownerProtocolOwnerClient2.createNeed(ownerURI,null,false);
@@ -166,6 +183,215 @@ public class NeedServerIntegrationTests
     Assert.assertEquals(needURI,conn2.getRemoteNeedURI());
     Assert.assertEquals(ConnectionState.CLOSED,conn2.getState());
   }
+
+  @Test
+  @Transactional(propagation = Propagation.NEVER)
+  public void testTrivialErrors(){
+    URI ownerURI = createOwnerURI();
+    URI matcherURI = createMatcherURI();
+
+    ownerProtocolOwnerClient.reset();
+    ownerProtocolOwnerClient2.reset();
+
+    URI need1URI = ownerProtocolOwnerClient.createNeed(ownerURI,null,false);
+    URI need2URI = ownerProtocolOwnerClient2.createNeed(ownerURI,null,false);
+    Assert.assertNotSame("Two consecutively created needs have the same URI", need1URI, need2URI);
+
+    URI dummyConnectionURI = URI.create("http://example.com/connection/1");
+
+    //HINT errors
+
+    //hint to same need
+    try {
+      mockMatchingService.hint(need1URI,need1URI,1.0);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    //missing fromNeedURI
+    try {
+      mockMatchingService.hint(null,need1URI,1.0);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    //missing toNeedURI
+    try {
+      mockMatchingService.hint(need1URI,null,1.0);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    //hint with illegal scores
+    try {
+      mockMatchingService.hint(need1URI,need1URI,1.1);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      mockMatchingService.hint(need1URI,need1URI,-0.1);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    //send hint without originatorURI
+    mockMatchingService.setMatcherUri(null);
+    try {
+      mockMatchingService.hint(need1URI,need2URI,0.1);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+    mockMatchingService.setMatcherUri(matcherURI);
+
+
+    //owner protocol errors
+
+    //connect to same need
+    try {
+      ownerProtocolNeedService.connectTo(need1URI,need1URI,"hi");
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    //need1 missing
+    try {
+      ownerProtocolNeedService.connectTo(null,need1URI,"hi");
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    //need2 missing
+    try {
+      ownerProtocolNeedService.connectTo(need1URI,null,"hi");
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    //
+    try {
+      ownerProtocolNeedService.readConnection(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.createNeed(null, Graph.emptyGraph, true);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    //TODO: as soon as we handle RDF content, test correctness checks here
+
+    try {
+      ownerProtocolNeedService.listConnectionURIs(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.accept(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.activate(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.close(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.deactivate(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.deny(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.getMatches(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.readConnection(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.readConnection(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.readNeed(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.readNeedContent(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.sendTextMessage(null,"hi");
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      ownerProtocolNeedService.sendTextMessage(dummyConnectionURI,null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+
+    //need protocol errors
+
+    //connect to same need
+    try {
+      needProtocolNeedService.connectionRequested(need1URI, need1URI, dummyConnectionURI, "hi");
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    //need1 missing
+    try {
+      needProtocolNeedService.connectionRequested(null, need1URI, dummyConnectionURI, "hi");
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    //need2 missing
+    try {
+      needProtocolNeedService.connectionRequested(need1URI, null, dummyConnectionURI, "hi");
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    //connectionURI missing
+    try {
+      needProtocolNeedService.connectionRequested(need1URI, need2URI, null, "hi");
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      needProtocolNeedService.close(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      needProtocolNeedService.accept(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      needProtocolNeedService.deny(null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      needProtocolNeedService.sendTextMessage(null,"hi");
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+    try {
+      needProtocolNeedService.sendTextMessage(dummyConnectionURI,null);
+      Assert.fail("Expected exception not thrown");
+    } catch (IllegalArgumentException e){}
+
+
+  }
+
 
   @Test
   //Propagation.NEVER is required here because if transactions start here and propagate,

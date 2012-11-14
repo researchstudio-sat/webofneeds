@@ -57,6 +57,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Override
   public URI createNeed(final URI ownerURI, final Graph content, final boolean activate) throws IllegalNeedContentException
   {
+    if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
+    //TODO: when we have RDF handling, check that the graph is valid here.
 
     Need need = new Need();
     need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
@@ -71,6 +73,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Override
   public void activate(final URI needURI) throws NoSuchNeedException
   {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     need.setState(NeedState.ACTIVE);
     need = needRepository.saveAndFlush(need);
@@ -79,6 +82,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Override
   public void deactivate(final URI needURI) throws NoSuchNeedException
   {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     need.setState(NeedState.INACTIVE);
     need = needRepository.saveAndFlush(need);
@@ -93,6 +97,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Override
   public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException
   {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     return matchRepository.findByFromNeed(need.getNeedURI());
   }
