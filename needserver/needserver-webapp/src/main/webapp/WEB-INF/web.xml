@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+         version="2.4">
+
+    <display-name>Archetype Created Web Application</display-name>
+
+
+    <servlet>
+        <servlet-name>NeedProtocol</servlet-name>
+        <servlet-class>won.server.ws.NeedProtocolNeedWebServiceEndpoint</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>OwnerProtocol</servlet-name>
+        <servlet-class>won.server.ws.OwnerProtocolNeedWebServiceEndpoint</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>MatcherProtocol</servlet-name>
+        <servlet-class>won.server.ws.MatcherProtocolNeedWebServiceEndpoint</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>NeedProtocol</servlet-name>
+        <url-pattern>/NeedProtocol/</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>OwnerProtocol</servlet-name>
+        <url-pattern>/OwnerProtocol/</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>MatcherProtocol</servlet-name>
+        <url-pattern>/MatcherProtocol/</url-pattern>
+    </servlet-mapping>
+
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            WEB-INF/spring-ws-servlet.xml
+            classpath:services.xml
+            classpath:applicationContext.xml
+        </param-value>
+    </context-param>
+
+</web-app>
