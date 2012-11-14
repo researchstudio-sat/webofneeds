@@ -1,0 +1,25 @@
+Status: FAILED
+Time Taken: 34
+Size: 0
+Timestamp: Wed Nov 14 17:04:55 CET 2012
+TestStep: close
+
+----------------- Messages ------------------------------
+org.apache.http.NoHttpResponseException: The target server failed to respond
+
+----------------- Properties ------------------------------
+Encoding: UTF-8
+Endpoint: http://localhost:8080/NeedProtocol/
+
+---------------- Request ---------------------------
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.webofneeds.org/protocol/need/soap/1.0/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:close>
+         <connectionURI>?</connectionURI>
+      </ns:close>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+---------------- Response --------------------------
+- missing response / garbage collected -
