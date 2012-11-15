@@ -92,7 +92,7 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
   }
 
 
-  public Connection readConnection(final URI connectionURI) throws NoSuchNeedException
+  public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException
   {
     this.lastConnectionURI = connectionURI;
     return ownerProtocolNeedService.readConnection(connectionURI);
@@ -110,7 +110,7 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
     return connUri;
   }
 
-  public Graph readConnectionContent(final URI connectionURI) throws NoSuchNeedException
+  public Graph readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
   {
     this.lastConnectionURI = connectionURI;
     return ownerProtocolNeedService.readConnectionContent(connectionURI);

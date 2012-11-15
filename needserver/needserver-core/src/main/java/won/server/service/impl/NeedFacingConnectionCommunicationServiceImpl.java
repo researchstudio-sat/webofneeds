@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionMessage;
@@ -71,7 +72,11 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       public void run()
       {
 
-        ownerFacingConnectionClient.accept(connectionURI);
+        try {
+          ownerFacingConnectionClient.accept(connectionURI);
+        } catch (WonProtocolException e) {
+          logger.debug("caught Exception:", e);
+        }
       }
     });
   }
@@ -94,7 +99,11 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       @Override
       public void run()
       {
-        ownerFacingConnectionClient.deny(connectionURI);
+        try {
+          ownerFacingConnectionClient.deny(connectionURI);
+        } catch (WonProtocolException e) {
+          logger.debug("caught Exception:", e);
+        }
       }
     });
   }
@@ -117,7 +126,11 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       @Override
       public void run()
       {
-        ownerFacingConnectionClient.close(connectionURI);
+        try{
+          ownerFacingConnectionClient.close(connectionURI);
+        } catch (WonProtocolException e) {
+          logger.debug("caught Exception:", e);
+        }
       }
     });
   }
@@ -146,7 +159,11 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       @Override
       public void run()
       {
-        ownerFacingConnectionClient.sendTextMessage(connectionURI, message);
+        try {
+          ownerFacingConnectionClient.sendTextMessage(connectionURI, message);
+        } catch (WonProtocolException e) {
+          logger.debug("caught Exception:", e);
+        }
       }
     });
 

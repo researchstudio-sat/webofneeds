@@ -20,10 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchNeedException;
-import won.protocol.exception.WonProtocolException;
+import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
@@ -115,7 +112,13 @@ public class NeedCommunicationServiceImpl implements
         //TODO: somewhere, we'll have to use the need's owner URI to determine where to send the request to..
         //should we access the database again in the implementation of the owner protocol owner client?
         //here, we don't really need to handle exceptions, as we don't want to flood matching services with error messages
-        ownerProtocolOwnerService.hintReceived(needURI, otherNeedURI, score, originator);
+
+        try {
+          ownerProtocolOwnerService.hintReceived(needURI, otherNeedURI, score, originator);
+        } catch (NoSuchNeedException e) {
+          logger.debug("caught NoSuchNeedException:", e);
+        }
+
       }
     });
   }
@@ -178,7 +181,13 @@ public class NeedCommunicationServiceImpl implements
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
           // For now, we call the close method as if it had been called from the remote side
           // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
-          NeedCommunicationServiceImpl.this.needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
+          try {
+            NeedCommunicationServiceImpl.this.needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
+          } catch (NoSuchConnectionException e1) {
+            logger.debug("caught NoSuchConnectionException:", e1);
+          } catch (IllegalMessageForConnectionStateException e1) {
+            logger.debug("caught IllegalMessageForConnectionStateException:", e1);
+          }
         }
       }
     });
@@ -247,7 +256,13 @@ public class NeedCommunicationServiceImpl implements
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
           // For now, we call the close method as if it had been called from the owner side
           // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
-          NeedCommunicationServiceImpl.this.ownerFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
+          try {
+            NeedCommunicationServiceImpl.this.ownerFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
+          } catch (NoSuchConnectionException e1) {
+            logger.debug("caught NoSuchConnectionException:", e1);
+          } catch (IllegalMessageForConnectionStateException e1) {
+            logger.debug("caught IllegalMessageForConnectionStateException:", e1);
+          }
         }
       }
     });

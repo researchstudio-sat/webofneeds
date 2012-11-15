@@ -63,8 +63,17 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
       if (this.automaticActionsFinished != null){
         this.automaticActionsFinished.countDown();
       }
-      throw wpe;
+      if (wpe instanceof  NoSuchNeedException) {
+        throw (NoSuchNeedException) wpe;
+      }
+      if (wpe instanceof  IllegalMessageForNeedStateException) {
+        throw (IllegalMessageForNeedStateException) wpe;
+      }
+      if (wpe instanceof  ConnectionAlreadyExistsException) {
+        throw (ConnectionAlreadyExistsException) wpe;
+      }
     }
+    return null;
   }
 
   @Override
@@ -72,7 +81,13 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
   {
     countMethodCall(Method.hintReceived);
     if (autoConnect) {
-      this.lastConnectionURI = this.ownerProtocolNeedService.connectTo(ownNeedURI,otherNeedURI,"I'm automatically interested, take " + (messageCount++) );
+      try {
+        this.lastConnectionURI = this.ownerProtocolNeedService.connectTo(ownNeedURI,otherNeedURI,"I'm automatically interested, take " + (messageCount++) );
+      } catch (IllegalMessageForNeedStateException e) {
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      } catch (ConnectionAlreadyExistsException e) {
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      }
     }
   }
 

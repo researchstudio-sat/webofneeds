@@ -19,6 +19,7 @@ package won.server.protocol.impl;
 import com.hp.hpl.jena.graph.Graph;
 import org.springframework.stereotype.Service;
 import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.model.Connection;
@@ -70,13 +71,13 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
   }
 
   @Override
-  public Connection readConnection(final URI connectionURI) throws NoSuchNeedException
+  public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException
   {
     return needInformationService.readConnection(connectionURI);
   }
 
   @Override
-  public Graph readConnectionContent(final URI connectionURI) throws NoSuchNeedException
+  public Graph readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
   {
     return needInformationService.readConnectionContent(connectionURI);
   }

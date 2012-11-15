@@ -17,10 +17,13 @@
 package won.server.service.impl;
 
 import com.hp.hpl.jena.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
@@ -41,6 +44,7 @@ import java.util.Collection;
 @Component
 public class NeedManagementServiceImpl implements NeedManagementService
 {
+  final Logger logger = LoggerFactory.getLogger(getClass());
   private OwnerProtocolOwnerService ownerProtocolOwnerService;
   //used to close connections when a need is deactivated
   private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
@@ -90,7 +94,11 @@ public class NeedManagementServiceImpl implements NeedManagementService
     //TODO: add a filter to the method/repo to filter only non-closed connections
     Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());
     for (URI connURI : connectionURIs){
-      ownerFacingConnectionCommunicationService.close(connURI);
+      try {
+        ownerFacingConnectionCommunicationService.close(connURI);
+      } catch (WonProtocolException e) {
+        logger.debug("caught exception when trying to close connection", e);
+      }
     }
   }
 

@@ -21,9 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
-import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.server.protocol.impl.MatcherProtocolNeedServiceImpl;
 
@@ -57,7 +57,7 @@ public class MatcherProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringS
   }
 
   @WebMethod
-  public String readConnectionContent(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchNeedException
+  public String readConnectionContent(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException
   {
     //TODO: remove this workaround when we have the linked data service running
     Graph ret = matcherProtocolNeedService.readConnectionContent(connectionURI);
@@ -65,9 +65,9 @@ public class MatcherProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringS
   }
 
   @WebMethod
-  public Connection readConnection(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchNeedException
+  public Connection readConnection(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException
   {
-    return matcherProtocolNeedService.readConnection(connectionURI);
+      return matcherProtocolNeedService.readConnection(connectionURI);
   }
 
   @WebMethod

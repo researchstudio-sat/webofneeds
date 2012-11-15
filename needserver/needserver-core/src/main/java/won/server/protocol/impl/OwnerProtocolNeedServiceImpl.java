@@ -120,13 +120,13 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService
   }
 
   @Override
-  public Connection readConnection(final URI connectionURI) throws NoSuchNeedException
+  public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException
   {
     return needInformationService.readConnection(connectionURI);
   }
 
   @Override
-  public Graph readConnectionContent(final URI connectionURI) throws NoSuchNeedException
+  public Graph readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
   {
     return needInformationService.readConnectionContent(connectionURI);
   }

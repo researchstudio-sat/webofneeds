@@ -18,7 +18,6 @@ package won.server.service.impl;
 
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.repository.ConnectionRepository;
@@ -46,7 +45,7 @@ public class DataAccessUtils
   {
     List<Need> needs = needRepository.findByNeedURI(needURI);
     if (needs.size() == 0) throw new NoSuchNeedException(needURI);
-    if (needs.size() > 1) throw new WonProtocolException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}", needURI));
+    if (needs.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}", needURI));
     return needs.get(0);
   }
 
@@ -60,8 +59,8 @@ public class DataAccessUtils
   public static Connection loadConnection(ConnectionRepository connectionRepository, final URI connectionURI) throws NoSuchConnectionException
   {
     List<Connection> connections = connectionRepository.findByConnectionURI(connectionURI);
-    if (connections.size() == 0) throw new NoSuchNeedException(connectionURI);
-    if (connections.size() > 1) throw new WonProtocolException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}",connectionURI));
+    if (connections.size() == 0) throw new NoSuchConnectionException(connectionURI);
+    if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}",connectionURI));
     return connections.get(0);
   }
 

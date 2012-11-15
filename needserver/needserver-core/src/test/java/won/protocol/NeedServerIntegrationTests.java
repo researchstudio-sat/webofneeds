@@ -73,7 +73,7 @@ public class NeedServerIntegrationTests
 
   @Test
   @Transactional(propagation = Propagation.NEVER)
-  public void testNeedCreation(){
+  public void testNeedCreation() throws Exception {
     URI ownerURI = createOwnerURI();
     URI matcherURI = createMatcherURI();
 
@@ -186,7 +186,7 @@ public class NeedServerIntegrationTests
 
   @Test
   @Transactional(propagation = Propagation.NEVER)
-  public void testTrivialErrors(){
+  public void testTrivialErrors() throws Exception {
     URI ownerURI = createOwnerURI();
     URI matcherURI = createMatcherURI();
 

@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionMessage;
@@ -68,7 +69,11 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       @Override
       public void run()
       {
-        needFacingConnectionClient.accept(connectionForRunnable.getRemoteConnectionURI());
+        try{
+          needFacingConnectionClient.accept(connectionForRunnable.getRemoteConnectionURI());
+        } catch (WonProtocolException e) {
+          logger.debug("caught Exception:", e);
+        }
       }
     });
   }
@@ -94,7 +99,11 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       @Override
       public void run()
       {
-        needFacingConnectionClient.deny(connectionForRunnable.getRemoteConnectionURI());
+        try{
+          needFacingConnectionClient.deny(connectionForRunnable.getRemoteConnectionURI());
+        } catch (WonProtocolException e) {
+          logger.debug("caught Exception:", e);
+        }
       }
     });
   }
@@ -119,7 +128,11 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
         @Override
         public void run()
         {
-          needFacingConnectionClient.close(connectionForRunnable.getRemoteConnectionURI());
+          try {
+            needFacingConnectionClient.close(connectionForRunnable.getRemoteConnectionURI());
+          } catch (WonProtocolException e) {
+            logger.debug("caught Exception:", e);
+          }
         }
       });
     }
@@ -150,7 +163,11 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       @Override
       public void run()
       {
-        needFacingConnectionClient.sendTextMessage(remoteConnectionURI, message);
+        try {
+          needFacingConnectionClient.sendTextMessage(remoteConnectionURI, message);
+        } catch (WonProtocolException e) {
+          logger.debug("caught Exception:", e);
+        }
       }
     });
 

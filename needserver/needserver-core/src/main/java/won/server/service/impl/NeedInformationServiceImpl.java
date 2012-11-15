@@ -19,6 +19,7 @@ package won.server.service.impl;
 import com.hp.hpl.jena.graph.Graph;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
@@ -87,7 +88,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
-  public Connection readConnection(final URI connectionURI) throws NoSuchNeedException
+  public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException
   {
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     return DataAccessUtils.loadConnection(connectionRepository, connectionURI);
@@ -95,7 +96,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
 
   //TODO implement RDF handling!
   @Override
-  public Graph readConnectionContent(final URI connectionURI) throws NoSuchNeedException
+  public Graph readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
   {
     return null;  //To change body of implemented methods use File | Settings | File Templates.
   }

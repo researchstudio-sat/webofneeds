@@ -17,7 +17,6 @@
 package won.server.ws;
 
 import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.rdf.arp.impl.RDFXMLParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -32,9 +31,7 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -49,7 +46,7 @@ public class OwnerProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSup
   private OwnerProtocolNeedServiceImpl ownerProtocolNeedService;
 
   @WebMethod
-  public String readConnectionContent(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchNeedException
+  public String readConnectionContent(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException
   {
     //TODO: remove this workaround when we have the linked data service running
     Graph ret = ownerProtocolNeedService.readConnectionContent(connectionURI);
@@ -57,9 +54,9 @@ public class OwnerProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSup
   }
 
   @WebMethod
-  public Connection readConnection(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchNeedException
+  public Connection readConnection(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException
   {
-    return ownerProtocolNeedService.readConnection(connectionURI);
+      return ownerProtocolNeedService.readConnection(connectionURI);
   }
 
   @WebMethod

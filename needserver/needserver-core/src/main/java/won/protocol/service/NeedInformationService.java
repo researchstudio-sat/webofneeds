@@ -17,6 +17,7 @@
 package won.protocol.service;
 
 import com.hp.hpl.jena.graph.Graph;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
@@ -64,19 +65,21 @@ public interface NeedInformationService
 
   /**
    * Read general information about the connection.
+   *
    * @param connectionURI
    * @return
    * @throws NoSuchNeedException
    */
-  public Connection readConnection(URI connectionURI) throws NoSuchNeedException;
+  public Connection readConnection(URI connectionURI) throws NoSuchConnectionException;
 
 
   /**
    * Retrieves the public description of the connection as an RDF graph.
+   *
    * @param connectionURI
    * @return
    * @throws NoSuchNeedException
    */
-  public Graph readConnectionContent(URI connectionURI) throws NoSuchNeedException;
+  public Graph readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
 }
