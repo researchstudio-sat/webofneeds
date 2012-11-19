@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- protocol-level services -->
+
+    <bean id="needProtocolNeedService2" class="won.node.protocol.impl.NeedProtocolNeedServiceImpl">
+        <property name="needFacingNeedCommunicationService" ref="needCommunicationService2" />
+        <!-- the connection communication service injected here is need facing, not owner facing -->
+        <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService2" />
+    </bean>
+
+    <bean id="ownerProtocolNeedService2" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
+        <!-- the connection communication service injected here is owner facing -->
+        <property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService2" />
+        <property name="needCommunicationService" ref="needCommunicationService2" />
+        <property name="needInformationService" ref="needInformationService2" />
+        <property name="needManagementService" ref="needManagementService2" />
+    </bean>
+
+    <bean id="matcherProtocolNeedService2" class="won.node.protocol.impl.MatcherProtocolNeedServiceImpl">
+        <property name="needInformationService" ref="needInformationService" />
+        <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
+    </bean>
+
+    <!-- service-level services -->
+
+    <bean id="needCommunicationService2" class="won.node.service.impl.NeedCommunicationServiceImpl">
+        <property name="needProtocolNeedService" ref="needProtocolNeedClient2" />
+        <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient2" />
+        <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService2" />
+        <property name="needFacingConnectionCommunicationService" ref="needFacingConnectionCommunicationService2" />
+        <property name="URIService" ref="uriService2" />
+        <property name="executorService" ref="threadPoolExecutor" />
+    </bean>
+
+    <bean id="needInformationService2" class="won.node.service.impl.NeedInformationServiceImpl">
+
+    </bean>
+
+    <bean id="needManagementService2" class="won.node.service.impl.NeedManagementServiceImpl">
+        <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService2" />
+        <property name="needInformationService" ref="needInformationService2"/>
+        <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient2" />
+        <property name="URIService" ref="uriService2" />
+    </bean>
+
+    <bean id="needFacingConnectionCommunicationService2"
+          class="won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl">
+        <property name="ownerFacingConnectionClient" ref="ownerProtocolOwnerClient2" />
+        <property name="executorService" ref="threadPoolExecutor" />
+    </bean>
+
+    <bean id="ownerFacingConnectionCommunicationService2" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl">
+        <property name="needFacingConnectionClient" ref="needProtocolNeedService" />
+        <property name="executorService" ref="threadPoolExecutor" />
+    </bean>
+
+    <bean id="uriService2" class="won.node.service.impl.URIService">
+        <property name="connectionURIPrefix" value="http://second.com/connection" />
+        <property name="needURIPrefix" value="http://second.com/need" />
+    </bean>
+
+    <bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg value="30" type="int" index="0"/>
+    </bean>
+
+    <bean id="threadPoolExecutor" class="java.util.concurrent.ThreadPoolExecutor">
+        <constructor-arg value="10" index="0"/>
+        <constructor-arg value="15" index="1"/>
+        <constructor-arg value="1" index="2"/>
+        <constructor-arg value="MINUTES" index="3"/>
+        <constructor-arg ref="workqueue" index="4"/>
+    </bean>
+
+    <bean id="ownerProtocolOwnerClient" class="won.owner.service.impl.MockOwnerService">
+        <property name="ownerProtocolNeedService" ref="ownerProtocolNeedService" />
+    </bean>
+
+    <bean id="ownerProtocolOwnerClient2" class="won.owner.service.impl.MockOwnerService">
+        <property name="ownerProtocolNeedService" ref="ownerProtocolNeedService2" />
+    </bean>
+
+    <bean id="mockMatchingService" class="won.owner.service.impl.MockMatchingService">
+        <property name="matcherProtocolNeedService" ref="matcherProtocolNeedService"/>
+        <property name="matcherProtocolNeedService2" ref="matcherProtocolNeedService2" />
+        <property name="matcherUri" value="http://matcher.com/" />
+    </bean>
+
+    <!-- connect NeedProtcolNeedService1 to NeedProtcolNeedService2 and vice versa -->
+    <alias name="needProtocolNeedService2" alias="needProtocolNeedClient" />
+    <alias name="needProtocolNeedService" alias="needProtocolNeedClient2" />
+
+</beans>
