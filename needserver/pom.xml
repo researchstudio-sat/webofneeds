@@ -13,22 +13,18 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>webofneeds</groupId>
-    <artifactId>needserver</artifactId>
+    <artifactId>webofneeds</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>needserver</name>
+    <name>Web of Needs module project</name>
     <modules>
-        <module>needserver-core</module>
-        <module>needserver-ws</module>
-        <module>needserver-xmpp</module>
-        <module>needserver-jboss-webapp</module>
-        <module>needserver-webapp</module>
-    </modules>
+        <module>won-core</module>
+        <module>won-node-webapp</module>
+    <module>won-node</module>
+  </modules>
     <build>
         <pluginManagement>
             <plugins>
