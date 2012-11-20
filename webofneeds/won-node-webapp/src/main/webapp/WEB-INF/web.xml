@@ -46,7 +46,7 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>
             WEB-INF/spring-ws-servlet.xml
-            classpath:src/main/resources/services.xml
+            classpath:services.xml
             classpath:applicationContext.xml
         </param-value>
     </context-param>
