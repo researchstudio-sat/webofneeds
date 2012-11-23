@@ -48,7 +48,7 @@
   <con:entry key="Report Format(s)" value=""/>
   <con:entry key="TestCase" value="normalConversation"/>
   <con:entry key="Username" value=""/>
-  <con:entry key="Root Folder" value="C:\DATA\fkleedorfer\workspace\webofneeds\needserver\needserver-webapp\target\reports"/>
+  <con:entry key="Root Folder" value="C:\DATA\fkleedorfer\workspace\webofneeds\webofneeds\won-node-webapp\target\reports"/>
   <con:entry key="Add Settings" value="false"/>
   <con:entry key="Save After" value="false"/>
   <con:entry key="Endpoint" value=""/>

@@ -37,8 +37,7 @@ import java.util.Collection;
  * User: fkleedorfer
  * Date: 13.11.12
  */
-@WebService(serviceName = "OwnerProtocol", targetNamespace = "http://www.webofneeds.org/protocol/owner/soap/1.0/")
-@Service("OwnerProtocolNeedWebServiceEndpoint")
+@WebService(serviceName = "ownerProtocol", targetNamespace = "http://www.webofneeds.org/protocol/owner/soap/1.0/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 public class OwnerProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSupport
 {

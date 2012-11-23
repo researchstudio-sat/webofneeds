@@ -38,8 +38,7 @@ import java.util.Collection;
  * User: fkleedorfer
  * Date: 14.11.12
  */
-@WebService(serviceName = "MatcherProtocol", targetNamespace = "http://www.webofneeds.org/protocol/matcher/soap/1.0/")
-@Service("MatcherProtocolNeedWebServiceEndpoint")
+@WebService(serviceName = "matcherProtocol", targetNamespace = "http://www.webofneeds.org/protocol/matcher/soap/1.0/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 public class MatcherProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSupport
 {

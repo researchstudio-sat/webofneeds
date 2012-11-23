@@ -3,38 +3,9 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
          version="2.4">
 
-    <display-name>Archetype Created Web Application</display-name>
+    <display-name>WON Node Webapp</display-name>
 
-
-    <servlet>
-        <servlet-name>NeedProtocol</servlet-name>
-        <servlet-class>won.node.ws.NeedProtocolNeedWebServiceEndpoint</servlet-class>
-    </servlet>
-
-    <servlet>
-        <servlet-name>OwnerProtocol</servlet-name>
-        <servlet-class>won.node.ws.OwnerProtocolNeedWebServiceEndpoint</servlet-class>
-    </servlet>
-
-    <servlet>
-        <servlet-name>MatcherProtocol</servlet-name>
-        <servlet-class>won.node.ws.MatcherProtocolNeedWebServiceEndpoint</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>NeedProtocol</servlet-name>
-        <url-pattern>/NeedProtocol/</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>OwnerProtocol</servlet-name>
-        <url-pattern>/OwnerProtocol/</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>MatcherProtocol</servlet-name>
-        <url-pattern>/MatcherProtocol/</url-pattern>
-    </servlet-mapping>
+    <!-- SPRING config -->
 
     <listener>
         <listener-class>
@@ -44,11 +15,54 @@
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>
-            WEB-INF/spring-ws-servlet.xml
+        <param-value>WEB-INF/spring-ws-servlet.xml
             classpath:services.xml
             classpath:applicationContext.xml
         </param-value>
     </context-param>
+
+
+    <!-- WEB SERVICES -->
+
+
+    <listener>
+        <listener-class>
+            com.sun.xml.ws.transport.http.servlet.WSServletContextListener
+        </listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>wonProtocolJaxWSServlet</servlet-name>
+        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>wonProtocolJaxWSServlet</servlet-name>
+        <url-pattern>/won/*</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- JAX-RS (REST) config -->
+
+    <servlet>
+        <servlet-name>jerseySpringWebapp</servlet-name>
+        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>won.node.rest</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>jerseySpringWebapp</servlet-name>
+        <url-pattern>/won/*</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- GENERAL -->
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
 
 </web-app>

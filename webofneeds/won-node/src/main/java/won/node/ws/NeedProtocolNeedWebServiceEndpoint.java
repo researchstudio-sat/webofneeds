@@ -32,8 +32,10 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 12.11.12
  */
-@WebService(serviceName="NeedProtocol", targetNamespace = "http://www.webofneeds.org/protocol/need/soap/1.0/")
-@Service("NeedProtocolNeedWebServiceEndpoint")
+@WebService(
+    serviceName="needProtocol",
+    targetNamespace = "http://www.webofneeds.org/protocol/need/soap/1.0/"
+    )
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 public class NeedProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSupport
 {
