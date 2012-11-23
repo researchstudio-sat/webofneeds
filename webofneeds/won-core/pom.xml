@@ -86,6 +86,11 @@
             <artifactId>spring-data-jpa</artifactId>
             <version>${org.springframework.data.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons-dist</artifactId>
+            <version>${org.springframework.data.version}</version>
+        </dependency>
 
         <!-- ORM  -->
         <dependency>
@@ -96,7 +101,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-c3p0</artifactId>
-            <version>4.1.7.Final</version>
+            <version>${org.hibernate.version}</version>
         </dependency>
 
 

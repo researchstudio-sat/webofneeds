@@ -29,7 +29,7 @@
     <!-- Database connection -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="driverClass" value="${db.sql.jdbcDriverClass}" />
-        <property name="JdbcUrl" value="${db.sql.jdbcUrl}"/>
+        <property name="jdbcUrl" value="${db.sql.jdbcUrl}"/>
         <property name="user" value="${db.sql.user}" /> <!-- Set your db user here -->
         <property name="password" value="${db.sql.password}" /> <!-- Set your db password here -->
     </bean>
@@ -44,7 +44,7 @@
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource" />
         <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
-        <property name="packagesToScan" value="won.protocol.model" /> <!-- Defines where the entity classes are placed -->
+        <property name="packagesToScan" value="won.protocol.model" />
     </bean>
 
     <!-- Configure transaction management -->
@@ -56,5 +56,6 @@
 
     <!-- Defines where repositories are placed -->
     <jpa:repositories base-package="won.protocol.repository" />
+
 
 </beans>
