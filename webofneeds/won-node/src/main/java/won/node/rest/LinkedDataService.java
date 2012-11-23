@@ -3,6 +3,7 @@ package won.node.rest;
 import com.hp.hpl.jena.rdf.model.Bag;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Provider;
 import java.net.URI;
 import java.util.Collection;
 
@@ -45,14 +45,8 @@ public class LinkedDataService
     for (URI needURI: uris){
        needs.add(needURI);
     }
-    /*
-    for (ResourceContainer<?> container : containers) {
-      String containerUriString = container.getUri().toString();
-      graph.add(new StatementImpl(new URIImpl(containerUriString), WON.CONTAINS_COMPONENT_SESAME, new URIImpl(container.getClassURI().toString())));
-    }
-    */
     //return Response.ok(model).build();
-    return Response.ok("list of needs").build();
+    return Response.ok(model).build();
   }
   /*
   @PUT
