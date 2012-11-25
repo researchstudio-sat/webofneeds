@@ -29,57 +29,93 @@ import java.util.Collection;
  * User: fkleedorfer
  * Date: 05.11.12
  */
-public interface NeedInformationService
-{
-  /**
-   * Retrieves a list of all needs on the needserver.
-   * @return a collection of all need URIs.
-   */
-  public Collection<URI> listNeedURIs();
+public interface NeedInformationService {
+    /**
+     * Retrieves a list of all needs on the needserver.
+     *
+     * @return a collection of all need URIs.
+     */
+    public Collection<URI> listNeedURIs();
+
+    /**
+     * Retrieves a page of the list of needs on the needserver.
+     *
+     * @param page the page number
+     * @return a collection of all need URIs.
+     */
+    public Collection<URI> listNeedURIs(int page);
+
+    /**
+     * Retrieves all connection URIs (regardless of state) for the specified local need URI.
+     *
+     * @param needURI the URI of the need
+     * @return a collection of connection URIs.
+     * @throws won.protocol.exception.NoSuchNeedException
+     *          if needURI is not a known need URI
+     */
+    public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException;
+
+    /**
+     * Retrieves all connection URIs (regardless of state).
+     *
+     * @return a collection of connection URIs.
+     */
+    public Collection<URI> listConnectionURIs();
+
+    /**
+     * Retrieves a page of the connection URI list (regardless of state).
+     *
+     * @return a collection of connection URIs.
+     */
+    public Collection<URI> listConnectionURIs(int page);
+
+    /**
+     * Retrieves a page of the list of connection URIs (regardless of state) for the specified local need URI.
+     *
+     * @param needURI the URI of the need
+     * @param page the page number
+     * @return a collection of connection URIs.
+     * @throws won.protocol.exception.NoSuchNeedException
+     *          if needURI is not a known need URI
+     */
+    public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException;
+
+    /**
+     * Read general information about the need.
+     *
+     * @param needURI
+     * @return
+     * @throws NoSuchNeedException
+     */
+    public Need readNeed(URI needURI) throws NoSuchNeedException;
+
+    /**
+     * Retrieves the public description of the need as an RDF graph.
+     * TODO: this is a simulation of the linked data interface, which we'll develop later
+     *
+     * @param needURI
+     * @return
+     * @throws NoSuchNeedException
+     */
+    public Graph readNeedContent(URI needURI) throws NoSuchNeedException;
+
+    /**
+     * Read general information about the connection.
+     *
+     * @param connectionURI
+     * @return
+     * @throws NoSuchNeedException
+     */
+    public Connection readConnection(URI connectionURI) throws NoSuchConnectionException;
 
 
-  /**
-   * Retrieves all connection URIs (regardless of state) for the specified local need URI.
-   * @param needURI the URI of the need
-   * @throws won.protocol.exception.NoSuchNeedException if needURI is not a known need URI
-   * @return a collection of connection URIs.
-   */
-  public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException;
-
-  /**
-   * Read general information about the need.
-   * @param needURI
-   * @return
-   * @throws NoSuchNeedException
-   */
-  public Need readNeed(URI needURI) throws NoSuchNeedException;
-
-  /**
-   * Retrieves the public description of the need as an RDF graph.
-   * TODO: this is a simulation of the linked data interface, which we'll develop later
-   * @param needURI
-   * @return
-   * @throws NoSuchNeedException
-   */
-  public Graph readNeedContent(URI needURI) throws NoSuchNeedException;
-
-  /**
-   * Read general information about the connection.
-   *
-   * @param connectionURI
-   * @return
-   * @throws NoSuchNeedException
-   */
-  public Connection readConnection(URI connectionURI) throws NoSuchConnectionException;
-
-
-  /**
-   * Retrieves the public description of the connection as an RDF graph.
-   *
-   * @param connectionURI
-   * @return
-   * @throws NoSuchNeedException
-   */
-  public Graph readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
+    /**
+     * Retrieves the public description of the connection as an RDF graph.
+     *
+     * @param connectionURI
+     * @return
+     * @throws NoSuchNeedException
+     */
+    public Graph readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
 }

@@ -52,7 +52,27 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
     return needInformationService.listNeedURIs();
   }
 
-  @Override
+    @Override
+    public Collection<URI> listNeedURIs(int page) {
+        return needInformationService.listNeedURIs(page);
+    }
+
+    @Override
+    public Collection<URI> listConnectionURIs() {
+        return needInformationService.listConnectionURIs();
+    }
+
+    @Override
+    public Collection<URI> listConnectionURIs(int page) {
+        return needInformationService.listConnectionURIs(page);
+    }
+
+    @Override
+    public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException {
+        return needInformationService.listConnectionURIs(needURI, page);
+    }
+
+    @Override
   public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
   {
     return needInformationService.listConnectionURIs(needURI);

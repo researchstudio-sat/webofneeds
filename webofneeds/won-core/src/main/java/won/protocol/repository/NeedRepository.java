@@ -19,9 +19,7 @@ public interface NeedRepository extends WonRepository<Need> {
 
   List<Need> findByNeedURI(URI URI);
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  @Override
-  Need saveAndFlush(Need need);
+
 
 
 }

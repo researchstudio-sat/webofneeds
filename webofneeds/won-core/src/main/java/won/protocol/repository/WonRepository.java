@@ -17,6 +17,10 @@
 package won.protocol.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import won.protocol.model.Need;
 
 import java.util.List;
 
@@ -27,6 +31,10 @@ import java.util.List;
  * Time: 17:05
  * To change this template use File | Settings | File Templates.
  */
-public interface WonRepository<M> extends JpaRepository<M, Long> {
+public interface WonRepository<M> extends PagingAndSortingRepository<M, Long> {
     List<M> findById(Long id);
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    M saveAndFlush(M obj);
+
 }

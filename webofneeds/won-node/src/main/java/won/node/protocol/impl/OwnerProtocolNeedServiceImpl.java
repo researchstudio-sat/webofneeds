@@ -34,120 +34,120 @@ import java.util.Collection;
  * User: fkleedorfer
  * Date: 02.11.12
  */
-public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService
-{
-  private OwnerFacingNeedCommunicationService needCommunicationService;
-  private ConnectionCommunicationService connectionCommunicationService;
-  private NeedManagementService needManagementService;
-  private NeedInformationService needInformationService;
+public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
+    private OwnerFacingNeedCommunicationService needCommunicationService;
+    private ConnectionCommunicationService connectionCommunicationService;
+    private NeedManagementService needManagementService;
+    private NeedInformationService needInformationService;
 
-  @Override
-  public URI createNeed(URI ownerURI, final Graph content, final boolean activate) throws IllegalNeedContentException
-  {
-    return this.needManagementService.createNeed(ownerURI, content, activate);
-  }
+    @Override
+    public URI createNeed(URI ownerURI, final Graph content, final boolean activate) throws IllegalNeedContentException {
+        return this.needManagementService.createNeed(ownerURI, content, activate);
+    }
 
-  @Override
-  public void activate(final URI needURI) throws NoSuchNeedException
-  {
-    this.needManagementService.activate(needURI);
-  }
+    @Override
+    public Collection<URI> listConnectionURIs() {
+        return needInformationService.listConnectionURIs();
+    }
 
-  @Override
-  public void deactivate(final URI needURI) throws NoSuchNeedException
-  {
-    this.needManagementService.deactivate(needURI);
-  }
+    @Override
+    public Collection<URI> listConnectionURIs(int page) {
+        return needInformationService.listConnectionURIs(page);
+    }
 
-  @Override
-  public URI connectTo(final URI need, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
-  {
-    return this.needCommunicationService.connectTo(need,otherNeedURI,message);
-  }
+    @Override
+    public Collection<URI> listNeedURIs(int page) {
+        return needInformationService.listNeedURIs(page);
+    }
 
-  @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    this.connectionCommunicationService.accept(connectionURI);
-  }
+    @Override
+    public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException {
+        return needInformationService.listConnectionURIs(needURI, page);
+    }
 
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    this.connectionCommunicationService.deny(connectionURI);
-  }
+    @Override
+    public void activate(final URI needURI) throws NoSuchNeedException {
+        this.needManagementService.activate(needURI);
+    }
 
-  @Override
-  public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    this.connectionCommunicationService.close(connectionURI);
-  }
+    @Override
+    public void deactivate(final URI needURI) throws NoSuchNeedException {
+        this.needManagementService.deactivate(needURI);
+    }
 
-  @Override
-  public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    this.connectionCommunicationService.sendTextMessage(connectionURI, message);
-  }
+    @Override
+    public URI connectTo(final URI need, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+        return this.needCommunicationService.connectTo(need, otherNeedURI, message);
+    }
 
-  @Override
-  public Collection<URI> listNeedURIs()
-  {
-    return this.needInformationService.listNeedURIs();
-  }
+    @Override
+    public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        this.connectionCommunicationService.accept(connectionURI);
+    }
 
-  @Override
-  public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException
-  {
-    return this.needManagementService.getMatches(needURI);
-  }
+    @Override
+    public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        this.connectionCommunicationService.deny(connectionURI);
+    }
 
-  @Override
-  public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
-  {
-    return this.needInformationService.listConnectionURIs(needURI);
-  }
+    @Override
+    public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        this.connectionCommunicationService.close(connectionURI);
+    }
 
-  @Override
-  public Need readNeed(final URI needURI) throws NoSuchNeedException
-  {
-    return needInformationService.readNeed(needURI);
-  }
+    @Override
+    public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        this.connectionCommunicationService.sendTextMessage(connectionURI, message);
+    }
 
-  @Override
-  public Graph readNeedContent(final URI needURI) throws NoSuchNeedException
-  {
-    return needInformationService.readNeedContent(needURI);
-  }
+    @Override
+    public Collection<URI> listNeedURIs() {
+        return this.needInformationService.listNeedURIs();
+    }
 
-  @Override
-  public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException
-  {
-    return needInformationService.readConnection(connectionURI);
-  }
+    @Override
+    public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException {
+        return this.needManagementService.getMatches(needURI);
+    }
 
-  @Override
-  public Graph readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
-  {
-    return needInformationService.readConnectionContent(connectionURI);
-  }
+    @Override
+    public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException {
+        return this.needInformationService.listConnectionURIs(needURI);
+    }
 
-  public void setNeedCommunicationService(final OwnerFacingNeedCommunicationService needCommunicationService)
-  {
-    this.needCommunicationService = needCommunicationService;
-  }
+    @Override
+    public Need readNeed(final URI needURI) throws NoSuchNeedException {
+        return needInformationService.readNeed(needURI);
+    }
 
-  public void setConnectionCommunicationService(final ConnectionCommunicationService connectionCommunicationService)
-  {
-    this.connectionCommunicationService = connectionCommunicationService;
-  }
+    @Override
+    public Graph readNeedContent(final URI needURI) throws NoSuchNeedException {
+        return needInformationService.readNeedContent(needURI);
+    }
 
-  public void setNeedManagementService(final NeedManagementService needManagementService)
-  {
-    this.needManagementService = needManagementService;
-  }
+    @Override
+    public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException {
+        return needInformationService.readConnection(connectionURI);
+    }
 
-  public void setNeedInformationService(final NeedInformationService needInformationService)
-  {
-    this.needInformationService = needInformationService;
-  }
+    @Override
+    public Graph readConnectionContent(final URI connectionURI) throws NoSuchConnectionException {
+        return needInformationService.readConnectionContent(connectionURI);
+    }
+
+    public void setNeedCommunicationService(final OwnerFacingNeedCommunicationService needCommunicationService) {
+        this.needCommunicationService = needCommunicationService;
+    }
+
+    public void setConnectionCommunicationService(final ConnectionCommunicationService connectionCommunicationService) {
+        this.connectionCommunicationService = connectionCommunicationService;
+    }
+
+    public void setNeedManagementService(final NeedManagementService needManagementService) {
+        this.needManagementService = needManagementService;
+    }
+
+    public void setNeedInformationService(final NeedInformationService needInformationService) {
+        this.needInformationService = needInformationService;
+    }
 }
