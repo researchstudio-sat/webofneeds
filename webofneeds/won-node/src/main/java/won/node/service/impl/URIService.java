@@ -28,27 +28,27 @@ import java.net.URI;
 public class URIService
 {
 
-  private URI needURIPrefix;
+  private URI needResourceURIPrefix;
 
-  private URI connectionURIPrefix;
+  private URI connectionResourceURIPrefix;
 
   public URI createNeedURI(Need need)
   {
-    return URI.create(needURIPrefix.toString() + "/" + need.getId());
+    return URI.create(needResourceURIPrefix.toString() + "/" + need.getId());
   }
 
   public URI createConnectionURI(Connection con)
   {
-    return URI.create(connectionURIPrefix.toString() + "/" + con.getId());
+    return URI.create(connectionResourceURIPrefix.toString() + "/" + con.getId());
   }
 
-  public void setNeedURIPrefix(final URI needURIPrefix)
+  public void setNeedResourceURIPrefix(final URI needResourceURIPrefix)
   {
-    this.needURIPrefix = needURIPrefix;
+    this.needResourceURIPrefix = needResourceURIPrefix;
   }
 
-  public void setConnectionURIPrefix(final URI connectionURIPrefix)
+  public void setConnectionResourceURIPrefix(final URI connectionResourceURIPrefix)
   {
-    this.connectionURIPrefix = connectionURIPrefix;
+    this.connectionResourceURIPrefix = connectionResourceURIPrefix;
   }
 }

@@ -19,9 +19,6 @@ package won.protocol.model;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-
-import java.net.URI;
 
 /**
  * User: fkleedorfer
@@ -37,7 +34,13 @@ public class WON {
         return BASE_URI;
     }
 
+
+
     private static Model m = ModelFactory.createDefaultModel();
+
+    static {
+
+    }
 
     public static final Property HAS_CONNECTIONS = m.createProperty(BASE_URI + "hasConnections");
     public static final Property STATE = m.createProperty(BASE_URI + "state");
@@ -46,5 +49,10 @@ public class WON {
     public static final Property REMOTE_CONNECTION = m.createProperty(BASE_URI + "remoteConnection");
     public static final Property REMOTE_NEED = m.createProperty(BASE_URI + "remoteNeed");
     public static final Property BELONGS_TO_NEED = m.createProperty(BASE_URI + "belongsToNeed");
+    public static final Property NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI + "needProtocolEndpoint");
+    public static final Property MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI + "ownerProtocolEndpoint");
+    public static final Property OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI + "matcherProtocolEndpoint");
+
+
 
 }

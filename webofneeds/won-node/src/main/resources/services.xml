@@ -83,16 +83,30 @@
     </bean>
 
     <bean id="uriService" class="won.node.service.impl.URIService">
-        <property name="connectionURIPrefix" value="${uri.prefix.connection}" />
-        <property name="needURIPrefix" value="${uri.prefix.need}" />
+        <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
+        <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
+    </bean>
+
+    <bean id="linkedDataService" class="won.node.service.impl.LinkedDataServiceImpl">
+        <property name="needInformationService" ref="needInformationService" />
+        <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
+        <property name="dataURIPrefix" value="${uri.prefix.data}" />
+        <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
+        <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
+        <property name="needProtocolEndpoint" value="${uri.protocol.need}" />
+        <property name="matcherProtocolEndpoint" value="${uri.protocol.matcher}" />
+        <property name="ownerProtocolEndpoint" value="${uri.protocol.owner}" />
     </bean>
 
     <bean id="linkedDataRestService" class="won.node.rest.LinkedDataRestService">
-        <property name="needInformationService" ref="needInformationService" />
-        <property name="connectionURIPrefix" value="${uri.prefix.connection}" />
-        <property name="needURIPrefix" value="${uri.prefix.need}" />
+        <property name="linkedDataService" ref="linkedDataService" />
+        <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
         <property name="dataURIPrefix" value="${uri.prefix.data}" />
+        <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
+        <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
     </bean>
+
+
     
     <bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg value="30" type="int" index="0"/>
