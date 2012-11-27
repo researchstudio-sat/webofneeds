@@ -4,6 +4,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import won.node.service.LinkedDataService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
@@ -26,17 +28,24 @@ public class LinkedDataRestService
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
 
+  //prefix of a need resource
   private String needResourceURIPrefix;
+  //prefix of a connection resource
   private String connectionResourceURIPrefix;
+  //prefix for URISs of RDF data
   private String dataURIPrefix;
+  //prefix for URIs referring to real-world things
   private String resourceURIPrefix;
+  //prefix for human readable pages
+  private String pageURIPrefix;
 
   @Autowired
   private LinkedDataService linkedDataService;
 
   @GET
-  @Path("/resource/need/{identifier}")
-  public Response showNeedResource(
+  @Path("/resource/{whatever:.*}")
+  @Produces("application/rdf+xml,application/x-turtle,text/turtle,text/rdf+n3,application/json")
+  public Response redirectToData(
       @Context UriInfo uriInfo,
       @PathParam("identifier") String identifier)
   {
@@ -46,24 +55,16 @@ public class LinkedDataRestService
   }
 
   @GET
-  @Path("/resource/need/{identifier}/connections")
-  public Response showNeedResourceConnections(
+  @Path("/resource/{whatever:.*}")
+  @Produces("text/html")
+  public Response redirectToPage(
       @Context UriInfo uriInfo,
       @PathParam("identifier") String identifier)
   {
-    return Response.seeOther(URI.create(this.dataURIPrefix + "/need/" + identifier + "/connections")).build();
+    String requestURI = uriInfo.getRequestUri().toString();
+    String redirectToURI = requestURI.replaceFirst(this.resourceURIPrefix, this.pageURIPrefix);
+    return Response.seeOther(URI.create(redirectToURI)).build();
   }
-
-
-  @GET
-  @Path("/resource/connection/{identifier}")
-  public Response showConnectionResource(
-      @Context UriInfo uriInfo,
-      @PathParam("identifier") String identifier)
-  {
-    return Response.seeOther(URI.create(this.dataURIPrefix + "/connection/" + identifier)).build();
-  }
-
 
   @GET
   @Path("/data/need")
@@ -76,8 +77,6 @@ public class LinkedDataRestService
     Model model = linkedDataService.listNeedURIs(page);
     return Response.ok(model).build();
   }
-
-
 
   @GET
   @Path("/data/connection")
@@ -293,5 +292,10 @@ public class LinkedDataRestService
   public void setLinkedDataService(final LinkedDataService linkedDataService)
   {
     this.linkedDataService = linkedDataService;
+  }
+
+  public void setPageURIPrefix(final String pageURIPrefix)
+  {
+    this.pageURIPrefix = pageURIPrefix;
   }
 }

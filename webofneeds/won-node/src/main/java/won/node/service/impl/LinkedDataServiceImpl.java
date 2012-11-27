@@ -43,10 +43,17 @@ public class LinkedDataServiceImpl implements LinkedDataService
   final Logger logger = LoggerFactory.getLogger(getClass());
   public static final PrefixMapping PREFIX_MAPPING = new PrefixMappingImpl();
 
+  //prefix of a need resource
   private String needResourceURIPrefix;
+  //prefix of a connection resource
   private String connectionResourceURIPrefix;
+  //prefix for URISs of RDF data
   private String dataURIPrefix;
+  //prefix for URIs referring to real-world things
   private String resourceURIPrefix;
+  //prefix for human readable pages
+  private String pageURIPrefix;
+
 
   private String needProtocolEndpoint;
   private String matcherProtocolEndpoint;
@@ -97,9 +104,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Need need = needInformationService.readNeed(needUri);
     Model model = ModelFactory.createDefaultModel();
     model.setNsPrefixes(PREFIX_MAPPING);
-    model.createResource()
+    model.createResource(needUri.toString())
         .addProperty(WON.STATE, need.getState().name())
-        .addProperty(WON.RESOURCE_URI, model.createResource(needUri.toString()))
         .addProperty(WON.HAS_CONNECTIONS, model.createResource(needUri + "/connections"))
         .addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
         .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
@@ -113,11 +119,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Connection connection = needInformationService.readConnection(connectionUri);
     Model model = ModelFactory.createDefaultModel();
     model.setNsPrefixes(PREFIX_MAPPING);
-    model.createResource()
+    model.createResource(connectionUri.toString())
         .addProperty(WON.STATE, connection.getState().name())
-        .addProperty(WON.REMOTE_CONNECTION, connection.getRemoteConnectionURI().toString())
-        .addProperty(WON.REMOTE_NEED, connection.getRemoteNeedURI().toString())
-        .addProperty(WON.RESOURCE_URI, model.createResource(connectionUri.toString()))
+        .addProperty(WON.REMOTE_CONNECTION, model.createResource(connection.getRemoteConnectionURI().toString()))
+        .addProperty(WON.REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()))
         .addProperty(WON.BELONGS_TO_NEED, model.createResource(connection.getNeedURI().toString()))
     ;
     return model;
@@ -179,5 +184,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public void setOwnerProtocolEndpoint(final String ownerProtocolEndpoint)
   {
     this.ownerProtocolEndpoint = ownerProtocolEndpoint;
+  }
+
+  public void setPageURIPrefix(final String pageURIPrefix)
+  {
+    this.pageURIPrefix = pageURIPrefix;
   }
 }

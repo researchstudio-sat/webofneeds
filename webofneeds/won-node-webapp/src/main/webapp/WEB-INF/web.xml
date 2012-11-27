@@ -33,7 +33,7 @@
     <servlet>
         <servlet-name>wonProtocolJaxWSServlet</servlet-name>
         <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>2</load-on-startup>
+        <load-on-startup>3</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>wonProtocolJaxWSServlet</servlet-name>
@@ -50,13 +50,24 @@
             <param-name>com.sun.jersey.config.property.packages</param-name>
             <param-value>won.node.rest</param-value>
         </init-param>
-        <load-on-startup>1</load-on-startup>
+        <load-on-startup>2</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>jerseySpringWebapp</servlet-name>
         <url-pattern>/won/*</url-pattern>
     </servlet-mapping>
 
+    <!-- SPRING WEB MVC config -->
+    <servlet>
+        <servlet-name>linkedDataPageServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>linkedDataPageServlet</servlet-name>
+        <url-pattern>/won/page/*</url-pattern>
+    </servlet-mapping>
 
     <!-- GENERAL -->
 

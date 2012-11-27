@@ -33,7 +33,24 @@
             <artifactId>jersey-core</artifactId>
             <version>${com.sun.jersey.version}</version>
         </dependency>
-
+        <!-- spring stuff -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+        <!-- servlet stuff -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
 
         <!-- TESTING -->
         <dependency>

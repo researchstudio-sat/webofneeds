@@ -28,9 +28,86 @@ import java.net.URI;
 public class URIService
 {
 
-  private URI needResourceURIPrefix;
+  //prefix of any URI
+  private String generalURIPrefix;
+  //prefix of a need resource
+  private String needResourceURIPrefix;
+  //prefix of a connection resource
+  private String connectionResourceURIPrefix;
+  //prefix for URISs of RDF data
+  private String dataURIPrefix;
+  //prefix for URIs referring to real-world things
+  private String resourceURIPrefix;
+  //prefix for human readable pages
+  private String pageURIPrefix;
 
-  private URI connectionResourceURIPrefix;
+
+  /**
+   * Transforms the specified URI, which may be a resource URI or a page URI, to a data URI.
+   * If the specified URI doesn't start with the right prefix, it's returned unchanged.
+   * @param pageOrResourceURI
+   * @return
+   */
+  public URI toDataURIIfPossible(URI pageOrResourceURI){
+    String fromURI = resolveAgainstGeneralURIPrefix(pageOrResourceURI);
+    if (fromURI.startsWith(this.pageURIPrefix)){
+      return URI.create(fromURI.replaceFirst(this.pageURIPrefix, this.dataURIPrefix));
+    }
+    if (fromURI.startsWith(this.resourceURIPrefix)){
+      return URI.create(fromURI.replaceFirst(this.resourceURIPrefix, this.dataURIPrefix));
+    }
+    return pageOrResourceURI;
+  }
+
+  /**
+   * Transforms the specified URI, which may be a resource URI or a page URI, to a page URI.
+   * If the specified URI doesn't start with the right prefix, it's returned unchanged.
+   * @param dataOrResourceURI
+   * @return
+   */
+  public URI toPageURIIfPossible(URI dataOrResourceURI){
+    String fromURI = resolveAgainstGeneralURIPrefix(dataOrResourceURI);
+    if (fromURI.startsWith(this.dataURIPrefix)) {
+      return URI.create(fromURI.replaceFirst(this.dataURIPrefix, this.pageURIPrefix));
+    }
+    if (fromURI.startsWith(this.resourceURIPrefix)){
+      return URI.create(fromURI.replaceFirst(this.resourceURIPrefix, this.pageURIPrefix));
+    }
+    return dataOrResourceURI;
+  }
+
+
+
+  /**
+   * Transforms the specified URI, which may be a resource URI or a page URI, to a page URI.
+   * If the specified URI doesn't start with the right prefix, it's returned unchanged.
+   * @param pageOrDataURI
+   * @return
+   */
+  public URI toResourceURIIfPossible(URI pageOrDataURI){
+    String fromURI = resolveAgainstGeneralURIPrefix(pageOrDataURI);
+    if (fromURI.startsWith(this.dataURIPrefix)) {
+      return URI.create(fromURI.replaceFirst(this.dataURIPrefix, this.resourceURIPrefix));
+    }
+    if (fromURI.startsWith(this.pageURIPrefix)){
+      return URI.create(fromURI.replaceFirst(this.pageURIPrefix, this.resourceURIPrefix));
+    }
+    return pageOrDataURI;
+  }
+
+  private String resolveAgainstGeneralURIPrefix(final URI uri)
+  {
+    if (uri.isAbsolute()) return uri.toString();
+    return URI.create(generalURIPrefix).resolve(uri).toString();
+  }
+
+  public URI createNeedURIForId(String id) {
+    return URI.create(needResourceURIPrefix.toString() + "/"   + id);
+  }
+
+  public URI createConnectionURIForId(String id) {
+    return URI.create(connectionResourceURIPrefix.toString() + "/"   + id);
+  }
 
   public URI createNeedURI(Need need)
   {
@@ -42,13 +119,33 @@ public class URIService
     return URI.create(connectionResourceURIPrefix.toString() + "/" + con.getId());
   }
 
-  public void setNeedResourceURIPrefix(final URI needResourceURIPrefix)
+  public void setNeedResourceURIPrefix(final String needResourceURIPrefix)
   {
     this.needResourceURIPrefix = needResourceURIPrefix;
   }
 
-  public void setConnectionResourceURIPrefix(final URI connectionResourceURIPrefix)
+  public void setConnectionResourceURIPrefix(final String connectionResourceURIPrefix)
   {
     this.connectionResourceURIPrefix = connectionResourceURIPrefix;
+  }
+
+  public void setDataURIPrefix(final String dataURIPrefix)
+  {
+    this.dataURIPrefix = dataURIPrefix;
+  }
+
+  public void setResourceURIPrefix(final String resourceURIPrefix)
+  {
+    this.resourceURIPrefix = resourceURIPrefix;
+  }
+
+  public void setPageURIPrefix(final String pageURIPrefix)
+  {
+    this.pageURIPrefix = pageURIPrefix;
+  }
+
+  public void setGeneralURIPrefix(final String generalURIPrefix)
+  {
+    this.generalURIPrefix = generalURIPrefix;
   }
 }
