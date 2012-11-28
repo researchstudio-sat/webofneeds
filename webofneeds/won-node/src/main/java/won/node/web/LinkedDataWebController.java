@@ -112,7 +112,7 @@ public class LinkedDataWebController
   }
 
   //webmvc controller method
-  @RequestMapping("/need/{identifier/connections/")
+  @RequestMapping("/need/{identifier}/connections/")
   public String showConnectionURIListPage(
       @PathVariable String identifier,
       @RequestParam(defaultValue="-1") int page,

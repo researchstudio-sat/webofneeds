@@ -154,6 +154,7 @@ public class NeedCommunicationServiceImpl implements
         }
       }
     }
+
     //Create new connection object
     Connection con = new Connection();
     con.setNeedURI(needURI);

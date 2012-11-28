@@ -35,14 +35,15 @@
     <h2>This page describes the resource with this URI: ${resourceURI}</h2>
 
     Description of the Resource (human readable):
-    <div style="bgcolor:darkblue">
+    <div style="background-color:#C9C9E0">
     <pre>
     <%
         Model model = (Model) request.getAttribute("rdfModel");
         StringWriter stringWriter = new StringWriter();
         model.write(stringWriter,"TURTLE");
-        String escapedTurtle = HtmlUtils.htmlEscape(stringWriter.toString());
-        out.print(escapedTurtle);
+        //String escapedTurtle = HtmlUtils.htmlEscape(stringWriter.toString());
+        String htmlTurtle = stringWriter.toString().replaceAll("<([^>]+)>","<a href=\"$1\">&lt;$1&gt;</a>");
+        out.print(htmlTurtle);
     %>
     </pre>
     </div>

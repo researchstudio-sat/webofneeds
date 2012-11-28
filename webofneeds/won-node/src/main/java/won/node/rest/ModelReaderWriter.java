@@ -24,7 +24,6 @@ import java.util.Properties;
  * Writer for rdf graph serialization.
  */
 @Provider
-//@Produces("application/rdf+xml,text/plain,application/x-turtle,text/turtle,text/rdf+n3")
 @Produces("text/html,application/rdf+xml,text/plain,application/x-turtle,text/turtle,text/rdf+n3,application/json")
 @Consumes("application/rdf+xml,text/plain,application/x-turtle,text/turtle,text/rdf+n3,application/json")
 public class ModelReaderWriter implements MessageBodyWriter<Model>, MessageBodyReader<Model>
@@ -55,7 +54,6 @@ public class ModelReaderWriter implements MessageBodyWriter<Model>, MessageBodyR
   @Override
   public void writeTo(Model model, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException
   {
-
     if (logger.isTraceEnabled()) {
       logger.trace("writeTo called on GraphWriter, mediaType=" + mediaType);
     }

@@ -77,7 +77,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     model.setNsPrefixes(PREFIX_MAPPING);
     Bag needs = model.createBag();
     for (URI needURI : uris) {
-      needs.add(needURI);
+      needs.add(model.createResource(needURI.toString()));
     }
     return model;
   }
@@ -92,9 +92,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
     Model model = ModelFactory.createDefaultModel();
     model.setNsPrefixes(PREFIX_MAPPING);
-    Bag needs = model.createBag();
-    for (URI needURI : uris) {
-      needs.add(needURI);
+    Bag connections = model.createBag();
+    for (URI connectionURI : uris) {
+      connections.add(model.createResource(connectionURI.toString()));
     }
     return model;
   }
@@ -106,7 +106,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     model.setNsPrefixes(PREFIX_MAPPING);
     model.createResource(needUri.toString())
         .addProperty(WON.STATE, need.getState().name())
-        .addProperty(WON.HAS_CONNECTIONS, model.createResource(needUri + "/connections"))
+        .addProperty(WON.HAS_CONNECTIONS, model.createResource(needUri + "/connections/"))
         .addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
         .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
         .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint))
@@ -140,7 +140,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     model.setNsPrefixes(PREFIX_MAPPING);
     Bag connections = model.createBag();
     for (URI connURI : uris) {
-      connections.add(connURI);
+      connections.add(model.createResource(connURI.toString()));
     }
     return model;
   }

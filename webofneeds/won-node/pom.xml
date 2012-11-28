@@ -33,6 +33,11 @@
             <artifactId>jersey-core</artifactId>
             <version>${com.sun.jersey.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${com.sun.jersey.version}</version>
+        </dependency>
         <!-- spring stuff -->
         <dependency>
             <groupId>org.springframework</groupId>
