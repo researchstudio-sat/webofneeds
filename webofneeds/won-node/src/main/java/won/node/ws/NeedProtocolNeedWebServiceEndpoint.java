@@ -16,11 +16,7 @@
 
 package won.node.ws;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import won.protocol.exception.*;
-import won.node.protocol.impl.NeedProtocolNeedServiceImpl;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -30,58 +26,35 @@ import java.net.URI;
 
 /**
  * User: fkleedorfer
- * Date: 12.11.12
+ * Date: 29.11.12
  */
 @WebService(
     serviceName="needProtocol",
-    targetNamespace = "http://www.webofneeds.org/protocol/need/soap/1.0/"
-    )
+    targetNamespace = "http://www.webofneeds.org/protocol/need/soap/1.0/",
+    portName="NeedProtocolNeedWebServiceEndpointPort"
+)
 @SOAPBinding(style = SOAPBinding.Style.RPC)
-public class NeedProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSupport
+public interface NeedProtocolNeedWebServiceEndpoint
 {
-  @Autowired
-  private NeedProtocolNeedServiceImpl needProtocolNeedService;
+  @WebMethod
+  URI connectionRequested(
+      @WebParam(name = "needURI") URI needURI,
+      @WebParam(name = "otherNeedURI") URI otherNeedURI,
+      @WebParam(name = "otherConnectionURI") URI otherConnectionURI,
+      @WebParam(name = "message") String message)
+        throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
   @WebMethod
-  public URI connectionRequested(
-      @WebParam(name="needURI") final URI needURI,
-      @WebParam(name="otherNeedURI")final URI otherNeedURI,
-      @WebParam(name="otherConnectionURI") final URI otherConnectionURI,
-      @WebParam(name="message")final String message)
-        throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
-  {
-    return needProtocolNeedService.connectionRequested(needURI, otherNeedURI, otherConnectionURI, message);
-  }
+  void accept(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   @WebMethod
-  public void accept(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    needProtocolNeedService.accept(connectionURI);
-  }
+  void deny(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   @WebMethod
-  public void deny(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    needProtocolNeedService.deny(connectionURI);
-  }
+  void close(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   @WebMethod
-  public void close(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    needProtocolNeedService.close(connectionURI);
-  }
-
-  @WebMethod
-  public void sendTextMessage(
-      @WebParam(name="connectionURI") final URI connectionURI,
-      @WebParam(name="message") final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    needProtocolNeedService.sendTextMessage(connectionURI, message);
-  }
-
-  @WebMethod(exclude = true)
-  public void setNeedProtocolNeedService(final NeedProtocolNeedServiceImpl needProtocolNeedService)
-  {
-    this.needProtocolNeedService = needProtocolNeedService;
-  }
+  void sendTextMessage(
+      @WebParam(name = "connectionURI") URI connectionURI,
+      @WebParam(name = "message") String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 }

@@ -18,14 +18,13 @@ package won.node.ws;
 
 import com.hp.hpl.jena.graph.Graph;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
-import won.node.protocol.impl.MatcherProtocolNeedServiceImpl;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -43,7 +42,7 @@ import java.util.Collection;
 public class MatcherProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSupport
 {
   @Autowired
-  private MatcherProtocolNeedServiceImpl matcherProtocolNeedService;
+  private MatcherProtocolNeedService matcherProtocolNeedService;
 
   @WebMethod
   public void hint(
@@ -99,7 +98,7 @@ public class MatcherProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringS
     return coll.toArray(new URI[coll.size()]);
   }
   @WebMethod(exclude = true)
-  public void setMatcherProtocolNeedService(final MatcherProtocolNeedServiceImpl matcherProtocolNeedService)
+  public void setMatcherProtocolNeedService(final MatcherProtocolNeedService matcherProtocolNeedService)
   {
     this.matcherProtocolNeedService = matcherProtocolNeedService;
   }

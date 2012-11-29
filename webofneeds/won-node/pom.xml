@@ -78,4 +78,44 @@
         </dependency>
 
     </dependencies>
+
+    <build>
+        <!--plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <version>1.9</version>
+                <executions>
+                    <!- -execution>
+                        <id>generate-wsdl</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>wsgen</goal>
+                        </goals>
+                        <configuration>
+                            <sei>won.node.ws.NeedProtocolNeedWebServiceEndpoint</sei>
+                            <genWsdl>true</genWsdl>
+                            <verbose>true</verbose>
+                            <protocol>soap1.1</protocol>
+                        </configuration>
+                    </execution- ->
+                    <execution>
+                        <id>generate-stubs</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlDirectory>target/jaxws/wsgen/wsdl</wsdlDirectory>
+                            <wsdlFiles>
+                                <wsdlFile>NeedProtocolNeedWebServiceEndpointService.wsdl</wsdlFile>
+                            </wsdlFiles>
+                            <! - - *** you need the next line to set the wsdlLocation in the generated stubs *** - ->
+                                <wsdlLocation>http://localhost:8080/won/needProtocol/?wsdl </wsdlLocation>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins-->
+    </build>
 </project>

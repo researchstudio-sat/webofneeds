@@ -16,7 +16,7 @@
   -->
 <endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime"
            version="2.0">
-    <endpoint name="needProtocol" implementation="won.node.ws.NeedProtocolNeedWebServiceEndpoint"
+    <endpoint name="needProtocol" implementation="won.node.ws.NeedProtocolNeedWebServiceEndpointImpl"
               url-pattern="/won/needProtocol"/>
     <endpoint name="ownerProtocol" implementation="won.node.ws.OwnerProtocolNeedWebServiceEndpoint"
               url-pattern="/won/ownerProtocol"/>

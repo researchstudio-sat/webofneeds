@@ -18,13 +18,13 @@ package won.node.ws;
 
 import com.hp.hpl.jena.graph.Graph;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+import won.node.protocol.impl.OwnerProtocolNeedServiceImpl;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
-import won.node.protocol.impl.OwnerProtocolNeedServiceImpl;
+import won.protocol.owner.OwnerProtocolNeedService;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -42,7 +42,7 @@ import java.util.Collection;
 public class OwnerProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSupport
 {
   @Autowired
-  private OwnerProtocolNeedServiceImpl ownerProtocolNeedService;
+  private OwnerProtocolNeedService ownerProtocolNeedService;
 
   @WebMethod
   public String readConnectionContent(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException
@@ -146,7 +146,7 @@ public class OwnerProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSup
   }
 
   @WebMethod(exclude = true)
-  public void setOwnerProtocolNeedService(final OwnerProtocolNeedServiceImpl ownerProtocolNeedService)
+  public void setOwnerProtocolNeedService(final OwnerProtocolNeedService ownerProtocolNeedService)
   {
     this.ownerProtocolNeedService = ownerProtocolNeedService;
   }

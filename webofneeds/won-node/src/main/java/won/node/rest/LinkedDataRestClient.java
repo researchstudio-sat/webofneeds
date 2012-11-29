@@ -16,7 +16,7 @@
 
 package won.node.rest;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.*;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -45,9 +45,21 @@ public class LinkedDataRestClient
     ClientConfig cc = new DefaultClientConfig();
     cc.getProperties().put(
         ClientConfig.PROPERTY_FOLLOW_REDIRECTS, true);
+    cc.getClasses().add(ModelReaderWriter.class);
     Client c = Client.create(cc);
     WebResource r = c.resource(resourceURI);
-    return r.accept(RDFMediaType.TEXT_TURTLE).get(Model.class);
+    return r.accept(RDFMediaType.APPLICATION_RDF_XML).get(Model.class);
+  }
+
+  public URI getURIPropertyForResource(final URI resourceURI, Property property)
+  {
+    Model rdfModel = readResourceData(resourceURI);
+    StmtIterator stmts = rdfModel.listStatements(
+        new SimpleSelector(rdfModel.createResource(resourceURI.toString()), property, (RDFNode) null));
+    //assume only one endpoint
+    if (!stmts.hasNext()) return null;
+    Statement stmt = stmts.next();
+    return URI.create(stmt.getObject().toString());
   }
 
 }

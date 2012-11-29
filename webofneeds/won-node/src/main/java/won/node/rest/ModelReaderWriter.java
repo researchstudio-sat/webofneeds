@@ -31,7 +31,6 @@ public class ModelReaderWriter implements MessageBodyWriter<Model>, MessageBodyR
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
   protected Properties serverProperties;
-  private String BASE_URI = "http://example.com/resource";
   private static final String DEFAULT_RDF_LANGUAGE = "TURTLE";
 
   public ModelReaderWriter()
@@ -74,10 +73,12 @@ public class ModelReaderWriter implements MessageBodyWriter<Model>, MessageBodyR
   @Override
   public Model readFrom(Class<Model> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException
   {
-    Model ret = ModelFactory.createDefaultModel();
+    Model model = ModelFactory.createDefaultModel();
     logger.trace("readFrom called on GraphWriter, mediaType=" + mediaType);
-    ret.read(entityStream,mimeTypeToJenaLanguage(mediaType, DEFAULT_RDF_LANGUAGE));
-    return ret;
+    String jenaLanguage = mimeTypeToJenaLanguage(mediaType, DEFAULT_RDF_LANGUAGE);
+    logger.info("converted mediaType " + mediaType + " to jena language " + jenaLanguage);
+    model.read(entityStream, jenaLanguage);
+    return model;
   }
 
   private String mimeTypeToJenaLanguage(MediaType mediaType, String defaultLanguage) {
@@ -87,9 +88,9 @@ public class ModelReaderWriter implements MessageBodyWriter<Model>, MessageBodyR
     if (type == null || subtype == null) return defaultLanguage;
     String mimeType = type + "/" + subtype;
     if ("application/rdf+xml".equalsIgnoreCase(mimeType)) return "RDF/XML";
-    if ("application/x-turtle".equalsIgnoreCase(mimeType)) return "TURTLE";
+    if ("application/x-turtle".equalsIgnoreCase(mimeType)) return "TTL";
     if ("text/plain".equalsIgnoreCase(mimeType)) return "N3";
-    if ("text/turtle".equalsIgnoreCase(mimeType)) return "TURTLE";
+    if ("text/turtle".equalsIgnoreCase(mimeType)) return "TTL";
     if ("text/rdf+n3".equalsIgnoreCase(mimeType)) return "N3";
     return defaultLanguage;
   }

@@ -124,6 +124,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
         .addProperty(WON.REMOTE_CONNECTION, model.createResource(connection.getRemoteConnectionURI().toString()))
         .addProperty(WON.REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()))
         .addProperty(WON.BELONGS_TO_NEED, model.createResource(connection.getNeedURI().toString()))
+        .addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
+        .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
     ;
     return model;
   }
