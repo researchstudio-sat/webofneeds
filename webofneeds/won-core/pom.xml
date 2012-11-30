@@ -84,12 +84,12 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
-            <version>${org.springframework.data.version}</version>
+            <version>${org.springframework.data.jpa.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-commons-dist</artifactId>
-            <version>${org.springframework.data.version}</version>
+            <artifactId>spring-data-commons-core</artifactId>
+            <version>${org.springframework.data.commons.version}</version>
         </dependency>
 
         <!-- ORM  -->
@@ -117,6 +117,22 @@
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
             <version>${org.apache.jena.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>xml-apis</artifactId>
+                    <groupId>xml-apis</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
+
+        </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.4.01</version>
         </dependency>
 
         <!-- LOGGING -->
