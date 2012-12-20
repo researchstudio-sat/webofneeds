@@ -61,8 +61,6 @@
     <bean id="needInformationService" class="won.node.service.impl.NeedInformationServiceImpl">
         <property name="pageSize" value="${linkeddata.pagesize}" />
     </bean>
-    
-    
 
     <bean id="needManagementService" class="won.node.service.impl.NeedManagementServiceImpl">
         <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
@@ -104,7 +102,7 @@
         <property name="ownerProtocolEndpoint" value="${uri.protocol.owner}" />
     </bean>
 
-    <bean id="linkedDataRestService" class="won.node.rest.LinkedDataRestService">
+    <bean id="linkedDataRestService" class="won.protocol.rest.LinkedDataRestService">
         <property name="linkedDataService" ref="linkedDataService" />
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
         <property name="dataURIPrefix" value="${uri.prefix.data}" />
@@ -130,11 +128,11 @@
     
 
     <!-- REST stuff -->
-    <context:component-scan base-package="won.node.rest">
-        <context:include-filter type="regex" expression="won.node.rest.*"/>
+    <context:component-scan base-package="won.protocol.rest">
+        <context:include-filter type="regex" expression="won.protocol.rest.*"/>
     </context:component-scan>
 
-    <bean id="linkedDataRestClient" class="won.node.rest.LinkedDataRestClient" />
+    <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
 
 
     <!-- TODO: remove DUMMY IMPLEMENTATIONS below   -->

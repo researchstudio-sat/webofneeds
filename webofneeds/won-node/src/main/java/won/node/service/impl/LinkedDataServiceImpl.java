@@ -23,7 +23,7 @@ import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.node.service.LinkedDataService;
+import won.protocol.service.LinkedDataService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;

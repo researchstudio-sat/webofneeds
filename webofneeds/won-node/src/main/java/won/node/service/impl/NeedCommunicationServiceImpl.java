@@ -31,6 +31,7 @@ import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
+import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.List;
@@ -117,6 +118,8 @@ public class NeedCommunicationServiceImpl implements
           ownerProtocolOwnerService.hintReceived(needURI, otherNeedURI, score, originator);
         } catch (NoSuchNeedException e) {
           logger.debug("caught NoSuchNeedException:", e);
+        } catch (IllegalMessageForNeedStateException e) {
+            e.printStackTrace();
         }
 
       }

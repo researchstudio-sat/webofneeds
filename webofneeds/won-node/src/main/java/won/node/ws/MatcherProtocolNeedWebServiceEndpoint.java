@@ -17,6 +17,7 @@
 package won.node.ws;
 
 import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import won.protocol.exception.IllegalMessageForNeedStateException;
@@ -58,7 +59,7 @@ public class MatcherProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringS
   public String readConnectionContent(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException
   {
     //TODO: remove this workaround when we have the linked data service running
-    Graph ret = matcherProtocolNeedService.readConnectionContent(connectionURI);
+    Model ret = matcherProtocolNeedService.readConnectionContent(connectionURI);
     return (ret!= null)? ret.toString():null;
   }
 
@@ -72,7 +73,7 @@ public class MatcherProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringS
   public String readNeedContent(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedException
   {
     //TODO: remove this workaround when we have the linked data service running
-    Graph ret = matcherProtocolNeedService.readNeedContent(needURI);
+    Model ret = matcherProtocolNeedService.readNeedContent(needURI);
     return (ret!= null)? ret.toString():null;
   }
 

@@ -50,7 +50,7 @@
             <param-name>com.sun.jersey.config.property.packages</param-name>
             <param-value>won.node.rest</param-value>
         </init-param>
-        <load-on-startup>2</load-on-startup>
+        <load-on-startup>4</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>jerseySpringWebapp</servlet-name>
@@ -61,7 +61,7 @@
     <servlet>
         <servlet-name>linkedDataPageServlet</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
+        <load-on-startup>5</load-on-startup>
     </servlet>
 
     <servlet-mapping>

@@ -17,7 +17,9 @@
 package won.node.ws;
 
 import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import won.node.protocol.impl.OwnerProtocolNeedServiceImpl;
 import won.protocol.exception.*;
@@ -25,6 +27,7 @@ import won.protocol.model.Connection;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -37,9 +40,10 @@ import java.util.Collection;
  * User: fkleedorfer
  * Date: 13.11.12
  */
+
 @WebService(serviceName = "ownerProtocol", targetNamespace = "http://www.webofneeds.org/protocol/owner/soap/1.0/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
-public class OwnerProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSupport
+public class OwnerProtocolNeedWebServiceEndpointImpl extends SpringBeanAutowiringSupport implements OwnerProtocolNeedWebServiceEndpoint
 {
   @Autowired
   private OwnerProtocolNeedService ownerProtocolNeedService;
@@ -48,7 +52,7 @@ public class OwnerProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSup
   public String readConnectionContent(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException
   {
     //TODO: remove this workaround when we have the linked data service running
-    Graph ret = ownerProtocolNeedService.readConnectionContent(connectionURI);
+    Model ret = ownerProtocolNeedService.readConnectionContent(connectionURI);
     return (ret!= null)? ret.toString():null;
   }
 
@@ -62,7 +66,7 @@ public class OwnerProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSup
   public String readNeedContent(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedException
   {
     //TODO: remove this workaround when we have the linked data service running
-    Graph ret = ownerProtocolNeedService.readNeedContent(needURI);
+    Model ret = ownerProtocolNeedService.readNeedContent(needURI);
     return (ret!= null)? ret.toString():null;
   }
 

@@ -54,7 +54,7 @@ public class Executor {
 
         System.out.println("before insert (no id):");
         for (final Need n : needs) {
-            System.out.format("  ● %s\n", n);
+            System.out.format("  * %s\n", n);
         }
         System.out.println();
         test(needRepository, needs, new UpdateEntity<Need>() {
@@ -140,7 +140,7 @@ public class Executor {
             rep.save(l);
             System.out.println("after insert (with id):");
             for (final M n : l) {
-                System.out.format("  ● %s\n", n);
+                System.out.format("  * %s\n", n);
             }
             System.out.println();
 
@@ -148,7 +148,7 @@ public class Executor {
             System.out.format("users with username like test123\n");
             final List<M> founds = rep.findById(1l);
             for (final M m : founds) {
-                System.out.format("  ● %s\n", m);
+                System.out.format("  * %s\n", m);
             }
             System.out.println();
 
@@ -159,13 +159,13 @@ public class Executor {
                     rep.save(test);
 
                     final M updatedNeed = rep.findOne(u.getId(test));
-                    System.out.format(" after update:\n  ● %s\n\n", updatedNeed);
+                    System.out.format(" after update:\n  * %s\n\n", updatedNeed);
             }
 
             // get all users from db
             System.out.println("all users:");
             for (final M n : rep.findAll()) {
-                System.out.format("  ● %s\n", n);
+                System.out.format("  * %s\n", n);
             }
             System.out.println();
         } finally {

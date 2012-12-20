@@ -30,6 +30,7 @@ import won.protocol.model.ConnectionState;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.service.ConnectionCommunicationService;
+import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.Date;

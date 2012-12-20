@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.node.service.impl;
+package won.protocol.util;
 
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;

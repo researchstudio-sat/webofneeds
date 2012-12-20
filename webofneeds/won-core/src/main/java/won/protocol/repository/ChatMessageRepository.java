@@ -18,12 +18,15 @@ package won.protocol.repository;
 
 import won.protocol.model.ChatMessage;
 
+import java.net.URI;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Gabriel
  * Date: 04.11.12
  * Time: 16:56
- * To change this template use File | Settings | File Templates.
  */
 public interface ChatMessageRepository extends WonRepository<ChatMessage> {
+    List<ChatMessage> findByLocalConnectionURI(URI URI);
 }

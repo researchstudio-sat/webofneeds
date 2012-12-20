@@ -16,10 +16,9 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.web.PageableArgumentResolver;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
@@ -29,6 +28,7 @@ import won.protocol.model.NeedState;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.NeedInformationService;
+import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -127,7 +127,7 @@ public class NeedInformationServiceImpl implements NeedInformationService {
 
     //TODO implement RDF handling!
     @Override
-    public Graph readNeedContent(final URI needURI) throws NoSuchNeedException {
+    public Model readNeedContent(final URI needURI) throws NoSuchNeedException {
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
         return null;
     }
@@ -140,7 +140,7 @@ public class NeedInformationServiceImpl implements NeedInformationService {
 
     //TODO implement RDF handling!
     @Override
-    public Graph readConnectionContent(final URI connectionURI) throws NoSuchConnectionException {
+    public Model readConnectionContent(final URI connectionURI) throws NoSuchConnectionException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

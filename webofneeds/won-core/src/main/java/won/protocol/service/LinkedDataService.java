@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.node.service;
+package won.protocol.service;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.NoSuchConnectionException;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.node.rest;
+package won.protocol.rest;
 
 import javax.ws.rs.core.MediaType;
 

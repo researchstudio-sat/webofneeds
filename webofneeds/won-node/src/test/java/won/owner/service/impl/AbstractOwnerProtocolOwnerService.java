@@ -17,6 +17,7 @@
 package won.owner.service.impl;
 
 import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -71,12 +72,12 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
-  public URI createNeed(final URI ownerURI, final Graph content, final boolean activate) throws IllegalNeedContentException
+  public URI createNeed(final URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException
   {
     return ownerProtocolNeedService.createNeed(ownerURI, content, activate);
   }
 
-  public Graph readNeedContent(final URI needURI) throws NoSuchNeedException
+  public Model readNeedContent(final URI needURI) throws NoSuchNeedException
   {
     return ownerProtocolNeedService.readNeedContent(needURI);
   }
@@ -110,7 +111,7 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
     return connUri;
   }
 
-  public Graph readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
+  public Model readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
   {
     this.lastConnectionURI = connectionURI;
     return ownerProtocolNeedService.readConnectionContent(connectionURI);

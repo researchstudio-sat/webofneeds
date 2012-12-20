@@ -1,4 +1,4 @@
-package won.node.rest;
+package won.protocol.rest;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import won.node.service.LinkedDataService;
+import won.protocol.service.LinkedDataService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 

@@ -23,8 +23,10 @@
     <modules>
         <module>won-core</module>
         <module>won-node-webapp</module>
-    <module>won-node</module>
-  </modules>
+        <module>won-node</module>
+        <module>won-owner</module>
+        <module>won-owner-webapp</module>
+    </modules>
     <build>
         <pluginManagement>
             <plugins>

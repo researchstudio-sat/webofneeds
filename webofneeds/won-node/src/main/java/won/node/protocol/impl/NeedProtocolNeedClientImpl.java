@@ -18,7 +18,7 @@ package won.node.protocol.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.node.rest.LinkedDataRestClient;
+import won.protocol.rest.LinkedDataRestClient;
 import won.node.ws.NeedProtocolNeedWebServiceClient;
 import won.node.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.*;
@@ -69,7 +69,7 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   @Override
   public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info(MessageFormat.format("need-facing: DENY called for connection {0}", connectionURI));
+    logger.info(MessageFormat.format("need-facing: DENY called for connecti6on {0}", connectionURI));
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForConnection(connectionURI);
       proxy.deny(connectionURI);
