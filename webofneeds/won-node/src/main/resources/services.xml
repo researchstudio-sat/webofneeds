@@ -138,7 +138,7 @@
     <!-- TODO: remove DUMMY IMPLEMENTATIONS below   -->
 
     <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClientEmptyImpl">
-
+        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
     </bean>
 
 
