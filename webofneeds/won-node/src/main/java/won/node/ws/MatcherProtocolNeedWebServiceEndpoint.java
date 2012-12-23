@@ -26,6 +26,7 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
+import won.protocol.util.LazySpringBeanAutowiringSupport;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -40,67 +41,72 @@ import java.util.Collection;
  */
 @WebService(serviceName = "matcherProtocol", targetNamespace = "http://www.webofneeds.org/protocol/matcher/soap/1.0/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
-public class MatcherProtocolNeedWebServiceEndpoint extends SpringBeanAutowiringSupport
-{
-  @Autowired
-  private MatcherProtocolNeedService matcherProtocolNeedService;
+public class MatcherProtocolNeedWebServiceEndpoint extends LazySpringBeanAutowiringSupport {
+    @Autowired
+    private MatcherProtocolNeedService matcherProtocolNeedService;
 
-  @WebMethod
-  public void hint(
-      @WebParam(name="needURI") final URI needURI,
-      @WebParam(name="otherNeedURI") final URI otherNeedURI,
-      @WebParam(name="score") final double score,
-      @WebParam(name="originatorURI") final URI originatorURI) throws NoSuchNeedException, IllegalMessageForNeedStateException
-  {
-    matcherProtocolNeedService.hint(needURI, otherNeedURI, score, originatorURI);
-  }
+    @WebMethod
+    public void hint(
+            @WebParam(name = "needURI") final URI needURI,
+            @WebParam(name = "otherNeedURI") final URI otherNeedURI,
+            @WebParam(name = "score") final double score,
+            @WebParam(name = "originatorURI") final URI originatorURI) throws NoSuchNeedException, IllegalMessageForNeedStateException {
+        wireDependenciesLazily();
+        matcherProtocolNeedService.hint(needURI, otherNeedURI, score, originatorURI);
+    }
 
-  @WebMethod
-  public String readConnectionContent(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException
-  {
-    //TODO: remove this workaround when we have the linked data service running
-    Model ret = matcherProtocolNeedService.readConnectionContent(connectionURI);
-    return (ret!= null)? ret.toString():null;
-  }
+    @WebMethod
+    public String readConnectionContent(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException {
+        wireDependenciesLazily();
+        //TODO: remove this workaround when we have the linked data service running
+        Model ret = matcherProtocolNeedService.readConnectionContent(connectionURI);
+        return (ret != null) ? ret.toString() : null;
+    }
 
-  @WebMethod
-  public Connection readConnection(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException
-  {
-      return matcherProtocolNeedService.readConnection(connectionURI);
-  }
+    @WebMethod
+    public Connection readConnection(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException {
+        wireDependenciesLazily();
+        return matcherProtocolNeedService.readConnection(connectionURI);
+    }
 
-  @WebMethod
-  public String readNeedContent(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedException
-  {
-    //TODO: remove this workaround when we have the linked data service running
-    Model ret = matcherProtocolNeedService.readNeedContent(needURI);
-    return (ret!= null)? ret.toString():null;
-  }
+    @WebMethod
+    public String readNeedContent(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException {
+        wireDependenciesLazily();
+        //TODO: remove this workaround when we have the linked data service running
+        Model ret = matcherProtocolNeedService.readNeedContent(needURI);
+        return (ret != null) ? ret.toString() : null;
+    }
 
-  @WebMethod
-  public Need readNeed(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedException
-  {
-    return matcherProtocolNeedService.readNeed(needURI);
-  }
+    @WebMethod
+    public Need readNeed(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException {
+        wireDependenciesLazily();
+        return matcherProtocolNeedService.readNeed(needURI);
+    }
 
-  @WebMethod
-  public URI[] listConnectionURIs(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedException
-  {
-    Collection<URI> coll = matcherProtocolNeedService.listConnectionURIs(needURI);
-    if (coll == null) return null;
-    return coll.toArray(new URI[coll.size()]);
-  }
+    @WebMethod
+    public URI[] listConnectionURIs(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException {
+        wireDependenciesLazily();
+        Collection<URI> coll = matcherProtocolNeedService.listConnectionURIs(needURI);
+        if (coll == null) return null;
+        return coll.toArray(new URI[coll.size()]);
+    }
 
-  @WebMethod
-  public URI[] listNeedURIs()
-  {
-    Collection<URI> coll = matcherProtocolNeedService.listNeedURIs();
-    if (coll == null) return null;
-    return coll.toArray(new URI[coll.size()]);
-  }
-  @WebMethod(exclude = true)
-  public void setMatcherProtocolNeedService(final MatcherProtocolNeedService matcherProtocolNeedService)
-  {
-    this.matcherProtocolNeedService = matcherProtocolNeedService;
-  }
+    @WebMethod
+    public URI[] listNeedURIs() {
+
+        wireDependenciesLazily();
+        Collection<URI> coll = matcherProtocolNeedService.listNeedURIs();
+        if (coll == null) return null;
+        return coll.toArray(new URI[coll.size()]);
+    }
+
+    @WebMethod(exclude = true)
+    public void setMatcherProtocolNeedService(final MatcherProtocolNeedService matcherProtocolNeedService) {
+        this.matcherProtocolNeedService = matcherProtocolNeedService;
+    }
+
+    @Override
+    protected boolean isWired() {
+        return this.matcherProtocolNeedService != null;
+    }
 }
