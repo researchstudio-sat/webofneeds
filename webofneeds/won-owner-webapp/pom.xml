@@ -19,6 +19,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- JSTL/Servlet-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>${javax.servlet.jstl.version}</version>
+        </dependency>
+
         <!-- JAX-WS (webservices)-->
         <dependency>
             <groupId>com.sun.xml.ws</groupId>

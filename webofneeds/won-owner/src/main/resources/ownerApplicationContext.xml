@@ -35,21 +35,14 @@
     <context:component-scan base-package="won.protocol.util" />
 
 
-    <!-- Database connection
-    <bean id="postgreDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+    <!-- Database connection -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="driverClass" value="${db.sql.jdbcDriverClass}" />
         <property name="jdbcUrl" value="${db.sql.jdbcUrl}"/>
         <property name="user" value="${db.sql.user}" />
         <property name="password" value="${db.sql.password}" />
     </bean>
-    -->
 
-    <bean id="hsqlDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-        <property name="driverClass" value="${db.hsql.jdbcDriverClass}" />
-        <property name="jdbcUrl" value="${db.hsql.jdbcUrl}"/>
-        <property name="user" value="${db.hsql.user}" /> <!-- Set your db user here -->
-        <property name="password" value="${db.hsql.password}" /> <!-- Set your db password here -->
-    </bean>
 
     <!-- Hibernate is used as JPA vendor-->
     <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
@@ -59,7 +52,7 @@
 
     <!-- Entity manager -->
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="dataSource" ref="hsqlDataSource" />
+        <property name="dataSource" ref="dataSource" />
         <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
         <property name="packagesToScan" value="won.protocol.model" />
     </bean>
