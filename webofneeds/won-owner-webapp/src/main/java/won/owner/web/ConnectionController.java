@@ -26,6 +26,7 @@ import java.util.List;
  * Time: 15:19
  */
 @Controller
+@RequestMapping("/connection")
 public class ConnectionController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -38,7 +39,7 @@ public class ConnectionController {
     @Autowired
     private ChatMessageRepository chatMessageRepository;
 
-    @RequestMapping(value = "connection/{conId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{conId}", method = RequestMethod.GET)
     public String viewConnection(@PathVariable String conId, Model model) {
         List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
         if(cons.isEmpty())
@@ -51,7 +52,7 @@ public class ConnectionController {
         return "viewConnection";
     }
 
-    @RequestMapping(value = "connection/{conId}/send", method = RequestMethod.POST)
+    @RequestMapping(value = "/{conId}/send", method = RequestMethod.POST)
     public String sendText(@PathVariable String conId, @ModelAttribute("SpringWeb") TextMessagePojo text, Model model) {
         List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
         if(cons.isEmpty())

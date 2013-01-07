@@ -5,21 +5,8 @@
 
     <display-name>WON Owner Webapp</display-name>
 
-    <!-- SPRING config    -->
 
-    <listener>
-        <listener-class>
-            org.springframework.web.context.ContextLoaderListener
-        </listener-class>
-    </listener>
 
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>WEB-INF/spring-ws-serverlet.xml
-            classpath:ownerServices.xml
-            classpath:ownerApplicationContext.xml
-        </param-value>
-    </context-param>
 
 
     <!-- WEB SERVICES  -->
@@ -36,20 +23,37 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ownerProtocolJaxWSServlet</servlet-name>
-        <url-pattern>/owner/*</url-pattern>
+        <url-pattern>/protocol/*</url-pattern>
     </servlet-mapping>
 
     <!-- SPRING WEB MVC config -->
     <servlet>
-        <servlet-name>ownerPage</servlet-name>
+        <servlet-name>ownerApp</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>ownerPage</servlet-name>
+        <servlet-name>ownerApp</servlet-name>
         <url-pattern>/page/*</url-pattern>
     </servlet-mapping>
+
+    <!-- SPRING config    -->
+
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>WEB-INF/spring-ws-servlet.xml
+            classpath:ownerServices.xml
+            classpath:ownerApplicationContext.xml
+        </param-value>
+    </context-param>
+
 
     <!-- GENERAL -->
 

@@ -81,4 +81,7 @@
             <version>${org.springframework.version}</version>
         </dependency>
     </dependencies>
+    <build>
+        <finalName>owner</finalName>
+    </build>
 </project>

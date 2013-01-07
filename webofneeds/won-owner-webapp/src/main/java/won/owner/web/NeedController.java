@@ -37,6 +37,7 @@ import java.util.List;
  */
 
 @Controller
+@RequestMapping("/need")
 public class NeedController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -53,14 +54,14 @@ public class NeedController {
     private ConnectionRepository connectionRepository;
 
 
-    @RequestMapping(value = "createNeed", method = RequestMethod.GET)
+    @RequestMapping(value = "/create", method = RequestMethod.GET)
     public String createNeedGet(Model model) {
         model.addAttribute("command", new NeedPojo());
         model.addAttribute("message", "Hello World!");
         return "createNeed";
     }
 
-    @RequestMapping(value = "createNeed", method = RequestMethod.POST)
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
     public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) {
         try {
             URI needURI = new URI(needPojo.getNeedURI());
@@ -80,7 +81,7 @@ public class NeedController {
         return "createNeed";
     }
 
-    @RequestMapping(value = "need/{needId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{needId}", method = RequestMethod.GET)
     public String viewNeed(@PathVariable String needId, Model model) {
 
         model.addAttribute("needId", needId);
@@ -106,7 +107,7 @@ public class NeedController {
         return "viewNeed";
     }
 
-    @RequestMapping(value = "need/{needId}/connect", method = RequestMethod.POST)
+    @RequestMapping(value = "/{needId}/connect", method = RequestMethod.POST)
     public String connect2Need(@PathVariable String needId, @ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) {
         try {
             List<Need> needs = needRepository.findById(Long.valueOf(needId));
@@ -132,7 +133,7 @@ public class NeedController {
         return "noNeedFound";
     }
 
-    @RequestMapping(value = "need/{needId}/toggle", method = RequestMethod.GET)
+    @RequestMapping(value = "/{needId}/toggle", method = RequestMethod.GET)
     public String toggleNeed(@PathVariable String needId, Model model) {
         List<Need> needs = needRepository.findById(Long.valueOf(needId));
         if(needs.isEmpty())
@@ -151,7 +152,7 @@ public class NeedController {
         return viewNeed(need.getId().toString(), model);
     }
 
-    @RequestMapping(value = "match/{matchId}/connect", method = RequestMethod.GET)
+    @RequestMapping(value = "/match/{matchId}/connect", method = RequestMethod.GET)
     public String connect(@PathVariable String matchId, Model model) {
         String ret = "noNeedFound";
 

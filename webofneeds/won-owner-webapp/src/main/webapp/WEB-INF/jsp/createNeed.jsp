@@ -16,7 +16,7 @@
     <h1>Create a Need</h1>
     <p>This is my test. <c:out value="${message}"/></p>
 
-    <form:form method="POST" action="/page/createNeed">
+    <form:form method="POST" action="create">
         <table>
             <tr>
                 <td><form:label path="needURI">Need URI:</form:label></td>

@@ -15,7 +15,6 @@
             <groupId>webofneeds</groupId>
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- JAX-WS (webservices)-->

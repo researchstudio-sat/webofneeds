@@ -102,7 +102,7 @@
         <property name="ownerProtocolEndpoint" value="${uri.protocol.owner}" />
     </bean>
 
-    <bean id="linkedDataRestService" class="won.protocol.rest.LinkedDataRestService">
+    <bean id="linkedDataRestService" class="won.node.rest.LinkedDataRestService">
         <property name="linkedDataService" ref="linkedDataService" />
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
         <property name="dataURIPrefix" value="${uri.prefix.data}" />
