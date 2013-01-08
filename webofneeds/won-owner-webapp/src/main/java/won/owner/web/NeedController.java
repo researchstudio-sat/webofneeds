@@ -63,9 +63,9 @@ public class NeedController {
     @RequestMapping(value = "createNeed", method = RequestMethod.POST)
     public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) {
         try {
-            URI needURI = new URI(needPojo.getNeedURI());
-            ownerService.createNeed(needURI, null, needPojo.isActive());
-            Need need = ownerService.readNeed(needURI);
+            //TODO: DB insert & Owner URI
+            ownerService.createNeed(new URI(""), null, needPojo.isActive());
+            Need need = ownerService.readNeed(new URI(""));
             return viewNeed(need.getId().toString(), model);
         } catch (IllegalNeedContentException e) {
             e.printStackTrace();
