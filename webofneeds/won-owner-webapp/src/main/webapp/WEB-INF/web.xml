@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:util="http://www.springframework.org/schema/util"
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
          version="2.4">
 
@@ -15,12 +16,11 @@
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>WEB-INF/spring-ws-serverlet.xml
+        <param-value>WEB-INF/spring-ws-servlet.xml
             classpath:ownerServices.xml
             classpath:ownerApplicationContext.xml
         </param-value>
     </context-param>
-
 
     <!-- WEB SERVICES  -->
 
@@ -36,20 +36,21 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ownerProtocolJaxWSServlet</servlet-name>
-        <url-pattern>/owner/*</url-pattern>
+        <url-pattern>/protocol</url-pattern>
     </servlet-mapping>
 
     <!-- SPRING WEB MVC config -->
     <servlet>
-        <servlet-name>ownerPage</servlet-name>
+        <servlet-name>ownerApp</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>ownerPage</servlet-name>
-        <url-pattern>/page/*</url-pattern>
+        <servlet-name>ownerApp</servlet-name>
+        <url-pattern>/need/*</url-pattern>
     </servlet-mapping>
+
 
     <!-- GENERAL -->
 

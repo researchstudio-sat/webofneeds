@@ -17,6 +17,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- HSQL STUFF -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${org.hsqldb.version}</version>
+        </dependency>
+
         <!-- JAX-WS (webservices)-->
         <dependency>
             <groupId>com.sun.xml.ws</groupId>

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import won.protocol.exception.*;
 import won.protocol.need.NeedProtocolNeedService;
+import won.protocol.util.LazySpringBeanAutowiringSupport;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -37,10 +38,12 @@ import java.net.URI;
     portName="NeedProtocolNeedWebServiceEndpointPort"
     )
 @SOAPBinding(style = SOAPBinding.Style.RPC)
-public class NeedProtocolNeedWebServiceEndpointImpl extends SpringBeanAutowiringSupport implements NeedProtocolNeedWebServiceEndpoint
+public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowiringSupport implements NeedProtocolNeedWebServiceEndpoint
 {
   @Autowired
   private NeedProtocolNeedService   needProtocolNeedService;
+
+
 
   @Override
   @WebMethod
@@ -51,6 +54,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends SpringBeanAutowiring
       @WebParam(name = "message") final String message)
         throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
+    wireDependenciesLazily();
     return needProtocolNeedService.connectionRequested(needURI, otherNeedURI, otherConnectionURI, message);
   }
 
@@ -58,6 +62,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends SpringBeanAutowiring
   @WebMethod
   public void accept(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    wireDependenciesLazily();
     needProtocolNeedService.accept(connectionURI);
   }
 
@@ -65,6 +70,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends SpringBeanAutowiring
   @WebMethod
   public void deny(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    wireDependenciesLazily();
     needProtocolNeedService.deny(connectionURI);
   }
 
@@ -72,6 +78,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends SpringBeanAutowiring
   @WebMethod
   public void close(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    wireDependenciesLazily();
     needProtocolNeedService.close(connectionURI);
   }
 
@@ -81,6 +88,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends SpringBeanAutowiring
       @WebParam(name = "connectionURI") final URI connectionURI,
       @WebParam(name = "message") final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
+    wireDependenciesLazily();
     needProtocolNeedService.sendTextMessage(connectionURI, message);
   }
 
@@ -88,5 +96,10 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends SpringBeanAutowiring
   public void setNeedProtocolNeedService(final NeedProtocolNeedService needProtocolNeedService)
   {
     this.needProtocolNeedService = needProtocolNeedService;
+  }
+
+  @Override
+  protected boolean isWired() {
+    return this.needProtocolNeedService != null;
   }
 }

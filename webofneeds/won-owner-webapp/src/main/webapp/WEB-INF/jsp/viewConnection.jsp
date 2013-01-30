@@ -14,7 +14,7 @@
 <body>
 <h1>Connection: <c:out value="${connection.id}" /></h1>
 
-<form:form method="POST" action="/connection/${connection.id}/send">
+<form:form method="POST" action="/page/connection/${connection.id}/send">
     <table>
         <tr>
             <td><form:label path="text">Text: </form:label></td>

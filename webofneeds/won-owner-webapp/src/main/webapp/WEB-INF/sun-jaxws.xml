@@ -17,5 +17,5 @@
 <endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime"
            version="2.0">
     <endpoint name="ownerProtocol" implementation="won.owner.ws.OwnerProtocolOwnerWebServiceEndpointImpl"
-              url-pattern="/owner/ownerProtocol"/>
+              url-pattern="/protocol"/>
 </endpoints>

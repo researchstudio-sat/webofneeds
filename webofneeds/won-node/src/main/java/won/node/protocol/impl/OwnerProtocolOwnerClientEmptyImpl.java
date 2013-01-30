@@ -18,13 +18,11 @@ package won.node.protocol.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ObjectUtils;
 import won.node.ws.OwnerProtocolOwnerWebServiceClient;
-import won.protocol.model.WON;
-import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.exception.*;
+import won.protocol.model.WON;
 import won.protocol.owner.OwnerProtocolOwnerService;
-import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
+import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
 
 import java.net.MalformedURLException;
@@ -136,4 +134,9 @@ public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerServ
         OwnerProtocolOwnerWebServiceClient client = new OwnerProtocolOwnerWebServiceClient(URI.create(needProtocolEndpoint.toString() + "?wsdl").toURL());
         return client.getOwnerProtocolOwnerWebServiceEndpointPort();
     }
+
+  public void setLinkedDataRestClient(final LinkedDataRestClient linkedDataRestClient)
+  {
+    this.linkedDataRestClient = linkedDataRestClient;
+  }
 }

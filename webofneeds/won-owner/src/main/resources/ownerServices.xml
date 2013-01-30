@@ -35,9 +35,6 @@
 
     <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
         <property name="linkedDataRestClient" ref="linkedDataRestClient" />
-        <property name="baseNeedURI" value="" />
-        <property name="baseConnectionURI" value="" />
-        <property name="ownerProtocolURI" value="" />
     </bean>
 
     <bean id="ownerProtocolOwnerServiceImpl" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />

@@ -7,8 +7,9 @@
         <groupId>webofneeds</groupId>
         <version>0.1-SNAPSHOT</version>
     </parent>
+    <packaging>war</packaging>
+    <name>WON owner web application</name>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>won-owner-webapp</artifactId>
 
     <dependencies>
@@ -16,6 +17,13 @@
             <groupId>webofneeds</groupId>
             <artifactId>won-owner</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <!-- JSTL/Servlet-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>${javax.servlet.jstl.version}</version>
         </dependency>
 
         <!-- JAX-WS (webservices)-->
@@ -73,4 +81,7 @@
             <version>${org.springframework.version}</version>
         </dependency>
     </dependencies>
+    <build>
+        <finalName>owner</finalName>
+    </build>
 </project>

@@ -3,6 +3,7 @@ package won.owner.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -37,6 +38,7 @@ import java.util.List;
  */
 
 @Controller
+//@RequestMapping("/need")
 public class NeedController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -52,20 +54,26 @@ public class NeedController {
     @Autowired
     private ConnectionRepository connectionRepository;
 
+    private String ownerURI = "http://localhost:8080/owner";
 
-    @RequestMapping(value = "createNeed", method = RequestMethod.GET)
+    public void setOwnerURI(String ownerURI) {
+        this.ownerURI = ownerURI;
+    }
+
+    @RequestMapping(value = "/create", method = RequestMethod.GET)
     public String createNeedGet(Model model) {
         model.addAttribute("command", new NeedPojo());
         model.addAttribute("message", "Hello World!");
         return "createNeed";
     }
 
-    @RequestMapping(value = "createNeed", method = RequestMethod.POST)
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
     public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) {
         try {
-            //TODO: DB insert & Owner URI
-            ownerService.createNeed(new URI(""), null, needPojo.isActive());
-            Need need = ownerService.readNeed(new URI(""));
+            System.out.println("URI: " + ownerURI);
+            URI ownerURI = new URI(this.ownerURI);
+            URI needURI = ownerService.createNeed(ownerURI, null, needPojo.isActive());
+            Need need = ownerService.readNeed(needURI);
             return viewNeed(need.getId().toString(), model);
         } catch (IllegalNeedContentException e) {
             e.printStackTrace();
@@ -80,7 +88,7 @@ public class NeedController {
         return "createNeed";
     }
 
-    @RequestMapping(value = "need/{needId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{needId}", method = RequestMethod.GET)
     public String viewNeed(@PathVariable String needId, Model model) {
 
         model.addAttribute("needId", needId);
@@ -106,7 +114,7 @@ public class NeedController {
         return "viewNeed";
     }
 
-    @RequestMapping(value = "need/{needId}/connect", method = RequestMethod.POST)
+    @RequestMapping(value = "/{needId}/connect", method = RequestMethod.POST)
     public String connect2Need(@PathVariable String needId, @ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) {
         try {
             List<Need> needs = needRepository.findById(Long.valueOf(needId));
@@ -132,7 +140,7 @@ public class NeedController {
         return "noNeedFound";
     }
 
-    @RequestMapping(value = "need/{needId}/toggle", method = RequestMethod.GET)
+    @RequestMapping(value = "/{needId}/toggle", method = RequestMethod.GET)
     public String toggleNeed(@PathVariable String needId, Model model) {
         List<Need> needs = needRepository.findById(Long.valueOf(needId));
         if(needs.isEmpty())
@@ -151,7 +159,7 @@ public class NeedController {
         return viewNeed(need.getId().toString(), model);
     }
 
-    @RequestMapping(value = "match/{matchId}/connect", method = RequestMethod.GET)
+    @RequestMapping(value = "/match/{matchId}/connect", method = RequestMethod.GET)
     public String connect(@PathVariable String matchId, Model model) {
         String ret = "noNeedFound";
 

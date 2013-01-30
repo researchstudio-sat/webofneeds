@@ -12,7 +12,7 @@
 </head>
 <body>
 <h1>Need: <c:out value="${needId}" />, <c:out value="${needURI}" />,
-    <a href=<c:out value="${\"{/need/\" +needId + \"/toggle\"}" /> ><c:out value="${active}"/></a>
+    <a href=<c:out value="/page/need/\" +${needId} + \"/toggle\"" /> ><c:out value="${active}"/></a>
 </h1>
 
 <h2>Connect to Need:</h2>
