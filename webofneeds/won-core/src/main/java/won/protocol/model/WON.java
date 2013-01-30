@@ -50,8 +50,8 @@ public class WON {
     public static final Property REMOTE_NEED = m.createProperty(BASE_URI + "remoteNeed");
     public static final Property BELONGS_TO_NEED = m.createProperty(BASE_URI + "belongsToNeed");
     public static final Property NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI + "needProtocolEndpoint");
-    public static final Property MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI + "ownerProtocolEndpoint");
-    public static final Property OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI + "matcherProtocolEndpoint");
+    public static final Property MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI + "matcherProtocolEndpoint");
+    public static final Property OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI + "ownerProtocolEndpoint");
 
 
 

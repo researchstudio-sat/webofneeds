@@ -23,7 +23,7 @@ public class OwnerProtocolNeedWebServiceClient extends Service {
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("http://localhost:8080/owner/needProtocol?wsdl");
+            url = new URL("http://localhost:8080/won/protocol/owner?wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }
@@ -47,8 +47,8 @@ public class OwnerProtocolNeedWebServiceClient extends Service {
      */
     @WebEndpoint(name = "OwnerProtocolOwnerWebServiceEndpointPort")
     public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolOwnerWebServiceEndpointPort() {
-        return super.getPort(new QName("http://www.webofneeds.org/protocol/need/soap/1.0/",
-                "NeedProtocolNeedWebServiceEndpointPort"), OwnerProtocolNeedWebServiceEndpoint.class);
+        return super.getPort(new QName("http://www.webofneeds.org/protocol/owner/soap/1.0/",
+                "OwnerProtocolNeedWebServiceEndpointImplPort"), OwnerProtocolNeedWebServiceEndpoint.class);
     }
 
     /**
@@ -61,8 +61,8 @@ public class OwnerProtocolNeedWebServiceClient extends Service {
      */
     @WebEndpoint(name = "OwnerProtocolOwnerWebServiceEndpointPort")
     public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolOwnerWebServiceEndpointPort(WebServiceFeature... features) {
-        return super.getPort(new QName("http://www.webofneeds.org/protocol/need/soap/1.0/",
-                "NeedProtocolNeedWebServiceEndpointPort"), OwnerProtocolNeedWebServiceEndpoint.class, features);
+        return super.getPort(new QName("http://www.webofneeds.org/protocol/owner/soap/1.0/",
+                "OwnerProtocolNeedWebServiceEndpointImplPort"), OwnerProtocolNeedWebServiceEndpoint.class, features);
     }
 
     private static URL __getWsdlLocation() {
