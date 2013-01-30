@@ -19,10 +19,6 @@
     <form:form method="POST" action="create">
         <table>
             <tr>
-                <td><form:label path="needURI">Need URI:</form:label></td>
-                <td><form:input path="needURI" /></td>
-            </tr>
-            <tr>
                 <td><form:label path="active">Active: </form:label></td>
                 <td><form:checkbox path="active" /></td>
             </tr>

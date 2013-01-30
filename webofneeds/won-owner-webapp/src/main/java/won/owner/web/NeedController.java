@@ -3,6 +3,7 @@ package won.owner.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -37,7 +38,7 @@ import java.util.List;
  */
 
 @Controller
-@RequestMapping("/need")
+//@RequestMapping("/need")
 public class NeedController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -53,6 +54,11 @@ public class NeedController {
     @Autowired
     private ConnectionRepository connectionRepository;
 
+    private String ownerURI = "http://localhost:8080/owner";
+
+    public void setOwnerURI(String ownerURI) {
+        this.ownerURI = ownerURI;
+    }
 
     @RequestMapping(value = "/create", method = RequestMethod.GET)
     public String createNeedGet(Model model) {
@@ -64,8 +70,9 @@ public class NeedController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) {
         try {
-            URI needURI = new URI(needPojo.getNeedURI());
-            ownerService.createNeed(needURI, null, needPojo.isActive());
+            System.out.println("URI: " + ownerURI);
+            URI ownerURI = new URI(this.ownerURI);
+            URI needURI = ownerService.createNeed(ownerURI, null, needPojo.isActive());
             Need need = ownerService.readNeed(needURI);
             return viewNeed(need.getId().toString(), model);
         } catch (IllegalNeedContentException e) {
