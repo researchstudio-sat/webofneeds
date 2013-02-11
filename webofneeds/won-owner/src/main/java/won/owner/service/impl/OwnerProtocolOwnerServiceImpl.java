@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
+import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
@@ -41,6 +42,9 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
 
     @Autowired
     private ChatMessageRepository chatMessageRepository;
+
+    @Autowired
+    private OwnerProtocolNeedService ownerService;
 
     @Override
     public void hintReceived(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI) throws NoSuchNeedException, IllegalMessageForNeedStateException {
@@ -93,6 +97,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         //d) a connection exists in state REQUEST_RECEIVED. The remote side contacts us repeatedly, it seems.
         //   -> error message
         //e) a connection exists in state CLOSED -> create new
+        /*
         List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURI, otherNeedURI);
         if (existingConnections.size() > 0){
             for(Connection conn: existingConnections){
@@ -114,9 +119,13 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         con = connectionRepository.saveAndFlush(con);
         //create and set new uri
         con.setConnectionURI(ownConnectionURI);
-        con = connectionRepository.saveAndFlush(con);
+        con = connectionRepository.saveAndFlush(con);   */
 
-        //TODO:  message handling
+        try {
+            connectionRepository.saveAndFlush(ownerService.readConnection(ownConnectionURI));
+        } catch (NoSuchConnectionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     @Override
@@ -124,14 +133,20 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
     {
         logger.info(MessageFormat.format("node-facing: ACCEPT called for connection {0}",connectionURI));
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+
+        try {
+            connectionRepository.saveAndFlush(ownerService.readConnection(connectionURI));
+        } catch (NoSuchConnectionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         //load connection, checking if it exists
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+       // Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //perform state transit
-        ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_ACCEPT);
+        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_ACCEPT);
         //set new state and save in the db
-        con.setState(nextState);
+        //con.setState(nextState);
         //save in the db
-        final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
+        //final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
 
     }
 
@@ -140,14 +155,20 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
     {
         logger.info(MessageFormat.format("node-facing: DENY called for connection {0}",connectionURI));
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+
+        try {
+            connectionRepository.saveAndFlush(ownerService.readConnection(connectionURI));
+        } catch (NoSuchConnectionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         //load connection, checking if it exists
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        //Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //perform state transit
-        ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_DENY);
+        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_DENY);
         //set new state and save in the db
-        con.setState(nextState);
+        //con.setState(nextState);
         //save in the db
-        final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
+        //final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
     }
 
     @Override
@@ -155,14 +176,20 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
     {
         logger.info(MessageFormat.format("node-facing: CLOSE called for connection {0}",connectionURI));
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+
+        try {
+            connectionRepository.saveAndFlush(ownerService.readConnection(connectionURI));
+        } catch (NoSuchConnectionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         //load connection, checking if it exists
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        //Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //perform state transit
-        ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_CLOSE);
+        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_CLOSE);
         //set new state and save in the db
-        con.setState(nextState);
+        //con.setState(nextState);
         //save in the db
-        final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
+        //final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
     }
 
     @Override
@@ -173,8 +200,9 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         if (message == null) throw new IllegalArgumentException("message is not set");
         //load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+
         //perform state transit (should not result in state change)
-        ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_MESSAGE);
+        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_MESSAGE);
         //construct chatMessage object to store in the db
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setCreationDate(new Date());
@@ -183,23 +211,9 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         chatMessage.setOriginatorURI(con.getNeedURI());
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);
-        final URI remoteConnectionURI = con.getRemoteConnectionURI();
     }
 
-
-    /**
-     * Calculates the connectionState resulting from the message in the current connection state.
-     * Checks if the specified message is allowed in the connection's state and throws an exception if not.
-     * @param con
-     * @param msg
-     * @return
-     * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the connection's current state
-     */
-    private ConnectionState performStateTransit(Connection con, ConnectionMessage msg) throws IllegalMessageForConnectionStateException{
-        if (!msg.isMessageAllowed(con.getState())){
-            throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(),con.getState());
-        }
-        return con.getState().transit(msg);
+    public void setOwnerService(OwnerProtocolNeedService ownerService) {
+        this.ownerService = ownerService;
     }
-
 }

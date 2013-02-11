@@ -46,10 +46,10 @@ public class LinkedDataRestService {
             @Context UriInfo uriInfo,
             @PathParam("identifier") String identifier) {
         URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
-        URI pageUriPrefix = URI.create(this.pageURIPrefix);
+        URI dataUri = URI.create(this.dataURIPrefix);
         String requestUri = uriInfo.getRequestUri().toString();
 
-        String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), pageUriPrefix.getPath());
+        String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), dataUri.getPath());
         return Response.seeOther(URI.create(redirectToURI)).build();
     }
 

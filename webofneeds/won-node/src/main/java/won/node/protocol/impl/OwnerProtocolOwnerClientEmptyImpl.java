@@ -18,25 +18,44 @@ package won.node.protocol.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import won.node.ws.OwnerProtocolOwnerWebServiceClient;
 import won.protocol.exception.*;
+import won.protocol.model.Need;
 import won.protocol.model.WON;
 import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.List;
 
 /**
  * TODO: Empty owner client implementation to be replaced by WS client.
  */
 public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerService
 {
-    final Logger logger = LoggerFactory.getLogger(getClass());
+  final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private LinkedDataRestClient linkedDataRestClient;
+  @Autowired
+  private LinkedDataRestClient linkedDataRestClient;
+
+  @Autowired
+  private NeedRepository needRepository;
+
+  @Autowired
+  private ConnectionRepository connectionRepository;
+
+  public void setNeedRepository(NeedRepository re) {
+    needRepository = re;
+  }
+  public void setNeedRepository(ConnectionRepository re) {
+      connectionRepository = re;
+  }
 
   @Override
   public void hintReceived(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI) throws NoSuchNeedException
@@ -75,6 +94,8 @@ public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerServ
           proxy.accept(connectionURI);
       } catch (MalformedURLException e) {
           logger.warn("couldn't create URL for needProtocolEndpoint", e);
+      } catch (NoSuchNeedException e) {
+          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
   }
 
@@ -87,6 +108,8 @@ public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerServ
           proxy.deny(connectionURI);
       } catch (MalformedURLException e) {
           logger.warn("couldn't create URL for needProtocolEndpoint", e);
+      } catch (NoSuchNeedException e) {
+          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
   }
 
@@ -99,6 +122,8 @@ public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerServ
           proxy.close(connectionURI);
       } catch (MalformedURLException e) {
           logger.warn("couldn't create URL for needProtocolEndpoint", e);
+      } catch (NoSuchNeedException e) {
+          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
   }
 
@@ -111,6 +136,8 @@ public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerServ
           proxy.sendTextMessage(connectionURI, message);
       } catch (MalformedURLException e) {
           logger.warn("couldn't create URL for needProtocolEndpoint", e);
+      } catch (NoSuchNeedException e) {
+          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
   }
 
@@ -118,21 +145,23 @@ public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerServ
     private OwnerProtocolOwnerWebServiceEndpoint getOwnerProtocolEndpointForNeed(URI needURI) throws NoSuchNeedException, MalformedURLException
     {
         //TODO: fetch endpoint information for the need and store in db?
-        URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.NEED_PROTOCOL_ENDPOINT);
-        logger.info("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
-        if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
-        OwnerProtocolOwnerWebServiceClient client = new OwnerProtocolOwnerWebServiceClient(URI.create(needProtocolEndpoint.toString() + "?wsdl").toURL());
+      //  URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.OWNER_PROTOCOL_ENDPOINT);
+      //  logger.info("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
+      //  if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
+
+        Need own = needRepository.findByNeedURI(needURI).get(0);
+        OwnerProtocolOwnerWebServiceClient client = new OwnerProtocolOwnerWebServiceClient(URI.create(own.getOwnerURI().toString() + "?wsdl").toURL());
         return client.getOwnerProtocolOwnerWebServiceEndpointPort();
     }
 
-    private OwnerProtocolOwnerWebServiceEndpoint getOwnerProtocolEndpointForConnection(URI connectionURI) throws NoSuchConnectionException, MalformedURLException
-    {
+    private OwnerProtocolOwnerWebServiceEndpoint getOwnerProtocolEndpointForConnection(URI connectionURI) throws NoSuchConnectionException, MalformedURLException,
+            NoSuchNeedException {
         //TODO: fetch endpoint information for the need and store in db?
-        URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.NEED_PROTOCOL_ENDPOINT);
-        logger.info("need protocol endpoint of connection {} is {}", connectionURI.toString(), needProtocolEndpoint.toString());
-        if (needProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
-        OwnerProtocolOwnerWebServiceClient client = new OwnerProtocolOwnerWebServiceClient(URI.create(needProtocolEndpoint.toString() + "?wsdl").toURL());
-        return client.getOwnerProtocolOwnerWebServiceEndpointPort();
+      //  URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.OWNER_PROTOCOL_ENDPOINT);
+      //  logger.info("need protocol endpoint of connection {} is {}", connectionURI.toString(), needProtocolEndpoint.toString());
+      //  if (needProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
+
+        return getOwnerProtocolEndpointForNeed(connectionRepository.findByConnectionURI(connectionURI).get(0).getNeedURI());
     }
 
   public void setLinkedDataRestClient(final LinkedDataRestClient linkedDataRestClient)

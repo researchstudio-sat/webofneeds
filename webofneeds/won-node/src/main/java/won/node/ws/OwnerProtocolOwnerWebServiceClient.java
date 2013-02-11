@@ -47,10 +47,10 @@ public class OwnerProtocolOwnerWebServiceClient extends Service {
      * @return
      *     returns NeedProtocolNeedWebServiceEndpoint
      */
-    @WebEndpoint(name = "OwnerProtocolOwnerWebServiceEndpointPort")
+    @WebEndpoint(name = "OwnerProtocolNeedWebServiceEndpointPort")
     public OwnerProtocolOwnerWebServiceEndpoint getOwnerProtocolOwnerWebServiceEndpointPort() {
-        return super.getPort(new QName("http://www.webofneeds.org/protocol/need/soap/1.0/",
-                "NeedProtocolNeedWebServiceEndpointPort"), OwnerProtocolOwnerWebServiceEndpoint.class);
+        return super.getPort(new QName("http://www.webofneeds.org/protocol/owner/soap/1.0/",
+                "OwnerProtocolOwnerWebServiceEndpointPort"), OwnerProtocolOwnerWebServiceEndpoint.class);
     }
 
     /**
@@ -61,10 +61,10 @@ public class OwnerProtocolOwnerWebServiceClient extends Service {
      * @return
      *     returns OwnerProtocolOwnerWebServiceEndpointPort
      */
-    @WebEndpoint(name = "OwnerProtocolOwnerWebServiceEndpointPort")
+    @WebEndpoint(name = "OwnerProtocolNeedWebServiceEndpointPort")
     public OwnerProtocolOwnerWebServiceEndpoint getOwnerProtocolOwnerWebServiceEndpointPort(WebServiceFeature... features) {
-        return super.getPort(new QName("http://www.webofneeds.org/protocol/need/soap/1.0/",
-                "NeedProtocolNeedWebServiceEndpointPort"), OwnerProtocolOwnerWebServiceEndpoint.class, features);
+        return super.getPort(new QName("http://www.webofneeds.org/protocol/owner/soap/1.0/",
+                "OwnerProtocolOwnerWebServiceEndpointPort"), OwnerProtocolOwnerWebServiceEndpoint.class, features);
     }
 
     private static URL __getWsdlLocation() {

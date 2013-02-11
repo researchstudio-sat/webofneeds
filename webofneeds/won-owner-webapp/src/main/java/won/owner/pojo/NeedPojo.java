@@ -8,10 +8,19 @@ package won.owner.pojo;
  */
 public class NeedPojo {
     private String needURI;
+    private String wonNode;
     private boolean active;
 
     public String getNeedURI() {
         return needURI;
+    }
+
+    public void setWonNode(String wonNode) {
+        this.wonNode = wonNode;
+    }
+
+    public String getWonNode() {
+        return wonNode;
     }
 
     public void setNeedURI(String needURI) {

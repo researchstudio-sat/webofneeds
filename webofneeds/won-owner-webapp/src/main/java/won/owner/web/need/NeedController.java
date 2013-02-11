@@ -1,0 +1,276 @@
+package won.owner.web.need;
+
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.util.FileManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+import won.owner.pojo.NeedPojo;
+import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
+import won.owner.service.impl.OwnerProtocolOwnerServiceImpl;
+import won.protocol.exception.*;
+import won.protocol.model.Connection;
+import won.protocol.model.Match;
+import won.protocol.model.Need;
+import won.protocol.model.NeedState;
+import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.repository.ChatMessageRepository;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.MatchRepository;
+import won.protocol.repository.NeedRepository;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: Gabriel
+ * Date: 17.12.12
+ * Time: 13:38
+ */
+
+@Controller
+//@RequestMapping("/need")
+public class NeedController {
+    final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    private OwnerProtocolNeedService ownerService;
+
+    @Autowired
+    private NeedRepository needRepository;
+
+    @Autowired
+    private MatchRepository matchRepository;
+
+    @Autowired
+    private ConnectionRepository connectionRepository;
+
+    private String ownerURI = "http://localhost:8080/owner/protocol";
+
+    public void setOwnerService(OwnerProtocolNeedService ownerService) {
+        this.ownerService = ownerService;
+    }
+
+    public void setConnectionRepository(ConnectionRepository connectionRepository) {
+        this.connectionRepository = connectionRepository;
+    }
+
+    public void setMatchRepository(MatchRepository matchRepository) {
+        this.matchRepository = matchRepository;
+    }
+
+    public void setNeedRepository(NeedRepository needRepository) {
+        this.needRepository = needRepository;
+    }
+
+    public void setOwnerURI(String ownerURI) {
+        this.ownerURI = ownerURI;
+    }
+
+    @RequestMapping(value = "/create", method = RequestMethod.GET)
+    public String createNeedGet(Model model) {
+        model.addAttribute("command", new NeedPojo());
+        model.addAttribute("message", "Hello World!");
+        return "createNeed";
+    }
+
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) {
+        URI needURI;
+
+        try {
+            URI ownerURI = new URI(this.ownerURI);
+            com.hp.hpl.jena.rdf.model.Model m = ModelFactory.createDefaultModel();
+            // use the FileManager to find the input file
+            InputStream in = FileManager.get().open( "/offer.ttl" );
+            if (in == null) {
+                throw new IllegalArgumentException(
+                        "File: offer.ttl not found");
+            }
+            m.read(in, null, "TTL");
+            in.close();
+
+            if(needPojo.getWonNode().equals("")) {
+                needURI = ownerService.createNeed(ownerURI, m, needPojo.isActive());
+            } else {
+                needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, m, needPojo.isActive(), needPojo.getWonNode());
+            }
+
+            Need need = ownerService.readNeed(needURI);
+            needRepository.saveAndFlush(need);
+            return "redirect:/need/" + need.getId().toString();
+            // return viewNeed(need.getId().toString(), model);
+        } catch (IllegalNeedContentException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (NoSuchNeedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        model.addAttribute("command", new NeedPojo());
+        model.addAttribute("message", "Hello World!");
+        return "createNeed";
+    }
+
+
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public String listNeeds(Model model) {
+
+       /* List<Need> needs = new ArrayList(needRepository.count());
+        ;
+        if(needs.isEmpty())
+            return "noNeedFound";
+
+        Need need = needs.get(0);  */
+        model.addAttribute("needs", needRepository.findAll());
+
+        return "listNeeds";
+    }
+
+    @RequestMapping(value = "/{needId}", method = RequestMethod.GET)
+    public String viewNeed(@PathVariable String needId, Model model) {
+
+        model.addAttribute("needId", needId);
+
+        List<Need> needs = needRepository.findById(Long.valueOf(needId));
+        if(needs.isEmpty())
+            return "noNeedFound";
+
+        Need need = needs.get(0);
+        model.addAttribute("active", (need.getState() != NeedState.ACTIVE ? "activate" : "deactivate"));
+        model.addAttribute("needURI", need.getNeedURI());
+        model.addAttribute("command", new NeedPojo());
+
+        return "viewNeed";
+    }
+
+
+    @RequestMapping(value = "/{needId}/listMatches", method = RequestMethod.GET)
+    public String listMatches(@PathVariable String needId, Model model) {
+        List<Need> needs = needRepository.findById(Long.valueOf(needId));
+        if(needs.isEmpty())
+            return "noNeedFound";
+
+        Need need = needs.get(0);
+        try {
+            model.addAttribute("matches", ownerService.getMatches(need.getNeedURI()));
+        } catch (NoSuchNeedException e) {
+            e.printStackTrace();
+        }
+
+        return "listMatches";
+    }
+
+    @RequestMapping(value = "/{needId}/listConnections", method = RequestMethod.GET)
+    public String listConnections(@PathVariable String needId, Model model) {
+
+        List<Need> needs = needRepository.findById(Long.valueOf(needId));
+        if(needs.isEmpty())
+            return "noNeedFound";
+
+        Need need = needs.get(0);
+
+        model.addAttribute("connections", connectionRepository.findByNeedURI(need.getNeedURI()));
+
+        return "listConnections";
+    }
+
+    @RequestMapping(value = "/{needId}/connect", method = RequestMethod.POST)
+    public String connect2Need(@PathVariable String needId, @ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) {
+        try {
+            List<Need> needs = needRepository.findById(Long.valueOf(needId));
+            if(needs.isEmpty())
+                return "noNeedFound";
+
+            Need need1 = needs.get(0);
+            needs = needRepository.findByNeedURI(new URI(needPojo.getNeedURI()));
+            if(needs.isEmpty())
+                return "noNeedFound";
+            Need need2 = needs.get(0);
+            ownerService.connectTo(need1.getNeedURI(), need2.getNeedURI(), "");
+            for(URI uri : ownerService.listConnectionURIs(need1.getNeedURI()))
+                if(uri != null)
+                    connectionRepository.saveAndFlush(ownerService.readConnection(uri));
+            return "redirect:/need/" + need1.getId().toString();//viewNeed(need1.getId().toString(), model);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (ConnectionAlreadyExistsException e) {
+            e.printStackTrace();
+        } catch (IllegalMessageForNeedStateException e) {
+            e.printStackTrace();
+        } catch (NoSuchNeedException e) {
+            e.printStackTrace();
+        } catch (NoSuchConnectionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return "noNeedFound";
+    }
+
+    @RequestMapping(value = "/{needId}/toggle", method = RequestMethod.POST)
+    public String toggleNeed(@PathVariable String needId, Model model) {
+        List<Need> needs = needRepository.findById(Long.valueOf(needId));
+        if(needs.isEmpty())
+            return "noNeedFound";
+        Need need = needs.get(0);
+        try {
+            if(need.getState() == NeedState.ACTIVE) {
+                ownerService.deactivate(need.getNeedURI());
+                need.setState(NeedState.INACTIVE);
+            } else {
+                ownerService.activate(need.getNeedURI());
+                need.setState(NeedState.ACTIVE);
+            }
+            needRepository.saveAndFlush(need);
+        } catch (NoSuchNeedException e) {
+            e.printStackTrace();
+        }
+        return "redirect:/need/" + need.getId().toString();
+        //return viewNeed(need.getId().toString(), model);
+    }
+
+    @RequestMapping(value = "/match/{matchId}/connect", method = RequestMethod.POST)
+    public String connect(@PathVariable String matchId, Model model) {
+        String ret = "noNeedFound";
+
+        try {
+            List<Match> matches = matchRepository.findById(Long.valueOf(matchId));
+            if(!matches.isEmpty()) {
+                Match match = matches.get(0);
+                List<Need> needs = needRepository.findByNeedURI(match.getFromNeed());
+                if(!needs.isEmpty())
+                    ret =  "redirect:/need/" + needs.get(0).getId().toString();//viewNeed(needs.get(0).getId().toString(), model);
+                ownerService.connectTo(match.getFromNeed(), match.getToNeed(), "");
+
+                for(URI uri : ownerService.listConnectionURIs(match.getFromNeed()))
+                    if(uri != null)
+                        connectionRepository.saveAndFlush(ownerService.readConnection(uri));
+            }
+        } catch (ConnectionAlreadyExistsException e) {
+            e.printStackTrace();
+        } catch (IllegalMessageForNeedStateException e) {
+            e.printStackTrace();
+        } catch (NoSuchNeedException e) {
+            e.printStackTrace();
+        } catch (NoSuchConnectionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return ret;
+    }
+}

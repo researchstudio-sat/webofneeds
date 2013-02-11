@@ -3,6 +3,7 @@ package won.owner.protocol.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import won.protocol.rest.LinkedDataRestClient;
 import won.owner.ws.OwnerProtocolNeedWebServiceClient;
@@ -29,6 +30,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Value("${uri_protocol_won}")
     private String ownerProtocolWONURI;
+
 
     public void setLinkedDataRestClient(LinkedDataRestClient linkedDataRestClient) {
         this.linkedDataRestClient = linkedDataRestClient;
@@ -296,6 +298,19 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
         return null;
     }
 
+    public URI createNeed(URI ownerURI, Model content, boolean activate, String wonURI) throws IllegalNeedContentException {
+        logger.info(MessageFormat.format("need-facing: CREATE_NEED called for need {0}, with content {1} and activate {2}", ownerURI, content, activate));
+        try {
+            OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed(wonURI);
+            return proxy.createNeed(ownerURI, "", activate);
+        } catch (MalformedURLException e) {
+            logger.warn("couldn't create URL for needProtocolEndpoint", e);
+        } catch (NoSuchNeedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     public URI createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
         logger.info(MessageFormat.format("need-facing: CREATE_NEED called for need {0}, with content {1} and activate {2}", ownerURI, content, activate));
@@ -355,10 +370,18 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
         OwnerProtocolNeedWebServiceClient client = new OwnerProtocolNeedWebServiceClient(URI.create(needProtocolEndpoint.toString() + "?wsdl").toURL());
         return client.getOwnerProtocolOwnerWebServiceEndpointPort();
     }
+    //TODO: workaround until we can work with multiple WON nodes: protocol URI is hard-coded in spring properties
+    private OwnerProtocolNeedWebServiceEndpoint getHardcodedOwnerProtocolEndpointForNeed(String ownerProtocolWONURI) throws NoSuchNeedException, MalformedURLException
+    {
+        //TODO: fetch endpoint information for the need and store in db?
+        OwnerProtocolNeedWebServiceClient client = new OwnerProtocolNeedWebServiceClient(URI.create(ownerProtocolWONURI + "?wsdl").toURL());
+        return client.getOwnerProtocolOwnerWebServiceEndpointPort();
+    }
 
     //TODO: workaround until we can work with multiple WON nodes: protocol URI is hard-coded in spring properties
     private OwnerProtocolNeedWebServiceEndpoint getHardcodedOwnerProtocolEndpointForNeed() throws NoSuchNeedException, MalformedURLException
     {
+
         //TODO: fetch endpoint information for the need and store in db?
         OwnerProtocolNeedWebServiceClient client = new OwnerProtocolNeedWebServiceClient(URI.create(this.ownerProtocolWONURI + "?wsdl").toURL());
         return client.getOwnerProtocolOwnerWebServiceEndpointPort();

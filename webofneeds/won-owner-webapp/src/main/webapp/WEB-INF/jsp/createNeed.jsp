@@ -14,13 +14,16 @@
 </head>
 <body>
     <h1>Create a Need</h1>
-    <p>This is my test. <c:out value="${message}"/></p>
 
     <form:form method="POST" action="create">
         <table>
             <tr>
                 <td><form:label path="active">Active: </form:label></td>
                 <td><form:checkbox path="active" /></td>
+            </tr>
+            <tr>
+                <td>Won Node:</td>
+                <td><form:input path="wonNode" /></td>
             </tr>
             <tr>
                 <td colspan="2">

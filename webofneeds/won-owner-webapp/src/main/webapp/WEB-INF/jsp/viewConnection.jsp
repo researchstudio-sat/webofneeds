@@ -14,7 +14,7 @@
 <body>
 <h1>Connection: <c:out value="${connection.id}" /></h1>
 
-<form:form method="POST" action="/page/connection/${connection.id}/send">
+<form:form method="POST" action="/owner/connection/${connection.id}/send">
     <table>
         <tr>
             <td><form:label path="text">Text: </form:label></td>
@@ -28,29 +28,19 @@
     </table>
 </form:form>
 
-<h2>Messages: </h2>
-<table border="1">
-    <tr>
-        <th>Message ID</th>
-        <th>Creation Date</th>
-        <th>Originator URI</th>
-        <th>Message</th>
-    </tr>
-    <c:forEach var="mes" items="${messages}">
-        <tr>
-            <td>${mes.id}</td>
-            <td>${mes.creationDate}</td>
-            <td>${mes.originatorURI}</td>
-            <td>${mes.message}</td>
-        </tr>
-    </c:forEach>
-</table>
+<button onclick="jQuery.post('/owner/connection/${connection.id}/close', function() { document.location.reload(true); });" >close</button>
+<div class="messages">
+    <iframe id="iMessages" class="cframe"  width="100%"  height="300px" src="/owner/connection/<c:out value="${connection.id}" />/body"></iframe>
+</div>
 
-<script type="text/javascript" src="scripts/jquery-1.8.3.min.js" ></script>
+
+<script type="text/javascript" src="/owner/scripts/jquery-1.8.3.min.js" ></script>
 <script type="text/javascript">
-    setTimeout(function(){
-        window.location.reload();
-    }, 2000);
+    var refresh = function(){
+        document.getElementById("iMessages").contentDocument.location.reload(true);
+        setTimeout(refresh, 2000);
+    }
+    setTimeout(refresh, 2000);
 </script>
 </body>
 </html>

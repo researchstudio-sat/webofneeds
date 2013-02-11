@@ -41,16 +41,26 @@
 
     <!-- SPRING WEB MVC config -->
     <servlet>
-        <servlet-name>ownerApp</servlet-name>
+        <servlet-name>needController</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>ownerApp</servlet-name>
+        <servlet-name>needController</servlet-name>
         <url-pattern>/need/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>connectionController</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>connectionController</servlet-name>
+        <url-pattern>/connection/*</url-pattern>
+    </servlet-mapping>
 
     <!-- GENERAL -->
 
