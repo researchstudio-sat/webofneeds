@@ -37,7 +37,7 @@ bin/setenv.*
 
 #application specific
 /needserver/repository
-/webofneeds/webofneeds/won-node/src/main/resources.lan/needserver.properties
-/webofneeds/webofneeds/won-owner/src/main/resources.lan/owner.properties
+/webofneeds/won-node/src/main/resources.lan/*
+/webofneeds/won-owner/src/main/resources.lan/*
 
 
