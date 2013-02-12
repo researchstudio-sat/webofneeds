@@ -202,5 +202,29 @@
                 </testResources>
             </build>
         </profile>
+        <profile>
+            <id>lan</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources.lan</directory>
+                    </resource>
+                </resources>
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                    </testResource>
+                    <testResource>
+                        <directory>src/test/resources.lan</directory>
+                    </testResource>
+                </testResources>
+            </build>
+        </profile>
     </profiles>
 </project>

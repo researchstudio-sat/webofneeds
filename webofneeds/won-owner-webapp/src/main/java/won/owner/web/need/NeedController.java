@@ -5,24 +5,21 @@ import com.hp.hpl.jena.util.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
 import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
-import won.owner.service.impl.OwnerProtocolOwnerServiceImpl;
+import won.owner.service.impl.URIService;
 import won.protocol.exception.*;
-import won.protocol.model.Connection;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolNeedService;
-import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
@@ -31,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,9 +54,21 @@ public class NeedController {
     @Autowired
     private ConnectionRepository connectionRepository;
 
-    private String ownerURI = "http://192.168.124.99:8080/owner/protocol";
+    @Autowired
+    private URIService uriService;
 
-    public void setOwnerService(OwnerProtocolNeedService ownerService) {
+
+  public URIService getUriService()
+  {
+    return uriService;
+  }
+
+  public void setUriService(final URIService uriService)
+  {
+    this.uriService = uriService;
+  }
+
+  public void setOwnerService(OwnerProtocolNeedService ownerService) {
         this.ownerService = ownerService;
     }
 
@@ -76,9 +84,6 @@ public class NeedController {
         this.needRepository = needRepository;
     }
 
-    public void setOwnerURI(String ownerURI) {
-        this.ownerURI = ownerURI;
-    }
 
     @RequestMapping(value = "/create", method = RequestMethod.GET)
     public String createNeedGet(Model model) {
@@ -92,7 +97,7 @@ public class NeedController {
         URI needURI;
 
         try {
-            URI ownerURI = new URI(this.ownerURI);
+            URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
             com.hp.hpl.jena.rdf.model.Model m = ModelFactory.createDefaultModel();
             // use the FileManager to find the input file
             InputStream in = FileManager.get().open( "/offer.ttl" );
@@ -114,8 +119,6 @@ public class NeedController {
             return "redirect:/need/" + need.getId().toString();
             // return viewNeed(need.getId().toString(), model);
         } catch (IllegalNeedContentException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (NoSuchNeedException e) {
             e.printStackTrace();

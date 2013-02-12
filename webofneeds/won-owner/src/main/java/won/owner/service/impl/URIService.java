@@ -16,11 +16,34 @@
 
 package won.owner.service.impl;
 
+import java.net.URI;
+
 /**
  * User: fkleedorfer
  * Date: 12.02.13
  */
 public class URIService
 {
-  private URI
+  private URI ownerProtocolOwnerServiceEndpointURI;
+  private URI defaultOwnerProtocolNeedServiceEndpointURI;
+
+  public URI getOwnerProtocolOwnerServiceEndpointURI()
+  {
+    return ownerProtocolOwnerServiceEndpointURI;
+  }
+
+  public void setOwnerProtocolOwnerServiceEndpointURI(final URI ownerProtocolOwnerServiceEndpointURI)
+  {
+    this.ownerProtocolOwnerServiceEndpointURI = ownerProtocolOwnerServiceEndpointURI;
+  }
+
+  public URI getDefaultOwnerProtocolNeedServiceEndpointURI()
+  {
+    return defaultOwnerProtocolNeedServiceEndpointURI;
+  }
+
+  public void setDefaultOwnerProtocolNeedServiceEndpointURI(final URI defaultOwnerProtocolNeedServiceEndpointURI)
+  {
+    this.defaultOwnerProtocolNeedServiceEndpointURI = defaultOwnerProtocolNeedServiceEndpointURI;
+  }
 }

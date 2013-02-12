@@ -3,19 +3,22 @@ package won.owner.protocol.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import won.protocol.rest.LinkedDataRestClient;
+import won.owner.service.impl.URIService;
 import won.owner.ws.OwnerProtocolNeedWebServiceClient;
 import won.protocol.exception.*;
-import won.protocol.model.*;
+import won.protocol.model.Match;
+import won.protocol.model.Need;
+import won.protocol.model.WON;
 import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,19 +31,19 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     private LinkedDataRestClient linkedDataRestClient;
 
-    @Value("${uri_protocol_won}")
-    private String ownerProtocolWONURI;
+    private URIService uriService;
 
 
     public void setLinkedDataRestClient(LinkedDataRestClient linkedDataRestClient) {
         this.linkedDataRestClient = linkedDataRestClient;
     }
 
-    public void setOwnerProtocolWONURI(String ownerProtocolWONURI) {
-        this.ownerProtocolWONURI = ownerProtocolWONURI;
+    public void setUriService(final URIService uriService)
+    {
+      this.uriService = uriService;
     }
 
-    @Override
+  @Override
     public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         logger.info(MessageFormat.format("need-facing: ACCEPT called for connection {0}", connectionURI));
@@ -383,7 +386,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
     {
 
         //TODO: fetch endpoint information for the need and store in db?
-        OwnerProtocolNeedWebServiceClient client = new OwnerProtocolNeedWebServiceClient(URI.create(this.ownerProtocolWONURI + "?wsdl").toURL());
+        OwnerProtocolNeedWebServiceClient client = new OwnerProtocolNeedWebServiceClient(URI.create((this.uriService.getDefaultOwnerProtocolNeedServiceEndpointURI().toString()+ "?wsdl")).toURL());
         return client.getOwnerProtocolOwnerWebServiceEndpointPort();
     }
 
