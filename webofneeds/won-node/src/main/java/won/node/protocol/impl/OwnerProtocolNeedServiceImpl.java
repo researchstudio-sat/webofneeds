@@ -16,7 +16,7 @@
 
 package won.node.protocol.impl;
 
-import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -41,7 +41,7 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     private NeedInformationService needInformationService;
 
     @Override
-    public URI createNeed(URI ownerURI, final Graph content, final boolean activate) throws IllegalNeedContentException {
+    public URI createNeed(URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException {
         return this.needManagementService.createNeed(ownerURI, content, activate);
     }
 
@@ -121,7 +121,7 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     }
 
     @Override
-    public Graph readNeedContent(final URI needURI) throws NoSuchNeedException {
+    public Model readNeedContent(final URI needURI) throws NoSuchNeedException {
         return needInformationService.readNeedContent(needURI);
     }
 
@@ -131,7 +131,7 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     }
 
     @Override
-    public Graph readConnectionContent(final URI connectionURI) throws NoSuchConnectionException {
+    public Model readConnectionContent(final URI connectionURI) throws NoSuchConnectionException {
         return needInformationService.readConnectionContent(connectionURI);
     }
 

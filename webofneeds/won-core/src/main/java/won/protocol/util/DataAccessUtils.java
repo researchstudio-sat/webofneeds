@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.node.service.impl;
+package won.protocol.util;
 
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
@@ -60,7 +60,7 @@ public class DataAccessUtils
   {
     List<Connection> connections = connectionRepository.findByConnectionURI(connectionURI);
     if (connections.size() == 0) throw new NoSuchConnectionException(connectionURI);
-    if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}",connectionURI));
+    if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple connections found with URI {0}",connectionURI));
     return connections.get(0);
   }
 

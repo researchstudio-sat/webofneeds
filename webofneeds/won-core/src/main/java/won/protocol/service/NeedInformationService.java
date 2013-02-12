@@ -17,6 +17,7 @@
 package won.protocol.service;
 
 import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
@@ -30,6 +31,9 @@ import java.util.Collection;
  * Date: 05.11.12
  */
 public interface NeedInformationService {
+
+    //TODO: Clean up and replace with Linked Data
+
     /**
      * Retrieves a list of all needs on the needserver.
      *
@@ -93,11 +97,12 @@ public interface NeedInformationService {
      * Retrieves the public description of the need as an RDF graph.
      * TODO: this is a simulation of the linked data interface, which we'll develop later
      *
+     *
      * @param needURI
      * @return
      * @throws NoSuchNeedException
      */
-    public Graph readNeedContent(URI needURI) throws NoSuchNeedException;
+    public Model readNeedContent(URI needURI) throws NoSuchNeedException;
 
     /**
      * Read general information about the connection.
@@ -112,10 +117,11 @@ public interface NeedInformationService {
     /**
      * Retrieves the public description of the connection as an RDF graph.
      *
+     *
      * @param connectionURI
      * @return
      * @throws NoSuchNeedException
      */
-    public Graph readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
+    public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
 }

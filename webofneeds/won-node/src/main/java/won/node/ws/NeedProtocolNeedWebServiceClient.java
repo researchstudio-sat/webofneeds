@@ -2,8 +2,10 @@
 package won.node.ws;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.*;
-import java.net.MalformedURLException;
+import javax.xml.ws.Service;
+import javax.xml.ws.WebEndpoint;
+import javax.xml.ws.WebServiceClient;
+import javax.xml.ws.WebServiceFeature;
 import java.net.URL;
 
 
@@ -18,21 +20,9 @@ public class NeedProtocolNeedWebServiceClient
     extends Service
 {
 
-  private final static URL NEEDPROTOCOL_WSDL_LOCATION;
-  private final static WebServiceException NEEDPROTOCOL_EXCEPTION;
   private final static QName NEEDPROTOCOL_QNAME = new QName("http://www.webofneeds.org/protocol/need/soap/1.0/", "needProtocol");
 
-  static {
-    URL url = null;
-    WebServiceException e = null;
-    try {
-      url = new URL("http://localhost:8080/won/needProtocol?wsdl");
-    } catch (MalformedURLException ex) {
-      e = new WebServiceException(ex);
-    }
-    NEEDPROTOCOL_WSDL_LOCATION = url;
-    NEEDPROTOCOL_EXCEPTION = e;
-  }
+
 
 
   /**
@@ -65,11 +55,5 @@ public class NeedProtocolNeedWebServiceClient
     return super.getPort(new QName("http://www.webofneeds.org/protocol/need/soap/1.0/", "NeedProtocolNeedWebServiceEndpointPort"), NeedProtocolNeedWebServiceEndpoint.class, features);
   }
 
-  private static URL __getWsdlLocation() {
-    if (NEEDPROTOCOL_EXCEPTION!= null) {
-      throw NEEDPROTOCOL_EXCEPTION;
-    }
-    return NEEDPROTOCOL_WSDL_LOCATION;
-  }
 
 }

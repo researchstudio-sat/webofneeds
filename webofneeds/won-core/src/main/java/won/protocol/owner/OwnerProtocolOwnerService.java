@@ -37,7 +37,7 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    * @param originatorURI
    * @throws NoSuchNeedException if ownNeedURI is not a known need URI
    */
-  public void hintReceived(URI ownNeedURI, URI otherNeedURI, double score, URI originatorURI) throws NoSuchNeedException;
+  public void hintReceived(URI ownNeedURI, URI otherNeedURI, double score, URI originatorURI) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
   /**
    * Informs the owner of a connection initiated by the need identified by otherNeedURI to the

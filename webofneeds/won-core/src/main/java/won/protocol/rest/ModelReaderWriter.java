@@ -1,4 +1,4 @@
-package won.node.rest;
+package won.protocol.rest;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;

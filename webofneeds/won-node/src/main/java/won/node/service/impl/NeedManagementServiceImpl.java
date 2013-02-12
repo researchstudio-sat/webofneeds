@@ -16,7 +16,7 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,7 @@ import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
+import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.Collection;
@@ -59,7 +60,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
 
   @Override
-  public URI createNeed(final URI ownerURI, final Graph content, final boolean activate) throws IllegalNeedContentException
+  public URI createNeed(final URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException
   {
     if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
     //TODO: when we have RDF handling, check that the graph is valid here.

@@ -10,6 +10,4 @@
 
     <context:component-scan base-package="won.node.ws"/>
 
-
-
 </beans>

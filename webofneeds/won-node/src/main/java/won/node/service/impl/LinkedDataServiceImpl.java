@@ -19,11 +19,12 @@ package won.node.service.impl;
 import com.hp.hpl.jena.rdf.model.Bag;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.node.service.LinkedDataService;
+import won.protocol.service.LinkedDataService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
@@ -119,14 +120,15 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Connection connection = needInformationService.readConnection(connectionUri);
     Model model = ModelFactory.createDefaultModel();
     model.setNsPrefixes(PREFIX_MAPPING);
-    model.createResource(connectionUri.toString())
-        .addProperty(WON.STATE, connection.getState().name())
-        .addProperty(WON.REMOTE_CONNECTION, model.createResource(connection.getRemoteConnectionURI().toString()))
-        .addProperty(WON.REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()))
-        .addProperty(WON.BELONGS_TO_NEED, model.createResource(connection.getNeedURI().toString()))
-        .addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
-        .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
-    ;
+    Resource r = model.createResource(connectionUri.toString());
+    r.addProperty(WON.STATE, connection.getState().name());
+    if(connection.getRemoteConnectionURI() != null)
+        r.addProperty(WON.REMOTE_CONNECTION, model.createResource(connection.getRemoteConnectionURI().toString()));
+    r.addProperty(WON.REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
+    r.addProperty(WON.BELONGS_TO_NEED, model.createResource(connection.getNeedURI().toString()));
+    r.addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint));
+    r.addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint));
+
     return model;
   }
 

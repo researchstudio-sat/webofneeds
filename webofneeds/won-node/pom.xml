@@ -22,22 +22,6 @@
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- REST stuff -->
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${com.sun.jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-            <version>${com.sun.jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${com.sun.jersey.version}</version>
-        </dependency>
         <!-- spring stuff -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -77,6 +61,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- HSQL STUFF -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${org.hsqldb.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

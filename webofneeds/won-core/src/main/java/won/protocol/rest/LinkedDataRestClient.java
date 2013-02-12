@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.node.rest;
+package won.protocol.rest;
 
 import com.hp.hpl.jena.rdf.model.*;
 import com.sun.jersey.api.client.Client;

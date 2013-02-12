@@ -17,6 +17,7 @@
 package won.node;
 
 import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.rdf.model.Model;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -266,7 +267,7 @@ public class NeedServerIntegrationTests
     } catch (IllegalArgumentException e){}
 
     try {
-      ownerProtocolNeedService.createNeed(null, Graph.emptyGraph, true);
+      ownerProtocolNeedService.createNeed(null, null, true);
       Assert.fail("Expected exception not thrown");
     } catch (IllegalArgumentException e){}
 

@@ -17,6 +17,7 @@
 package won.protocol.service;
 
 import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Match;
@@ -34,12 +35,13 @@ public interface NeedManagementService
    * Creates a new need with the specified content, ownerURI and active state.
    *
    *
+   *
    * @param ownerURI
    * @param content
    * @param activate
    * @return the URI of the newly created need
    */
-  public URI createNeed(final URI ownerURI, Graph content, final boolean activate) throws IllegalNeedContentException;
+  public URI createNeed(final URI ownerURI, Model content, final boolean activate) throws IllegalNeedContentException;
 
   /**
    * Activates the need object.

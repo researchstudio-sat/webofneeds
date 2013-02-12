@@ -16,7 +16,7 @@
 
 package won.node.protocol.impl;
 
-import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.stereotype.Service;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchConnectionException;
@@ -85,7 +85,7 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
   }
 
   @Override
-  public Graph readNeedContent(final URI needURI) throws NoSuchNeedException
+  public Model readNeedContent(final URI needURI) throws NoSuchNeedException
   {
     return needInformationService.readNeedContent(needURI);
   }
@@ -97,7 +97,7 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
   }
 
   @Override
-  public Graph readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
+  public Model readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
   {
     return needInformationService.readConnectionContent(connectionURI);
   }

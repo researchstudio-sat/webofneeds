@@ -25,11 +25,7 @@
     <!-- WEB SERVICES -->
 
 
-    <listener>
-        <listener-class>
-            com.sun.xml.ws.transport.http.servlet.WSServletContextListener
-        </listener-class>
-    </listener>
+
     <servlet>
         <servlet-name>wonProtocolJaxWSServlet</servlet-name>
         <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
@@ -37,7 +33,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>wonProtocolJaxWSServlet</servlet-name>
-        <url-pattern>/won/*</url-pattern>
+        <url-pattern>/protocol/*</url-pattern>
     </servlet-mapping>
 
 
@@ -50,23 +46,34 @@
             <param-name>com.sun.jersey.config.property.packages</param-name>
             <param-value>won.node.rest</param-value>
         </init-param>
-        <load-on-startup>2</load-on-startup>
+        <load-on-startup>4</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>jerseySpringWebapp</servlet-name>
-        <url-pattern>/won/*</url-pattern>
+        <url-pattern>/ld/*</url-pattern>
+        <!--
+        TODO: here, we're mapping [prefix]/ld/data and [prefix]/ld/resource to this servlet (the last part is handled
+        by jax-rs - see the respective class in won.node.rest.
+        However, we would like to get rid of the /ld/. If we attempt this by using the url pattern '/', this servlet
+        is the catch-all servlet and gets everything, including requests for /index.html - which is bad. If we attempt
+        it by using two url-patterns '/data/*' and '/resource/*', the JAX-RS @Path annotations only process the path
+        starting with whatever is matched by the '*', and so it can't differentiate between the two.
+        Possible solutions:
+        a) use spring web mvc to implement the REST calls
+        b) find out how JAX-RS can be configured to use a different attribute of the HttpServletRequest
+        -->
     </servlet-mapping>
 
     <!-- SPRING WEB MVC config -->
     <servlet>
         <servlet-name>linkedDataPageServlet</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
+        <load-on-startup>5</load-on-startup>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>linkedDataPageServlet</servlet-name>
-        <url-pattern>/won/page/*</url-pattern>
+        <url-pattern>/page/*</url-pattern>
     </servlet-mapping>
 
     <!-- GENERAL -->
@@ -75,5 +82,11 @@
         <welcome-file>index.html</welcome-file>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+
+    <listener>
+        <listener-class>
+            com.sun.xml.ws.transport.http.servlet.WSServletContextListener
+        </listener-class>
+    </listener>
 
 </web-app>

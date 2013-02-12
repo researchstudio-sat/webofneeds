@@ -33,8 +33,8 @@
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="driverClass" value="${db.sql.jdbcDriverClass}" />
         <property name="jdbcUrl" value="${db.sql.jdbcUrl}"/>
-        <property name="user" value="${db.sql.user}" /> <!-- Set your db user here -->
-        <property name="password" value="${db.sql.password}" /> <!-- Set your db password here -->
+        <property name="user" value="${db.sql.user}" />
+        <property name="password" value="${db.sql.password}" />
     </bean>
 
     <!-- Hibernate is used as JPA vendor-->

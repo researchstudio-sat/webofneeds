@@ -61,8 +61,6 @@
     <bean id="needInformationService" class="won.node.service.impl.NeedInformationServiceImpl">
         <property name="pageSize" value="${linkeddata.pagesize}" />
     </bean>
-    
-    
 
     <bean id="needManagementService" class="won.node.service.impl.NeedManagementServiceImpl">
         <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
@@ -130,17 +128,17 @@
     
 
     <!-- REST stuff -->
-    <context:component-scan base-package="won.node.rest">
-        <context:include-filter type="regex" expression="won.node.rest.*"/>
+    <context:component-scan base-package="won.protocol.rest">
+        <context:include-filter type="regex" expression="won.protocol.rest.*"/>
     </context:component-scan>
 
-    <bean id="linkedDataRestClient" class="won.node.rest.LinkedDataRestClient" />
+    <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
 
 
     <!-- TODO: remove DUMMY IMPLEMENTATIONS below   -->
 
     <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClientEmptyImpl">
-
+        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
     </bean>
 
 
