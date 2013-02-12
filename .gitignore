@@ -37,6 +37,6 @@ bin/setenv.*
 
 #application specific
 /needserver/repository
-/*/resources.lan
+/**/resources.lan/
 
 
