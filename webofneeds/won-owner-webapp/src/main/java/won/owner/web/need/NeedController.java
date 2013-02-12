@@ -58,7 +58,7 @@ public class NeedController {
     @Autowired
     private ConnectionRepository connectionRepository;
 
-    private String ownerURI = "http://localhost:8080/owner/protocol";
+    private String ownerURI = "http://192.168.124.99:8080/owner/protocol";
 
     public void setOwnerService(OwnerProtocolNeedService ownerService) {
         this.ownerService = ownerService;
@@ -199,11 +199,7 @@ public class NeedController {
                 return "noNeedFound";
 
             Need need1 = needs.get(0);
-            needs = needRepository.findByNeedURI(new URI(needPojo.getNeedURI()));
-            if(needs.isEmpty())
-                return "noNeedFound";
-            Need need2 = needs.get(0);
-            ownerService.connectTo(need1.getNeedURI(), need2.getNeedURI(), "");
+            ownerService.connectTo(need1.getNeedURI(), new URI(needPojo.getNeedURI()), "");
             for(URI uri : ownerService.listConnectionURIs(need1.getNeedURI()))
                 if(uri != null)
                     connectionRepository.saveAndFlush(ownerService.readConnection(uri));
