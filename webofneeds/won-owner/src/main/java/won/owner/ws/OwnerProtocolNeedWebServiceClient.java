@@ -3,8 +3,10 @@ package won.owner.ws;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.*;
-import java.net.MalformedURLException;
+import javax.xml.ws.Service;
+import javax.xml.ws.WebEndpoint;
+import javax.xml.ws.WebServiceClient;
+import javax.xml.ws.WebServiceFeature;
 import java.net.URL;
 
 /**
@@ -15,21 +17,9 @@ import java.net.URL;
  */
 @WebServiceClient(name = "ownerProtocol", targetNamespace = "http://www.webofneeds.org/protocol/owner/soap/1.0/")
 public class OwnerProtocolNeedWebServiceClient extends Service {
-    private final static URL OWNERPROTOCOL_WSDL_LOCATION;
-    private final static WebServiceException OWNERPROTOCOL_EXCEPTION;
+
     private final static QName OWNERPROTOCOL_QNAME = new QName("http://www.webofneeds.org/protocol/owner/soap/1.0/", "ownerProtocol");
 
-    static {
-        URL url = null;
-        WebServiceException e = null;
-        try {
-            url = new URL("http://localhost:8080/won/protocol/owner?wsdl");
-        } catch (MalformedURLException ex) {
-            e = new WebServiceException(ex);
-        }
-        OWNERPROTOCOL_WSDL_LOCATION = url;
-        OWNERPROTOCOL_EXCEPTION = e;
-    }
 
 
     /**
@@ -65,10 +55,4 @@ public class OwnerProtocolNeedWebServiceClient extends Service {
                 "OwnerProtocolNeedWebServiceEndpointImplPort"), OwnerProtocolNeedWebServiceEndpoint.class, features);
     }
 
-    private static URL __getWsdlLocation() {
-        if (OWNERPROTOCOL_EXCEPTION!= null) {
-            throw OWNERPROTOCOL_EXCEPTION;
-        }
-        return OWNERPROTOCOL_WSDL_LOCATION;
-    }
 }
