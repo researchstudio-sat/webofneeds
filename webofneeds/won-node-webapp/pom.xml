@@ -78,7 +78,7 @@
 
     </dependencies>
     <build>
-        <finalName>won-node</finalName>
+        <finalName>won</finalName>
     </build>
 </project>
 
