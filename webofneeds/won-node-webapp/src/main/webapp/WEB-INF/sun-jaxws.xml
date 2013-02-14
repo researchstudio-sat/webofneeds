@@ -20,6 +20,6 @@
               url-pattern="/protocol/need"/>
     <endpoint name="ownerProtocol" implementation="won.node.ws.OwnerProtocolNeedWebServiceEndpointImpl"
               url-pattern="/protocol/owner"/>
-    <endpoint name="matcherProtocol" implementation="won.node.ws.MatcherProtocolNeedWebServiceEndpoint"
+    <endpoint name="matcherProtocol" implementation="won.node.ws.MatcherProtocolNeedWebServiceEndpointImpl"
               url-pattern="/protocol/matcher"/>
 </endpoints>

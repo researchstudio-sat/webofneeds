@@ -26,6 +26,7 @@
         <module>won-node</module>
         <module>won-owner</module>
         <module>won-owner-webapp</module>
+        <module>won-matcher</module>
     </modules>
     <build>
         <pluginManagement>
