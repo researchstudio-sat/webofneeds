@@ -18,6 +18,7 @@ package won.protocol.model;
 
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
 
 @Entity
@@ -50,6 +51,7 @@ public class Match
         '}';
   }
 
+  @XmlTransient
   public Long getId() {
         return id;
     }
