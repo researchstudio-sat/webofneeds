@@ -1,12 +1,13 @@
 #t4c pseudo-namespaces
 @prefix t4c:   		<http://sourceforge.net/projects/t4c/files/owl/simple#> .
+@prefix won:        <http://www.webofneeds.org/model/> .
 @prefix intuit:   	<http://sourceforge.net/projects/t4c/files/owl/intuitive#> .
 
 #freebase
 @prefix fbase: 		<http://rdf.freebase.com/ns/en.>.
 
 #time and timezone:
-@prefix time:  		<http//www.w3.org/2006/time#>.
+@prefix time:  		<http://www.w3.org/2006/time#>.
 @prefix tz:    		<http://www.w3.org/2006/timezone-world#>.
 
 #xml schema
@@ -35,7 +36,7 @@
 # Are these examples instances of the same slot?
 # Here, we keep it simple: anytime before Jan, 1 2011.
 
-[] a t4c:Request;
+[] a won:NeedDescription;
         t4c:autoAccept "true"^^xsd:boolean;
      	t4c:what [
 		a fbase:couch;

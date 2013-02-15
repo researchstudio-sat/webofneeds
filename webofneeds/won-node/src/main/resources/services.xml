@@ -103,6 +103,7 @@
         <property name="needProtocolEndpoint" value="${uri.protocol.need}" />
         <property name="matcherProtocolEndpoint" value="${uri.protocol.matcher}" />
         <property name="ownerProtocolEndpoint" value="${uri.protocol.owner}" />
+        <property name="rdfStorage" ref="rdfStorageRef" />
     </bean>
 
     <bean id="linkedDataRestService" class="won.node.rest.LinkedDataRestService">

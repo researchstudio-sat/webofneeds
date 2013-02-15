@@ -126,7 +126,6 @@ public class NeedInformationServiceImpl implements NeedInformationService {
         return (DataAccessUtils.loadNeed(needRepository, needURI));
     }
 
-    //TODO implement RDF handling!
     @Override
     public Model readNeedContent(final URI needURI) throws NoSuchNeedException {
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");

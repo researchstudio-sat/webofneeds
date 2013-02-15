@@ -4,9 +4,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileManager;
 import org.springframework.beans.factory.annotation.Value;
+import won.protocol.exception.RDFStorageException;
 import won.protocol.model.Need;
 
 import java.io.*;
+import java.nio.file.AccessDeniedException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,14 +32,16 @@ public class RDFFileStorageService implements RDFStorageService {
         try {
             out = new FileOutputStream(new File(path, getFileName(need)));
             graph.write(out, "TTL");
+        } catch (SecurityException se) {
+            throw new RDFStorageException("Check the value of rdf.file.path in the needserver properties file!", se);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw new RDFStorageException("Could not create File!", e);
         } finally {
             if(out != null)
                 try {
                     out.close();
                 } catch (IOException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    throw new RDFStorageException("Could not close File!", e);
                 }
         }
     }
@@ -45,17 +49,17 @@ public class RDFFileStorageService implements RDFStorageService {
     @Override
     public Model loadContent(Need need) {
         InputStream in = null;
+        Model m;
 
         if(path.equals(""))
             path = System.getProperty("java.io.tmpdir");
 
         try {
-            Model m = ModelFactory.createDefaultModel();
+            m = ModelFactory.createDefaultModel();
             // use the FileManager to find the input file
             in = FileManager.get().open(path + "/" + getFileName(need));
             if (in == null) {
-                throw new IllegalArgumentException(
-                        "File: offer.ttl not found");
+                throw new IllegalArgumentException("File: offer.ttl not found");
             }
             m.read(in, null, "TTL");
         } finally {
@@ -63,10 +67,10 @@ public class RDFFileStorageService implements RDFStorageService {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    throw new RDFStorageException("Could not close File!", e);
                 }
         }
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return m;
     }
 
     private String getFileName(Need n) {

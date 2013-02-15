@@ -16,12 +16,10 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.rdf.model.Bag;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.service.LinkedDataService;
@@ -54,6 +52,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String resourceURIPrefix;
   //prefix for human readable pages
   private String pageURIPrefix;
+  private RDFStorageService rdfStorage;
 
 
   private String needProtocolEndpoint;
@@ -105,13 +104,21 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Need need = needInformationService.readNeed(needUri);
     Model model = ModelFactory.createDefaultModel();
     model.setNsPrefixes(PREFIX_MAPPING);
-    model.createResource(needUri.toString())
+    Resource mainNeedNode = model.createResource(needUri.toString())
         .addProperty(WON.STATE, need.getState().name())
         .addProperty(WON.HAS_CONNECTIONS, model.createResource(needUri + "/connections/"))
         .addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
         .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
         .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint))
     ;
+    Model contentModel =  rdfStorage.loadContent(need);
+    model.add(contentModel);
+    //identify the outer blank node in the content model and link it to the needURI node
+    ResIterator it = contentModel.listSubjectsWithProperty(RDF.type, WON.NEED_DESCRIPTION);
+    if (it.hasNext()){
+        Resource mainContentNode = it.next();
+        model.add(model.createStatement(mainNeedNode, WON.HAS_CONTENT, mainContentNode));
+    }
     return model;
   }
 
@@ -194,4 +201,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
   {
     this.pageURIPrefix = pageURIPrefix;
   }
+
+    public void setRdfStorage(RDFStorageService rdfStorage) {
+        this.rdfStorage = rdfStorage;
+    }
 }

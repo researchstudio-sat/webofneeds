@@ -25,6 +25,7 @@ import com.hp.hpl.jena.rdf.model.Property;
  * Date: 20.11.12
  */
 public class WON {
+    //TODO change URI style to '#' style for the ontology
     public static final String BASE_URI = "http://www.webofneeds.org/model/";
 
     /** returns the URI for this schema
@@ -42,6 +43,7 @@ public class WON {
 
     }
 
+    public static final Property NEED_DESCRIPTION = m.createProperty(BASE_URI + "NeedDescription");
     public static final Property HAS_CONNECTIONS = m.createProperty(BASE_URI + "hasConnections");
     public static final Property STATE = m.createProperty(BASE_URI + "state");
     public static final Property TEXT_DESCRIPTION = m.createProperty(BASE_URI + "textDescription");
@@ -52,7 +54,5 @@ public class WON {
     public static final Property NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI + "needProtocolEndpoint");
     public static final Property MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI + "matcherProtocolEndpoint");
     public static final Property OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI + "ownerProtocolEndpoint");
-
-
-
+    public static final Property HAS_CONTENT = m.createProperty(BASE_URI + "hasContent");
 }

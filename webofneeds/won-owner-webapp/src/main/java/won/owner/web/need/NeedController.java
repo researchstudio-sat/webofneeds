@@ -1,7 +1,10 @@
 package won.owner.web.need;
 
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ResIterator;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.util.FileManager;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,7 @@ import won.protocol.exception.*;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
+import won.protocol.model.WON;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
@@ -107,7 +111,13 @@ public class NeedController {
                         "File: offer.ttl not found");
             }
             m.read(in, null, "TTL");
+
             in.close();
+            ResIterator it = m.listSubjectsWithProperty(RDF.type, WON.NEED_DESCRIPTION);
+            if (it.hasNext()){
+                Resource mainContentNode = it.next();
+                m.add(m.createStatement(mainContentNode, WON.TEXT_DESCRIPTION, needPojo.getTextDescription()));
+            }
 
             if(needPojo.getWonNode().equals("")) {
                 needURI = ownerService.createNeed(ownerURI, m, needPojo.isActive());
