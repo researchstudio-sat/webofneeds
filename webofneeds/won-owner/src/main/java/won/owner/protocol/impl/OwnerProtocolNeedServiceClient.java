@@ -1,6 +1,7 @@
 package won.owner.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.owner.service.impl.URIService;
@@ -13,6 +14,8 @@ import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -268,8 +271,11 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
         logger.info(MessageFormat.format("need-facing: READ_NEED_CONTENT called for need {0}", needURI));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy =getOwnerProtocolEndpointForNeed(needURI);
-            //TODO: Fix Models
-            return null;//proxy.readNeedContent(needURI);
+            Model m = ModelFactory.createDefaultModel();
+
+            StringReader sr = new StringReader(proxy.readNeedContent(needURI));
+            m.read(sr, null, "TTL");
+            return m;
         } catch (MalformedURLException e) {
             logger.warn("couldn't create URL for needProtocolEndpoint", e);
         } 
@@ -305,7 +311,11 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
         logger.info(MessageFormat.format("need-facing: CREATE_NEED called for need {0}, with content {1} and activate {2}", ownerURI, content, activate));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed(wonURI);
-            return proxy.createNeed(ownerURI, "", activate);
+
+            StringWriter sw = new StringWriter();
+            content.write(sw, "TTL");
+
+            return proxy.createNeed(ownerURI, sw.toString(), activate);
         } catch (MalformedURLException e) {
             logger.warn("couldn't create URL for needProtocolEndpoint", e);
         } catch (NoSuchNeedException e) {
@@ -319,7 +329,11 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
         logger.info(MessageFormat.format("need-facing: CREATE_NEED called for need {0}, with content {1} and activate {2}", ownerURI, content, activate));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed();
-            return proxy.createNeed(ownerURI, "", activate);
+
+            StringWriter sw = new StringWriter();
+            content.write(sw, "TTL");
+
+            return proxy.createNeed(ownerURI, sw.toString(), activate);
         } catch (MalformedURLException e) {
             logger.warn("couldn't create URL for needProtocolEndpoint", e);
         } catch (NoSuchNeedException e) {

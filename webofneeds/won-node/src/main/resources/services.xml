@@ -24,7 +24,8 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-
+    <!--- RDF Storage -->
+    <bean id="rdfStorageRef" class="won.node.service.impl.RDFFileStorageService" />
 
     <!-- protocol-level services -->
 
@@ -60,6 +61,7 @@
 
     <bean id="needInformationService" class="won.node.service.impl.NeedInformationServiceImpl">
         <property name="pageSize" value="${linkeddata.pagesize}" />
+        <property name="rdfStorage" ref="rdfStorageRef" />
     </bean>
 
     <bean id="needManagementService" class="won.node.service.impl.NeedManagementServiceImpl">
@@ -67,6 +69,7 @@
         <property name="needInformationService" ref="needInformationService"/>
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
         <property name="URIService" ref="uriService" />
+        <property name="rdfStorage" ref="rdfStorageRef" />
     </bean>
 
     <bean id="needFacingConnectionCommunicationService"
@@ -100,6 +103,7 @@
         <property name="needProtocolEndpoint" value="${uri.protocol.need}" />
         <property name="matcherProtocolEndpoint" value="${uri.protocol.matcher}" />
         <property name="ownerProtocolEndpoint" value="${uri.protocol.owner}" />
+        <property name="rdfStorage" ref="rdfStorageRef" />
     </bean>
 
     <bean id="linkedDataRestService" class="won.node.rest.LinkedDataRestService">

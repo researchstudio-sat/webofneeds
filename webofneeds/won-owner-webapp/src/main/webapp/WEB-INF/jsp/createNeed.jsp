@@ -26,6 +26,10 @@
                 <td><form:input path="wonNode" /></td>
             </tr>
             <tr>
+                <td>Text description:</td>
+                <td><form:textarea path="textDescription" rows="5" cols="30" /></td>
+            </tr>
+            <tr>
                 <td colspan="2">
                     <input type="submit" value="Submit"/>
                 </td>
