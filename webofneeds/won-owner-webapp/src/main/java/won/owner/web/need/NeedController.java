@@ -26,6 +26,7 @@ import won.protocol.repository.NeedRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;

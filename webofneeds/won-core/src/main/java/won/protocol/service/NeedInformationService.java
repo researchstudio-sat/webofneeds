@@ -87,6 +87,8 @@ public interface NeedInformationService {
     /**
      * Read general information about the need.
      *
+     *
+     *
      * @param needURI
      * @return
      * @throws NoSuchNeedException
@@ -96,6 +98,8 @@ public interface NeedInformationService {
     /**
      * Retrieves the public description of the need as an RDF graph.
      * TODO: this is a simulation of the linked data interface, which we'll develop later
+     *
+     *
      *
      *
      * @param needURI
@@ -116,6 +120,8 @@ public interface NeedInformationService {
 
     /**
      * Retrieves the public description of the connection as an RDF graph.
+     *
+     *
      *
      *
      * @param connectionURI

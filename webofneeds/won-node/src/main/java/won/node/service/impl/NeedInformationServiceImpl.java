@@ -42,6 +42,7 @@ import java.util.List;
 @Component
 public class NeedInformationServiceImpl implements NeedInformationService {
 
+    private RDFStorageService rdfStorage;
     @Autowired
     private NeedRepository needRepository;
     @Autowired
@@ -129,7 +130,7 @@ public class NeedInformationServiceImpl implements NeedInformationService {
     @Override
     public Model readNeedContent(final URI needURI) throws NoSuchNeedException {
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-        return null;
+        return rdfStorage.loadContent(DataAccessUtils.loadNeed(needRepository, needURI));
     }
 
     @Override
@@ -159,5 +160,9 @@ public class NeedInformationServiceImpl implements NeedInformationService {
 
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public void setRdfStorage(RDFStorageService rdfStorage) {
+        this.rdfStorage = rdfStorage;
     }
 }

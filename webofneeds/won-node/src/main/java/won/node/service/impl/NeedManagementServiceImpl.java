@@ -51,6 +51,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
   private NeedInformationService needInformationService;
   private URIService URIService;
+  private RDFStorageService rdfStorage;
 
   @Autowired
   private NeedRepository needRepository;
@@ -58,10 +59,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Autowired
   private MatchRepository matchRepository;
 
-
   @Override
-  public URI createNeed(final URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException
-  {
+  public URI createNeed(final URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException {
     if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
     //TODO: when we have RDF handling, check that the graph is valid here.
 
@@ -72,6 +71,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
     //now, create the need URI and save again
     need.setNeedURI(URIService.createNeedURI(need));
     need = needRepository.saveAndFlush(need);
+    rdfStorage.storeContent(need, content);
+
     return need.getNeedURI();
   }
 
@@ -147,4 +148,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
   {
     this.matchRepository = matchRepository;
   }
+
+    public void setRdfStorage(RDFStorageService rdfStorage) {
+        this.rdfStorage = rdfStorage;
+    }
 }

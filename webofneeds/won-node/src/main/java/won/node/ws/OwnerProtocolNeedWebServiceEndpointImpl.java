@@ -18,6 +18,7 @@ package won.node.ws;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,8 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.servlet.ServletContext;
 import javax.xml.ws.WebServiceContext;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Collection;
 
@@ -77,7 +80,11 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
         //TODO: remove this workaround when we have the linked data service running
         wireDependenciesLazily();
         Model ret = ownerProtocolNeedService.readNeedContent(needURI);
-        return (ret != null) ? ret.toString() : null;
+
+        StringWriter sw = new StringWriter();
+        ret.write(sw, "TTL");
+
+        return (ret != null) ? sw.toString() : null;
     }
 
     @WebMethod
@@ -155,9 +162,12 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     @WebMethod
     public URI createNeed(@WebParam(name = "ownerURI") final URI ownerURI, @WebParam(name = "content") final String content, @WebParam(name = "activate") final boolean activate) throws IllegalNeedContentException {
         wireDependenciesLazily();
-        //TODO: when we start processing RDF, create Graph here!
 
-        return ownerProtocolNeedService.createNeed(ownerURI, null, activate);
+        Model m = ModelFactory.createDefaultModel();
+        StringReader sr = new StringReader(content);
+        m.read(sr, null, "TTL");
+
+        return ownerProtocolNeedService.createNeed(ownerURI, m, activate);
     }
 
     @WebMethod(exclude = true)
