@@ -151,7 +151,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
     Model model = ModelFactory.createDefaultModel();
     model.setNsPrefixes(PREFIX_MAPPING);
-    Bag connections = model.createBag();
+    Bag connections = model.createBag(needURI.toString()+"/connections/");
     for (URI connURI : uris) {
       connections.add(model.createResource(connURI.toString()));
     }
