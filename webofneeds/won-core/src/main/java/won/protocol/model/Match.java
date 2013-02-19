@@ -51,8 +51,8 @@ public class Match
         '}';
   }
 
-  @XmlTransient
-  public Long getId() {
+    @XmlTransient
+    public Long getId() {
         return id;
     }
 
