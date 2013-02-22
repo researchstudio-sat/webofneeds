@@ -73,9 +73,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
     } else {
       uris = needInformationService.listNeedURIs();
     }
+    String needListURI = this.needResourceURIPrefix;
     Model model = ModelFactory.createDefaultModel();
     model.setNsPrefixes(PREFIX_MAPPING);
-    Bag needs = model.createBag();
+    Bag needs = model.createBag(needListURI);
     for (URI needURI : uris) {
       needs.add(model.createResource(needURI.toString()));
     }
@@ -90,9 +91,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
     } else {
       uris = needInformationService.listConnectionURIs();
     }
+    String connectionListURI = this.connectionResourceURIPrefix;
     Model model = ModelFactory.createDefaultModel();
     model.setNsPrefixes(PREFIX_MAPPING);
-    Bag connections = model.createBag();
+    Bag connections = model.createBag(connectionListURI);
     for (URI connectionURI : uris) {
       connections.add(model.createResource(connectionURI.toString()));
     }
@@ -149,7 +151,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
     Model model = ModelFactory.createDefaultModel();
     model.setNsPrefixes(PREFIX_MAPPING);
-    Bag connections = model.createBag();
+    Bag connections = model.createBag(needURI.toString()+"/connections/");
     for (URI connURI : uris) {
       connections.add(model.createResource(connURI.toString()));
     }

@@ -20,6 +20,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
 
 /**
@@ -44,6 +45,7 @@ public class Need
   @Column( name = "ownerURI" )
   private URI ownerURI;
 
+  @XmlTransient
   public Long getId() {
       return id;
   }
