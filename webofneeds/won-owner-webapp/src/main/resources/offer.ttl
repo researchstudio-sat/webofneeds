@@ -1,7 +1,6 @@
 #t4c pseudo-namespaces
 @prefix t4c:   		<http://sourceforge.net/projects/t4c/files/owl/simple#> .
 @prefix won:        <http://www.webofneeds.org/model/> .
-@prefix :        <http://www.webofneeds.org/model/temp> .
 @prefix intuit:   	<http://sourceforge.net/projects/t4c/files/owl/intuitive#> .
 
 #freebase
@@ -37,23 +36,28 @@
 # Are these examples instances of the same slot?
 # Here, we keep it simple: anytime before Jan, 1 2011.
 
-:desc a won:NeedDescription;
+[] a won:NeedDescription;
         t4c:autoAccept "true"^^xsd:boolean;
-     	t4c:what :object.
-  		:object a fbase:couch.
-:desc	t4c:when :when.
-	:when	a time:Instant ;
-		time:before :before.
-		:before	time:inDateTime :time1.
-		:time1 a time:DateTimeDescription;
+     	t4c:what [
+		a fbase:couch;
+	];
+	t4c:when [
+		a time:Instant ;
+		time:before [
+			time:inDateTime [
+				a time:DateTimeDescription ;
 				time:unitType time:unitMinute ;
 				time:minute 0 ;
 				time:hour 0 ;
 				time:day 1 ;
 				time:month 1 ;
 				time:timeZone tz:ATZ ;
-				time:year 2011 .
-:desc	t4c:where :where .
-:where a geo:Point ;
-		geo:latitude 48.217883 ;
-		geo:longitude 16.390475 .
+				time:year 2011
+			]
+		]
+	];
+	t4c:where [
+		a geo:Point;
+		geo:latitude 48.217883;
+		geo:longitude 16.390475;
+	].
