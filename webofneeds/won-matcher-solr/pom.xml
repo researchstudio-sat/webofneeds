@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>webofneeds</artifactId>
+        <groupId>webofneeds</groupId>
+        <version>0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>won-matcher-solr</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr</artifactId>
+            <version>${solr.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-core</artifactId>
+            <version>${solr.version}</version>
+        </dependency>
+
+
+    </dependencies>
+
+    <build>
+        <finalName>solr</finalName>
+        <filters>
+            <filter>src/main/profiles/config.properties</filter>
+        </filters>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <configuration>
+                    <files>
+                        <!-- Properties are read from profile specific property file -->
+                        <file>src/main/profiles/config.properties</file>
+                    </files>
+                </configuration>
+                <executions>
+                    <!-- Load properties for the default lifecycle -->
+                    <execution>
+                        <id>default-lifecycle-properties</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                    </execution>
+                    <!-- Load properties for the clean lifecycle -->
+                    <execution>
+                        <id>clean-lifecycle-properties</id>
+                        <phase>pre-clean</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.goldin</groupId>
+                <artifactId>copy-maven-plugin</artifactId>
+                <version>0.2.5</version>
+                <executions>
+                    <!-- Copy Solr configuration file when compile phase is executed -->
+                    <execution>
+                        <id>copy-solr-config</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <!--
+                                    Copies solr.xml to correct directory and applies properties
+                                    filtering to it.
+                                -->
+                                <resource>
+                                    <directory>${project.basedir}/src/main/resources</directory>
+                                    <filtering>true</filtering>
+                                    <targetPath>${solr.home.directory}</targetPath>
+                                    <includes>
+                                        <include>solr.xml</include>
+                                    </includes>
+                                </resource>
+                                <!-- Copies configuration files -->
+                                <resource>
+                                    <directory>${project.basedir}/src/main/config</directory>
+                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf</targetPath>
+                                    <excludes>
+                                        <exclude>lang</exclude>
+                                        <exclude>velocity</exclude>
+                                        <exclude>xslt</exclude>
+                                    </excludes>
+                                </resource>
+                                <!-- Copies language specific configuration files -->
+                                <resource>
+                                    <directory>${project.basedir}/src/main/config/lang</directory>
+                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf/lang</targetPath>
+                                </resource>
+                                <!-- Copy Velocity macros and other files -->
+                                <resource>
+                                    <directory>${project.basedir}/src/main/config/velocity</directory>
+                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf/velocity</targetPath>
+                                </resource>
+                                <!-- Copy XSL style sheets -->
+                                <resource>
+                                    <directory>${project.basedir}/src/main/config/xslt</directory>
+                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf/xslt</targetPath>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <!-- Delete Solr configuration files clean clean phase is executed -->
+                    <execution>
+                        <id>clean-solr</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <failIfNotFound>false</failIfNotFound>
+                            <resources>
+                                <!-- Clean the overlays directory from the project root directory -->
+                                <resource>
+                                    <clean>true</clean>
+                                    <cleanEmptyDirectories>true</cleanEmptyDirectories>
+                                    <directory>${project.basedir}/overlays</directory>
+                                    <includes>
+                                        <include>**/**</include>
+                                    </includes>
+                                </resource>
+                                <!-- Remove the solr.xml file -->
+                                <resource>
+                                    <clean>true</clean>
+                                    <directory>${solr.home.directory}</directory>
+                                    <includes>
+                                        <include>solr.xml</include>
+                                    </includes>
+                                </resource>
+                                <!-- Remove the conf directory -->
+                                <resource>
+                                    <clean>true</clean>
+                                    <cleanEmptyDirectories>true</cleanEmptyDirectories>
+                                    <directory>${solr.home.directory}/${solr.default.core.directory}</directory>
+                                    <includes>
+                                        <include>conf</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>8.1.8.v20121106</version>
+                <configuration>
+                    <stopPort>9966</stopPort>
+                    <stopKey>stop</stopKey>
+                    <connectors>
+                        <!-- Listen to port 8983 -->
+                        <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+                            <port>8984</port>
+                            <maxIdleTime>60000</maxIdleTime>
+                        </connector>
+                    </connectors>
+                    <!-- Read system properties from profile specific configuration file -->
+                    <systemPropertiesFile>${project.basedir}/src/main/profiles/config.properties</systemPropertiesFile>
+                    <webApp>
+                        <contextPath>/solr</contextPath>
+                    </webApp>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
