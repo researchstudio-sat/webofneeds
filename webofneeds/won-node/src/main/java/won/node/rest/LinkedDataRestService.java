@@ -55,8 +55,6 @@ import java.net.URI;
  *
  * 5.3.5 server initiated paging is a good idea (see 5.3.5.1 )
  *
- * 5.3.6 support paging (see .1,.2,.3)
- *
  * 5.3.7 ordering
  *
  */
