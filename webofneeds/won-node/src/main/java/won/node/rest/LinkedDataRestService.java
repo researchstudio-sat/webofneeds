@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.service.LinkedDataService;
+import won.protocol.util.HTTP;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -21,6 +22,44 @@ import java.net.URI;
  * @author Florian Kleedorfer
  */
 
+/**
+ * TODO: check the working draft here and see to conformance:
+ * http://www.w3.org/TR/ldp/
+ * Not met yet:
+ *
+ * 4.1.13 LDPR server responses must contain accurate response ETag header values.
+ *
+ * add dcterms:modified and dcterms:creator
+ *
+ * 4.4 HTTP PUT - we don't support that. especially:
+ * 4.4.1 If HTTP PUT is performed ... (we do that using the owner protocol)
+ *
+ * 4.4.2 LDPR clients should use the HTTP If-Match header and HTTP ETags to ensure ...
+ *
+ * 4.5 HTTP DELETE - we don't support that.
+ *
+ * 4.6 HTTP HEAD - do we support that?
+ *
+ * 4.7 HTTP PATCH - we don't support that.
+ *
+ * 4.8 Common Properties - use common properties!!
+ *
+ * 5.1.2 Retrieving Only Non-member Properties - not supported (would have to be changed in LinkedDataServiceImpl
+ *
+ *  see 5.3.2 LDPC - send 404 when non-member-properties is not supported...
+ *
+ *
+ * 5.3.3 first page request: if a Request-URI of “<containerURL>?firstPage” is not supported --> 404
+ *
+ * 5.3.4 support the firstPage query param
+ *
+ * 5.3.5 server initiated paging is a good idea (see 5.3.5.1 )
+ *
+ * 5.3.6 support paging (see .1,.2,.3)
+ *
+ * 5.3.7 ordering
+ *
+ */
 @Path("/") //the servlet-mapping defines where this root path is published externally
 public class LinkedDataRestService {
     final Logger logger = LoggerFactory.getLogger(getClass());
@@ -75,7 +114,7 @@ public class LinkedDataRestService {
             @DefaultValue("-1") @QueryParam("page") int page) {
         logger.debug("listNeedURIs() called");
         Model model = linkedDataService.listNeedURIs(page);
-        return Response.ok(model).build();
+      return addLocationHeaderIfNecessary(Response.ok(model), uriInfo.getRequestUri(), URI.create(this.needResourceURIPrefix)).build();
     }
 
     @GET
@@ -86,7 +125,7 @@ public class LinkedDataRestService {
             @DefaultValue("-1") @QueryParam("page") int page) {
         logger.debug("listNeedURIs() called");
         Model model = linkedDataService.listConnectionURIs(page);
-        return Response.ok(model).build();
+      return addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), URI.create(this.connectionResourceURIPrefix)).build();
     }
 
 
@@ -100,7 +139,7 @@ public class LinkedDataRestService {
         URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
         try {
             Model model = linkedDataService.getNeedModel(needUri);
-            return Response.ok(model).build();
+          return addLocationHeaderIfNecessary(Response.ok(model), uriInfo.getRequestUri(), needUri).build();
         } catch (NoSuchNeedException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -117,8 +156,9 @@ public class LinkedDataRestService {
         URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
 
         try {
-            Model model = linkedDataService.getConnectionModel(connectionUri);
-            return Response.ok(model).build();
+          Model model = linkedDataService.getConnectionModel(connectionUri);
+          return addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), connectionUri).build();
+
         } catch (NoSuchConnectionException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -133,14 +173,32 @@ public class LinkedDataRestService {
             @PathParam("identifier") String identifier,
             @DefaultValue("-1") @QueryParam("page") int page) {
         logger.debug("readConnectionsOfNeed() called");
-        URI needURI = URI.create(this.needResourceURIPrefix + "/" + identifier);
+        URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
 
         try {
-            Model model = linkedDataService.listConnectionURIs(page, needURI);
-            return Response.ok(model).build();
+            Model model = linkedDataService.listConnectionURIs(page, needUri);
+            return addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), needUri).build();
         } catch (NoSuchNeedException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+    }
+
+  /**
+   * Checks if the actual URI is the same as the canonical URI; if not, adds a Location header to the response builder
+   * indicating the canonical URI.
+   * @param builder
+   * @param actualURI
+   * @param canonicalURI
+   * @return
+   */
+    private Response.ResponseBuilder addLocationHeaderIfNecessary(Response.ResponseBuilder builder, URI actualURI, URI canonicalURI){
+      if(!canonicalURI.resolve(actualURI).equals(canonicalURI)) {
+        //the request URI is the canonical URI, it may be a DNS alias or relative
+        //according to http://www.w3.org/TR/ldp/#general we have to include
+        //the canonical URI in the lcoation header here
+        return builder.header(HTTP.HEADER_LOCATION, canonicalURI.toString());
+      }
+      return builder;
     }
 
 
