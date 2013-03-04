@@ -59,6 +59,8 @@ public class TextDescriptionMatcher {
         MoreLikeThis mlt = new MoreLikeThis(ir);
         mlt.setMinDocFreq(1);
         mlt.setMinTermFreq(1);
+        mlt.setMinWordLen(1);
+        mlt.setFieldNames(new String[]{"ntriple"});
         Query query = null;
         TopDocs tdocs = null;
 
@@ -66,17 +68,19 @@ public class TextDescriptionMatcher {
             for(int i = 0; i < si.maxDoc(); i++) {
                 try {
                     query = mlt.like(i);
+                    //logger.info("doc:" + ir.document(i).get("url"));
                     //TODO: improve search request
                     tdocs = si.search(query, 1);
                     if(tdocs.totalHits > 0) {
-                        logger.info("MaxScore: " + tdocs.getMaxScore());
-                        logger.info("Field-price: " +  ir.document(tdocs.scoreDocs[0].doc).get("price"));
-                       // logger.info("Field-ntriples: " +  ir.document(tdocs.scoreDocs[0].doc).get("ntriples"));
-                        /*
+                        //logger.info("MaxScore: " + tdocs.getMaxScore());
+                        //logger.info("Field-price: " +  ir.document(tdocs.scoreDocs[0].doc).get("price"));
+                        //logger.info("Field-ntriples: " +  ir.document(tdocs.scoreDocs[0].doc).get("ntriple"));
+
                         try {
-                            client.hint(new URI(ir.document(i).get("URI")),
-                                    new URI(ir.document(tdocs.scoreDocs[0].doc).get("URI")),
-                                    tdocs.scoreDocs[0].score,  new URI("http://LDSpiderMatcher.webofneeds"));
+                            URI fromURI = new URI(ir.document(i).get("url"));
+                            URI toURI = new URI(ir.document(tdocs.scoreDocs[0].doc).get("url"));
+                            logger.info("Match: " + fromURI + " to " + toURI + ", score: " + tdocs.getMaxScore());
+                            client.hint(fromURI, toURI, tdocs.scoreDocs[0].score,  new URI("http://LDSpiderMatcher.webofneeds"));
                         } catch (NoSuchNeedException e) {
                             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                         } catch (IllegalMessageForNeedStateException e) {
@@ -84,7 +88,7 @@ public class TextDescriptionMatcher {
                         } catch (URISyntaxException e) {
                             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                         }
-                        */
+
                     } else {
                         logger.info("Not found!!");
                     }
