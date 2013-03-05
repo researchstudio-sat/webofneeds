@@ -56,7 +56,6 @@ public class TextDescriptionMatcher {
         MoreLikeThis mlt = new MoreLikeThis(ir);
         mlt.setMinDocFreq(1);
         mlt.setMinTermFreq(1);
-        mlt.setMinWordLen(1);
         mlt.setFieldNames(new String[]{"ntriple"});
         Query query = null;
         TopDocs tdocs = null;
@@ -65,26 +64,29 @@ public class TextDescriptionMatcher {
             for(int i = 0; i < si.maxDoc(); i++) {
                 try {
                     query = mlt.like(i);
+                  String fromUriString = ir.document(i).get("url");
                     //logger.info("doc:" + ir.document(i).get("url"));
                     //TODO: improve search request
-                    tdocs = si.search(query, 3);
+                    tdocs = si.search(query,10);
                     if(tdocs.totalHits > 0) {
                         //logger.info("MaxScore: " + tdocs.getMaxScore());
                         //logger.info("Field-price: " +  ir.document(tdocs.scoreDocs[0].doc).get("price"));
                         //logger.info("Field-ntriples: " +  ir.document(tdocs.scoreDocs[0].doc).get("ntriple"));
 
                         try {
-                            String fromUriString = ir.document(i).get("url");
+
                             fromUriString = fromUriString.replaceAll("^<","").replaceAll(">$","");
                             URI fromURI = new URI(fromUriString);
 
                             String toUriString = ir.document(tdocs.scoreDocs[0].doc).get("url");
                             toUriString = toUriString.replaceAll("^<","").replaceAll(">$","");
                             URI toURI = new URI(toUriString);
+                            if (fromURI.equals(toURI)) continue;
 
-                            double score = tdocs.scoreDocs[0].score / 100000; //TODO fix this hack! how do we keep the score in (0,1)?
+                            double score = tdocs.scoreDocs[0].score / 1000; //TODO fix this hack! how do we keep the score in (0,1)?
                             String matchKey = fromURI.toString() + " <=> " + toURI.toString();
-                            if (this.knownMatches.contains(matchKey)){
+                            String matchKey2 = toURI.toString() + " <=> " + fromURI.toString();
+                            if (this.knownMatches.contains(matchKey) || this.knownMatches.contains(matchKey2)){
                               logger.info("ignoring known match: " + matchKey);
                             } else {
                               //add the match key before sending the hint!
@@ -92,6 +94,7 @@ public class TextDescriptionMatcher {
                               logger.info("new match: " + matchKey);
                               logger.info("sending hint..");
                               client.hint(fromURI, toURI, score,  new URI("http://LDSpiderMatcher.webofneeds"));
+                              client.hint(toURI, fromURI, score,  new URI("http://LDSpiderMatcher.webofneeds"));
                               logger.info("hint sent.");
                             }
                         } catch (NoSuchNeedException e) {
@@ -105,7 +108,7 @@ public class TextDescriptionMatcher {
                         }
 
                     } else {
-                        logger.info("Not found!!");
+                        logger.info("Nothing found similar to " + fromUriString );
                     }
                 } catch (IOException e) {
                     logger.warn("Could not generate similarity query with document " + i + "!", e);  //To change body of catch statement use File | Settings | File Templates.
