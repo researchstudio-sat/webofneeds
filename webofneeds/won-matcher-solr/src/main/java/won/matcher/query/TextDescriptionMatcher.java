@@ -1,14 +1,9 @@
 package won.matcher.query;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similar.MoreLikeThis;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
@@ -19,9 +14,10 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.rest.LinkedDataRestClient;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,6 +30,7 @@ public class TextDescriptionMatcher {
     Logger logger;
     SolrCore solrCore;
     MatcherProtocolNeedServiceClient client;
+    private Set<String> knownMatches = new HashSet();
 
     public TextDescriptionMatcher(SolrCore solrCore) {
         this.solrCore = solrCore;
@@ -70,23 +67,41 @@ public class TextDescriptionMatcher {
                     query = mlt.like(i);
                     //logger.info("doc:" + ir.document(i).get("url"));
                     //TODO: improve search request
-                    tdocs = si.search(query, 1);
+                    tdocs = si.search(query, 3);
                     if(tdocs.totalHits > 0) {
                         //logger.info("MaxScore: " + tdocs.getMaxScore());
                         //logger.info("Field-price: " +  ir.document(tdocs.scoreDocs[0].doc).get("price"));
                         //logger.info("Field-ntriples: " +  ir.document(tdocs.scoreDocs[0].doc).get("ntriple"));
 
                         try {
-                            URI fromURI = new URI(ir.document(i).get("url"));
-                            URI toURI = new URI(ir.document(tdocs.scoreDocs[0].doc).get("url"));
-                            logger.info("Match: " + fromURI + " to " + toURI + ", score: " + tdocs.getMaxScore());
-                            client.hint(fromURI, toURI, tdocs.scoreDocs[0].score,  new URI("http://LDSpiderMatcher.webofneeds"));
+                            String fromUriString = ir.document(i).get("url");
+                            fromUriString = fromUriString.replaceAll("^<","").replaceAll(">$","");
+                            URI fromURI = new URI(fromUriString);
+
+                            String toUriString = ir.document(tdocs.scoreDocs[0].doc).get("url");
+                            toUriString = toUriString.replaceAll("^<","").replaceAll(">$","");
+                            URI toURI = new URI(toUriString);
+
+                            double score = tdocs.scoreDocs[0].score / 100000; //TODO fix this hack! how do we keep the score in (0,1)?
+                            String matchKey = fromURI.toString() + " <=> " + toURI.toString();
+                            if (this.knownMatches.contains(matchKey)){
+                              logger.info("ignoring known match: " + matchKey);
+                            } else {
+                              //add the match key before sending the hint!
+                              this.knownMatches.add(matchKey);
+                              logger.info("new match: " + matchKey);
+                              logger.info("sending hint..");
+                              client.hint(fromURI, toURI, score,  new URI("http://LDSpiderMatcher.webofneeds"));
+                              logger.info("hint sent.");
+                            }
                         } catch (NoSuchNeedException e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            logger.warn("Hint failed: no such need", e);
                         } catch (IllegalMessageForNeedStateException e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            logger.warn("Hint failed: illegal message for need state", e);
                         } catch (URISyntaxException e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            logger.warn("Hint failed: illegal URI", e);
+                        } catch (Exception e){
+                          logger.warn("Hint failed.", e);
                         }
 
                     } else {
