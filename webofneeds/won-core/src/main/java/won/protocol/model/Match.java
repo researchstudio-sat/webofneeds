@@ -18,7 +18,6 @@ package won.protocol.model;
 
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
 
 @Entity
@@ -51,7 +50,8 @@ public class Match
         '}';
   }
 
-    @XmlTransient
+    // TODO: we rely on the id being marshalled in the current owner implementation, but this is not neccessary
+    // it would be better to make this field @XmlTransient
     public Long getId() {
         return id;
     }
