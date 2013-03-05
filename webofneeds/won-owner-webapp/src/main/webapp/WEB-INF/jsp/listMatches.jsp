@@ -20,7 +20,7 @@
     <c:forEach var="match" items="${matches}">
         <tr>
             <td>${match.id}</td>
-            <td>${match.toNeed}</td>
+            <td><a href="${match.toNeed}" target="_blank"> ${match.toNeed} </a></td>
             <td>${match.score}</td>
             <td>
                 <button onclick="jQuery.post('/owner/need/match/${match.id}/connect');" >connect</button>
