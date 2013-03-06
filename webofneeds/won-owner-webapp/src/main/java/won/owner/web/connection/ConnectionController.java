@@ -80,10 +80,11 @@ public class ConnectionController {
                     model.addAttribute("messages", chatMessageRepository.findByLocalConnectionURI(con.getConnectionURI()));
                     return "listMessages";
             }
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+            logger.warn("error reading connection from won node");
+            return "error reading connection from won node: " + e.getMessage();
         }
-        return "noNeedFound";
+      return "noNeedFound";
     }
 
     @RequestMapping(value = "/{conId}/send", method = RequestMethod.POST)
@@ -102,10 +103,9 @@ public class ConnectionController {
             chatMessage.setOriginatorURI(con.getNeedURI());
             //save in the db
             chatMessageRepository.saveAndFlush(chatMessage);
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();
-        } catch (IllegalMessageForConnectionStateException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+          logger.warn("error sending text message");
+          return "error sending text message: " + e.getMessage();
         }
 
         return  "redirect:/connection/" + con.getId().toString();//"viewConnection";
@@ -120,10 +120,9 @@ public class ConnectionController {
         Connection con = cons.get(0);
         try {
             ownerService.accept(con.getConnectionURI());
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IllegalMessageForConnectionStateException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+          logger.warn("error during accept", e);
+          return "error during accept: " + e.getMessage();
         }
 
         return  "redirect:/connection/" + con.getId().toString() + "/body";
@@ -137,10 +136,9 @@ public class ConnectionController {
         Connection con = cons.get(0);
         try {
             ownerService.deny(con.getConnectionURI());
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IllegalMessageForConnectionStateException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+          logger.warn("error during deny", e);
+          return "error during deny: " + e.getMessage();
         }
 
         return  "redirect:/connection/" + con.getId().toString() + "/body";
@@ -154,10 +152,9 @@ public class ConnectionController {
         Connection con = cons.get(0);
         try {
             ownerService.close(con.getConnectionURI());
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IllegalMessageForConnectionStateException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+          logger.warn("error during close", e);
+          return "error during close: " + e.getMessage();
         }
 
         return  "redirect:/connection/" + con.getId().toString();

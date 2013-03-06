@@ -85,7 +85,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
     @Override
     public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.info(MessageFormat.format("need-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
+        logger.debug(MessageFormat.format("need-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
             proxy.sendTextMessage(connectionURI, message);
@@ -108,7 +108,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Override
     public Collection<URI> listNeedURIs() {
-        logger.info("need-facing: LIST_NEED_URIS called");
+        logger.debug("need-facing: LIST_NEED_URIS called");
         try {
 
             OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed();
@@ -135,7 +135,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Override
     public Collection<URI> listNeedURIs(int page) {
-        logger.info(MessageFormat.format("need-facing: LIST_NEED_URIS called for page {0}", page));
+        logger.debug(MessageFormat.format("need-facing: LIST_NEED_URIS called for page {0}", page));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed();
             return Arrays.asList(proxy.listNeedURIs());
@@ -162,7 +162,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Override
     public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException {
-        logger.info(MessageFormat.format("need-facing: LIST_CONNECTION_URIS called for need {0}", needURI));
+        logger.debug(MessageFormat.format("need-facing: LIST_CONNECTION_URIS called for need {0}", needURI));
         try {
            OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForNeed(needURI);
            return Arrays.asList(proxy.listConnectionURIs(needURI));
@@ -177,7 +177,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Override
     public Collection<URI> listConnectionURIs() {
-        logger.info("need-facing: LIST_CONNECTION_URIS called");
+        logger.debug("need-facing: LIST_CONNECTION_URIS called");
         try {
 
             OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed();
@@ -208,7 +208,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Override
     public Collection<URI> listConnectionURIs(int page) {
-        logger.info(MessageFormat.format("need-facing: LIST_CONNECTION_URIS called for page {0}", page));
+        logger.debug(MessageFormat.format("need-facing: LIST_CONNECTION_URIS called for page {0}", page));
         try {
 
             OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed();
@@ -241,7 +241,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Override
     public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException {
-        logger.info(MessageFormat.format("need-facing: LIST_CONNECTION_URIS called for need {0} and page {1}", needURI, page));
+        logger.debug(MessageFormat.format("need-facing: LIST_CONNECTION_URIS called for need {0} and page {1}", needURI, page));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy =getOwnerProtocolEndpointForNeed(needURI);
             //TODO: paging
@@ -256,7 +256,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Override
     public Need readNeed(URI needURI) throws NoSuchNeedException {
-        logger.info(MessageFormat.format("need-facing: READ_NEED called for need {0}", needURI));
+        logger.debug(MessageFormat.format("need-facing: READ_NEED called for need {0}", needURI));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForNeed(needURI);
             return proxy.readNeed(needURI);
@@ -268,7 +268,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Override
     public Model readNeedContent(URI needURI) throws NoSuchNeedException {
-        logger.info(MessageFormat.format("need-facing: READ_NEED_CONTENT called for need {0}", needURI));
+        logger.debug(MessageFormat.format("need-facing: READ_NEED_CONTENT called for need {0}", needURI));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy =getOwnerProtocolEndpointForNeed(needURI);
             Model m = ModelFactory.createDefaultModel();
@@ -284,7 +284,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Override
     public won.protocol.model.Connection readConnection(URI connectionURI) throws NoSuchConnectionException {
-        logger.info(MessageFormat.format("need-facing: READ_CONNECTION called for connection {0}", connectionURI));
+        logger.debug(MessageFormat.format("need-facing: READ_CONNECTION called for connection {0}", connectionURI));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
             return proxy.readConnection(connectionURI);
@@ -296,7 +296,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Override
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException {
-        logger.info(MessageFormat.format("need-facing: READ_CONNECTION_CONTENT called for connection {0}", connectionURI));
+        logger.debug(MessageFormat.format("need-facing: READ_CONNECTION_CONTENT called for connection {0}", connectionURI));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
             //TODO: Fix Models
@@ -366,7 +366,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
     @Override
     public Collection<Match> getMatches(URI needURI) throws NoSuchNeedException {
-        logger.info(MessageFormat.format("need-facing: GET_MATCHES called for need {0}", needURI));
+        logger.debug(MessageFormat.format("need-facing: GET_MATCHES called for need {0}", needURI));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy =getOwnerProtocolEndpointForNeed(needURI);
             return Arrays.asList(proxy.getMatches(needURI));
@@ -382,7 +382,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
     {
         //TODO: fetch endpoint information for the need and store in db?
         URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.OWNER_PROTOCOL_ENDPOINT);
-        logger.info("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
+        logger.debug("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
         if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
         OwnerProtocolNeedWebServiceClient client = new OwnerProtocolNeedWebServiceClient(URI.create(needProtocolEndpoint.toString() + "?wsdl").toURL());
         return client.getOwnerProtocolOwnerWebServiceEndpointPort();
@@ -408,7 +408,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
     {
         //TODO: fetch endpoint information for the need and store in db?
         URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.OWNER_PROTOCOL_ENDPOINT);
-        logger.info("need protocol endpoint of connection {} is {}", connectionURI.toString(), needProtocolEndpoint.toString());
+        logger.debug("need protocol endpoint of connection {} is {}", connectionURI.toString(), needProtocolEndpoint.toString());
         if (needProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
         OwnerProtocolNeedWebServiceClient client = new OwnerProtocolNeedWebServiceClient(URI.create(needProtocolEndpoint.toString() + "?wsdl").toURL());
         return client.getOwnerProtocolOwnerWebServiceEndpointPort();
