@@ -21,7 +21,9 @@ import javax.persistence.*;
 import java.net.URI;
 
 @Entity
-@Table(name = "match")
+@Table(name = "match",
+    uniqueConstraints=@UniqueConstraint(columnNames={"fromNeed", "toNeed","originator"})
+)
 public class Match
 {
     @Id

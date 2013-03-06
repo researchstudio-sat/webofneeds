@@ -16,6 +16,7 @@
 
 package won.protocol.repository;
 
+import org.springframework.data.domain.Sort;
 import won.protocol.model.Match;
 
 import java.net.URI;
@@ -28,4 +29,5 @@ import java.util.List;
 public interface MatchRepository extends WonRepository<Match>
 {
   public List<Match> findByFromNeed(URI fromNeed);
+  public List<Match> findByFromNeed(URI fromNeed,Sort sort);
 }
