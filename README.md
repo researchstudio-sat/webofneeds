@@ -8,9 +8,9 @@ Web of needs tries to fill the gap.
 For further information have a look at: http://webofneeds.org
 
 Web of needs is build up of 
-won-node
-won-owner 
-and matching-service.
+- won-node
+- won-owner 
+- and matching-service.
 
 Requirements for getting started:
 - jdk 1.6 or later
@@ -26,6 +26,7 @@ we come back to existing (old) technology for the matching services:
 __________________________________________________________________________________________
 
 won-node
+=
 All needs and offers will be saved there
 
 won-owner
