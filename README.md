@@ -26,11 +26,10 @@ we come back to existing (old) technology for the matching services:
 __________________________________________________________________________________________
 
 won-node
-==========
-all needs and offers will be saved there
+All needs and offers will be saved there
 
 won-owner
-needs are managed by the won-owner
+Needs are managed by the won-owner
 
 matching-service
-the matching-service crawls the won-nodes and looks for matching need and offer pairs.
+The matching-service crawls the won-nodes and looks for matching need and offer pairs.
