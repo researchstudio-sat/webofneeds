@@ -19,7 +19,7 @@ Requirements for getting started:
 
 To prevent reinventing the wheel every single day, 
 we come back to existing (old) technology for the matching services:
- siren -> http://siren.sindice.com/ 
- triplestore(virtuoso) -> http://virtuoso.openlinksw.com/
- solr, -> http://lucene.apache.org/solr/
- ldspider -> https://code.google.com/p/ldspider/
+- siren -> http://siren.sindice.com/ 
+- triplestore(virtuoso) -> http://virtuoso.openlinksw.com/
+- solr, -> http://lucene.apache.org/solr/
+- ldspider -> https://code.google.com/p/ldspider/
