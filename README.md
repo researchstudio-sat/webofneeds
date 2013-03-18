@@ -32,4 +32,4 @@ won-owner
 - needs are managed by the won-owner
 
 matching-service
-- the matching-service crawls the won-nodes and looks and looks for need and offer entries with corresping values.
+- the matching-service crawls the won-nodes and looks and looks for need and offer entries with corresponding values.
