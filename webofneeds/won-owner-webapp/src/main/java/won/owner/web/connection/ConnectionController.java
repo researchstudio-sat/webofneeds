@@ -65,7 +65,6 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
-            connectionRepository.saveAndFlush(con = ownerService.readConnection(con.getConnectionURI()));
             switch (con.getState()) {
                 case REQUEST_RECEIVED:
                     model.addAttribute("connection", con);
@@ -96,13 +95,6 @@ public class ConnectionController {
 
         try {
             ownerService.sendTextMessage(con.getConnectionURI(), text.getText());
-            ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setCreationDate(new Date());
-            chatMessage.setLocalConnectionURI(con.getConnectionURI());
-            chatMessage.setMessage(text.getText());
-            chatMessage.setOriginatorURI(con.getNeedURI());
-            //save in the db
-            chatMessageRepository.saveAndFlush(chatMessage);
         } catch (Exception e) {
           logger.warn("error sending text message");
           return "error sending text message: " + e.getMessage();

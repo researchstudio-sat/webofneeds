@@ -8,6 +8,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.model.Connection;
+import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.WON;
 import won.protocol.rest.LinkedDataRestClient;
@@ -95,6 +96,16 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
 
     @Override
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

@@ -38,6 +38,7 @@ import java.util.Collection;
  */
 @WebService(serviceName = "ownerProtocol", targetNamespace = "http://www.webofneeds.org/protocol/owner/soap/1.0/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
+//TODO: shouldn't we extend one of our protocol interfaces here?
 public interface OwnerProtocolNeedWebServiceEndpoint
 {
   @WebMethod

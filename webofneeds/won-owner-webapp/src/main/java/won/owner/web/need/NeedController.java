@@ -8,7 +8,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,10 +18,7 @@ import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
 import won.owner.service.impl.URIService;
 import won.protocol.exception.*;
-import won.protocol.model.Match;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
-import won.protocol.model.WON;
+import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
@@ -30,7 +26,6 @@ import won.protocol.repository.NeedRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -93,7 +88,6 @@ public class NeedController {
     @RequestMapping(value = "/create", method = RequestMethod.GET)
     public String createNeedGet(Model model) {
         model.addAttribute("command", new NeedPojo());
-        model.addAttribute("message", "Hello World!");
         return "createNeed";
     }
 
@@ -125,20 +119,19 @@ public class NeedController {
                 needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, m, needPojo.isActive(), needPojo.getWonNode());
             }
 
-            Need need = ownerService.readNeed(needURI);
-            needRepository.saveAndFlush(need);
-            return "redirect:/need/" + need.getId().toString();
+            List<Need> needs = needRepository.findByNeedURI(needURI);
+
+            model.addAttribute("command", new NeedPojo());
+
+            if(needs.size() == 1)
+                return "redirect:/need/" + needs.get(0).getId().toString();
             // return viewNeed(need.getId().toString(), model);
         } catch (IllegalNeedContentException e) {
-            e.printStackTrace();
-        } catch (NoSuchNeedException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        model.addAttribute("command", new NeedPojo());
-        model.addAttribute("message", "Hello World!");
         return "createNeed";
     }
 
@@ -182,11 +175,7 @@ public class NeedController {
             return "noNeedFound";
 
         Need need = needs.get(0);
-        try {
-            model.addAttribute("matches", ownerService.getMatches(need.getNeedURI()));
-        } catch (NoSuchNeedException e) {
-            e.printStackTrace();
-        }
+        model.addAttribute("matches", matchRepository.findByFromNeed(need.getNeedURI()));
 
         return "listMatches";
     }
@@ -214,9 +203,6 @@ public class NeedController {
 
             Need need1 = needs.get(0);
             ownerService.connectTo(need1.getNeedURI(), new URI(needPojo.getNeedURI()), "");
-            for(URI uri : ownerService.listConnectionURIs(need1.getNeedURI()))
-                if(uri != null)
-                    connectionRepository.saveAndFlush(ownerService.readConnection(uri));
             return "redirect:/need/" + need1.getId().toString();//viewNeed(need1.getId().toString(), model);
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -226,8 +212,6 @@ public class NeedController {
             e.printStackTrace();
         } catch (NoSuchNeedException e) {
             e.printStackTrace();
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
         return "noNeedFound";
@@ -242,12 +226,9 @@ public class NeedController {
         try {
             if(need.getState() == NeedState.ACTIVE) {
                 ownerService.deactivate(need.getNeedURI());
-                need.setState(NeedState.INACTIVE);
             } else {
                 ownerService.activate(need.getNeedURI());
-                need.setState(NeedState.ACTIVE);
             }
-            needRepository.saveAndFlush(need);
         } catch (NoSuchNeedException e) {
             e.printStackTrace();
         }
@@ -267,10 +248,6 @@ public class NeedController {
                 if(!needs.isEmpty())
                     ret =  "redirect:/need/" + needs.get(0).getId().toString();//viewNeed(needs.get(0).getId().toString(), model);
                 ownerService.connectTo(match.getFromNeed(), match.getToNeed(), "");
-
-                for(URI uri : ownerService.listConnectionURIs(match.getFromNeed()))
-                    if(uri != null)
-                        connectionRepository.saveAndFlush(ownerService.readConnection(uri));
             }
         } catch (ConnectionAlreadyExistsException e) {
             e.printStackTrace();
@@ -278,9 +255,8 @@ public class NeedController {
             e.printStackTrace();
         } catch (NoSuchNeedException e) {
             e.printStackTrace();
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+
         return ret;
     }
 }

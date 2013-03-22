@@ -71,4 +71,14 @@ public interface LinkedDataService
    * @throws NoSuchNeedException
    */
   public Model listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException;
+
+    /**
+     * Returns a model containing all match uris belonging to the specified need.
+     * If page >=0, paging is used and the respective page is returned.
+     * @param page
+     * @param needURI
+     * @return
+     * @throws NoSuchNeedException
+     */
+  public Model listMatchURIs(int page, URI needURI) throws NoSuchNeedException;
 }
