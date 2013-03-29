@@ -20,6 +20,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
@@ -109,7 +110,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   {
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    return matchRepository.findByFromNeed(need.getNeedURI());
+    return matchRepository.findByFromNeed(need.getNeedURI(),new Sort(Sort.Direction.DESC,"score"));
   }
 
 

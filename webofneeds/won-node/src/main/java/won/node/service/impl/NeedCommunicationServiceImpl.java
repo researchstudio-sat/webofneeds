@@ -33,6 +33,7 @@ import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 import won.protocol.util.DataAccessUtils;
 
+import javax.persistence.PersistenceException;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -103,23 +104,30 @@ public class NeedCommunicationServiceImpl implements
     match.setToNeed(otherNeedURI);
     match.setScore(score);
     match.setOriginator(originator);
-    matchRepository.saveAndFlush(match);
+    try {
+      matchRepository.saveAndFlush(match);
+    } catch (PersistenceException e){
+       //TODO: catch a more specific exception (EntityExistsException?)
+       logger.warn("error while trying to store match", e);
+       return;
+    }
 
     executorService.execute(new Runnable()
     {
       @Override
       public void run()
       {
-        //TODO: somewhere, we'll have to use the need's owner URI to determine where to send the request to..
-        //should we access the database again in the implementation of the owner protocol owner client?
+
         //here, we don't really need to handle exceptions, as we don't want to flood matching services with error messages
 
         try {
           ownerProtocolOwnerService.hintReceived(needURI, otherNeedURI, score, originator);
         } catch (NoSuchNeedException e) {
-          logger.debug("caught NoSuchNeedException:", e);
+          logger.debug("error sending hintReceived message to owner - no such need:", e);
         } catch (IllegalMessageForNeedStateException e) {
-            e.printStackTrace();
+          logger.debug("error sending hintReceived message to owner- illegal need state:", e);
+        } catch (Exception e) {
+          logger.debug("error sending hintReceived message to owner:", e);
         }
 
       }

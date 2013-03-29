@@ -27,10 +27,10 @@ import java.net.URI;
 @Table(name = "connection")
 public class Connection
 {
-    @Id
-    @GeneratedValue
-    @Column( name = "id" )
-    private Long id;
+  @Id
+  @GeneratedValue
+  @Column( name = "id" )
+  private Long id;
   /* The public URI of this connection */
   @Column( name = "connectionURI", unique = true)
   private URI connectionURI;
