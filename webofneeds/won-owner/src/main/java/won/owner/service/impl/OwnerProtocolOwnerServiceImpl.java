@@ -108,21 +108,12 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         logger.info(MessageFormat.format("node-facing: ACCEPT called for connection {0}",connectionURI));
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
-        try {
-            connectionRepository.saveAndFlush(ownerService.readConnection(connectionURI));
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        //TODO: continue here!
         //load connection, checking if it exists
-       // Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        //perform state transit
-        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_ACCEPT);
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        //con.setState(nextState);
+        con.setState(con.getState().transit(ConnectionMessage.OWNER_ACCEPT));
         //save in the db
-        //final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
-
+        connectionRepository.saveAndFlush(con);
     }
 
     @Override
@@ -131,20 +122,12 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         logger.info(MessageFormat.format("node-facing: DENY called for connection {0}",connectionURI));
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
-        try {
-            connectionRepository.saveAndFlush(ownerService.readConnection(connectionURI));
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        //TODO: continue here!
         //load connection, checking if it exists
-        //Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        //perform state transit
-        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_DENY);
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        //con.setState(nextState);
+        con.setState(con.getState().transit(ConnectionMessage.OWNER_DENY));
         //save in the db
-        //final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
+        connectionRepository.saveAndFlush(con);
     }
 
     @Override
@@ -153,20 +136,12 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         logger.info(MessageFormat.format("node-facing: CLOSE called for connection {0}",connectionURI));
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
-        try {
-            connectionRepository.saveAndFlush(ownerService.readConnection(connectionURI));
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        //TODO: continue here!
         //load connection, checking if it exists
-        //Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        //perform state transit
-        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_CLOSE);
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        //con.setState(nextState);
+        con.setState(con.getState().transit(ConnectionMessage.OWNER_CLOSE));
         //save in the db
-        //final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
+        connectionRepository.saveAndFlush(con);
     }
 
     @Override
@@ -185,7 +160,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         chatMessage.setCreationDate(new Date());
         chatMessage.setLocalConnectionURI(con.getConnectionURI());
         chatMessage.setMessage(message);
-        chatMessage.setOriginatorURI(con.getNeedURI());
+        chatMessage.setOriginatorURI(con.getRemoteNeedURI());
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);
     }

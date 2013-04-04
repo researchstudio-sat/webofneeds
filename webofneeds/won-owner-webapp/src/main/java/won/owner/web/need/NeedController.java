@@ -38,7 +38,6 @@ import java.util.List;
  */
 
 @Controller
-//@RequestMapping("/need")
 public class NeedController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -135,19 +134,20 @@ public class NeedController {
         return "createNeed";
     }
 
-
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String listNeeds(Model model) {
 
-       /* List<Need> needs = new ArrayList(needRepository.count());
-        ;
-        if(needs.isEmpty())
-            return "noNeedFound";
-
-        Need need = needs.get(0);  */
         model.addAttribute("needs", needRepository.findAll());
 
         return "listNeeds";
+    }
+
+    @RequestMapping(value = "refresh", method = RequestMethod.GET)
+    public String refresh(Model model) {
+
+        model.addAttribute("needs", needRepository.findAll());
+
+        return "redirect:/need";
     }
 
     @RequestMapping(value = "/{needId}", method = RequestMethod.GET)

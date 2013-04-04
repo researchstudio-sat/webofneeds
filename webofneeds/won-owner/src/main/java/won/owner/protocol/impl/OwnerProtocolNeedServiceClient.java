@@ -341,6 +341,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
             Need need = needs.get(0);
             need.setState(NeedState.ACTIVE);
+            needRepository.saveAndFlush(need);
         } catch (MalformedURLException e) {
             logger.warn("couldn't create URL for needProtocolEndpoint", e);
         } 
@@ -360,6 +361,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
 
             Need need = needs.get(0);
             need.setState(NeedState.INACTIVE);
+            needRepository.saveAndFlush(need);
         } catch (MalformedURLException e) {
             logger.warn("couldn't create URL for needProtocolEndpoint", e);
         } 
