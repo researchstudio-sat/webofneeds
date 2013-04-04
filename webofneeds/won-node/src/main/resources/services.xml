@@ -70,6 +70,7 @@
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
         <property name="URIService" ref="uriService" />
         <property name="rdfStorage" ref="rdfStorageRef" />
+        <property name="xmppServer" ref="xmppServer" />
     </bean>
 
     <bean id="needFacingConnectionCommunicationService"

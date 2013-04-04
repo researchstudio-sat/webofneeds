@@ -35,6 +35,7 @@ import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.util.DataAccessUtils;
+import won.xmpp.WONXmppServer;
 
 import java.net.URI;
 import java.util.Collection;
@@ -53,12 +54,15 @@ public class NeedManagementServiceImpl implements NeedManagementService
   private NeedInformationService needInformationService;
   private URIService URIService;
   private RDFStorageService rdfStorage;
+  private WONXmppServer xmppServer;
 
   @Autowired
   private NeedRepository needRepository;
 
   @Autowired
   private MatchRepository matchRepository;
+
+
 
   @Override
   public URI createNeed(final URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException {
@@ -73,6 +77,9 @@ public class NeedManagementServiceImpl implements NeedManagementService
     need.setNeedURI(URIService.createNeedURI(need));
     need = needRepository.saveAndFlush(need);
     rdfStorage.storeContent(need, content);
+
+    //create xmpp-jabber account
+    xmppServer.registerNewNeed(need);
 
     return need.getNeedURI();
   }
@@ -152,5 +159,9 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
     public void setRdfStorage(RDFStorageService rdfStorage) {
         this.rdfStorage = rdfStorage;
+    }
+
+    public void setXmppServer(WONXmppServer xmppServer) {
+        this.xmppServer = xmppServer;
     }
 }

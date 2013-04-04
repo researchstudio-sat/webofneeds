@@ -67,6 +67,12 @@
             <artifactId>hsqldb</artifactId>
             <version>${org.hsqldb.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-xmpp</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

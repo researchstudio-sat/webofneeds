@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <!--
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements. See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to you under the Apache License, Version
+    2.0 (the "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0 
+    
+    Unless required by applicable law or agreed to in writing, software 
+    distributed under the License is distributed on an "AS IS" BASIS, 
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+    See the License for the specific language governing permissions and 
+    limitations under the License.
+  -->
+
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd" >
+
+    <!--
+    CacheManager Configuration
+    ==========================
+    An ehcache.xml corresponds to a single CacheManager.
+
+    See instructions below or the ehcache schema (ehcache.xsd) on how to configure.
+
+    System property tokens can be specified in this file which are replaced when the configuration
+    is loaded. For example multicastGroupPort=${multicastGroupPort} can be replaced with the
+    System property either from an environment variable or a system property specified with a
+    command line switch such as -DmulticastGroupPort=4446.
+
+    DiskStore configuration
+    =======================
+
+    The diskStore element is optional. To turn off disk store path creation, comment out the diskStore
+    element below.
+
+    Configure it if you have overflowToDisk or diskPersistent enabled for any cache.
+
+    If it is not configured, and a cache is created which requires a disk store, a warning will be
+     issued and java.io.tmpdir will automatically be used.
+
+    diskStore has only one attribute - "path". It is the path to the directory where
+    .data and .index files will be created.
+
+    If the path is one of the following Java System Property it is replaced by its value in the
+    running VM. For backward compatibility these are not specified without being enclosed in the ${token}
+    replacement syntax.
+
+    The following properties are translated:
+    * user.home - User's home directory
+    * user.dir - User's current working directory
+    * java.io.tmpdir - Default temp file path
+    * ehcache.disk.store.dir - A system property you would normally specify on the command line
+      e.g. java -Dehcache.disk.store.dir=/u01/myapp/diskdir ...
+
+    Subdirectories can be specified below the property e.g. java.io.tmpdir/one
+
+    -->
+    <diskStore path="java.io.tmpdir"/>
+
+
+    <!--
+    Mandatory Default Cache configuration. These settings will be applied to caches
+    created programmtically using CacheManager.add(String cacheName).
+
+    The defaultCache has an implicit name "default" which is a reserved cache name.
+    -->
+    <defaultCache
+            maxElementsInMemory="10000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"
+            diskSpoolBufferSizeMB="30"
+            maxElementsOnDisk="10000000"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU"
+            />
+
+    <!--
+    	Caches
+    -->
+
+    <!--
+    	Cache for Presence with Entity as key
+    -->
+    <cache name="PresenceCache"
+           maxElementsInMemory="10000"
+           eternal="true"
+           overflowToDisk="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+	<!--
+    	Cache for Presence with JID as key
+    -->
+    <cache name="JIDCache"
+           maxElementsInMemory="10000"
+           eternal="true"
+           overflowToDisk="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+</ehcache>

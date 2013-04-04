@@ -32,8 +32,12 @@ import org.apache.vysper.xmpp.modules.extension.xep0092_software_version.Softwar
 import org.apache.vysper.xmpp.modules.extension.xep0202_entity_time.EntityTimeModule;
 import org.apache.vysper.xmpp.modules.roster.persistence.MemoryRosterManager;
 import org.apache.vysper.xmpp.server.XMPPServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import won.protocol.model.Need;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -41,9 +45,9 @@ import java.io.FileNotFoundException;
  * User: Ashkan
  * Date: 29.03.13
  */
-public class WONXmppServer{
+public class WONXmppServer implements InitializingBean{
 
-
+    final Logger logger = LoggerFactory.getLogger(getClass());
 
     private String hostname = "sat.at";
     private XMPPServer server;
@@ -60,9 +64,7 @@ public class WONXmppServer{
         server = new XMPPServer(hostname);
         server.addEndpoint(new C2SEndpoint());
         server.addEndpoint(new S2SEndpoint());
-
         server.setStorageProviderRegistry(providerRegistry);
-
         //configuring Modules
         //Change here for additional XMPP features
         server.addModule(new SoftwareVersionModule());
@@ -71,14 +73,15 @@ public class WONXmppServer{
 
         server.addModule(new InBandRegistrationModule()); //under Development ??
 
-        try {
-            server.setTLSCertificateInfo(new File("won-xmpp/src/main/config/bogus_mina_tls.cert"), "boguspw");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+
+        //"won-xmpp/src/main/config/bogus_mina_tls.cert"
+        server.setTLSCertificateInfo(Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream("/config/bogus_mina_tls.cert"), "boguspw");
+
         //for TESTING purpose
         initializeUsers();
     }
+
 
     public void start(){
 
@@ -97,8 +100,8 @@ public class WONXmppServer{
 
     public void registerNewNeed(Need need){
         try {
-            Entity needEntity = EntityImpl.parse("Need_"+need.getId()+"@"+hostname);
-
+            Entity needEntity = EntityImpl.parse("need_"+need.getId()+"@"+hostname);
+            logger.info(String.format("Jabber id %s created!", "need_" + need.getId() + "@" + hostname));
             if(!accountManagement.verifyAccountExists(needEntity)){
                 accountManagement.addUser(needEntity, "password1");
             }
@@ -113,7 +116,7 @@ public class WONXmppServer{
 
     public void deleteNeed(Need need){
         try {
-            Entity needEntity = EntityImpl.parse("Need_"+need.getId()+"@"+hostname);
+            Entity needEntity = EntityImpl.parse("need_"+need.getId()+"@"+hostname);
 
             if(accountManagement.verifyAccountExists(needEntity)){
                 accountManagement.removeUser(needEntity);
@@ -139,4 +142,9 @@ public class WONXmppServer{
 
     }
 
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.start();
+    }
 }

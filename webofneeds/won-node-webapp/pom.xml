@@ -18,7 +18,7 @@
         <dependency>
             <groupId>webofneeds</groupId>
             <artifactId>won-node</artifactId>
-            <version>${project.version}</version>
+            <version>0.1-SNAPSHOT</version>
         </dependency>
 
         <!-- JAX-WS (webservices)-->
@@ -75,6 +75,8 @@
             <artifactId>spring-webmvc</artifactId>
             <version>${org.springframework.version}</version>
         </dependency>
+
+
 
     </dependencies>
     <build>

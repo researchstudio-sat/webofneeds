@@ -49,6 +49,9 @@
         <property name="packagesToScan" value="won.protocol.model" />
     </bean>
 
+    <!-- XMPP Server -->
+    <bean id="xmppServer" class="won.xmpp.WONXmppServer" />
+
     <!-- Configure transaction management -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory" />
