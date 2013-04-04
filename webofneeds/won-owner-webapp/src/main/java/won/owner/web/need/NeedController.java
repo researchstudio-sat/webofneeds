@@ -142,12 +142,10 @@ public class NeedController {
         return "listNeeds";
     }
 
-    @RequestMapping(value = "refresh", method = RequestMethod.GET)
-    public String refresh(Model model) {
+    @RequestMapping(value = "reload", method = RequestMethod.GET)
+    public String reload(Model model) {
 
-        model.addAttribute("needs", needRepository.findAll());
-
-        return "redirect:/need";
+        return "redirect:/need/";
     }
 
     @RequestMapping(value = "/{needId}", method = RequestMethod.GET)
