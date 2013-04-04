@@ -1,0 +1,341 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY schema "http://schema.org/" >
+    <!ENTITY all "http://schema.rdfs.org/all#" >
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY model "http://www.webofneeds.org/model#" >
+    <!ENTITY wonex "http://www.webofneeds.org/example" >
+    <!ENTITY v1 "http://purl.org/goodrelations/v1#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY wgs84_pos "http://www.w3.org/2003/01/geo/wgs84_pos#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="&wonex;#"
+     xml:base="http://www.webofneeds.org/example"
+     xmlns:v1="http://purl.org/goodrelations/v1#"
+     xmlns:schema="http://schema.org/"
+     xmlns:wonex="http://www.webofneeds.org/example"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:model="http://www.webofneeds.org/model#"
+     xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:all="http://schema.rdfs.org/all#">
+    <owl:Ontology rdf:about="http://www.webofneeds.org/example">
+        <owl:imports rdf:resource="http://schema.rdfs.org/all"/>
+        <owl:imports rdf:resource="http://www.webofneeds.org/model"/>
+        <owl:versionIRI rdf:resource="&wonex;/1"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.freebase.com/m/02crq1 -->
+
+    <owl:Class rdf:about="http://www.freebase.com/m/02crq1">
+        <rdfs:comment>Couch
+</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.freebase.com/m/02crq1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.freebase.com/m/02crq1"/>
+    
+
+
+    <!-- http://www.webofneeds.org/Need_01 -->
+
+    <owl:NamedIndividual rdf:about="http://www.webofneeds.org/Need_01">
+        <rdf:type rdf:resource="&model;Need"/>
+        <model:needCreationDate rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:00+02:00</model:needCreationDate>
+        <model:isActive rdf:datatype="&xsd;boolean">true</model:isActive>
+        <model:hasConnections rdf:resource="&wonex;#Connections_01"/>
+        <model:hasOwner rdf:resource="&wonex;#NeedOwner_1"/>
+        <model:hasBasicNeedType rdf:resource="&model;Give"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#Connection_01_1 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#Connection_01_1">
+        <rdf:type rdf:resource="&model;Connection"/>
+        <model:hasRemoteConnection rdf:resource="&wonex;#Connection_02_1"/>
+        <model:hasEventContainer rdf:resource="&wonex;#EventContainer_01"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#Connection_02_1 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#Connection_02_1">
+        <rdf:type rdf:resource="&model;Connection"/>
+        <model:hasRemoteConnection rdf:resource="&wonex;#Connection_01_1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#Connections_01 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#Connections_01">
+        <rdf:type rdf:resource="&model;ConnectionContainer"/>
+        <rdfs:member rdf:resource="&wonex;#Connection_01_1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#Connections_02 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#Connections_02">
+        <rdf:type rdf:resource="&model;ConnectionContainer"/>
+        <rdfs:member rdf:resource="&wonex;#Connection_02_1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#CouchDepth -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#CouchDepth">
+        <rdf:type rdf:resource="&v1;QuantitativeValue"/>
+        <v1:hasValue rdf:datatype="&rdfs;Literal">50</v1:hasValue>
+        <v1:hasUnitOfMeasurement rdf:datatype="&xsd;string">cm</v1:hasUnitOfMeasurement>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#CouchHeight -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#CouchHeight">
+        <rdf:type rdf:resource="&v1;QuantitativeValue"/>
+        <v1:hasValue rdf:datatype="&rdfs;Literal">50</v1:hasValue>
+        <v1:hasUnitOfMeasurement rdf:datatype="&xsd;string">cm</v1:hasUnitOfMeasurement>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#CouchPerson -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#CouchPerson">
+        <rdf:type rdf:resource="&xsd;string"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#CouchWeight -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#CouchWeight">
+        <rdf:type rdf:resource="&v1;QuantitativeValue"/>
+        <v1:hasValue rdf:datatype="&rdfs;Literal">120</v1:hasValue>
+        <v1:hasUnitOfMeasurement rdf:datatype="&xsd;string">kg</v1:hasUnitOfMeasurement>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#CouchWidth -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#CouchWidth">
+        <rdf:type rdf:resource="&v1;QuantitativeValue"/>
+        <v1:hasValue rdf:datatype="&rdfs;Literal">250</v1:hasValue>
+        <v1:hasUnitOfMeasurement rdf:datatype="&xsd;string">cm</v1:hasUnitOfMeasurement>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#EventContainer_01 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#EventContainer_01">
+        <rdf:type rdf:resource="&model;EventContainer"/>
+        <rdfs:member rdf:resource="&wonex;#Hint_01_1"/>
+        <rdfs:member rdf:resource="&wonex;#OwnerConnect_01_1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#Hint_01_1 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#Hint_01_1">
+        <rdf:type rdf:resource="&model;Hint"/>
+        <model:occurredAt rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:05+02:00</model:occurredAt>
+        <model:hasOriginator rdf:resource="&wonex;#Matcher_01"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#Matcher_01 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#Matcher_01">
+        <rdf:type rdf:resource="http://www.w3.org/ns/ldp#Resource"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#NeedContent_01 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#NeedContent_01">
+        <model:textDescription rdf:datatype="&xsd;string">rote Couch mit integrierter Mäusefalle</model:textDescription>
+        <model:contentType rdf:resource="http://www.freebase.com/m/02crq1"/>
+        <model:depth rdf:resource="&wonex;#CouchDepth"/>
+        <model:height rdf:resource="&wonex;#CouchHeight"/>
+        <model:weight rdf:resource="&wonex;#CouchWeight"/>
+        <model:width rdf:resource="&wonex;#CouchWidth"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#NeedModality_01_1 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#NeedModality_01_1">
+        <rdf:type rdf:resource="&model;NeedModality"/>
+        <v1:availableDeliveryMethods rdf:resource="&v1;DeliveryModePickUp"/>
+        <v1:hasPriceSpecification rdf:resource="&wonex;#PriceSpecification_01_1"/>
+        <model:availableAtLocation rdf:resource="&wonex;#Thurngasse_8"/>
+        <model:availableAtTime rdf:resource="&wonex;#TimeConstraint_01_1_1"/>
+        <model:availableAtTime rdf:resource="&wonex;#TimeConstraint_01_1_2"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#NeedModality_01_2 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#NeedModality_01_2">
+        <rdf:type rdf:resource="&model;NeedModality"/>
+        <v1:availableDeliveryMethods rdf:resource="&v1;DeliveryModeFreight"/>
+        <v1:hasPriceSpecification rdf:resource="&wonex;#PriceSpecification_01_2"/>
+        <model:availableAtTime rdf:resource="&wonex;#TimeConstraint_01_2"/>
+        <model:availableAtLocation rdf:resource="&wonex;#Österreich"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#NeedOwner_1 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#NeedOwner_1">
+        <rdf:type rdf:resource="&schema;Person"/>
+        <schema:givenName rdf:resource="&wonex;#CouchPerson"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#Need_02 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#Need_02">
+        <rdf:type rdf:resource="&model;Need"/>
+        <model:needCreationDate rdf:datatype="&xsd;dateTimeStamp">2013-03-20T14:29:00+02:00</model:needCreationDate>
+        <model:isActive rdf:datatype="&xsd;boolean">true</model:isActive>
+        <model:hasConnections rdf:resource="&wonex;#Connections_02"/>
+        <model:hasBasicNeedType rdf:resource="&model;Take"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#OwnerConnect_01_1 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#OwnerConnect_01_1">
+        <rdf:type rdf:resource="&model;OwnerConnect"/>
+        <model:occurredAt rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:47:06+02:00</model:occurredAt>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#PriceSpecification_01_1 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#PriceSpecification_01_1">
+        <model:hasUpperPriceLimit rdf:datatype="&xsd;float">100.0</model:hasUpperPriceLimit>
+        <model:hasLowerPriceLimit rdf:datatype="&xsd;float">100.0</model:hasLowerPriceLimit>
+        <model:hasCurrency rdf:datatype="&xsd;string">EUR</model:hasCurrency>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#PriceSpecification_01_2 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#PriceSpecification_01_2">
+        <model:hasUpperPriceLimit rdf:datatype="&xsd;float">130.0</model:hasUpperPriceLimit>
+        <model:hasLowerPriceLimit rdf:datatype="&xsd;float">130.0</model:hasLowerPriceLimit>
+        <model:hasCurrency rdf:datatype="&xsd;string">EUR</model:hasCurrency>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#Thurngasse_8 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#Thurngasse_8">
+        <rdf:type rdf:resource="&wgs84_pos;Point"/>
+        <wgs84_pos:longitude rdf:datatype="&xsd;float">16.360283</wgs84_pos:longitude>
+        <wgs84_pos:latitude rdf:datatype="&xsd;float">48.218746</wgs84_pos:latitude>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#TimeConstraint_01_1_1 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#TimeConstraint_01_1_1">
+        <model:recurTimes rdf:datatype="&xsd;integer">0</model:recurTimes>
+        <model:startTime rdf:datatype="&xsd;dateTimeStamp">2013-04-04T09:00:00+02:00</model:startTime>
+        <model:endTime rdf:datatype="&xsd;dateTimeStamp">2013-04-04T17:00:00+02:00</model:endTime>
+        <model:recurIn rdf:datatype="&xsd;duration">P7D</model:recurIn>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#TimeConstraint_01_1_2 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#TimeConstraint_01_1_2">
+        <model:startTime>2013-04-05T09:00:00+02:00</model:startTime>
+        <model:recurTimes>0</model:recurTimes>
+        <model:endTime>2013-04-05T17:00:00+02:00</model:endTime>
+        <model:recurIn>P7D</model:recurIn>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#TimeConstraint_01_2 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#TimeConstraint_01_2">
+        <model:startTime rdf:datatype="&xsd;dateTimeStamp">2013-04-04T09:00:00+02:00</model:startTime>
+        <model:endTime rdf:datatype="&xsd;dateTimeStamp">2013-05-04T09:00:00+02:00</model:endTime>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/example#Österreich -->
+
+    <owl:NamedIndividual rdf:about="&wonex;#Österreich">
+        <rdf:type rdf:resource="&model;Region"/>
+        <model:hasISOCode rdf:datatype="&xsd;string">AT</model:hasISOCode>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+
