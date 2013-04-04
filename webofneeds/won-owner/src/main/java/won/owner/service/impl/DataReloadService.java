@@ -14,7 +14,6 @@ import won.protocol.repository.NeedRepository;
  * To change this template use File | Settings | File Templates.
  */
 public class DataReloadService {
-    @Autowired
     private OwnerProtocolNeedService ownerService;
 
     @Autowired
@@ -26,5 +25,7 @@ public class DataReloadService {
     @Autowired
     private ConnectionRepository connectionRepository;
 
-
+    public void setOwnerService(OwnerProtocolNeedService ownerService) {
+        this.ownerService = ownerService;
+    }
 }
