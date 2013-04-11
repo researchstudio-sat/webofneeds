@@ -59,11 +59,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Autowired
   private NeedRepository needRepository;
 
-  @Autowired
-  private MatchRepository matchRepository;
-
-
-
   @Override
   public URI createNeed(final URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException {
     if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
@@ -112,16 +107,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
     }
   }
 
-  @Override
-  public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException
-  {
-    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    return matchRepository.findByFromNeed(need.getNeedURI(),new Sort(Sort.Direction.DESC,"score"));
-  }
-
-
-
   private boolean isNeedActive(final Need need) {
     return NeedState.ACTIVE == need.getState();
   }
@@ -152,14 +137,9 @@ public class NeedManagementServiceImpl implements NeedManagementService
     this.needRepository = needRepository;
   }
 
-  public void setMatchRepository(final MatchRepository matchRepository)
-  {
-    this.matchRepository = matchRepository;
+  public void setRdfStorage(RDFStorageService rdfStorage) {
+      this.rdfStorage = rdfStorage;
   }
-
-    public void setRdfStorage(RDFStorageService rdfStorage) {
-        this.rdfStorage = rdfStorage;
-    }
 
     public void setXmppServer(WONXmppServer xmppServer) {
         this.xmppServer = xmppServer;

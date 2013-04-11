@@ -38,29 +38,9 @@ import java.util.Collection;
  */
 @WebService(serviceName = "ownerProtocol", targetNamespace = "http://www.webofneeds.org/protocol/owner/soap/1.0/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
+//TODO: shouldn't we extend one of our protocol interfaces here?
 public interface OwnerProtocolNeedWebServiceEndpoint
 {
-
-  @WebMethod
-  public String readConnectionContent(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException;
-
-  @WebMethod
-  public Connection readConnection(@WebParam(name="connectionURI") final URI connectionURI) throws NoSuchConnectionException;
-  @WebMethod
-  public String readNeedContent(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedException;
-
-  @WebMethod
-  public Need readNeed(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedException;
-
-  @WebMethod
-  public URI[] listConnectionURIs(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedException;
-
-  @WebMethod
-  public Match[] getMatches(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedException;
-
-  @WebMethod
-  public URI[] listNeedURIs();
-
   @WebMethod
   public void sendTextMessage(@WebParam(name="connectionURI") final URI connectionURI, @WebParam(name="message") final String message)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
