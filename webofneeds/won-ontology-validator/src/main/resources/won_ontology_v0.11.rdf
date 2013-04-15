@@ -194,6 +194,16 @@
     
 
 
+    <!-- http://www.webofneeds.org/model#isInState -->
+
+    <owl:ObjectProperty rdf:about="&won;isInState">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;Need"/>
+        <rdfs:range rdf:resource="&won;NeedState"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.webofneeds.org/model#quantitativeProperty -->
 
     <owl:ObjectProperty rdf:about="&won;quantitativeProperty">
@@ -292,16 +302,6 @@
     <owl:DatatypeProperty rdf:about="&won;hasUpperPriceLimit">
         <rdfs:range rdf:resource="&xsd;float"/>
         <rdfs:domain rdf:resource="&won;PriceSpecification"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.webofneeds.org/model#isActive -->
-
-    <owl:DatatypeProperty rdf:about="&won;isActive">
-        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:range rdf:resource="&xsd;boolean"/>
-        <rdfs:domain rdf:resource="&won;Need"/>
     </owl:DatatypeProperty>
     
 
@@ -408,6 +408,14 @@
     
 
 
+    <!-- http://www.webofneeds.org/model#Accept -->
+
+    <owl:Class rdf:about="&won;Accept">
+        <rdfs:subClassOf rdf:resource="&won;Event"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.webofneeds.org/model#AnonymizedOwner -->
 
     <owl:Class rdf:about="&won;AnonymizedOwner">
@@ -419,6 +427,14 @@
     <!-- http://www.webofneeds.org/model#BasicNeedType -->
 
     <owl:Class rdf:about="&won;BasicNeedType"/>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Close -->
+
+    <owl:Class rdf:about="&won;Close">
+        <rdfs:subClassOf rdf:resource="&won;Event"/>
+    </owl:Class>
     
 
 
@@ -487,71 +503,29 @@
     
 
 
+    <!-- http://www.webofneeds.org/model#NeedState -->
+
+    <owl:Class rdf:about="&won;NeedState"/>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Open -->
+
+    <owl:Class rdf:about="&won;Open">
+        <rdfs:subClassOf rdf:resource="&won;Event"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.webofneeds.org/model#Owner -->
 
     <owl:Class rdf:about="&won;Owner"/>
     
 
 
-    <!-- http://www.webofneeds.org/model#OwnerAccept -->
+    <!-- http://www.webofneeds.org/model#Prepare -->
 
-    <owl:Class rdf:about="&won;OwnerAccept">
-        <rdfs:subClassOf rdf:resource="&won;Event"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.webofneeds.org/model#OwnerClose -->
-
-    <owl:Class rdf:about="&won;OwnerClose">
-        <rdfs:subClassOf rdf:resource="&won;Event"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.webofneeds.org/model#OwnerConnect -->
-
-    <owl:Class rdf:about="&won;OwnerConnect">
-        <rdfs:subClassOf rdf:resource="&won;Event"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.webofneeds.org/model#OwnerDeny -->
-
-    <owl:Class rdf:about="&won;OwnerDeny">
-        <rdfs:subClassOf rdf:resource="&won;Event"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.webofneeds.org/model#PartnerAccept -->
-
-    <owl:Class rdf:about="&won;PartnerAccept">
-        <rdfs:subClassOf rdf:resource="&won;Event"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.webofneeds.org/model#PartnerClose -->
-
-    <owl:Class rdf:about="&won;PartnerClose">
-        <rdfs:subClassOf rdf:resource="&won;Event"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.webofneeds.org/model#PartnerConnect -->
-
-    <owl:Class rdf:about="&won;PartnerConnect">
-        <rdfs:subClassOf rdf:resource="&won;Event"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.webofneeds.org/model#PartnerDeny -->
-
-    <owl:Class rdf:about="&won;PartnerDeny">
+    <owl:Class rdf:about="&won;Prepare">
         <rdfs:subClassOf rdf:resource="&won;Event"/>
     </owl:Class>
     
@@ -588,6 +562,14 @@
     
 
 
+    <!-- http://www.webofneeds.org/model#Active -->
+
+    <owl:NamedIndividual rdf:about="&won;Active">
+        <rdf:type rdf:resource="&won;NeedState"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.webofneeds.org/model#Do -->
 
     <owl:NamedIndividual rdf:about="&won;Do">
@@ -600,6 +582,14 @@
 
     <owl:NamedIndividual rdf:about="&won;Give">
         <rdf:type rdf:resource="&won;BasicNeedType"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Inactive -->
+
+    <owl:NamedIndividual rdf:about="&won;Inactive">
+        <rdf:type rdf:resource="&won;NeedState"/>
     </owl:NamedIndividual>
     
 

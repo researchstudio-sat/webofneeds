@@ -153,7 +153,7 @@
     <owl:NamedIndividual rdf:about="&wonex;#EventContainer_01">
         <rdf:type rdf:resource="&model;EventContainer"/>
         <rdfs:member rdf:resource="&wonex;#Hint_01_1"/>
-        <rdfs:member rdf:resource="&wonex;#OwnerConnect_01_1"/>
+        <rdfs:member rdf:resource="&wonex;#Open_01_1"/>
     </owl:NamedIndividual>
     
 
@@ -236,12 +236,12 @@
     <owl:NamedIndividual rdf:about="&wonex;#Need_01">
         <rdf:type rdf:resource="&model;Need"/>
         <model:needCreationDate rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:00+02:00</model:needCreationDate>
-        <model:isActive rdf:datatype="&xsd;boolean">true</model:isActive>
         <model:hasConnections rdf:resource="&wonex;#Connections_01"/>
         <model:hasContent rdf:resource="&wonex;#NeedContent_01"/>
         <model:hasNeedModality rdf:resource="&wonex;#NeedModality_01_1"/>
         <model:hasNeedModality rdf:resource="&wonex;#NeedModality_01_2"/>
         <model:hasOwner rdf:resource="&wonex;#NeedOwner_1"/>
+        <model:isInState rdf:resource="&model;Active"/>
         <model:hasBasicNeedType rdf:resource="&model;Give"/>
     </owl:NamedIndividual>
     
@@ -252,18 +252,19 @@
     <owl:NamedIndividual rdf:about="&wonex;#Need_02">
         <rdf:type rdf:resource="&model;Need"/>
         <model:needCreationDate rdf:datatype="&xsd;dateTimeStamp">2013-03-20T14:29:00+02:00</model:needCreationDate>
-        <model:isActive rdf:datatype="&xsd;boolean">true</model:isActive>
         <model:hasConnections rdf:resource="&wonex;#Connections_02"/>
+        <model:isInState rdf:resource="&model;Active"/>
         <model:hasBasicNeedType rdf:resource="&model;Take"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.webofneeds.org/example#OwnerConnect_01_1 -->
+    <!-- http://www.webofneeds.org/example#Open_01_1 -->
 
-    <owl:NamedIndividual rdf:about="&wonex;#OwnerConnect_01_1">
-        <rdf:type rdf:resource="&model;OwnerConnect"/>
+    <owl:NamedIndividual rdf:about="&wonex;#Open_01_1">
+        <rdf:type rdf:resource="&model;Open"/>
         <model:occurredAt rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:47:06+02:00</model:occurredAt>
+        <model:hasOriginator rdf:resource="&wonex;#NeedOwner_1"/>
     </owl:NamedIndividual>
     
 

@@ -33,8 +33,11 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * User: fsalcher
- * Date: 03.04.13
+ * JUnit tests to check the WoN ontology against the competency questions.
+ * One test case for each question.
+ *
+ * @author Fabian Salcher
+ * @version 2013/04
  */
 
 public class Validator
@@ -109,13 +112,15 @@ public class Validator
       ResultSet results = qExec.execSelect();
       for (; results.hasNext(); ) {
         QuerySolution soln = results.nextSolution();
-        System.out.println(soln.toString());
         actualList.add(soln.toString());
       }
     } finally {
       qExec.close();
     }
     assertTrue("wrong number of results", actualList.size() >= 1);
+    String expected1 = "( ?event = <http://www.webofneeds.org/example#Open_01_1> ) ( ?eventType = <http://www.webofneeds.org/model#Open> )";
+    String expected2 = "( ?event = <http://www.webofneeds.org/example#Hint_01_1> ) ( ?eventType = <http://www.webofneeds.org/model#Hint> )";
+    assertThat(actualList, hasItems(expected1, expected2));
   }
 
   @Test
@@ -135,14 +140,15 @@ public class Validator
       ResultSet results = qExec.execSelect();
       for (; results.hasNext(); ) {
         QuerySolution soln = results.nextSolution();
-        actualList.add(soln.get("?originator").toString());
+        actualList.add(soln.toString());
       }
     } finally {
       qExec.close();
     }
-    assertEquals("wrong number of results", 1, actualList.size());
-    String expected = "http://www.webofneeds.org/example#Matcher_01";
-    assertThat(actualList, hasItems(expected));
+    assertEquals("wrong number of results", 2, actualList.size());
+    String expected1 = "( ?event = <http://www.webofneeds.org/example#Open_01_1> ) ( ?originator = <http://www.webofneeds.org/example#NeedOwner_1> )";
+    String expected2 = "( ?event = <http://www.webofneeds.org/example#Hint_01_1> ) ( ?originator = <http://www.webofneeds.org/example#Matcher_01> )";
+    assertThat(actualList, hasItems(expected1, expected2));
   }
 
   @Test
@@ -155,9 +161,9 @@ public class Validator
         "?need won:hasNeedModality ?needModality." +
         "?needModality gr:availableDeliveryMethods ?delivery." +
         "?needModality won:hasPriceSpecification ?price." +
-        "?price ?hasCurrency ?currency." +
-        "?price ?hasLowerPriceLimit ?lowerPrice." +
-        "?price ?hasUpperPriceLimit ?upperPrice." +
+        "?price won:hasCurrency ?currency." +
+        "?price won:hasLowerPriceLimit ?lowerPrice." +
+        "?price won:hasUpperPriceLimit ?upperPrice." +
         "}";
 
     Query query = QueryFactory.create(queryString);
@@ -172,15 +178,19 @@ public class Validator
     } finally {
       qExec.close();
     }
-    // TODO: Extend the expected values to all meaningful results not only one result.
-    // TODO: Results should look like the one below but there are some strange results like "?upperPrice = "EUR"^^xsd:string" which has to be investigated!
-    String expected = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
+    String expected1 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
         "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
         "( ?delivery = <http://purl.org/goodrelations/v1#DeliveryModePickUp> ) " +
         "( ?price = <http://www.webofneeds.org/example#PriceSpecification_01_1> ) " +
         "( ?currency = \"EUR\"^^xsd:string ) ( ?lowerPrice = \"100.0\"^^xsd:float ) " +
         "( ?upperPrice = \"100.0\"^^xsd:float )";
-    assertThat(actualList, hasItems(expected));
+    String expected2 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
+        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_2> ) " +
+        "( ?delivery = <http://purl.org/goodrelations/v1#DeliveryModeFreight> ) " +
+        "( ?price = <http://www.webofneeds.org/example#PriceSpecification_01_2> ) " +
+        "( ?currency = \"EUR\"^^xsd:string ) ( ?lowerPrice = \"130.0\"^^xsd:float ) " +
+        "( ?upperPrice = \"130.0\"^^xsd:float )";
+    assertThat(actualList, hasItems(expected1, expected2));
   }
 
   @Test
@@ -519,9 +529,10 @@ public class Validator
   {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
-        "SELECT ?need ?active WHERE {" +
+        "SELECT ?need ?state WHERE {" +
         "?need rdf:type won:Need. " +
-        "?need won:isActive ?active." +
+        "?need won:isInState ?state." +
+        "?state rdf:type won:NeedState." +
         "}";
     Query query = QueryFactory.create(queryString);
     QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
@@ -535,41 +546,30 @@ public class Validator
     } finally {
       qExec.close();
     }
-    String expected1 = "( ?need = <http://www.webofneeds.org/example#Need_02> ) ( ?active = true )";
-    String expected2 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) ( ?active = true )";
+    String expected1 = "( ?need = <http://www.webofneeds.org/example#Need_02> ) " +
+        "( ?state = <http://www.webofneeds.org/model#Active> )";
+    String expected2 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
+        "( ?state = <http://www.webofneeds.org/model#Active> )";
     assertThat(actualList, hasItems(expected1, expected2));
     assertEquals("wrong number of results", 2, actualList.size());
   }
 
-  public static void main(String[] args)
+  /**
+   * This method is for testing the queries. Just rename it to main and execute.
+   *
+   * @param args
+   */
+  public static void mainDeactivated(String[] args)
   {
     loadOntologies();
     System.out.println("executing queries...");
 
-//    String queryString = sparqlPreface +
-//        "SELECT ?event ?eventType WHERE {" +
-//        "wonexample:EventContainer_01 rdfs:member ?event. " +
-//        "?event rdf:type won:Event." +
-//        "?event rdf:type ?eventType." +
-//        "?eventType rdf:type won:Event." +
-//        "}";
-
-//    String queryString = sparqlPreface +
-//        "SELECT ?eventType WHERE {" +
-//        "?eventType rdfs:subClassOf won:Event. " +
-//        "}";
-
     String queryString = sparqlPreface +
-        "SELECT ?need ?needModality ?delivery ?price ?currency ?lowerPrice ?upperPrice WHERE {" +
+        "SELECT ?need ?state WHERE {" +
         "?need rdf:type won:Need. " +
-        "?need won:hasNeedModality ?needModality." +
-        "?needModality gr:availableDeliveryMethods ?delivery." +
-        "?needModality won:hasPriceSpecification ?price." +
-        "?price ?hasCurrency ?currency." +
-        "?price ?hasLowerPriceLimit ?lowerPrice." +
-        "?price ?hasUpperPriceLimit ?upperPrice." +
+        "?need won:isInState ?state." +
+        "?state rdf:type won:NeedState." +
         "}";
-
     Query query = QueryFactory.create(queryString);
     QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
     try {
@@ -583,4 +583,3 @@ public class Validator
     }
   }
 }
-
