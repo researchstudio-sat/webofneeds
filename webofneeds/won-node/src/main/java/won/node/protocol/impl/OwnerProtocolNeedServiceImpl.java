@@ -106,8 +106,13 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     }
 
     @Override
-    public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException {
-        return this.needManagementService.getMatches(needURI);
+    public Collection<Match> listMatches(final URI needURI) throws NoSuchNeedException {
+        return this.needInformationService.listMatches(needURI);
+    }
+
+    @Override
+    public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException {
+        return this.needInformationService.listMatches(needURI, page);
     }
 
     @Override

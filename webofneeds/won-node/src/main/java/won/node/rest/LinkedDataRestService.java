@@ -4,6 +4,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.service.LinkedDataService;
@@ -136,8 +137,8 @@ public class LinkedDataRestService {
         logger.debug("readNeed() called");
         URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
         try {
-            Model model = linkedDataService.getNeedModel(needUri);
-          return addLocationHeaderIfNecessary(Response.ok(model), uriInfo.getRequestUri(), needUri).build();
+           Model model = linkedDataService.getNeedModel(needUri);
+           return addLocationHeaderIfNecessary(Response.ok(model), uriInfo.getRequestUri(), needUri).build();
         } catch (NoSuchNeedException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -175,6 +176,25 @@ public class LinkedDataRestService {
 
         try {
             Model model = linkedDataService.listConnectionURIs(page, needUri);
+            return addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), needUri).build();
+        } catch (NoSuchNeedException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+    }
+
+
+    @GET
+    @Path("/data/need/{identifier}/matches")
+    @Produces("application/rdf+xml,application/x-turtle,text/turtle,text/rdf+n3,application/json")
+    public Response readMatchesOfNeed(
+            @Context UriInfo uriInfo,
+            @PathParam("identifier") String identifier,
+            @DefaultValue("-1") @QueryParam("page") int page) {
+        logger.debug("readMatchesOfNeed() called");
+        URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
+
+        try {
+            Model model = linkedDataService.listMatchURIs(page, needUri);
             return addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), needUri).build();
         } catch (NoSuchNeedException e) {
             return Response.status(Response.Status.NOT_FOUND).build();

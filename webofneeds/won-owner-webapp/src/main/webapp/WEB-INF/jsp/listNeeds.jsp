@@ -14,6 +14,7 @@
 <body>
 
 <h2>Needs: </h2>
+<a href="/owner/need/reload">reload</a>
 <table border="1">
     <tr>
         <th>Need Id</th>

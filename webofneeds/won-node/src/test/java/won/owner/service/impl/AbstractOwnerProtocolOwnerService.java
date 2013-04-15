@@ -16,7 +16,6 @@
 
 package won.owner.service.impl;
 
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
@@ -89,7 +88,7 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
 
   public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException
   {
-    return ownerProtocolNeedService.getMatches(needURI);
+    return ownerProtocolNeedService.listMatches(needURI);
   }
 
 

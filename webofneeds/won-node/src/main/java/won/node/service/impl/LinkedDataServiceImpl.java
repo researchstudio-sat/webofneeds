@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
+import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.WON;
 import won.protocol.service.LinkedDataService;
@@ -183,7 +184,30 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return model;
   }
 
-  private String addPageQueryString(String uri, int page) {
+   //TODO: continue here!
+    @Override
+    public Model listMatchURIs(int page, URI needURI) throws NoSuchNeedException {
+        Collection<Match> matches = null;
+        if (page >= 0) {
+            matches = needInformationService.listMatches(needURI, page);
+        } else {
+            matches = needInformationService.listMatches(needURI);
+        }
+        Model model = ModelFactory.createDefaultModel();
+        setNsPrefixes(model);
+        Resource connections = null;
+        if (page >=0){
+            connections = createPage(model,needURI.toString() + "/connections/",page,matches.size());
+        } else {
+            connections = model.createResource(needURI.toString() + "/connections/");
+        }
+        for (Match match : matches) {
+            model.add(model.createStatement(connections, RDFS.member, model.createResource(match.toString())));
+        }
+        return model;
+    }
+
+    private String addPageQueryString(String uri, int page) {
     //TODO: simple implementation for adding page number to uri - breaks as soon as other query strings are present!
     return uri + "?page="+page;
   }
