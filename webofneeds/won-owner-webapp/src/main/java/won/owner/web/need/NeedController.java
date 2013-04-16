@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
+import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
 import won.protocol.exception.*;
 import won.protocol.model.*;
@@ -56,18 +57,23 @@ public class NeedController {
     @Autowired
     private URIService uriService;
 
+    @Autowired
+    private DataReloadService dataReloadService;
 
-  public URIService getUriService()
-  {
-    return uriService;
-  }
 
-  public void setUriService(final URIService uriService)
-  {
-    this.uriService = uriService;
-  }
+    public void setDataReloadService(DataReloadService dataReloadService) {
+        this.dataReloadService = dataReloadService;
+    }
 
-  public void setOwnerService(OwnerProtocolNeedService ownerService) {
+    public URIService getUriService() {
+        return uriService;
+    }
+
+    public void setUriService(final URIService uriService) {
+        this.uriService = uriService;
+    }
+
+    public void setOwnerService(OwnerProtocolNeedService ownerService) {
         this.ownerService = ownerService;
     }
 
@@ -82,7 +88,6 @@ public class NeedController {
     public void setNeedRepository(NeedRepository needRepository) {
         this.needRepository = needRepository;
     }
-
 
     @RequestMapping(value = "/create", method = RequestMethod.GET)
     public String createNeedGet(Model model) {
@@ -145,6 +150,7 @@ public class NeedController {
     @RequestMapping(value = "reload", method = RequestMethod.GET)
     public String reload(Model model) {
 
+        dataReloadService.reload();
         return "redirect:/need/";
     }
 
