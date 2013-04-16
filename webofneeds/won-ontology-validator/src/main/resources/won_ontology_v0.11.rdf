@@ -316,11 +316,33 @@
     
 
 
+    <!-- http://www.webofneeds.org/model#matcherProtocolEndpoint -->
+
+    <owl:DatatypeProperty rdf:about="&won;matcherProtocolEndpoint">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment xml:lang="en">Points to the matcherProtocol webservice endpoint of the need. I.e., matchers can communicate with the need through this endpoint.</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;anyURI"/>
+        <rdfs:domain rdf:resource="&won;Need"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.webofneeds.org/model#needCreationDate -->
 
     <owl:DatatypeProperty rdf:about="&won;needCreationDate">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
+        <rdfs:domain rdf:resource="&won;Need"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#needProtocolEndpoint -->
+
+    <owl:DatatypeProperty rdf:about="&won;needProtocolEndpoint">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment xml:lang="en">Points to the needProtocol webservice endpoint of the need. I.e., won nodes can communicate with the need through this endpoint.</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;anyURI"/>
         <rdfs:domain rdf:resource="&won;Need"/>
     </owl:DatatypeProperty>
     
@@ -332,6 +354,17 @@
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
         <rdfs:domain rdf:resource="&won;Event"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#ownerProtocolEndpoint -->
+
+    <owl:DatatypeProperty rdf:about="&won;ownerProtocolEndpoint">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment xml:lang="en">Points to the ownerProtocol webservice endpoint of the need. I.e., owner applications can communicate with the need through this endpoint.</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;anyURI"/>
+        <rdfs:domain rdf:resource="&won;Need"/>
     </owl:DatatypeProperty>
     
 
