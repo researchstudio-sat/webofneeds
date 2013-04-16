@@ -182,25 +182,6 @@ public class LinkedDataRestService {
         }
     }
 
-
-    @GET
-    @Path("/data/need/{identifier}/matches")
-    @Produces("application/rdf+xml,application/x-turtle,text/turtle,text/rdf+n3,application/json")
-    public Response readMatchesOfNeed(
-            @Context UriInfo uriInfo,
-            @PathParam("identifier") String identifier,
-            @DefaultValue("-1") @QueryParam("page") int page) {
-        logger.debug("readMatchesOfNeed() called");
-        URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
-
-        try {
-            Model model = linkedDataService.listMatchURIs(page, needUri);
-            return addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), needUri).build();
-        } catch (NoSuchNeedException e) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-    }
-
   /**
    * Checks if the actual URI is the same as the canonical URI; if not, adds a Location header to the response builder
    * indicating the canonical URI.
