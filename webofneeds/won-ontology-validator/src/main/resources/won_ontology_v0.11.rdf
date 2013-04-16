@@ -1,0 +1,607 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY won "http://www.webofneeds.org/model#" >
+    <!ENTITY gr "http://purl.org/goodrelations/v1#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.webofneeds.org/model#"
+     xml:base="http://www.webofneeds.org/model"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:won="http://www.webofneeds.org/model#"
+     xmlns:gr="http://purl.org/goodrelations/v1#">
+    <owl:Ontology rdf:about="http://www.webofneeds.org/model">
+        <owl:imports rdf:resource="http://purl.org/goodrelations/v1"/>
+        <owl:imports rdf:resource="http://www.w3.org/2000/01/rdf-schema#"/>
+        <owl:imports rdf:resource="http://www.w3.org/ns/ldp#"/>
+        <owl:versionIRI rdf:resource="http://www.webofneeds.org/model/0.1"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.w3.org/2001/XMLSchema#duration -->
+
+    <rdfs:Datatype rdf:about="&xsd;duration"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/goodrelations/v1#availableDeliveryMethods -->
+
+    <rdf:Description rdf:about="&gr;availableDeliveryMethods">
+        <rdfs:domain rdf:resource="&won;NeedModality"/>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.webofneeds.org/model#availableAtLocation -->
+
+    <owl:ObjectProperty rdf:about="&won;availableAtLocation">
+        <rdfs:range rdf:resource="&won;Location"/>
+        <rdfs:domain rdf:resource="&won;NeedModality"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#availableAtTime -->
+
+    <owl:ObjectProperty rdf:about="&won;availableAtTime">
+        <rdfs:domain rdf:resource="&won;NeedModality"/>
+        <rdfs:range rdf:resource="&won;TimeConstraint"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#contentDescription -->
+
+    <owl:ObjectProperty rdf:about="&won;contentDescription">
+        <rdfs:range rdf:resource="&owl;Thing"/>
+        <rdfs:domain rdf:resource="&won;NeedContent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#depth -->
+
+    <owl:ObjectProperty rdf:about="&won;depth">
+        <rdfs:subPropertyOf rdf:resource="&won;quantitativeProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasBasicNeedType -->
+
+    <owl:ObjectProperty rdf:about="&won;hasBasicNeedType">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="&won;BasicNeedType"/>
+        <rdfs:domain rdf:resource="&won;Need"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasConnections -->
+
+    <owl:ObjectProperty rdf:about="&won;hasConnections">
+        <rdfs:range rdf:resource="&won;ConnectionContainer"/>
+        <rdfs:domain rdf:resource="&won;Need"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasContent -->
+
+    <owl:ObjectProperty rdf:about="&won;hasContent">
+        <rdfs:domain rdf:resource="&won;Need"/>
+        <rdfs:range rdf:resource="&won;NeedContent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasEventContainer -->
+
+    <owl:ObjectProperty rdf:about="&won;hasEventContainer">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;Connection"/>
+        <rdfs:range rdf:resource="&won;EventContainer"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasNeedModality -->
+
+    <owl:ObjectProperty rdf:about="&won;hasNeedModality">
+        <rdfs:domain rdf:resource="&won;Need"/>
+        <rdfs:range rdf:resource="&won;NeedModality"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasOriginator -->
+
+    <owl:ObjectProperty rdf:about="&won;hasOriginator">
+        <rdf:type rdf:resource="&owl;InverseFunctionalProperty"/>
+        <rdfs:range rdf:resource="&won;Event"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasOwner -->
+
+    <owl:ObjectProperty rdf:about="&won;hasOwner">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;Need"/>
+        <rdfs:range rdf:resource="&won;Owner"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasPriceSpecification -->
+
+    <owl:ObjectProperty rdf:about="&won;hasPriceSpecification">
+        <rdfs:domain rdf:resource="&won;NeedModality"/>
+        <rdfs:range rdf:resource="&won;PriceSpecification"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasRemoteConnection -->
+
+    <owl:ObjectProperty rdf:about="&won;hasRemoteConnection">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdf:type rdf:resource="&owl;InverseFunctionalProperty"/>
+        <rdf:type rdf:resource="&owl;SymmetricProperty"/>
+        <rdfs:range rdf:resource="&won;Connection"/>
+        <rdfs:domain rdf:resource="&won;Connection"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#height -->
+
+    <owl:ObjectProperty rdf:about="&won;height">
+        <rdfs:subPropertyOf rdf:resource="&won;quantitativeProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#isInState -->
+
+    <owl:ObjectProperty rdf:about="&won;isInState">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;Need"/>
+        <rdfs:range rdf:resource="&won;NeedState"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#quantitativeProperty -->
+
+    <owl:ObjectProperty rdf:about="&won;quantitativeProperty">
+        <rdfs:range rdf:resource="&gr;QuantitativeValue"/>
+        <rdfs:domain rdf:resource="&won;NeedContent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#weight -->
+
+    <owl:ObjectProperty rdf:about="&won;weight">
+        <rdfs:subPropertyOf rdf:resource="&won;quantitativeProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#width -->
+
+    <owl:ObjectProperty rdf:about="&won;width">
+        <rdfs:subPropertyOf rdf:resource="&won;quantitativeProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.w3.org/2003/01/geo/wgs84_pos#latitude -->
+
+    <owl:DatatypeProperty rdf:about="http://www.w3.org/2003/01/geo/wgs84_pos#latitude">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+        <rdfs:domain rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#Point"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.w3.org/2003/01/geo/wgs84_pos#longitude -->
+
+    <owl:DatatypeProperty rdf:about="http://www.w3.org/2003/01/geo/wgs84_pos#longitude">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+        <rdfs:domain rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#Point"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#endTime -->
+
+    <owl:DatatypeProperty rdf:about="&won;endTime">
+        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
+        <rdfs:domain rdf:resource="&won;TimeConstraint"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasCurrency -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasCurrency">
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain rdf:resource="&won;PriceSpecification"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasISOCode -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasISOCode">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain rdf:resource="&won;Region"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasLowerPriceLimit -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasLowerPriceLimit">
+        <rdfs:range rdf:resource="&xsd;float"/>
+        <rdfs:domain rdf:resource="&won;PriceSpecification"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#hasUpperPriceLimit -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasUpperPriceLimit">
+        <rdfs:range rdf:resource="&xsd;float"/>
+        <rdfs:domain rdf:resource="&won;PriceSpecification"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#isConcealed -->
+
+    <owl:DatatypeProperty rdf:about="&won;isConcealed">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+        <rdfs:domain rdf:resource="&won;Location"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#needCreationDate -->
+
+    <owl:DatatypeProperty rdf:about="&won;needCreationDate">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
+        <rdfs:domain rdf:resource="&won;Need"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#occurredAt -->
+
+    <owl:DatatypeProperty rdf:about="&won;occurredAt">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
+        <rdfs:domain rdf:resource="&won;Event"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#recurIn -->
+
+    <owl:DatatypeProperty rdf:about="&won;recurIn">
+        <rdfs:range rdf:resource="&xsd;duration"/>
+        <rdfs:domain rdf:resource="&won;TimeConstraint"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#recurTimes -->
+
+    <owl:DatatypeProperty rdf:about="&won;recurTimes">
+        <rdfs:range rdf:resource="&xsd;integer"/>
+        <rdfs:domain rdf:resource="&won;TimeConstraint"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#startTime -->
+
+    <owl:DatatypeProperty rdf:about="&won;startTime">
+        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
+        <rdfs:domain rdf:resource="&won;TimeConstraint"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.webofneeds.org/model#textDescription -->
+
+    <owl:DatatypeProperty rdf:about="&won;textDescription">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain rdf:resource="&won;NeedContent"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/goodrelations/v1#BusinessEntity -->
+
+    <rdf:Description rdf:about="&gr;BusinessEntity">
+        <rdfs:subClassOf rdf:resource="&won;Owner"/>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/goodrelations/v1#Offering -->
+
+    <rdf:Description rdf:about="&gr;Offering">
+        <rdfs:subClassOf rdf:resource="&won;Need"/>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.w3.org/2003/01/geo/wgs84_pos#Point -->
+
+    <owl:Class rdf:about="http://www.w3.org/2003/01/geo/wgs84_pos#Point">
+        <rdfs:subClassOf rdf:resource="&won;Location"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Accept -->
+
+    <owl:Class rdf:about="&won;Accept">
+        <rdfs:subClassOf rdf:resource="&won;Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#AnonymizedOwner -->
+
+    <owl:Class rdf:about="&won;AnonymizedOwner">
+        <rdfs:subClassOf rdf:resource="&won;Owner"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#BasicNeedType -->
+
+    <owl:Class rdf:about="&won;BasicNeedType"/>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Close -->
+
+    <owl:Class rdf:about="&won;Close">
+        <rdfs:subClassOf rdf:resource="&won;Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Connection -->
+
+    <owl:Class rdf:about="&won;Connection">
+        <rdfs:subClassOf rdf:resource="&rdfs;Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#ConnectionContainer -->
+
+    <owl:Class rdf:about="&won;ConnectionContainer">
+        <rdfs:subClassOf rdf:resource="&rdfs;Resource"/>
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/ldp#CompositeContainer"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Event -->
+
+    <owl:Class rdf:about="&won;Event">
+        <rdfs:subClassOf rdf:resource="&rdfs;Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#EventContainer -->
+
+    <owl:Class rdf:about="&won;EventContainer">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/ldp#CompositeContainer"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Hint -->
+
+    <owl:Class rdf:about="&won;Hint">
+        <rdfs:subClassOf rdf:resource="&won;Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Location -->
+
+    <owl:Class rdf:about="&won;Location"/>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Need -->
+
+    <owl:Class rdf:about="&won;Need"/>
+    
+
+
+    <!-- http://www.webofneeds.org/model#NeedContent -->
+
+    <owl:Class rdf:about="&won;NeedContent"/>
+    
+
+
+    <!-- http://www.webofneeds.org/model#NeedModality -->
+
+    <owl:Class rdf:about="&won;NeedModality"/>
+    
+
+
+    <!-- http://www.webofneeds.org/model#NeedState -->
+
+    <owl:Class rdf:about="&won;NeedState"/>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Open -->
+
+    <owl:Class rdf:about="&won;Open">
+        <rdfs:subClassOf rdf:resource="&won;Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Owner -->
+
+    <owl:Class rdf:about="&won;Owner"/>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Prepare -->
+
+    <owl:Class rdf:about="&won;Prepare">
+        <rdfs:subClassOf rdf:resource="&won;Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#PriceSpecification -->
+
+    <owl:Class rdf:about="&won;PriceSpecification"/>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Region -->
+
+    <owl:Class rdf:about="&won;Region">
+        <rdfs:subClassOf rdf:resource="&won;Location"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.webofneeds.org/model#TimeConstraint -->
+
+    <owl:Class rdf:about="&won;TimeConstraint"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.webofneeds.org/model#Active -->
+
+    <owl:NamedIndividual rdf:about="&won;Active">
+        <rdf:type rdf:resource="&won;NeedState"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Do -->
+
+    <owl:NamedIndividual rdf:about="&won;Do">
+        <rdf:type rdf:resource="&won;BasicNeedType"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Give -->
+
+    <owl:NamedIndividual rdf:about="&won;Give">
+        <rdf:type rdf:resource="&won;BasicNeedType"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Inactive -->
+
+    <owl:NamedIndividual rdf:about="&won;Inactive">
+        <rdf:type rdf:resource="&won;NeedState"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.webofneeds.org/model#Take -->
+
+    <owl:NamedIndividual rdf:about="&won;Take">
+        <rdf:type rdf:resource="&won;BasicNeedType"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+

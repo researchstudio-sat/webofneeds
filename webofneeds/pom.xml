@@ -28,6 +28,7 @@
         <module>won-owner-webapp</module>
         <module>won-matcher</module>
         <module>won-matcher-solr</module>
+        <module>won-ontology-validator</module>
     </modules>
     <build>
         <pluginManagement>
