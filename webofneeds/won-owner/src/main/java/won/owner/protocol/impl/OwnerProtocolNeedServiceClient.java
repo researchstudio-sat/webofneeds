@@ -15,6 +15,8 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.ConnectionModelMapper;
+import won.protocol.util.NeedModelMapper;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 
 import java.io.StringWriter;
@@ -66,7 +68,99 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
       this.uriService = uriService;
     }
 
-  @Override
+    @Override
+    public URI createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
+        logger.info(MessageFormat.format("need-facing: CREATE_NEED called for need {0}, with content {1} and activate {2}", ownerURI, content, activate));
+        try {
+            OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed();
+
+            StringWriter sw = new StringWriter();
+            content.write(sw, "TTL");
+
+            URI uri =  proxy.createNeed(ownerURI, sw.toString(), activate);
+
+            Need need = new Need();
+            need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
+            need.setOwnerURI(ownerURI);
+            need.setNeedURI(uri);
+            needRepository.saveAndFlush(need);
+
+            return uri;
+        } catch (MalformedURLException e) {
+            logger.warn("couldn't create URL for needProtocolEndpoint", e);
+        } catch (NoSuchNeedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public URI createNeed(URI ownerURI, Model content, boolean activate, String wonURI) throws IllegalNeedContentException {
+        logger.info(MessageFormat.format("need-facing: CREATE_NEED called for need {0}, with content {1} and activate {2}", ownerURI, content, activate));
+        try {
+            OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed(wonURI);
+
+            StringWriter sw = new StringWriter();
+            content.write(sw, "TTL");
+
+            URI uri = proxy.createNeed(ownerURI, sw.toString(), activate);
+
+            Need need = new Need();
+            need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
+            need.setOwnerURI(ownerURI);
+            need.setNeedURI(uri);
+            needRepository.saveAndFlush(need);
+
+            return uri;
+        } catch (MalformedURLException e) {
+            logger.warn("couldn't create URL for needProtocolEndpoint", e);
+        } catch (NoSuchNeedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    @Override
+    public void activate(URI needURI) throws NoSuchNeedException {
+        logger.info(MessageFormat.format("need-facing: ACTIVATE called for need {0}", needURI));
+        try {
+            OwnerProtocolNeedWebServiceEndpoint proxy =getOwnerProtocolEndpointForNeed(needURI);
+
+            List<Need> needs = needRepository.findByNeedURI(needURI);
+            if(needs.size() != 1)
+                throw new NoSuchNeedException(needURI);
+
+            proxy.activate(needURI);
+
+            Need need = needs.get(0);
+            need.setState(NeedState.ACTIVE);
+            needRepository.saveAndFlush(need);
+        } catch (MalformedURLException e) {
+            logger.warn("couldn't create URL for needProtocolEndpoint", e);
+        }
+    }
+
+    @Override
+    public void deactivate(URI needURI) throws NoSuchNeedException {
+        logger.info(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
+        try {
+            OwnerProtocolNeedWebServiceEndpoint proxy =getOwnerProtocolEndpointForNeed(needURI);
+
+            List<Need> needs = needRepository.findByNeedURI(needURI);
+            if(needs.size() != 1)
+                throw new NoSuchNeedException(needURI);
+
+            proxy.deactivate(needURI);
+
+            Need need = needs.get(0);
+            need.setState(NeedState.INACTIVE);
+            needRepository.saveAndFlush(need);
+        } catch (MalformedURLException e) {
+            logger.warn("couldn't create URL for needProtocolEndpoint", e);
+        }
+    }
+
+    @Override
     public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         logger.info(MessageFormat.format("need-facing: ACCEPT called for connection {0}", connectionURI));
@@ -216,39 +310,27 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
         return getHardcodedCollectionResource(needURI, NEED_CONNECTION_URI_PATH_SUFFIX + "?page=" + page);
     }
 
-
     @Override
     public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException {
         logger.debug(MessageFormat.format("need-facing: GET_MATCHES called for need {0}", needURI));
-        Model mUris = getHardcodedNeedResource(needURI, NEED_MATCH_URI_PATH_SUFFIX);
-
-        Stack<Match> matches = new Stack<Match>();
-        for(Statement stmt : mUris.listStatements().toList()) {
-            // matches.push(stmt.getObject());
-        }
-
-        return matches;
+        //TODO: implement this
+        return null;
     }
-
 
     @Override
     public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException {
         logger.debug(MessageFormat.format("need-facing: GET_MATCHES called for need {0} and page {1}", needURI, page));
-        Model mUris = getHardcodedNeedResource(needURI, NEED_MATCH_URI_PATH_SUFFIX + "?page=" + page);
-
-        Stack<Match> matches = new Stack<Match>();
-        for(Statement stmt : mUris.listStatements().toList()) {
-           // matches.push(stmt.getObject());
-        }
-
-        return matches;
+        //TODO: implement this
+        return null;
     }
 
     @Override
     public Need readNeed(URI needURI) throws NoSuchNeedException {
         logger.debug(MessageFormat.format("need-facing: READ_NEED called for need {0}", needURI));
-        //TODO: Convert readNeedContent(needURI); to Need
-        return null;
+
+        Need n =  NeedModelMapper.instance.fromModel(readNeedContent(needURI));
+        n.setOwnerURI(uriService.getOwnerProtocolOwnerServiceEndpointURI());
+        return n;
     }
 
     @Override
@@ -262,8 +344,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
     public Connection readConnection(URI connectionURI) throws NoSuchConnectionException {
         logger.debug(MessageFormat.format("need-facing: READ_CONNECTION called for connection {0}", connectionURI));
 
-        //TODO: Convert readConnectionContent(connectionURI)
-        return null;
+        return ConnectionModelMapper.instance.fromModel(readConnectionContent(connectionURI));
     }
 
     @Override
@@ -274,97 +355,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
         if (connectionProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
 
         return linkedDataRestClient.readResourceData(URI.create(connectionProtocolEndpoint.toString()));
-    }
-
-    public URI createNeed(URI ownerURI, Model content, boolean activate, String wonURI) throws IllegalNeedContentException {
-        logger.info(MessageFormat.format("need-facing: CREATE_NEED called for need {0}, with content {1} and activate {2}", ownerURI, content, activate));
-        try {
-            OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed(wonURI);
-
-            StringWriter sw = new StringWriter();
-            content.write(sw, "TTL");
-
-            URI uri = proxy.createNeed(ownerURI, sw.toString(), activate);
-
-            Need need = new Need();
-            need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
-            need.setOwnerURI(ownerURI);
-            need.setNeedURI(uri);
-            needRepository.saveAndFlush(need);
-
-            return uri;
-        } catch (MalformedURLException e) {
-            logger.warn("couldn't create URL for needProtocolEndpoint", e);
-        } catch (NoSuchNeedException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public URI createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
-        logger.info(MessageFormat.format("need-facing: CREATE_NEED called for need {0}, with content {1} and activate {2}", ownerURI, content, activate));
-        try {
-            OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed();
-
-            StringWriter sw = new StringWriter();
-            content.write(sw, "TTL");
-
-            URI uri =  proxy.createNeed(ownerURI, sw.toString(), activate);
-
-            Need need = new Need();
-            need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
-            need.setOwnerURI(ownerURI);
-            need.setNeedURI(uri);
-            needRepository.saveAndFlush(need);
-
-            return uri;
-        } catch (MalformedURLException e) {
-            logger.warn("couldn't create URL for needProtocolEndpoint", e);
-        } catch (NoSuchNeedException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public void activate(URI needURI) throws NoSuchNeedException {
-        logger.info(MessageFormat.format("need-facing: ACTIVATE called for need {0}", needURI));
-        try {
-            OwnerProtocolNeedWebServiceEndpoint proxy =getOwnerProtocolEndpointForNeed(needURI);
-
-            List<Need> needs = needRepository.findByNeedURI(needURI);
-            if(needs.size() != 1)
-               throw new NoSuchNeedException(needURI);
-
-            proxy.activate(needURI);
-
-            Need need = needs.get(0);
-            need.setState(NeedState.ACTIVE);
-            needRepository.saveAndFlush(need);
-        } catch (MalformedURLException e) {
-            logger.warn("couldn't create URL for needProtocolEndpoint", e);
-        } 
-    }
-
-    @Override
-    public void deactivate(URI needURI) throws NoSuchNeedException {
-        logger.info(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
-        try {
-            OwnerProtocolNeedWebServiceEndpoint proxy =getOwnerProtocolEndpointForNeed(needURI);
-
-            List<Need> needs = needRepository.findByNeedURI(needURI);
-            if(needs.size() != 1)
-                throw new NoSuchNeedException(needURI);
-
-            proxy.deactivate(needURI);
-
-            Need need = needs.get(0);
-            need.setState(NeedState.INACTIVE);
-            needRepository.saveAndFlush(need);
-        } catch (MalformedURLException e) {
-            logger.warn("couldn't create URL for needProtocolEndpoint", e);
-        } 
     }
 
     private Collection<URI> getHardcodedCollectionResource(URI needURI, String res) throws NoSuchNeedException {
@@ -390,12 +380,10 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
     }
 
     private Model getHardcodedNeedResource(URI needURI, String res) throws NoSuchNeedException {
-        URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.OWNER_PROTOCOL_ENDPOINT);
-        logger.debug("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
-        if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
-
-        return linkedDataRestClient.readResourceData(
-                URI.create(needProtocolEndpoint.toString() + res));
+        if(res.equals(""))
+            return linkedDataRestClient.readResourceData(needURI);
+        else
+            return linkedDataRestClient.readResourceData(URI.create(needURI.toString() + res));
     }
 
     private Model getHardcodedResource(String res) {
