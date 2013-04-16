@@ -1,6 +1,6 @@
 #t4c pseudo-namespaces
 @prefix t4c:   		<http://sourceforge.net/projects/t4c/files/owl/simple#> .
-@prefix won:        <http://www.webofneeds.org/model/> .
+@prefix won:        <http://purl.org/webofneeds/model#> .
 @prefix intuit:   	<http://sourceforge.net/projects/t4c/files/owl/intuitive#> .
 
 #freebase

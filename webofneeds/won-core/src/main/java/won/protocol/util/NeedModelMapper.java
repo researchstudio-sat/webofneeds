@@ -25,13 +25,17 @@ public class NeedModelMapper implements ModelMapper<Need> {
     public Model toModel(Need need) {
         Model model = ModelFactory.createDefaultModel();
 
-        Resource connectionsContainer =  model.createResource(need.getNeedURI() + "/connections/");
-        Resource mainNeedNode = model.createResource(need.getNeedURI().toString())
-                .addProperty(WON.STATE, need.getState().name())
-                .addProperty(WON.HAS_CONNECTIONS,connectionsContainer)
-                ;
+        Resource needNode = model.createResource(need.getNeedURI().toString());
 
+        model.add(model.createStatement(needNode, WON.IS_IN_STATE, need.getState().name()));
+        //TODO: check this owner triple
+        model.add(model.createStatement(needNode, WON.HAS_OWNER, need.getOwnerURI().toString()));
+
+        Resource connectionsContainer =  model.createResource(need.getNeedURI() + "/connections/");
         model.add(model.createStatement(connectionsContainer, RDF.type, LDP.CONTAINER));
+
+        model.add(model.createStatement(needNode, WON.HAS_CONNECTIONS, connectionsContainer));
+
         return model;
     }
 
