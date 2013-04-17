@@ -17,7 +17,6 @@ import java.net.URI;
  * To change this template use File | Settings | File Templates.
  */
 public class ConnectionModelMapper implements ModelMapper<Connection> {
-    public static final ConnectionModelMapper instance = new ConnectionModelMapper();
 
     @Override
     public Model toModel(Connection tobject) {

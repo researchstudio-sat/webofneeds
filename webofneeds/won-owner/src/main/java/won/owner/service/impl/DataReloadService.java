@@ -1,7 +1,6 @@
 package won.owner.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import won.owner.exception.DuplicateConnectionException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
@@ -46,8 +45,6 @@ public class DataReloadService {
                 }
             } catch (NoSuchNeedException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } catch (DuplicateConnectionException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
     }
@@ -64,7 +61,7 @@ public class DataReloadService {
         }
     }
 
-    public void reloadConnection(URI uri) throws DuplicateConnectionException {
+    public void reloadConnection(URI uri) {
         Connection c = null;
 
         List<Connection> cons = connectionRepository.findByConnectionURI(uri);
@@ -81,7 +78,7 @@ public class DataReloadService {
                     connectionRepository.saveAndFlush(c);
                     break;
                 default:
-                    throw new DuplicateConnectionException();
+                    throw new IllegalStateException("Connection-URI is not unique in local Database!");
             }
         } catch (NoSuchConnectionException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

@@ -18,7 +18,6 @@ import java.net.URI;
  * To change this template use File | Settings | File Templates.
  */
 public class NeedModelMapper implements ModelMapper<Need> {
-    public static final NeedModelMapper instance = new NeedModelMapper();
 
     @Override
     public Model toModel(Need need) {

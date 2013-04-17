@@ -59,6 +59,12 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
     @Autowired
     private MatchRepository matchRepository;
 
+    @Autowired
+    private NeedModelMapper needModelMapper;
+
+    @Autowired
+    private ConnectionModelMapper connectionModelMapper;
+
     public void setLinkedDataRestClient(LinkedDataRestClient linkedDataRestClient) {
         this.linkedDataRestClient = linkedDataRestClient;
     }
@@ -328,7 +334,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
     public Need readNeed(URI needURI) throws NoSuchNeedException {
         logger.debug(MessageFormat.format("need-facing: READ_NEED called for need {0}", needURI));
 
-        Need n =  NeedModelMapper.instance.fromModel(readNeedContent(needURI));
+        Need n =  needModelMapper.fromModel(readNeedContent(needURI));
         n.setOwnerURI(uriService.getOwnerProtocolOwnerServiceEndpointURI());
         return n;
     }
@@ -344,7 +350,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
     public Connection readConnection(URI connectionURI) throws NoSuchConnectionException {
         logger.debug(MessageFormat.format("need-facing: READ_CONNECTION called for connection {0}", connectionURI));
 
-        return ConnectionModelMapper.instance.fromModel(readConnectionContent(connectionURI));
+        return connectionModelMapper.fromModel(readConnectionContent(connectionURI));
     }
 
     @Override
