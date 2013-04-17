@@ -49,4 +49,7 @@
         <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
     </bean>
 
+    <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
+    <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
+
 </beans>
