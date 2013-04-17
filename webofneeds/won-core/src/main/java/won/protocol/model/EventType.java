@@ -1,11 +1,13 @@
 package won.protocol.model;
 
+import java.net.URI;
+
 /**
  * User: Alan Tus
  * Date: 17.04.13
  * Time: 13:38
  */
-public enum Event {
+public enum EventType {
 
     ACCEPT("Accept"),
     CLOSE("Close"),
@@ -15,12 +17,11 @@ public enum Event {
 
     private String name;
 
-    private Event(String name) {
+    private EventType(String name) {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return WON.BASE_URI + name;
+    public URI getURI() {
+        return URI.create(WON.BASE_URI + name);
     }
 }

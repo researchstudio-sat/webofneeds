@@ -16,6 +16,8 @@
 
 package won.protocol.model;
 
+import java.net.URI;
+
 /**
  * User: fsalcher
  * Date: 10.10.12
@@ -31,8 +33,7 @@ public enum NeedState {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return WON.BASE_URI + name;
+    public URI getURI() {
+        return URI.create(WON.BASE_URI + name);
     }
 }

@@ -1,5 +1,7 @@
 package won.protocol.model;
 
+import java.net.URI;
+
 /**
  * User: Alan Tus
  * Date: 17.04.13
@@ -17,8 +19,7 @@ public enum BasicNeedType {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return WON.BASE_URI + name;
+    public URI getURI() {
+        return URI.create(WON.BASE_URI + name);
     }
 }

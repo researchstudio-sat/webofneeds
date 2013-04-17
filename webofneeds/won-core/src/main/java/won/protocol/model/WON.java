@@ -19,15 +19,14 @@ package won.protocol.model;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  * User: fkleedorfer
  * Date: 20.11.12
  */
 public class WON {
-    //TODO change URI style to '#' style for the ontology
     public static final String BASE_URI = "http://purl.org/webofneeds/model#";
-
     private static Model m = ModelFactory.createDefaultModel();
 
     //NEW
@@ -90,7 +89,22 @@ public class WON {
     public static final Property RECUR_TIMES = m.createProperty(BASE_URI + "recurTimes");
     public static final Property RECUR_INFINITE_TIMES = m.createProperty(BASE_URI + "recurInfiniteTimes");
 
-    //OLD
+    // Resource individuals
+    public static final Resource EVENT_TYPE_ACCEPT = m.createResource(EventType.ACCEPT.getURI().toString());
+    public static final Resource EVENT_TYPE_CLOSE = m.createResource(EventType.CLOSE.getURI().toString());
+    public static final Resource EVENT_TYPE_PREPARE = m.createResource(EventType.PREPARE.getURI().toString());
+    public static final Resource EVENT_TYPE_OPEN = m.createResource(EventType.OPEN.getURI().toString());
+    public static final Resource EVENT_TYPE_HINT = m.createResource(EventType.HINT.getURI().toString());
+
+    public static final Resource BASIC_NEED_TYPE_DO = m.createResource(BasicNeedType.DO.getURI().toString());
+    public static final Resource BASIC_NEED_TYPE_GIVE = m.createResource(BasicNeedType.GIVE.getURI().toString());
+    public static final Resource BASIC_NEED_TYPE_TAKE = m.createResource(BasicNeedType.TAKE.getURI().toString());
+
+    public static final Resource NEED_STATE_ACTIVE = m.createResource(NeedState.ACTIVE.getURI().toString());
+    public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
+
+    // Old properties that should be deleted when no longer used
+    // TODO: [CLEANUP] delete when properties no longer used
     @Deprecated
     public static final Property NEED_DESCRIPTION = m.createProperty(BASE_URI + "NeedDescription");
     @Deprecated
