@@ -2,7 +2,6 @@ package won.protocol.util;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 import won.protocol.model.Need;
@@ -42,15 +41,15 @@ public class NeedModelMapper implements ModelMapper<Need> {
     @Override
     public Need fromModel(Model model) {
         Need n = new Need();
-        Resource rNeed = model.listSubjectsWithProperty(WON.STATE).nextResource();
+        Resource rNeed = model.listSubjectsWithProperty(WON.NEED_STATE).nextResource();
 
         //TODO: Not safe
         n.setNeedURI(URI.create(rNeed.getURI()));
 
         //TODO: Not safe
-        if(model.listObjectsOfProperty(rNeed, WON.STATE).next().asLiteral().getString().equals(NeedState.ACTIVE.name()))
+        if(model.listObjectsOfProperty(rNeed, WON.NEED_STATE).next().asLiteral().getString().equals(NeedState.ACTIVE.name()))
             n.setState(NeedState.ACTIVE);
-        else if(model.listObjectsOfProperty(rNeed, WON.STATE).next().asLiteral().getString().equals(NeedState.INACTIVE.name()))
+        else if(model.listObjectsOfProperty(rNeed, WON.NEED_STATE).next().asLiteral().getString().equals(NeedState.INACTIVE.name()))
             n.setState(NeedState.INACTIVE);
 
         return n;

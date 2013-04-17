@@ -17,13 +17,22 @@
 package won.protocol.model;
 
 /**
- * Created with IntelliJ IDEA.
  * User: fsalcher
  * Date: 10.10.12
  * Time: 14:13
- * To change this template use File | Settings | File Templates.
  */
-public enum NeedState
-{
-  INACTIVE, ACTIVE;
+public enum NeedState {
+    INACTIVE("Inactive"),
+    ACTIVE("Active");
+
+    private String name;
+
+    private NeedState(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return WON.BASE_URI + name;
+    }
 }
