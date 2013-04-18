@@ -26,6 +26,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
@@ -33,6 +34,7 @@ import won.protocol.model.Need;
 import won.protocol.model.WON;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
+import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.LDP;
 import won.protocol.util.NeedModelMapper;
 
@@ -62,6 +64,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     private RDFStorageService rdfStorage;
 
+    @Autowired
+    private NeedModelMapper needModelMapper;
+    @Autowired
+    private ConnectionModelMapper connectionModelMapper;
 
     private String needProtocolEndpoint;
     private String matcherProtocolEndpoint;
@@ -121,7 +127,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     public Model getNeedModel(final URI needUri) throws NoSuchNeedException {
         Need need = needInformationService.readNeed(needUri);
 
-        Model model = NeedModelMapper.instance.toModel(need);
+        Model model = needModelMapper.toModel(need);
         setNsPrefixes(model);
 
         Resource needResource = model.getResource(needUri.toString());
