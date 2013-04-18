@@ -172,9 +172,9 @@
     
 
 
-    <!-- http://purl.org/webofneeds/model#needCreationDate -->
+    <!-- http://purl.org/webofneeds/model#creationDate -->
 
-    <owl:AnnotationProperty rdf:about="&won;needCreationDate"/>
+    <owl:AnnotationProperty rdf:about="&won;creationDate"/>
     
 
 
@@ -468,7 +468,7 @@
 
     <owl:NamedIndividual rdf:about="&wonex;Need_01">
         <rdf:type rdf:resource="&won;Need"/>
-        <won:needCreationDate rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:00+02:00</won:needCreationDate>
+        <won:creationDate rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:00+02:00</won:creationDate>
         <won:hasConnections rdf:resource="&wonex;Connections_01"/>
         <won:hasContent rdf:resource="&wonex;NeedContent_01"/>
         <won:hasNeedModality rdf:resource="&wonex;NeedModality_01_1"/>
@@ -484,7 +484,7 @@
 
     <owl:NamedIndividual rdf:about="&wonex;Need_02">
         <rdf:type rdf:resource="&won;Need"/>
-        <won:needCreationDate rdf:datatype="&xsd;dateTimeStamp">2013-03-20T14:29:00+02:00</won:needCreationDate>
+        <won:creationDate rdf:datatype="&xsd;dateTimeStamp">2013-03-20T14:29:00+02:00</won:creationDate>
         <won:hasConnections rdf:resource="&wonex;Connections_02"/>
         <won:isInState rdf:resource="&won;Active"/>
         <won:hasBasicNeedType rdf:resource="&won;Take"/>
