@@ -23,17 +23,20 @@ import java.net.URI;
  * Date: 10.10.12
  * Time: 14:13
  */
-public enum NeedState {
-    INACTIVE("Inactive"),
-    ACTIVE("Active");
+public enum NeedState
+{
+  INACTIVE("Inactive"),
+  ACTIVE("Active");
 
-    private String name;
+  private String name;
 
-    private NeedState(String name) {
-        this.name = name;
-    }
+  private NeedState(String name)
+  {
+    this.name = name;
+  }
 
-    public URI getURI() {
-        return URI.create(WON.BASE_URI + name);
-    }
+  public URI getURI()
+  {
+    return URI.create(WON.BASE_URI + name);
+  }
 }
