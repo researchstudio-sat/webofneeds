@@ -18,21 +18,31 @@
     <form:form method="POST" action="create">
         <table>
             <tr>
-                <td><form:label path="active">Active: </form:label></td>
+                <td><form:label path="title">Need title:</form:label></td>
+                <td><form:input path="title" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="basicNeedType">Basic type:</form:label></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><form:label path="active">Need state:</form:label></td>
                 <td><form:checkbox path="active" /></td>
             </tr>
             <tr>
-                <td>Won Node:</td>
+                <td><form:label path="anonymize">Anonymize owner:</form:label></td>
+                <td><form:checkbox path="anonymize" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="wonNode">WoN Node:</form:label></td>
                 <td><form:input path="wonNode" /></td>
             </tr>
             <tr>
-                <td>Text description:</td>
+                <td><form:label path="textDescription">Text description:</form:label></td>
                 <td><form:textarea path="textDescription" rows="5" cols="30" /></td>
             </tr>
             <tr>
-                <td colspan="2">
-                    <input type="submit" value="Submit"/>
-                </td>
+                <td colspan="2"><input type="submit" value="Submit"/></td>
             </tr>
         </table>
     </form:form>
