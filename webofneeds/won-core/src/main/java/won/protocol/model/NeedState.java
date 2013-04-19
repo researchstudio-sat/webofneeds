@@ -16,14 +16,27 @@
 
 package won.protocol.model;
 
+import java.net.URI;
+
 /**
- * Created with IntelliJ IDEA.
  * User: fsalcher
  * Date: 10.10.12
  * Time: 14:13
- * To change this template use File | Settings | File Templates.
  */
 public enum NeedState
 {
-  INACTIVE, ACTIVE;
+  INACTIVE("Inactive"),
+  ACTIVE("Active");
+
+  private String name;
+
+  private NeedState(String name)
+  {
+    this.name = name;
+  }
+
+  public URI getURI()
+  {
+    return URI.create(WON.BASE_URI + name);
+  }
 }

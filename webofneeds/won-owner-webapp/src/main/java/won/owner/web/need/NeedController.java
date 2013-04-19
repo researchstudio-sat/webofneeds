@@ -1,9 +1,7 @@
 package won.owner.web.need;
 
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,15 +16,20 @@ import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
-import won.protocol.exception.*;
-import won.protocol.model.*;
+import won.protocol.exception.ConnectionAlreadyExistsException;
+import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.IllegalNeedContentException;
+import won.protocol.exception.NoSuchNeedException;
+import won.protocol.model.Match;
+import won.protocol.model.Need;
+import won.protocol.model.NeedState;
+import won.protocol.model.WON;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.util.LDP;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -39,228 +42,245 @@ import java.util.List;
  */
 
 @Controller
-public class NeedController {
-    final Logger logger = LoggerFactory.getLogger(getClass());
+public class NeedController
+{
+  final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private OwnerProtocolNeedService ownerService;
+  @Autowired
+  private OwnerProtocolNeedService ownerService;
 
-    @Autowired
-    private NeedRepository needRepository;
+  @Autowired
+  private NeedRepository needRepository;
 
-    @Autowired
-    private MatchRepository matchRepository;
+  @Autowired
+  private MatchRepository matchRepository;
 
-    @Autowired
-    private ConnectionRepository connectionRepository;
+  @Autowired
+  private ConnectionRepository connectionRepository;
 
-    @Autowired
-    private URIService uriService;
+  @Autowired
+  private URIService uriService;
 
-    @Autowired
-    private DataReloadService dataReloadService;
+  @Autowired
+  private DataReloadService dataReloadService;
 
 
-    public void setDataReloadService(DataReloadService dataReloadService) {
-        this.dataReloadService = dataReloadService;
+  public void setDataReloadService(DataReloadService dataReloadService)
+  {
+    this.dataReloadService = dataReloadService;
+  }
+
+  public URIService getUriService()
+  {
+    return uriService;
+  }
+
+  public void setUriService(final URIService uriService)
+  {
+    this.uriService = uriService;
+  }
+
+  public void setOwnerService(OwnerProtocolNeedService ownerService)
+  {
+    this.ownerService = ownerService;
+  }
+
+  public void setConnectionRepository(ConnectionRepository connectionRepository)
+  {
+    this.connectionRepository = connectionRepository;
+  }
+
+  public void setMatchRepository(MatchRepository matchRepository)
+  {
+    this.matchRepository = matchRepository;
+  }
+
+  public void setNeedRepository(NeedRepository needRepository)
+  {
+    this.needRepository = needRepository;
+  }
+
+  @RequestMapping(value = "/create", method = RequestMethod.GET)
+  public String createNeedGet(Model model)
+  {
+    model.addAttribute("command", new NeedPojo());
+    return "createNeed";
+  }
+
+  @RequestMapping(value = "/create", method = RequestMethod.POST)
+  public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model)
+  {
+    URI needURI;
+
+    try {
+      URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
+
+      com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
+
+      //TODO: [CLEANUP] Hardcoded sample need graph
+      Resource needResource = needModel.createResource(WON.NEED);
+
+      // need type
+      needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_GIVE));
+
+      // need content
+      Resource needContent = needModel.createResource(WON.NEED_CONTENT);
+      needModel.add(needModel.createStatement(needContent, WON.TEXT_DESCRIPTION, needPojo.getTextDescription()));
+      needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
+
+      // need modalities
+
+      if (needPojo.getWonNode().equals("")) {
+        needURI = ownerService.createNeed(ownerURI, needModel, needPojo.isActive());
+      } else {
+        needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.isActive(), needPojo.getWonNode());
+      }
+
+      List<Need> needs = needRepository.findByNeedURI(needURI);
+
+
+      if (needs.size() == 1)
+        return "redirect:/need/" + needs.get(0).getId().toString();
+      // return viewNeed(need.getId().toString(), model);
+    } catch (IllegalNeedContentException e) {
+      e.printStackTrace();
     }
 
-    public URIService getUriService() {
-        return uriService;
-    }
+    model.addAttribute("command", new NeedPojo());
 
-    public void setUriService(final URIService uriService) {
-        this.uriService = uriService;
-    }
+    return "createNeed";
+  }
 
-    public void setOwnerService(OwnerProtocolNeedService ownerService) {
-        this.ownerService = ownerService;
-    }
+  @RequestMapping(value = "", method = RequestMethod.GET)
+  public String listNeeds(Model model)
+  {
 
-    public void setConnectionRepository(ConnectionRepository connectionRepository) {
-        this.connectionRepository = connectionRepository;
-    }
+    model.addAttribute("needs", needRepository.findAll());
 
-    public void setMatchRepository(MatchRepository matchRepository) {
-        this.matchRepository = matchRepository;
-    }
+    return "listNeeds";
+  }
 
-    public void setNeedRepository(NeedRepository needRepository) {
-        this.needRepository = needRepository;
-    }
+  @RequestMapping(value = "reload", method = RequestMethod.GET)
+  public String reload(Model model)
+  {
 
-    @RequestMapping(value = "/create", method = RequestMethod.GET)
-    public String createNeedGet(Model model) {
-        model.addAttribute("command", new NeedPojo());
-        return "createNeed";
-    }
+    dataReloadService.reload();
+    return "redirect:/need/";
+  }
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) {
-        URI needURI;
+  @RequestMapping(value = "/{needId}", method = RequestMethod.GET)
+  public String viewNeed(@PathVariable String needId, Model model)
+  {
 
-        try {
-            URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
-            com.hp.hpl.jena.rdf.model.Model m = ModelFactory.createDefaultModel();
-            // use the FileManager to find the input file
-            InputStream in = FileManager.get().open( "/offer.ttl" );
-            if (in == null) {
-                throw new IllegalArgumentException(
-                        "File: offer.ttl not found");
-            }
-            m.read(in, null, "TTL");
+    model.addAttribute("needId", needId);
 
-            in.close();
-            ResIterator it = m.listSubjectsWithProperty(RDF.type, WON.NEED_DESCRIPTION);
-            if (it.hasNext()){
-                Resource mainContentNode = it.next();
-                m.add(m.createStatement(mainContentNode, WON.TEXT_DESCRIPTION, needPojo.getTextDescription()));
-            }
+    List<Need> needs = needRepository.findById(Long.valueOf(needId));
+    if (needs.isEmpty())
+      return "noNeedFound";
 
-            if(needPojo.getWonNode().equals("")) {
-                needURI = ownerService.createNeed(ownerURI, m, needPojo.isActive());
-            } else {
-                needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, m, needPojo.isActive(), needPojo.getWonNode());
-            }
+    Need need = needs.get(0);
+    model.addAttribute("active", (need.getState() != NeedState.ACTIVE ? "activate" : "deactivate"));
+    model.addAttribute("needURI", need.getNeedURI());
+    model.addAttribute("command", new NeedPojo());
 
-            List<Need> needs = needRepository.findByNeedURI(needURI);
-
-            model.addAttribute("command", new NeedPojo());
-
-            if(needs.size() == 1)
-                return "redirect:/need/" + needs.get(0).getId().toString();
-            // return viewNeed(need.getId().toString(), model);
-        } catch (IllegalNeedContentException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-        return "createNeed";
-    }
-
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public String listNeeds(Model model) {
-
-        model.addAttribute("needs", needRepository.findAll());
-
-        return "listNeeds";
-    }
-
-    @RequestMapping(value = "reload", method = RequestMethod.GET)
-    public String reload(Model model) {
-
-        dataReloadService.reload();
-        return "redirect:/need/";
-    }
-
-    @RequestMapping(value = "/{needId}", method = RequestMethod.GET)
-    public String viewNeed(@PathVariable String needId, Model model) {
-
-        model.addAttribute("needId", needId);
-
-        List<Need> needs = needRepository.findById(Long.valueOf(needId));
-        if(needs.isEmpty())
-            return "noNeedFound";
-
-        Need need = needs.get(0);
-        model.addAttribute("active", (need.getState() != NeedState.ACTIVE ? "activate" : "deactivate"));
-        model.addAttribute("needURI", need.getNeedURI());
-        model.addAttribute("command", new NeedPojo());
-
-        return "viewNeed";
-    }
+    return "viewNeed";
+  }
 
 
-    @RequestMapping(value = "/{needId}/listMatches", method = RequestMethod.GET)
-    public String listMatches(@PathVariable String needId, Model model) {
-        List<Need> needs = needRepository.findById(Long.valueOf(needId));
-        if(needs.isEmpty())
-            return "noNeedFound";
+  @RequestMapping(value = "/{needId}/listMatches", method = RequestMethod.GET)
+  public String listMatches(@PathVariable String needId, Model model)
+  {
+    List<Need> needs = needRepository.findById(Long.valueOf(needId));
+    if (needs.isEmpty())
+      return "noNeedFound";
 
-        Need need = needs.get(0);
-        model.addAttribute("matches", matchRepository.findByFromNeed(need.getNeedURI()));
+    Need need = needs.get(0);
+    model.addAttribute("matches", matchRepository.findByFromNeed(need.getNeedURI()));
 
-        return "listMatches";
-    }
+    return "listMatches";
+  }
 
-    @RequestMapping(value = "/{needId}/listConnections", method = RequestMethod.GET)
-    public String listConnections(@PathVariable String needId, Model model) {
+  @RequestMapping(value = "/{needId}/listConnections", method = RequestMethod.GET)
+  public String listConnections(@PathVariable String needId, Model model)
+  {
 
-        List<Need> needs = needRepository.findById(Long.valueOf(needId));
-        if(needs.isEmpty())
-            return "noNeedFound";
+    List<Need> needs = needRepository.findById(Long.valueOf(needId));
+    if (needs.isEmpty())
+      return "noNeedFound";
 
-        Need need = needs.get(0);
+    Need need = needs.get(0);
 
-        model.addAttribute("connections", connectionRepository.findByNeedURI(need.getNeedURI()));
+    model.addAttribute("connections", connectionRepository.findByNeedURI(need.getNeedURI()));
 
-        return "listConnections";
-    }
+    return "listConnections";
+  }
 
-    @RequestMapping(value = "/{needId}/connect", method = RequestMethod.POST)
-    public String connect2Need(@PathVariable String needId, @ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) {
-        try {
-            List<Need> needs = needRepository.findById(Long.valueOf(needId));
-            if(needs.isEmpty())
-                return "noNeedFound";
-
-            Need need1 = needs.get(0);
-            ownerService.connectTo(need1.getNeedURI(), new URI(needPojo.getNeedURI()), "");
-            return "redirect:/need/" + need1.getId().toString();//viewNeed(need1.getId().toString(), model);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (ConnectionAlreadyExistsException e) {
-            e.printStackTrace();
-        } catch (IllegalMessageForNeedStateException e) {
-            e.printStackTrace();
-        } catch (NoSuchNeedException e) {
-            e.printStackTrace();
-        }
-
+  @RequestMapping(value = "/{needId}/connect", method = RequestMethod.POST)
+  public String connect2Need(@PathVariable String needId, @ModelAttribute("SpringWeb") NeedPojo needPojo, Model model)
+  {
+    try {
+      List<Need> needs = needRepository.findById(Long.valueOf(needId));
+      if (needs.isEmpty())
         return "noNeedFound";
+
+      Need need1 = needs.get(0);
+      ownerService.connectTo(need1.getNeedURI(), new URI(needPojo.getNeedURI()), "");
+      return "redirect:/need/" + need1.getId().toString();//viewNeed(need1.getId().toString(), model);
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
+    } catch (ConnectionAlreadyExistsException e) {
+      e.printStackTrace();
+    } catch (IllegalMessageForNeedStateException e) {
+      e.printStackTrace();
+    } catch (NoSuchNeedException e) {
+      e.printStackTrace();
     }
 
-    @RequestMapping(value = "/{needId}/toggle", method = RequestMethod.POST)
-    public String toggleNeed(@PathVariable String needId, Model model) {
-        List<Need> needs = needRepository.findById(Long.valueOf(needId));
-        if(needs.isEmpty())
-            return "noNeedFound";
-        Need need = needs.get(0);
-        try {
-            if(need.getState() == NeedState.ACTIVE) {
-                ownerService.deactivate(need.getNeedURI());
-            } else {
-                ownerService.activate(need.getNeedURI());
-            }
-        } catch (NoSuchNeedException e) {
-            e.printStackTrace();
-        }
-        return "redirect:/need/" + need.getId().toString();
-        //return viewNeed(need.getId().toString(), model);
+    return "noNeedFound";
+  }
+
+  @RequestMapping(value = "/{needId}/toggle", method = RequestMethod.POST)
+  public String toggleNeed(@PathVariable String needId, Model model)
+  {
+    List<Need> needs = needRepository.findById(Long.valueOf(needId));
+    if (needs.isEmpty())
+      return "noNeedFound";
+    Need need = needs.get(0);
+    try {
+      if (need.getState() == NeedState.ACTIVE) {
+        ownerService.deactivate(need.getNeedURI());
+      } else {
+        ownerService.activate(need.getNeedURI());
+      }
+    } catch (NoSuchNeedException e) {
+      e.printStackTrace();
+    }
+    return "redirect:/need/" + need.getId().toString();
+    //return viewNeed(need.getId().toString(), model);
+  }
+
+  @RequestMapping(value = "/match/{matchId}/connect", method = RequestMethod.POST)
+  public String connect(@PathVariable String matchId, Model model)
+  {
+    String ret = "noNeedFound";
+
+    try {
+      List<Match> matches = matchRepository.findById(Long.valueOf(matchId));
+      if (!matches.isEmpty()) {
+        Match match = matches.get(0);
+        List<Need> needs = needRepository.findByNeedURI(match.getFromNeed());
+        if (!needs.isEmpty())
+          ret = "redirect:/need/" + needs.get(0).getId().toString();//viewNeed(needs.get(0).getId().toString(), model);
+        ownerService.connectTo(match.getFromNeed(), match.getToNeed(), "");
+      }
+    } catch (ConnectionAlreadyExistsException e) {
+      e.printStackTrace();
+    } catch (IllegalMessageForNeedStateException e) {
+      e.printStackTrace();
+    } catch (NoSuchNeedException e) {
+      e.printStackTrace();
     }
 
-    @RequestMapping(value = "/match/{matchId}/connect", method = RequestMethod.POST)
-    public String connect(@PathVariable String matchId, Model model) {
-        String ret = "noNeedFound";
-
-        try {
-            List<Match> matches = matchRepository.findById(Long.valueOf(matchId));
-            if(!matches.isEmpty()) {
-                Match match = matches.get(0);
-                List<Need> needs = needRepository.findByNeedURI(match.getFromNeed());
-                if(!needs.isEmpty())
-                    ret =  "redirect:/need/" + needs.get(0).getId().toString();//viewNeed(needs.get(0).getId().toString(), model);
-                ownerService.connectTo(match.getFromNeed(), match.getToNeed(), "");
-            }
-        } catch (ConnectionAlreadyExistsException e) {
-            e.printStackTrace();
-        } catch (IllegalMessageForNeedStateException e) {
-            e.printStackTrace();
-        } catch (NoSuchNeedException e) {
-            e.printStackTrace();
-        }
-
-        return ret;
-    }
+    return ret;
+  }
 }

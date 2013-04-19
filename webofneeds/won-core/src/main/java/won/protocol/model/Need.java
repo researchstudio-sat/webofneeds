@@ -22,6 +22,7 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
+import java.util.Date;
 
 /**
  *
@@ -44,6 +45,24 @@ public class Need
   /* The owner protocol endpoint URI where the owner of the need can be reached */
   @Column( name = "ownerURI" )
   private URI ownerURI;
+
+  /* The creation date of the need */
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column( name = "creationDate", nullable = false)
+  private Date creationDate;
+
+  @PrePersist
+  protected void onCreate() {
+    creationDate = new Date();
+  }
+
+  public Date getCreationDate() {
+      return creationDate;
+  }
+
+  public void setCreationDate(Date creationDate) {
+      this.creationDate = creationDate;
+  }
 
   @XmlTransient
   public Long getId() {
@@ -92,38 +111,40 @@ public class Need
         ", needURI=" + needURI +
         ", state=" + state +
         ", ownerURI=" + ownerURI +
+        ", creationDate=" + creationDate +
         '}';
   }
 
-  @Override
-  public boolean equals(final Object o)
-  {
-    if (this == o) return true;
-    if (!(o instanceof Need)) return false;
+    @Override
+    public boolean equals(final Object o)
+    {
+        if (this == o) return true;
+        if (!(o instanceof Need)) return false;
 
-    final Need need = (Need) o;
+        final Need need = (Need) o;
 
-    if (needURI != null ? !needURI.equals(need.needURI) : need.needURI != null) return false;
-    if (ownerURI != null ? !ownerURI.equals(need.ownerURI) : need.ownerURI != null) return false;
-    if (state != need.state) return false;
+        if (needURI != null ? !needURI.equals(need.needURI) : need.needURI != null) return false;
+        if (ownerURI != null ? !ownerURI.equals(need.ownerURI) : need.ownerURI != null) return false;
+        if (creationDate != null ? !creationDate.equals(need.creationDate) : need.creationDate != null) return false;
+        if (state != need.state) return false;
 
-    return true;
-  }
+        return true;
+    }
 
-  @Override
-  public int hashCode()
-  {
-    int result = needURI != null ? needURI.hashCode() : 0;
-    result = 31 * result + (state != null ? state.hashCode() : 0);
-    result = 31 * result + (ownerURI != null ? ownerURI.hashCode() : 0);
-    return result;
-  }
+    @Override
+    public int hashCode() {
+        int result = needURI.hashCode();
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + ownerURI.hashCode();
+        result = 31 * result + creationDate.hashCode();
+        return result;
+    }
 
     public static void main(String args[]) {
-        Configuration config =
-                new Configuration();
-        config.addAnnotatedClass(Need.class);
-        config.configure();
-        new SchemaExport(config).create(true, true);
-    }
+       Configuration config =
+               new Configuration();
+       config.addAnnotatedClass(Need.class);
+       config.configure();
+       new SchemaExport(config).create(true, true);
+   }
 }
