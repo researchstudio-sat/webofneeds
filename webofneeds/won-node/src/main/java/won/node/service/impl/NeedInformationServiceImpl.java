@@ -19,13 +19,16 @@ package won.node.service.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
+import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.NeedInformationService;
 import won.protocol.util.DataAccessUtils;
@@ -42,10 +45,13 @@ import java.util.List;
 @Component
 public class NeedInformationServiceImpl implements NeedInformationService {
 
+    private RDFStorageService rdfStorage;
     @Autowired
     private NeedRepository needRepository;
     @Autowired
     private ConnectionRepository connectionRepository;
+    @Autowired
+    private MatchRepository matchRepository;
 
     private static final int DEFAULT_PAGE_SIZE = 500;
 
@@ -125,11 +131,10 @@ public class NeedInformationServiceImpl implements NeedInformationService {
         return (DataAccessUtils.loadNeed(needRepository, needURI));
     }
 
-    //TODO implement RDF handling!
     @Override
     public Model readNeedContent(final URI needURI) throws NoSuchNeedException {
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-        return null;
+        return rdfStorage.loadContent(DataAccessUtils.loadNeed(needRepository, needURI));
     }
 
     @Override
@@ -144,6 +149,20 @@ public class NeedInformationServiceImpl implements NeedInformationService {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    //TODO implement paging
+    @Override
+    public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException {
+        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+        Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+        return matchRepository.findByFromNeed(need.getNeedURI(),new Sort(Sort.Direction.DESC,"score"));
+    }
+
+    @Override
+    public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException {
+        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+        Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+        return matchRepository.findByFromNeed(need.getNeedURI(),new Sort(Sort.Direction.DESC,"score"));
+    }
 
     public void setNeedRepository(final NeedRepository needRepository) {
         this.needRepository = needRepository;
@@ -153,11 +172,20 @@ public class NeedInformationServiceImpl implements NeedInformationService {
         this.connectionRepository = connectionRepository;
     }
 
+    public void setMatchRepository(final MatchRepository matchRepository)
+    {
+        this.matchRepository = matchRepository;
+    }
+
     private boolean isNeedActive(final Need need) {
         return NeedState.ACTIVE == need.getState();
     }
 
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public void setRdfStorage(RDFStorageService rdfStorage) {
+        this.rdfStorage = rdfStorage;
     }
 }

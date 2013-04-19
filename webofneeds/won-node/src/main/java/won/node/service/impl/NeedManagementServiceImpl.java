@@ -16,7 +16,8 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,10 @@ import org.springframework.stereotype.Component;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
-import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
+import won.protocol.model.WON;
 import won.protocol.owner.OwnerProtocolOwnerService;
-import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
@@ -37,6 +37,9 @@ import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -51,13 +54,10 @@ public class NeedManagementServiceImpl implements NeedManagementService
   private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
   private NeedInformationService needInformationService;
   private URIService URIService;
+  private RDFStorageService rdfStorage;
 
   @Autowired
   private NeedRepository needRepository;
-
-  @Autowired
-  private MatchRepository matchRepository;
-
 
   @Override
   public URI createNeed(final URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException
@@ -72,6 +72,26 @@ public class NeedManagementServiceImpl implements NeedManagementService
     //now, create the need URI and save again
     need.setNeedURI(URIService.createNeedURI(need));
     need = needRepository.saveAndFlush(need);
+
+    Resource needRes = content.createResource(need.getNeedURI().toString());
+
+    // Here we use the received model and reattach its parts to create a new one. The problem was we do not have a needURI when creating the need so now it gets saved properly.
+    ResIterator contentIterator = content.listSubjectsWithProperty(RDF.type, WON.NEED);
+    Resource contentNeed = contentIterator.next();
+    if (contentIterator.hasNext()) {
+      logger.warn("Multiple nodes of type won:Need found in RDF need description from owner. If this happens regularly, check the OwnerProtocol RDF handling.");
+    }
+    StmtIterator iterator = contentNeed.listProperties();
+    while (iterator.hasNext()) {
+      Statement s = iterator.next();
+      Resource subject = s.getSubject();
+      needRes.addProperty(s.getPredicate(), s.getObject());
+    }
+
+    content.removeAll(contentNeed, null, null);
+
+    rdfStorage.storeContent(need, content);
+
     return need.getNeedURI();
   }
 
@@ -94,7 +114,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     //close all connections
     //TODO: add a filter to the method/repo to filter only non-closed connections
     Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());
-    for (URI connURI : connectionURIs){
+    for (URI connURI : connectionURIs) {
       try {
         ownerFacingConnectionCommunicationService.close(connURI);
       } catch (WonProtocolException e) {
@@ -103,17 +123,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
     }
   }
 
-  @Override
-  public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException
+  private boolean isNeedActive(final Need need)
   {
-    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    return matchRepository.findByFromNeed(need.getNeedURI());
-  }
-
-
-
-  private boolean isNeedActive(final Need need) {
     return NeedState.ACTIVE == need.getState();
   }
 
@@ -143,8 +154,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
     this.needRepository = needRepository;
   }
 
-  public void setMatchRepository(final MatchRepository matchRepository)
+  public void setRdfStorage(RDFStorageService rdfStorage)
   {
-    this.matchRepository = matchRepository;
+    this.rdfStorage = rdfStorage;
   }
 }

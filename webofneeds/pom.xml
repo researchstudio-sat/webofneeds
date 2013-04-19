@@ -26,6 +26,9 @@
         <module>won-node</module>
         <module>won-owner</module>
         <module>won-owner-webapp</module>
+        <module>won-matcher</module>
+        <module>won-matcher-solr</module>
+        <module>won-ontology-validator</module>
     </modules>
     <build>
         <pluginManagement>
@@ -118,6 +121,7 @@
         <surefire.usefile>false</surefire.usefile>
 
         <!-- versions for various dependencies -->
+        <solr.version>3.5.0</solr.version>
         <cglib.version>2.2.2</cglib.version>
         <com.sun.jersey.version>1.9.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.9.1</com.sun.jersey.contribs-jersey-spring.version>

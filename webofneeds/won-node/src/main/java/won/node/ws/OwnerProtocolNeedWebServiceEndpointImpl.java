@@ -18,6 +18,7 @@ package won.node.ws;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,8 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.servlet.ServletContext;
 import javax.xml.ws.WebServiceContext;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Collection;
 
@@ -56,58 +59,6 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
 
     protected boolean isWired() {
         return ownerProtocolNeedService != null;
-    }
-
-    @WebMethod
-    public String readConnectionContent(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException {
-        //TODO: remove this workaround when we have the linked data service running
-        wireDependenciesLazily();
-        Model ret = ownerProtocolNeedService.readConnectionContent(connectionURI);
-        return (ret != null) ? ret.toString() : null;
-    }
-
-    @WebMethod
-    public Connection readConnection(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException {
-        wireDependenciesLazily();
-        return ownerProtocolNeedService.readConnection(connectionURI);
-    }
-
-    @WebMethod
-    public String readNeedContent(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException {
-        //TODO: remove this workaround when we have the linked data service running
-        wireDependenciesLazily();
-        Model ret = ownerProtocolNeedService.readNeedContent(needURI);
-        return (ret != null) ? ret.toString() : null;
-    }
-
-    @WebMethod
-    public Need readNeed(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException {
-        wireDependenciesLazily();
-        return ownerProtocolNeedService.readNeed(needURI);
-    }
-
-    @WebMethod
-    public URI[] listConnectionURIs(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException {
-        wireDependenciesLazily();
-        Collection<URI> coll = ownerProtocolNeedService.listConnectionURIs(needURI);
-        if (coll == null) return null;
-        return coll.toArray(new URI[coll.size()]);
-    }
-
-    @WebMethod
-    public Match[] getMatches(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException {
-        wireDependenciesLazily();
-        Collection<Match> coll = ownerProtocolNeedService.getMatches(needURI);
-        if (coll == null) return null;
-        return coll.toArray(new Match[coll.size()]);
-    }
-
-    @WebMethod
-    public URI[] listNeedURIs() {
-        wireDependenciesLazily();
-        Collection<URI> coll = ownerProtocolNeedService.listNeedURIs();
-        if (coll == null) return null;
-        return coll.toArray(new URI[coll.size()]);
     }
 
     @WebMethod
@@ -155,9 +106,12 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     @WebMethod
     public URI createNeed(@WebParam(name = "ownerURI") final URI ownerURI, @WebParam(name = "content") final String content, @WebParam(name = "activate") final boolean activate) throws IllegalNeedContentException {
         wireDependenciesLazily();
-        //TODO: when we start processing RDF, create Graph here!
 
-        return ownerProtocolNeedService.createNeed(ownerURI, null, activate);
+        Model m = ModelFactory.createDefaultModel();
+        StringReader sr = new StringReader(content);
+        m.read(sr, null, "TTL");
+
+        return ownerProtocolNeedService.createNeed(ownerURI, m, activate);
     }
 
     @WebMethod(exclude = true)

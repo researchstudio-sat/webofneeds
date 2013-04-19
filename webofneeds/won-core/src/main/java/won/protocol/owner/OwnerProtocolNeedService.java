@@ -16,14 +16,19 @@
 
 package won.protocol.owner;
 
+import won.protocol.exception.NoSuchNeedException;
+import won.protocol.model.Match;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 
+import java.net.URI;
+import java.util.Collection;
+
 /**
  * User: fkleedorfer
  * Date: 31.10.12
  */
-public interface OwnerProtocolNeedService extends NeedManagementService, NeedInformationService, ConnectionCommunicationService, OwnerFacingNeedCommunicationService
-{}
+public interface OwnerProtocolNeedService extends NeedManagementService, NeedInformationService,
+        ConnectionCommunicationService, OwnerFacingNeedCommunicationService { }

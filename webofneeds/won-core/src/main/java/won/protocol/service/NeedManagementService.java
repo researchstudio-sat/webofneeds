@@ -36,6 +36,8 @@ public interface NeedManagementService
    *
    *
    *
+   *
+   *
    * @param ownerURI
    * @param content
    * @param activate
@@ -58,15 +60,4 @@ public interface NeedManagementService
    * @throws NoSuchNeedException if needURI does not refer to an existing need
    */
   public void deactivate(URI needURI) throws NoSuchNeedException;
-
-  /**
-   * Returns all matches for the need.
-   *
-   * @param needURI the URI of the need
-   * @throws NoSuchNeedException if needURI is not a known need URI
-   * @return a collection of matches
-   */
-  public Collection<Match> getMatches(URI needURI) throws NoSuchNeedException;
-
-
 }

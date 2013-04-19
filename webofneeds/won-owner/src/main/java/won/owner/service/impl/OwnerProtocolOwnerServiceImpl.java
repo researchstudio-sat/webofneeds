@@ -75,7 +75,8 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
     }
 
     @Override
-    public void connectionRequested(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final String message) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
+    public void connectionRequested(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI,
+                                    final String message) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
         logger.info(MessageFormat.format("node-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, own connection {2} and message ''{3}''", ownNeedURI,otherNeedURI,ownConnectionURI,message));
         if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
@@ -88,44 +89,17 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, NeedMessage.CONNECTION_REQUESTED.name(), need.getState());
         //Create new connection object on our side
 
-        //check if there already exists a connection between those two
-        //we have multiple options:
-        //a) no connection exists -> create new
-        //b) a connection exists in state ESTABLISHED -> error message
-        //c) a connection exists in state REQUEST_SENT. Our request was first, we won't accept a request
-        //   from the other side. They have to accept/deny ours! -> error message
-        //d) a connection exists in state REQUEST_RECEIVED. The remote side contacts us repeatedly, it seems.
-        //   -> error message
-        //e) a connection exists in state CLOSED -> create new
-        /*
-        List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURI, otherNeedURI);
-        if (existingConnections.size() > 0){
-            for(Connection conn: existingConnections){
-                if (ConnectionState.ESTABLISHED == conn.getState()
-                        || ConnectionState.REQUEST_RECEIVED == conn.getState()
-                        || ConnectionState.REQUEST_SENT == conn.getState()) {
-                    throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),ownNeedURI,otherNeedURI);
-                }
-            }
-        }
-
-
         Connection con = new Connection();
         con.setNeedURI(ownNeedURI);
         con.setState(ConnectionState.REQUEST_RECEIVED);
         con.setRemoteNeedURI(otherNeedURI);
-        con.setRemoteConnectionURI(otherNeedURI);
-        //save connection (this creates a new URI)
-        con = connectionRepository.saveAndFlush(con);
-        //create and set new uri
-        con.setConnectionURI(ownConnectionURI);
-        con = connectionRepository.saveAndFlush(con);   */
 
-        try {
-            connectionRepository.saveAndFlush(ownerService.readConnection(ownConnectionURI));
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        //TODO problem: remote connection URI not available here! Do we need it? Do we adapt the interface? (using core interface - we could split it)
+        //con.setRemoteConnectionURI(otherConnectionURI);
+
+        //set new uri
+        con.setConnectionURI(ownConnectionURI);
+        connectionRepository.saveAndFlush(con);
     }
 
     @Override
@@ -134,20 +108,12 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         logger.info(MessageFormat.format("node-facing: ACCEPT called for connection {0}",connectionURI));
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
-        try {
-            connectionRepository.saveAndFlush(ownerService.readConnection(connectionURI));
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
         //load connection, checking if it exists
-       // Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        //perform state transit
-        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_ACCEPT);
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        //con.setState(nextState);
+        con.setState(con.getState().transit(ConnectionMessage.OWNER_ACCEPT));
         //save in the db
-        //final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
-
+        connectionRepository.saveAndFlush(con);
     }
 
     @Override
@@ -156,19 +122,12 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         logger.info(MessageFormat.format("node-facing: DENY called for connection {0}",connectionURI));
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
-        try {
-            connectionRepository.saveAndFlush(ownerService.readConnection(connectionURI));
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
         //load connection, checking if it exists
-        //Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        //perform state transit
-        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_DENY);
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        //con.setState(nextState);
+        con.setState(con.getState().transit(ConnectionMessage.OWNER_DENY));
         //save in the db
-        //final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
+        connectionRepository.saveAndFlush(con);
     }
 
     @Override
@@ -177,19 +136,12 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         logger.info(MessageFormat.format("node-facing: CLOSE called for connection {0}",connectionURI));
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
-        try {
-            connectionRepository.saveAndFlush(ownerService.readConnection(connectionURI));
-        } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
         //load connection, checking if it exists
-        //Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        //perform state transit
-        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_CLOSE);
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        //con.setState(nextState);
+        con.setState(con.getState().transit(ConnectionMessage.OWNER_CLOSE));
         //save in the db
-        //final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
+        connectionRepository.saveAndFlush(con);
     }
 
     @Override
@@ -208,7 +160,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         chatMessage.setCreationDate(new Date());
         chatMessage.setLocalConnectionURI(con.getConnectionURI());
         chatMessage.setMessage(message);
-        chatMessage.setOriginatorURI(con.getNeedURI());
+        chatMessage.setOriginatorURI(con.getRemoteNeedURI());
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);
     }

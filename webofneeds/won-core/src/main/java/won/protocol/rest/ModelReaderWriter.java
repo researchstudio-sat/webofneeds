@@ -76,7 +76,7 @@ public class ModelReaderWriter implements MessageBodyWriter<Model>, MessageBodyR
     Model model = ModelFactory.createDefaultModel();
     logger.trace("readFrom called on GraphWriter, mediaType=" + mediaType);
     String jenaLanguage = mimeTypeToJenaLanguage(mediaType, DEFAULT_RDF_LANGUAGE);
-    logger.info("converted mediaType " + mediaType + " to jena language " + jenaLanguage);
+    logger.debug("converted mediaType " + mediaType + " to jena language " + jenaLanguage);
     model.read(entityStream, jenaLanguage);
     return model;
   }

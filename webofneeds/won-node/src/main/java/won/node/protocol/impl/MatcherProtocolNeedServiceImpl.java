@@ -23,6 +23,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.model.Connection;
+import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedInformationService;
@@ -102,8 +103,17 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
     return needInformationService.readConnectionContent(connectionURI);
   }
 
-  public void setMatcherProtocolNeedService(final MatcherProtocolNeedService matcherProtocolNeedService)
-  {
+  @Override
+  public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException {
+    return needInformationService.listMatches(needURI, page);
+  }
+
+  @Override
+  public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException {
+      return needInformationService.listMatches(needURI);
+  }
+
+  public void setMatcherProtocolNeedService(final MatcherProtocolNeedService matcherProtocolNeedService) {
     this.needInformationService = matcherProtocolNeedService;
   }
 
