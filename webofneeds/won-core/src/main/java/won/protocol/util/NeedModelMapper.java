@@ -25,7 +25,6 @@ public class NeedModelMapper implements ModelMapper<Need>
 
     Model model = ModelFactory.createDefaultModel();
     Resource needResource = model.createResource(need.getNeedURI().toString(), WON.NEED);
-
     model.add(model.createStatement(needResource, WON.IS_IN_STATE, WON.toResource(need.getState())));
 
     return model;

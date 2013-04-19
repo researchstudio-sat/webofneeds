@@ -133,7 +133,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Model model = rdfStorage.loadContent(need);
     setNsPrefixes(model);
 
-    //Model needModel = needModelMapper.toModel(need);
+    Model needModel = needModelMapper.toModel(need);
 
     // add endpoints
     Resource needResource = model.getResource(needUri.toString());
@@ -141,18 +141,13 @@ public class LinkedDataServiceImpl implements LinkedDataService
         .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
         .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint));
 
-    // owner
-    Resource owner = model.createResource(need.getOwnerURI().toString(), WON.OWNER);
-    model.add(model.createStatement(needResource, WON.HAS_OWNER, owner));
-
-    // set active or inactive
-    model.add(model.createStatement(needResource, WON.IS_IN_STATE, WON.toResource(need.getState())));
-
     // add connections
     Resource connectionsContainer = model.createResource(need.getNeedURI().toString() + "/connections/");
     model.add(model.createStatement(connectionsContainer, RDF.type, LDP.CONTAINER));
-
     model.add(model.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
+
+    //merge needModel and model
+    model.add(needModel.listStatements());
 
     return model;
   }
