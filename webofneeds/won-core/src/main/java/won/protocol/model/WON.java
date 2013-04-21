@@ -32,7 +32,6 @@ public class WON
   public static final String BASE_URI = "http://purl.org/webofneeds/model#";
   private static Model m = ModelFactory.createDefaultModel();
 
-  //NEW
   public static final Property NEED = m.createProperty(BASE_URI, "Need");
   public static final Property NEED_CREATION_DATE = m.createProperty(BASE_URI, "needCreationDate");
   public static final Property NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "needProtocolEndpoint");
@@ -58,7 +57,7 @@ public class WON
 
   public static final Property HAS_OWNER = m.createProperty(BASE_URI, "hasOwner");
   public static final Property OWNER = m.createProperty(BASE_URI, "Owner");
-  public static final Property ANONYMIZED_OWNER = m.createProperty(BASE_URI, "AnonymizedOwner");
+  public static final Resource ANONYMIZED_OWNER = m.createResource(BASE_URI + "AnonymizedOwner");
 
   public static final Property HAS_CONNECTIONS = m.createProperty(BASE_URI, "hasConnections");
   public static final Property CONNECTION_CONTAINER = m.createProperty(BASE_URI, "ConnectionContainer");
