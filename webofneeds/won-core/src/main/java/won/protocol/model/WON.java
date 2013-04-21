@@ -45,6 +45,7 @@ public class WON
 
   public static final Property HAS_CONTENT = m.createProperty(BASE_URI, "hasContent");
   public static final Property NEED_CONTENT = m.createProperty(BASE_URI, "NeedContent");
+  public static final Property TITLE = m.createProperty(BASE_URI, "title");
   public static final Property TEXT_DESCRIPTION = m.createProperty(BASE_URI, "textDescription");
   public static final Property CONTENT_DESCRIPTION = m.createProperty(BASE_URI, "contentDescription");
   public static final Property HEIGHT = m.createProperty(BASE_URI, "height");
@@ -68,6 +69,7 @@ public class WON
   public static final Property OCCURED_AT = m.createProperty(BASE_URI, "occuredAt");
   public static final Property HAS_ORIGINATOR = m.createProperty(BASE_URI, "hasOriginator");
 
+  public static final Property HAS_NEED_MODALITY = m.createProperty(BASE_URI, "hasMeedModality");
   public static final Property NEED_MODALITY = m.createProperty(BASE_URI, "NeedModality");
 
   public static final Property HAS_PRICE_SPECIFICATION = m.createProperty(BASE_URI, "hasPriceSpecification");
