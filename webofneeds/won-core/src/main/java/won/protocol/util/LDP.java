@@ -22,6 +22,8 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
+ * LDP vocabulary.
+ *
  * User: fkleedorfer
  * Date: 25.02.13
  */
@@ -30,13 +32,6 @@ public class LDP
   public static final String BASE_URI = "http://www.w3.org/ns/ldp#";
   public static final String DEFAULT_PREFIX= "ldp";
 
-  /** returns the URI for this schema
-   * @return the URI for this schema
-   */
-  public static String getURI() {
-    return BASE_URI;
-  }
-
   private static Model m = ModelFactory.createDefaultModel();
 
   public static final Property CONTAINER = m.createProperty(BASE_URI + "Container");
@@ -44,4 +39,10 @@ public class LDP
   public static final Property NEXT_PAGE = m.createProperty(BASE_URI + "nextPage");
   public static final Resource PAGE = m.createResource(BASE_URI + "Page");
 
+  /** returns the URI for this schema
+   * @return the URI for this schema
+   */
+  public static String getURI() {
+      return BASE_URI;
+  }
 }
