@@ -123,6 +123,11 @@ public class NeedController
               .addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription());
       needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
 
+      // owner
+      if(needPojo.isAnonymize()) {
+        needModel.add(needModel.createStatement(needResource, WON.HAS_OWNER, WON.ANONYMIZED_OWNER));
+      }
+
       // need modalities
       Resource needModality = needModel.createResource(WON.NEED_MODALITY);
 
