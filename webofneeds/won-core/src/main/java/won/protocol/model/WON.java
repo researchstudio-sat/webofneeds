@@ -22,6 +22,8 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
+ * WON vocabulary.
+ *
  * User: fkleedorfer
  * Date: 20.11.12
  */
@@ -78,7 +80,7 @@ public class WON
   public static final Property HAS_UPPER_PRICE_LIMIT = m.createProperty(BASE_URI, "hasUpperPriceLimit");
   public static final Property HAS_CURRENCY = m.createProperty(BASE_URI, "hasCurrency");
 
-  public static final Property AVAILABLE_LOCATION = m.createProperty(BASE_URI, "availableLocation");
+  public static final Property AVAILABLE_AT_LOCATION = m.createProperty(BASE_URI, "availableAtLocation");
   public static final Property LOCATION = m.createProperty(BASE_URI, "Location");
   public static final Property IS_CONCEALED = m.createProperty(BASE_URI, "isConcealed");
   public static final Property REGION = m.createProperty(BASE_URI, "Region");

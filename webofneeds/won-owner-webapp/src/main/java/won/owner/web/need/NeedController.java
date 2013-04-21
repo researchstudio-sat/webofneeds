@@ -2,7 +2,6 @@ package won.owner.web.need;
 
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +19,11 @@ import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.model.Match;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
-import won.protocol.model.WON;
+import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.util.LDP;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -141,11 +136,17 @@ public class NeedController
           priceSpecification.addProperty(WON.HAS_UPPER_PRICE_LIMIT, Double.toString(needPojo.getUpperPriceLimit()));
         if(!needPojo.getCurrency().isEmpty())
           priceSpecification.addProperty(WON.HAS_CURRENCY, needPojo.getCurrency());
-        needModel.add(needModel.createStatement(needResource, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
+
+        needModel.add(needModel.createStatement(needModality, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
       }
 
-      // TODO: location specification
-      //Resource location = needModel.createResource();
+      if(needPojo.getLatitude() != null && needPojo.getLongitude() != null) {
+        Resource location = needModel.createResource(GEO.POINT)
+            .addProperty(GEO.LATITUDE, Double.toString(needPojo.getLatitude()))
+            .addProperty(GEO.LONGITUDE, Double.toString(needPojo.getLongitude()));
+
+        needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_LOCATION, location));
+      }
 
       // time constraint
 
