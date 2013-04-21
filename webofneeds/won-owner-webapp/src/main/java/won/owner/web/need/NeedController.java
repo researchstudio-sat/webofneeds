@@ -131,7 +131,7 @@ public class NeedController
       // need modalities
       Resource needModality = needModel.createResource(WON.NEED_MODALITY);
 
-      // TODO: keep need modalities in separate objects to enable easier checking and multiple instances
+      // TODO: store need modalities in separate objects to enable easier checking and multiple instances
       //price and currency
       if(needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null || !needPojo.getCurrency().isEmpty()) {
         Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
