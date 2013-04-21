@@ -28,5 +28,11 @@ public class GR {
     public static final Property HAS_MAX_VALUE = m.createProperty(BASE_URI, "hasMaxValue");
     public static final Property HAS_VALUE = m.createProperty(BASE_URI, "hasValue");
 
+    /** returns the URI for this schema
+     * @return the URI for this schema
+     */
+    public static String getURI() {
+        return BASE_URI;
+    }
 
 }

@@ -26,9 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.model.Connection;
-import won.protocol.model.Need;
-import won.protocol.model.WON;
+import won.protocol.model.*;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.util.ConnectionModelMapper;
@@ -73,12 +71,13 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   private NeedInformationService needInformationService;
 
-
   static {
     PREFIX_MAPPING.setNsPrefix("won", WON.getURI());
     PREFIX_MAPPING.setNsPrefix("rdf", RDF.getURI());
     PREFIX_MAPPING.setNsPrefix("ldp", LDP.getURI());
     PREFIX_MAPPING.setNsPrefix("rdfs", RDFS.getURI());
+    PREFIX_MAPPING.setNsPrefix("geo", GEO.getURI());
+    PREFIX_MAPPING.setNsPrefix("gr", GR.getURI());
   }
 
   public Model listNeedURIs(final int page)

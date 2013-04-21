@@ -20,4 +20,10 @@ public class GEO {
     public static final Property LONGITUDE = m.createProperty(BASE_URI, "longitude");
     public static final Property LATITUDE = m.createProperty(BASE_URI, "latitude");
 
+    /** returns the URI for this schema
+     * @return the URI for this schema
+     */
+    public static String getURI() {
+        return BASE_URI;
+    }
 }
