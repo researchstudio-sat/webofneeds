@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.protocol.util;
+package won.protocol.model;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;

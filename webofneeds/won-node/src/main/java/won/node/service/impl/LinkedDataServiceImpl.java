@@ -30,7 +30,7 @@ import won.protocol.model.*;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.util.ConnectionModelMapper;
-import won.protocol.util.LDP;
+import won.protocol.model.LDP;
 import won.protocol.util.NeedModelMapper;
 
 import java.net.URI;
