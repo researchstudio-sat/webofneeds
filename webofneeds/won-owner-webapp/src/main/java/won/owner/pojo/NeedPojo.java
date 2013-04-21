@@ -10,13 +10,23 @@ import won.protocol.model.BasicNeedType;
  */
 public class NeedPojo
 {
+  private String needURI;
+
   private String title;
   private BasicNeedType basicNeedType;
   private boolean active;
   private boolean anonymize;
   private String wonNode;
+
   private String textDescription;
-  private String needURI;
+
+  // using objects to be able to check for null
+  private Double upperPriceLimit;
+  private Double lowerPriceLimit;
+  private String currency;
+
+  private Double latitude;
+  private Double longitude;
 
   public String getTitle()
   {
@@ -87,4 +97,44 @@ public class NeedPojo
   {
     this.needURI = needURI;
   }
+
+    public Double getUpperPriceLimit() {
+        return upperPriceLimit;
+    }
+
+    public void setUpperPriceLimit(Double upperPriceLimit) {
+        this.upperPriceLimit = upperPriceLimit;
+    }
+
+    public Double getLowerPriceLimit() {
+        return lowerPriceLimit;
+    }
+
+    public void setLowerPriceLimit(Double lowerPriceLimit) {
+        this.lowerPriceLimit = lowerPriceLimit;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
 }

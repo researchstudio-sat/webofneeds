@@ -13,7 +13,7 @@
     <title>Create Need</title>
 </head>
 <body>
-    <h1>Create a Need</h1>
+    <h1>New need</h1>
 
     <form:form method="POST" action="create">
         <table>
@@ -23,7 +23,10 @@
             </tr>
             <tr>
                 <td><form:label path="basicNeedType">Basic type:</form:label></td>
-                <td></td>
+                <td><form:select path="basicNeedType">
+                    <form:option value="-" label="--Please Select"/>
+                    <form:options items="${enumValues}" />
+                </form:select></td>
             </tr>
             <tr>
                 <td><form:label path="active">Need state:</form:label></td>
@@ -40,6 +43,31 @@
             <tr>
                 <td><form:label path="textDescription">Text description:</form:label></td>
                 <td><form:textarea path="textDescription" rows="5" cols="30" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="upperPriceLimit">Upper price limit:</form:label> </td>
+                <td><form:input path="upperPriceLimit" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="lowerPriceLimit">Lower price limit:</form:label> </td>
+                <td><form:input path="lowerPriceLimit" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="currency">Currency</form:label> </td>
+                <td><form:input path="currency" /></td>
+            </tr>
+
+            <tr>
+                <td><form:label path="latitude">Latitude:</form:label></td>
+                <td><form:input path="latitude" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="longitude">Longitude:</form:label></td>
+                <td><form:input path="longitude" /></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
             </tr>
             <tr>
                 <td colspan="2"><input type="submit" value="Submit"/></td>

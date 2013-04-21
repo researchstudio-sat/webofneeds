@@ -117,18 +117,39 @@ public class NeedController
 
       com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
-      //TODO: [CLEANUP] Hardcoded sample need graph
       Resource needResource = needModel.createResource(WON.NEED);
 
       // need type
-      needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_GIVE));
+      needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
 
       // need content
-      Resource needContent = needModel.createResource(WON.NEED_CONTENT);
-      needModel.add(needModel.createStatement(needContent, WON.TEXT_DESCRIPTION, needPojo.getTextDescription()));
+      Resource needContent = needModel.createResource(WON.NEED_CONTENT)
+              .addProperty(WON.TITLE, needPojo.getTitle())
+              .addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription());
       needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
 
       // need modalities
+      Resource needModality = needModel.createResource(WON.NEED_MODALITY);
+
+      // TODO: keep need modalities in separate objects to enable easier checking and multiple instances
+      //price and currency
+      if(needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null || !needPojo.getCurrency().isEmpty()) {
+        Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
+        if(needPojo.getLowerPriceLimit() != null)
+          priceSpecification.addProperty(WON.HAS_LOWER_PRICE_LIMIT, Double.toString(needPojo.getLowerPriceLimit()));
+        if(needPojo.getUpperPriceLimit() != null)
+          priceSpecification.addProperty(WON.HAS_UPPER_PRICE_LIMIT, Double.toString(needPojo.getUpperPriceLimit()));
+        if(!needPojo.getCurrency().isEmpty())
+          priceSpecification.addProperty(WON.HAS_CURRENCY, needPojo.getCurrency());
+        needModel.add(needModel.createStatement(needResource, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
+      }
+
+      // TODO: location specification
+      //Resource location = needModel.createResource();
+
+      // time constraint
+
+      needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
 
       if (needPojo.getWonNode().equals("")) {
         needURI = ownerService.createNeed(ownerURI, needModel, needPojo.isActive());
@@ -151,7 +172,7 @@ public class NeedController
     return "createNeed";
   }
 
-  @RequestMapping(value = "", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
   public String listNeeds(Model model)
   {
 
