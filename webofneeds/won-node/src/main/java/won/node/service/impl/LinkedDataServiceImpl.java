@@ -30,8 +30,11 @@ import won.protocol.model.*;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.util.ConnectionModelMapper;
-import won.protocol.model.LDP;
+import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.GR;
+import won.protocol.vocabulary.LDP;
 import won.protocol.util.NeedModelMapper;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;

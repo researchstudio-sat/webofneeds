@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package won.protocol.model;
+package won.protocol.vocabulary;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import won.protocol.model.BasicNeedType;
+import won.protocol.model.EventType;
+import won.protocol.model.NeedState;
 
 /**
  * WON vocabulary.

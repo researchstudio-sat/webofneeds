@@ -27,7 +27,7 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.model.WON;
+import won.protocol.vocabulary.WON;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
@@ -37,9 +37,6 @@ import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * User: fkleedorfer

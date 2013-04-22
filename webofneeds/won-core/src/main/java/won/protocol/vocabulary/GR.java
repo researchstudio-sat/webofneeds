@@ -1,4 +1,4 @@
-package won.protocol.model;
+package won.protocol.vocabulary;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -13,7 +13,7 @@ import com.hp.hpl.jena.rdf.model.Property;
  */
 public class GR {
 
-    public static final String BASE_URI = "www.w3.org/2003/01/geo/wgs84_pos#";
+    public static final String BASE_URI = "http://purl.org/goodrelations/v1#";
     private static Model m = ModelFactory.createDefaultModel();
 
     public static final Property OFFERING = m.createProperty(BASE_URI, "Offering");

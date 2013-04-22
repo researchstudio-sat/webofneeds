@@ -10,7 +10,7 @@ import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
-import won.protocol.model.WON;
+import won.protocol.vocabulary.WON;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.ws.MatcherProtocolNeedWebServiceEndpoint;
 import won.matcher.ws.MatcherProtocolNeedWebServiceClient;

@@ -24,6 +24,9 @@ import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -133,7 +136,7 @@ public class NeedController
 
       // TODO: store need modalities in separate objects to enable easier checking and multiple instances
       //price and currency
-      if(needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null || !needPojo.getCurrency().isEmpty()) {
+      if(needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
         Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
         if(needPojo.getLowerPriceLimit() != null)
           priceSpecification.addProperty(WON.HAS_LOWER_PRICE_LIMIT, Double.toString(needPojo.getLowerPriceLimit()));
@@ -157,13 +160,12 @@ public class NeedController
       if(needPojo.getStartTime() != null && needPojo.getEndTime() != null) {
         Resource timeConstraint = needModel.createResource(WON.TIME)
                 .addProperty(WON.START_TIME, needPojo.getStartTime())
-                .addProperty(WON.END_TIME, needPojo.getEndTime());
+                .addProperty(WON.END_TIME, needPojo.getEndTime())
+                .addProperty(WON.RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()));
           if(needPojo.getRecurIn() != null)
               timeConstraint.addProperty(WON.RECUR_IN, Long.toString(needPojo.getRecurIn()));
           if(needPojo.getRecurTimes() != null)
               timeConstraint.addProperty(WON.RECUR_TIMES, Integer.toString(needPojo.getRecurTimes()));
-          //if(needPojo.getRecurInfiniteTimes() != null)
-          //    timeConstraint.addProperty(WON.RECUR_INFINITE_TIMES, needPojo.getRecurInfiniteTimes());
           needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_TIME, timeConstraint));
       }
 

@@ -17,6 +17,7 @@ import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.NeedModelMapper;
+import won.protocol.vocabulary.WON;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 
 import java.io.StringWriter;

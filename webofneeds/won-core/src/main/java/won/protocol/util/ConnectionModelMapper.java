@@ -5,7 +5,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import won.protocol.model.Connection;
-import won.protocol.model.WON;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 

@@ -16,6 +16,8 @@
 
 package won.protocol.model;
 
+import won.protocol.vocabulary.WON;
+
 import java.net.URI;
 
 /**
