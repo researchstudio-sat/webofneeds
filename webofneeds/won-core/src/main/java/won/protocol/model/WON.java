@@ -85,6 +85,7 @@ public class WON
   public static final Property REGION = m.createProperty(BASE_URI, "Region");
   public static final Property HAS_ISO_CODE = m.createProperty(BASE_URI, "hasISOCode");
 
+  public static final Property TIME = m.createProperty(BASE_URI, "Time");
   public static final Property AVAILABLE_AT_TIME = m.createProperty(BASE_URI, "availableAtTime");
   public static final Property TIME_CONSTRAINT = m.createProperty(BASE_URI, "TimeConstraint");
   public static final Property START_TIME = m.createProperty(BASE_URI, "startTime");
