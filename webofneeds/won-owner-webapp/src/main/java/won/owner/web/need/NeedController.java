@@ -154,6 +154,18 @@ public class NeedController
       }
 
       // time constraint
+      if(needPojo.getStartTime() != null && needPojo.getEndTime() != null) {
+        Resource timeConstraint = needModel.createResource(WON.TIME)
+                .addProperty(WON.START_TIME, needPojo.getStartTime())
+                .addProperty(WON.END_TIME, needPojo.getEndTime());
+          if(needPojo.getRecurIn() != null)
+              timeConstraint.addProperty(WON.RECUR_IN, Long.toString(needPojo.getRecurIn()));
+          if(needPojo.getRecurTimes() != null)
+              timeConstraint.addProperty(WON.RECUR_TIMES, Integer.toString(needPojo.getRecurTimes()));
+          //if(needPojo.getRecurInfiniteTimes() != null)
+          //    timeConstraint.addProperty(WON.RECUR_INFINITE_TIMES, needPojo.getRecurInfiniteTimes());
+          needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_TIME, timeConstraint));
+      }
 
       needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
 

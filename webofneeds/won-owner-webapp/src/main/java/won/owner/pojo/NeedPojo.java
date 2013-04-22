@@ -3,7 +3,6 @@ package won.owner.pojo;
 import won.protocol.model.BasicNeedType;
 
 /**
- * Created with IntelliJ IDEA.
  * User: Gabriel
  * Date: 19.12.12
  * Time: 11:44
@@ -27,6 +26,12 @@ public class NeedPojo
 
   private Double latitude;
   private Double longitude;
+
+  private String startTime;
+  private String endTime;
+  private Long recurIn;
+  private Integer recurTimes;
+  private boolean recurInfiniteTimes;
 
   public String getTitle()
   {
@@ -136,5 +141,45 @@ public class NeedPojo
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public Long getRecurIn() {
+        return recurIn;
+    }
+
+    public void setRecurIn(Long recurIn) {
+        this.recurIn = recurIn;
+    }
+
+    public Integer getRecurTimes() {
+        return recurTimes;
+    }
+
+    public void setRecurTimes(Integer recurTimes) {
+        this.recurTimes = recurTimes;
+    }
+
+    public boolean getRecurInfiniteTimes() {
+        return recurInfiniteTimes;
+    }
+
+    public void setRecurInfiniteTimes(boolean recurInfiniteTimes) {
+        this.recurInfiniteTimes = recurInfiniteTimes;
     }
 }

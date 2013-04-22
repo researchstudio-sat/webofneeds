@@ -66,8 +66,24 @@
                 <td><form:input path="longitude" /></td>
             </tr>
             <tr>
-                <td></td>
-                <td></td>
+                <td><form:label path="startTime">Start time:</form:label></td>
+                <td><form:input path="startTime" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="endTime">End time:</form:label></td>
+                <td><form:input path="endTime" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="recurIn">Recur in:</form:label></td>
+                <td><form:input path="recurIn" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="recurTimes">Recur times:</form:label></td>
+                <td><form:input path="recurTimes" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="recurInfiniteTimes">Recur inifinite times:</form:label></td>
+                <td><form:checkbox path="recurInfiniteTimes" /></td>
             </tr>
             <tr>
                 <td colspan="2"><input type="submit" value="Submit"/></td>
