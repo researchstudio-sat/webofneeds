@@ -16,11 +16,13 @@
 
 package won.node.service.impl;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.vocabulary.XSD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +83,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     PREFIX_MAPPING.setNsPrefix("rdfs", RDFS.getURI());
     PREFIX_MAPPING.setNsPrefix("geo", GEO.getURI());
     PREFIX_MAPPING.setNsPrefix("gr", GR.getURI());
+    PREFIX_MAPPING.setNsPrefix("xsd", XSD.getURI());
   }
 
   public Model listNeedURIs(final int page)
