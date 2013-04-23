@@ -160,7 +160,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
     Resource r = model.createResource(connectionUri.toString());
-    r.addProperty(WON.NEED_STATE, connection.getState().name());
+    r.addProperty(WON.IS_IN_STATE, connection.getState().name());
     if (connection.getRemoteConnectionURI() != null)
       r.addProperty(WON.HAS_REMOTE_CONNECTION, model.createResource(connection.getRemoteConnectionURI().toString()));
     r.addProperty(WON.REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));

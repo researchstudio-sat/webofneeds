@@ -3,6 +3,7 @@ package won.protocol.vocabulary;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  * WGS84 Geo Positioning vocabulary.
@@ -16,7 +17,7 @@ public class GEO {
     public static final String BASE_URI = "http://www.w3.org/2003/01/geo/wgs84_pos#";
     private static Model m = ModelFactory.createDefaultModel();
 
-    public static final Property POINT = m.createProperty(BASE_URI, "Point");
+    public static final Resource POINT = m.createResource(BASE_URI + "Point");
     public static final Property LONGITUDE = m.createProperty(BASE_URI, "longitude");
     public static final Property LATITUDE = m.createProperty(BASE_URI, "latitude");
 

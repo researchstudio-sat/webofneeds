@@ -24,13 +24,14 @@
             <tr>
                 <td><form:label path="basicNeedType">Basic type:</form:label></td>
                 <td><form:select path="basicNeedType">
-                    <form:option value="-" label="--Please Select"/>
                     <form:options items="${enumValues}" />
                 </form:select></td>
             </tr>
             <tr>
-                <td><form:label path="active">Need state:</form:label></td>
-                <td><form:checkbox path="active" /></td>
+                <td><form:label path="state">Need state:</form:label></td>
+                <td><form:select path="state">
+                    <form:options items="${enumValues}" />
+                </form:select></td>
             </tr>
             <tr>
                 <td><form:label path="anonymize">Anonymize owner:</form:label></td>
@@ -55,6 +56,12 @@
             <tr>
                 <td><form:label path="currency">Currency</form:label> </td>
                 <td><form:input path="currency" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="deliveryMethod">Delivery method</form:label> </td>
+                <td><form:select path="deliveryMethod">
+                    <form:options items="${enumValues}" />
+                </form:select></td>
             </tr>
 
             <tr>

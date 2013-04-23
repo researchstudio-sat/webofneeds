@@ -23,7 +23,7 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
         Model model = ModelFactory.createDefaultModel();
 
         Resource r = model.createResource(tobject.getConnectionURI().toString());
-        r.addProperty(WON.NEED_STATE, tobject.getState().name());
+        r.addProperty(WON.IS_IN_STATE, tobject.getState().name());
         if(tobject.getRemoteConnectionURI() != null)
             r.addProperty(WON.HAS_REMOTE_CONNECTION, model.createResource(tobject.getRemoteConnectionURI().toString()));
         r.addProperty(WON.REMOTE_NEED, model.createResource(tobject.getRemoteNeedURI().toString()));
@@ -35,7 +35,7 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
     @Override
     public Connection fromModel(Model model) {
         Connection c = new Connection();
-        Resource rCon = model.listSubjectsWithProperty(WON.NEED_STATE).nextResource();
+        Resource rCon = model.listSubjectsWithProperty(WON.IS_IN_STATE).nextResource();
 
         //TODO: Not Safe
         c.setConnectionURI(URI.create(rCon.getURI()));

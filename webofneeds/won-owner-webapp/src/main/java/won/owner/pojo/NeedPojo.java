@@ -1,6 +1,17 @@
 package won.owner.pojo;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.model.BasicNeedType;
+import won.protocol.model.NeedState;
+import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.GRDeliveryMethod;
+import won.protocol.vocabulary.WON;
+
+import java.net.URI;
 
 /**
  * User: Gabriel
@@ -9,20 +20,24 @@ import won.protocol.model.BasicNeedType;
  */
 public class NeedPojo
 {
+  final Logger logger = LoggerFactory.getLogger(getClass());
+
   private String needURI;
 
   private String title;
   private BasicNeedType basicNeedType;
-  private boolean active;
+  private NeedState state;
   private boolean anonymize;
   private String wonNode;
 
   private String textDescription;
+  private String creationDate;
 
   // using objects to be able to check for null
   private Double upperPriceLimit;
   private Double lowerPriceLimit;
   private String currency;
+  private GRDeliveryMethod deliveryMethod;
 
   private Double latitude;
   private Double longitude;
@@ -32,6 +47,99 @@ public class NeedPojo
   private Long recurIn;
   private Integer recurTimes;
   private boolean recurInfiniteTimes;
+
+  public NeedPojo()
+  {
+
+  }
+
+  public NeedPojo(URI needUri, final Model model)
+  {
+    Resource need = model.getResource(needUri.toString());
+    creationDate = need.getProperty(WON.NEED_CREATION_DATE).getString();
+
+    //TODO: add owner
+
+    Statement stateStat = need.getProperty(WON.IS_IN_STATE);
+    if (stateStat != null) {
+      URI uri = URI.create(stateStat.getResource().getURI());
+      state = NeedState.parseString(uri.getFragment());
+    }
+
+    Statement basicNeedStat = need.getProperty(WON.HAS_BASIC_NEED_TYPE);
+    if (basicNeedStat != null) {
+      URI uri = URI.create(basicNeedStat.getResource().getURI());
+      basicNeedType = BasicNeedType.parseString(uri.getFragment());
+    }
+
+    Statement needContent = need.getProperty(WON.HAS_CONTENT);
+    if (needContent != null) {
+      Statement titleStat = needContent.getResource().getProperty(WON.TITLE);
+      if (titleStat != null) title = titleStat.getString();
+
+      Statement textDescriptionStat = needContent.getResource().getProperty(WON.TEXT_DESCRIPTION);
+      if (textDescriptionStat != null) textDescription = textDescriptionStat.getString();
+    }
+
+    Statement needModality = need.getProperty(WON.HAS_NEED_MODALITY);
+    if (needModality != null) {
+
+      Statement location = needModality.getResource().getProperty(WON.AVAILABLE_AT_LOCATION);
+      if (location != null) {
+        latitude = location.getProperty(GEO.LATITUDE).getDouble();
+        longitude = location.getProperty(GEO.LONGITUDE).getDouble();
+      }
+
+      Statement timeConstraints = needModality.getResource().getProperty(WON.AVAILABLE_AT_TIME);
+      if (timeConstraints != null) {
+
+        Statement startTimeStat = timeConstraints.getResource().getProperty(WON.START_TIME);
+        if (startTimeStat != null) startTime = startTimeStat.getString();
+
+        Statement endTimeStat = timeConstraints.getResource().getProperty(WON.END_TIME);
+        if (endTimeStat != null) endTime = endTimeStat.getString();
+
+        Statement timeConstraintStat = timeConstraints.getResource().getProperty(WON.RECUR_IN);
+        if (timeConstraintStat != null) recurIn = timeConstraintStat.getLong();
+
+        Statement recurTimesStat = timeConstraints.getResource().getProperty(WON.RECUR_TIMES);
+        if (recurTimesStat != null) recurTimes = recurTimesStat.getInt();
+
+        recurInfiniteTimes = timeConstraints.getResource().getProperty(WON.RECUR_INFINITE_TIMES).getBoolean();
+      }
+
+      Statement priceSpecification = needModality.getResource().getProperty(WON.HAS_PRICE_SPECIFICATION);
+      if (priceSpecification != null) {
+
+        Statement currencyStat = priceSpecification.getResource().getProperty(WON.HAS_CURRENCY);
+        if (currencyStat != null) currency = currencyStat.getString();
+
+        Statement lowerStat = priceSpecification.getResource().getProperty(WON.HAS_LOWER_PRICE_LIMIT);
+        if (lowerStat != null) lowerPriceLimit = lowerStat.getDouble();
+
+        Statement upperStat = priceSpecification.getResource().getProperty(WON.HAS_UPPER_PRICE_LIMIT);
+        if (upperStat != null) upperPriceLimit = upperStat.getDouble();
+      }
+
+      Statement deliveryStat = needModality.getProperty(WON.AVAILABLE_DELIVERY_METHOD);
+      if (deliveryStat != null) {
+        URI uri = URI.create(deliveryStat.getResource().getURI());
+        deliveryMethod = GRDeliveryMethod.parseString(uri.getFragment());
+      }
+
+    }
+
+  }
+
+  public String getCreationDate()
+  {
+    return creationDate;
+  }
+
+  public void setCreationDate(final String creationDate)
+  {
+    this.creationDate = creationDate;
+  }
 
   public String getTitle()
   {
@@ -53,14 +161,14 @@ public class NeedPojo
     this.basicNeedType = basicNeedType;
   }
 
-  public boolean isActive()
+  public NeedState getState()
   {
-    return active;
+    return state;
   }
 
-  public void setActive(final boolean active)
+  public void setState(final NeedState state)
   {
-    this.active = active;
+    this.state = state;
   }
 
   public boolean isAnonymize()
@@ -103,83 +211,113 @@ public class NeedPojo
     this.needURI = needURI;
   }
 
-    public Double getUpperPriceLimit() {
-        return upperPriceLimit;
-    }
+  public Double getUpperPriceLimit()
+  {
+    return upperPriceLimit;
+  }
 
-    public void setUpperPriceLimit(Double upperPriceLimit) {
-        this.upperPriceLimit = upperPriceLimit;
-    }
+  public void setUpperPriceLimit(Double upperPriceLimit)
+  {
+    this.upperPriceLimit = upperPriceLimit;
+  }
 
-    public Double getLowerPriceLimit() {
-        return lowerPriceLimit;
-    }
+  public Double getLowerPriceLimit()
+  {
+    return lowerPriceLimit;
+  }
 
-    public void setLowerPriceLimit(Double lowerPriceLimit) {
-        this.lowerPriceLimit = lowerPriceLimit;
-    }
+  public void setLowerPriceLimit(Double lowerPriceLimit)
+  {
+    this.lowerPriceLimit = lowerPriceLimit;
+  }
 
-    public String getCurrency() {
-        return currency;
-    }
+  public String getCurrency()
+  {
+    return currency;
+  }
 
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
+  public void setCurrency(String currency)
+  {
+    this.currency = currency;
+  }
 
-    public Double getLatitude() {
-        return latitude;
-    }
+  public GRDeliveryMethod getDeliveryMethod()
+  {
+    return deliveryMethod;
+  }
 
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
+  public void setDeliveryMethod(final GRDeliveryMethod deliveryMethod)
+  {
+    this.deliveryMethod = deliveryMethod;
+  }
 
-    public Double getLongitude() {
-        return longitude;
-    }
+  public Double getLatitude()
+  {
+    return latitude;
+  }
 
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
+  public void setLatitude(Double latitude)
+  {
+    this.latitude = latitude;
+  }
 
-    public String getStartTime() {
-        return startTime;
-    }
+  public Double getLongitude()
+  {
+    return longitude;
+  }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
+  public void setLongitude(Double longitude)
+  {
+    this.longitude = longitude;
+  }
 
-    public String getEndTime() {
-        return endTime;
-    }
+  public String getStartTime()
+  {
+    return startTime;
+  }
 
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
+  public void setStartTime(String startTime)
+  {
+    this.startTime = startTime;
+  }
 
-    public Long getRecurIn() {
-        return recurIn;
-    }
+  public String getEndTime()
+  {
+    return endTime;
+  }
 
-    public void setRecurIn(Long recurIn) {
-        this.recurIn = recurIn;
-    }
+  public void setEndTime(String endTime)
+  {
+    this.endTime = endTime;
+  }
 
-    public Integer getRecurTimes() {
-        return recurTimes;
-    }
+  public Long getRecurIn()
+  {
+    return recurIn;
+  }
 
-    public void setRecurTimes(Integer recurTimes) {
-        this.recurTimes = recurTimes;
-    }
+  public void setRecurIn(Long recurIn)
+  {
+    this.recurIn = recurIn;
+  }
 
-    public boolean getRecurInfiniteTimes() {
-        return recurInfiniteTimes;
-    }
+  public Integer getRecurTimes()
+  {
+    return recurTimes;
+  }
 
-    public void setRecurInfiniteTimes(boolean recurInfiniteTimes) {
-        this.recurInfiniteTimes = recurInfiniteTimes;
-    }
+  public void setRecurTimes(Integer recurTimes)
+  {
+    this.recurTimes = recurTimes;
+  }
+
+  public boolean getRecurInfiniteTimes()
+  {
+    return recurInfiniteTimes;
+  }
+
+  public void setRecurInfiniteTimes(boolean recurInfiniteTimes)
+  {
+    this.recurInfiniteTimes = recurInfiniteTimes;
+  }
 }
