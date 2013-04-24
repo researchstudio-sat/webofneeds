@@ -1,5 +1,6 @@
 package won.protocol.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -19,5 +20,18 @@ public class DateTimeUtils
   public  static String getCurrentDateTimeStamp() {
     sdf = new SimpleDateFormat("YYYY-MM-DD'T'hh:mm:ss.sss");
     return sdf.format(new Date());
+  }
+
+  //TODO: review method
+  public static Date parse(String date) {
+    sdf = new SimpleDateFormat("YYYY-MM-DD'T'hh:mm:ss.sss");
+    try{
+      return sdf.parse(date);
+    } catch (ParseException e) {
+      e.printStackTrace();
+    } finally {
+      return null;
+    }
+
   }
 }
