@@ -3,8 +3,6 @@ package won.owner.web.need;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.XSD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +35,6 @@ import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -131,9 +127,11 @@ public class NeedController
       needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
 
       // need content
-      Resource needContent = needModel.createResource(WON.NEED_CONTENT)
-          .addProperty(WON.TITLE, needPojo.getTitle())
-          .addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
+      Resource needContent = needModel.createResource(WON.NEED_CONTENT);
+      if (!needPojo.getTitle().isEmpty())
+        needContent.addProperty(WON.TITLE, needPojo.getTitle(), XSDDatatype.XSDstring);
+      if (!needPojo.getTextDescription().isEmpty())
+        needContent.addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
       needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
 
       // owner
@@ -169,11 +167,13 @@ public class NeedController
       }
 
       // time constraint
-      if (needPojo.getStartTime() != null || needPojo.getEndTime() != null) {
+      if (!needPojo.getStartTime().isEmpty() || !needPojo.getEndTime().isEmpty()) {
         Resource timeConstraint = needModel.createResource(WON.TIME_CONSTRAINT)
-            .addProperty(WON.START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime)
-            .addProperty(WON.END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime)
             .addProperty(WON.RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
+        if (!needPojo.getStartTime().isEmpty())
+          timeConstraint.addProperty(WON.START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
+        if (!needPojo.getStartTime().isEmpty())
+          timeConstraint.addProperty(WON.END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
         if (needPojo.getRecurIn() != null)
           timeConstraint.addProperty(WON.RECUR_IN, Long.toString(needPojo.getRecurIn()));
         if (needPojo.getRecurTimes() != null)
@@ -185,9 +185,9 @@ public class NeedController
 
       if (needPojo.getWonNode().equals("")) {
         //TODO: this is a temporary hack, please fix. The protocol expects boolean and we have an enum for needState
-        needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState()==NeedState.ACTIVE);
+        needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
       } else {
-        needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState()==NeedState.ACTIVE, needPojo.getWonNode());
+        needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, needPojo.getWonNode());
       }
 
       List<Need> needs = needRepository.findByNeedURI(needURI);
