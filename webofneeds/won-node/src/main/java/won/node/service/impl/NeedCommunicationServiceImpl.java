@@ -96,7 +96,7 @@ public class NeedCommunicationServiceImpl implements
 
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.HINT.name(), need.getState());
+    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
 
     //save match
     Match match = new Match();
@@ -144,12 +144,12 @@ public class NeedCommunicationServiceImpl implements
 
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECT_TO.name(), need.getState());
+    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.OWNER_OPEN.name(), need.getState());
 
     //check if there already exists a connection between those two
     //we have multiple options:
     //a) no connection exists -> create new
-    //b) a connection exists in state ESTABLISHED -> error message
+    //b) a connection exists in state CONNECTED -> error message
     //c) a connection exists in state REQUEST_SENT. The call must be a
     //   duplicate (or re-sent after the remote end hasn't replied for some time) -> error message
     //d) a connection exists in state REQUEST_RECEIVED. The remote end tried to connect before we did.
@@ -158,13 +158,14 @@ public class NeedCommunicationServiceImpl implements
     List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
     if (existingConnections.size() > 0){
       for(Connection conn: existingConnections){
-        if (ConnectionState.ESTABLISHED == conn.getState()
+        if (ConnectionState.CONNECTED == conn.getState()
             || ConnectionState.REQUEST_RECEIVED == conn.getState()
             || ConnectionState.REQUEST_SENT == conn.getState()) {
           throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),needURI,otherNeedURI);
         }
       }
     }
+
 
     //Create new connection object
     Connection con = new Connection();
@@ -218,7 +219,7 @@ public class NeedCommunicationServiceImpl implements
 
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository,needURI);
-    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, NeedMessage.CONNECTION_REQUESTED.name(), need.getState());
+    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
     //Create new connection object on our side
 
     //check if there already exists a connection between those two
@@ -233,7 +234,7 @@ public class NeedCommunicationServiceImpl implements
     List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
     if (existingConnections.size() > 0){
       for(Connection conn: existingConnections){
-        if (ConnectionState.ESTABLISHED == conn.getState()
+        if (ConnectionState.CONNECTED == conn.getState()
             || ConnectionState.REQUEST_RECEIVED == conn.getState()
             || ConnectionState.REQUEST_SENT == conn.getState()) {
           throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),needURI,otherNeedURI);

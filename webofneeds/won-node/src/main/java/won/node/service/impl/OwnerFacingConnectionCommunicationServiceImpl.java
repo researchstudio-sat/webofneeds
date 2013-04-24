@@ -24,7 +24,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionMessage;
+import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
@@ -59,7 +59,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_ACCEPT);
+    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_ACCEPT);
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
@@ -89,7 +89,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_DENY);
+    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_CLOSE);
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
@@ -117,7 +117,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_CLOSE);
+    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_CLOSE);
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
@@ -148,7 +148,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_MESSAGE);
+    //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
     //construct chatMessage object to store in the db
     ChatMessage chatMessage = new ChatMessage();
     chatMessage.setCreationDate(new Date());
@@ -197,7 +197,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
    * @return
    * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the connection's current state
    */
-  private ConnectionState performStateTransit(Connection con, ConnectionMessage msg) throws IllegalMessageForConnectionStateException{
+  private ConnectionState performStateTransit(Connection con, ConnectionEventType msg) throws IllegalMessageForConnectionStateException{
     if (!msg.isMessageAllowed(con.getState())){
       throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(),con.getState());
     }

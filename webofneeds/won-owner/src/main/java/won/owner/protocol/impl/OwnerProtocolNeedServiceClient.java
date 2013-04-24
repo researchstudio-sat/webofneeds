@@ -180,7 +180,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService 
             proxy.accept(connectionURI);
 
             Connection con = cons.get(0);
-            con.setState(ConnectionState.ESTABLISHED);
+            con.setState(ConnectionState.CONNECTED);
             connectionRepository.saveAndFlush(con);
         } catch (MalformedURLException e) {
             logger.warn("couldn't create URL for needProtocolEndpoint", e);

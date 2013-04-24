@@ -75,7 +75,7 @@ public class ConnectionController {
                 case CLOSED:
                     model.addAttribute("message", "Connection Closed!");
                     return "showMessage";
-                case ESTABLISHED:
+                case CONNECTED:
                     model.addAttribute("messages", chatMessageRepository.findByLocalConnectionURI(con.getConnectionURI()));
                     return "listMessages";
             }

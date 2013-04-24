@@ -11,15 +11,12 @@ import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.service.ConnectionCommunicationService;
-import won.protocol.service.OwnerFacingNeedCommunicationService;
 import org.springframework.util.*;
 import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -59,7 +56,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
 
         //Load need (throws exception if not found)
         Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
-        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, NeedMessage.HINT.name(), need.getState());
+        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
 
         //save match
         Match match = new Match();
@@ -86,7 +83,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
 
         //Load need (throws exception if not found)
         Need need = DataAccessUtils.loadNeed(needRepository,ownNeedURI);
-        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, NeedMessage.CONNECTION_REQUESTED.name(), need.getState());
+        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
         //Create new connection object on our side
 
         Connection con = new Connection();
@@ -111,7 +108,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         //load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        con.setState(con.getState().transit(ConnectionMessage.OWNER_ACCEPT));
+        con.setState(con.getState().transit(ConnectionEventType.OWNER_ACCEPT));
         //save in the db
         connectionRepository.saveAndFlush(con);
     }
@@ -125,7 +122,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         //load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        con.setState(con.getState().transit(ConnectionMessage.OWNER_DENY));
+        con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
         //save in the db
         connectionRepository.saveAndFlush(con);
     }
@@ -139,7 +136,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         //load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        con.setState(con.getState().transit(ConnectionMessage.OWNER_CLOSE));
+        con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
         //save in the db
         connectionRepository.saveAndFlush(con);
     }
@@ -154,7 +151,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
 
         //perform state transit (should not result in state change)
-        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_MESSAGE);
+        //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
         //construct chatMessage object to store in the db
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setCreationDate(new Date());

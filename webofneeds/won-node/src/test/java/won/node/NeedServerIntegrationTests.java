@@ -514,7 +514,7 @@ public class NeedServerIntegrationTests
     Assert.assertEquals(connectionURI2,conn.getRemoteConnectionURI());
     Assert.assertEquals(needURI,conn.getNeedURI());
     Assert.assertEquals(needURI2,conn.getRemoteNeedURI());
-    Assert.assertEquals(ConnectionState.ESTABLISHED,conn.getState());
+    Assert.assertEquals(ConnectionState.CONNECTED,conn.getState());
 
     Collection<URI> needConnections2 = ownerProtocolOwnerClient2.listConnectionURIs(needURI2);
     Assert.assertEquals(1, needConnections2.size());
@@ -524,7 +524,7 @@ public class NeedServerIntegrationTests
     Assert.assertEquals(connectionURI,conn2.getRemoteConnectionURI());
     Assert.assertEquals(needURI2,conn2.getNeedURI());
     Assert.assertEquals(needURI,conn2.getRemoteNeedURI());
-    Assert.assertEquals(ConnectionState.ESTABLISHED,conn2.getState());
+    Assert.assertEquals(ConnectionState.CONNECTED,conn2.getState());
 
     //now, owner2 deactivates the need:
     countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads

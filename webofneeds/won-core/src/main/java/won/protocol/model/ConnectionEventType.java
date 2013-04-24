@@ -16,29 +16,36 @@
 
 package won.protocol.model;
 
+import java.net.URI;
+
 /**
  * User: fkleedorfer
  * Date: 02.11.12
  */
-public enum ConnectionMessage
+public enum ConnectionEventType
 {
   //in general, be permissive about messages where possible. Don't care about duplicate messages
 
-  OWNER_ACCEPT(ConnectionState.REQUEST_RECEIVED,ConnectionState.ESTABLISHED),
-  OWNER_DENY(ConnectionState.REQUEST_RECEIVED,ConnectionState.CLOSED),
-  //close may always be called. It always closes the connnection.
-  OWNER_CLOSE(ConnectionState.ESTABLISHED, ConnectionState.REQUEST_SENT, ConnectionState.REQUEST_RECEIVED, ConnectionState.CLOSED),
-  OWNER_MESSAGE(ConnectionState.ESTABLISHED),
-  PARTNER_ACCEPT(ConnectionState.REQUEST_SENT,ConnectionState.ESTABLISHED),
-  PARTNER_DENY(ConnectionState.REQUEST_SENT,ConnectionState.CLOSED),
-  //close may always be called. It always closes the connnection.
-  PARTNER_CLOSE(ConnectionState.ESTABLISHED, ConnectionState.REQUEST_SENT, ConnectionState.REQUEST_RECEIVED, ConnectionState.CLOSED),
-  PARTNER_MESSAGE(ConnectionState.ESTABLISHED);
+  OWNER_ACCEPT("Accept", ConnectionState.CONNECTED),
+  PARTNER_ACCEPT("Accept", ConnectionState.CONNECTED),
 
+  //close may always be called. It always closes the connnection.
+  OWNER_CLOSE("Close", ConnectionState.CLOSED),
+  PARTNER_CLOSE("Close", ConnectionState.CLOSED),
+
+  OWNER_PREPARE("Prepare", ConnectionState.PREPARED),
+
+  OWNER_OPEN("Open", ConnectionState.REQUEST_SENT),
+  PARTNER_OPEN("Open", ConnectionState.REQUEST_RECEIVED),
+
+  MATCHER_HINT("Hint", ConnectionState.SUGGESTED);
+
+  private String name;
   private ConnectionState[] permittingStates;
 
-  ConnectionMessage(ConnectionState... permittingStates){
+  ConnectionEventType(String name, ConnectionState... permittingStates) {
     this.permittingStates = permittingStates;
+    this.name = name;
   }
 
   public boolean isMessageAllowed(ConnectionState stateToCheck){
@@ -46,5 +53,9 @@ public enum ConnectionMessage
       if (st.equals(stateToCheck)) return true;
     }
     return false;
+  }
+
+  public URI getURI() {
+    return URI.create(WON.BASE_URI + name);
   }
 }
