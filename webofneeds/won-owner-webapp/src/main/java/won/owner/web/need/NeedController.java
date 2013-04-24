@@ -30,6 +30,7 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.DateTimeUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.GR;
 import won.protocol.vocabulary.WON;
@@ -123,11 +124,8 @@ public class NeedController
 
       com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
-      SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
-      simpleDateFormat.applyPattern("YYYY-MM-DD'T'hh:mm:ss.sss");
-
       Resource needResource = needModel.createResource(WON.NEED)
-          .addProperty(WON.NEED_CREATION_DATE, simpleDateFormat.format(new Date()), XSDDatatype.XSDdateTime);
+          .addProperty(WON.NEED_CREATION_DATE, DateTimeUtils.getCurrentDateTimeStamp(), XSDDatatype.XSDdateTime);
 
       // need type
       needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));

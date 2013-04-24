@@ -49,67 +49,6 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
         }
     }
 
-    @Override
-    public Collection<URI> listNeedURIs() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Collection<URI> listNeedURIs(int page) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs(int page) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Need readNeed(URI needURI) throws NoSuchNeedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Model readNeedContent(URI needURI) throws NoSuchNeedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Connection readConnection(URI connectionURI) throws NoSuchConnectionException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-
     private MatcherProtocolNeedWebServiceEndpoint getMatcherProtocolEndpointForNeed(URI needURI) throws NoSuchNeedException, MalformedURLException
     {
         //TODO: fetch endpoint information for the need and store in db?

@@ -30,24 +30,6 @@ public interface MatcherProtocolNeedWebServiceEndpoint {
             @WebParam(name = "score") double score,
             @WebParam(name = "originatorURI") URI originatorURI) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
-    @WebMethod
-    String readConnectionContent(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException;
-
-    @WebMethod
-    Connection readConnection(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException;
-
-    @WebMethod
-    String readNeedContent(@WebParam(name = "needURI") URI needURI) throws NoSuchNeedException;
-
-    @WebMethod
-    Need readNeed(@WebParam(name = "needURI") URI needURI) throws NoSuchNeedException;
-
-    @WebMethod
-    URI[] listConnectionURIs(@WebParam(name = "needURI") URI needURI) throws NoSuchNeedException;
-
-    @WebMethod
-    URI[] listNeedURIs();
-
     @WebMethod(exclude = true)
     void setMatcherProtocolNeedService(MatcherProtocolNeedService matcherProtocolNeedService);
 }

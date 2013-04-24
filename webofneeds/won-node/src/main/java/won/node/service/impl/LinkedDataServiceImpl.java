@@ -17,7 +17,9 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -28,18 +30,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.model.*;
+import won.protocol.model.Connection;
+import won.protocol.model.Event;
+import won.protocol.model.Need;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.util.ConnectionModelMapper;
+import won.protocol.util.DateTimeUtils;
+import won.protocol.util.NeedModelMapper;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.GR;
 import won.protocol.vocabulary.LDP;
-import won.protocol.util.NeedModelMapper;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -142,13 +148,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     // add endpoints
     Resource needResource = model.getResource(needUri.toString());
-    needResource.addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
-        .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
-        .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint));
+    addProtocolEndpoints(model, needResource);
 
     // add connections
-    Resource connectionsContainer = model.createResource(need.getNeedURI().toString() + "/connections/");
-    model.add(model.createStatement(connectionsContainer, RDF.type, LDP.CONTAINER));
+    Resource connectionsContainer = model.createResource(need.getNeedURI().toString() + "/connections/", LDP.CONTAINER);
     model.add(model.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
 
     //merge needModel and model
@@ -157,19 +160,44 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return model;
   }
 
+  private void addProtocolEndpoints(Model model, Resource res)
+  {
+    res.addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
+        .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
+        .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint));
+  }
+
   public Model getConnectionModel(final URI connectionUri) throws NoSuchConnectionException
   {
     Connection connection = needInformationService.readConnection(connectionUri);
+    List<Event> events = needInformationService.readEvents(connectionUri);
+
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
-    Resource r = model.createResource(connectionUri.toString());
-    r.addProperty(WON.IS_IN_STATE, connection.getState().name());
+
+    //create connection member
+    Resource connectionMember = model.createResource(connectionUri.toString(), WON.CONNECTION);
+    addProtocolEndpoints(model, connectionMember);
+
     if (connection.getRemoteConnectionURI() != null)
-      r.addProperty(WON.HAS_REMOTE_CONNECTION, model.createResource(connection.getRemoteConnectionURI().toString()));
-    r.addProperty(WON.REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
-    r.addProperty(WON.BELONGS_TO_NEED, model.createResource(connection.getNeedURI().toString()));
-    r.addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint));
-    r.addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint));
+      connectionMember.addProperty(WON.HAS_REMOTE_CONNECTION, model.createResource(connection.getRemoteConnectionURI().toString()));
+
+    //create event container
+    Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
+    //attach event container to event member
+    model.add(model.createStatement(connectionMember, WON.HAS_EVENT_CONTAINER, eventContainer));
+
+    //TODO: not working, no events are ever returned by read events
+    for (Event e : events) {
+      //create event member
+      Resource eventMember = model.createResource(WON.toResource(e.getType()))
+          //TODO: add originator data to event
+          //.addProperty(WON.HAS_ORIGINATOR, e.getOriginator())
+          .addProperty(WON.OCCURED_AT, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
+
+      //attach event member to event container
+      model.add(model.createStatement(eventContainer, RDFS.member, eventMember));
+    }
 
     return model;
   }
@@ -177,22 +205,23 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public Model listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException
   {
     Collection<URI> uris = null;
-    if (page >= 0) {
+    if (page >= 0)
       uris = needInformationService.listConnectionURIs(needURI, page);
-    } else {
+    else
       uris = needInformationService.listConnectionURIs(needURI);
-    }
+
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
+
     Resource connections = null;
-    if (page >= 0) {
+    if (page >= 0)
       connections = createPage(model, needURI.toString() + "/connections/", page, uris.size());
-    } else {
+    else
       connections = model.createResource(needURI.toString() + "/connections/");
-    }
-    for (URI connURI : uris) {
+
+    for (URI connURI : uris)
       model.add(model.createStatement(connections, RDFS.member, model.createResource(connURI.toString())));
-    }
+
     return model;
   }
 

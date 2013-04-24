@@ -23,11 +23,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.model.Connection;
-import won.protocol.model.Match;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
+import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.EventRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.NeedInformationService;
@@ -43,149 +41,176 @@ import java.util.List;
  * Date: 02.11.12
  */
 @Component
-public class NeedInformationServiceImpl implements NeedInformationService {
+public class NeedInformationServiceImpl implements NeedInformationService
+{
 
-    private RDFStorageService rdfStorage;
-    @Autowired
-    private NeedRepository needRepository;
-    @Autowired
-    private ConnectionRepository connectionRepository;
-    @Autowired
-    private MatchRepository matchRepository;
+  private RDFStorageService rdfStorage;
+  @Autowired
+  private NeedRepository needRepository;
+  @Autowired
+  private ConnectionRepository connectionRepository;
+  @Autowired
+  private EventRepository eventRepository;
+  @Autowired
+  private MatchRepository matchRepository;
 
-    private static final int DEFAULT_PAGE_SIZE = 500;
+  private static final int DEFAULT_PAGE_SIZE = 500;
 
-    private int pageSize = DEFAULT_PAGE_SIZE;
+  private int pageSize = DEFAULT_PAGE_SIZE;
 
-    @Override
-    public Collection<URI> listNeedURIs() {
-        //TODO: provide a repository method for listing just the need URIs
-        Iterable<Need> allNeeds = needRepository.findAll();
-        List<URI> needURIs = new ArrayList<URI>();
-        for (Need need : allNeeds) {
-            needURIs.add(need.getNeedURI());
-        }
-        return needURIs;
+  @Override
+  public Collection<URI> listNeedURIs()
+  {
+    //TODO: provide a repository method for listing just the need URIs
+    Iterable<Need> allNeeds = needRepository.findAll();
+    List<URI> needURIs = new ArrayList<URI>();
+    for (Need need : allNeeds) {
+      needURIs.add(need.getNeedURI());
     }
+    return needURIs;
+  }
 
-    @Override
-    public Collection<URI> listNeedURIs(int page) {
-        //TODO: provide a repository method for listing just the need URIs
-        Iterable<Need> allNeeds = needRepository.findAll(new PageRequest(page, this.pageSize));
-        List<URI> needURIs = new ArrayList<URI>();
-        for (Need need : allNeeds) {
-            needURIs.add(need.getNeedURI());
-        }
-        return needURIs;
+  @Override
+  public Collection<URI> listNeedURIs(int page)
+  {
+    //TODO: provide a repository method for listing just the need URIs
+    Iterable<Need> allNeeds = needRepository.findAll(new PageRequest(page, this.pageSize));
+    List<URI> needURIs = new ArrayList<URI>();
+    for (Need need : allNeeds) {
+      needURIs.add(need.getNeedURI());
     }
+    return needURIs;
+  }
 
-    @Override
-    public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException {
-        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-        Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-        //TODO: provide a repository method for listing the connection URIs for a need
-        List<Connection> allConnections = connectionRepository.findByNeedURI(need.getNeedURI());
-        List<URI> connectionURIs = new ArrayList<URI>(allConnections.size());
-        for (Connection connection : allConnections) {
-            connectionURIs.add(connection.getConnectionURI());
-        }
-        return connectionURIs;
+  @Override
+  public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
+  {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+    //TODO: provide a repository method for listing the connection URIs for a need
+    List<Connection> allConnections = connectionRepository.findByNeedURI(need.getNeedURI());
+    List<URI> connectionURIs = new ArrayList<URI>(allConnections.size());
+    for (Connection connection : allConnections) {
+      connectionURIs.add(connection.getConnectionURI());
     }
+    return connectionURIs;
+  }
 
-    @Override
-    public Collection<URI> listConnectionURIs() {
-        Iterable<Connection> allConnections = connectionRepository.findAll();
-        List<URI> connectionURIs = new ArrayList<URI>();
-        for (Connection connection : allConnections) {
-            connectionURIs.add(connection.getConnectionURI());
-        }
-        return connectionURIs;
+  @Override
+  public Collection<URI> listConnectionURIs()
+  {
+    Iterable<Connection> allConnections = connectionRepository.findAll();
+    List<URI> connectionURIs = new ArrayList<URI>();
+    for (Connection connection : allConnections) {
+      connectionURIs.add(connection.getConnectionURI());
     }
+    return connectionURIs;
+  }
 
-    @Override
-    public Collection<URI> listConnectionURIs(int page) {
-        Iterable<Connection> allConnections = connectionRepository.findAll(new PageRequest(page, this.pageSize));
-        List<URI> connectionURIs = new ArrayList<URI>();
-        for (Connection connection : allConnections) {
-            connectionURIs.add(connection.getConnectionURI());
-        }
-        return connectionURIs;
+  @Override
+  public Collection<URI> listConnectionURIs(int page)
+  {
+    Iterable<Connection> allConnections = connectionRepository.findAll(new PageRequest(page, this.pageSize));
+    List<URI> connectionURIs = new ArrayList<URI>();
+    for (Connection connection : allConnections) {
+      connectionURIs.add(connection.getConnectionURI());
     }
+    return connectionURIs;
+  }
 
-    @Override
-    public Collection<URI> listConnectionURIs(final URI needURI, int page) throws NoSuchNeedException {
-        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-        Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-        //TODO: provide a repository method for listing the connection URIs for a need
-        List<Connection> allConnections = connectionRepository.findByNeedURI(need.getNeedURI(), new PageRequest(page, this.pageSize));
-        List<URI> connectionURIs = new ArrayList<URI>(allConnections.size());
-        for (Connection connection : allConnections) {
-            connectionURIs.add(connection.getConnectionURI());
-        }
-        return connectionURIs;
+  @Override
+  public Collection<URI> listConnectionURIs(final URI needURI, int page) throws NoSuchNeedException
+  {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+    //TODO: provide a repository method for listing the connection URIs for a need
+    List<Connection> allConnections = connectionRepository.findByNeedURI(need.getNeedURI(), new PageRequest(page, this.pageSize));
+    List<URI> connectionURIs = new ArrayList<URI>(allConnections.size());
+    for (Connection connection : allConnections) {
+      connectionURIs.add(connection.getConnectionURI());
     }
+    return connectionURIs;
+  }
 
-    @Override
-    public Need readNeed(final URI needURI) throws NoSuchNeedException {
-        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-        return (DataAccessUtils.loadNeed(needRepository, needURI));
-    }
 
-    @Override
-    public Model readNeedContent(final URI needURI) throws NoSuchNeedException {
-        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-        return rdfStorage.loadContent(DataAccessUtils.loadNeed(needRepository, needURI));
-    }
+  @Override
+  public List<Event> readEvents(final URI connectionURI) throws NoSuchConnectionException
+  {
+    return eventRepository.findByConnectionURI(connectionURI);
+  }
 
-    @Override
-    public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException {
-        if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-        return DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    }
+  @Override
+  public Need readNeed(final URI needURI) throws NoSuchNeedException
+  {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+    return (DataAccessUtils.loadNeed(needRepository, needURI));
+  }
 
-    //TODO implement RDF handling!
-    @Override
-    public Model readConnectionContent(final URI connectionURI) throws NoSuchConnectionException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public Model readNeedContent(final URI needURI) throws NoSuchNeedException
+  {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+    return rdfStorage.loadContent(DataAccessUtils.loadNeed(needRepository, needURI));
+  }
 
-    //TODO implement paging
-    @Override
-    public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException {
-        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-        Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-        return matchRepository.findByFromNeed(need.getNeedURI(),new Sort(Sort.Direction.DESC,"score"));
-    }
+  @Override
+  public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException
+  {
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+    return DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+  }
 
-    @Override
-    public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException {
-        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-        Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-        return matchRepository.findByFromNeed(need.getNeedURI(),new Sort(Sort.Direction.DESC,"score"));
-    }
+  //TODO implement RDF handling!
+  @Override
+  public Model readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
+  {
+    return null;  //To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    public void setNeedRepository(final NeedRepository needRepository) {
-        this.needRepository = needRepository;
-    }
+  //TODO implement paging
+  @Override
+  public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException
+  {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+    return matchRepository.findByFromNeed(need.getNeedURI(), new Sort(Sort.Direction.DESC, "score"));
+  }
 
-    public void setConnectionRepository(final ConnectionRepository connectionRepository) {
-        this.connectionRepository = connectionRepository;
-    }
+  @Override
+  public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException
+  {
+    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+    return matchRepository.findByFromNeed(need.getNeedURI(), new Sort(Sort.Direction.DESC, "score"));
+  }
 
-    public void setMatchRepository(final MatchRepository matchRepository)
-    {
-        this.matchRepository = matchRepository;
-    }
+  public void setNeedRepository(final NeedRepository needRepository)
+  {
+    this.needRepository = needRepository;
+  }
 
-    private boolean isNeedActive(final Need need) {
-        return NeedState.ACTIVE == need.getState();
-    }
+  public void setConnectionRepository(final ConnectionRepository connectionRepository)
+  {
+    this.connectionRepository = connectionRepository;
+  }
 
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-    }
+  public void setMatchRepository(final MatchRepository matchRepository)
+  {
+    this.matchRepository = matchRepository;
+  }
 
-    public void setRdfStorage(RDFStorageService rdfStorage) {
-        this.rdfStorage = rdfStorage;
-    }
+  private boolean isNeedActive(final Need need)
+  {
+    return NeedState.ACTIVE == need.getState();
+  }
+
+  public void setPageSize(int pageSize)
+  {
+    this.pageSize = pageSize;
+  }
+
+  public void setRdfStorage(RDFStorageService rdfStorage)
+  {
+    this.rdfStorage = rdfStorage;
+  }
 }
