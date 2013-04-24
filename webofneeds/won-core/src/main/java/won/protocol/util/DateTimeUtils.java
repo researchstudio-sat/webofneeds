@@ -11,15 +11,13 @@ public class DateTimeUtils
 {
   private static SimpleDateFormat sdf;
 
-  static {
-    sdf = new SimpleDateFormat("YYYY-MM-DD'T'hh:mm:ss.sss");
-  }
-
   public static String format(Date date) {
+    sdf = new SimpleDateFormat("YYYY-MM-DD'T'hh:mm:ss.sss");
     return sdf.format(date);
   }
 
   public  static String getCurrentDateTimeStamp() {
+    sdf = new SimpleDateFormat("YYYY-MM-DD'T'hh:mm:ss.sss");
     return sdf.format(new Date());
   }
 }
