@@ -16,7 +16,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "event")
-public class Event {
+public class ConnectionEvent {
 
     @Id
     @GeneratedValue
@@ -25,7 +25,7 @@ public class Event {
 
     /* The state of the connection */
     @Column( name = "type")
-    private EventType type;
+    private ConnectionEventType type;
 
     /* The creation date of the event */
     @Temporal(TemporalType.TIMESTAMP)
@@ -49,11 +49,11 @@ public class Event {
         this.id = id;
     }
 
-    public EventType getType() {
+    public ConnectionEventType getType() {
         return type;
     }
 
-    public void setType(EventType type) {
+    public void setType(ConnectionEventType type) {
         this.type = type;
     }
 
@@ -89,12 +89,12 @@ public class Event {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Event event = (Event) o;
+        ConnectionEvent connectionEvent = (ConnectionEvent) o;
 
-        if (connectionURI != null ? !connectionURI.equals(event.connectionURI) : event.connectionURI != null)
+        if (connectionURI != null ? !connectionURI.equals(connectionEvent.connectionURI) : connectionEvent.connectionURI != null)
             return false;
-        if (creationDate != null ? !creationDate.equals(event.creationDate) : event.creationDate != null) return false;
-        if (type != event.type) return false;
+        if (creationDate != null ? !creationDate.equals(connectionEvent.creationDate) : connectionEvent.creationDate != null) return false;
+        if (type != connectionEvent.type) return false;
 
         return true;
     }

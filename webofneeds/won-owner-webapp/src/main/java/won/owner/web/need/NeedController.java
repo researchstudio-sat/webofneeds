@@ -1,8 +1,8 @@
 package won.owner.web.need;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +23,15 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.model.WON;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.util.LDP;
+import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.DateTimeUtils;
+import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.GR;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -117,27 +120,77 @@ public class NeedController
 
       com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
-      //TODO: [CLEANUP] Hardcoded sample need graph
-      Resource needResource = needModel.createResource(WON.NEED);
+      Resource needResource = needModel.createResource(WON.NEED)
+          .addProperty(WON.NEED_CREATION_DATE, DateTimeUtils.getCurrentDateTimeStamp(), XSDDatatype.XSDdateTime);
 
       // need type
-      needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_GIVE));
+      needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
 
       // need content
       Resource needContent = needModel.createResource(WON.NEED_CONTENT);
-      needModel.add(needModel.createStatement(needContent, WON.TEXT_DESCRIPTION, needPojo.getTextDescription()));
+      if (!needPojo.getTitle().isEmpty())
+        needContent.addProperty(WON.TITLE, needPojo.getTitle(), XSDDatatype.XSDstring);
+      if (!needPojo.getTextDescription().isEmpty())
+        needContent.addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
       needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
 
+      // owner
+      if (needPojo.isAnonymize()) {
+        needModel.add(needModel.createStatement(needResource, WON.HAS_OWNER, WON.ANONYMIZED_OWNER));
+      }
+
       // need modalities
+      Resource needModality = needModel.createResource(WON.NEED_MODALITY);
+
+      needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_DELIVERY_METHOD, GR.toResource(needPojo.getDeliveryMethod())));
+
+      // TODO: store need modalities in separate objects to enable easier checking and multiple instances
+      //price and currency
+      if (needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
+        Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
+        if (needPojo.getLowerPriceLimit() != null)
+          priceSpecification.addProperty(WON.HAS_LOWER_PRICE_LIMIT, Double.toString(needPojo.getLowerPriceLimit()), XSDDatatype.XSDdouble);
+        if (needPojo.getUpperPriceLimit() != null)
+          priceSpecification.addProperty(WON.HAS_UPPER_PRICE_LIMIT, Double.toString(needPojo.getUpperPriceLimit()), XSDDatatype.XSDdouble);
+        if (!needPojo.getCurrency().isEmpty())
+          priceSpecification.addProperty(WON.HAS_CURRENCY, needPojo.getCurrency(), XSDDatatype.XSDstring);
+
+        needModel.add(needModel.createStatement(needModality, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
+      }
+
+      if (needPojo.getLatitude() != null && needPojo.getLongitude() != null) {
+        Resource location = needModel.createResource(GEO.POINT)
+            .addProperty(GEO.LATITUDE, Double.toString(needPojo.getLatitude()))
+            .addProperty(GEO.LONGITUDE, Double.toString(needPojo.getLongitude()));
+
+        needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_LOCATION, location));
+      }
+
+      // time constraint
+      if (!needPojo.getStartTime().isEmpty() || !needPojo.getEndTime().isEmpty()) {
+        Resource timeConstraint = needModel.createResource(WON.TIME_CONSTRAINT)
+            .addProperty(WON.RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
+        if (!needPojo.getStartTime().isEmpty())
+          timeConstraint.addProperty(WON.START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
+        if (!needPojo.getStartTime().isEmpty())
+          timeConstraint.addProperty(WON.END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
+        if (needPojo.getRecurIn() != null)
+          timeConstraint.addProperty(WON.RECUR_IN, Long.toString(needPojo.getRecurIn()));
+        if (needPojo.getRecurTimes() != null)
+          timeConstraint.addProperty(WON.RECUR_TIMES, Integer.toString(needPojo.getRecurTimes()));
+        needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_TIME, timeConstraint));
+      }
+
+      needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
 
       if (needPojo.getWonNode().equals("")) {
-        needURI = ownerService.createNeed(ownerURI, needModel, needPojo.isActive());
+        //TODO: this is a temporary hack, please fix. The protocol expects boolean and we have an enum for needState
+        needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
       } else {
-        needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.isActive(), needPojo.getWonNode());
+        needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, needPojo.getWonNode());
       }
 
       List<Need> needs = needRepository.findByNeedURI(needURI);
-
 
       if (needs.size() == 1)
         return "redirect:/need/" + needs.get(0).getId().toString();
@@ -182,6 +235,11 @@ public class NeedController
     model.addAttribute("active", (need.getState() != NeedState.ACTIVE ? "activate" : "deactivate"));
     model.addAttribute("needURI", need.getNeedURI());
     model.addAttribute("command", new NeedPojo());
+
+    LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
+    NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+
+    model.addAttribute("pojo", pojo);
 
     return "viewNeed";
   }

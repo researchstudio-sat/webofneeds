@@ -27,7 +27,7 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.model.WON;
+import won.protocol.vocabulary.WON;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
@@ -70,19 +70,24 @@ public class NeedManagementServiceImpl implements NeedManagementService
     need.setNeedURI(URIService.createNeedURI(need));
     need = needRepository.saveAndFlush(need);
 
-    Model model = ModelFactory.createDefaultModel();
-    Resource needRes = model.createResource(need.getNeedURI().toString(), WON.NEED);
+    Resource needRes = content.createResource(need.getNeedURI().toString());
 
     // Here we use the received model and reattach its parts to create a new one. The problem was we do not have a needURI when creating the need so now it gets saved properly.
     ResIterator contentIterator = content.listSubjectsWithProperty(RDF.type, WON.NEED);
     Resource contentNeed = contentIterator.next();
+    if (contentIterator.hasNext()) {
+      logger.warn("Multiple nodes of type won:Need found in RDF need description from owner. If this happens regularly, check the OwnerProtocol RDF handling.");
+    }
     StmtIterator iterator = contentNeed.listProperties();
     while (iterator.hasNext()) {
       Statement s = iterator.next();
+      Resource subject = s.getSubject();
       needRes.addProperty(s.getPredicate(), s.getObject());
     }
 
-    rdfStorage.storeContent(need, model);
+    content.removeAll(contentNeed, null, null);
+
+    rdfStorage.storeContent(need, content);
 
     return need.getNeedURI();
   }

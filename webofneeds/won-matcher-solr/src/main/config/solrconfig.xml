@@ -351,9 +351,9 @@
        </autoSoftCommit>
       -->
 
-    <!-- Update Related Event Listeners
+    <!-- Update Related ConnectionEvent Listeners
          
-         Various IndexWriter related events can trigger Listeners to
+         Various IndexWriter related connectionEvents can trigger Listeners to
          take actions.
 
          postCommit - fired after every commit or optimize command
@@ -374,7 +374,7 @@
          http://wiki.apache.org/solr/CollectionDistribution
       -->
     <!--
-       <listener event="postCommit" class="solr.RunExecutableListener">
+       <listener connectionEvent="postCommit" class="solr.RunExecutableListener">
          <str name="exe">solr/bin/snapshooter</str>
          <str name="dir">.</str>
          <bool name="wait">true</bool>
@@ -575,9 +575,9 @@
      -->
    <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
 
-   <!-- Query Related Event Listeners
+   <!-- Query Related ConnectionEvent Listeners
 
-        Various IndexSearcher related events can trigger Listeners to
+        Various IndexSearcher related connectionEvents can trigger Listeners to
         take actions.
 
         newSearcher - fired whenever a new searcher is being prepared

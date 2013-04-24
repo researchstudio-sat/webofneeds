@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.node.ws.OwnerProtocolOwnerWebServiceClient;
 import won.protocol.exception.*;
 import won.protocol.model.Need;
-import won.protocol.model.WON;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -32,7 +31,6 @@ import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.List;
 
 /**
  * TODO: Empty owner client implementation to be replaced by WS client.

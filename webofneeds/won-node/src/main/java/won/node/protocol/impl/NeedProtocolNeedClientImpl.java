@@ -22,7 +22,7 @@ import won.protocol.rest.LinkedDataRestClient;
 import won.node.ws.NeedProtocolNeedWebServiceClient;
 import won.node.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.*;
-import won.protocol.model.WON;
+import won.protocol.vocabulary.WON;
 import won.protocol.need.NeedProtocolNeedService;
 
 import java.net.MalformedURLException;
