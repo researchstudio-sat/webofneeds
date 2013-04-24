@@ -3,11 +3,18 @@ package won.protocol.util;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import won.protocol.model.BasicNeedType;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
+import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.GRDeliveryMethod;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.security.acl.Owner;
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * User: gabriel
@@ -20,11 +27,15 @@ public class NeedModelMapper implements ModelMapper<Need>
   @Override
   public Model toModel(Need need)
   {
-    // TODO: see if we can use RDF storage here
-
     Model model = ModelFactory.createDefaultModel();
     Resource needResource = model.createResource(need.getNeedURI().toString(), WON.NEED);
-    model.add(model.createStatement(needResource, WON.IS_IN_STATE, WON.toResource(need.getState())));
+    model.add(model.createStatement(needResource, WON.NEED_CREATION_DATE, DateTimeUtils.format(need.getCreationDate())));
+
+    Resource stateRes = model.createResource(WON.toResource(need.getState()));
+    model.add(model.createStatement(needResource, WON.IS_IN_STATE, stateRes));
+
+    Resource ownerRes = model.createResource(need.getOwnerURI().toString());
+    model.add(model.createStatement(needResource, WON.HAS_OWNER, ownerRes));
 
     return model;
   }
@@ -32,18 +43,27 @@ public class NeedModelMapper implements ModelMapper<Need>
   @Override
   public Need fromModel(Model model)
   {
-    Need n = new Need();
-    Resource rNeed = model.listSubjectsWithProperty(WON.IS_IN_STATE).nextResource();
+    Need need = new Need();
 
-    //TODO: Not safe
-    n.setNeedURI(URI.create(rNeed.getURI()));
+    Resource needRes = model.getResource(WON.NEED.toString());
 
-    //TODO: Not safe
-    if (model.listObjectsOfProperty(rNeed, WON.IS_IN_STATE).next().asLiteral().getString().equals(NeedState.ACTIVE.name()))
-      n.setState(NeedState.ACTIVE);
-    else if (model.listObjectsOfProperty(rNeed, WON.IS_IN_STATE).next().asLiteral().getString().equals(NeedState.INACTIVE.name()))
-      n.setState(NeedState.INACTIVE);
+    need.setNeedURI(URI.create(needRes.getURI()));
 
-    return n;
+    String dateTime = needRes.getProperty(WON.NEED_CREATION_DATE).getString();
+    need.setCreationDate(DateTimeUtils.parse(dateTime));
+
+    Statement stateStat = needRes.getProperty(WON.IS_IN_STATE);
+    if (stateStat != null) {
+      URI uri = URI.create(stateStat.getResource().getURI());
+      need.setState(NeedState.parseString(uri.getFragment()));
+    }
+
+    Statement ownerStat = needRes.getProperty(WON.HAS_OWNER);
+    if(ownerStat != null) {
+      URI uri = URI.create(ownerStat.getResource().getURI());
+      need.setOwnerURI(uri);
+    }
+
+    return need;
   }
 }
