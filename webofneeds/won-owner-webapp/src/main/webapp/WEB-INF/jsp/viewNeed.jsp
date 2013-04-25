@@ -25,7 +25,7 @@
     <dt>Need type</dt>
         <dd><c:out value="${pojo.basicNeedType}" /></dd>
     <dt>Active</dt>
-        <dd><c:out value="${pojo.state}" /><br />
+        <dd><c:out value="${active}" /><br />
             <button onclick="jQuery.post('/owner/need/<c:out value="${needId}" />/toggle', function() { document.location.reload(true); });" ><c:out value="${active}"/></button>
         </dd>
     <dt>Price specification</dt>
