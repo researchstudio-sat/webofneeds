@@ -60,11 +60,12 @@ public class NeedPojo
 
     //TODO: add owner
 
-    Statement stateStat = need.getProperty(WON.IS_IN_STATE);
-    if (stateStat != null) {
-      URI uri = URI.create(stateStat.getResource().getURI());
-      state = NeedState.parseString(uri.getFragment());
-    }
+    // created dynamically
+//    Statement stateStat = need.getProperty(WON.IS_IN_STATE);
+//    if (stateStat != null) {
+//      URI uri = URI.create(stateStat.getResource().getURI());
+//      state = NeedState.parseString(uri.getFragment());
+//    }
 
     Statement basicNeedStat = need.getProperty(WON.HAS_BASIC_NEED_TYPE);
     if (basicNeedStat != null) {

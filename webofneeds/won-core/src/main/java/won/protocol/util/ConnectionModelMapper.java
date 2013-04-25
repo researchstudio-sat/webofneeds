@@ -1,9 +1,6 @@
 package won.protocol.util;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.*;
 import won.protocol.model.Connection;
 import won.protocol.vocabulary.WON;
 
@@ -16,36 +13,40 @@ import java.net.URI;
  * Time: 15:38
  * To change this template use File | Settings | File Templates.
  */
-public class ConnectionModelMapper implements ModelMapper<Connection> {
+public class ConnectionModelMapper implements ModelMapper<Connection>
+{
 
-    @Override
-    public Model toModel(Connection tobject) {
-        Model model = ModelFactory.createDefaultModel();
+  //TODO: needs rewriting
+  @Override
+  public Model toModel(Connection connection)
+  {
+    Model model = ModelFactory.createDefaultModel();
+    Resource connectionMember = model.createResource(connection.getConnectionURI().toString());
 
-        Resource r = model.createResource(tobject.getConnectionURI().toString());
-        r.addProperty(WON.IS_IN_STATE, tobject.getState().name());
-        if(tobject.getRemoteConnectionURI() != null)
-            r.addProperty(WON.HAS_REMOTE_CONNECTION, model.createResource(tobject.getRemoteConnectionURI().toString()));
-        r.addProperty(WON.REMOTE_NEED, model.createResource(tobject.getRemoteNeedURI().toString()));
-        r.addProperty(WON.BELONGS_TO_NEED, model.createResource(tobject.getNeedURI().toString()));
+    Resource remoteConnection = model.createResource(connection.getRemoteConnectionURI().toString());
+    model.add(model.createStatement(connectionMember, WON.HAS_REMOTE_CONNECTION, remoteConnection));
 
-        return model;
-    }
+    Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
 
-    @Override
-    public Connection fromModel(Model model) {
-        Connection c = new Connection();
-        Resource rCon = model.listSubjectsWithProperty(WON.IS_IN_STATE).nextResource();
+//    connectionMember.addProperty(WON.IS_IN_STATE, connection.getState().name());
 
-        //TODO: Not Safe
-        c.setConnectionURI(URI.create(rCon.getURI()));
-        c.setNeedURI(URI.create(rCon.listProperties(WON.BELONGS_TO_NEED).next().getString()));
-        c.setRemoteNeedURI(URI.create(rCon.listProperties(WON.REMOTE_NEED).next().getString()));
+    return model;
+  }
 
-        StmtIterator itRemoteCon = rCon.listProperties(WON.HAS_REMOTE_CONNECTION);
-        if(itRemoteCon.hasNext())
-           c.setRemoteConnectionURI(URI.create(itRemoteCon.next().getString()));
+  @Override
+  public Connection fromModel(Model model)
+  {
+    Connection c = new Connection();
 
-        return c;
-    }
+    Resource connectionRes = model.getResource(WON.CONNECTION.toString());
+    c.setConnectionURI(URI.create(connectionRes.getURI()));
+
+    Statement remoteConnectionStat = connectionRes.getProperty(WON.HAS_REMOTE_CONNECTION);
+    c.setRemoteConnectionURI(URI.create(remoteConnectionStat.getResource().getURI()));
+
+    //c.setNeedURI(URI.create(rCon.listProperties(WON.BELONGS_TO_NEED).next().getString()));
+    //c.setRemoteNeedURI(URI.create(rCon.listProperties(WON.REMOTE_NEED).next().getString()));
+
+    return c;
+  }
 }

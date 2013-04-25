@@ -169,6 +169,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   public Model getConnectionModel(final URI connectionUri) throws NoSuchConnectionException
   {
+    //TODO: use connection model mapper here
+
     Connection connection = needInformationService.readConnection(connectionUri);
     List<Event> events = needInformationService.readEvents(connectionUri);
 
