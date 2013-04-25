@@ -39,18 +39,6 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   }
 
   @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    connectionCommunicationService.accept(connectionURI);
-  }
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    connectionCommunicationService.deny(connectionURI);
-  }
-
-  @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     connectionCommunicationService.close(connectionURI);

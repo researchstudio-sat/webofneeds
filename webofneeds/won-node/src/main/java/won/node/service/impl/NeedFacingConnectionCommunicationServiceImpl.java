@@ -53,62 +53,6 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Autowired
   private ChatMessageRepository chatMessageRepository;
 
-
-  @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info("ACCEPT received from the need side for connection {}",new Object[]{connectionURI});
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit (should not result in state change)
-    ConnectionState nextState = performStateTransit(con, ConnectionEventType.PARTNER_ACCEPT);
-    con.setState(nextState);
-    //save in the db
-    con = connectionRepository.saveAndFlush(con);
-    //inform the need side
-    executorService.execute(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-
-        try {
-          ownerFacingConnectionClient.accept(connectionURI);
-        } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
-        }
-      }
-    });
-  }
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info("DENY received from the need side for connection {}",new Object[]{connectionURI});
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit (should not result in state change)
-    ConnectionState nextState = performStateTransit(con, ConnectionEventType.PARTNER_CLOSE);
-    con.setState(nextState);
-    //save in the db
-    con = connectionRepository.saveAndFlush(con);
-    //inform the need side
-    executorService.execute(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        try {
-          ownerFacingConnectionClient.deny(connectionURI);
-        } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
-        }
-      }
-    });
-  }
-
    @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {

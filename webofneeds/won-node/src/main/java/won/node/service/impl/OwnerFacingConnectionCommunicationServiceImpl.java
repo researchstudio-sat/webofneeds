@@ -51,64 +51,6 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   @Autowired
   private ChatMessageRepository chatMessageRepository;
 
-  @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info("ACCEPT received from the owner side for connection {}",new Object[]{connectionURI});
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_ACCEPT);
-    //set new state and save in the db
-    con.setState(nextState);
-    //save in the db
-    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
-    //inform the other side
-    executorService.execute(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        try{
-          needFacingConnectionClient.accept(connectionForRunnable.getRemoteConnectionURI());
-        } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
-        }
-      }
-    });
-  }
-
-
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info("DENY received from the owner side for connection {}",new Object[]{connectionURI});
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_CLOSE);
-    //set new state and save in the db
-    con.setState(nextState);
-    //save in the db
-    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
-    //inform the other side
-    executorService.execute(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        try{
-          needFacingConnectionClient.deny(connectionForRunnable.getRemoteConnectionURI());
-        } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
-        }
-      }
-    });
-  }
-
    @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {

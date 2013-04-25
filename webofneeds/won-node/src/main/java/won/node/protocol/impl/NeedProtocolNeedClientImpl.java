@@ -55,30 +55,6 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   }
 
   @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("need-facing: ACCEPT called for connection {0}", connectionURI));
-    try {
-      NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForConnection(connectionURI);
-      proxy.accept(connectionURI);
-    } catch (MalformedURLException e) {
-      logger.warn("couldnt create URL for needProtocolEndpoint", e);
-    }
-  }
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("need-facing: DENY called for connecti6on {0}", connectionURI));
-    try {
-      NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForConnection(connectionURI);
-      proxy.deny(connectionURI);
-    } catch (MalformedURLException e) {
-      logger.warn("couldnt create URL for needProtocolEndpoint", e);
-    }
-  }
-
-  @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));

@@ -99,7 +99,7 @@ public class WON
     public static final Property RECUR_INFINITE_TIMES = m.createProperty(BASE_URI, "recurInfiniteTimes");
 
     // Resource individuals
-    public static final Resource EVENT_TYPE_ACCEPT = m.createResource(ConnectionEventType.OWNER_ACCEPT.getURI().toString());
+    //public static final Resource EVENT_TYPE_ACCEPT = m.createResource(ConnectionEventType.OWNER_ACCEPT.getURI().toString());
     public static final Resource EVENT_TYPE_CLOSE = m.createResource(ConnectionEventType.OWNER_CLOSE.getURI().toString());
     public static final Resource EVENT_TYPE_PREPARE = m.createResource(ConnectionEventType.OWNER_PREPARE.getURI().toString());
     public static final Resource EVENT_TYPE_OPEN = m.createResource(ConnectionEventType.OWNER_OPEN.getURI().toString());
@@ -175,9 +175,6 @@ public class WON
     public static Resource toResource(ConnectionEventType type)
     {
         switch (type) {
-            case OWNER_ACCEPT:
-            case PARTNER_ACCEPT:
-                return EVENT_TYPE_ACCEPT;
             case OWNER_CLOSE:
             case PARTNER_CLOSE:
                 return EVENT_TYPE_CLOSE;

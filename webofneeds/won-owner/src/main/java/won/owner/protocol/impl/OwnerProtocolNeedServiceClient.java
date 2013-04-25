@@ -90,46 +90,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     }
 
     @Override
-    public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
-        logger.info(MessageFormat.format("need-facing: ACCEPT called for connection {0}", connectionURI));
-        try {
-            OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
-
-            List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
-            if(cons.size() != 1)
-                throw new NoSuchConnectionException(connectionURI);
-
-            proxy.accept(connectionURI);
-
-            Connection con = cons.get(0);
-            con.setState(ConnectionState.CONNECTED);
-            connectionRepository.saveAndFlush(con);
-        } catch (MalformedURLException e) {
-            logger.warn("couldn't create URL for needProtocolEndpoint", e);
-        } 
-    }
-
-    @Override
-    public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
-        logger.info(MessageFormat.format("need-facing: DENY called for connection {0}", connectionURI));
-        try {
-            OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
-            List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
-            if(cons.size() != 1)
-                throw new NoSuchConnectionException(connectionURI);
-            proxy.deny(connectionURI);
-
-            Connection con = cons.get(0);
-            con.setState(ConnectionState.CLOSED);
-            connectionRepository.saveAndFlush(con);
-        } catch (MalformedURLException e) {
-            logger.warn("couldn't create URL for needProtocolEndpoint", e);
-        } 
-    }
-
-    @Override
     public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));

@@ -57,13 +57,13 @@ public enum ConnectionState
           }
       case REQUEST_SENT: //the owner has initiated the connection, the request was sent to the remote need
         switch(msg){
-           case PARTNER_ACCEPT: return CONNECTED;  //the partner accepted
+           case PARTNER_OPEN: return CONNECTED;  //the partner accepted
            case OWNER_CLOSE: return CLOSED;
            case PARTNER_CLOSE: return CLOSED;
           }
       case REQUEST_RECEIVED: //a remote need has requested a connection
         switch(msg){
-          case OWNER_ACCEPT: return CONNECTED;
+          case OWNER_OPEN: return CONNECTED;
           case OWNER_CLOSE: return CLOSED;
           case PARTNER_CLOSE: return CLOSED;
         }

@@ -84,34 +84,6 @@ public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerServ
   }
 
   @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("owner-facing: ACCEPT called for connection {0}",connectionURI));
-      try {
-          OwnerProtocolOwnerWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
-          proxy.accept(connectionURI);
-      } catch (MalformedURLException e) {
-          logger.warn("couldn't create URL for needProtocolEndpoint", e);
-      } catch (NoSuchNeedException e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-      }
-  }
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("owner-facing: DENY called for connection {0}",connectionURI));
-      try {
-          OwnerProtocolOwnerWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
-          proxy.deny(connectionURI);
-      } catch (MalformedURLException e) {
-          logger.warn("couldn't create URL for needProtocolEndpoint", e);
-      } catch (NoSuchNeedException e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-      }
-  }
-
-  @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}",connectionURI));

@@ -100,34 +100,6 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
     }
 
     @Override
-    public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
-        logger.info(MessageFormat.format("node-facing: ACCEPT called for connection {0}",connectionURI));
-        if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-
-        //load connection, checking if it exists
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        //set new state and save in the db
-        con.setState(con.getState().transit(ConnectionEventType.OWNER_ACCEPT));
-        //save in the db
-        connectionRepository.saveAndFlush(con);
-    }
-
-    @Override
-    public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
-        logger.info(MessageFormat.format("node-facing: DENY called for connection {0}",connectionURI));
-        if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-
-        //load connection, checking if it exists
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        //set new state and save in the db
-        con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
-        //save in the db
-        connectionRepository.saveAndFlush(con);
-    }
-
-    @Override
     public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         logger.info(MessageFormat.format("node-facing: CLOSE called for connection {0}",connectionURI));

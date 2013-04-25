@@ -83,16 +83,6 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     }
 
     @Override
-    public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        this.connectionCommunicationService.accept(connectionURI);
-    }
-
-    @Override
-    public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        this.connectionCommunicationService.deny(connectionURI);
-    }
-
-    @Override
     public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         this.connectionCommunicationService.close(connectionURI);
     }

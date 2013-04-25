@@ -28,24 +28,6 @@ public interface ConnectionCommunicationService
 {
 
   /**
-   * Accepts a connection initiated by a connect().
-   *
-   * @param connectionURI the URI of the connection
-   * @throws won.protocol.exception.NoSuchConnectionException if connectionURI does not refer to an existing connection
-   * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
-   */
-  public void accept(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-  /**
-   * Deny a connection initiated by a connect().
-   *
-   * @param connectionURI the URI of the connection
-   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
-   */
-  public void deny(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-  /**
    * Closes the connection identified by the specified URI, indicating success.
    *
    * @param connectionURI the URI of the connection

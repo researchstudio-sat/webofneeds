@@ -28,9 +28,6 @@ public enum ConnectionEventType
 {
   //in general, be permissive about messages where possible. Don't care about duplicate messages
 
-  OWNER_ACCEPT("Accept", ConnectionState.CONNECTED),
-  PARTNER_ACCEPT("Accept", ConnectionState.CONNECTED),
-
   //close may always be called. It always closes the connnection.
   OWNER_CLOSE("Close", ConnectionState.CLOSED),
   PARTNER_CLOSE("Close", ConnectionState.CLOSED),

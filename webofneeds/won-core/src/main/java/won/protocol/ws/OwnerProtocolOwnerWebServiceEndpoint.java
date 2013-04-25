@@ -43,16 +43,6 @@ public interface OwnerProtocolOwnerWebServiceEndpoint {
             throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
     @WebMethod
-    public void accept(
-            @WebParam(name = "connectionURI") final URI connectionURI)
-            throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-    @WebMethod
-    public void deny(
-            @WebParam(name = "connectionURI") final URI connectionURI)
-            throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-    @WebMethod
     public void close(
             @WebParam(name = "connectionURI") final URI connectionURI)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
