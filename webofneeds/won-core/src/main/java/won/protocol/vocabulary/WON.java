@@ -21,7 +21,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import won.protocol.model.BasicNeedType;
-import won.protocol.model.EventType;
+import won.protocol.model.ConnectionEventType;
 import won.protocol.model.NeedState;
 
 /**
@@ -99,11 +99,11 @@ public class WON
   public static final Property RECUR_INFINITE_TIMES = m.createProperty(BASE_URI, "recurInfiniteTimes");
 
   // Resource individuals
-  public static final Resource EVENT_TYPE_ACCEPT = m.createResource(EventType.ACCEPT.getURI().toString());
-  public static final Resource EVENT_TYPE_CLOSE = m.createResource(EventType.CLOSE.getURI().toString());
-  public static final Resource EVENT_TYPE_PREPARE = m.createResource(EventType.PREPARE.getURI().toString());
-  public static final Resource EVENT_TYPE_OPEN = m.createResource(EventType.OPEN.getURI().toString());
-  public static final Resource EVENT_TYPE_HINT = m.createResource(EventType.HINT.getURI().toString());
+  //public static final Resource EVENT_TYPE_ACCEPT = m.createResource(EventType.ACCEPT.getURI().toString());
+  public static final Resource EVENT_TYPE_CLOSE = m.createResource(ConnectionEventType.OWNER_CLOSE.getURI().toString());
+  public static final Resource EVENT_TYPE_PREPARE = m.createResource(ConnectionEventType.OWNER_PREPARE.getURI().toString());
+  public static final Resource EVENT_TYPE_OPEN = m.createResource(ConnectionEventType.OWNER_OPEN.getURI().toString());
+  public static final Resource EVENT_TYPE_HINT = m.createResource(ConnectionEventType.MATCHER_HINT.getURI().toString());
 
   public static final Resource BASIC_NEED_TYPE_DO = m.createResource(BasicNeedType.DO.getURI().toString());
   public static final Resource BASIC_NEED_TYPE_GIVE = m.createResource(BasicNeedType.GIVE.getURI().toString());
@@ -172,18 +172,18 @@ public class WON
    * @param type
    * @return
    */
-  public static Resource toResource(EventType type)
+  public static Resource toResource(ConnectionEventType type)
   {
     switch (type) {
-      case ACCEPT:
-        return EVENT_TYPE_ACCEPT;
-      case CLOSE:
+      case OWNER_CLOSE:
+      case PARTNER_CLOSE:
         return EVENT_TYPE_CLOSE;
-      case HINT:
+      case MATCHER_HINT:
         return EVENT_TYPE_HINT;
-      case OPEN:
+      case OWNER_OPEN:
+      case PARTNER_OPEN:
         return EVENT_TYPE_OPEN;
-      case PREPARE:
+      case OWNER_PREPARE:
         return EVENT_TYPE_PREPARE;
       default:
         throw new IllegalStateException("No such case specified for " + type.name());

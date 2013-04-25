@@ -29,15 +29,17 @@ public enum ConnectionEventType
   //in general, be permissive about messages where possible. Don't care about duplicate messages
 
   //close may always be called. It always closes the connnection.
-  OWNER_CLOSE("Close", ConnectionState.CLOSED),
-  PARTNER_CLOSE("Close", ConnectionState.CLOSED),
+  OWNER_CLOSE("Close", ConnectionState.PREPARED, ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
+          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED),
+  PARTNER_CLOSE("Close",  ConnectionState.PREPARED, ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
+          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED),
 
-  OWNER_PREPARE("Prepare", ConnectionState.PREPARED),
+  OWNER_PREPARE("Prepare", ConnectionState.SUGGESTED),
 
-  OWNER_OPEN("Open", ConnectionState.REQUEST_SENT),
-  PARTNER_OPEN("Open", ConnectionState.REQUEST_RECEIVED),
+  OWNER_OPEN("Open", ConnectionState.REQUEST_RECEIVED, ConnectionState.PREPARED),
+  PARTNER_OPEN("Open", ConnectionState.REQUEST_SENT, ConnectionState.PREPARED),
 
-  MATCHER_HINT("Hint", ConnectionState.SUGGESTED);
+  MATCHER_HINT("Hint");
 
   private String name;
   private ConnectionState[] permittingStates;

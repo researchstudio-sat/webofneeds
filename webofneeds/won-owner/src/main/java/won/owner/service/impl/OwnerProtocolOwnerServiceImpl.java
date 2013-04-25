@@ -17,6 +17,7 @@ import won.protocol.util.DataAccessUtils;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -86,17 +87,33 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
         //Create new connection object on our side
 
-        Connection con = new Connection();
-        con.setNeedURI(ownNeedURI);
-        con.setState(ConnectionState.REQUEST_RECEIVED);
-        con.setRemoteNeedURI(otherNeedURI);
-
-        //TODO problem: remote connection URI not available here! Do we need it? Do we adapt the interface? (using core interface - we could split it)
-        //con.setRemoteConnectionURI(otherConnectionURI);
-
         //set new uri
-        con.setConnectionURI(ownConnectionURI);
-        connectionRepository.saveAndFlush(con);
+        List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURI, otherNeedURI);
+        if (existingConnections.size() > 0){
+            for(Connection conn: existingConnections){
+                //TODO: Move this to the transition() - Method in ConnectionState
+                if (ConnectionState.CONNECTED == conn.getState() ||
+                        ConnectionState.REQUEST_RECEIVED == conn.getState()) {
+                    throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),ownNeedURI,otherNeedURI);
+                } else {
+                    conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
+                    connectionRepository.saveAndFlush(conn);
+                }
+            }
+        } else {
+            Connection con = new Connection();
+            con.setNeedURI(ownNeedURI);
+            con.setState(ConnectionState.REQUEST_RECEIVED);
+            con.setRemoteNeedURI(otherNeedURI);
+
+            //TODO problem: remote connection URI not available here! Do we need it? Do we adapt the interface? (using core interface - we could split it)
+            //con.setRemoteConnectionURI(otherConnectionURI);
+            //create and set new uri
+            con.setConnectionURI(ownConnectionURI);
+            connectionRepository.saveAndFlush(con);
+
+            //TODO: do we save the connection message? where? as a chat message?
+        }
     }
 
     @Override

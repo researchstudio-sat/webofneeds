@@ -222,6 +222,10 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     }
   }
 
+
+  //TODO: Prepare Method is missing
+  //TODO: connectTo RENAME to open
+  //TODO: add open Method which takes a connectionURI as a argument
   @Override
   public URI connectTo(URI needURI, URI otherNeedURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
@@ -230,16 +234,28 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForNeed(needURI);
       URI uri = proxy.connectTo(needURI, otherNeedURI, message);
 
-
-      //Create new connection object
-      Connection con = new Connection();
-      con.setNeedURI(needURI);
-      con.setState(ConnectionState.REQUEST_SENT);
-      con.setRemoteNeedURI(otherNeedURI);
-      //set new uri
-      con.setConnectionURI(uri);
-      connectionRepository.saveAndFlush(con);
-
+      List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri);
+      if (existingConnections.size() > 0){
+        for(Connection conn: existingConnections){
+            //TODO: Move this to the transition() - Method in ConnectionState
+            if (ConnectionState.CONNECTED == conn.getState() ||
+                    ConnectionState.REQUEST_SENT == conn.getState()) {
+                throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),needURI,otherNeedURI);
+            } else {
+                conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
+                connectionRepository.saveAndFlush(conn);
+            }
+        }
+      } else {
+          //Create new connection object
+          Connection con = new Connection();
+          con.setNeedURI(needURI);
+          con.setState(ConnectionState.REQUEST_SENT);
+          con.setRemoteNeedURI(otherNeedURI);
+          //set new uri
+          con.setConnectionURI(uri);
+          connectionRepository.saveAndFlush(con);
+      }
       return uri;
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);

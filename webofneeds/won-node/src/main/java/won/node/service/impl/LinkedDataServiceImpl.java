@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
-import won.protocol.model.Event;
+import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
@@ -172,7 +172,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     //TODO: use connection model mapper here
 
     Connection connection = needInformationService.readConnection(connectionUri);
-    List<Event> events = needInformationService.readEvents(connectionUri);
+    List<ConnectionEvent> events = needInformationService.readEvents(connectionUri);
 
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
@@ -190,7 +190,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     model.add(model.createStatement(connectionMember, WON.HAS_EVENT_CONTAINER, eventContainer));
 
     //TODO: not working, no events are ever returned by read events
-    for (Event e : events) {
+    for (ConnectionEvent e : events) {
       //create event member
       Resource eventMember = model.createResource(WON.toResource(e.getType()))
           //TODO: add originator data to event

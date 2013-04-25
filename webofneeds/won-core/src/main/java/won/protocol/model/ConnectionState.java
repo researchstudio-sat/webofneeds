@@ -16,6 +16,8 @@
 
 package won.protocol.model;
 
+import won.protocol.exception.ConnectionAlreadyExistsException;
+
 /**
  * User: fkleedorfer
  * Date: 30.10.12
