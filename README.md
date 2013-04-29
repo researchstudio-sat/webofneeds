@@ -5,7 +5,7 @@ Web of Needs is a new idea based on old technology, enabling a recent field of r
 Central Point is the need. In contrast to the offer, the need is inadequately represented.
 Web of needs tries to fill the gap. 
 
-For further information have a look at: http://webofneeds.org
+For further information have a look at: http://www.webofneeds.org
 
 Web of needs is build up of 
 - won-node
