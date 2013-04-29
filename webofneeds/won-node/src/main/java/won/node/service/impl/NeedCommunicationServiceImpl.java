@@ -25,6 +25,7 @@ import won.protocol.model.*;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.EventRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
@@ -83,10 +84,13 @@ public class NeedCommunicationServiceImpl implements
   @Autowired
   private MatchRepository matchRepository;
 
+  @Autowired
+  private EventRepository eventRepository;
+
   @Override
   public void hint(final URI needURI, final URI otherNeedURI, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    logger.info("HINT received for need {} referring to need {} with score {} from originator {}", new Object[]{needURI, otherNeedURI,score,originator});
+    logger.info("HINT received for need {} referring to need {} with score {} from originator {}", new Object[]{needURI, otherNeedURI, score, originator});
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
@@ -96,8 +100,11 @@ public class NeedCommunicationServiceImpl implements
 
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
+    if (!isNeedActive(need))
+      throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
 
+
+    //TODO: Remove Matchrepository
     //save match
     Match match = new Match();
     match.setFromNeed(needURI);
@@ -106,11 +113,28 @@ public class NeedCommunicationServiceImpl implements
     match.setOriginator(originator);
     try {
       matchRepository.saveAndFlush(match);
-    } catch (PersistenceException e){
-       //TODO: catch a more specific exception (EntityExistsException?)
-       logger.warn("error while trying to store match", e);
-       return;
+    } catch (PersistenceException e) {
+      //TODO: catch a more specific exception (EntityExistsException?)
+      logger.warn("error while trying to store match", e);
+      return;
     }
+
+    /* Create connection */
+    Connection con = new Connection();
+    con.setNeedURI(needURI);
+    con.setState(ConnectionState.SUGGESTED);
+    con.setRemoteNeedURI(otherNeedURI);
+    //save connection (this creates a new id)
+    con = connectionRepository.saveAndFlush(con);
+    //create and set new uri
+    con.setConnectionURI(URIService.createConnectionURI(con));
+    con = connectionRepository.saveAndFlush(con);
+
+    ConnectionEvent event = new ConnectionEvent();
+    event.setConnectionURI(con.getConnectionURI());
+    event.setType(ConnectionEventType.MATCHER_HINT);
+    event.setOriginatorUri(match.getOriginator());
+    eventRepository.saveAndFlush(event);
 
     executorService.execute(new Runnable()
     {
@@ -137,7 +161,7 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public URI connectTo(final URI needURI, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info("CONNECT_TO received for need {} referring to need {} with message {}",new Object[]{needURI,otherNeedURI,message});
+    logger.info("CONNECT_TO received for need {} referring to need {} with message {}", new Object[]{needURI, otherNeedURI, message});
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (needURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
@@ -145,7 +169,8 @@ public class NeedCommunicationServiceImpl implements
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     Connection con = null;
-    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.OWNER_OPEN.name(), need.getState());
+    if (!isNeedActive(need))
+      throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.OWNER_OPEN.name(), need.getState());
 
     //check if there already exists a connection between those two
     //we have multiple options:
@@ -157,64 +182,71 @@ public class NeedCommunicationServiceImpl implements
     //   -> error message
     //e) a connection exists in state CLOSED -> create new
     List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
-    if (existingConnections.size() > 0){
-      for(Connection conn: existingConnections){
+    if (existingConnections.size() > 0) {
+      for (Connection conn : existingConnections) {
         //TODO: Move this to the transition() - Method in ConnectionState
         if (ConnectionState.CONNECTED == conn.getState() ||
-                ConnectionState.REQUEST_SENT == conn.getState()) {
-          throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),needURI,otherNeedURI);
+            ConnectionState.REQUEST_SENT == conn.getState()) {
+          throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);
         } else {
-            conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
-            con = connectionRepository.saveAndFlush(conn);
+          conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
+          con = connectionRepository.saveAndFlush(conn);
         }
       }
     } else {
-        //Create new connection object
-        con = new Connection();
-        con.setNeedURI(needURI);
-        con.setState(ConnectionState.REQUEST_SENT);
-        con.setRemoteNeedURI(otherNeedURI);
-        //save connection (this creates a new id)
-        con = connectionRepository.saveAndFlush(con);
-        //create and set new uri
-        con.setConnectionURI(URIService.createConnectionURI(con));
-        con = connectionRepository.saveAndFlush(con);
+      //Create new connection object
+      con = new Connection();
+      con.setNeedURI(needURI);
+      con.setState(ConnectionState.REQUEST_SENT);
+      con.setRemoteNeedURI(otherNeedURI);
+      //save connection (this creates a new id)
+      con = connectionRepository.saveAndFlush(con);
+      //create and set new uri
+      con.setConnectionURI(URIService.createConnectionURI(con));
+      con = connectionRepository.saveAndFlush(con);
     }
 
 
-    if(con == null) {
-        //TODO: make this more beautiful
-        //This should not happen
-        throw new IllegalStateException("con is null");
+    if (con == null) {
+      //TODO: make this more beautiful
+      //This should not happen
+      throw new IllegalStateException("con is null");
     } else {
-        final Connection connectionForRunnable = con;
-        //send to need
-        executorService.execute(new Runnable()
+
+      ConnectionEvent event = new ConnectionEvent();
+      event.setConnectionURI(con.getConnectionURI());
+      event.setType(ConnectionEventType.OWNER_OPEN);
+      event.setOriginatorUri(con.getConnectionURI());
+      eventRepository.saveAndFlush(event);
+
+      final Connection connectionForRunnable = con;
+      //send to need
+      executorService.execute(new Runnable()
+      {
+        @Override
+        public void run()
         {
-          @Override
-          public void run()
-          {
+          try {
+            URI remoteConnectionURI = needProtocolNeedService.connectionRequested(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), message);
+            connectionForRunnable.setRemoteConnectionURI(remoteConnectionURI);
+            connectionRepository.saveAndFlush(connectionForRunnable);
+          } catch (WonProtocolException e) {
+            // we can't open the connection. we send a close back to the owner
+            // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
+            // For now, we call the close method as if it had been called from the remote side
+            // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
             try {
-              URI remoteConnectionURI = needProtocolNeedService.connectionRequested(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), message);
-              connectionForRunnable.setRemoteConnectionURI(remoteConnectionURI);
-              connectionRepository.saveAndFlush(connectionForRunnable);
-            } catch (WonProtocolException e){
-              // we can't open the connection. we send a close back to the owner
-              // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
-              // For now, we call the close method as if it had been called from the remote side
-              // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
-              try {
-                NeedCommunicationServiceImpl.this.needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
-              } catch (NoSuchConnectionException e1) {
-                logger.debug("caught NoSuchConnectionException:", e1);
-              } catch (IllegalMessageForConnectionStateException e1) {
-                logger.debug("caught IllegalMessageForConnectionStateException:", e1);
-              }
+              NeedCommunicationServiceImpl.this.needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
+            } catch (NoSuchConnectionException e1) {
+              logger.debug("caught NoSuchConnectionException:", e1);
+            } catch (IllegalMessageForConnectionStateException e1) {
+              logger.debug("caught IllegalMessageForConnectionStateException:", e1);
             }
           }
-        });
+        }
+      });
 
-        return con.getConnectionURI();
+      return con.getConnectionURI();
     }
   }
 
@@ -229,9 +261,10 @@ public class NeedCommunicationServiceImpl implements
     if (needURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
 
     //Load need (throws exception if not found)
-    Need need = DataAccessUtils.loadNeed(needRepository,needURI);
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     Connection con = null;
-    if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
+    if (!isNeedActive(need))
+      throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
     //Create new connection object on our side
 
     //check if there already exists a connection between those two
@@ -244,68 +277,76 @@ public class NeedCommunicationServiceImpl implements
     //   -> error message
     //e) a connection exists in state CLOSED -> create new
     List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
-    if (existingConnections.size() > 0){
-      for(Connection conn: existingConnections){
+    if (existingConnections.size() > 0) {
+      for (Connection conn : existingConnections) {
         //TODO: Move this to the transition() - Method in ConnectionState
         if (ConnectionState.CONNECTED == conn.getState() ||
-                ConnectionState.REQUEST_RECEIVED == conn.getState()) {
-          throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),needURI,otherNeedURI);
+            ConnectionState.REQUEST_RECEIVED == conn.getState()) {
+          throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);
         } else {
-            conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
-            con = connectionRepository.saveAndFlush(conn);
+          conn.setState(conn.getState().transit(ConnectionEventType.PARTNER_OPEN));
+          con = connectionRepository.saveAndFlush(conn);
         }
       }
     } else {
-        con = new Connection();
-        con.setNeedURI(needURI);
-        con.setState(ConnectionState.REQUEST_RECEIVED);
-        con.setRemoteNeedURI(otherNeedURI);
-        con.setRemoteConnectionURI(otherConnectionURI);
-        //save connection (this creates a new URI)
-        con = connectionRepository.saveAndFlush(con);
-        //create and set new uri
-        con.setConnectionURI(URIService.createConnectionURI(con));
-        con = connectionRepository.saveAndFlush(con);
+      con = new Connection();
+      con.setNeedURI(needURI);
+      con.setState(ConnectionState.REQUEST_RECEIVED);
+      con.setRemoteNeedURI(otherNeedURI);
+      con.setRemoteConnectionURI(otherConnectionURI);
+      //save connection (this creates a new URI)
+      con = connectionRepository.saveAndFlush(con);
+      //create and set new uri
+      con.setConnectionURI(URIService.createConnectionURI(con));
+      con = connectionRepository.saveAndFlush(con);
 
-        //TODO: do we save the connection message? where? as a chat message?
+      //TODO: do we save the connection message? where? as a chat message?
     }
 
-      if(con == null) {
-          //TODO: make this more beautiful
-          //This should not happen
-          throw new IllegalStateException("con is null");
-      } else {
-        final Connection connectionForRunnable = con;
-        executorService.execute(new Runnable()
+    if (con == null) {
+      //TODO: make this more beautiful
+      //This should not happen
+      throw new IllegalStateException("con is null");
+    } else {
+
+      ConnectionEvent event = new ConnectionEvent();
+      event.setConnectionURI(con.getConnectionURI());
+      event.setType(ConnectionEventType.PARTNER_OPEN);
+      event.setOriginatorUri(con.getRemoteConnectionURI());
+      eventRepository.saveAndFlush(event);
+
+      final Connection connectionForRunnable = con;
+      executorService.execute(new Runnable()
+      {
+        @Override
+        public void run()
         {
-          @Override
-          public void run()
-          {
+          try {
+            ownerProtocolOwnerService.connectionRequested(needURI, otherNeedURI, connectionForRunnable.getConnectionURI(), message);
+          } catch (WonProtocolException e) {
+            // we can't open the connection. we send a deny back to the owner
+            // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
+            // For now, we call the close method as if it had been called from the owner side
+            // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
             try {
-              ownerProtocolOwnerService.connectionRequested(needURI, otherNeedURI, connectionForRunnable.getConnectionURI(), message);
-            } catch (WonProtocolException e) {
-              // we can't open the connection. we send a deny back to the owner
-              // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
-              // For now, we call the close method as if it had been called from the owner side
-              // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
-              try {
-                NeedCommunicationServiceImpl.this.ownerFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
-              } catch (NoSuchConnectionException e1) {
-                logger.debug("caught NoSuchConnectionException:", e1);
-              } catch (IllegalMessageForConnectionStateException e1) {
-                logger.debug("caught IllegalMessageForConnectionStateException:", e1);
-              }
+              NeedCommunicationServiceImpl.this.ownerFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
+            } catch (NoSuchConnectionException e1) {
+              logger.debug("caught NoSuchConnectionException:", e1);
+            } catch (IllegalMessageForConnectionStateException e1) {
+              logger.debug("caught IllegalMessageForConnectionStateException:", e1);
             }
           }
-        });
+        }
+      });
 
-        //return the URI of the new connection
-        return con.getConnectionURI();
-      }
+      //return the URI of the new connection
+      return con.getConnectionURI();
+    }
   }
 
 
-  private boolean isNeedActive(final Need need) {
+  private boolean isNeedActive(final Need need)
+  {
     return NeedState.ACTIVE == need.getState();
   }
 

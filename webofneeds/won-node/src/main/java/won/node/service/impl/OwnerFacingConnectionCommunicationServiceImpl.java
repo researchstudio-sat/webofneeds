@@ -22,12 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
-import won.protocol.model.ChatMessage;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEventType;
-import won.protocol.model.ConnectionState;
+import won.protocol.model.*;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.EventRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
 
@@ -50,6 +48,8 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   private ConnectionRepository connectionRepository;
   @Autowired
   private ChatMessageRepository chatMessageRepository;
+    @Autowired
+    private EventRepository eventRepository;
 
    @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
@@ -64,6 +64,13 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     con.setState(nextState);
     //save in the db
     final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
+
+    ConnectionEvent event = new ConnectionEvent();
+    event.setConnectionURI(con.getConnectionURI());
+    event.setType(ConnectionEventType.OWNER_CLOSE);
+    event.setOriginatorUri(con.getRemoteConnectionURI());
+    eventRepository.saveAndFlush(event);
+
     //inform the other side
     if (con.getRemoteConnectionURI() != null) {
       executorService.execute(new Runnable()
