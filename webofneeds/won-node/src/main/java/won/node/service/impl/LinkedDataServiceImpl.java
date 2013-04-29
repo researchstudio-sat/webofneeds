@@ -145,8 +145,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     setNsPrefixes(model);
 
     Model needModel = needModelMapper.toModel(need);
-
-    // add endpoints
     Resource needResource = model.getResource(needUri.toString());
     addProtocolEndpoints(model, needResource);
 
@@ -169,28 +167,20 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   public Model getConnectionModel(final URI connectionUri) throws NoSuchConnectionException
   {
-    //TODO: use connection model mapper here
-
     Connection connection = needInformationService.readConnection(connectionUri);
     List<ConnectionEvent> events = needInformationService.readEvents(connectionUri);
 
-    Model model = ModelFactory.createDefaultModel();
+    Model model = connectionModelMapper.toModel(connection);
     setNsPrefixes(model);
 
     //create connection member
-    Resource connectionMember = model.createResource(connectionUri.toString(), WON.CONNECTION)
-        .addProperty(WON.IS_IN_STATE, WON.toResource(connection.getState()));
+    Resource connectionMember = model.getResource(connection.getConnectionURI().toString());
 
     addProtocolEndpoints(model, connectionMember);
 
-    if (connection.getRemoteConnectionURI() != null)
-      connectionMember.addProperty(WON.HAS_REMOTE_CONNECTION, model.createResource(connection.getRemoteConnectionURI().toString()));
-
-    //create event container
+    //create event container and attach it to the member
     Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
-    //attach event container to event member
     model.add(model.createStatement(connectionMember, WON.HAS_EVENT_CONTAINER, eventContainer));
-    connectionMember.addProperty(WON.BELONGS_TO_NEED, model.createResource(connection.getNeedURI().toString()));
 
     //add event members and attach them
     for (ConnectionEvent e : events) {
