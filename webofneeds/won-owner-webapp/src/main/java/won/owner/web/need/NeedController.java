@@ -232,12 +232,12 @@ public class NeedController
 
     Need need = needs.get(0);
     model.addAttribute("active", need.getState() != NeedState.ACTIVE ? "activate" : "deactivate");
-    model.addAttribute("state", need.getState() == NeedState.ACTIVE ? "active" : "inactive");
     model.addAttribute("needURI", need.getNeedURI());
     model.addAttribute("command", new NeedPojo());
 
     LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
     NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+    pojo.setState(need.getState());
 
     model.addAttribute("pojo", pojo);
 
