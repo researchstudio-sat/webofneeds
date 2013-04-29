@@ -178,7 +178,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
     setNsPrefixes(model);
 
     //create connection member
-    Resource connectionMember = model.createResource(connectionUri.toString(), WON.CONNECTION);
+    Resource connectionMember = model.createResource(connectionUri.toString(), WON.CONNECTION)
+        .addProperty(WON.IS_IN_STATE, WON.toResource(connection.getState()));
+
     addProtocolEndpoints(model, connectionMember);
 
     if (connection.getRemoteConnectionURI() != null)
