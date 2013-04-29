@@ -42,7 +42,7 @@ public class WON
   public static final Property MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "matcherProtocolEndpoint");
   public static final Property OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "ownerProtocolEndpoint");
 
-  public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "hasNeedState");
+  public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
   public static final Resource NEED_STATE = m.createResource(BASE_URI + "NeedState");
 
   public static final Property HAS_BASIC_NEED_TYPE = m.createProperty(BASE_URI, "hasBasicNeedType");
