@@ -188,6 +188,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
     //attach event container to event member
     model.add(model.createStatement(connectionMember, WON.HAS_EVENT_CONTAINER, eventContainer));
+    connectionMember.addProperty(WON.BELONGS_TO_NEED, model.createResource(connection.getNeedURI().toString()));
 
     //TODO: not working, no events are ever returned by read events
     for (ConnectionEvent e : events) {
