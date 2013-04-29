@@ -173,7 +173,7 @@ public class NeedController
             .addProperty(WON.RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
         if (!needPojo.getStartTime().isEmpty())
           timeConstraint.addProperty(WON.START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
-        if (!needPojo.getStartTime().isEmpty())
+        if (!needPojo.getEndTime().isEmpty())
           timeConstraint.addProperty(WON.END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
         if (needPojo.getRecurIn() != null)
           timeConstraint.addProperty(WON.RECUR_IN, Long.toString(needPojo.getRecurIn()));
