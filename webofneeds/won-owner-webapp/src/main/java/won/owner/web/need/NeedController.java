@@ -121,8 +121,6 @@ public class NeedController
       com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
       Resource needResource = needModel.createResource(WON.NEED);
-      //TODO: add this after it is saved to the DB for the first time
-      // .addProperty(WON.NEED_CREATION_DATE, DateTimeUtils.getCurrentDateTimeStamp(), XSDDatatype.XSDdateTime);
 
       // need type
       needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
@@ -233,12 +231,13 @@ public class NeedController
       return "noNeedFound";
 
     Need need = needs.get(0);
-    model.addAttribute("active", (need.getState() != NeedState.ACTIVE ? "activate" : "deactivate"));
+    model.addAttribute("active", need.getState() != NeedState.ACTIVE ? "activate" : "deactivate");
     model.addAttribute("needURI", need.getNeedURI());
     model.addAttribute("command", new NeedPojo());
 
     LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
     NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+    pojo.setState(need.getState());
 
     model.addAttribute("pojo", pojo);
 
