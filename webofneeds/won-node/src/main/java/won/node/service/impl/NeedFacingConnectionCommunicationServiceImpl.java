@@ -70,6 +70,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     ConnectionEvent event = new ConnectionEvent();
     event.setConnectionURI(con.getConnectionURI());
     event.setType(ConnectionEventType.PARTNER_CLOSE);
+    event.setOriginatorUri(con.getRemoteConnectionURI());
     eventRepository.saveAndFlush(event);
 
       //inform the need side
