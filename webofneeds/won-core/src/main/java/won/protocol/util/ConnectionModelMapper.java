@@ -11,11 +11,9 @@ import won.protocol.vocabulary.WON;
 import java.net.URI;
 
 /**
- * Created with IntelliJ IDEA.
  * User: gabriel
  * Date: 09.04.13
  * Time: 15:38
- * To change this template use File | Settings | File Templates.
  */
 public class ConnectionModelMapper implements ModelMapper<Connection>
 {

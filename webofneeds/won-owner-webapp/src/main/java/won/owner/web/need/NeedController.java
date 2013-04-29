@@ -231,7 +231,8 @@ public class NeedController
       return "noNeedFound";
 
     Need need = needs.get(0);
-    model.addAttribute("active", (need.getState() != NeedState.ACTIVE ? "activate" : "deactivate"));
+    model.addAttribute("active", need.getState() != NeedState.ACTIVE ? "activate" : "deactivate");
+    model.addAttribute("state", need.getState() == NeedState.ACTIVE ? "active" : "inactive");
     model.addAttribute("needURI", need.getNeedURI());
     model.addAttribute("command", new NeedPojo());
 

@@ -7,7 +7,6 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
-<% //NeedPojo need = (NeedPojo) request.getAttribute("pojo"); %>
 
 <html>
 <head>
@@ -25,7 +24,7 @@
     <dt>Need type</dt>
         <dd><c:out value="${pojo.basicNeedType}" /></dd>
     <dt>Active</dt>
-        <dd><c:out value="${active}" /><br />
+        <dd><c:out value="${state}" /><br />
             <button onclick="jQuery.post('/owner/need/<c:out value="${needId}" />/toggle', function() { document.location.reload(true); });" ><c:out value="${active}"/></button>
         </dd>
     <dt>Price specification</dt>
