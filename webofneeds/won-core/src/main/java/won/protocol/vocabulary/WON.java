@@ -22,6 +22,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import won.protocol.model.BasicNeedType;
 import won.protocol.model.ConnectionEventType;
+import won.protocol.model.ConnectionState;
 import won.protocol.model.NeedState;
 
 /**
@@ -41,7 +42,7 @@ public class WON
   public static final Property MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "matcherProtocolEndpoint");
   public static final Property OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "ownerProtocolEndpoint");
 
-  public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
+  public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "hasNeedState");
   public static final Resource NEED_STATE = m.createResource(BASE_URI + "NeedState");
 
   public static final Property HAS_BASIC_NEED_TYPE = m.createProperty(BASE_URI, "hasBasicNeedType");
@@ -64,8 +65,11 @@ public class WON
 
   public static final Property HAS_CONNECTIONS = m.createProperty(BASE_URI, "hasConnections");
   public static final Resource CONNECTION_CONTAINER = m.createResource(BASE_URI + "ConnectionContainer");
+
   public static final Resource CONNECTION = m.createResource(BASE_URI + "Connection");
+  public static final Property HAS_CONNECTION_STATE = m.createProperty(BASE_URI, "hasConnectionState");
   public static final Property HAS_REMOTE_CONNECTION = m.createProperty(BASE_URI, "hasRemoteConnection");
+  public static final Property BELONGS_TO_NEED = m.createProperty(BASE_URI, "belongsToNeed");
 
   public static final Property HAS_EVENT_CONTAINER = m.createProperty(BASE_URI, "hasEventContainer");
   public static final Resource EVENT_CONTAINER = m.createResource(BASE_URI + "EventContainer");
@@ -99,7 +103,6 @@ public class WON
   public static final Property RECUR_INFINITE_TIMES = m.createProperty(BASE_URI, "recurInfiniteTimes");
 
   // Resource individuals
-  //public static final Resource EVENT_TYPE_ACCEPT = m.createResource(EventType.ACCEPT.getURI().toString());
   public static final Resource EVENT_TYPE_CLOSE = m.createResource(ConnectionEventType.OWNER_CLOSE.getURI().toString());
   public static final Resource EVENT_TYPE_PREPARE = m.createResource(ConnectionEventType.OWNER_PREPARE.getURI().toString());
   public static final Resource EVENT_TYPE_OPEN = m.createResource(ConnectionEventType.OWNER_OPEN.getURI().toString());
@@ -112,14 +115,12 @@ public class WON
   public static final Resource NEED_STATE_ACTIVE = m.createResource(NeedState.ACTIVE.getURI().toString());
   public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
 
-  //TODO: define this property in the ontology
-  public static final Property BELONGS_TO_NEED = m.createProperty(BASE_URI, "belongsToNeed");
-
-  // TODO: [CLEANUP] delete when properties no longer used
-  @Deprecated
-  public static final Property REMOTE_NEED = m.createProperty(BASE_URI, "remoteNeed");
-
-
+  public static final Resource CONNECTION_STATE_SUGGESTED = m.createResource(ConnectionState.SUGGESTED.getURI().toString());
+  public static final Resource CONNECTION_STATE_PREPARED = m.createResource(ConnectionState.PREPARED.getURI().toString());
+  public static final Resource CONNECTION_STATE_REQUEST_SENT = m.createResource(ConnectionState.REQUEST_SENT.getURI().toString());
+  public static final Resource CONNECTION_STATE_REQUEST_RECEIVED = m.createResource(ConnectionState.REQUEST_RECEIVED.getURI().toString());
+  public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
+  public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
 
   /**
    * Returns the base URI for this schema.
@@ -188,6 +189,32 @@ public class WON
         return EVENT_TYPE_OPEN;
       case OWNER_PREPARE:
         return EVENT_TYPE_PREPARE;
+      default:
+        throw new IllegalStateException("No such case specified for " + type.name());
+    }
+  }
+
+  /**
+   * Converts the ConnectionState Enum to a Resource.
+   *
+   * @param type
+   * @return
+   */
+  public static Resource toResource(ConnectionState type)
+  {
+    switch (type) {
+      case SUGGESTED:
+        return CONNECTION_STATE_SUGGESTED;
+      case PREPARED:
+        return CONNECTION_STATE_PREPARED;
+      case REQUEST_SENT:
+        return CONNECTION_STATE_REQUEST_SENT;
+      case REQUEST_RECEIVED:
+        return CONNECTION_STATE_REQUEST_RECEIVED;
+      case CONNECTED:
+        return CONNECTION_STATE_CONNECTED;
+      case CLOSED:
+        return CONNECTION_STATE_CLOSED;
       default:
         throw new IllegalStateException("No such case specified for " + type.name());
     }
