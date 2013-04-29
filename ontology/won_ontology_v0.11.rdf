@@ -109,6 +109,16 @@
     
 
 
+    <!-- http://purl.org/webofneeds/model#hasConnectionState -->
+
+    <owl:ObjectProperty rdf:about="&won;hasConnectionState">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;Connection"/>
+        <rdfs:range rdf:resource="&won;ConnectionState"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://purl.org/webofneeds/model#hasConnections -->
 
     <owl:ObjectProperty rdf:about="&won;hasConnections">
@@ -417,27 +427,11 @@
     
 
 
-    <!-- http://purl.org/goodrelations/v1#BusinessEntity -->
-
-    <rdf:Description rdf:about="&gr;BusinessEntity">
-        <rdfs:subClassOf rdf:resource="&won;Owner"/>
-    </rdf:Description>
-    
-
-
     <!-- http://purl.org/goodrelations/v1#Offering -->
 
     <rdf:Description rdf:about="&gr;Offering">
         <rdfs:subClassOf rdf:resource="&won;Need"/>
     </rdf:Description>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#Accept -->
-
-    <owl:Class rdf:about="&won;Accept">
-        <rdfs:subClassOf rdf:resource="&won;Event"/>
-    </owl:Class>
     
 
 
@@ -477,6 +471,12 @@
         <rdfs:subClassOf rdf:resource="&rdfs;Resource"/>
         <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/ldp#CompositeContainer"/>
     </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#ConnectionState -->
+
+    <owl:Class rdf:about="&won;ConnectionState"/>
     
 
 
@@ -573,6 +573,22 @@
     <!-- http://purl.org/webofneeds/model#TimeConstraint -->
 
     <owl:Class rdf:about="&won;TimeConstraint"/>
+    
+
+
+    <!-- http://schema.org/Organization -->
+
+    <rdf:Description rdf:about="http://schema.org/Organization">
+        <rdfs:subClassOf rdf:resource="&won;Owner"/>
+    </rdf:Description>
+    
+
+
+    <!-- http://schema.org/Person -->
+
+    <rdf:Description rdf:about="http://schema.org/Person">
+        <rdfs:subClassOf rdf:resource="&won;Owner"/>
+    </rdf:Description>
     
 
 
