@@ -25,6 +25,7 @@ import won.protocol.model.*;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.EventRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
@@ -83,6 +84,9 @@ public class NeedCommunicationServiceImpl implements
   @Autowired
   private MatchRepository matchRepository;
 
+  @Autowired
+  private EventRepository eventRepository;
+
   @Override
   public void hint(final URI needURI, final URI otherNeedURI, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
@@ -98,6 +102,8 @@ public class NeedCommunicationServiceImpl implements
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
 
+
+    //TODO: Remove Matchrepository
     //save match
     Match match = new Match();
     match.setFromNeed(needURI);
@@ -111,6 +117,22 @@ public class NeedCommunicationServiceImpl implements
        logger.warn("error while trying to store match", e);
        return;
     }
+
+    /* Create connection */
+    Connection con = new Connection();
+    con.setNeedURI(needURI);
+    con.setState(ConnectionState.SUGGESTED);
+    con.setRemoteNeedURI(otherNeedURI);
+    //save connection (this creates a new id)
+    con = connectionRepository.saveAndFlush(con);
+    //create and set new uri
+    con.setConnectionURI(URIService.createConnectionURI(con));
+    con = connectionRepository.saveAndFlush(con);
+
+    ConnectionEvent event = new ConnectionEvent();
+    event.setConnectionURI(con.getConnectionURI());
+    event.setType(ConnectionEventType.MATCHER_HINT);
+    eventRepository.saveAndFlush(event);
 
     executorService.execute(new Runnable()
     {
@@ -187,6 +209,12 @@ public class NeedCommunicationServiceImpl implements
         //This should not happen
         throw new IllegalStateException("con is null");
     } else {
+
+        ConnectionEvent event = new ConnectionEvent();
+        event.setConnectionURI(con.getConnectionURI());
+        event.setType(ConnectionEventType.OWNER_OPEN);
+        eventRepository.saveAndFlush(event);
+
         final Connection connectionForRunnable = con;
         //send to need
         executorService.execute(new Runnable()
@@ -251,7 +279,7 @@ public class NeedCommunicationServiceImpl implements
                 ConnectionState.REQUEST_RECEIVED == conn.getState()) {
           throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),needURI,otherNeedURI);
         } else {
-            conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
+            conn.setState(conn.getState().transit(ConnectionEventType.PARTNER_OPEN));
             con = connectionRepository.saveAndFlush(conn);
         }
       }
@@ -275,6 +303,12 @@ public class NeedCommunicationServiceImpl implements
           //This should not happen
           throw new IllegalStateException("con is null");
       } else {
+
+        ConnectionEvent event = new ConnectionEvent();
+        event.setConnectionURI(con.getConnectionURI());
+        event.setType(ConnectionEventType.PARTNER_OPEN);
+        eventRepository.saveAndFlush(event);
+
         final Connection connectionForRunnable = con;
         executorService.execute(new Runnable()
         {

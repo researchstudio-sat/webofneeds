@@ -23,12 +23,10 @@ import org.springframework.stereotype.Component;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
-import won.protocol.model.ChatMessage;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEventType;
-import won.protocol.model.ConnectionState;
+import won.protocol.model.*;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.EventRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
 
@@ -53,7 +51,10 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Autowired
   private ChatMessageRepository chatMessageRepository;
 
-   @Override
+  @Autowired
+  private EventRepository eventRepository;
+
+  @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("CLOSE received from the need side for connection {}",new Object[]{connectionURI});
@@ -65,7 +66,13 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     con.setState(nextState);
     //save in the db
     con = connectionRepository.saveAndFlush(con);
-    //inform the need side
+
+    ConnectionEvent event = new ConnectionEvent();
+    event.setConnectionURI(con.getConnectionURI());
+    event.setType(ConnectionEventType.PARTNER_CLOSE);
+    eventRepository.saveAndFlush(event);
+
+      //inform the need side
     executorService.execute(new Runnable()
     {
       @Override
