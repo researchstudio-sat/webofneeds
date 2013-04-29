@@ -65,7 +65,7 @@ public class WON
   public static final Property HAS_CONNECTIONS = m.createProperty(BASE_URI, "hasConnections");
   public static final Resource CONNECTION_CONTAINER = m.createResource(BASE_URI + "ConnectionContainer");
   public static final Resource CONNECTION = m.createResource(BASE_URI + "Connection");
-  public static final Property HAS_REMOTE_CONNECTION = m.createProperty(BASE_URI, "remoteConnection");
+  public static final Property HAS_REMOTE_CONNECTION = m.createProperty(BASE_URI, "hasRemoteConnection");
 
   public static final Property HAS_EVENT_CONTAINER = m.createProperty(BASE_URI, "hasEventContainer");
   public static final Resource EVENT_CONTAINER = m.createResource(BASE_URI + "EventContainer");
@@ -112,11 +112,14 @@ public class WON
   public static final Resource NEED_STATE_ACTIVE = m.createResource(NeedState.ACTIVE.getURI().toString());
   public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
 
+  //TODO: define this property in the ontology
+  public static final Property BELONGS_TO_NEED = m.createProperty(BASE_URI, "belongsToNeed");
+
   // TODO: [CLEANUP] delete when properties no longer used
   @Deprecated
   public static final Property REMOTE_NEED = m.createProperty(BASE_URI, "remoteNeed");
-  @Deprecated
-  public static final Property BELONGS_TO_NEED = m.createProperty(BASE_URI, "belongsToNeed");
+
+
 
   /**
    * Returns the base URI for this schema.
