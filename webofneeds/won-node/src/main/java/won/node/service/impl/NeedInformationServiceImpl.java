@@ -134,7 +134,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
 
 
   @Override
-  public List<Event> readEvents(final URI connectionURI) throws NoSuchConnectionException
+  public List<ConnectionEvent> readEvents(final URI connectionURI) throws NoSuchConnectionException
   {
     return eventRepository.findByConnectionURI(connectionURI);
   }

@@ -48,18 +48,6 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
   }
 
   @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.

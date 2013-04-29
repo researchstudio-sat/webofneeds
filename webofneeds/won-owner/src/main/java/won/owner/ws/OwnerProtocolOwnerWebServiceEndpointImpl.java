@@ -42,18 +42,6 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     }
 
     @Override
-    public void accept(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        wireDependenciesLazily();
-        ownerProtocolOwnerService.accept(connectionURI);
-    }
-
-    @Override
-    public void deny(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        wireDependenciesLazily();
-        ownerProtocolOwnerService.deny(connectionURI);
-    }
-
-    @Override
     public void close(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         wireDependenciesLazily();
         ownerProtocolOwnerService.close(connectionURI);

@@ -120,6 +120,7 @@ public class NeedServerIntegrationTests
 
   }
 
+  //TODO: Fix Test (new Protocol doesn't work)
   @Test
   //Propagation.NEVER is required here because if transactions start here and propagate,
   //code running in different threads won't inherit the transaction, and won't see changes to the database
@@ -132,7 +133,7 @@ public class NeedServerIntegrationTests
 
     ownerProtocolOwnerClient.reset();
     ownerProtocolOwnerClient.setAutoConnect(true);
-    ownerProtocolOwnerClient.setOnAcceptAction("MESSAGE");
+    //ownerProtocolOwnerClient.setOnAcceptAction("MESSAGE");
     ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
 
     ownerProtocolOwnerClient2.reset();
@@ -154,10 +155,10 @@ public class NeedServerIntegrationTests
     Assert.assertNotNull(connectionURI2);
 
 
-    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
 
@@ -183,6 +184,7 @@ public class NeedServerIntegrationTests
     Assert.assertEquals(ConnectionState.CLOSED,conn2.getState());
   }
 
+    //TODO: Fix Test (new Protocol doesn't work)
   @Test
   @Transactional(propagation = Propagation.NEVER)
   public void testTrivialErrors() throws Exception {
@@ -281,11 +283,6 @@ public class NeedServerIntegrationTests
 //    } catch (IllegalArgumentException e){}
 
     try {
-      ownerProtocolNeedService.accept(null);
-      Assert.fail("Expected exception not thrown");
-    } catch (IllegalArgumentException e){}
-
-    try {
       ownerProtocolNeedService.activate(null);
       Assert.fail("Expected exception not thrown");
     } catch (IllegalArgumentException e){}
@@ -297,11 +294,6 @@ public class NeedServerIntegrationTests
 
     try {
       ownerProtocolNeedService.deactivate(null);
-      Assert.fail("Expected exception not thrown");
-    } catch (IllegalArgumentException e){}
-
-    try {
-      ownerProtocolNeedService.deny(null);
       Assert.fail("Expected exception not thrown");
     } catch (IllegalArgumentException e){}
 
@@ -376,16 +368,6 @@ public class NeedServerIntegrationTests
     } catch (IllegalArgumentException e){}
 
     try {
-      needProtocolNeedService.accept(null);
-      Assert.fail("Expected exception not thrown");
-    } catch (IllegalArgumentException e){}
-
-    try {
-      needProtocolNeedService.deny(null);
-      Assert.fail("Expected exception not thrown");
-    } catch (IllegalArgumentException e){}
-
-    try {
       needProtocolNeedService.sendTextMessage(null,"hi");
       Assert.fail("Expected exception not thrown");
     } catch (IllegalArgumentException e){}
@@ -398,13 +380,12 @@ public class NeedServerIntegrationTests
 
   }
 
-
+  //TODO: Fix Test (new Protocol doesn't work)
   @Test
   //Propagation.NEVER is required here because if transactions start here and propagate,
   //code running in different threads won't inherit the transaction, and won't see changes to the database
   //made within the transaction
   @Transactional(propagation = Propagation.NEVER)
-
   public void testDeniedConnection() throws Exception{
     URI ownerURI = createOwnerURI();
     URI matcherURI = createMatcherURI();
@@ -432,16 +413,16 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
@@ -498,16 +479,16 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
@@ -521,7 +502,7 @@ public class NeedServerIntegrationTests
     Assert.assertEquals(connectionURI2,conn.getRemoteConnectionURI());
     Assert.assertEquals(needURI,conn.getNeedURI());
     Assert.assertEquals(needURI2,conn.getRemoteNeedURI());
-    Assert.assertEquals(ConnectionState.ESTABLISHED,conn.getState());
+    Assert.assertEquals(ConnectionState.CONNECTED,conn.getState());
 
     Collection<URI> needConnections2 = ownerProtocolOwnerClient2.listConnectionURIs(needURI2);
     Assert.assertEquals(1, needConnections2.size());
@@ -531,7 +512,7 @@ public class NeedServerIntegrationTests
     Assert.assertEquals(connectionURI,conn2.getRemoteConnectionURI());
     Assert.assertEquals(needURI2,conn2.getNeedURI());
     Assert.assertEquals(needURI,conn2.getRemoteNeedURI());
-    Assert.assertEquals(ConnectionState.ESTABLISHED,conn2.getState());
+    Assert.assertEquals(ConnectionState.CONNECTED,conn2.getState());
 
     //now, owner2 deactivates the need:
     countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
@@ -542,16 +523,16 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
@@ -586,6 +567,7 @@ public class NeedServerIntegrationTests
 
   }
 
+  //TODO: Fix Test (test doesn't work with new protocol)
   @Test
   public void testProtocolErrorThenNormal() throws Exception{
     URI ownerURI = createOwnerURI();
@@ -616,16 +598,16 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
@@ -652,28 +634,28 @@ public class NeedServerIntegrationTests
     Assert.assertEquals(ConnectionState.REQUEST_RECEIVED,conn2.getState());
 
     //now, send the right message from owner2 (accept)
-    ownerProtocolOwnerClient.setOnAcceptAction("MESSAGE");
+    //ownerProtocolOwnerClient.setOnAcceptAction("MESSAGE");
     ownerProtocolOwnerClient2.setOnMessageAction("MESSAGE");
     ownerProtocolOwnerClient.setOnMessageAction("CLOSE");
     countDownLatch = new CountDownLatch(1); //used to synchronize with the owners' Threads
     ownerProtocolOwnerClient.setAutomaticActionsFinished(countDownLatch);
     ownerProtocolOwnerClient2.setAutomaticActionsFinished(countDownLatch);
 
-    ownerProtocolOwnerClient2.performAction(MockOwnerService.ConnectionAction.ACCEPT, connectionURI2);
+    //ownerProtocolOwnerClient2.performAction(MockOwnerService.ConnectionAction.ACCEPT, connectionURI2);
     countDownLatch.await(10, TimeUnit.SECONDS);
 
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
@@ -703,6 +685,8 @@ public class NeedServerIntegrationTests
     System.out.println("conn2:" + connAfter2);
   }
 
+
+    //TODO: Fix Test (new Protocol doesn't work)
   @Test
   public void testConnectToInactiveNeed() throws Exception{
     URI ownerURI = createOwnerURI();
@@ -732,16 +716,16 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
@@ -796,6 +780,8 @@ public class NeedServerIntegrationTests
     }
   }
 
+
+    //TODO: Fix Test (new Protocol doesn't work)
   @Test
   //Propagation.NEVER is required here because if transactions start here and propagate,
   //code running in different threads won't inherit the transaction, and won't see changes to the database
@@ -807,7 +793,7 @@ public class NeedServerIntegrationTests
 
     ownerProtocolOwnerClient.reset();
     ownerProtocolOwnerClient2.reset();
-    ownerProtocolOwnerClient.setOnAcceptAction("CLOSE");
+    //ownerProtocolOwnerClient.setOnAcceptAction("CLOSE");
     ownerProtocolOwnerClient2.setOnConnectAction("ACCEPT");
 
     URI needURI = ownerProtocolOwnerClient.createNeed(ownerURI,null,true);
@@ -825,16 +811,16 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
@@ -863,7 +849,7 @@ public class NeedServerIntegrationTests
 
     ownerProtocolOwnerClient.reset();
     ownerProtocolOwnerClient2.reset();
-    ownerProtocolOwnerClient.setOnAcceptAction("CLOSE");
+    //ownerProtocolOwnerClient.setOnAcceptAction("CLOSE");
     ownerProtocolOwnerClient2.setOnConnectAction("ACCEPT");
     countDownLatch = resetCountDownLatchTo(1);
     connectionURI = ownerProtocolOwnerClient.connectTo(needURI,needURI2,"this is the first connection attempt");
@@ -876,16 +862,16 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
@@ -912,6 +898,8 @@ public class NeedServerIntegrationTests
     Assert.assertEquals(ConnectionState.CLOSED,connAfter2.getState());
   }
 
+
+    //TODO: Fix Test (new Protocol doesn't work)
   @Test
   public void testConnectFromBothSidesBeforeFirstAccept() throws Exception{
     URI ownerURI = createOwnerURI();
@@ -946,19 +934,21 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+   // Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+   // Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
  }
 
+
+    //TODO: Fix Test (new Protocol doesn't work)
   @Test
   public void testConnectTwiceBeforeFirstAccept() throws Exception{
     URI ownerURI = createOwnerURI();
@@ -996,21 +986,23 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
   }
 
+
+    //TODO: Fix Test (new Protocol doesn't work)
   @Test
   public void testConnectTwiceAfterFirstAccept() throws Exception{
     URI ownerURI = createOwnerURI();
@@ -1048,8 +1040,8 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
@@ -1057,8 +1049,8 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));
@@ -1066,6 +1058,8 @@ public class NeedServerIntegrationTests
 
   }
 
+
+    //TODO: Fix Test (new Protocol doesn't work)
   @Test
   public void testConnectFromBothSidesAfterFirstAccept() throws Exception{
     URI ownerURI = createOwnerURI();
@@ -1102,15 +1096,15 @@ public class NeedServerIntegrationTests
 
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(1, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient.getMethodCallCount(MockOwnerService.Method.close));
 
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.hintReceived));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.connectionRequested));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
-    Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.accept));
+    //Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.deny));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.sendTextMessage));
     Assert.assertEquals(0, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.close));
     Assert.assertEquals(1, ownerProtocolOwnerClient2.getMethodCallCount(MockOwnerService.Method.EXCEPTION_CAUGHT));

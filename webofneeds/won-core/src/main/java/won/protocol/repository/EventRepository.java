@@ -16,8 +16,8 @@
 
 package won.protocol.repository;
 
-import won.protocol.model.Event;
-import won.protocol.model.EventType;
+import won.protocol.model.ConnectionEvent;
+import won.protocol.model.ConnectionEventType;
 
 import java.net.URI;
 import java.util.List;
@@ -27,11 +27,11 @@ import java.util.List;
  * Date: 24.04.2013
  * Time: 11:56
  */
-public interface EventRepository extends WonRepository<Event>
+public interface EventRepository extends WonRepository<ConnectionEvent>
 {
-  List<Event> findByConnectionURI(URI uri);
+  List<ConnectionEvent> findByConnectionURI(URI uri);
 
-//  List<Event> findByOriginatorURI(URI uri);
+//  List<ConnectionEvent> findByOriginatorURI(URI uri);
 
-  List<Event> findByType(EventType type);
+  List<ConnectionEvent> findByType(ConnectionEventType type);
 }

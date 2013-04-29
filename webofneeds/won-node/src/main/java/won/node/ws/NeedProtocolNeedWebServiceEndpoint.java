@@ -45,12 +45,6 @@ public interface NeedProtocolNeedWebServiceEndpoint
         throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
   @WebMethod
-  void accept(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-  @WebMethod
-  void deny(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
-
-  @WebMethod
   void close(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   @WebMethod

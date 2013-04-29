@@ -11,8 +11,6 @@ import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.service.ConnectionCommunicationService;
-import won.protocol.service.OwnerFacingNeedCommunicationService;
 import org.springframework.util.*;
 import won.protocol.util.DataAccessUtils;
 
@@ -59,7 +57,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
 
         //Load need (throws exception if not found)
         Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
-        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, NeedMessage.HINT.name(), need.getState());
+        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
 
         //save match
         Match match = new Match();
@@ -86,48 +84,36 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
 
         //Load need (throws exception if not found)
         Need need = DataAccessUtils.loadNeed(needRepository,ownNeedURI);
-        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, NeedMessage.CONNECTION_REQUESTED.name(), need.getState());
+        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
         //Create new connection object on our side
 
-        Connection con = new Connection();
-        con.setNeedURI(ownNeedURI);
-        con.setState(ConnectionState.REQUEST_RECEIVED);
-        con.setRemoteNeedURI(otherNeedURI);
-
-        //TODO problem: remote connection URI not available here! Do we need it? Do we adapt the interface? (using core interface - we could split it)
-        //con.setRemoteConnectionURI(otherConnectionURI);
-
         //set new uri
-        con.setConnectionURI(ownConnectionURI);
-        connectionRepository.saveAndFlush(con);
-    }
+        List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURI, otherNeedURI);
+        if (existingConnections.size() > 0){
+            for(Connection conn: existingConnections){
+                //TODO: Move this to the transition() - Method in ConnectionState
+                if (ConnectionState.CONNECTED == conn.getState() ||
+                        ConnectionState.REQUEST_RECEIVED == conn.getState()) {
+                    throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),ownNeedURI,otherNeedURI);
+                } else {
+                    conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
+                    connectionRepository.saveAndFlush(conn);
+                }
+            }
+        } else {
+            Connection con = new Connection();
+            con.setNeedURI(ownNeedURI);
+            con.setState(ConnectionState.REQUEST_RECEIVED);
+            con.setRemoteNeedURI(otherNeedURI);
 
-    @Override
-    public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
-        logger.info(MessageFormat.format("node-facing: ACCEPT called for connection {0}",connectionURI));
-        if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+            //TODO problem: remote connection URI not available here! Do we need it? Do we adapt the interface? (using core interface - we could split it)
+            //con.setRemoteConnectionURI(otherConnectionURI);
+            //create and set new uri
+            con.setConnectionURI(ownConnectionURI);
+            connectionRepository.saveAndFlush(con);
 
-        //load connection, checking if it exists
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        //set new state and save in the db
-        con.setState(con.getState().transit(ConnectionMessage.OWNER_ACCEPT));
-        //save in the db
-        connectionRepository.saveAndFlush(con);
-    }
-
-    @Override
-    public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
-        logger.info(MessageFormat.format("node-facing: DENY called for connection {0}",connectionURI));
-        if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-
-        //load connection, checking if it exists
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        //set new state and save in the db
-        con.setState(con.getState().transit(ConnectionMessage.OWNER_DENY));
-        //save in the db
-        connectionRepository.saveAndFlush(con);
+            //TODO: do we save the connection message? where? as a chat message?
+        }
     }
 
     @Override
@@ -139,7 +125,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         //load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        con.setState(con.getState().transit(ConnectionMessage.OWNER_CLOSE));
+        con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
         //save in the db
         connectionRepository.saveAndFlush(con);
     }
@@ -154,7 +140,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
 
         //perform state transit (should not result in state change)
-        //ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_MESSAGE);
+        //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
         //construct chatMessage object to store in the db
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setCreationDate(new Date());

@@ -16,12 +16,11 @@
 
 package won.protocol.service;
 
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
-import won.protocol.model.Event;
+import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
 
@@ -127,7 +126,7 @@ public interface NeedInformationService {
    * @return
    * @throws NoSuchConnectionException
    */
-    public List<Event> readEvents(URI connectionURI) throws NoSuchConnectionException;
+    public List<ConnectionEvent> readEvents(URI connectionURI) throws NoSuchConnectionException;
 
     /**
      * Retrieves the public description of the connection as an RDF graph.

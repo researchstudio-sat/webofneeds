@@ -69,6 +69,74 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Autowired
   private ConnectionModelMapper connectionModelMapper;
 
+    @Override
+    public void deactivate(URI needURI) throws NoSuchNeedException {
+        logger.info(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
+        try {
+            OwnerProtocolNeedWebServiceEndpoint proxy =getOwnerProtocolEndpointForNeed(needURI);
+
+            List<Need> needs = needRepository.findByNeedURI(needURI);
+            if(needs.size() != 1)
+                throw new NoSuchNeedException(needURI);
+
+            proxy.deactivate(needURI);
+
+            Need need = needs.get(0);
+            need.setState(NeedState.INACTIVE);
+            needRepository.saveAndFlush(need);
+        } catch (MalformedURLException e) {
+            logger.warn("couldn't create URL for needProtocolEndpoint", e);
+        }
+    }
+
+    @Override
+    public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
+        logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));
+        try {
+            OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
+            List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
+            if(cons.size() != 1)
+                throw new NoSuchConnectionException(connectionURI);
+            proxy.close(connectionURI);
+
+            Connection con = cons.get(0);
+            con.setState(ConnectionState.CLOSED);
+            connectionRepository.saveAndFlush(con);
+        } catch (MalformedURLException e) {
+            logger.warn("couldn't create URL for needProtocolEndpoint", e);
+        } 
+    }
+
+    @Override
+    public void sendTextMessage(final URI connectionURI, final String message)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
+        logger.debug(MessageFormat.format("need-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
+        try {
+            OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
+            List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
+            if(cons.isEmpty())
+                throw new NoSuchConnectionException(connectionURI);
+            Connection con = cons.get(0);
+
+            //send text message
+            proxy.sendTextMessage(connectionURI, message);
+
+            ChatMessage chatMessage = new ChatMessage();
+            chatMessage.setCreationDate(new Date());
+            chatMessage.setLocalConnectionURI(connectionURI);
+            chatMessage.setMessage(message);
+            chatMessage.setOriginatorURI(con.getNeedURI());
+
+            //save in the db
+            chatMessageRepository.saveAndFlush(chatMessage);
+
+        } catch (MalformedURLException e) {
+            logger.warn("couldn't create URL for needProtocolEndpoint", e);
+        } 
+    }
+
   public void setLinkedDataRestClient(LinkedDataRestClient linkedDataRestClient)
   {
     this.linkedDataRestClient = linkedDataRestClient;
@@ -154,115 +222,10 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     }
   }
 
-  @Override
-  public void deactivate(URI needURI) throws NoSuchNeedException
-  {
-    logger.info(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
-    try {
-      OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForNeed(needURI);
 
-      List<Need> needs = needRepository.findByNeedURI(needURI);
-      if (needs.size() != 1)
-        throw new NoSuchNeedException(needURI);
-
-      proxy.deactivate(needURI);
-
-      Need need = needs.get(0);
-      need.setState(NeedState.INACTIVE);
-      needRepository.saveAndFlush(need);
-    } catch (MalformedURLException e) {
-      logger.warn("couldn't create URL for needProtocolEndpoint", e);
-    }
-  }
-
-  @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("need-facing: ACCEPT called for connection {0}", connectionURI));
-    try {
-      OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
-
-      List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
-      if (cons.size() != 1)
-        throw new NoSuchConnectionException(connectionURI);
-
-      proxy.accept(connectionURI);
-
-      Connection con = cons.get(0);
-      con.setState(ConnectionState.ESTABLISHED);
-      connectionRepository.saveAndFlush(con);
-    } catch (MalformedURLException e) {
-      logger.warn("couldn't create URL for needProtocolEndpoint", e);
-    }
-  }
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("need-facing: DENY called for connection {0}", connectionURI));
-    try {
-      OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
-      List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
-      if (cons.size() != 1)
-        throw new NoSuchConnectionException(connectionURI);
-      proxy.deny(connectionURI);
-
-      Connection con = cons.get(0);
-      con.setState(ConnectionState.CLOSED);
-      connectionRepository.saveAndFlush(con);
-    } catch (MalformedURLException e) {
-      logger.warn("couldn't create URL for needProtocolEndpoint", e);
-    }
-  }
-
-  @Override
-  public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));
-    try {
-      OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
-      List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
-      if (cons.size() != 1)
-        throw new NoSuchConnectionException(connectionURI);
-      proxy.close(connectionURI);
-
-      Connection con = cons.get(0);
-      con.setState(ConnectionState.CLOSED);
-      connectionRepository.saveAndFlush(con);
-    } catch (MalformedURLException e) {
-      logger.warn("couldn't create URL for needProtocolEndpoint", e);
-    }
-  }
-
-  @Override
-  public void sendTextMessage(final URI connectionURI, final String message)
-      throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.debug(MessageFormat.format("need-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
-    try {
-      OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
-      List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
-      if (cons.isEmpty())
-        throw new NoSuchConnectionException(connectionURI);
-      Connection con = cons.get(0);
-
-      //send text message
-      proxy.sendTextMessage(connectionURI, message);
-
-      ChatMessage chatMessage = new ChatMessage();
-      chatMessage.setCreationDate(new Date());
-      chatMessage.setLocalConnectionURI(connectionURI);
-      chatMessage.setMessage(message);
-      chatMessage.setOriginatorURI(con.getNeedURI());
-
-      //save in the db
-      chatMessageRepository.saveAndFlush(chatMessage);
-
-    } catch (MalformedURLException e) {
-      logger.warn("couldn't create URL for needProtocolEndpoint", e);
-    }
-  }
-
+  //TODO: Prepare Method is missing
+  //TODO: connectTo RENAME to open
+  //TODO: add open Method which takes a connectionURI as a argument
   @Override
   public URI connectTo(URI needURI, URI otherNeedURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
@@ -271,16 +234,28 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForNeed(needURI);
       URI uri = proxy.connectTo(needURI, otherNeedURI, message);
 
-
-      //Create new connection object
-      Connection con = new Connection();
-      con.setNeedURI(needURI);
-      con.setState(ConnectionState.REQUEST_SENT);
-      con.setRemoteNeedURI(otherNeedURI);
-      //set new uri
-      con.setConnectionURI(uri);
-      connectionRepository.saveAndFlush(con);
-
+      List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri);
+      if (existingConnections.size() > 0){
+        for(Connection conn: existingConnections){
+            //TODO: Move this to the transition() - Method in ConnectionState
+            if (ConnectionState.CONNECTED == conn.getState() ||
+                    ConnectionState.REQUEST_SENT == conn.getState()) {
+                throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),needURI,otherNeedURI);
+            } else {
+                conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
+                connectionRepository.saveAndFlush(conn);
+            }
+        }
+      } else {
+          //Create new connection object
+          Connection con = new Connection();
+          con.setNeedURI(needURI);
+          con.setState(ConnectionState.REQUEST_SENT);
+          con.setRemoteNeedURI(otherNeedURI);
+          //set new uri
+          con.setConnectionURI(uri);
+          connectionRepository.saveAndFlush(con);
+      }
       return uri;
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
@@ -376,7 +351,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   }
 
   @Override
-  public List<Event> readEvents(final URI connectionURI) throws NoSuchConnectionException
+  public List<ConnectionEvent> readEvents(final URI connectionURI) throws NoSuchConnectionException
   {
     return eventRepository.findByConnectionURI(connectionURI);
   }
