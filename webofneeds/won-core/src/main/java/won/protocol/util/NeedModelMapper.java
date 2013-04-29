@@ -4,17 +4,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
-import won.protocol.model.BasicNeedType;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.GRDeliveryMethod;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.security.acl.Owner;
-import java.text.DateFormat;
-import java.util.Date;
 
 /**
  * User: gabriel
@@ -34,8 +28,7 @@ public class NeedModelMapper implements ModelMapper<Need>
     Resource stateRes = model.createResource(WON.toResource(need.getState()));
     model.add(model.createStatement(needResource, WON.IS_IN_STATE, stateRes));
 
-    Resource ownerRes = model.createResource(need.getOwnerURI().toString());
-    model.add(model.createStatement(needResource, WON.HAS_OWNER, ownerRes));
+    // We don't add the need owner's endpoint here as this is confidential information
 
     return model;
   }
