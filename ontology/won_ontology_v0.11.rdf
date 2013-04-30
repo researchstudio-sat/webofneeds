@@ -2,6 +2,7 @@
 
 
 <!DOCTYPE rdf:RDF [
+    <!ENTITY schema_org "http://schema.rdfs.org/all#" >
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
     <!ENTITY gr "http://purl.org/goodrelations/v1#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
@@ -18,10 +19,12 @@
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:won="http://purl.org/webofneeds/model#"
-     xmlns:gr="http://purl.org/goodrelations/v1#">
+     xmlns:gr="http://purl.org/goodrelations/v1#"
+     xmlns:schema_org="http://schema.rdfs.org/all#">
     <owl:Ontology rdf:about="http://purl.org/webofneeds/model">
         <owl:imports rdf:resource="http://purl.org/goodrelations/v1"/>
         <owl:versionIRI rdf:resource="http://purl.org/webofneeds/model/0.1"/>
+        <owl:imports rdf:resource="http://schema.rdfs.org/all"/>
         <owl:imports rdf:resource="http://www.w3.org/2000/01/rdf-schema#"/>
         <owl:imports rdf:resource="http://www.w3.org/ns/ldp#"/>
     </owl:Ontology>
@@ -250,6 +253,14 @@
     
 
 
+    <!-- http://purl.org/dc/terms/title -->
+
+    <owl:DatatypeProperty rdf:about="http://purl.org/dc/terms/title">
+        <owl:equivalentProperty rdf:resource="&won;title"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://purl.org/webofneeds/model#endTime -->
 
     <owl:DatatypeProperty rdf:about="&won;endTime">
@@ -401,7 +412,7 @@
     <owl:DatatypeProperty rdf:about="&won;title">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:domain rdf:resource="&won;NeedContent"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:range rdf:resource="&rdfs;Literal"/>
     </owl:DatatypeProperty>
     
 
