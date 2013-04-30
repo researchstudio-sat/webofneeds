@@ -184,10 +184,13 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     //add event members and attach them
     for (ConnectionEvent e : events) {
-      Resource eventMember = model.createResource(WON.toResource(e.getType()))
-          .addProperty(WON.HAS_ORIGINATOR, e.getOriginatorUri().toString())
-          .addProperty(WON.OCCURED_AT, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
-
+      Resource eventMember = model.createResource(WON.toResource(e.getType()));
+      if (e.getOriginatorUri() != null) {
+          eventMember.addProperty(WON.HAS_ORIGINATOR, e.getOriginatorUri().toString());
+      }
+      if (e.getCreationDate() != null){
+          eventMember.addProperty(WON.OCCURED_AT, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
+      }
       model.add(model.createStatement(eventContainer, RDFS.member, eventMember));
     }
 
