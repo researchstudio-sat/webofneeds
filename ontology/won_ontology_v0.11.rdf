@@ -396,6 +396,16 @@
     
 
 
+    <!-- http://purl.org/webofneeds/model#title -->
+
+    <owl:DatatypeProperty rdf:about="&won;title">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;NeedContent"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.w3.org/2003/01/geo/wgs84_pos#latitude -->
 
     <owl:DatatypeProperty rdf:about="http://www.w3.org/2003/01/geo/wgs84_pos#latitude">
