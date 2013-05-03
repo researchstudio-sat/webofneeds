@@ -5,7 +5,7 @@ Web of Needs is a new idea based on old technology, enabling a recent field of r
 Central Point is the need. In contrast to the offer, the need is inadequately represented.
 Web of needs tries to fill the gap. 
 
-For further information have a look at: http://webofneeds.org
+For further information have a look at: http://www.webofneeds.org
 
 Web of needs is build up of 
 - won-node
@@ -19,10 +19,10 @@ Requirements for getting started:
 
 To prevent reinventing the wheel every single day, 
 we come back to existing (old) technology for the matching services:
-- siren                   -> http://siren.sindice.com/ 
-- triplestore(virtuoso)   -> http://virtuoso.openlinksw.com/
-- solr                    -> http://lucene.apache.org/solr/
-- ldspider                -> https://code.google.com/p/ldspider/
+- siren                  -> http://siren.sindice.com/ 
+- triplestore(virtuoso)  -> http://virtuoso.openlinksw.com/
+- solr                   -> http://lucene.apache.org/solr/
+- ldspider               -> https://code.google.com/p/ldspider/
 __________________________________________________________________________________________
 
 won-node
@@ -32,4 +32,4 @@ won-owner
 - needs are managed by the won-owner
 
 matching-service
-- the matching-service crawls the won-nodes and looks for need and offer entries with corresponding values.
+- the matching-service crawls the won-nodes and looks and looks for need and offer entries with corresponding values.
