@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package won.protocol.model;
+package won.protocol.repository;
+
+import won.protocol.model.ConnectionEvent;
+import won.protocol.model.ConnectionEventType;
+
+import java.net.URI;
+import java.util.List;
 
 /**
- * User: fkleedorfer
- * Date: 05.11.12
+ * User: Alan Tus
+ * Date: 24.04.2013
+ * Time: 11:56
  */
-public enum NeedMessage
+public interface EventRepository extends WonRepository<ConnectionEvent>
 {
-  HINT,CONNECT_TO,CONNECTION_REQUESTED,ACTIVATE,DEACTIVATE;
+  List<ConnectionEvent> findByConnectionURI(URI uri);
+
+//  List<ConnectionEvent> findByOriginatorURI(URI uri);
+
+  List<ConnectionEvent> findByType(ConnectionEventType type);
 }

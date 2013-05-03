@@ -16,31 +16,43 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.vocabulary.XSD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
-import won.protocol.model.Match;
+import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
-import won.protocol.model.WON;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
-import won.protocol.util.LDP;
+import won.protocol.util.ConnectionModelMapper;
+import won.protocol.util.DateTimeUtils;
+import won.protocol.util.NeedModelMapper;
+import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.GR;
+import won.protocol.vocabulary.LDP;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * User: fkleedorfer
  * Date: 26.11.12
  */
-public class LinkedDataServiceImpl implements LinkedDataService {
+public class LinkedDataServiceImpl implements LinkedDataService
+{
   final Logger logger = LoggerFactory.getLogger(getClass());
   public static final PrefixMapping PREFIX_MAPPING = new PrefixMappingImpl();
 
@@ -59,6 +71,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
   private RDFStorageService rdfStorage;
 
+  @Autowired
+  private NeedModelMapper needModelMapper;
+  @Autowired
+  private ConnectionModelMapper connectionModelMapper;
 
   private String needProtocolEndpoint;
   private String matcherProtocolEndpoint;
@@ -67,10 +83,13 @@ public class LinkedDataServiceImpl implements LinkedDataService {
   private NeedInformationService needInformationService;
 
   static {
-    PREFIX_MAPPING.setNsPrefix("won",WON.getURI());
-    PREFIX_MAPPING.setNsPrefix("rdf",RDF.getURI());
-    PREFIX_MAPPING.setNsPrefix("ldp",LDP.getURI());
-    PREFIX_MAPPING.setNsPrefix("rdfs",RDFS.getURI());
+    PREFIX_MAPPING.setNsPrefix("won", WON.getURI());
+    PREFIX_MAPPING.setNsPrefix("rdf", RDF.getURI());
+    PREFIX_MAPPING.setNsPrefix("ldp", LDP.getURI());
+    PREFIX_MAPPING.setNsPrefix("rdfs", RDFS.getURI());
+    PREFIX_MAPPING.setNsPrefix("geo", GEO.getURI());
+    PREFIX_MAPPING.setNsPrefix("gr", GR.getURI());
+    PREFIX_MAPPING.setNsPrefix("xsd", XSD.getURI());
   }
 
   public Model listNeedURIs(final int page)
@@ -84,7 +103,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
     Resource needListPageResource = null;
-    if (page >=0) {
+    if (page >= 0) {
       needListPageResource = createPage(model, this.needResourceURIPrefix, page, uris.size());
     } else {
       needListPageResource = model.createResource(this.needResourceURIPrefix);
@@ -106,7 +125,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
     Resource connections = null;
-    if (page >=0){
+    if (page >= 0) {
       connections = createPage(model, this.connectionResourceURIPrefix, page, uris.size());
     } else {
       connections = model.createResource(this.connectionResourceURIPrefix);
@@ -120,41 +139,60 @@ public class LinkedDataServiceImpl implements LinkedDataService {
   public Model getNeedModel(final URI needUri) throws NoSuchNeedException
   {
     Need need = needInformationService.readNeed(needUri);
-    Model model = ModelFactory.createDefaultModel();
+
+    // load the model from storage
+    Model model = rdfStorage.loadContent(need);
     setNsPrefixes(model);
-    Resource connectionsContainer =  model.createResource(needUri + "/connections/");
-    Resource mainNeedNode = model.createResource(needUri.toString())
-        .addProperty(WON.STATE, need.getState().name())
-        .addProperty(WON.HAS_CONNECTIONS,connectionsContainer)
-        .addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
-        .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
-        .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint))
-    ;
-    Model contentModel =  rdfStorage.loadContent(need);
-    model.add(contentModel);
-    model.add(model.createStatement(connectionsContainer,RDF.type, LDP.CONTAINER));
-    //identify the outer blank node in the content model and link it to the needURI node
-    ResIterator it = contentModel.listSubjectsWithProperty(RDF.type, WON.NEED_DESCRIPTION);
-    if (it.hasNext()){
-        Resource mainContentNode = it.next();
-        model.add(model.createStatement(mainNeedNode, WON.HAS_CONTENT, mainContentNode));
-    }
+
+    Model needModel = needModelMapper.toModel(need);
+    Resource needResource = model.getResource(needUri.toString());
+    addProtocolEndpoints(model, needResource);
+
+    // add connections
+    Resource connectionsContainer = model.createResource(need.getNeedURI().toString() + "/connections/", LDP.CONTAINER);
+    model.add(model.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
+
+    //merge needModel and model
+    model.add(needModel.listStatements());
+
     return model;
+  }
+
+  private void addProtocolEndpoints(Model model, Resource res)
+  {
+    res.addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
+        .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
+        .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint));
   }
 
   public Model getConnectionModel(final URI connectionUri) throws NoSuchConnectionException
   {
     Connection connection = needInformationService.readConnection(connectionUri);
-    Model model = ModelFactory.createDefaultModel();
+    List<ConnectionEvent> events = needInformationService.readEvents(connectionUri);
+
+    Model model = connectionModelMapper.toModel(connection);
     setNsPrefixes(model);
-    Resource r = model.createResource(connectionUri.toString());
-    r.addProperty(WON.STATE, connection.getState().name());
-    if(connection.getRemoteConnectionURI() != null)
-        r.addProperty(WON.REMOTE_CONNECTION, model.createResource(connection.getRemoteConnectionURI().toString()));
-    r.addProperty(WON.REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
-    r.addProperty(WON.BELONGS_TO_NEED, model.createResource(connection.getNeedURI().toString()));
-    r.addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint));
-    r.addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint));
+
+    //create connection member
+    Resource connectionMember = model.getResource(connection.getConnectionURI().toString());
+
+    addProtocolEndpoints(model, connectionMember);
+
+    //create event container and attach it to the member
+    Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
+    model.add(model.createStatement(connectionMember, WON.HAS_EVENT_CONTAINER, eventContainer));
+
+    //add event members and attach them
+    for (ConnectionEvent e : events) {
+      Resource eventMember = model.createResource(WON.toResource(e.getType()));
+      if (e.getOriginatorUri() != null) {
+          eventMember.addProperty(WON.HAS_ORIGINATOR, e.getOriginatorUri().toString());
+      }
+      if (e.getCreationDate() != null){
+          eventMember.addProperty(WON.OCCURED_AT, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
+      }
+      model.add(model.createStatement(eventContainer, RDFS.member, eventMember));
+    }
 
     return model;
   }
@@ -162,38 +200,40 @@ public class LinkedDataServiceImpl implements LinkedDataService {
   public Model listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException
   {
     Collection<URI> uris = null;
-    if (page >= 0) {
+    if (page >= 0)
       uris = needInformationService.listConnectionURIs(needURI, page);
-    } else {
+    else
       uris = needInformationService.listConnectionURIs(needURI);
-    }
+
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
+
     Resource connections = null;
-    if (page >=0){
-      connections = createPage(model,needURI.toString() + "/connections/",page,uris.size());
-    } else {
+    if (page >= 0)
+      connections = createPage(model, needURI.toString() + "/connections/", page, uris.size());
+    else
       connections = model.createResource(needURI.toString() + "/connections/");
-    }
-    for (URI connURI : uris) {
+
+    for (URI connURI : uris)
       model.add(model.createStatement(connections, RDFS.member, model.createResource(connURI.toString())));
-    }
+
     return model;
   }
 
-    private String addPageQueryString(String uri, int page) {
+  private String addPageQueryString(String uri, int page)
+  {
     //TODO: simple implementation for adding page number to uri - breaks as soon as other query strings are present!
-    return uri + "?page="+page;
+    return uri + "?page=" + page;
   }
 
   private Resource createPage(final Model model, final String containerURI, final int page, final int numberOfMembers)
   {
-    String containerPageURI = addPageQueryString(containerURI,page);
+    String containerPageURI = addPageQueryString(containerURI, page);
     Resource containerPageResource = model.createResource(containerPageURI);
     Resource containerResource = model.createResource(containerURI);
     model.add(model.createStatement(containerPageResource, RDF.type, LDP.PAGE));
-    model.add(model.createStatement(containerPageResource,LDP.PAGE_OF, containerResource));
-    model.add(model.createStatement(containerPageResource,RDF.type, LDP.CONTAINER));
+    model.add(model.createStatement(containerPageResource, LDP.PAGE_OF, containerResource));
+    model.add(model.createStatement(containerPageResource, RDF.type, LDP.CONTAINER));
     Resource containerNextPageResource = null;
     //assume last page if we didn't fetch pageSize uris
     if (numberOfMembers < pageSize) {
@@ -201,7 +241,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     } else {
       containerNextPageResource = model.createResource(addPageQueryString(containerURI, page + 1));
     }
-    model.add(model.createStatement(containerPageResource,LDP.NEXT_PAGE, containerNextPageResource));
+    model.add(model.createStatement(containerPageResource, LDP.NEXT_PAGE, containerNextPageResource));
     return containerPageResource;
   }
 
@@ -257,9 +297,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     this.pageURIPrefix = pageURIPrefix;
   }
 
-    public void setRdfStorage(RDFStorageService rdfStorage) {
-        this.rdfStorage = rdfStorage;
-    }
+  public void setRdfStorage(RDFStorageService rdfStorage)
+  {
+    this.rdfStorage = rdfStorage;
+  }
 
   public int getPageSize()
   {

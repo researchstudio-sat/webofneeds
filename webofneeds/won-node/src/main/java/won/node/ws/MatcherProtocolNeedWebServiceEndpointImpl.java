@@ -56,57 +56,6 @@ public class MatcherProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAut
     }
 
     @Override
-    @WebMethod
-    public String readConnectionContent(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException {
-        wireDependenciesLazily();
-        //TODO: remove this workaround when we have the linked data service running
-        Model ret = matcherProtocolNeedService.readConnectionContent(connectionURI);
-        return (ret != null) ? ret.toString() : null;
-    }
-
-    @Override
-    @WebMethod
-    public Connection readConnection(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException {
-        wireDependenciesLazily();
-        return matcherProtocolNeedService.readConnection(connectionURI);
-    }
-
-    @Override
-    @WebMethod
-    public String readNeedContent(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException {
-        wireDependenciesLazily();
-        //TODO: remove this workaround when we have the linked data service running
-        Model ret = matcherProtocolNeedService.readNeedContent(needURI);
-        return (ret != null) ? ret.toString() : null;
-    }
-
-    @Override
-    @WebMethod
-    public Need readNeed(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException {
-        wireDependenciesLazily();
-        return matcherProtocolNeedService.readNeed(needURI);
-    }
-
-    @Override
-    @WebMethod
-    public URI[] listConnectionURIs(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException {
-        wireDependenciesLazily();
-        Collection<URI> coll = matcherProtocolNeedService.listConnectionURIs(needURI);
-        if (coll == null) return null;
-        return coll.toArray(new URI[coll.size()]);
-    }
-
-    @Override
-    @WebMethod
-    public URI[] listNeedURIs() {
-
-        wireDependenciesLazily();
-        Collection<URI> coll = matcherProtocolNeedService.listNeedURIs();
-        if (coll == null) return null;
-        return coll.toArray(new URI[coll.size()]);
-    }
-
-    @Override
     @WebMethod(exclude = true)
     public void setMatcherProtocolNeedService(final MatcherProtocolNeedService matcherProtocolNeedService) {
         this.matcherProtocolNeedService = matcherProtocolNeedService;

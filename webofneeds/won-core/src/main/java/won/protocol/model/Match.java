@@ -26,10 +26,11 @@ import java.net.URI;
 )
 public class Match
 {
+    /* This is the event ID to the corresponding match */
     @Id
     @GeneratedValue
-    @Column( name = "id" )
-    private Long id;
+    @Column( name = "id")
+    private long id;
     @Column( name = "fromNeed")
     private URI fromNeed;
     @Column( name = "toNeed")
@@ -39,26 +40,31 @@ public class Match
     private double score;
     @Column( name = "originator")
     private URI originator;
+    //TODO: set unique after this filed is filled with information
+    @Column( name = "eventId")
+    private long eventId;
 
   @Override
   public String toString()
   {
     return "Match{" +
-        "id=" + id +
+        ", id=" + id +
         ", fromNeed=" + fromNeed +
         ", toNeed=" + toNeed +
         ", score=" + score +
         ", originator=" + originator +
+        ", eventId=" + eventId +
         '}';
   }
 
     // TODO: we rely on the id being marshalled in the current owner implementation, but this is not neccessary
     // it would be better to make this field @XmlTransient
-    public Long getId() {
+
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -92,5 +98,13 @@ public class Match
 
     public void setOriginator(URI originator) {
         this.originator = originator;
+    }
+
+    public long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(long eventId) {
+        this.eventId = eventId;
     }
 }

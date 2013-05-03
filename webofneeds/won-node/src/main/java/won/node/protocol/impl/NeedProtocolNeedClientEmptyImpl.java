@@ -39,18 +39,6 @@ public class NeedProtocolNeedClientEmptyImpl implements NeedProtocolNeedService
   }
 
   @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("need-facing: ACCEPT called for connection {0}", connectionURI));
-  }
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("need-facing: DENY called for connection {0}", connectionURI));
-  }
-
-  @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));

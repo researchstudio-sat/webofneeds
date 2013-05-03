@@ -28,6 +28,7 @@ import won.protocol.model.Need;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedInformationService;
 
+import javax.jws.WebMethod;
 import java.net.URI;
 import java.util.Collection;
 
@@ -47,76 +48,7 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
     matcherFacingNeedCommunicationService.hint(needURI,otherNeed,score,originator);
   }
 
-  @Override
-  public Collection<URI> listNeedURIs()
-  {
-    return needInformationService.listNeedURIs();
-  }
-
-    @Override
-    public Collection<URI> listNeedURIs(int page) {
-        return needInformationService.listNeedURIs(page);
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs() {
-        return needInformationService.listConnectionURIs();
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs(int page) {
-        return needInformationService.listConnectionURIs(page);
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException {
-        return needInformationService.listConnectionURIs(needURI, page);
-    }
-
-    @Override
-  public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
-  {
-    return needInformationService.listConnectionURIs(needURI);
-  }
-
-  @Override
-  public Need readNeed(final URI needURI) throws NoSuchNeedException
-  {
-    return needInformationService.readNeed(needURI);
-  }
-
-  @Override
-  public Model readNeedContent(final URI needURI) throws NoSuchNeedException
-  {
-    return needInformationService.readNeedContent(needURI);
-  }
-
-  @Override
-  public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException
-  {
-    return needInformationService.readConnection(connectionURI);
-  }
-
-  @Override
-  public Model readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
-  {
-    return needInformationService.readConnectionContent(connectionURI);
-  }
-
-  @Override
-  public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException {
-    return needInformationService.listMatches(needURI, page);
-  }
-
-  @Override
-  public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException {
-      return needInformationService.listMatches(needURI);
-  }
-
-  public void setMatcherProtocolNeedService(final MatcherProtocolNeedService matcherProtocolNeedService) {
-    this.needInformationService = matcherProtocolNeedService;
-  }
-
+  @WebMethod(exclude = true)
   public void setMatcherFacingNeedCommunicationService(final MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService)
   {
     this.matcherFacingNeedCommunicationService = matcherFacingNeedCommunicationService;

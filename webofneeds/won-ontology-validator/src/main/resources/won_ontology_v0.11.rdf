@@ -307,9 +307,9 @@
     
 
 
-    <!-- http://purl.org/webofneeds/model#needCreationDate -->
+    <!-- http://purl.org/webofneeds/model#creationDate -->
 
-    <owl:DatatypeProperty rdf:about="&won;needCreationDate">
+    <owl:DatatypeProperty rdf:about="&won;creationDate">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:domain rdf:resource="&won;Need"/>
         <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>

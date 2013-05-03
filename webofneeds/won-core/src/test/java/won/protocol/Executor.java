@@ -87,7 +87,7 @@ public class Executor {
 
             @Override
             public Long getId(Match Entity) {
-                return Entity.getId();
+                return Entity.getEventId();
             }
         });
 

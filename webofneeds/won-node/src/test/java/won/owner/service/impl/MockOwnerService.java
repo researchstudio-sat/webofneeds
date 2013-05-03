@@ -33,14 +33,12 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
   private static int messageCount = 0;
   private boolean autoConnect = true;
   private ConnectionAction onConnectAction;
-  private ConnectionAction onAcceptAction;
   private ConnectionAction onMessageAction;
-  private ConnectionAction onDenyAction;
   private ConnectionAction onCloseAction;
   private Map<Method,Integer> methodCallCounts;
 
-  public enum ConnectionAction {ACCEPT, DENY, MESSAGE, CLOSE, NONE};
-  public enum Method  {hintReceived,connectionRequested,accept,deny,close,sendTextMessage,EXCEPTION_CAUGHT};
+  public enum ConnectionAction {MESSAGE, CLOSE, NONE};
+  public enum Method  {hintReceived,connectionRequested,close,sendTextMessage,EXCEPTION_CAUGHT};
 
   private CountDownLatch automaticActionsFinished;
 
@@ -100,20 +98,6 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
   }
 
   @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    countMethodCall(Method.accept);
-    performAction(onAcceptAction, connectionURI);
-  }
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    countMethodCall(Method.deny);
-    performAction(onDenyAction, connectionURI);
-  }
-
-  @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     countMethodCall(Method.close);
@@ -137,9 +121,7 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
     this.messageCount = 0;
     this.autoConnect = false;
     this.onConnectAction = ConnectionAction.NONE;
-    this.onAcceptAction = ConnectionAction.NONE;
     this.onMessageAction = ConnectionAction.NONE;
-    this.onDenyAction = ConnectionAction.NONE;
     this.onCloseAction = ConnectionAction.NONE;
     this.methodCallCounts = new HashMap<Method,Integer>();
     this.lastConnectionURI = null;
@@ -154,12 +136,6 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
   public void performAction(ConnectionAction action, URI connectionURI) {
     try{
       switch (action){
-        case ACCEPT:
-          this.ownerProtocolNeedService.accept(connectionURI );
-          break;
-        case DENY:
-          this.ownerProtocolNeedService.deny(connectionURI );
-          break;
         case MESSAGE:
           this.ownerProtocolNeedService.sendTextMessage(connectionURI,"this is my automatic message #" + (messageCount++));
           break;
@@ -204,19 +180,9 @@ public class MockOwnerService extends AbstractOwnerProtocolOwnerService
     this.onConnectAction = ConnectionAction.valueOf(action);
   }
 
-  public void setOnAcceptAction(final String action)
-  {
-    this.onAcceptAction = ConnectionAction.valueOf(action);
-  }
-
   public void setOnMessageAction(final String action)
   {
     this.onMessageAction  = ConnectionAction.valueOf(action);
-  }
-
-  public void setOnDenyAction(final String action)
-  {
-    this.onDenyAction  = ConnectionAction.valueOf(action);
   }
 
   public void setOnCloseAction(final String action)

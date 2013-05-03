@@ -60,22 +60,6 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
 
   @Override
   @WebMethod
-  public void accept(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    wireDependenciesLazily();
-    needProtocolNeedService.accept(connectionURI);
-  }
-
-  @Override
-  @WebMethod
-  public void deny(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    wireDependenciesLazily();
-    needProtocolNeedService.deny(connectionURI);
-  }
-
-  @Override
-  @WebMethod
   public void close(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     wireDependenciesLazily();
