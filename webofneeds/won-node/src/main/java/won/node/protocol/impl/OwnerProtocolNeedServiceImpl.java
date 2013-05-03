@@ -19,6 +19,7 @@ package won.node.protocol.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
+import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
@@ -29,6 +30,7 @@ import won.protocol.service.OwnerFacingNeedCommunicationService;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -81,16 +83,6 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     }
 
     @Override
-    public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        this.connectionCommunicationService.accept(connectionURI);
-    }
-
-    @Override
-    public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        this.connectionCommunicationService.deny(connectionURI);
-    }
-
-    @Override
     public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         this.connectionCommunicationService.close(connectionURI);
     }
@@ -140,7 +132,13 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
         return needInformationService.readConnectionContent(connectionURI);
     }
 
-    public void setNeedCommunicationService(final OwnerFacingNeedCommunicationService needCommunicationService) {
+  @Override
+  public List<ConnectionEvent> readEvents(final URI connectionURI) throws NoSuchConnectionException
+  {
+    return needInformationService.readEvents(connectionURI);
+  }
+
+  public void setNeedCommunicationService(final OwnerFacingNeedCommunicationService needCommunicationService) {
         this.needCommunicationService = needCommunicationService;
     }
 

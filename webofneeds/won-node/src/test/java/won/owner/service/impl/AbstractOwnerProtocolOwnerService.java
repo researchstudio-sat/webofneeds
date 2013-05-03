@@ -48,18 +48,6 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
   }
 
   @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     //To change body of implemented methods use File | Settings | File Templates.
@@ -78,24 +66,40 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
 
   public Model readNeedContent(final URI needURI) throws NoSuchNeedException
   {
-    return ownerProtocolNeedService.readNeedContent(needURI);
+    //changed implementation from SOAP to linked data.
+    //Effort for fixing this code is currently too high, therefore:
+    return null;
+    // instead of:
+    //return ownerProtocolNeedService.readNeedContent(needURI);
   }
 
   public Need readNeed(final URI needURI) throws NoSuchNeedException
   {
-    return ownerProtocolNeedService.readNeed(needURI);
+    //changed implementation from SOAP to linked data.
+    //Effort for fixing this code is currently too high, therefore:
+    return null;
+    // instead of:
+    // return ownerProtocolNeedService.readNeed(needURI);
   }
 
   public Collection<Match> getMatches(final URI needURI) throws NoSuchNeedException
   {
-    return ownerProtocolNeedService.listMatches(needURI);
+    //changed implementation from SOAP to linked data.
+    //Effort for fixing this code is currently too high, therefore:
+    return null;
+    // instead of:
+    // return ownerProtocolNeedService.listMatches(needURI);
   }
 
 
   public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException
   {
-    this.lastConnectionURI = connectionURI;
-    return ownerProtocolNeedService.readConnection(connectionURI);
+    //changed implementation from SOAP to linked data.
+    //Effort for fixing this code is currently too high, therefore:
+    return null;
+    // instead of:
+    //this.lastConnectionURI = connectionURI;
+    //return ownerProtocolNeedService.readConnection(connectionURI);
   }
 
   public void activate(final URI needURI) throws NoSuchNeedException
@@ -112,8 +116,12 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
 
   public Model readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
   {
-    this.lastConnectionURI = connectionURI;
-    return ownerProtocolNeedService.readConnectionContent(connectionURI);
+    //changed implementation from SOAP to linked data.
+    //Effort for fixing this code is currently too high, therefore:
+    return null;
+    // instead of:
+    //this.lastConnectionURI = connectionURI;
+    //return ownerProtocolNeedService.readConnectionContent(connectionURI);
   }
 
   public void deactivate(final URI needURI) throws NoSuchNeedException
@@ -123,12 +131,20 @@ public abstract class AbstractOwnerProtocolOwnerService implements OwnerProtocol
 
   public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
   {
-    return ownerProtocolNeedService.listConnectionURIs(needURI);
+    //changed implementation from SOAP to linked data.
+    //Effort for fixing this code is currently too high, therefore:
+    return null;
+    // instead of:
+    //return ownerProtocolNeedService.listConnectionURIs(needURI);
   }
 
   public Collection<URI> listNeedURIs()
   {
-    return ownerProtocolNeedService.listNeedURIs();
+    //changed implementation from SOAP to linked data.
+    //Effort for fixing this code is currently too high, therefore:
+    return null;
+    // instead of:
+    // return ownerProtocolNeedService.listNeedURIs();
   }
 
   public void setOwnerProtocolNeedService(final OwnerProtocolNeedService ownerProtocolNeedService)

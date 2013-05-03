@@ -44,4 +44,12 @@
         <property name="ownerProtocolOwnerServiceEndpointURI" value="${uri.owner.protocol.endpoint}" />
         <property name="defaultOwnerProtocolNeedServiceEndpointURI" value="${uri.need.protocol.endpoint.default}" />
     </bean>
+
+    <bean id="dataReloadService" class="won.owner.service.impl.DataReloadService">
+        <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
+    </bean>
+
+    <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
+    <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
+
 </beans>

@@ -28,6 +28,7 @@
         <module>won-owner-webapp</module>
         <module>won-matcher</module>
         <module>won-matcher-solr</module>
+        <module>won-ontology-validator</module>
         <module>won-xmpp</module>
     </modules>
     <build>
@@ -226,6 +227,26 @@
                     </testResource>
                     <testResource>
                         <directory>src/test/resources.lan</directory>
+                    </testResource>
+                </testResources>
+            </build>
+        </profile>
+        <profile>
+            <!--
+                Profile for building wars for a specific deployment environment:
+                *) Place environment-specific settings in src/main/resources.{serverId}
+                *) When building, set the environment variable deployServerId (from the command line: -DserverId=[serverId])
+            -->
+            <id>forServer</id>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources.${serverId}</directory>
+                    </resource>
+                </resources>
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources.${serverId}</directory>
                     </testResource>
                 </testResources>
             </build>

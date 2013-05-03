@@ -23,6 +23,6 @@ import won.protocol.service.NeedInformationService;
  * User: fkleedorfer
  * Date: 31.10.12
  */
-public interface MatcherProtocolNeedService extends NeedInformationService, MatcherFacingNeedCommunicationService
+public interface MatcherProtocolNeedService extends MatcherFacingNeedCommunicationService
 {
 }

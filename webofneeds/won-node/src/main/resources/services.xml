@@ -151,4 +151,8 @@
     <bean name="needProtocolNeedClient" class="won.node.protocol.impl.NeedProtocolNeedClientImpl">
         <property name="linkedDataRestClient" ref="linkedDataRestClient" />
     </bean>
+
+    <!-- Model Mapper for RDF -->
+    <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
+    <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
 </beans>

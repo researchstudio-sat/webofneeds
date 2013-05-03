@@ -75,7 +75,7 @@ public class ConnectionController {
                 case CLOSED:
                     model.addAttribute("message", "Connection Closed!");
                     return "showMessage";
-                case ESTABLISHED:
+                case CONNECTED:
                     model.addAttribute("messages", chatMessageRepository.findByLocalConnectionURI(con.getConnectionURI()));
                     return "listMessages";
             }
@@ -111,7 +111,8 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
-            ownerService.accept(con.getConnectionURI());
+            //TODO: ConnectionURI should be used here instead
+            ownerService.connectTo(con.getNeedURI(), con.getRemoteNeedURI(), "");
         } catch (Exception e) {
           logger.warn("error during accept", e);
           return "error during accept: " + e.getMessage();
@@ -127,7 +128,7 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
-            ownerService.deny(con.getConnectionURI());
+            ownerService.close(con.getConnectionURI());
         } catch (Exception e) {
           logger.warn("error during deny", e);
           return "error during deny: " + e.getMessage();

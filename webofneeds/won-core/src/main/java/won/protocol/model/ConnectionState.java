@@ -16,39 +16,124 @@
 
 package won.protocol.model;
 
+import won.protocol.vocabulary.WON;
+
+import java.net.URI;
+
 /**
  * User: fkleedorfer
  * Date: 30.10.12
  */
 public enum ConnectionState
 {
-  REQUEST_SENT,
-  REQUEST_RECEIVED,
-  ESTABLISHED,
-  CLOSED;
+  SUGGESTED("Suggested"),
+  PREPARED("Prepared"),
+  REQUEST_SENT("RequestSent"),
+  REQUEST_RECEIVED("RequestReceived"),
+  CONNECTED("Connected"),
+  CLOSED("Closed");
 
-  public ConnectionState transit(ConnectionMessage msg){
-    switch(this){
-      case REQUEST_SENT: //the owner has initiated the connection, the request was sent to the remote need
-        switch(msg){
-           case PARTNER_ACCEPT: return ESTABLISHED;  //the partner accepted
-           case PARTNER_DENY: return CLOSED;
-           case OWNER_CLOSE: return CLOSED;
-           case PARTNER_CLOSE: return CLOSED;
-          }
-      case REQUEST_RECEIVED: //a remote need has requested a connection
-        switch(msg){
-          case OWNER_ACCEPT: return ESTABLISHED;
-          case OWNER_DENY: return CLOSED;
-          case OWNER_CLOSE: return CLOSED;
-          case PARTNER_CLOSE: return CLOSED;
+  private String name;
+
+  private ConnectionState(String name)
+  {
+    this.name = name;
+  }
+
+  public static ConnectionState create(ConnectionEventType msg)
+  {
+    switch (msg) {
+      case OWNER_PREPARE:
+        return PREPARED;
+      case MATCHER_HINT:
+        return SUGGESTED;
+      case OWNER_OPEN:
+        return REQUEST_SENT;
+      case PARTNER_OPEN:
+        return REQUEST_RECEIVED;
+    }
+    throw new IllegalArgumentException("Connection creation failed: Wrong ConnectionEventType");
+  }
+
+  public ConnectionState transit(ConnectionEventType msg)
+  {
+    switch (this) {
+      case SUGGESTED:
+        switch (msg) {
+          case OWNER_PREPARE:
+            return PREPARED;
+          case PARTNER_OPEN:
+            return REQUEST_RECEIVED;
+          case OWNER_CLOSE:
+            return CLOSED;
+          case PARTNER_CLOSE:
+            return CLOSED;
         }
-      case ESTABLISHED: //the connection is established
-        switch(msg){
-          case PARTNER_CLOSE: return CLOSED;
-          case OWNER_CLOSE: return CLOSED;
+      case PREPARED:
+        switch (msg) {
+          case OWNER_OPEN:
+            return REQUEST_SENT;
+          case PARTNER_OPEN:
+            return REQUEST_RECEIVED;
+          case OWNER_CLOSE:
+            return CLOSED;
+          case PARTNER_CLOSE:
+            return CLOSED;
+        }
+      case REQUEST_SENT: //the owner has initiated the connection, the request was sent to the remote need
+        switch (msg) {
+          case PARTNER_OPEN:
+            return CONNECTED;  //the partner accepted
+          case OWNER_CLOSE:
+            return CLOSED;
+          case PARTNER_CLOSE:
+            return CLOSED;
+        }
+      case REQUEST_RECEIVED: //a remote need has requested a connection
+        switch (msg) {
+          case OWNER_OPEN:
+            return CONNECTED;
+          case OWNER_CLOSE:
+            return CLOSED;
+          case PARTNER_CLOSE:
+            return CLOSED;
+        }
+      case CONNECTED: //the connection is established
+        switch (msg) {
+          case PARTNER_CLOSE:
+            return CLOSED;
+          case OWNER_CLOSE:
+            return CLOSED;
+        }
+      case CLOSED:
+        switch (msg) {
+          case OWNER_OPEN:
+            return REQUEST_SENT; //reopen connection
+          case PARTNER_OPEN:
+            return REQUEST_RECEIVED;
         }
     }
     return this;
+  }
+
+  public URI getURI()
+  {
+    return URI.create(WON.BASE_URI + name);
+  }
+
+  /**
+   * Tries to match the given string against all enum values.
+   *
+   * @param fragment string to match
+   * @return matched enum, null otherwise
+   */
+  public static ConnectionState parseString(final String fragment)
+  {
+    for (ConnectionState state : values())
+      if (state.name.equals(fragment))
+        return state;
+
+    System.err.println("No enum could be matched for: " + fragment);
+    return null;
   }
 }

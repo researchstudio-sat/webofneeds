@@ -16,14 +16,48 @@
 
 package won.protocol.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.protocol.vocabulary.WON;
+
+import java.net.URI;
+
 /**
- * Created with IntelliJ IDEA.
  * User: fsalcher
  * Date: 10.10.12
  * Time: 14:13
- * To change this template use File | Settings | File Templates.
  */
 public enum NeedState
 {
-  INACTIVE, ACTIVE;
+  INACTIVE("Inactive"),
+  ACTIVE("Active");
+
+  final Logger logger = LoggerFactory.getLogger(getClass());
+  private String name;
+
+  private NeedState(String name)
+  {
+    this.name = name;
+  }
+
+  public URI getURI()
+  {
+    return URI.create(WON.BASE_URI + name);
+  }
+
+  /**
+   * Tries to match the given string against all enum values.
+   *
+   * @param fragment string to match
+   * @return matched enum, null otherwise
+   */
+  public static NeedState parseString(final String fragment)
+  {
+    for(NeedState state : values())
+      if(state.name.equals(fragment))
+        return state;
+
+    System.err.println("No enum could be matched for: " + fragment);
+    return null;
+  }
 }

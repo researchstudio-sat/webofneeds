@@ -22,7 +22,7 @@ import won.protocol.rest.LinkedDataRestClient;
 import won.node.ws.NeedProtocolNeedWebServiceClient;
 import won.node.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.*;
-import won.protocol.model.WON;
+import won.protocol.vocabulary.WON;
 import won.protocol.need.NeedProtocolNeedService;
 
 import java.net.MalformedURLException;
@@ -52,30 +52,6 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
       logger.warn("couldnt create URL for needProtocolEndpoint", e);
     }
     return null;
-  }
-
-  @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("need-facing: ACCEPT called for connection {0}", connectionURI));
-    try {
-      NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForConnection(connectionURI);
-      proxy.accept(connectionURI);
-    } catch (MalformedURLException e) {
-      logger.warn("couldnt create URL for needProtocolEndpoint", e);
-    }
-  }
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("need-facing: DENY called for connecti6on {0}", connectionURI));
-    try {
-      NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForConnection(connectionURI);
-      proxy.deny(connectionURI);
-    } catch (MalformedURLException e) {
-      logger.warn("couldnt create URL for needProtocolEndpoint", e);
-    }
   }
 
   @Override

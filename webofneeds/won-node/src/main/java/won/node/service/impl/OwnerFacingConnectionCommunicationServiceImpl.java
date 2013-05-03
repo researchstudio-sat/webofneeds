@@ -22,12 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
-import won.protocol.model.ChatMessage;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionMessage;
-import won.protocol.model.ConnectionState;
+import won.protocol.model.*;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.EventRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
 
@@ -50,64 +48,8 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   private ConnectionRepository connectionRepository;
   @Autowired
   private ChatMessageRepository chatMessageRepository;
-
-  @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info("ACCEPT received from the owner side for connection {}",new Object[]{connectionURI});
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_ACCEPT);
-    //set new state and save in the db
-    con.setState(nextState);
-    //save in the db
-    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
-    //inform the other side
-    executorService.execute(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        try{
-          needFacingConnectionClient.accept(connectionForRunnable.getRemoteConnectionURI());
-        } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
-        }
-      }
-    });
-  }
-
-
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info("DENY received from the owner side for connection {}",new Object[]{connectionURI});
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_DENY);
-    //set new state and save in the db
-    con.setState(nextState);
-    //save in the db
-    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
-    //inform the other side
-    executorService.execute(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        try{
-          needFacingConnectionClient.deny(connectionForRunnable.getRemoteConnectionURI());
-        } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
-        }
-      }
-    });
-  }
+    @Autowired
+    private EventRepository eventRepository;
 
    @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
@@ -117,11 +59,18 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_CLOSE);
+    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_CLOSE);
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
     final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
+
+    ConnectionEvent event = new ConnectionEvent();
+    event.setConnectionURI(con.getConnectionURI());
+    event.setType(ConnectionEventType.OWNER_CLOSE);
+    event.setOriginatorUri(con.getRemoteConnectionURI());
+    eventRepository.saveAndFlush(event);
+
     //inform the other side
     if (con.getRemoteConnectionURI() != null) {
       executorService.execute(new Runnable()
@@ -148,7 +97,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit (should not result in state change)
-    ConnectionState nextState = performStateTransit(con, ConnectionMessage.OWNER_MESSAGE);
+    //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
     //construct chatMessage object to store in the db
     ChatMessage chatMessage = new ChatMessage();
     chatMessage.setCreationDate(new Date());
@@ -197,7 +146,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
    * @return
    * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the connection's current state
    */
-  private ConnectionState performStateTransit(Connection con, ConnectionMessage msg) throws IllegalMessageForConnectionStateException{
+  private ConnectionState performStateTransit(Connection con, ConnectionEventType msg) throws IllegalMessageForConnectionStateException{
     if (!msg.isMessageAllowed(con.getState())){
       throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(),con.getState());
     }

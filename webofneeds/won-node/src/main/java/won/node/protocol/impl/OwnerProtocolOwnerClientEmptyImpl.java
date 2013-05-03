@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.node.ws.OwnerProtocolOwnerWebServiceClient;
 import won.protocol.exception.*;
 import won.protocol.model.Need;
-import won.protocol.model.WON;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -32,7 +31,6 @@ import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.List;
 
 /**
  * TODO: Empty owner client implementation to be replaced by WS client.
@@ -82,34 +80,6 @@ public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerServ
           logger.warn("couldn't create URL for needProtocolEndpoint", e);
       } catch (IllegalMessageForNeedStateException e) {
           e.printStackTrace();
-      }
-  }
-
-  @Override
-  public void accept(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("owner-facing: ACCEPT called for connection {0}",connectionURI));
-      try {
-          OwnerProtocolOwnerWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
-          proxy.accept(connectionURI);
-      } catch (MalformedURLException e) {
-          logger.warn("couldn't create URL for needProtocolEndpoint", e);
-      } catch (NoSuchNeedException e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-      }
-  }
-
-  @Override
-  public void deny(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info(MessageFormat.format("owner-facing: DENY called for connection {0}",connectionURI));
-      try {
-          OwnerProtocolOwnerWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
-          proxy.deny(connectionURI);
-      } catch (MalformedURLException e) {
-          logger.warn("couldn't create URL for needProtocolEndpoint", e);
-      } catch (NoSuchNeedException e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
   }
 
