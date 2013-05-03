@@ -30,12 +30,21 @@ import org.apache.vysper.xmpp.modules.extension.xep0054_vcardtemp.VcardTempModul
 import org.apache.vysper.xmpp.modules.extension.xep0077_inbandreg.InBandRegistrationModule;
 import org.apache.vysper.xmpp.modules.extension.xep0092_software_version.SoftwareVersionModule;
 import org.apache.vysper.xmpp.modules.extension.xep0202_entity_time.EntityTimeModule;
+import org.apache.vysper.xmpp.modules.roster.AskSubscriptionType;
+import org.apache.vysper.xmpp.modules.roster.RosterException;
+import org.apache.vysper.xmpp.modules.roster.RosterItem;
+import org.apache.vysper.xmpp.modules.roster.SubscriptionType;
 import org.apache.vysper.xmpp.modules.roster.persistence.MemoryRosterManager;
+import org.apache.vysper.xmpp.modules.roster.persistence.RosterManagerUtils;
+import org.apache.vysper.xmpp.server.SessionContext;
 import org.apache.vysper.xmpp.server.XMPPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import won.protocol.model.Need;
+import won.xmpp.core.ProxyRepository;
+import won.xmpp.won.xmpp.component.WONXmppComponent;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -45,16 +54,18 @@ import java.io.FileNotFoundException;
  * User: Ashkan
  * Date: 29.03.13
  */
-public class WONXmppServer implements InitializingBean{
+public class WONXmppServer implements InitializingBean, DisposableBean{
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     private String hostname = "sat.at";
     private XMPPServer server;
 
-    StorageProviderRegistry providerRegistry;
+    private StorageProviderRegistry providerRegistry;
 
     final WONUserAuthentication accountManagement;
+
+    private WONRoutingModule routingModule;
 
     public WONXmppServer(){
 
@@ -69,17 +80,20 @@ public class WONXmppServer implements InitializingBean{
         //Change here for additional XMPP features
         server.addModule(new SoftwareVersionModule());
         server.addModule(new EntityTimeModule());
-        server.addModule(new VcardTempModule());
+        //server.addModule(new VcardTempModule());
 
         server.addModule(new InBandRegistrationModule()); //under Development ??
 
+        server.addModule(new WONXmppComponent(server.getServerRuntimeContext()));
 
+        /*routing module*/
+        routingModule = new WONRoutingModule();
+        server.addModule(routingModule);
         //"won-xmpp/src/main/config/bogus_mina_tls.cert"
         server.setTLSCertificateInfo(Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream("/config/bogus_mina_tls.cert"), "boguspw");
+                .getResourceAsStream("/config/bogus_mina_tls.cert"), "boguspw");
 
-        //for TESTING purpose
-        initializeUsers();
+
     }
 
 
@@ -87,6 +101,9 @@ public class WONXmppServer implements InitializingBean{
 
         try {
             server.start();
+            //server.getServerRuntimeContext().registerComponent(new WONXmppComponent(server.getServerRuntimeContext()));
+            //for TESTING purpose
+            initializeUsers();
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -129,13 +146,53 @@ public class WONXmppServer implements InitializingBean{
 
     private void initializeUsers(){
 
-        try {
-            accountManagement.addUser(EntityImpl.parse("admin@"+hostname) , "password1");
-            accountManagement.addUser(EntityImpl.parse("user1@"+hostname), "password1");
+        try{
+        String admin = "admin@"+hostname;
+        Entity adminEntity = EntityImpl.parse(admin);
+        String user1 =  "user1@"+hostname;
+        Entity user1Entity = EntityImpl.parse(user1);
+
+        String wonComp = "won."+hostname;
+        String pw = "password1";
+        String proxy1 = "proxy1@" + wonComp;
+        String proxy2 = "proxy2@" +wonComp;
+        Entity proxy1Entity = EntityImpl.parse(proxy1);
+        Entity proxy2Entity = EntityImpl.parse(proxy2);
+
+
+            accountManagement.addUser(adminEntity , pw);
+            accountManagement.addUser(user1Entity, pw);
+            accountManagement.addUser(EntityImpl.parse("won@" + wonComp), pw);
+            accountManagement.addUser(EntityImpl.parse("user1@" + wonComp), pw);
+            accountManagement.addUser(EntityImpl.parse("admin@" + wonComp), pw);
+            accountManagement.addUser(proxy1Entity, pw);
+            accountManagement.addUser(proxy2Entity, pw);
+
+            routingModule.addProxy(proxy1, admin, proxy2);
+            routingModule.addProxy(proxy2, user1, proxy1);
+
+            routingModule.getProxy(proxy1).setStatus("I need a car");
+            routingModule.getProxy(proxy2).setStatus("I have a car");
+
+            for(SessionContext sc: server.getServerRuntimeContext().getResourceRegistry().getSessions(adminEntity)){
+
+                RosterManagerUtils.getRosterInstance(server.getServerRuntimeContext(), sc).addContact(proxy1Entity
+                        , new RosterItem(proxy1Entity, routingModule.getProxy(proxy1).getStatus(), SubscriptionType.TO , AskSubscriptionType.ASK_SUBSCRIBED) );
+
+            }
+
+            for(SessionContext sc: server.getServerRuntimeContext().getResourceRegistry().getSessions(user1Entity)){
+
+                RosterManagerUtils.getRosterInstance(server.getServerRuntimeContext(), sc).addContact(proxy2Entity
+                        , new RosterItem(proxy2Entity, routingModule.getProxy(proxy2).getStatus(), SubscriptionType.TO , AskSubscriptionType.ASK_SUBSCRIBED) );
+
+            }
 
         } catch (AccountCreationException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (EntityFormatException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (RosterException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
@@ -146,5 +203,11 @@ public class WONXmppServer implements InitializingBean{
     @Override
     public void afterPropertiesSet() throws Exception {
         this.start();
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        logger.info("destroying server");
+        server.stop();
     }
 }
