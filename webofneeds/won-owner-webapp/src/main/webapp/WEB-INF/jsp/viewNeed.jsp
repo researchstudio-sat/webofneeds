@@ -12,6 +12,8 @@
 </head>
 <body>
 <h1>Need: <c:out value="${needId}" />, <c:out value="${needURI}" /> </h1>
+<p></p><c:out value="${needDescription}" /></p>
+<p></p><c:out value="${needDate}" />, <c:out value="${needLatitude}" />, <c:out value="${needLongitude}" />, </p>
 
 <button onclick="jQuery.post('/owner/need/<c:out value="${needId}" />/toggle', function() { document.location.reload(true); });" ><c:out value="${active}"/></button>
 

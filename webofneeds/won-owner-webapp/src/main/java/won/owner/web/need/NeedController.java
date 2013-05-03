@@ -18,6 +18,7 @@ import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
+import won.owner.util.NeedFetcher;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedService;
@@ -99,6 +100,7 @@ public class NeedController {
     public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) {
         URI needURI;
 
+
         try {
             URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
             com.hp.hpl.jena.rdf.model.Model m = ModelFactory.createDefaultModel();
@@ -163,10 +165,20 @@ public class NeedController {
         if(needs.isEmpty())
             return "noNeedFound";
 
+
         Need need = needs.get(0);
+
+        NeedPojo fullNeed = NeedFetcher.getNeedInfo(need);
+
+
         model.addAttribute("active", (need.getState() != NeedState.ACTIVE ? "activate" : "deactivate"));
         model.addAttribute("needURI", need.getNeedURI());
+        model.addAttribute("needDescription", fullNeed.getTextDescription());
+        model.addAttribute("needDate", fullNeed.getDate());
+        model.addAttribute("needLatitude", fullNeed.getLatitude());
+        model.addAttribute("needLongitude", fullNeed.getLongitude());
         model.addAttribute("command", new NeedPojo());
+
 
         return "viewNeed";
     }
