@@ -32,12 +32,14 @@ public class ProxyRepository {
     }
 
     public void addProxy(String jid, NeedProxy np){
-        proxyMap.put(jid, np);
+        proxyMap.put(jid,np);
     }
 
-    public void addProxy(String thisProxyJid, String thisOwnerJid, String otherProxyJid){
+    public NeedProxy addProxy(String thisProxyJid, String thisOwnerJid, String otherProxyJid){
 
-        addProxy(thisProxyJid  , new NeedProxy(thisProxyJid, new Owner(thisOwnerJid), otherProxyJid));
+        NeedProxy needProxy = new NeedProxy(thisProxyJid, new Owner(thisOwnerJid), otherProxyJid);
+        addProxy(thisProxyJid  ,needProxy );
+        return needProxy;
     }
 
     public NeedProxy getNeedProxy(String jid){
@@ -46,6 +48,10 @@ public class ProxyRepository {
 
     public boolean hasProxy(String jid){
         return proxyMap.containsKey(jid);
+    }
+
+    public NeedProxy removeProxy(String jid){
+        return proxyMap.remove(jid);
     }
 
 }

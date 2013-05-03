@@ -25,6 +25,7 @@ public class NeedProxy {
     String jid;
     String otherProxyJid;
     String status;
+    String nickname;
     Owner owner;
 
 
@@ -70,5 +71,13 @@ public class NeedProxy {
 
     public void setOtherProxyJid(String otherProxyJid) {
         this.otherProxyJid = otherProxyJid;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

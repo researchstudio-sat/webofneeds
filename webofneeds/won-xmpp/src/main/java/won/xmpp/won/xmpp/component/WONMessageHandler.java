@@ -131,9 +131,9 @@ public class WONMessageHandler extends WONCoreStanzaHandler {
         if(fromProxy == null ){
             throw new IllegalStateException("Stanza from invalid proxy: jid is " + from.getBareJID().toString() );
         }
-        String status = fromProxy.getStatus();
+        String nickname = fromProxy.getNickname();
 
-        stanzaBuilder.addPreparedElement(new XMLElementBuilder("nick", "http://jabber.org/protocol/nick").addText(status).build());
+        stanzaBuilder.addPreparedElement(new XMLElementBuilder("nick", "http://jabber.org/protocol/nick").addText(nickname).build());
 
         return stanzaBuilder;
 

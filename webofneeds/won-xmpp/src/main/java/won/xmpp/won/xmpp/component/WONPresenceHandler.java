@@ -45,28 +45,7 @@ public class WONPresenceHandler extends WONCoreStanzaHandler {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
 
-    @Override
-    protected StanzaBuilder buildCoreStanza(Entity from, Entity to, Stanza oldStanza, ServerRuntimeContext serverRuntimeContext, SessionContext sessionContext) throws XMLSemanticError {
 
-        PresenceStanza oldPresenceStanza= new PresenceStanza(oldStanza);
-
-        WONRoutingModule router = serverRuntimeContext.getModule(WONRoutingModule.class);
-        if(router == null){
-            throw new IllegalStateException("router cannot be null");
-        }
-        NeedProxy fromProxy  = router.getProxy(from.getBareJID().toString());
-        if(fromProxy == null ){
-            throw new IllegalStateException("Stanza from invalid proxy: jid is " + from.getBareJID().toString() );
-        }
-        StanzaBuilder stanzaBuilder = StanzaBuilder.createPresenceStanza(from, to, oldPresenceStanza.getXMLLang(), oldPresenceStanza.getPresenceType(),
-                oldPresenceStanza.getShow(), oldPresenceStanza.getStatus(oldPresenceStanza.getXMLLang()));
-        String status = fromProxy.getStatus() == null ? "" : fromProxy.getStatus();
-
-        stanzaBuilder.addPreparedElement(new XMLElementBuilder("nick", "http://jabber.org/protocol/nick").addText(status).build());
-        stanzaBuilder.addPreparedElement(new XMLElementBuilder("status").addText("Status: " + status).build());
-
-        return stanzaBuilder;
-    }
 
     @Override
     protected boolean verifyType(Stanza stanza) {
@@ -82,13 +61,13 @@ public class WONPresenceHandler extends WONCoreStanzaHandler {
 
         logger.info("component received presense stanza!");
 
-        if(PresenceStanzaType.isSubscriptionType(stanza.getPresenceType())){
+        /*if(PresenceStanzaType.isSubscriptionType(stanza.getPresenceType())){
 
             logger.info("subscription stanza");
 
             return executeSubscriptionPresence(stanza, serverRuntimeContext, sessionContext);
 
-        }else{
+        }else{ */
 
             try {
                 return PresenceStanza.getWrapper(buildNextStanza(stanza, serverRuntimeContext, sessionContext));//presense
@@ -98,7 +77,7 @@ public class WONPresenceHandler extends WONCoreStanzaHandler {
             }
 
 
-        }
+
 
         return null;
     }
@@ -106,6 +85,45 @@ public class WONPresenceHandler extends WONCoreStanzaHandler {
     @Override
     public String getName() {
         return "wonPresenceHandler";
+    }
+
+    @Override
+    protected StanzaBuilder buildCoreStanza(Entity from, Entity to, Stanza oldStanza, ServerRuntimeContext serverRuntimeContext, SessionContext sessionContext) throws XMLSemanticError {
+
+        PresenceStanza oldPresenceStanza= new PresenceStanza(oldStanza);
+
+        WONRoutingModule router = serverRuntimeContext.getModule(WONRoutingModule.class);
+        if(router == null){
+            throw new IllegalStateException("router cannot be null");
+        }
+        NeedProxy fromProxy  = router.getProxy(from.getBareJID().toString());
+        if(fromProxy == null ){
+            throw new IllegalStateException("Stanza from invalid proxy: jid is " + from.getBareJID().toString() );
+        }
+
+        WONRoutingModule routingModule = serverRuntimeContext.getModule(WONRoutingModule.class);
+        /*if the msg comes from proxy to proxy then we have to change the nickname to the nickname of the sender proxy
+          otherwise we copy the old nickname */
+        boolean isPr2Pr = routingModule.hasProxy(from.getBareJID().toString()) && routingModule.hasProxy(to.getBareJID().toString());
+
+        XMLElement nickElement = oldPresenceStanza.getSingleInnerElementsNamed("nick","http://jabber.org/protocol/nick");
+
+        String nickname = null;
+        if(nickElement != null){
+            nickname = nickElement.getInnerText().getText();
+
+        }
+        String newStatus = isPr2Pr ? fromProxy.getStatus() : oldPresenceStanza.getStatus(oldPresenceStanza.getXMLLang());
+        String newNickname = isPr2Pr ? fromProxy.getNickname() : (nickname == null ? "" : nickname);
+        newStatus = newStatus ==null ? "" : newStatus;
+        newNickname = newNickname==null ? "" : newNickname;
+
+        StanzaBuilder stanzaBuilder = StanzaBuilder.createPresenceStanza(from, to, oldPresenceStanza.getXMLLang(), oldPresenceStanza.getPresenceType(),
+                oldPresenceStanza.getShow(), newStatus);
+
+        stanzaBuilder.addPreparedElement(new XMLElementBuilder("nick", "http://jabber.org/protocol/nick").addText(newNickname).build());
+
+        return stanzaBuilder;
     }
 
     private Stanza executeSubscriptionPresence(PresenceStanza stanza, ServerRuntimeContext serverRuntimeContext, SessionContext sessionContext){
@@ -166,7 +184,8 @@ public class WONPresenceHandler extends WONCoreStanzaHandler {
 
         StanzaBuilder stanzaBuilder = StanzaBuilder.createPresenceStanza(to.getBareJID(), from.getBareJID(), stanza.getXMLLang(), PresenceStanzaType.SUBSCRIBE, "available" , proxy.getStatus() );
         String status = proxy.getStatus() == null ? "" : proxy.getStatus();
-        stanzaBuilder.addPreparedElement(new XMLElementBuilder("nick", "http://jabber.org/protocol/nick").addText(status).build());
+        String nickname = proxy.getNickname() == null ? "" : proxy.getNickname();
+        stanzaBuilder.addPreparedElement(new XMLElementBuilder("nick", "http://jabber.org/protocol/nick").addText(nickname).build());
         return stanzaBuilder.build();
 
     }

@@ -16,7 +16,6 @@
 
 package won.xmpp;
 
-import org.apache.vysper.xmpp.writer.SystemOutStanzaWriter;
 import won.protocol.model.Need;
 
 import java.io.BufferedReader;
@@ -33,28 +32,12 @@ public class Main {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader( System.in));
 
-        WONXmppServer server = new WONXmppServer();
+        WONXmppServer server = new WONXmppServerImpl();
 
         server.start();
         System.out.println("server is running ...");
         System.out.println("predefined  users are set");
 
-
-        String line = null;
-        long counter = 0;
-
-        while(true){
-
-            System.out.println("Enter bare jid to register:");
-            line = reader.readLine();
-            if(line == null){
-                break;
-            }
-            Need n = new Need();
-            n.setId(counter);
-            server.registerNewNeed(n);
-
-        }
 
         System.out.println("press Enter to terminate");
         reader.readLine();
@@ -62,9 +45,6 @@ public class Main {
         server.stop();
 
         System.out.println("server stopped!");
-
-
-
 
 
     }

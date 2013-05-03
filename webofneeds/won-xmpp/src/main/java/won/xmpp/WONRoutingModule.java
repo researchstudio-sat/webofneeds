@@ -40,9 +40,9 @@ public class WONRoutingModule extends DefaultModule {
         this.proxyRepository = new ProxyRepository();
     }
 
-    public void addProxy(String thisProxyJid, String thisProxyOwner, String otherProxyJid){
+    public NeedProxy addProxy(String thisProxyJid, String thisProxyOwner, String otherProxyJid){
 
-        proxyRepository.addProxy(thisProxyJid,thisProxyOwner, otherProxyJid);
+        return proxyRepository.addProxy(thisProxyJid,thisProxyOwner, otherProxyJid);
     }
 
     public NeedProxy getProxy(String jid){
@@ -54,6 +54,9 @@ public class WONRoutingModule extends DefaultModule {
         return proxyRepository.hasProxy(jid);
     }
 
+    public NeedProxy removeProxy(String jid){
+        return proxyRepository.removeProxy(jid);
+    }
 
     @Override
     public String getName() {

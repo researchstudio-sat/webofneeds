@@ -73,21 +73,23 @@ public abstract class WONCoreStanzaHandler extends XMPPCoreStanzaHandler {
                 throw new IllegalStateException("Recipient address outside of component");
             }
             //msg goes to another Proxy
-            String toJid = stanza.getTo().getFullQualifiedName();
+            String toJid = stanza.getTo().getBareJID().toString();
 
             if(!router.hasProxy(toJid)){
                 logger.info("Target proxy cannot be found!");
                 return null;
             }
+
+            if(!router.getProxy(toJid).getOtherProxyJid().equals(from.getBareJID().toString())){
+                logger.info(String.format("Invalid source proxy: %s , for destination proxy: %s ", from.getBareJID().toString(), toJid));
+                return null;
+            }
             // so we direct it to TO's owner
-            String ownerJid = router.getProxy(stanza.getTo().getFullQualifiedName()).getOwner().getJid();
+            String ownerJid = router.getProxy(stanza.getTo().getBareJID().toString()).getOwner().getJid();
             logger.info("owner Jid for " + stanza.getTo().getFullQualifiedName() + " : " + ownerJid);
             Entity owner = EntityImpl.parse(ownerJid);
 
             stanzaBuilder = buildCoreStanza(stanza.getTo(), owner, stanza, serverCtx, sessionContext);
-            /* stanzaBuilder = StanzaBuilder.createMessageStanza(stanza.getTo(), owner, stanza.getXMLLang(),
-                    stanza.getBody(stanza.getXMLLang()));
-            stanzaBuilder.addAttribute("type", "chat");*/
 
             return stanzaBuilder.build();
 
@@ -99,7 +101,7 @@ public abstract class WONCoreStanzaHandler extends XMPPCoreStanzaHandler {
             //msg comes from outside of the component
             if(subdomain.equals(stanza.getTo().getDomain())){
                 //msg goes to a Proxy inside the component
-                String toJid = stanza.getTo().getFullQualifiedName();
+                String toJid = stanza.getTo().getBareJID().toString();
 
                 if(!router.hasProxy(toJid)){
                     logger.info("Target proxy cannot be found! : " + toJid);
@@ -124,21 +126,14 @@ public abstract class WONCoreStanzaHandler extends XMPPCoreStanzaHandler {
                 }
                 logger.info("other proxy Jid for "+ stanza.getTo().getFullQualifiedName() + " : " + otherProxyJid);
 
-                String otherOwnerJid = router.getProxy(otherProxyJid).getOwner().getJid();
+                //String otherOwnerJid = router.getProxy(otherProxyJid).getOwner().getJid();
 
                 Entity otherProxy = EntityImpl.parse(otherProxyJid);
-                Entity otherOwner = EntityImpl.parse(otherOwnerJid);
+                Entity toProxyEntity = EntityImpl.parse(toJid);
+                //Entity otherOwner = EntityImpl.parse(otherOwnerJid);
 
-                /*stanzaBuilder = StanzaBuilder.createMessageStanza(otherProxy, otherOwner,stanza.getXMLLang(),
-                        stanza.getBody(stanza.getXMLLang()));
-                stanzaBuilder.addAttribute("type", "chat");
 
-                String status = router.getProxy(otherProxyJid).getStatus() == null ? "" : router.getProxy(otherProxyJid).getStatus();
-
-                stanzaBuilder.addPreparedElement(new XMLElementBuilder("nick", "http://jabber.org/protocol/nick").addText(status).build());
-                */
-
-                stanzaBuilder = buildCoreStanza(otherProxy, otherOwner, stanza, serverCtx, sessionContext);
+                stanzaBuilder = buildCoreStanza(toProxyEntity, otherProxy, stanza, serverCtx, sessionContext);
 
 
                 return stanzaBuilder.build();
