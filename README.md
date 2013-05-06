@@ -1,16 +1,18 @@
 webofneeds
 ==========
 
-Web of Needs is a new idea based on old technology, enabling a recent field of research.
-Central Point is the need. In contrast to the offer, the need is inadequately represented.
-Web of needs tries to fill the gap. 
+The central idea of the Web of needs is this: the WWW looks like a marketplace; 
+everyone knows what there is for sale, only a few know what is needed. We want to change that.
 
-For further information have a look at: http://www.webofneeds.org
+The central point is the 'need', which we represent as a linked data resource. It names communication
+protocol endpoints that can be used to contact its owner and provide information about interesting other
+'needs'.
 
-Web of needs is build up of 
-- won-node
-- won-owner 
-- and matching-service.
+Web of needs is built of 
+- won-node: the server component hosting the needs
+- won-owner: a simple application allowing for enduser need management  
+- and a matching-service: currently implemented as a crawler that contacts needs (via the protocol endpoints) whenever 
+   it finds a good match.
 
 Requirements for getting started:
 - jdk 1.6 or later
