@@ -1,37 +1,33 @@
 package won.owner.web.rest;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.RDF;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
-import org.apache.http.client.utils.URIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.owner.pojo.NeedPojo;
+import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
-import won.owner.util.NeedFetcher;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.model.WON;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.GR;
+import won.protocol.vocabulary.WON;
 
-import javax.management.remote.JMXConnectorFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -124,7 +120,12 @@ public class RestController {
 
         logger.info("Found need in DB: ");
         Need need = needs.get(0);
-        NeedPojo fullNeed = NeedFetcher.getNeedInfo(need);
+
+
+        LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
+        NeedPojo fullNeed = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+
+        //NeedPojo fullNeed = NeedFetcher.getNeedInfo(need);
 
         logger.info("Looking for matches for: " + need.getNeedURI());
         List<Match> matches =  matchRepository.findByFromNeed(need.getNeedURI());
@@ -142,7 +143,8 @@ public class RestController {
 
 
             List<Need> matchNeeds = needRepository.findByNeedURI(matchUri);
-            NeedPojo matchedNeed = NeedFetcher.getNeedInfo(matchNeeds.get(0));
+            NeedPojo matchedNeed = new NeedPojo(matchNeeds.get(0).getNeedURI(), linkedDataRestClient.readResourceData(matchNeeds.get(0).getNeedURI()));
+            //NeedPojo matchedNeed = NeedFetcher.getNeedInfo(matchNeeds.get(0));
             if(matchNeeds.get(0).getState().equals(NeedState.ACTIVE))
                 returnList.add(matchedNeed);
         }
@@ -159,8 +161,8 @@ public class RestController {
     public NeedPojo createNeed(NeedPojo needPojo)
     {
 
-        logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getDate() + "/" +
-                needPojo.getLongitude() + "/" + needPojo.getLatitude() + "/" + needPojo.isActive());
+        logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getCreationDate() + "/" +
+                needPojo.getLongitude() + "/" + needPojo.getLatitude() + "/" + (needPojo.getState() == NeedState.ACTIVE));
 
         return resolve(needPojo);
     }
@@ -187,93 +189,95 @@ public class RestController {
             }
         }
         URI needURI;
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-
-
-
-        try {
-            cal.setTime(sdf.parse(needPojo.getDate()));// all done
-        } catch (ParseException e) {
-            logger.warn("Could not parse Date String:" + needPojo.getDate() + " " + e.getMessage());
-        }
-
 
         try {
             URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
-            com.hp.hpl.jena.rdf.model.Model m = ModelFactory.createDefaultModel();
-            // use the FileManager to find the input file
-            InputStream in = FileManager.get().open( "/offer.ttl" );
-            if (in == null) {
-                throw new IllegalArgumentException(
-                        "File: offer.ttl not found");
-            }
-            m.read(in, null, "TTL");
 
-            in.close();
-            ResIterator it = m.listSubjectsWithProperty(RDF.type, WON.NEED_DESCRIPTION);
-            if (it.hasNext()){
-                Resource mainContentNode = it.next();
-                m.add(m.createStatement(mainContentNode, WON.TEXT_DESCRIPTION, needPojo.getTextDescription()));
-            }
+            com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
+            Resource needResource = needModel.createResource(WON.NEED);
 
-            String whereUri = "http://www.w3.org/2003/01/geo/wgs84_pos#Point";
-            String latUri = "http://www.w3.org/2003/01/geo/wgs84_pos#latitude";
-            String longUri = "http://www.w3.org/2003/01/geo/wgs84_pos#longitude";
-            Property whereProp = m.createProperty(whereUri);
-            Property latitudeProp = m.createProperty(latUri);
-            Property longitudeProp = m.createProperty(longUri);
+            // need type
+            needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
 
-            it = m.listSubjectsWithProperty(RDF.type, whereProp);
-            if (it.hasNext()) {
-                Resource mainContentNode = it.next();
-                m.removeAll(mainContentNode, latitudeProp, (RDFNode) null);
-                m.addLiteral(mainContentNode, latitudeProp, needPojo.getLatitude());
-                m.removeAll(mainContentNode, longitudeProp, (RDFNode) null);
-                m.addLiteral(mainContentNode, longitudeProp, needPojo.getLongitude());
+            // need content
+            Resource needContent = needModel.createResource(WON.NEED_CONTENT);
+            if (!needPojo.getTitle().isEmpty())
+                needContent.addProperty(WON.TITLE, needPojo.getTitle(), XSDDatatype.XSDstring);
+            if (!needPojo.getTextDescription().isEmpty())
+                needContent.addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
+            needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
+
+            // owner
+            if (needPojo.isAnonymize()) {
+                needModel.add(needModel.createStatement(needResource, WON.HAS_OWNER, WON.ANONYMIZED_OWNER));
             }
 
-            String timeUri = "http://www.w3.org/2006/time#";
-            Property timeProp = m.createProperty(timeUri
-                    + "DateTimeDescription");
-            Property minuteProp = m.createProperty(timeUri + "minute");
-            Property hourProp = m.createProperty(timeUri + "hour");
-            Property dayProp = m.createProperty(timeUri + "day");
-            Property monthProp = m.createProperty(timeUri + "month");
-            Property yearProp = m.createProperty(timeUri + "year");
+            // need modalities
+            Resource needModality = needModel.createResource(WON.NEED_MODALITY);
 
-            it = m.listSubjectsWithProperty(RDF.type, timeProp);
-            if (it.hasNext()) {
-                Resource mainContentNode = it.next();
-                m.removeAll(mainContentNode, minuteProp, (RDFNode) null);
-                m.addLiteral(mainContentNode, minuteProp, cal.get(Calendar.MINUTE));
+            needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_DELIVERY_METHOD, GR.toResource(needPojo.getDeliveryMethod())));
 
-                m.removeAll(mainContentNode, hourProp, (RDFNode) null);
-                m.addLiteral(mainContentNode, hourProp, cal.get(Calendar.HOUR_OF_DAY));
+            // TODO: store need modalities in separate objects to enable easier checking and multiple instances
+            //price and currency
+            if (needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
+                Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
+                if (needPojo.getLowerPriceLimit() != null)
+                    priceSpecification.addProperty(WON.HAS_LOWER_PRICE_LIMIT, Double.toString(needPojo.getLowerPriceLimit()), XSDDatatype.XSDdouble);
+                if (needPojo.getUpperPriceLimit() != null)
+                    priceSpecification.addProperty(WON.HAS_UPPER_PRICE_LIMIT, Double.toString(needPojo.getUpperPriceLimit()), XSDDatatype.XSDdouble);
+                if (!needPojo.getCurrency().isEmpty())
+                    priceSpecification.addProperty(WON.HAS_CURRENCY, needPojo.getCurrency(), XSDDatatype.XSDstring);
 
-                m.removeAll(mainContentNode, dayProp, (RDFNode) null);
-                m.addLiteral(mainContentNode, dayProp, cal.get(Calendar.DATE));
-
-                m.removeAll(mainContentNode, monthProp, (RDFNode) null);
-                m.addLiteral(mainContentNode, monthProp, cal.get(Calendar.MONTH));
-
-                m.removeAll(mainContentNode, yearProp, (RDFNode) null);
-                m.addLiteral(mainContentNode, yearProp,
-                        cal.get(Calendar.YEAR));
+                needModel.add(needModel.createStatement(needModality, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
             }
 
-            logger.info("Creating need, is active: " + needPojo.isActive());
-            needURI = ownerService.createNeed(ownerURI, m, needPojo.isActive());
+            if (needPojo.getLatitude() != null && needPojo.getLongitude() != null) {
+                Resource location = needModel.createResource(GEO.POINT)
+                        .addProperty(GEO.LATITUDE, Double.toString(needPojo.getLatitude()))
+                        .addProperty(GEO.LONGITUDE, Double.toString(needPojo.getLongitude()));
+
+                needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_LOCATION, location));
+            }
+
+            // time constraint
+            if (!needPojo.getStartTime().isEmpty() || !needPojo.getEndTime().isEmpty()) {
+                Resource timeConstraint = needModel.createResource(WON.TIME_CONSTRAINT)
+                        .addProperty(WON.RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
+                if (!needPojo.getStartTime().isEmpty())
+                    timeConstraint.addProperty(WON.START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
+                if (!needPojo.getEndTime().isEmpty())
+                    timeConstraint.addProperty(WON.END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
+                if (needPojo.getRecurIn() != null)
+                    timeConstraint.addProperty(WON.RECUR_IN, Long.toString(needPojo.getRecurIn()));
+                if (needPojo.getRecurTimes() != null)
+                    timeConstraint.addProperty(WON.RECUR_TIMES, Integer.toString(needPojo.getRecurTimes()));
+                needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_TIME, timeConstraint));
+            }
+
+            needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
+
+            if (needPojo.getWonNode().equals("")) {
+                //TODO: this is a temporary hack, please fix. The protocol expects boolean and we have an enum for needState
+                needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+            } else {
+                needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, needPojo.getWonNode());
+            }
 
             List<Need> needs = needRepository.findByNeedURI(needURI);
 
 
 
-            URI needUri = needs.get(0).getNeedURI();
 
-            NeedPojo fullNeed = NeedFetcher.getNeedInfo(needs.get(0));
-            logger.info("Added need id:" + fullNeed.getNeedId());
+
+
+
+            LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
+            NeedPojo fullNeed = new NeedPojo(needURI, linkedDataRestClient.readResourceData(needs.get(0).getNeedURI()));
+            fullNeed.setNeedId(needs.get(0).getId());
+
+            //NeedPojo fullNeed = NeedFetcher.getNeedInfo(needs.get(0));
+            logger.info("Added need id:" + fullNeed.getNeedId() + "uri: " + needURI);
 
 
 //            if(!fullNeed.isActive())
@@ -295,13 +299,13 @@ public class RestController {
                     continue;
 
                 }
-                if(iterNeed.getNeedURI().equals(needUri))
+                if(iterNeed.getNeedURI().equals(needURI))
                     continue;
 
                 try {
-                    logger.info("Matching need: " + needUri + " to: " + iterNeed.getNeedURI());
-                    client.hint(needUri, iterNeed.getNeedURI(), 0.5, new URI("http://www.agentdroid.com"));
-                    client.hint( iterNeed.getNeedURI(),needUri, 0.5, new URI("http://www.agentdroid.com"));
+                    logger.info("Matching need: " + needURI + " to: " + iterNeed.getNeedURI());
+                    client.hint(needURI, iterNeed.getNeedURI(), 0.5, new URI("http://www.agentdroid.com"));
+                    client.hint( iterNeed.getNeedURI(),needURI, 0.5, new URI("http://www.agentdroid.com"));
                 } catch (URISyntaxException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 } catch (IllegalMessageForNeedStateException e) {
@@ -318,9 +322,8 @@ public class RestController {
             // return viewNeed(need.getId().toString(), model);
         } catch (IllegalNeedContentException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+
 
         return new NeedPojo();
     }
