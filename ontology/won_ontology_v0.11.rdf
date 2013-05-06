@@ -2,6 +2,7 @@
 
 
 <!DOCTYPE rdf:RDF [
+    <!ENTITY schema_org "http://schema.rdfs.org/all#" >
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
     <!ENTITY gr "http://purl.org/goodrelations/v1#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
@@ -18,10 +19,12 @@
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:won="http://purl.org/webofneeds/model#"
-     xmlns:gr="http://purl.org/goodrelations/v1#">
+     xmlns:gr="http://purl.org/goodrelations/v1#"
+     xmlns:schema_org="http://schema.rdfs.org/all#">
     <owl:Ontology rdf:about="http://purl.org/webofneeds/model">
         <owl:imports rdf:resource="http://purl.org/goodrelations/v1"/>
         <owl:versionIRI rdf:resource="http://purl.org/webofneeds/model/0.1"/>
+        <owl:imports rdf:resource="http://schema.rdfs.org/all"/>
         <owl:imports rdf:resource="http://www.w3.org/2000/01/rdf-schema#"/>
         <owl:imports rdf:resource="http://www.w3.org/ns/ldp#"/>
     </owl:Ontology>
@@ -105,6 +108,16 @@
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:range rdf:resource="&won;BasicNeedType"/>
         <rdfs:domain rdf:resource="&won;Need"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasConnectionState -->
+
+    <owl:ObjectProperty rdf:about="&won;hasConnectionState">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;Connection"/>
+        <rdfs:range rdf:resource="&won;ConnectionState"/>
     </owl:ObjectProperty>
     
 
@@ -237,6 +250,14 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://purl.org/dc/terms/title -->
+
+    <owl:DatatypeProperty rdf:about="http://purl.org/dc/terms/title">
+        <owl:equivalentProperty rdf:resource="&won;title"/>
+    </owl:DatatypeProperty>
     
 
 
@@ -386,6 +407,16 @@
     
 
 
+    <!-- http://purl.org/webofneeds/model#title -->
+
+    <owl:DatatypeProperty rdf:about="&won;title">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;NeedContent"/>
+        <rdfs:range rdf:resource="&rdfs;Literal"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.w3.org/2003/01/geo/wgs84_pos#latitude -->
 
     <owl:DatatypeProperty rdf:about="http://www.w3.org/2003/01/geo/wgs84_pos#latitude">
@@ -417,27 +448,11 @@
     
 
 
-    <!-- http://purl.org/goodrelations/v1#BusinessEntity -->
-
-    <rdf:Description rdf:about="&gr;BusinessEntity">
-        <rdfs:subClassOf rdf:resource="&won;Owner"/>
-    </rdf:Description>
-    
-
-
     <!-- http://purl.org/goodrelations/v1#Offering -->
 
     <rdf:Description rdf:about="&gr;Offering">
         <rdfs:subClassOf rdf:resource="&won;Need"/>
     </rdf:Description>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#Accept -->
-
-    <owl:Class rdf:about="&won;Accept">
-        <rdfs:subClassOf rdf:resource="&won;Event"/>
-    </owl:Class>
     
 
 
@@ -477,6 +492,12 @@
         <rdfs:subClassOf rdf:resource="&rdfs;Resource"/>
         <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/ldp#CompositeContainer"/>
     </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#ConnectionState -->
+
+    <owl:Class rdf:about="&won;ConnectionState"/>
     
 
 
@@ -573,6 +594,22 @@
     <!-- http://purl.org/webofneeds/model#TimeConstraint -->
 
     <owl:Class rdf:about="&won;TimeConstraint"/>
+    
+
+
+    <!-- http://schema.org/Organization -->
+
+    <rdf:Description rdf:about="http://schema.org/Organization">
+        <rdfs:subClassOf rdf:resource="&won;Owner"/>
+    </rdf:Description>
+    
+
+
+    <!-- http://schema.org/Person -->
+
+    <rdf:Description rdf:about="http://schema.org/Person">
+        <rdfs:subClassOf rdf:resource="&won;Owner"/>
+    </rdf:Description>
     
 
 
