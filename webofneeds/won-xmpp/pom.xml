@@ -28,7 +28,11 @@
             <artifactId>vysper-core</artifactId>
             <version>0.8-SNAPSHOT</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.vysper.extensions</groupId>
+            <artifactId>xep0124-xep0206-bosh</artifactId>
+            <version>0.8-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.vysper</groupId>
             <artifactId>nbxml</artifactId>

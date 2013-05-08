@@ -29,6 +29,7 @@ import org.apache.vysper.xmpp.authentication.AccountManagement;
 import org.apache.vysper.xmpp.modules.extension.xep0054_vcardtemp.VcardTempModule;
 import org.apache.vysper.xmpp.modules.extension.xep0077_inbandreg.InBandRegistrationModule;
 import org.apache.vysper.xmpp.modules.extension.xep0092_software_version.SoftwareVersionModule;
+import org.apache.vysper.xmpp.modules.extension.xep0199_xmppping.XmppPingModule;
 import org.apache.vysper.xmpp.modules.extension.xep0202_entity_time.EntityTimeModule;
 import org.apache.vysper.xmpp.modules.roster.AskSubscriptionType;
 import org.apache.vysper.xmpp.modules.roster.RosterException;
@@ -85,7 +86,7 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
         server.addModule(new SoftwareVersionModule());
         server.addModule(new EntityTimeModule());
         //server.addModule(new VcardTempModule());
-
+        server.addModule(new XmppPingModule());
         server.addModule(new InBandRegistrationModule()); //under Development ??
 
         server.addModule(new WONXmppComponent(server.getServerRuntimeContext()));
