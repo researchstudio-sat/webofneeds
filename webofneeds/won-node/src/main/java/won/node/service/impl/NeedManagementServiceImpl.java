@@ -34,7 +34,7 @@ import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.util.DataAccessUtils;
-import won.xmpp.WONXmppServer;
+import won.xmpp.WONXmppServerImpl;
 
 import java.net.URI;
 import java.util.Collection;
@@ -53,7 +53,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
   private NeedInformationService needInformationService;
   private URIService URIService;
   private RDFStorageService rdfStorage;
-  private WONXmppServer xmppServer;
 
   @Autowired
   private NeedRepository needRepository;
@@ -90,9 +89,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
     content.removeAll(contentNeed, null, null);
 
     rdfStorage.storeContent(need, content);
-
-    //create xmpp-jabber account
-    xmppServer.registerNewNeed(need);
 
     return need.getNeedURI();
   }
@@ -161,7 +157,4 @@ public class NeedManagementServiceImpl implements NeedManagementService
     this.rdfStorage = rdfStorage;
   }
 
-    public void setXmppServer(WONXmppServer xmppServer) {
-        this.xmppServer = xmppServer;
-    }
 }

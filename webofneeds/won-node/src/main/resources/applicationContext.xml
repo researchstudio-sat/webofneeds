@@ -50,7 +50,7 @@
     </bean>
 
     <!-- XMPP Server -->
-    <bean id="xmppServer" class="won.xmpp.WONXmppServer" />
+    <bean id="xmppServer" class="won.xmpp.WONXmppServerImpl" />
 
     <!-- Configure transaction management -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
