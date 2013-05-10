@@ -61,7 +61,7 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private String hostname = "sat.at";
+    private String hostname = "sat016";
     
     private String wonDomain = "won."+hostname;
     private XMPPServer server;
@@ -129,12 +129,12 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
     public void createXmppConnectionProxy(String ownerBareJid, String ownProxyJid, String partnerProxyJid, String nickname)
     throws XmppAcountCreationException{
         try {
-            String ownProxyBareJid = ownProxyJid + "@"+wonDomain;
-            String partnerProxyBareJid = partnerProxyJid + "@"+wonDomain;
+            //String ownProxyBareJid = ownProxyJid + "@"+wonDomain;
+            //String partnerProxyBareJid = partnerProxyJid + "@"+wonDomain;
 
             Entity ownerEntity = EntityImpl.parse(ownerBareJid);
-            Entity ownProxyEntity = EntityImpl.parse(ownProxyBareJid);
-            Entity partnerProxyEntity = EntityImpl.parse(partnerProxyBareJid);
+            Entity ownProxyEntity = EntityImpl.parse(ownProxyJid);
+            Entity partnerProxyEntity = EntityImpl.parse(partnerProxyJid);
 
             /*Owner should have been registered with a password*/
             if(!accountManagement.verifyAccountExists(ownerEntity)){
@@ -153,7 +153,7 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
             accountManagement.addUser(ownProxyEntity, "password1");
 
 
-            NeedProxy newProxy = routingModule.addProxy(ownProxyBareJid, ownerBareJid, partnerProxyBareJid);
+            NeedProxy newProxy = routingModule.addProxy(ownProxyJid, ownerBareJid, partnerProxyJid);
 
             newProxy.setNickname(nickname);
             //TODO update roster of the owner
@@ -195,16 +195,32 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
         String user1 =  "user1@"+hostname;
         Entity user1Entity = EntityImpl.parse(user1);
 
+        String user001 = "user001@sat001";
+        String user016 = "user016@sat016";
+
+        Entity user001Entity = EntityImpl.parse(user001);
+        Entity user016Entity = EntityImpl.parse(user016);
 
         String pw = "password1";
         String proxy1 = "proxy1@" + wonDomain;
         String proxy2 = "proxy2@" +wonDomain;
-        Entity proxy1Entity = EntityImpl.parse(proxy1);
-        Entity proxy2Entity = EntityImpl.parse(proxy2);
+        //Entity proxy1Entity = EntityImpl.parse(proxy1);
+        //Entity proxy2Entity = EntityImpl.parse(proxy2);
 
 
             accountManagement.addUser(adminEntity , pw);
             accountManagement.addUser(user1Entity, pw);
+
+            if(hostname.equals("sat001")){
+                accountManagement.addUser(user001Entity, pw);
+                createXmppConnectionProxy(user001, "proxy001@won.sat001", "proxy016@won.sat016", "I am user001 and I need a house");
+
+            }else if(hostname.equals("sat016")){
+                accountManagement.addUser(user016Entity, pw);
+                createXmppConnectionProxy(user016, "proxy016@won.sat016", "proxy001@won.sat001", "I am user016 and I have a house");
+
+            }
+
             /*accountManagement.addUser(EntityImpl.parse("won@" + wonComp), pw);
             accountManagement.addUser(EntityImpl.parse("user1@" + wonComp), pw);
             accountManagement.addUser(EntityImpl.parse("admin@" + wonComp), pw);
@@ -215,12 +231,17 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
             routingModule.addProxy(proxy2, user1, proxy1);
             */
 
-            createXmppConnectionProxy(admin, "proxy1", "proxy2", "I am admin and need a car");
-            createXmppConnectionProxy(user1, "proxy2", "proxy1", "I am user1 and have a car");
+            createXmppConnectionProxy(admin, "proxy1"+"@"+wonDomain, "proxy2"+"@"+wonDomain, "I am admin and need a car");
+            createXmppConnectionProxy(user1, "proxy2"+"@"+wonDomain, "proxy1"+"@"+wonDomain, "I am user1 and have a car");
+
+
+
 
             routingModule.getProxy(proxy1).setStatus("I need a car");
             routingModule.getProxy(proxy2).setStatus("I have a car");
 
+
+            /*
             for(SessionContext sc: server.getServerRuntimeContext().getResourceRegistry().getSessions(adminEntity)){
 
                 RosterManagerUtils.getRosterInstance(server.getServerRuntimeContext(), sc).addContact(proxy1Entity
@@ -234,10 +255,8 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
                         , new RosterItem(proxy2Entity, routingModule.getProxy(proxy2).getStatus(), SubscriptionType.TO , AskSubscriptionType.ASK_SUBSCRIBED) );
 
             }
-
+            */
         } catch (EntityFormatException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (RosterException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (XmppAcountCreationException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

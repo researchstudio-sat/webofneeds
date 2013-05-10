@@ -70,7 +70,8 @@ public abstract class WONCoreStanzaHandler extends XMPPCoreStanzaHandler {
             //msg comes from a proxy inside the component
 
             if(!subdomain.equals(stanza.getTo().getDomain())){
-                throw new IllegalStateException("Recipient address outside of component");
+                //throw new IllegalStateException("Recipient address outside of component");
+                logger.info("recipient from outside domain: " + stanza.getTo().getDomain());
             }
             //msg goes to another Proxy
             String toJid = stanza.getTo().getBareJID().toString();
