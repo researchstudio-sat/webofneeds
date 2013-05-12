@@ -280,6 +280,7 @@ public class RestController {
             logger.info("Added need id:" + fullNeed.getNeedId() + "uri: " + needURI);
 
 
+/*
 //            if(!fullNeed.isActive())
 //            {
 //                logger.info("Need is not active returning");
@@ -314,6 +315,7 @@ public class RestController {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             }
+*/
 
 
             if(needs.size() == 1)
