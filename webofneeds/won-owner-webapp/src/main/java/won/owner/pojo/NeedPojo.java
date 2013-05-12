@@ -48,6 +48,8 @@ public class NeedPojo
   private Integer recurTimes;
   private boolean recurInfiniteTimes;
 
+    private long needId = -1;
+
   public NeedPojo()
   {
 
@@ -55,6 +57,7 @@ public class NeedPojo
 
   public NeedPojo(URI needUri, final Model model)
   {
+    this.needURI = needUri.toString();
     Resource need = model.getResource(needUri.toString());
     creationDate = need.getProperty(WON.NEED_CREATION_DATE).getString();
 
@@ -314,4 +317,14 @@ public class NeedPojo
   {
     this.recurInfiniteTimes = recurInfiniteTimes;
   }
+
+    public long getNeedId()
+    {
+        return needId;
+    }
+
+    public void setNeedId(long needId)
+    {
+        this.needId = needId;
+    }
 }
