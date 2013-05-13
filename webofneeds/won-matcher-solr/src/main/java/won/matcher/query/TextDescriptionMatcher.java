@@ -203,8 +203,13 @@ public class TextDescriptionMatcher
 
   private Model convertNTriplesToModel(String ntriples)
   {
-    Model model = ModelFactory.createDefaultModel();
-    model.read(new StringReader(ntriples), WON.getURI(), "N-TRIPLES");
+      Model model = ModelFactory.createDefaultModel();
+      try {
+        model.read(new StringReader(ntriples), WON.getURI(), "N-TRIPLES");
+    } catch (Exception e) {
+        logger.debug("could not convert ntriples to model",e);
+        logger.debug("triples were:\n{}", ntriples);
+    }
     return model;
   }
 
