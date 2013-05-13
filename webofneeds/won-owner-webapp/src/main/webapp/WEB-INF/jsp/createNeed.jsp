@@ -58,13 +58,6 @@
                 <td><form:input path="currency" /></td>
             </tr>
             <tr>
-                <td><form:label path="deliveryMethod">Delivery method</form:label> </td>
-                <td><form:select path="deliveryMethod">
-                    <form:options items="${enumValues}" />
-                </form:select></td>
-            </tr>
-
-            <tr>
                 <td><form:label path="latitude">Latitude:</form:label></td>
                 <td><form:input path="latitude" /></td>
             </tr>
