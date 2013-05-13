@@ -143,6 +143,15 @@
     
 
 
+    <!-- http://purl.org/webofneeds/model#hasEventStatement -->
+
+    <owl:ObjectProperty rdf:about="&won;hasEventStatement">
+        <rdfs:domain rdf:resource="&won;Event"/>
+        <rdfs:range rdf:resource="&owl;Thing"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://purl.org/webofneeds/model#hasHeight -->
 
     <owl:ObjectProperty rdf:about="&won;hasHeight">
@@ -377,8 +386,6 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasTextDescription">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:domain rdf:resource="&won;NeedContent"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 

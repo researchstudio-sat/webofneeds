@@ -551,6 +551,32 @@ public class Validator
     assertEquals("wrong number of results", 2, actualList.size());
   }
 
+  @Test
+  public void testCQEventStatement1()
+  {
+    System.out.println("executing queries...");
+    String queryString = sparqlPreface +
+        "SELECT ?event ?eventStatement WHERE {?event rdf:type won:Event. " +
+        "?event won:hasEventStatement ?eventStatement" +
+        "}";
+    Query query = QueryFactory.create(queryString);
+    QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
+    List<String> actualList = new ArrayList<String>();
+    try {
+      ResultSet results = qExec.execSelect();
+      for (; results.hasNext(); ) {
+        QuerySolution soln = results.nextSolution();
+        actualList.add(soln.toString());
+      }
+    } finally {
+      qExec.close();
+    }
+    String expected1 = "( ?event = <http://purl.org/webofneeds/example#Hint_01_1> ) " +
+        "( ?eventStatement = <http://purl.org/webofneeds/example#MatchExplanation_01> )";
+    assertThat(actualList, hasItems(expected1));
+    assertEquals("wrong number of results", 1, actualList.size());
+  }
+
   /**
    * This method is for testing the queries. Just rename it to main and execute.
    *
@@ -562,8 +588,8 @@ public class Validator
     System.out.println("executing queries...");
 
     String queryString = sparqlPreface +
-        "SELECT ?event ?time WHERE {?event rdf:type won:Hint. " +
-        "?event won:hasTimeStamp ?time" +
+        "SELECT ?event ?eventStatement WHERE {?event rdf:type won:Event. " +
+        "?event won:hasEventStatement ?eventStatement" +
         "}";
     Query query = QueryFactory.create(queryString);
     QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);

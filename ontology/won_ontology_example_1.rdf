@@ -231,11 +231,47 @@
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/webofneeds/example#hasMatchExplanation -->
+
+    <owl:DatatypeProperty rdf:about="&wonex;hasMatchExplanation">
+        <rdfs:domain rdf:resource="&wonex;MatchExplanation"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topDataProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/example#hasMatchScore -->
+
+    <owl:DatatypeProperty rdf:about="&wonex;hasMatchScore">
+        <rdfs:domain rdf:resource="&wonex;MatchExplanation"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
     // Classes
     //
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://purl.org/webofneeds/example#MatchExplanation -->
+
+    <owl:Class rdf:about="&wonex;MatchExplanation"/>
     
 
 
@@ -404,7 +440,18 @@
     <owl:NamedIndividual rdf:about="&wonex;Hint_01_1">
         <rdf:type rdf:resource="&won;Hint"/>
         <won:hasTimeStamp rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:05+02:00</won:hasTimeStamp>
+        <won:hasEventStatement rdf:resource="&wonex;MatchExplanation_01"/>
         <won:hasOriginator rdf:resource="&wonex;Matcher_01"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://purl.org/webofneeds/example#MatchExplanation_01 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;MatchExplanation_01">
+        <rdf:type rdf:resource="&wonex;MatchExplanation"/>
+        <hasMatchScore rdf:datatype="&xsd;float">0.74</hasMatchScore>
+        <hasMatchExplanation rdf:datatype="&xsd;string">Dimensions are within 10% threshold.</hasMatchExplanation>
     </owl:NamedIndividual>
     
 

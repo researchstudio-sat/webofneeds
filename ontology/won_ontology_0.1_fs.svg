@@ -45,20 +45,22 @@ won:EventContainer</text>
 won:Connection</text>
 <rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="109" x="667" y="638"/>
 <rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="109" x="667" y="659"/>
-<rect fill="#ffffff" height="88" stroke="#ffffff" stroke-width="1" width="240" x="872" y="774"/>
-<rect fill="none" height="88" stroke="#000000" stroke-width="1" width="240" x="872" y="774"/>
-<text font-family="Dialog" font-size="12" x="964" y="788">
+<rect fill="#ffffff" height="105" stroke="#ffffff" stroke-width="1" width="240" x="867" y="782"/>
+<rect fill="none" height="105" stroke="#000000" stroke-width="1" width="240" x="867" y="782"/>
+<text font-family="Dialog" font-size="12" x="959" y="796">
 won:Event</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="240" x="872" y="798"/>
-<text font-family="Dialog" font-size="12" x="876" y="813">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="240" x="867" y="806"/>
+<text font-family="Dialog" font-size="12" x="871" y="821">
 won:hasTimeStamp : xsd:DateTimeStamp</text>
-<text font-family="Dialog" font-size="12" x="876" y="830">
+<text font-family="Dialog" font-size="12" x="871" y="838">
 won:hasOriginator : rdfs:Ressource</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="240" x="872" y="840"/>
-<polyline fill="none" points="995,665 995,774" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="988" x2="995" y1="762" y2="774"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="1002" x2="995" y1="762" y2="774"/>
-<text font-family="Dialog" font-size="12" x="998" y="724">
+<text font-family="Dialog" font-size="12" x="871" y="855">
+won:hasEventStatement : owl:Thing</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="240" x="867" y="865"/>
+<polyline fill="none" points="995,665 995,782" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="988" x2="995" y1="770" y2="782"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1002" x2="995" y1="770" y2="782"/>
+<text font-family="Dialog" font-size="12" x="998" y="728">
 rdfs:member</text>
 <polyline fill="none" points="775,630 931,630" stroke="#000000" stroke-width="1"/>
 <line fill="#000000" stroke="#000000" stroke-width="1" x1="919" x2="931" y1="637" y2="630"/>
@@ -82,21 +84,21 @@ won:Close</text>
 won:Open</text>
 <rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="95" x="947" y="934"/>
 <rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="95" x="947" y="955"/>
-<polyline fill="none" points="1083,910 1083,861" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="1083,861 1090,873 1076,873" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="1083,861 1090,873 1076,873" stroke="#000000" stroke-width="1"/>
-<polyline fill="none" points="995,910 995,861" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="995,861 1002,873 988,873" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="995,861 1002,873 988,873" stroke="#000000" stroke-width="1"/>
+<polyline fill="none" points="1083,910 1083,886" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="1083,886 1090,898 1076,898" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="1083,886 1090,898 1076,898" stroke="#000000" stroke-width="1"/>
+<polyline fill="none" points="995,910 995,886" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="995,886 1002,898 988,898" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="995,886 1002,898 988,898" stroke="#000000" stroke-width="1"/>
 <rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="94" x="835" y="910"/>
 <rect fill="none" height="67" stroke="#000000" stroke-width="1" width="94" x="835" y="910"/>
 <text font-family="Dialog" font-size="12" x="858" y="924">
 won:Hint</text>
 <rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="94" x="835" y="934"/>
 <rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="94" x="835" y="955"/>
-<polyline fill="none" points="897,910 897,861" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="897,861 904,873 890,873" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="897,861 904,873 890,873" stroke="#000000" stroke-width="1"/>
+<polyline fill="none" points="897,910 897,886" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="897,886 904,898 890,898" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="897,886 904,898 890,898" stroke="#000000" stroke-width="1"/>
 <rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="80" x="635" y="14"/>
 <rect fill="none" height="68" stroke="#000000" stroke-width="1" width="80" x="635" y="14"/>
 <text font-family="Dialog" font-size="12" x="648" y="28">
