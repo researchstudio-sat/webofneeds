@@ -77,7 +77,7 @@ public class WON
   public static final Property OCCURED_AT = m.createProperty(BASE_URI, "occuredAt");
   public static final Property HAS_ORIGINATOR = m.createProperty(BASE_URI, "hasOriginator");
 
-  public static final Property HAS_NEED_MODALITY = m.createProperty(BASE_URI, "hasMeedModality");
+  public static final Property HAS_NEED_MODALITY = m.createProperty(BASE_URI, "hasNeedModality");
   public static final Resource NEED_MODALITY = m.createResource(BASE_URI + "NeedModality");
 
   public static final Property HAS_PRICE_SPECIFICATION = m.createProperty(BASE_URI, "hasPriceSpecification");
