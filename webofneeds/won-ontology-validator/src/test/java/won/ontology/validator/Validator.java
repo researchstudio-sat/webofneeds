@@ -46,8 +46,8 @@ public class Validator
   private final static String WON_ONTOLOGY_FILE = "/won_ontology_v0.11.rdf";
   private final static String EXAMPLE_ONTOLOGY_FILE = "/won_ontology_example_1.rdf";
 
-  private final static String WON_ONTOLOGY_URI = "http://www.webofneeds.org/model#";
-  private final static String EXAMPLE_ONTOLOGY_URI = "http://www.webofneeds.org/example#";
+  private final static String WON_ONTOLOGY_URI = "http://purl.org/webofneeds/model#";
+  private final static String EXAMPLE_ONTOLOGY_URI = "http://purl.org/webofneeds/example#";
 
 
   private static OntModel ontModel;
@@ -76,7 +76,7 @@ public class Validator
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?event ?time WHERE {?event rdf:type won:Hint. " +
-        "?event won:occurredAt ?time}";
+        "?event won:hasTimeStamp ?time}";
     Query query = QueryFactory.create(queryString);
     QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
     List<String> actualList = new ArrayList<String>();
@@ -118,8 +118,8 @@ public class Validator
       qExec.close();
     }
     assertTrue("wrong number of results", actualList.size() >= 1);
-    String expected1 = "( ?event = <http://www.webofneeds.org/example#Open_01_1> ) ( ?eventType = <http://www.webofneeds.org/model#Open> )";
-    String expected2 = "( ?event = <http://www.webofneeds.org/example#Hint_01_1> ) ( ?eventType = <http://www.webofneeds.org/model#Hint> )";
+    String expected1 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Open_01_1> ) ( ?eventType = <" + WON_ONTOLOGY_URI + "Open> )";
+    String expected2 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Hint_01_1> ) ( ?eventType = <" + WON_ONTOLOGY_URI + "Hint> )";
     assertThat(actualList, hasItems(expected1, expected2));
   }
 
@@ -146,8 +146,8 @@ public class Validator
       qExec.close();
     }
     assertEquals("wrong number of results", 2, actualList.size());
-    String expected1 = "( ?event = <http://www.webofneeds.org/example#Open_01_1> ) ( ?originator = <http://www.webofneeds.org/example#NeedOwner_1> )";
-    String expected2 = "( ?event = <http://www.webofneeds.org/example#Hint_01_1> ) ( ?originator = <http://www.webofneeds.org/example#Matcher_01> )";
+    String expected1 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Open_01_1> ) ( ?originator = <" + EXAMPLE_ONTOLOGY_URI + "NeedOwner_1> )";
+    String expected2 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Hint_01_1> ) ( ?originator = <" + EXAMPLE_ONTOLOGY_URI + "Matcher_01> )";
     assertThat(actualList, hasItems(expected1, expected2));
   }
 
@@ -156,10 +156,9 @@ public class Validator
   {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
-        "SELECT ?need ?needModality ?delivery ?price ?currency ?lowerPrice ?upperPrice WHERE {" +
+        "SELECT ?need ?needModality ?price ?currency ?lowerPrice ?upperPrice WHERE {" +
         "?need rdf:type won:Need. " +
         "?need won:hasNeedModality ?needModality." +
-        "?needModality gr:availableDeliveryMethods ?delivery." +
         "?needModality won:hasPriceSpecification ?price." +
         "?price won:hasCurrency ?currency." +
         "?price won:hasLowerPriceLimit ?lowerPrice." +
@@ -178,16 +177,14 @@ public class Validator
     } finally {
       qExec.close();
     }
-    String expected1 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
-        "( ?delivery = <http://purl.org/goodrelations/v1#DeliveryModePickUp> ) " +
-        "( ?price = <http://www.webofneeds.org/example#PriceSpecification_01_1> ) " +
+    String expected1 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_1> ) " +
+        "( ?price = <" + EXAMPLE_ONTOLOGY_URI + "PriceSpecification_01_1> ) " +
         "( ?currency = \"EUR\"^^xsd:string ) ( ?lowerPrice = \"100.0\"^^xsd:float ) " +
         "( ?upperPrice = \"100.0\"^^xsd:float )";
-    String expected2 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_2> ) " +
-        "( ?delivery = <http://purl.org/goodrelations/v1#DeliveryModeFreight> ) " +
-        "( ?price = <http://www.webofneeds.org/example#PriceSpecification_01_2> ) " +
+    String expected2 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_2> ) " +
+        "( ?price = <" + EXAMPLE_ONTOLOGY_URI + "PriceSpecification_01_2> ) " +
         "( ?currency = \"EUR\"^^xsd:string ) ( ?lowerPrice = \"130.0\"^^xsd:float ) " +
         "( ?upperPrice = \"130.0\"^^xsd:float )";
     assertThat(actualList, hasItems(expected1, expected2));
@@ -201,8 +198,8 @@ public class Validator
         "SELECT ?need ?text ?description WHERE {" +
         "?need rdf:type won:Need. " +
         "?need won:hasContent ?content." +
-        "?content won:textDescription ?text." +
-        "?content won:contentDescription ?description." +
+        "?content won:hasTextDescription ?text." +
+        "?content won:hasContentDescription ?description." +
         "}";
     Query query = QueryFactory.create(queryString);
     QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
@@ -217,9 +214,9 @@ public class Validator
       qExec.close();
     }
     assertEquals("wrong number of results", 1, actualList.size());
-    String expected = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
+    String expected = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
         "( ?text = \"rote Couch mit integrierter Mäusefalle\"^^xsd:string ) " +
-        "( ?description = <http://www.webofneeds.org/example#MyCouch> )";
+        "( ?description = <" + EXAMPLE_ONTOLOGY_URI + "MyCouch> )";
     assertThat(actualList, hasItems(expected));
   }
 
@@ -231,7 +228,7 @@ public class Validator
         "SELECT ?need ?descType WHERE {" +
         "?need rdf:type won:Need. " +
         "?need won:hasContent ?content." +
-        "?content won:contentDescription ?description." +
+        "?content won:hasContentDescription ?description." +
         "?description rdf:type ?descType." +
         "}";
     Query query = QueryFactory.create(queryString);
@@ -246,7 +243,7 @@ public class Validator
     } finally {
       qExec.close();
     }
-    String expected = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
+    String expected = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
         "( ?descType = <http://www.freebase.com/m/02crq1> )";
     assertThat(actualList, hasItems(expected));
   }
@@ -260,16 +257,16 @@ public class Validator
         "?depth ?depthV ?depthM ?weight ?weightV ?weightM WHERE {" +
         "?need rdf:type won:Need. " +
         "?need won:hasContent ?content." +
-        "?content won:height ?height." +
+        "?content won:hasHeight ?height." +
         "?height gr:hasValue ?heightV." +
         "?height gr:hasUnitOfMeasurement ?heightM." +
-        "?content won:width ?width." +
+        "?content won:hasWidth ?width." +
         "?width gr:hasValue ?widthV." +
         "?width gr:hasUnitOfMeasurement ?widthM." +
-        "?content won:depth ?depth." +
+        "?content won:hasDepth ?depth." +
         "?depth gr:hasValue ?depthV." +
         "?depth gr:hasUnitOfMeasurement ?depthM." +
-        "?content won:weight ?weight." +
+        "?content won:hasWeight ?weight." +
         "?weight gr:hasValue ?weightV." +
         "?weight gr:hasUnitOfMeasurement ?weightM." +
         "}";
@@ -286,12 +283,12 @@ public class Validator
       qExec.close();
     }
     assertEquals("wrong number of results", 1, actualList.size());
-    String expected = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?height = <http://www.webofneeds.org/example#CouchHeight> ) ( ?heightV = \"50\"^^rdfs:Literal ) " +
-        "( ?heightM = \"cm\"^^xsd:string ) ( ?width = <http://www.webofneeds.org/example#CouchWidth> ) " +
+    String expected = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?height = <" + EXAMPLE_ONTOLOGY_URI + "CouchHeight> ) ( ?heightV = \"50\"^^rdfs:Literal ) " +
+        "( ?heightM = \"cm\"^^xsd:string ) ( ?width = <" + EXAMPLE_ONTOLOGY_URI + "CouchWidth> ) " +
         "( ?widthV = \"250\"^^rdfs:Literal ) ( ?widthM = \"cm\"^^xsd:string ) " +
-        "( ?depth = <http://www.webofneeds.org/example#CouchDepth> ) ( ?depthV = \"50\"^^rdfs:Literal ) " +
-        "( ?depthM = \"cm\"^^xsd:string ) ( ?weight = <http://www.webofneeds.org/example#CouchWeight> ) " +
+        "( ?depth = <" + EXAMPLE_ONTOLOGY_URI + "CouchDepth> ) ( ?depthV = \"50\"^^rdfs:Literal ) " +
+        "( ?depthM = \"cm\"^^xsd:string ) ( ?weight = <" + EXAMPLE_ONTOLOGY_URI + "CouchWeight> ) " +
         "( ?weightV = \"120\"^^rdfs:Literal ) ( ?weightM = \"kg\"^^xsd:string )";
     assertThat(actualList, hasItems(expected));
   }
@@ -304,10 +301,10 @@ public class Validator
         "SELECT ?need ?height ?width ?depth ?weight WHERE {" +
         "?need rdf:type won:Need. " +
         "?need won:hasContent ?content." +
-        "?content won:height ?height." +
-        "?content won:width ?width." +
-        "?content won:depth ?depth." +
-        "?content won:weight ?weight." +
+        "?content won:hasHeight ?height." +
+        "?content won:hasWidth ?width." +
+        "?content won:hasDepth ?depth." +
+        "?content won:hasWeight ?weight." +
         "}";
     Query query = QueryFactory.create(queryString);
     QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
@@ -322,11 +319,11 @@ public class Validator
       qExec.close();
     }
     assertEquals("wrong number of results", 1, actualList.size());
-    String expected = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?height = <http://www.webofneeds.org/example#CouchHeight> ) " +
-        "( ?width = <http://www.webofneeds.org/example#CouchWidth> ) " +
-        "( ?depth = <http://www.webofneeds.org/example#CouchDepth> ) " +
-        "( ?weight = <http://www.webofneeds.org/example#CouchWeight> )";
+    String expected = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?height = <" + EXAMPLE_ONTOLOGY_URI + "CouchHeight> ) " +
+        "( ?width = <" + EXAMPLE_ONTOLOGY_URI + "CouchWidth> ) " +
+        "( ?depth = <" + EXAMPLE_ONTOLOGY_URI + "CouchDepth> ) " +
+        "( ?weight = <" + EXAMPLE_ONTOLOGY_URI + "CouchWeight> )";
     assertThat(actualList, hasItems(expected));
   }
 
@@ -352,9 +349,9 @@ public class Validator
       qExec.close();
     }
     assertEquals("wrong number of results", 2, actualList.size());
-    String expected1 = "( ?need = <http://www.webofneeds.org/example#Need_02> ) " +
+    String expected1 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_02> ) " +
         "( ?creationDate = \"2013-03-20T14:29:00+02:00\"^^xsd:dateTimeStamp )";
-    String expected2 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
+    String expected2 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
         "( ?creationDate = \"2013-04-04T07:26:00+02:00\"^^xsd:dateTimeStamp )";
     assertThat(actualList, hasItems(expected1, expected2));
   }
@@ -382,46 +379,46 @@ public class Validator
     } finally {
       qExec.close();
     }
-    String expected1 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
-        "( ?timeConstraint = <http://www.webofneeds.org/example#TimeConstraint_01_1_2> ) " +
-        "( ?p = <http://www.webofneeds.org/model#recurIn> ) ( ?o = \"P7D\"^^xsd:duration )";
-    String expected2 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
-        "( ?timeConstraint = <http://www.webofneeds.org/example#TimeConstraint_01_1_2> ) " +
-        "( ?p = <http://www.webofneeds.org/model#endTime> ) ( ?o = \"2013-04-05T17:00:00+02:00\"^^xsd:dateTimeStamp )";
-    String expected3 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
-        "( ?timeConstraint = <http://www.webofneeds.org/example#TimeConstraint_01_1_2> ) " +
-        "( ?p = <http://www.webofneeds.org/model#startTime> ) ( ?o = \"2013-04-05T09:00:00+02:00\"^^xsd:dateTimeStamp )";
-    String expected4 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
-        "( ?timeConstraint = <http://www.webofneeds.org/example#TimeConstraint_01_1_2> ) " +
-        "( ?p = <http://www.webofneeds.org/model#recurTimes> ) ( ?o = 0 )";
-    String expected5 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
-        "( ?timeConstraint = <http://www.webofneeds.org/example#TimeConstraint_01_1_1> ) " +
-        "( ?p = <http://www.webofneeds.org/model#recurIn> ) ( ?o = \"P7D\"^^xsd:duration )";
-    String expected6 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
-        "( ?timeConstraint = <http://www.webofneeds.org/example#TimeConstraint_01_1_1> ) " +
-        "( ?p = <http://www.webofneeds.org/model#endTime> ) ( ?o = \"2013-04-04T17:00:00+02:00\"^^xsd:dateTimeStamp )";
-    String expected7 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
-        "( ?timeConstraint = <http://www.webofneeds.org/example#TimeConstraint_01_1_1> ) " +
-        "( ?p = <http://www.webofneeds.org/model#startTime> ) ( ?o = \"2013-04-04T09:00:00+02:00\"^^xsd:dateTimeStamp )";
-    String expected8 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
-        "( ?timeConstraint = <http://www.webofneeds.org/example#TimeConstraint_01_1_1> ) " +
-        "( ?p = <http://www.webofneeds.org/model#recurTimes> ) ( ?o = 0 )";
-    String expected9 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_2> ) " +
-        "( ?timeConstraint = <http://www.webofneeds.org/example#TimeConstraint_01_2> ) " +
-        "( ?p = <http://www.webofneeds.org/model#endTime> ) ( ?o = \"2013-05-04T09:00:00+02:00\"^^xsd:dateTimeStamp )";
-    String expected10 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_2> ) " +
-        "( ?timeConstraint = <http://www.webofneeds.org/example#TimeConstraint_01_2> ) " +
-        "( ?p = <http://www.webofneeds.org/model#startTime> ) ( ?o = \"2013-04-04T09:00:00+02:00\"^^xsd:dateTimeStamp )";
+    String expected1 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_1> ) " +
+        "( ?timeConstraint = <" + EXAMPLE_ONTOLOGY_URI + "TimeConstraint_01_1_2> ) " +
+        "( ?p = <" + WON_ONTOLOGY_URI + "recurIn> ) ( ?o = \"P7D\"^^xsd:duration )";
+    String expected2 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_1> ) " +
+        "( ?timeConstraint = <" + EXAMPLE_ONTOLOGY_URI + "TimeConstraint_01_1_2> ) " +
+        "( ?p = <" + WON_ONTOLOGY_URI + "endTime> ) ( ?o = \"2013-04-05T17:00:00+02:00\"^^xsd:dateTimeStamp )";
+    String expected3 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_1> ) " +
+        "( ?timeConstraint = <" + EXAMPLE_ONTOLOGY_URI + "TimeConstraint_01_1_2> ) " +
+        "( ?p = <" + WON_ONTOLOGY_URI + "startTime> ) ( ?o = \"2013-04-05T09:00:00+02:00\"^^xsd:dateTimeStamp )";
+    String expected4 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_1> ) " +
+        "( ?timeConstraint = <" + EXAMPLE_ONTOLOGY_URI + "TimeConstraint_01_1_2> ) " +
+        "( ?p = <" + WON_ONTOLOGY_URI + "recurTimes> ) ( ?o = 0 )";
+    String expected5 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_1> ) " +
+        "( ?timeConstraint = <" + EXAMPLE_ONTOLOGY_URI + "TimeConstraint_01_1_1> ) " +
+        "( ?p = <" + WON_ONTOLOGY_URI + "recurIn> ) ( ?o = \"P7D\"^^xsd:duration )";
+    String expected6 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_1> ) " +
+        "( ?timeConstraint = <" + EXAMPLE_ONTOLOGY_URI + "TimeConstraint_01_1_1> ) " +
+        "( ?p = <" + WON_ONTOLOGY_URI + "endTime> ) ( ?o = \"2013-04-04T17:00:00+02:00\"^^xsd:dateTimeStamp )";
+    String expected7 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_1> ) " +
+        "( ?timeConstraint = <" + EXAMPLE_ONTOLOGY_URI + "TimeConstraint_01_1_1> ) " +
+        "( ?p = <" + WON_ONTOLOGY_URI + "startTime> ) ( ?o = \"2013-04-04T09:00:00+02:00\"^^xsd:dateTimeStamp )";
+    String expected8 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_1> ) " +
+        "( ?timeConstraint = <" + EXAMPLE_ONTOLOGY_URI + "TimeConstraint_01_1_1> ) " +
+        "( ?p = <" + WON_ONTOLOGY_URI + "recurTimes> ) ( ?o = 0 )";
+    String expected9 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_2> ) " +
+        "( ?timeConstraint = <" + EXAMPLE_ONTOLOGY_URI + "TimeConstraint_01_2> ) " +
+        "( ?p = <" + WON_ONTOLOGY_URI + "endTime> ) ( ?o = \"2013-05-04T09:00:00+02:00\"^^xsd:dateTimeStamp )";
+    String expected10 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_2> ) " +
+        "( ?timeConstraint = <" + EXAMPLE_ONTOLOGY_URI + "TimeConstraint_01_2> ) " +
+        "( ?p = <" + WON_ONTOLOGY_URI + "startTime> ) ( ?o = \"2013-04-04T09:00:00+02:00\"^^xsd:dateTimeStamp )";
     assertThat(actualList, hasItems(expected1, expected2, expected3, expected4, expected5, expected6, expected7,
         expected8, expected9, expected10));
   }
@@ -449,20 +446,20 @@ public class Validator
     } finally {
       qExec.close();
     }
-    String expected1 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
-        "( ?location = <http://www.webofneeds.org/example#Thurngasse_8> ) " +
+    String expected1 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_1> ) " +
+        "( ?location = <" + EXAMPLE_ONTOLOGY_URI + "Thurngasse_8> ) " +
         "( ?p = <http://www.w3.org/2003/01/geo/wgs84_pos#latitude> ) " +
         "( ?o = \"48.218746\"^^xsd:float )";
-    String expected2 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_1> ) " +
-        "( ?location = <http://www.webofneeds.org/example#Thurngasse_8> ) " +
+    String expected2 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_1> ) " +
+        "( ?location = <" + EXAMPLE_ONTOLOGY_URI + "Thurngasse_8> ) " +
         "( ?p = <http://www.w3.org/2003/01/geo/wgs84_pos#longitude> ) " +
         "( ?o = \"16.360283\"^^xsd:float )";
-    String expected3 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?needModality = <http://www.webofneeds.org/example#NeedModality_01_2> ) " +
-        "( ?location = <http://www.webofneeds.org/example#Österreich> ) " +
-        "( ?p = <http://www.webofneeds.org/model#hasISOCode> ) ( ?o = \"AT\"^^xsd:string )";
+    String expected3 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_2> ) " +
+        "( ?location = <" + EXAMPLE_ONTOLOGY_URI + "Österreich> ) " +
+        "( ?p = <" + WON_ONTOLOGY_URI + "hasISOCode> ) ( ?o = \"AT\"^^xsd:string )";
     assertThat(actualList, hasItems(expected1, expected2, expected3));
   }
 
@@ -490,10 +487,10 @@ public class Validator
       qExec.close();
     }
     assertEquals("wrong number of results", 2, actualList.size());
-    String expected1 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?location = <http://www.webofneeds.org/example#Thurngasse_8> ) ( ?concealed = true )";
-    String expected2 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?location = <http://www.webofneeds.org/example#Österreich> ) ( ?concealed = false )";
+    String expected1 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?location = <" + EXAMPLE_ONTOLOGY_URI + "Thurngasse_8> ) ( ?concealed = true )";
+    String expected2 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?location = <" + EXAMPLE_ONTOLOGY_URI + "Österreich> ) ( ?concealed = false )";
     assertThat(actualList, hasItems(expected1, expected2));
   }
 
@@ -519,8 +516,8 @@ public class Validator
       qExec.close();
     }
     assertEquals("wrong number of results", 1, actualList.size());
-    String expected = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?owner = <http://www.webofneeds.org/example#NeedOwner_1> )";
+    String expected = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?owner = <" + EXAMPLE_ONTOLOGY_URI + "NeedOwner_1> )";
     assertThat(actualList, hasItems(expected));
   }
 
@@ -546,10 +543,10 @@ public class Validator
     } finally {
       qExec.close();
     }
-    String expected1 = "( ?need = <http://www.webofneeds.org/example#Need_02> ) " +
-        "( ?state = <http://www.webofneeds.org/model#Active> )";
-    String expected2 = "( ?need = <http://www.webofneeds.org/example#Need_01> ) " +
-        "( ?state = <http://www.webofneeds.org/model#Active> )";
+    String expected1 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_02> ) " +
+        "( ?state = <" + WON_ONTOLOGY_URI + "Active> )";
+    String expected2 = "( ?need = <" + EXAMPLE_ONTOLOGY_URI + "Need_01> ) " +
+        "( ?state = <" + WON_ONTOLOGY_URI + "Active> )";
     assertThat(actualList, hasItems(expected1, expected2));
     assertEquals("wrong number of results", 2, actualList.size());
   }
@@ -565,10 +562,8 @@ public class Validator
     System.out.println("executing queries...");
 
     String queryString = sparqlPreface +
-        "SELECT ?need ?state WHERE {" +
-        "?need rdf:type won:Need. " +
-        "?need won:isInState ?state." +
-        "?state rdf:type won:NeedState." +
+        "SELECT ?event ?time WHERE {?event rdf:type won:Hint. " +
+        "?event won:hasTimeStamp ?time" +
         "}";
     Query query = QueryFactory.create(queryString);
     QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);

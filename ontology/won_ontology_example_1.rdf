@@ -403,7 +403,7 @@
 
     <owl:NamedIndividual rdf:about="&wonex;Hint_01_1">
         <rdf:type rdf:resource="&won;Hint"/>
-        <won:occurredAt rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:05+02:00</won:occurredAt>
+        <won:hasTimeStamp rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:05+02:00</won:hasTimeStamp>
         <won:hasOriginator rdf:resource="&wonex;Matcher_01"/>
     </owl:NamedIndividual>
     

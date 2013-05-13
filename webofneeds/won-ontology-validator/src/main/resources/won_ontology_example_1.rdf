@@ -3,6 +3,7 @@
 
 <!DOCTYPE rdf:RDF [
     <!ENTITY schema "http://schema.org/" >
+    <!ENTITY terms "http://purl.org/dc/terms/" >
     <!ENTITY all "http://schema.rdfs.org/all#" >
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
     <!ENTITY v1 "http://purl.org/goodrelations/v1#" >
@@ -22,6 +23,7 @@
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:wonex="http://purl.org/webofneeds/example#"
      xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#"
+     xmlns:terms="http://purl.org/dc/terms/"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -43,6 +45,12 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://purl.org/dc/terms/title -->
+
+    <owl:AnnotationProperty rdf:about="&terms;title"/>
     
 
 
@@ -172,9 +180,9 @@
     
 
 
-    <!-- http://purl.org/webofneeds/model#creationDate -->
+    <!-- http://purl.org/webofneeds/model#needCreationDate -->
 
-    <owl:AnnotationProperty rdf:about="&won;creationDate"/>
+    <owl:AnnotationProperty rdf:about="&won;needCreationDate"/>
     
 
 
@@ -395,7 +403,7 @@
 
     <owl:NamedIndividual rdf:about="&wonex;Hint_01_1">
         <rdf:type rdf:resource="&won;Hint"/>
-        <won:occurredAt rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:05+02:00</won:occurredAt>
+        <won:hasTimeStamp rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:05+02:00</won:hasTimeStamp>
         <won:hasOriginator rdf:resource="&wonex;Matcher_01"/>
     </owl:NamedIndividual>
     
@@ -420,12 +428,14 @@
     <!-- http://purl.org/webofneeds/example#NeedContent_01 -->
 
     <owl:NamedIndividual rdf:about="&wonex;NeedContent_01">
-        <won:textDescription rdf:datatype="&xsd;string">rote Couch mit integrierter Mäusefalle</won:textDescription>
-        <won:depth rdf:resource="&wonex;CouchDepth"/>
-        <won:height rdf:resource="&wonex;CouchHeight"/>
-        <won:weight rdf:resource="&wonex;CouchWeight"/>
-        <won:width rdf:resource="&wonex;CouchWidth"/>
-        <won:contentDescription rdf:resource="&wonex;MyCouch"/>
+        <terms:title rdf:datatype="&rdfs;Literal">Couch</terms:title>
+        <terms:title rdf:datatype="&xsd;string">Couch</terms:title>
+        <won:hasTextDescription rdf:datatype="&xsd;string">rote Couch mit integrierter Mäusefalle</won:hasTextDescription>
+        <won:hasDepth rdf:resource="&wonex;CouchDepth"/>
+        <won:hasHeight rdf:resource="&wonex;CouchHeight"/>
+        <won:hasWeight rdf:resource="&wonex;CouchWeight"/>
+        <won:hasWidth rdf:resource="&wonex;CouchWidth"/>
+        <won:hasContentDescription rdf:resource="&wonex;MyCouch"/>
     </owl:NamedIndividual>
     
 
@@ -434,7 +444,6 @@
 
     <owl:NamedIndividual rdf:about="&wonex;NeedModality_01_1">
         <rdf:type rdf:resource="&won;NeedModality"/>
-        <v1:availableDeliveryMethods rdf:resource="&v1;DeliveryModePickUp"/>
         <won:hasPriceSpecification rdf:resource="&wonex;PriceSpecification_01_1"/>
         <won:availableAtLocation rdf:resource="&wonex;Thurngasse_8"/>
         <won:availableAtTime rdf:resource="&wonex;TimeConstraint_01_1_1"/>
@@ -447,7 +456,6 @@
 
     <owl:NamedIndividual rdf:about="&wonex;NeedModality_01_2">
         <rdf:type rdf:resource="&won;NeedModality"/>
-        <v1:availableDeliveryMethods rdf:resource="&v1;DeliveryModeFreight"/>
         <won:hasPriceSpecification rdf:resource="&wonex;PriceSpecification_01_2"/>
         <won:availableAtTime rdf:resource="&wonex;TimeConstraint_01_2"/>
         <won:availableAtLocation rdf:resource="&wonex;Österreich"/>
@@ -468,7 +476,7 @@
 
     <owl:NamedIndividual rdf:about="&wonex;Need_01">
         <rdf:type rdf:resource="&won;Need"/>
-        <won:creationDate rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:00+02:00</won:creationDate>
+        <won:needCreationDate rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:00+02:00</won:needCreationDate>
         <won:hasConnections rdf:resource="&wonex;Connections_01"/>
         <won:hasContent rdf:resource="&wonex;NeedContent_01"/>
         <won:hasNeedModality rdf:resource="&wonex;NeedModality_01_1"/>
@@ -484,7 +492,7 @@
 
     <owl:NamedIndividual rdf:about="&wonex;Need_02">
         <rdf:type rdf:resource="&won;Need"/>
-        <won:creationDate rdf:datatype="&xsd;dateTimeStamp">2013-03-20T14:29:00+02:00</won:creationDate>
+        <won:needCreationDate rdf:datatype="&xsd;dateTimeStamp">2013-03-20T14:29:00+02:00</won:needCreationDate>
         <won:hasConnections rdf:resource="&wonex;Connections_02"/>
         <won:isInState rdf:resource="&won;Active"/>
         <won:hasBasicNeedType rdf:resource="&won;Take"/>
