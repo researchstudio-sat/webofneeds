@@ -74,9 +74,9 @@
     var refresh = function(){
         document.getElementById("iMatches").contentDocument.location.reload(true);
         document.getElementById("iConnections").contentDocument.location.reload(true);
-        setTimeout(refresh, 2000);
+        setTimeout(refresh, 15000);
     };
-    setTimeout(refresh, 2000);
+    setTimeout(refresh, 15000);
 </script>
 </body>
 </html>
