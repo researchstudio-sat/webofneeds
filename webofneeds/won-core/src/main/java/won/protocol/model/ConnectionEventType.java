@@ -34,8 +34,6 @@ public enum ConnectionEventType
   PARTNER_CLOSE("Close",  ConnectionState.PREPARED, ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
           ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED),
 
-  OWNER_PREPARE("Prepare", ConnectionState.SUGGESTED),
-
   OWNER_OPEN("Open", ConnectionState.REQUEST_RECEIVED, ConnectionState.PREPARED),
   PARTNER_OPEN("Open", ConnectionState.REQUEST_SENT, ConnectionState.PREPARED),
 

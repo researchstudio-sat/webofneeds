@@ -101,7 +101,6 @@ public class WON
 
   // Resource individuals
   public static final Resource EVENT_TYPE_CLOSE = m.createResource(ConnectionEventType.OWNER_CLOSE.getURI().toString());
-  public static final Resource EVENT_TYPE_PREPARE = m.createResource(ConnectionEventType.OWNER_PREPARE.getURI().toString());
   public static final Resource EVENT_TYPE_OPEN = m.createResource(ConnectionEventType.OWNER_OPEN.getURI().toString());
   public static final Resource EVENT_TYPE_HINT = m.createResource(ConnectionEventType.MATCHER_HINT.getURI().toString());
 
@@ -184,8 +183,6 @@ public class WON
       case OWNER_OPEN:
       case PARTNER_OPEN:
         return EVENT_TYPE_OPEN;
-      case OWNER_PREPARE:
-        return EVENT_TYPE_PREPARE;
       default:
         throw new IllegalStateException("No such case specified for " + type.name());
     }
