@@ -1,13 +1,14 @@
-package won.owner;
+package won.owner.ws;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.service.impl.URIService;
-import won.owner.ws.OwnerProtocolNeedWebServiceClient;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.vocabulary.WON;
+import won.protocol.ws.AbstractClientFactory;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 
 import java.net.MalformedURLException;
@@ -17,14 +18,17 @@ import java.net.URI;
  * User: atus
  * Date: 08.05.13
  */
-public class OwnerProtocolNeedWebServiceClientFactory implements AbstractOwnerProtocolNeedClientFactory
+public class OwnerProtocolNeedWebServiceClientFactory extends AbstractClientFactory<OwnerProtocolNeedWebServiceClient>
 {
   /* default wsdl location */
   private static final String WSDL_LOCATION = "?wsdl";
 
-  final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
+  @Autowired
   private LinkedDataRestClient linkedDataRestClient;
+
+  @Autowired
   private URIService uriService;
 
   public void setLinkedDataRestClient(LinkedDataRestClient linkedDataRestClient)
@@ -40,15 +44,20 @@ public class OwnerProtocolNeedWebServiceClientFactory implements AbstractOwnerPr
   //TODO: workaround until we can work with multiple WON nodes: protocol URI is hard-coded in spring properties
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpoint(URI wonNodeURI) throws NoSuchNeedException, MalformedURLException
   {
-    if(wonNodeURI == null)
-     wonNodeURI = uriService.getDefaultOwnerProtocolNeedServiceEndpointURI();
+    if (wonNodeURI == null)
+      wonNodeURI = uriService.getDefaultOwnerProtocolNeedServiceEndpointURI();
 
-    //TODO: fetch endpoint information for the need and store in db?
-    OwnerProtocolNeedWebServiceClient client = new OwnerProtocolNeedWebServiceClient(URI.create(wonNodeURI.toURL() + WSDL_LOCATION).toURL());
+    OwnerProtocolNeedWebServiceClient client = getCachedClient(wonNodeURI);
+
+    if (client == null) {
+      //TODO: fetch endpoint information for the need and store in db?
+      client = new OwnerProtocolNeedWebServiceClient(URI.create(wonNodeURI.toURL() + WSDL_LOCATION).toURL());
+      cacheClient(wonNodeURI, client);
+    }
+
     return client.getOwnerProtocolOwnerWebServiceEndpointPort();
   }
 
-  @Override
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpointForNeed(URI needURI) throws NoSuchNeedException, MalformedURLException
   {
     //TODO: fetch endpoint information for the need and store in db?
@@ -57,13 +66,16 @@ public class OwnerProtocolNeedWebServiceClientFactory implements AbstractOwnerPr
 
     logger.debug("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
 
-    URI wsdlURI = URI.create(needProtocolEndpoint.toString() + WSDL_LOCATION);
-    OwnerProtocolNeedWebServiceClient client = new OwnerProtocolNeedWebServiceClient(wsdlURI.toURL());
+    OwnerProtocolNeedWebServiceClient client = getCachedClient(needProtocolEndpoint);
+    if (client == null) {
+      URI wsdlURI = URI.create(needProtocolEndpoint.toString() + WSDL_LOCATION);
+      client = new OwnerProtocolNeedWebServiceClient(wsdlURI.toURL());
+      cacheClient(needProtocolEndpoint, client);
+    }
 
     return client.getOwnerProtocolOwnerWebServiceEndpointPort();
   }
 
-  @Override
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpointForConnection(URI connectionURI) throws NoSuchConnectionException, MalformedURLException
   {
     //TODO: fetch endpoint information for the need and store in db?
@@ -72,9 +84,14 @@ public class OwnerProtocolNeedWebServiceClientFactory implements AbstractOwnerPr
 
     logger.debug("need protocol endpoint of connection {} is {}", connectionURI.toString(), needProtocolEndpoint.toString());
 
-    URI wsdlURI = URI.create(needProtocolEndpoint.toString() + WSDL_LOCATION);
-    OwnerProtocolNeedWebServiceClient client = new OwnerProtocolNeedWebServiceClient(wsdlURI.toURL());
+    OwnerProtocolNeedWebServiceClient client = getCachedClient(connectionURI);
+    if (client == null) {
+      URI wsdlURI = URI.create(needProtocolEndpoint.toString() + WSDL_LOCATION);
+      client = new OwnerProtocolNeedWebServiceClient(wsdlURI.toURL());
+      cacheClient(wsdlURI, client);
+    }
 
     return client.getOwnerProtocolOwnerWebServiceEndpointPort();
   }
+
 }

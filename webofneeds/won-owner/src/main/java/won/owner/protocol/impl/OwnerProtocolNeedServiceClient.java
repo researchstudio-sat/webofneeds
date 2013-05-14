@@ -5,8 +5,8 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.owner.AbstractOwnerProtocolNeedClientFactory;
 import won.owner.service.impl.URIService;
+import won.owner.ws.OwnerProtocolNeedWebServiceClientFactory;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedService;
@@ -45,7 +45,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
 
   private URIService uriService;
 
-  private AbstractOwnerProtocolNeedClientFactory clientFactory;
+  @Autowired
+  private OwnerProtocolNeedWebServiceClientFactory clientFactory;
 
   @Autowired
   private ChatMessageRepository chatMessageRepository;
@@ -69,6 +70,27 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   private ConnectionModelMapper connectionModelMapper;
 
   @Override
+  public void activate(URI needURI) throws NoSuchNeedException
+  {
+    logger.info(MessageFormat.format("need-facing: ACTIVATE called for need {0}", needURI));
+    try {
+      OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
+
+      List<Need> needs = needRepository.findByNeedURI(needURI);
+      if (needs.size() != 1)
+        throw new NoSuchNeedException(needURI);
+
+      proxy.activate(needURI);
+
+      Need need = needs.get(0);
+      need.setState(NeedState.ACTIVE);
+      needRepository.saveAndFlush(need);
+    } catch (MalformedURLException e) {
+      logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    }
+  }
+
+  @Override
   public void deactivate(URI needURI) throws NoSuchNeedException
   {
     logger.info(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
@@ -87,6 +109,46 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     }
+  }
+
+  //TODO: Prepare Method is missing
+  //TODO: connectTo RENAME to open
+  //TODO: add open Method which takes a connectionURI as a argument
+  @Override
+  public URI connectTo(URI needURI, URI otherNeedURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  {
+    logger.info(MessageFormat.format("need-facing: CONNECT_TO called for other need {0}, own need {1} and message {2}", needURI, otherNeedURI, message));
+    try {
+      OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
+      URI uri = proxy.connectTo(needURI, otherNeedURI, message);
+
+      List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri);
+      if (existingConnections.size() > 0) {
+        for (Connection conn : existingConnections) {
+          //TODO: Move this to the transition() - Method in ConnectionState
+          if (ConnectionState.CONNECTED == conn.getState() ||
+              ConnectionState.REQUEST_SENT == conn.getState()) {
+            throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);
+          } else {
+            conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
+            connectionRepository.saveAndFlush(conn);
+          }
+        }
+      } else {
+        //Create new connection object
+        Connection con = new Connection();
+        con.setNeedURI(needURI);
+        con.setState(ConnectionState.REQUEST_SENT);
+        con.setRemoteNeedURI(otherNeedURI);
+        //set new uri
+        con.setConnectionURI(uri);
+        connectionRepository.saveAndFlush(con);
+      }
+      return uri;
+    } catch (MalformedURLException e) {
+      logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    }
+    return null;
   }
 
   @Override
@@ -137,16 +199,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     }
   }
 
-  public void setLinkedDataRestClient(LinkedDataRestClient linkedDataRestClient)
-  {
-    this.linkedDataRestClient = linkedDataRestClient;
-  }
-
-  public void setUriService(final URIService uriService)
-  {
-    this.uriService = uriService;
-  }
-
   @Override
   public URI createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException
   {
@@ -157,7 +209,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   {
     logger.info(MessageFormat.format("need-facing: CREATE_NEED called for need {0}, with content {1} and activate {2}", ownerURI, content, activate));
     try {
-      OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(URI.create(wonURI));
+      OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(wonURI == null ? null : URI.create(wonURI));
 
       StringWriter sw = new StringWriter();
       content.write(sw, "TTL");
@@ -175,69 +227,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {
       e.printStackTrace();
-    }
-    return null;
-  }
-
-
-  @Override
-  public void activate(URI needURI) throws NoSuchNeedException
-  {
-    logger.info(MessageFormat.format("need-facing: ACTIVATE called for need {0}", needURI));
-    try {
-      OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
-
-      List<Need> needs = needRepository.findByNeedURI(needURI);
-      if (needs.size() != 1)
-        throw new NoSuchNeedException(needURI);
-
-      proxy.activate(needURI);
-
-      Need need = needs.get(0);
-      need.setState(NeedState.ACTIVE);
-      needRepository.saveAndFlush(need);
-    } catch (MalformedURLException e) {
-      logger.warn("couldn't create URL for needProtocolEndpoint", e);
-    }
-  }
-
-
-  //TODO: Prepare Method is missing
-  //TODO: connectTo RENAME to open
-  //TODO: add open Method which takes a connectionURI as a argument
-  @Override
-  public URI connectTo(URI needURI, URI otherNeedURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
-  {
-    logger.info(MessageFormat.format("need-facing: CONNECT_TO called for other need {0}, own need {1} and message {2}", needURI, otherNeedURI, message));
-    try {
-      OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
-      URI uri = proxy.connectTo(needURI, otherNeedURI, message);
-
-      List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri);
-      if (existingConnections.size() > 0) {
-        for (Connection conn : existingConnections) {
-          //TODO: Move this to the transition() - Method in ConnectionState
-          if (ConnectionState.CONNECTED == conn.getState() ||
-              ConnectionState.REQUEST_SENT == conn.getState()) {
-            throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);
-          } else {
-            conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
-            connectionRepository.saveAndFlush(conn);
-          }
-        }
-      } else {
-        //Create new connection object
-        Connection con = new Connection();
-        con.setNeedURI(needURI);
-        con.setState(ConnectionState.REQUEST_SENT);
-        con.setRemoteNeedURI(otherNeedURI);
-        //set new uri
-        con.setConnectionURI(uri);
-        connectionRepository.saveAndFlush(con);
-      }
-      return uri;
-    } catch (MalformedURLException e) {
-      logger.warn("couldn't create URL for needProtocolEndpoint", e);
     }
     return null;
   }
@@ -285,7 +274,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     logger.debug(MessageFormat.format("need-facing: LIST_CONNECTION_URIS called for need {0} and page {1}", needURI, page));
     return getHardcodedCollectionResource(needURI, NEED_CONNECTION_URI_PATH_SUFFIX + "?page=" + page);
   }
-
 
   @Override
   public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException
@@ -384,5 +372,20 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   {
     return linkedDataRestClient.readResourceData(
         URI.create(this.uriService.getDefaultOwnerProtocolNeedServiceEndpointURI().toString() + res));
+  }
+
+  public void setLinkedDataRestClient(LinkedDataRestClient linkedDataRestClient)
+  {
+    this.linkedDataRestClient = linkedDataRestClient;
+  }
+
+  public void setUriService(final URIService uriService)
+  {
+    this.uriService = uriService;
+  }
+
+  public void setClientFactory(final OwnerProtocolNeedWebServiceClientFactory clientFactory)
+  {
+    this.clientFactory = clientFactory;
   }
 }

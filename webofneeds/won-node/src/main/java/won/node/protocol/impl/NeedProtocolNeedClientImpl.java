@@ -37,15 +37,19 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private LinkedDataRestClient linkedDataRestClient;
+  NeedProtocolNeedWebServiceClientFactory clientFactory;
 
+  public void setClientFactory(final NeedProtocolNeedWebServiceClientFactory clientFactory)
+  {
+    this.clientFactory = clientFactory;
+  }
 
   @Override
   public URI connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
     logger.info(MessageFormat.format("need-facing: CONNECTION_REQUESTED called for other need {0}, own need {1}, own connection {2} and message {3}", needURI, otherNeedURI, otherConnectionURI, message));
     try {
-      NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForNeed(needURI);
+      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForNeed(needURI);
       return proxy.connectionRequested(needURI, otherNeedURI, otherConnectionURI, message);
     } catch (MalformedURLException e) {
       //TODO think this through: what happens if we return null here?
@@ -59,7 +63,7 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   {
     logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));
     try {
-      NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForConnection(connectionURI);
+      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connectionURI);
       proxy.close(connectionURI);
     } catch (MalformedURLException e) {
       logger.warn("couldnt create URL for needProtocolEndpoint", e);
@@ -71,35 +75,11 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   {
     logger.info(MessageFormat.format("need-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
     try {
-      NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForConnection(connectionURI);
+      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connectionURI);
       proxy.sendTextMessage(connectionURI, message);
     } catch (MalformedURLException e) {
       logger.warn("couldnt create URL for needProtocolEndpoint", e);
     }
   }
 
-  private NeedProtocolNeedWebServiceEndpoint getNeedProtocolEndpointForNeed(URI needURI) throws NoSuchNeedException, MalformedURLException
-  {
-    //TODO: fetch endpoint information for the need and store in db?
-    URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.NEED_PROTOCOL_ENDPOINT);
-    logger.info("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
-    if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
-    NeedProtocolNeedWebServiceClient client = new NeedProtocolNeedWebServiceClient(URI.create(needProtocolEndpoint.toString() + "?wsdl").toURL());
-    return client.getNeedProtocolNeedWebServiceEndpointPort();
-  }
-
-  private NeedProtocolNeedWebServiceEndpoint getNeedProtocolEndpointForConnection(URI connectionURI) throws NoSuchConnectionException, MalformedURLException
-  {
-    //TODO: fetch endpoint information for the need and store in db?
-    URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.NEED_PROTOCOL_ENDPOINT);
-    logger.info("need protocol endpoint of connection {} is {}", connectionURI.toString(), needProtocolEndpoint.toString());
-    if (needProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
-    NeedProtocolNeedWebServiceClient client = new NeedProtocolNeedWebServiceClient(URI.create(needProtocolEndpoint.toString() + "?wsdl").toURL());
-    return client.getNeedProtocolNeedWebServiceEndpointPort();
-  }
-
-  public void setLinkedDataRestClient(final LinkedDataRestClient linkedDataRestClient)
-  {
-    this.linkedDataRestClient = linkedDataRestClient;
-  }
 }

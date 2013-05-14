@@ -139,16 +139,19 @@
 
     <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
 
-
     <!-- TODO: remove DUMMY IMPLEMENTATIONS below   -->
 
-    <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClientEmptyImpl">
-        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
+    <bean id="ownerProtocolOwnerWebServiceClientFactory" class="won.node.protocol.impl.OwnerProtocolOwnerWebServiceClientFactory" />
+
+    <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClientImpl">
+        <property name="clientFactory" ref="ownerProtocolOwnerWebServiceClientFactory" />
     </bean>
 
 
+    <bean id="needProtocolNeedWebServiceClientFactory" class="won.node.protocol.impl.NeedProtocolNeedWebServiceClientFactory" />
+
     <bean name="needProtocolNeedClient" class="won.node.protocol.impl.NeedProtocolNeedClientImpl">
-        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
+        <property name="clientFactory" ref="needProtocolNeedWebServiceClientFactory" />
     </bean>
 
     <!-- Model Mapper for RDF -->
