@@ -47,6 +47,8 @@ public class TextDescriptionMatcher
   private static final String FIELD_URL = "url";
   private static final int MAX_MATCHES = 3;
   private static double MAX_DISTANCE_KM = 15;
+  private static final double MATCH_THRESHOLD = 0.1;
+  private static final long TIMEOUT_BETWEEN_SEARHCES = 1000; //timeout in millis
 
   public TextDescriptionMatcher(SolrCore solrCore)
   {
@@ -86,6 +88,11 @@ public class TextDescriptionMatcher
     logger.debug("maxDoc: " + si.maxDoc());
     for (int i = 0; i < si.maxDoc(); i++) {
       try {
+          try{
+            Thread.sleep(TIMEOUT_BETWEEN_SEARHCES);
+          } catch (InterruptedException e ){
+              //swallow that one
+          }
         query = mlt.like(i);
         String fromUriString = ir.document(i).getValues(FIELD_URL)[0]; //getValues() instead of get() just to make sure we don't have more than 1
         fromUriString = fromUriString.replaceAll("^<", "").replaceAll(">$", "");
@@ -150,7 +157,7 @@ public class TextDescriptionMatcher
               if (fromPoint != null) {
                 Point toPoint = getPointIfPresent(toUriString, toModel);
                 if (toPoint != null){
-                  double distance = fromPoint.distance(toPoint);
+                  double distance = Math.abs(fromPoint.distance(toPoint));
                   if (distance > MAX_DISTANCE_KM) {
                     logger.debug("geo points are too far apart ({} km), ignoring match {}", fromPoint.distance(toPoint), toURI.toString());
                     continue;
@@ -161,6 +168,10 @@ public class TextDescriptionMatcher
 
               logger.debug("score: {}, weighted score: {}", score, score * scoreWeight);
               score = score * scoreWeight;
+              if (score < MATCH_THRESHOLD) {
+                  logger.debug("score {} is lower than match trheshold {}, ignoring match {}", new Object[]{score, MATCH_THRESHOLD, toURI.toString()});
+                  continue;
+              }
               String matchKey = fromURI.toString() + " <=> " + toURI.toString();
               String matchKey2 = toURI.toString() + " <=> " + fromURI.toString();
               if (this.knownMatches.contains(matchKey) || this.knownMatches.contains(matchKey2)) {
@@ -296,7 +307,7 @@ public class TextDescriptionMatcher
 
       double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
           Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
-      double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      double c = Math.abs(2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
       double d = R * c;
       logger.debug("calculated a distance of {} km between {} and {}", new Object[]{d, this,other});
       return d;
