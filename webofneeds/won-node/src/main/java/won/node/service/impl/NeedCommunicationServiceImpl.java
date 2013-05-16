@@ -169,6 +169,7 @@ public class NeedCommunicationServiceImpl implements
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     Connection con = null;
+    //TODO: why throw an exception?? warn!!
     if (!isNeedActive(need))
       throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.OWNER_OPEN.name(), need.getState());
 
