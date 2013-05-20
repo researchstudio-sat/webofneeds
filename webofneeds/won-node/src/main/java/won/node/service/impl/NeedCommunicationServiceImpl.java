@@ -16,6 +16,7 @@
 
 package won.node.service.impl;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,9 +89,9 @@ public class NeedCommunicationServiceImpl implements
   private EventRepository eventRepository;
 
   @Override
-  public void hint(final URI needURI, final URI otherNeedURI, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
+  public void hint(final URI needURI, final URI otherNeedURI, final double score, final URI originator, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    logger.info("HINT received for need {} referring to need {} with score {} from originator {}", new Object[]{needURI, otherNeedURI, score, originator});
+    logger.info("HINT received for need {} referring to need {} with score {} from originator {} and content {}", new Object[]{needURI, otherNeedURI, score, originator, content});
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
@@ -145,13 +146,13 @@ public class NeedCommunicationServiceImpl implements
         //here, we don't really need to handle exceptions, as we don't want to flood matching services with error messages
 
         try {
-          ownerProtocolOwnerService.hintReceived(needURI, otherNeedURI, score, originator);
+          ownerProtocolOwnerService.hint(needURI, otherNeedURI, score, originator, content);
         } catch (NoSuchNeedException e) {
-          logger.debug("error sending hintReceived message to owner - no such need:", e);
+          logger.debug("error sending hint content to owner - no such need:", e);
         } catch (IllegalMessageForNeedStateException e) {
-          logger.debug("error sending hintReceived message to owner- illegal need state:", e);
+          logger.debug("error sending hint content to owner- illegal need state:", e);
         } catch (Exception e) {
-          logger.debug("error sending hintReceived message to owner:", e);
+          logger.debug("error sending hint content to owner:", e);
         }
 
       }
@@ -159,9 +160,9 @@ public class NeedCommunicationServiceImpl implements
   }
 
   @Override
-  public URI connectTo(final URI needURI, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public URI connect(final URI needURI, final URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info("CONNECT_TO received for need {} referring to need {} with message {}", new Object[]{needURI, otherNeedURI, message});
+    logger.info("CONNECT_TO received for need {} referring to need {} with content {}", new Object[]{needURI, otherNeedURI, content});
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (needURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
@@ -175,11 +176,11 @@ public class NeedCommunicationServiceImpl implements
     //check if there already exists a connection between those two
     //we have multiple options:
     //a) no connection exists -> create new
-    //b) a connection exists in state CONNECTED -> error message
+    //b) a connection exists in state CONNECTED -> error content
     //c) a connection exists in state REQUEST_SENT. The call must be a
-    //   duplicate (or re-sent after the remote end hasn't replied for some time) -> error message
+    //   duplicate (or re-sent after the remote end hasn't replied for some time) -> error content
     //d) a connection exists in state REQUEST_RECEIVED. The remote end tried to connect before we did.
-    //   -> error message
+    //   -> error content
     //e) a connection exists in state CLOSED -> create new
     List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
     if (existingConnections.size() > 0) {
@@ -227,16 +228,16 @@ public class NeedCommunicationServiceImpl implements
         public void run()
         {
           try {
-            URI remoteConnectionURI = needProtocolNeedService.connectionRequested(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), message);
+            URI remoteConnectionURI = needProtocolNeedService.connect(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), content);
             connectionForRunnable.setRemoteConnectionURI(remoteConnectionURI);
             connectionRepository.saveAndFlush(connectionForRunnable);
           } catch (WonProtocolException e) {
-            // we can't open the connection. we send a close back to the owner
+            // we can't connect the connection. we send a close back to the owner
             // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
             // For now, we call the close method as if it had been called from the remote side
-            // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
+            // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
             try {
-              NeedCommunicationServiceImpl.this.needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
+              NeedCommunicationServiceImpl.this.needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI(), content);
             } catch (NoSuchConnectionException e1) {
               logger.debug("caught NoSuchConnectionException:", e1);
             } catch (IllegalMessageForConnectionStateException e1) {
@@ -252,9 +253,9 @@ public class NeedCommunicationServiceImpl implements
 
 
   @Override
-  public URI connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info("CONNECTION_REQUESTED received for need {} referring to need {} (connection {}) with message '{}'", new Object[]{needURI, otherNeedURI, otherConnectionURI, message});
+    logger.info("CONNECTION_REQUESTED received for need {} referring to need {} (connection {}) with content '{}'", new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (otherConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
@@ -270,11 +271,11 @@ public class NeedCommunicationServiceImpl implements
     //check if there already exists a connection between those two
     //we have multiple options:
     //a) no connection exists -> create new
-    //b) a connection exists in state ESTABLISHED -> error message
+    //b) a connection exists in state ESTABLISHED -> error content
     //c) a connection exists in state REQUEST_SENT. Our request was first, we won't accept a request
-    //   from the other side. They have to accept/deny ours! -> error message
+    //   from the other side. They have to accept/deny ours! -> error content
     //d) a connection exists in state REQUEST_RECEIVED. The remote side contacts us repeatedly, it seems.
-    //   -> error message
+    //   -> error content
     //e) a connection exists in state CLOSED -> create new
     List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
     if (existingConnections.size() > 0) {
@@ -300,7 +301,7 @@ public class NeedCommunicationServiceImpl implements
       con.setConnectionURI(URIService.createConnectionURI(con));
       con = connectionRepository.saveAndFlush(con);
 
-      //TODO: do we save the connection message? where? as a chat message?
+      //TODO: do we save the connection content? where? as a chat content?
     }
 
     if (con == null) {
@@ -322,14 +323,14 @@ public class NeedCommunicationServiceImpl implements
         public void run()
         {
           try {
-            ownerProtocolOwnerService.connectionRequested(needURI, otherNeedURI, connectionForRunnable.getConnectionURI(), message);
+            ownerProtocolOwnerService.connect(needURI, otherNeedURI, connectionForRunnable.getConnectionURI(), content);
           } catch (WonProtocolException e) {
-            // we can't open the connection. we send a deny back to the owner
+            // we can't connect the connection. we send a deny back to the owner
             // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
             // For now, we call the close method as if it had been called from the owner side
-            // TODO: even with this workaround, it would be good to send a message along with the close (so we can explain what happened).
+            // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
             try {
-              NeedCommunicationServiceImpl.this.ownerFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
+              NeedCommunicationServiceImpl.this.ownerFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI(), content);
             } catch (NoSuchConnectionException e1) {
               logger.debug("caught NoSuchConnectionException:", e1);
             } catch (IllegalMessageForConnectionStateException e1) {

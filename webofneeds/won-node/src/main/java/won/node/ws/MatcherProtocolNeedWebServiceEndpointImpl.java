@@ -17,22 +17,21 @@
 package won.node.ws;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedService;
-import won.protocol.model.Connection;
-import won.protocol.model.Need;
 import won.protocol.util.LazySpringBeanAutowiringSupport;
+import won.protocol.util.RdfUtils;
 import won.protocol.ws.MatcherProtocolNeedWebServiceEndpoint;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
+import java.io.StringReader;
 import java.net.URI;
-import java.util.Collection;
 
 /**
  * User: fkleedorfer
@@ -43,6 +42,8 @@ import java.util.Collection;
 public class MatcherProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowiringSupport implements MatcherProtocolNeedWebServiceEndpoint {
     @Autowired
     private MatcherProtocolNeedService matcherProtocolNeedService;
+    @Autowired
+    private RdfUtils rdfUtils;
 
     @Override
     @WebMethod
@@ -50,9 +51,11 @@ public class MatcherProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAut
             @WebParam(name = "needURI") final URI needURI,
             @WebParam(name = "otherNeedURI") final URI otherNeedURI,
             @WebParam(name = "score") final double score,
-            @WebParam(name = "originatorURI") final URI originatorURI) throws NoSuchNeedException, IllegalMessageForNeedStateException {
+            @WebParam(name = "originatorURI") final URI originatorURI,
+            @WebParam(name = "content") final String content
+            ) throws NoSuchNeedException, IllegalMessageForNeedStateException {
         wireDependenciesLazily();
-        matcherProtocolNeedService.hint(needURI, otherNeedURI, score, originatorURI);
+        matcherProtocolNeedService.hint(needURI, otherNeedURI, score, originatorURI, rdfUtils.toModel(content));
     }
 
     @Override

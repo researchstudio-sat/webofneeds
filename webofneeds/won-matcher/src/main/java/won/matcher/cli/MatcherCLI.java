@@ -1,13 +1,10 @@
 package won.matcher.cli;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.rest.LinkedDataRestClient;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -45,7 +42,8 @@ public class MatcherCLI {
         client.setLinkedDataRestClient(new LinkedDataRestClient());
 
         try {
-            client.hint(new URI(need1), new URI(need2), score, new URI(org));
+            //TODO: Add rdf content
+            client.hint(new URI(need1), new URI(need2), score, new URI(org), null);
         } catch (URISyntaxException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (IllegalMessageForNeedStateException e) {

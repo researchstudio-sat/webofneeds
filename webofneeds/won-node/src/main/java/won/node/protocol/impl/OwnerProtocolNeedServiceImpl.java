@@ -78,13 +78,18 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     }
 
     @Override
-    public URI connectTo(final URI need, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-        return this.needCommunicationService.connectTo(need, otherNeedURI, message);
+    public URI connect(final URI need, final URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+        return this.needCommunicationService.connect(need, otherNeedURI, content);
     }
 
     @Override
-    public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        this.connectionCommunicationService.close(connectionURI);
+    public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        this.connectionCommunicationService.close(connectionURI, content);
+    }
+
+    @Override
+    public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        this.connectionCommunicationService.close(connectionURI, content);
     }
 
     @Override

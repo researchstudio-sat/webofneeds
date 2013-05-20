@@ -16,15 +16,17 @@
 
 package won.node.protocol.impl;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.rest.LinkedDataRestClient;
 import won.node.ws.NeedProtocolNeedWebServiceClient;
-import won.node.ws.NeedProtocolNeedWebServiceEndpoint;
+import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.*;
 import won.protocol.vocabulary.WON;
 import won.protocol.need.NeedProtocolNeedService;
 
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -41,12 +43,14 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
 
 
   @Override
-  public URI connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info(MessageFormat.format("need-facing: CONNECTION_REQUESTED called for other need {0}, own need {1}, own connection {2} and message {3}", needURI, otherNeedURI, otherConnectionURI, message));
+    logger.info(MessageFormat.format("need-facing: CONNECTION_REQUESTED called for other need {0}, own need {1}, own connection {2} and message {3}", needURI, otherNeedURI, otherConnectionURI, content));
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForNeed(needURI);
-      return proxy.connectionRequested(needURI, otherNeedURI, otherConnectionURI, message);
+      StringWriter sw = new StringWriter();
+      content.write(sw, "TTL");
+      return proxy.connect(needURI, otherNeedURI, otherConnectionURI, sw.toString());
     } catch (MalformedURLException e) {
       //TODO think this through: what happens if we return null here?
       logger.warn("couldnt create URL for needProtocolEndpoint", e);
@@ -54,13 +58,28 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
     return null;
   }
 
+    @Override
+    public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connectionURI));
+        try {
+            NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForConnection(connectionURI);
+            StringWriter sw = new StringWriter();
+            content.write(sw, "TTL");
+            proxy.open(connectionURI, sw.toString());
+        } catch (MalformedURLException e) {
+            logger.warn("couldnt create URL for needProtocolEndpoint", e);
+        }
+    }
+
   @Override
-  public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForConnection(connectionURI);
-      proxy.close(connectionURI);
+      StringWriter sw = new StringWriter();
+      content.write(sw, "TTL");
+      proxy.close(connectionURI, sw.toString());
     } catch (MalformedURLException e) {
       logger.warn("couldnt create URL for needProtocolEndpoint", e);
     }

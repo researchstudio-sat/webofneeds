@@ -104,7 +104,6 @@ public class WON
 
   // Resource individuals
   public static final Resource EVENT_TYPE_CLOSE = m.createResource(ConnectionEventType.OWNER_CLOSE.getURI().toString());
-  public static final Resource EVENT_TYPE_PREPARE = m.createResource(ConnectionEventType.OWNER_PREPARE.getURI().toString());
   public static final Resource EVENT_TYPE_OPEN = m.createResource(ConnectionEventType.OWNER_OPEN.getURI().toString());
   public static final Resource EVENT_TYPE_HINT = m.createResource(ConnectionEventType.MATCHER_HINT.getURI().toString());
 
@@ -116,7 +115,6 @@ public class WON
   public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
 
   public static final Resource CONNECTION_STATE_SUGGESTED = m.createResource(ConnectionState.SUGGESTED.getURI().toString());
-  public static final Resource CONNECTION_STATE_PREPARED = m.createResource(ConnectionState.PREPARED.getURI().toString());
   public static final Resource CONNECTION_STATE_REQUEST_SENT = m.createResource(ConnectionState.REQUEST_SENT.getURI().toString());
   public static final Resource CONNECTION_STATE_REQUEST_RECEIVED = m.createResource(ConnectionState.REQUEST_RECEIVED.getURI().toString());
   public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
@@ -187,8 +185,6 @@ public class WON
       case OWNER_OPEN:
       case PARTNER_OPEN:
         return EVENT_TYPE_OPEN;
-      case OWNER_PREPARE:
-        return EVENT_TYPE_PREPARE;
       default:
         throw new IllegalStateException("No such case specified for " + type.name());
     }
@@ -205,8 +201,6 @@ public class WON
     switch (type) {
       case SUGGESTED:
         return CONNECTION_STATE_SUGGESTED;
-      case PREPARED:
-        return CONNECTION_STATE_PREPARED;
       case REQUEST_SENT:
         return CONNECTION_STATE_REQUEST_SENT;
       case REQUEST_RECEIVED:

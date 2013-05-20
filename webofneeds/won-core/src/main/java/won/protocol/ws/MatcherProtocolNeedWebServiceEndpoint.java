@@ -1,5 +1,6 @@
 package won.protocol.ws;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
@@ -28,7 +29,8 @@ public interface MatcherProtocolNeedWebServiceEndpoint {
             @WebParam(name = "needURI") URI needURI,
             @WebParam(name = "otherNeedURI") URI otherNeedURI,
             @WebParam(name = "score") double score,
-            @WebParam(name = "originatorURI") URI originatorURI) throws NoSuchNeedException, IllegalMessageForNeedStateException;
+            @WebParam(name = "originatorURI") URI originatorURI,
+            @WebParam(name = "content") final String content) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
     @WebMethod(exclude = true)
     void setMatcherProtocolNeedService(MatcherProtocolNeedService matcherProtocolNeedService);

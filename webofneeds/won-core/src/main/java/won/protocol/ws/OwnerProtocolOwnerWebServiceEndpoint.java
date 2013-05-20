@@ -1,5 +1,6 @@
 package won.protocol.ws;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.util.ObjectUtils;
 import won.protocol.exception.*;
 import won.protocol.model.*;
@@ -27,24 +28,32 @@ import javax.jws.soap.SOAPBinding;
 public interface OwnerProtocolOwnerWebServiceEndpoint {
 
     @WebMethod
-    public void hintReceived(
+    public void hint(
             @WebParam(name = "ownNeedURI") final URI ownNeedURI,
             @WebParam(name = "otherNeedURI") final URI otherNeedURI,
             @WebParam(name = "score") final double score,
-            @WebParam(name = "originatorURI") final URI originatorURI)
+            @WebParam(name = "originatorURI") final URI originatorURI,
+            @WebParam(name = "content") final String content)
             throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
     @WebMethod
-    public void connectionRequested(
+    public void connect(
             @WebParam(name = "ownNeedURI") final URI ownNeedURI,
             @WebParam(name = "otherNeedURI") final URI otherNeedURI,
             @WebParam(name = "ownConnectionURI") final URI ownConnectionURI,
-            @WebParam(name = "message") final String message)
+            @WebParam(name = "content") final String content)
             throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
     @WebMethod
+    public void open(
+            @WebParam(name = "connectionURI") final URI connectionURI,
+            @WebParam(name = "content") final String content)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+
+    @WebMethod
     public void close(
-            @WebParam(name = "connectionURI") final URI connectionURI)
+            @WebParam(name = "connectionURI") final URI connectionURI,
+            @WebParam(name = "content") final String content)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
     @WebMethod

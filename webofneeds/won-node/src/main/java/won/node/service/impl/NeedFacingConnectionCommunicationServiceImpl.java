@@ -16,6 +16,7 @@
 
 package won.node.service.impl;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +56,42 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   private EventRepository eventRepository;
 
   @Override
-  public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+      logger.info("OPEN received from the need side for connection {0} with content {1}", connectionURI, content);
+      if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+      //load connection, checking if it exists
+      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+      //perform state transit (should not result in state change)
+      ConnectionState nextState = performStateTransit(con, ConnectionEventType.PARTNER_OPEN);
+      con.setState(nextState);
+      //save in the db
+      con = connectionRepository.saveAndFlush(con);
+
+      ConnectionEvent event = new ConnectionEvent();
+      event.setConnectionURI(con.getConnectionURI());
+      event.setType(ConnectionEventType.PARTNER_OPEN);
+      event.setOriginatorUri(con.getRemoteConnectionURI());
+      eventRepository.saveAndFlush(event);
+
+      //inform the need side
+      executorService.execute(new Runnable()
+      {
+          @Override
+          public void run()
+          {
+              try{
+                  ownerFacingConnectionClient.open(connectionURI, content);
+              } catch (WonProtocolException e) {
+                  logger.debug("caught Exception:", e);
+              }
+          }
+      });
+  }
+
+  @Override
+  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("CLOSE received from the need side for connection {}",new Object[]{connectionURI});
+    logger.info("CLOSE received from the need side for connection {0} with content {1}", connectionURI, content);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
@@ -80,7 +114,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       public void run()
       {
         try{
-          ownerFacingConnectionClient.close(connectionURI);
+          ownerFacingConnectionClient.close(connectionURI, content);
         } catch (WonProtocolException e) {
           logger.debug("caught Exception:", e);
         }

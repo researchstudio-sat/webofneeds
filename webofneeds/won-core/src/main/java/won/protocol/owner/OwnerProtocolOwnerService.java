@@ -16,6 +16,7 @@
 
 package won.protocol.owner;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
@@ -37,7 +38,7 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    * @param originatorURI
    * @throws NoSuchNeedException if ownNeedURI is not a known need URI
    */
-  public void hintReceived(URI ownNeedURI, URI otherNeedURI, double score, URI originatorURI) throws NoSuchNeedException, IllegalMessageForNeedStateException;
+  public void hint(URI ownNeedURI, URI otherNeedURI, double score, URI originatorURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
   /**
    * Informs the owner of a connection initiated by the need identified by otherNeedURI to the
@@ -45,16 +46,17 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    * needserver upon being contacted and is passed here to serve as a connection handle.
    *
    *
+   *
    * @param ownNeedURI
    * @param otherNeedURI
    * @param ownConnectionURI
-   * @param message
+   * @param content
    * @throws NoSuchNeedException if ownNeedURI or otherNeedURI does not denote a need
    * @throws IllegalMessageForNeedStateException
    *                             if one of the needs is inactive
    * @throws ConnectionAlreadyExistsException
    *                             if the two needs are already connected
    */
-  public void connectionRequested(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI, final String message) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
+  public void connect(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI, Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
 }

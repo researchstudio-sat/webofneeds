@@ -14,6 +14,7 @@ import won.protocol.repository.*;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.NeedModelMapper;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 
@@ -69,19 +70,20 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Autowired
   private ConnectionModelMapper connectionModelMapper;
 
+  @Autowired
+  private RdfUtils rdfUtils;
+
     @Override
     public void deactivate(URI needURI) throws NoSuchNeedException {
         logger.info(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy =getOwnerProtocolEndpointForNeed(needURI);
-
             List<Need> needs = needRepository.findByNeedURI(needURI);
             if(needs.size() != 1)
                 throw new NoSuchNeedException(needURI);
 
             proxy.deactivate(needURI);
-
-            Need need = needs.get(0);
+                  Need need = needs.get(0);
             need.setState(NeedState.INACTIVE);
             needRepository.saveAndFlush(need);
         } catch (MalformedURLException e) {
@@ -90,18 +92,38 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     }
 
     @Override
-    public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
-        logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));
+    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0} with model {1}", connectionURI, content));
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
             List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
             if(cons.size() != 1)
                 throw new NoSuchConnectionException(connectionURI);
-            proxy.close(connectionURI);
+
+            proxy.open(connectionURI, rdfUtils.toString(content));
 
             Connection con = cons.get(0);
-            con.setState(ConnectionState.CLOSED);
+            con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
+            connectionRepository.saveAndFlush(con);
+        } catch (MalformedURLException e) {
+            logger.warn("couldn't create URL for needProtocolEndpoint", e);
+        }
+    }
+
+    @Override
+    public void close(final URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
+        logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0} with model {1}", connectionURI, content));
+        try {
+            OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
+            List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
+            if(cons.size() != 1)
+                throw new NoSuchConnectionException(connectionURI);
+
+            proxy.close(connectionURI, rdfUtils.toString(content));
+
+            Connection con = cons.get(0);
+            con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
             connectionRepository.saveAndFlush(con);
         } catch (MalformedURLException e) {
             logger.warn("couldn't create URL for needProtocolEndpoint", e);
@@ -154,10 +176,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed();
 
-      StringWriter sw = new StringWriter();
-      content.write(sw, "TTL");
-
-      URI uri = proxy.createNeed(ownerURI, sw.toString(), activate);
+      URI uri = proxy.createNeed(ownerURI, rdfUtils.toString(content), activate);
 
       Need need = new Need();
       need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
@@ -180,10 +199,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed(wonURI);
 
-      StringWriter sw = new StringWriter();
-      content.write(sw, "TTL");
-
-      URI uri = proxy.createNeed(ownerURI, sw.toString(), activate);
+      URI uri = proxy.createNeed(ownerURI, rdfUtils.toString(content), activate);
 
       Need need = new Need();
       need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
@@ -222,17 +238,15 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     }
   }
 
-
-  //TODO: Prepare Method is missing
-  //TODO: connectTo RENAME to open
-  //TODO: add open Method which takes a connectionURI as a argument
+  //TODO: add connect Method which takes a connectionURI as a argument
   @Override
-  public URI connectTo(URI needURI, URI otherNeedURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public URI connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info(MessageFormat.format("need-facing: CONNECT_TO called for other need {0}, own need {1} and message {2}", needURI, otherNeedURI, message));
+    logger.info(MessageFormat.format("need-facing: CONNECT_TO called for other need {0}, own need {1} and content {2}", needURI, otherNeedURI, content));
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForNeed(needURI);
-      URI uri = proxy.connectTo(needURI, otherNeedURI, message);
+
+      URI uri = proxy.connect(needURI, otherNeedURI, rdfUtils.toString(content));
 
       List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri);
       if (existingConnections.size() > 0){
