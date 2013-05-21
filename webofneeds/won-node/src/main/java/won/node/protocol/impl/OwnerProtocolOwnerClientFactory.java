@@ -18,7 +18,7 @@ import java.net.URI;
  * User: atus
  * Date: 14.05.13
  */
-public class OwnerProtocolOwnerWebServiceClientFactory extends AbstractClientFactory<OwnerProtocolOwnerWebServiceClient>
+public class OwnerProtocolOwnerClientFactory extends AbstractClientFactory<OwnerProtocolOwnerWebServiceClient>
 {
   @Autowired
   private NeedRepository needRepository;

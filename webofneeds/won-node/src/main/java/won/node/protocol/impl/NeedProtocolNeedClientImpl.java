@@ -20,15 +20,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.protocol.rest.LinkedDataRestClient;
-import won.node.ws.NeedProtocolNeedWebServiceClient;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.*;
-import won.protocol.vocabulary.WON;
 import won.protocol.need.NeedProtocolNeedService;
 
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -42,7 +38,7 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private NeedProtocolNeedWebServiceClientFactory clientFactory;
+  private NeedProtocolNeedClientFactory clientFactory;
 
   @Autowired
   private RdfUtils rdfUtils;
@@ -96,7 +92,7 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
     }
   }
 
-  public void setClientFactory(final NeedProtocolNeedWebServiceClientFactory clientFactory)
+  public void setClientFactory(final NeedProtocolNeedClientFactory clientFactory)
   {
     this.clientFactory = clientFactory;
   }

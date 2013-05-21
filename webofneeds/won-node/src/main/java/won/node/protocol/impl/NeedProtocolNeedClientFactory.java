@@ -18,7 +18,7 @@ import java.net.URI;
  * User: atus
  * Date: 14.05.13
  */
-public class NeedProtocolNeedWebServiceClientFactory extends AbstractClientFactory<NeedProtocolNeedWebServiceClient>
+public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedProtocolNeedWebServiceClient>
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
 
