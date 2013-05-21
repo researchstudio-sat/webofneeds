@@ -1,5 +1,6 @@
 package won.owner.service.impl;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +46,9 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
     private OwnerProtocolNeedService ownerService;
 
     @Override
-    public void hintReceived(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI) throws NoSuchNeedException, IllegalMessageForNeedStateException {
-        logger.info(MessageFormat.format("node-facing: HINT_RECEIVED called for own need {0}, other need {1}, with score {2} from originator {3}", ObjectUtils.nullSafeToString(new Object[]{ownNeedURI, otherNeedURI, score, originatorURI})));
+    public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
+        logger.info(MessageFormat.format("node-facing: HINT_RECEIVED called for own need {0}, other need {1}, with score {2} from originator {3} and content {4}",
+                ObjectUtils.nullSafeToString(new Object[]{ownNeedURI, otherNeedURI, score, originatorURI, content})));
 
         if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
         if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
@@ -73,10 +75,10 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
     }
 
     @Override
-    public void connectionRequested(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI,
-                                    final String message) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
+    public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI,
+                        final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
-        logger.info(MessageFormat.format("node-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, own connection {2} and message ''{3}''", ownNeedURI,otherNeedURI,ownConnectionURI,message));
+        logger.info(MessageFormat.format("node-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, own connection {2} and message ''{3}''", ownNeedURI,otherNeedURI,ownConnectionURI, content));
         if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
         if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
         if (ownConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
@@ -117,7 +119,20 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
     }
 
     @Override
-    public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        logger.info(MessageFormat.format("node-facing: OPEN called for connection {0} with content {1}.", connectionURI, content));
+        if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+
+        //load connection, checking if it exists
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        //set new state and save in the db
+        con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
+        //save in the db
+        connectionRepository.saveAndFlush(con);
+    }
+
+    @Override
+    public void close(final URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         logger.info(MessageFormat.format("node-facing: CLOSE called for connection {0}",connectionURI));
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");

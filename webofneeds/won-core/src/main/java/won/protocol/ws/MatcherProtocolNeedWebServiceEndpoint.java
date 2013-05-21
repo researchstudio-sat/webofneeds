@@ -1,5 +1,6 @@
 package won.protocol.ws;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedService;
@@ -17,15 +18,15 @@ import java.net.URI;
  */
 @WebService(serviceName = "matcherProtocol", targetNamespace = "http://www.webofneeds.org/protocol/matcher/soap/1.0/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
-public interface MatcherProtocolNeedWebServiceEndpoint
-{
-  @WebMethod
-  void hint(
-      @WebParam(name = "needURI") URI needURI,
-      @WebParam(name = "otherNeedURI") URI otherNeedURI,
-      @WebParam(name = "score") double score,
-      @WebParam(name = "originatorURI") URI originatorURI) throws NoSuchNeedException, IllegalMessageForNeedStateException;
+public interface MatcherProtocolNeedWebServiceEndpoint {
+    @WebMethod
+    void hint(
+            @WebParam(name = "needURI") URI needURI,
+            @WebParam(name = "otherNeedURI") URI otherNeedURI,
+            @WebParam(name = "score") double score,
+            @WebParam(name = "originatorURI") URI originatorURI,
+            @WebParam(name = "content") final String content) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
-  @WebMethod(exclude = true)
-  void setMatcherProtocolNeedService(MatcherProtocolNeedService matcherProtocolNeedService);
+    @WebMethod(exclude = true)
+    void setMatcherProtocolNeedService(MatcherProtocolNeedService matcherProtocolNeedService);
 }

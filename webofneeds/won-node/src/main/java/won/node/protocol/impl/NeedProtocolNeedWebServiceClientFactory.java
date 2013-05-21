@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.ws.NeedProtocolNeedWebServiceClient;
-import won.node.ws.NeedProtocolNeedWebServiceEndpoint;
+import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.rest.LinkedDataRestClient;

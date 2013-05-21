@@ -53,7 +53,10 @@
         <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
     </bean>
 
+    <!-- Model Mapper for RDF -->
     <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
 
+    <!-- RDF Utility Service -->
+    <bean id="rdfUtils" class="won.protocol.util.RdfUtils"></bean>
 </beans>

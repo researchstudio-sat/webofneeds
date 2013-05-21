@@ -1,6 +1,8 @@
 
 package won.node.ws;
 
+import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebEndpoint;

@@ -16,8 +16,8 @@
 
 package won.protocol.service;
 
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.NoSuchConnectionException;
+import com.hp.hpl.jena.rdf.model.Model;
+import won.protocol.exception.*;
 
 import java.net.URI;
 
@@ -28,13 +28,24 @@ public interface ConnectionCommunicationService
 {
 
   /**
-   * Closes the connection identified by the specified URI, indicating success.
+   * Opens a connection identified by connectionURI. A rdf graph can be sent along with the request.
    *
    * @param connectionURI the URI of the connection
+   * @param content a rdf graph describing properties of the event
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void close(URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+
+  /**
+   * Closes the connection identified by the specified URI.
+   *
+   * @param connectionURI the URI of the connection
+   * @param content a rdf graph describing properties of the event
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
+   */
+  public void close(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * Sends a chat message via the local connection identified by the specified connectionURI

@@ -28,7 +28,6 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
-import won.protocol.util.DateTimeUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.GR;
 import won.protocol.vocabulary.WON;
@@ -282,7 +281,7 @@ public class NeedController
         return "noNeedFound";
 
       Need need1 = needs.get(0);
-      ownerService.connectTo(need1.getNeedURI(), new URI(needPojo.getNeedURI()), "");
+      ownerService.connect(need1.getNeedURI(), new URI(needPojo.getNeedURI()), null);
       return "redirect:/need/" + need1.getId().toString();//viewNeed(need1.getId().toString(), model);
     } catch (URISyntaxException e) {
       e.printStackTrace();
@@ -329,7 +328,7 @@ public class NeedController
         List<Need> needs = needRepository.findByNeedURI(match.getFromNeed());
         if (!needs.isEmpty())
           ret = "redirect:/need/" + needs.get(0).getId().toString();//viewNeed(needs.get(0).getId().toString(), model);
-        ownerService.connectTo(match.getFromNeed(), match.getToNeed(), "");
+        ownerService.connect(match.getFromNeed(), match.getToNeed(), null);
       }
     } catch (ConnectionAlreadyExistsException e) {
       e.printStackTrace();

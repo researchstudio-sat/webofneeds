@@ -16,6 +16,7 @@
 
 package won.protocol.service;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
@@ -29,8 +30,8 @@ public interface OwnerFacingNeedCommunicationService
 {
 
   /**
-   * Causes the need identified by needURI to open a connection to the need identified by otherNeedURI.
-   * A short message (max 140 chars) can be sent along with the request. The other need is contacted by calling
+   * Causes the need identified by needURI to connect a connection to the need identified by otherNeedURI.
+   * A rdf graph can be sent along with the request. The other need is contacted by calling
    * its requestConnection method.
    *
    * The returned URI is the new connection's URI, generated automatically and passed to the
@@ -38,16 +39,19 @@ public interface OwnerFacingNeedCommunicationService
    * a connection URI in its own domain and link it to the URI generated here.
    *
    * The other need object is contacted asynchronously. If the other need object is inactive, the owner of this
-   * need object will receive a deny message.
+   * need object will receive a deny content.
+   *
+   *
+   *
    *
    * @param needURI the URI of the need
    * @param otherNeedURI the remote need to connect to
-   * @param message (optional) a message for the remote need's owner
+   * @param content (optional) a rdf graph for the remote need's owner
    * @throws won.protocol.exception.NoSuchNeedException if needURI is not a known need URI
    * @throws won.protocol.exception.IllegalMessageForNeedStateException if the need is not in active state
    * @throws won.protocol.exception.ConnectionAlreadyExistsException if there already is a connection between the specified needs
    * @return an URI identifying the connection
    */
-  public URI connectTo(URI needURI, URI otherNeedURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+  public URI connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
 }

@@ -27,7 +27,6 @@ import java.net.URI;
 public enum ConnectionState
 {
   SUGGESTED("Suggested"),
-  PREPARED("Prepared"),
   REQUEST_SENT("RequestSent"),
   REQUEST_RECEIVED("RequestReceived"),
   CONNECTED("Connected"),
@@ -43,8 +42,6 @@ public enum ConnectionState
   public static ConnectionState create(ConnectionEventType msg)
   {
     switch (msg) {
-      case OWNER_PREPARE:
-        return PREPARED;
       case MATCHER_HINT:
         return SUGGESTED;
       case OWNER_OPEN:
@@ -60,19 +57,8 @@ public enum ConnectionState
     switch (this) {
       case SUGGESTED:
         switch (msg) {
-          case OWNER_PREPARE:
-            return PREPARED;
-          case PARTNER_OPEN:
-            return REQUEST_RECEIVED;
-          case OWNER_CLOSE:
-            return CLOSED;
-          case PARTNER_CLOSE:
-            return CLOSED;
-        }
-      case PREPARED:
-        switch (msg) {
           case OWNER_OPEN:
-            return REQUEST_SENT;
+                return REQUEST_SENT;
           case PARTNER_OPEN:
             return REQUEST_RECEIVED;
           case OWNER_CLOSE:

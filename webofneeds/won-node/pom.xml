@@ -83,7 +83,7 @@
                             <goal>wsgen</goal>
                         </goals>
                         <configuration>
-                            <sei>won.node.ws.NeedProtocolNeedWebServiceEndpoint</sei>
+                            <sei>won.protocol.ws.NeedProtocolNeedWebServiceEndpoint</sei>
                             <genWsdl>true</genWsdl>
                             <verbose>true</verbose>
                             <protocol>soap1.1</protocol>

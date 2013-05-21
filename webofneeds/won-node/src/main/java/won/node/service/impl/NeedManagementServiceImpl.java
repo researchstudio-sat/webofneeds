@@ -113,7 +113,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
     Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());
     for (URI connURI : connectionURIs) {
       try {
-        ownerFacingConnectionCommunicationService.close(connURI);
+        //TODO: ADD content
+        ownerFacingConnectionCommunicationService.close(connURI, null);
       } catch (WonProtocolException e) {
         logger.debug("caught exception when trying to close connection", e);
       }

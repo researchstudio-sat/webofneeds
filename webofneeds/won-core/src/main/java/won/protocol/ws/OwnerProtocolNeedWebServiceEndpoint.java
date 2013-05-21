@@ -16,13 +16,21 @@
 
 package won.protocol.ws;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import won.protocol.exception.*;
+import won.protocol.model.Connection;
+import won.protocol.model.Match;
+import won.protocol.model.Need;
+import won.protocol.owner.OwnerProtocolNeedService;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import java.net.URI;
+import java.util.Collection;
 
 /**
  * User: fkleedorfer
@@ -34,25 +42,30 @@ import java.net.URI;
 public interface OwnerProtocolNeedWebServiceEndpoint
 {
   @WebMethod
-  public void sendTextMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "message") final String message)
-      throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void sendTextMessage(@WebParam(name="connectionURI") final URI connectionURI, @WebParam(name="message") final String message)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   @WebMethod
-  public void close(@WebParam(name = "connectionURI") final URI connectionURI)
-      throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void open(@WebParam(name="connectionURI") final URI connectionURI, @WebParam(name = "content") final String content)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   @WebMethod
-  public URI connectTo(@WebParam(name = "needURI") final URI needURI, @WebParam(name = "otherNeedURI") final URI otherNeedURI, @WebParam(name = "message") final String message)
-      throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+  public void close(@WebParam(name="connectionURI") final URI connectionURI, @WebParam(name = "content") final String content)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   @WebMethod
-  public void deactivate(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException;
+  public URI connect(@WebParam(name = "needURI") final URI needURI, @WebParam(name = "otherNeedURI") final URI otherNeedURI, @WebParam(name = "content") final String content)
+          throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
   @WebMethod
-  public void activate(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException;
+  public void deactivate(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedException;
 
   @WebMethod
-  public URI createNeed(@WebParam(name = "ownerURI") final URI ownerURI, @WebParam(name = "content") final String content,
-                        @WebParam(name = "activate") final boolean activate)
-      throws IllegalNeedContentException;
+  public void activate(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedException;
+
+  @WebMethod
+  public URI createNeed(@WebParam(name="ownerURI")final URI ownerURI, @WebParam(name="content") final String content,
+                        @WebParam(name="activate")final boolean activate)
+          throws IllegalNeedContentException;
+
 }

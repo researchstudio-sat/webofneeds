@@ -172,8 +172,9 @@ public class TextDescriptionMatcher
                 this.knownMatches.add(matchKey);
                 logger.debug("new match: " + matchKey);
                 logger.debug("sending hint..");
-                client.hint(fromURI, toURI, score, new URI("http://LDSpiderMatcher.webofneeds"));
-                client.hint(toURI, fromURI, score, new URI("http://LDSpiderMatcher.webofneeds"));
+                //TODO: Add rdf content
+                client.hint(fromURI, toURI, score, new URI("http://LDSpiderMatcher.webofneeds"), null);
+                client.hint(toURI, fromURI, score, new URI("http://LDSpiderMatcher.webofneeds"), null);
                 logger.debug("hint sent.");
                 //check if we have enough matches
                 if (++numMatches > MAX_MATCHES) break;
