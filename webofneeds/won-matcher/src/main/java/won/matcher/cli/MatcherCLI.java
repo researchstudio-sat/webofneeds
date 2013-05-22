@@ -9,11 +9,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * Created with IntelliJ IDEA.
  * User: gabriel
  * Date: 14.02.13
  * Time: 15:00
- * To change this template use File | Settings | File Templates.
  */
 public class MatcherCLI {
 
@@ -45,11 +43,11 @@ public class MatcherCLI {
             //TODO: Add rdf content
             client.hint(new URI(need1), new URI(need2), score, new URI(org), null);
         } catch (URISyntaxException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (IllegalMessageForNeedStateException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (NoSuchNeedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
     }
 }

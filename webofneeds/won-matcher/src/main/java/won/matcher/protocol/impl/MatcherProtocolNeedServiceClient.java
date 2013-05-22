@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedService;
+import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.MatcherProtocolNeedWebServiceEndpoint;
 
@@ -46,5 +47,10 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
   public void setClientFactory(final MatcherProtocolNeedClientFactory clientFactory)
   {
     this.clientFactory = clientFactory;
+  }
+
+  public void setLinkedDataRestClient(final LinkedDataRestClient linkedDataRestClient)
+  {
+    clientFactory.setLinkedDataRestClient(linkedDataRestClient);
   }
 }
