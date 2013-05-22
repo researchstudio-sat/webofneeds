@@ -28,7 +28,7 @@ public class MatcherProtocolNeedClientFactory extends AbstractClientFactory<Matc
   {
     URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.MATCHER_PROTOCOL_ENDPOINT);
     if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
-    logger.info("need won.matcher.protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
+    logger.debug("need won.matcher.protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
 
     URI needProtocolEndpointUri = URI.create(needProtocolEndpoint.toString() + "?wsdl");
 

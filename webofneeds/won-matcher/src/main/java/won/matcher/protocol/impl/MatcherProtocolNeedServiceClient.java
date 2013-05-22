@@ -31,7 +31,7 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
 
   @Override
   public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content)
-            throws NoSuchNeedException, IllegalMessageForNeedStateException {
+            throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
         logger.info("need-facing: HINT called for needURI {} and otherNeed {} " +
                 "with score {} from originator {}.", new Object[]{needURI, otherNeed, score, originator});
