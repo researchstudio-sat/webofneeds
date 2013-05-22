@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package won.node.ws;
+package won.protocol.ws;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.*;
 
 import javax.jws.WebMethod;
@@ -37,15 +38,20 @@ import java.net.URI;
 public interface NeedProtocolNeedWebServiceEndpoint
 {
   @WebMethod
-  URI connectionRequested(
-      @WebParam(name = "needURI") URI needURI,
-      @WebParam(name = "otherNeedURI") URI otherNeedURI,
-      @WebParam(name = "otherConnectionURI") URI otherConnectionURI,
-      @WebParam(name = "message") String message)
+  URI connect(
+          @WebParam(name = "needURI") URI needURI,
+          @WebParam(name = "otherNeedURI") URI otherNeedURI,
+          @WebParam(name = "otherConnectionURI") URI otherConnectionURI,
+          @WebParam(name = "message") String content)
         throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
   @WebMethod
-  void close(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  void open(@WebParam(name = "connectionURI") URI connectionURI,
+               @WebParam(name = "content") String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+
+  @WebMethod
+  void close(@WebParam(name = "connectionURI") URI connectionURI,
+          @WebParam(name = "content") String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   @WebMethod
   void sendTextMessage(

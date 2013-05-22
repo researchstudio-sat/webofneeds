@@ -1,16 +1,19 @@
 package won.owner.ws;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import won.protocol.exception.*;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.util.LazySpringBeanAutowiringSupport;
+import won.protocol.util.RdfUtils;
 import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
+import java.io.StringReader;
 import java.net.URI;
 
 /**
@@ -28,23 +31,31 @@ import java.net.URI;
 public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAutowiringSupport implements OwnerProtocolOwnerWebServiceEndpoint {
     @Autowired
     private OwnerProtocolOwnerService ownerProtocolOwnerService;
+    @Autowired
+    private RdfUtils rdfUtils;
 
     @Override
-    public void hintReceived(@WebParam(name = "ownNeedURI") URI ownNeedURI, @WebParam(name = "otherNeedURI") URI otherNeedURI, @WebParam(name = "score") double score, @WebParam(name = "originatorURI") URI originatorURI) throws NoSuchNeedException, IllegalMessageForNeedStateException {
+    public void hint(@WebParam(name = "ownNeedURI") URI ownNeedURI, @WebParam(name = "otherNeedURI") URI otherNeedURI, @WebParam(name = "score") double score, @WebParam(name = "originatorURI") URI originatorURI, @WebParam(name = "content") String content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
         wireDependenciesLazily();
-        ownerProtocolOwnerService.hintReceived(ownNeedURI, otherNeedURI, score, originatorURI);
+        ownerProtocolOwnerService.hint(ownNeedURI, otherNeedURI, score, originatorURI, rdfUtils.toModel(content));
     }
 
     @Override
-    public void connectionRequested(@WebParam(name = "ownNeedURI") URI ownNeedURI, @WebParam(name = "otherNeedURI") URI otherNeedURI, @WebParam(name = "ownConnectionURI") URI ownConnectionURI, @WebParam(name = "message") String message) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException {
+    public void connect(@WebParam(name = "ownNeedURI") URI ownNeedURI, @WebParam(name = "otherNeedURI") URI otherNeedURI, @WebParam(name = "ownConnectionURI") URI ownConnectionURI, @WebParam(name = "content") String content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException {
         wireDependenciesLazily();
-        ownerProtocolOwnerService.connectionRequested(ownNeedURI, otherNeedURI, ownConnectionURI, message);
+        ownerProtocolOwnerService.connect(ownNeedURI, otherNeedURI, ownConnectionURI, rdfUtils.toModel(content));
     }
 
     @Override
-    public void close(@WebParam(name = "connectionURI") URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(@WebParam(name = "connectionURI") URI connectionURI, @WebParam(name = "content") String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         wireDependenciesLazily();
-        ownerProtocolOwnerService.close(connectionURI);
+        ownerProtocolOwnerService.open(connectionURI, rdfUtils.toModel(content));
+    }
+
+    @Override
+    public void close(@WebParam(name = "connectionURI") URI connectionURI, @WebParam(name = "content") String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        wireDependenciesLazily();
+        ownerProtocolOwnerService.close(connectionURI, rdfUtils.toModel(content));
     }
 
     @Override

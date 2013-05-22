@@ -1,5 +1,7 @@
 package won.owner.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
@@ -23,6 +25,8 @@ import java.util.List;
 public class DataReloadService {
     private OwnerProtocolNeedService ownerService;
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private NeedRepository needRepository;
 
@@ -44,7 +48,7 @@ public class DataReloadService {
                    reloadConnection(cURI);
                 }
             } catch (NoSuchNeedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                logger.warn("caught NoSuchNeedException:", e);
             }
         }
     }
@@ -57,7 +61,7 @@ public class DataReloadService {
             n.setId(id);
             needRepository.saveAndFlush(n);
         } catch (NoSuchNeedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.warn("caught NoSuchNeedException:", e);
         }
     }
 
@@ -81,7 +85,7 @@ public class DataReloadService {
                     throw new IllegalStateException("Connection-URI is not unique in local Database!");
             }
         } catch (NoSuchConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.warn("caught NoSuchConnectionException:", e);
         }
     }
 }

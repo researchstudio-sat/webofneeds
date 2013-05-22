@@ -838,7 +838,7 @@
 
 
   <!-- realtime get handler, guaranteed to return the latest stored fields of
-       any document, without the need to commit or open a new searcher.  The
+       any document, without the need to commit or connect a new searcher.  The
        current implementation relies on the updateLog feature being enabled. -->
   <requestHandler name="/get" class="solr.RealTimeGetHandler">
      <lst name="defaults">

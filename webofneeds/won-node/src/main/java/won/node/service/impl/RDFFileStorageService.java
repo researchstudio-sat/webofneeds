@@ -21,6 +21,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileManager;
 import org.springframework.beans.factory.annotation.Value;
 import won.protocol.exception.RDFStorageException;
+import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 
 import java.io.*;
@@ -38,14 +39,14 @@ public class RDFFileStorageService implements RDFStorageService {
     private String path;
 
     @Override
-    public void storeContent(Need need, Model graph) {
+    public void storeContent(String filename, Model graph) {
         FileOutputStream out = null;
 
         if(path.equals(""))
             path = System.getProperty("java.io.tmpdir");
 
         try {
-            out = new FileOutputStream(new File(path, getFileName(need)));
+            out = new FileOutputStream(new File(path, filename));
             graph.write(out, "TTL");
         } catch (SecurityException se) {
             throw new RDFStorageException("Check the value of rdf.file.path in the needserver properties file!", se);
@@ -62,7 +63,7 @@ public class RDFFileStorageService implements RDFStorageService {
     }
 
     @Override
-    public Model loadContent(Need need) {
+    public Model loadContent(String filename) {
         InputStream in = null;
         Model m;
 
@@ -72,7 +73,7 @@ public class RDFFileStorageService implements RDFStorageService {
         try {
             m = ModelFactory.createDefaultModel();
             // use the FileManager to find the input file
-            in = FileManager.get().open(path + "/" + getFileName(need));
+            in = FileManager.get().open(path + "/" + filename);
             if (in == null) {
                 throw new IllegalArgumentException("File: offer.ttl not found");
             }
@@ -88,7 +89,31 @@ public class RDFFileStorageService implements RDFStorageService {
         return m;
     }
 
-    private String getFileName(Need n) {
-        return n.getId() + ".ttl";
+    @Override
+    public void storeContent(Need need, Model graph) {
+        storeContent(getFileName(need), graph);
+    }
+
+    @Override
+    public Model loadContent(Need need) {
+        return loadContent(getFileName(need));
+    }
+
+    @Override
+    public void storeContent(ConnectionEvent event, Model graph) {
+        storeContent(getFileName(event), graph);
+    }
+
+    @Override
+    public Model loadContent(ConnectionEvent event) {
+        return loadContent(getFileName(event));
+    }
+
+    private String getFileName(ConnectionEvent event) {
+        return "event_" + event.getId() + ".ttl";
+    }
+
+    private String getFileName(Need need) {
+        return "need_" + need.getId() + ".ttl";
     }
 }

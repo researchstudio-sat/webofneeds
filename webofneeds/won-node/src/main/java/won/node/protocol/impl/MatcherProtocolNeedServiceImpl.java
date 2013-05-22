@@ -19,18 +19,13 @@ package won.node.protocol.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.stereotype.Service;
 import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedService;
-import won.protocol.model.Connection;
-import won.protocol.model.Match;
-import won.protocol.model.Need;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedInformationService;
 
 import javax.jws.WebMethod;
 import java.net.URI;
-import java.util.Collection;
 
 /**
  * User: fkleedorfer
@@ -43,9 +38,9 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
   private NeedInformationService needInformationService;
 
   @Override
-  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
+  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    matcherFacingNeedCommunicationService.hint(needURI,otherNeed,score,originator);
+    matcherFacingNeedCommunicationService.hint(needURI,otherNeed,score,originator, content);
   }
 
   @WebMethod(exclude = true)
