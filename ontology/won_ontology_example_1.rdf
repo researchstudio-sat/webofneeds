@@ -420,6 +420,7 @@
     <!-- http://purl.org/webofneeds/example#NeedContent_01 -->
 
     <owl:NamedIndividual rdf:about="&wonex;NeedContent_01">
+        <won:title rdf:datatype="&xsd;string">Couch</won:title>
         <won:textDescription rdf:datatype="&xsd;string">rote Couch mit integrierter Mäusefalle</won:textDescription>
         <won:depth rdf:resource="&wonex;CouchDepth"/>
         <won:height rdf:resource="&wonex;CouchHeight"/>
