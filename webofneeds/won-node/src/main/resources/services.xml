@@ -130,8 +130,6 @@
         <constructor-arg ref="workqueue" index="4"/>
     </bean>
 
-    
-
     <!-- REST stuff -->
     <context:component-scan base-package="won.protocol.rest">
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
@@ -140,15 +138,17 @@
     <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
 
 
-    <!-- TODO: remove DUMMY IMPLEMENTATIONS below   -->
+    <bean id="ownerProtocolOwnerWebServiceClientFactory" class="won.node.protocol.impl.OwnerProtocolOwnerClientFactory" />
 
     <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClientImpl">
-        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
+        <property name="clientFactory" ref="ownerProtocolOwnerWebServiceClientFactory" />
     </bean>
 
 
+    <bean id="needProtocolNeedWebServiceClientFactory" class="won.node.protocol.impl.NeedProtocolNeedClientFactory" />
+
     <bean name="needProtocolNeedClient" class="won.node.protocol.impl.NeedProtocolNeedClientImpl">
-        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
+        <property name="clientFactory" ref="needProtocolNeedWebServiceClientFactory" />
     </bean>
 
     <!-- Model Mapper for RDF -->

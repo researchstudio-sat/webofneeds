@@ -173,15 +173,17 @@ public class NeedCommunicationServiceImpl implements
     if (!isNeedActive(need))
       throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.OWNER_OPEN.name(), need.getState());
 
-    //check if there already exists a connection between those two
-    //we have multiple options:
-    //a) no connection exists -> create new
-    //b) a connection exists in state CONNECTED -> error content
-    //c) a connection exists in state REQUEST_SENT. The call must be a
-    //   duplicate (or re-sent after the remote end hasn't replied for some time) -> error content
-    //d) a connection exists in state REQUEST_RECEIVED. The remote end tried to connect before we did.
-    //   -> error content
-    //e) a connection exists in state CLOSED -> create new
+    /**
+     * check if there already exists a connection between those two
+     * we have multiple options:
+     * a) no connection exists -> create new
+     * b) a connection exists in state CONNECTED -> error message
+     * c) a connection exists in state REQUEST_SENT. The call must be a
+     * duplicate (or re-sent after the remote end hasn't replied for some time) -> error message
+     * d) a connection exists in state REQUEST_RECEIVED. The remote end tried to connect before we did.
+     * -> error message
+     * e) a connection exists in state CLOSED -> create new
+     */
     List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
     if (existingConnections.size() > 0) {
       for (Connection conn : existingConnections) {
