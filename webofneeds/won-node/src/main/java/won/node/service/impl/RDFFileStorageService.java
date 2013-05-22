@@ -110,10 +110,10 @@ public class RDFFileStorageService implements RDFStorageService {
     }
 
     private String getFileName(ConnectionEvent event) {
-        return event.getId() + ".ttl";
+        return "event_" + event.getId() + ".ttl";
     }
 
     private String getFileName(Need need) {
-        return need.getId() + ".ttl";
+        return "need_" + need.getId() + ".ttl";
     }
 }
