@@ -54,7 +54,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
   @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-      logger.info("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
+      logger.info("OPEN received from the owner side for connection {} with content {}", connectionURI, content);
       if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
       //load connection, checking if it exists
       Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
@@ -118,7 +118,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
           try {
             needFacingConnectionClient.close(connectionForRunnable.getRemoteConnectionURI(), content);
           } catch (WonProtocolException e) {
-            logger.debug("caught Exception:", e);
+            logger.warn("caught WonProtocolException:", e);
           }
         }
       });
@@ -128,7 +128,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'",new Object[]{connectionURI,message});
+    logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     if (message == null) throw new IllegalArgumentException("message is not set");
     //load connection, checking if it exists
@@ -153,7 +153,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
         try {
           needFacingConnectionClient.sendTextMessage(remoteConnectionURI, message);
         } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
+          logger.warn("caught WonProtocolException:", e);
         }
       }
     });

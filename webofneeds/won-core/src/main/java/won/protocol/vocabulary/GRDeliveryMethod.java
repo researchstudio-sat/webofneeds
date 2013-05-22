@@ -1,5 +1,8 @@
 package won.protocol.vocabulary;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URI;
 
 /**
@@ -13,6 +16,8 @@ public enum GRDeliveryMethod
   DELIVERY_MODE_MAIL("DeliveryModeMail"),
   DELIVERY_MODE_OWN_FLEET("DeliveryModeOwnFleet"),
   DELIVERY_MODE_PICK_UP("DeliveryModePickUp");
+
+  private static final Logger logger = LoggerFactory.getLogger(GRDeliveryMethod.class);
 
   private String name;
 
@@ -38,7 +43,7 @@ public enum GRDeliveryMethod
       if(state.name.equals(fragment))
         return state;
 
-    System.err.println("No enum could be matched for: " + fragment);
+    logger.warn("No enum could be matched for: {}", fragment);
     return null;
   }
 

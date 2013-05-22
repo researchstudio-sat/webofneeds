@@ -148,11 +148,11 @@ public class NeedCommunicationServiceImpl implements
         try {
           ownerProtocolOwnerService.hint(needURI, otherNeedURI, score, originator, content);
         } catch (NoSuchNeedException e) {
-          logger.debug("error sending hint content to owner - no such need:", e);
+          logger.warn("error sending hint message to owner - no such need:", e);
         } catch (IllegalMessageForNeedStateException e) {
-          logger.debug("error sending hint content to owner- illegal need state:", e);
+          logger.warn("error sending hint content to owner- illegal need state:", e);
         } catch (Exception e) {
-          logger.debug("error sending hint content to owner:", e);
+          logger.warn("error sending hint content to owner:", e);
         }
 
       }
@@ -162,7 +162,7 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info("CONNECT_TO received for need {} referring to need {} with content {}", new Object[]{needURI, otherNeedURI, content});
+    logger.info("CONNECT received for need {} referring to need {} with content {}", new Object[]{needURI, otherNeedURI, content});
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (needURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
@@ -241,9 +241,9 @@ public class NeedCommunicationServiceImpl implements
             try {
               NeedCommunicationServiceImpl.this.needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI(), content);
             } catch (NoSuchConnectionException e1) {
-              logger.debug("caught NoSuchConnectionException:", e1);
+              logger.warn("caught NoSuchConnectionException:", e1);
             } catch (IllegalMessageForConnectionStateException e1) {
-              logger.debug("caught IllegalMessageForConnectionStateException:", e1);
+              logger.warn("caught IllegalMessageForConnectionStateException:", e1);
             }
           }
         }
@@ -257,7 +257,7 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info("CONNECTION_REQUESTED received for need {} referring to need {} (connection {}) with content '{}'", new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
+    logger.info("CONNECT received for need {} referring to need {} (connection {}) with content '{}'", new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (otherConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
@@ -334,9 +334,9 @@ public class NeedCommunicationServiceImpl implements
             try {
               NeedCommunicationServiceImpl.this.ownerFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI(), content);
             } catch (NoSuchConnectionException e1) {
-              logger.debug("caught NoSuchConnectionException:", e1);
+              logger.warn("caught NoSuchConnectionException:", e1);
             } catch (IllegalMessageForConnectionStateException e1) {
-              logger.debug("caught IllegalMessageForConnectionStateException:", e1);
+              logger.warn("caught IllegalMessageForConnectionStateException:", e1);
             }
           }
         }

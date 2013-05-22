@@ -17,24 +17,23 @@ import won.matcher.query.TextDescriptionMatcher;
  * To change this template use File | Settings | File Templates.
  */
 public class UpdateListener implements SolrEventListener {//, SolrCoreAware {
-    private Logger logger;
+    private Logger logger = LoggerFactory.getLogger(UpdateListener.class);;
     private TextDescriptionMatcher matcher;
 
     @Override
     public void postCommit() {
-        log.info("Post Commit asdf asdf received!!");
+        logger.debug("Post Commit received!!");
         matcher.executeQuery();
     }
 
     @Override
     public void newSearcher(SolrIndexSearcher solrIndexSearcher, SolrIndexSearcher solrIndexSearcher2) {
-        log.info("new Searcher Called");
+        logger.debug("new Searcher Called");
     }
 
     @Override
     public void init(NamedList namedList) {
-        logger = LoggerFactory.getLogger(UpdateListener.class);
-        logger.info("init!!");
+        logger.info("initiating UpdateListener for Solr");
         matcher = new TextDescriptionMatcher();//SolrCore.openHandles.keySet().iterator().next());
     }
 
@@ -42,7 +41,7 @@ public class UpdateListener implements SolrEventListener {//, SolrCoreAware {
     @Override
     public void inform(SolrCore solrCore) {
         logger = LoggerFactory.getLogger(UpdateListener.class);
-        logger.info("informed!!");
+        logger.debug("informed!!");
         matcher = new TextDescriptionMatcher(solrCore);
     }
     */

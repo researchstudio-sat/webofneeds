@@ -46,13 +46,15 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info(MessageFormat.format("need-facing: CONNECTION_REQUESTED called for other need {0}, own need {1}, own connection {2} and message {3}", needURI, otherNeedURI, otherConnectionURI, content));
+
+    logger.info("need-facing: CONNECTION_REQUESTED called for other need {}, own need {}, own connection {}, message {} and content {}",
+        new Object[]{needURI, otherNeedURI, otherConnectionURI, message, content});
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForNeed(needURI);
       return proxy.connect(needURI, otherNeedURI, otherConnectionURI, rdfUtils.toString(content));
     } catch (MalformedURLException e) {
       //TODO think this through: what happens if we return null here?
-      logger.warn("couldnt create URL for needProtocolEndpoint", e);
+      logger.warn("couldn't create URL for needProtocolEndpoint", e);
     }
     return null;
   }
@@ -71,24 +73,24 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   @Override
   public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));
+    logger.info("need-facing: CLOSE called for connection {}", connectionURI);
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connectionURI);
       proxy.close(connectionURI, rdfUtils.toString(content));
     } catch (MalformedURLException e) {
-      logger.warn("couldnt create URL for needProtocolEndpoint", e);
+      logger.warn("couldn't create URL for needProtocolEndpoint", e);
     }
   }
 
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info(MessageFormat.format("need-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
+    logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connectionURI);
       proxy.sendTextMessage(connectionURI, message);
     } catch (MalformedURLException e) {
-      logger.warn("couldnt create URL for needProtocolEndpoint", e);
+      logger.warn("couldn't create URL for needProtocolEndpoint", e);
     }
   }
 
