@@ -14,7 +14,7 @@ import java.util.Map;
  * User: atus
  * Date: 14.05.13
  */
-public class AbstractClientFactory<T extends Service>
+public abstract class AbstractClientFactory<T extends Service>
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
