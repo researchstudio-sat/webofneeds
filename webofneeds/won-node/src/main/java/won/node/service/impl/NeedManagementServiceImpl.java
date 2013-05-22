@@ -98,7 +98,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     need.setState(NeedState.ACTIVE);
-    need = needRepository.saveAndFlush(need);
+    needRepository.saveAndFlush(need);
   }
 
   @Override

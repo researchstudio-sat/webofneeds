@@ -40,7 +40,7 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
   @Override
   public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    matcherFacingNeedCommunicationService.hint(needURI,otherNeed,score,originator, content);
+    matcherFacingNeedCommunicationService.hint(needURI, otherNeed, score, originator, content);
   }
 
   @WebMethod(exclude = true)
