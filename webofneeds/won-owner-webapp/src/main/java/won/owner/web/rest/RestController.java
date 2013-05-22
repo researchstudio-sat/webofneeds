@@ -4,6 +4,7 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.codehaus.jackson.map.util.LRUMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,8 @@ public class RestController {
     @Autowired
     private DataReloadService dataReloadService;
 
+    private LRUMap<URI, NeedPojo> cachedNeeds = new LRUMap<URI, NeedPojo>(200,1000);
+
 
     public void setDataReloadService(DataReloadService dataReloadService) {
         this.dataReloadService = dataReloadService;
@@ -136,17 +139,28 @@ public class RestController {
         for(Match match : matches)
         {
             URI matchUri;
+            logger.debug("using match: {} ", match);
             if(!match.getFromNeed().equals(need.getNeedURI()))
                 matchUri = match.getFromNeed();
             else
                 matchUri = match.getToNeed();
-
-
-            List<Need> matchNeeds = needRepository.findByNeedURI(matchUri);
-            NeedPojo matchedNeed = new NeedPojo(matchNeeds.get(0).getNeedURI(), linkedDataRestClient.readResourceData(matchNeeds.get(0).getNeedURI()));
-            //NeedPojo matchedNeed = NeedFetcher.getNeedInfo(matchNeeds.get(0));
-            if(matchNeeds.get(0).getState().equals(NeedState.ACTIVE))
+            logger.debug("using needUri: {} ", matchUri);
+            NeedPojo matchedNeed = this.cachedNeeds.get(matchUri);
+            if (matchedNeed == null) {
+                List<Need> matchNeeds = needRepository.findByNeedURI(matchUri);
+                logger.debug("found {} needs for uri {} in repo", matchNeeds.size(), matchUri);
+                logger.debug("matchUri:{}, needURi:{}", matchUri, matchNeeds.get(0));
+                logger.debug("fetching need {} from WON node", matchUri);
+                matchedNeed = new NeedPojo(matchNeeds.get(0).getNeedURI(), linkedDataRestClient.readResourceData(matchNeeds.get(0).getNeedURI()));
+                //matchedNeed = new NeedPojo(matchUri, linkedDataRestClient.readResourceData(matchUri));
+                //NeedPojo matchedNeed = NeedFetcher.getNeedInfo(matchNeeds.get(0));
+                this.cachedNeeds.put(matchUri, matchedNeed);
+            }
+            logger.debug("matched need's state: {}", matchedNeed.getState());
+            if(matchedNeed != null && !NeedState.INACTIVE.equals(matchedNeed.getState())) {
+                logger.debug("adding need {}", matchedNeed.getNeedURI());
                 returnList.add(matchedNeed);
+            }
         }
 
         return returnList;
@@ -168,7 +182,26 @@ public class RestController {
     }
 
 
+    @GET
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<NeedPojo> getAllNeeds()
+    {
 
+        logger.info("Getting all needs: ");
+
+        LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
+        List<NeedPojo> returnList = new ArrayList<NeedPojo>();
+
+        Iterable<Need> needs = needRepository.findAll();
+        for(Need need : needs)
+        {
+            NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+            needPojo.setNeedId(need.getId());
+            returnList.add(needPojo);
+        }
+        return returnList;
+    }
 
     private NeedPojo resolve(NeedPojo needPojo)
     {
