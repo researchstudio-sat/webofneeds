@@ -1,6 +1,8 @@
 
 package won.node.ws;
 
+import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebEndpoint;
@@ -21,9 +23,6 @@ public class NeedProtocolNeedWebServiceClient
 {
 
   private final static QName NEEDPROTOCOL_QNAME = new QName("http://www.webofneeds.org/protocol/need/soap/1.0/", "needProtocol");
-
-
-
 
   /**
    * TODO: We want to be able to pass the web service URI directly here... We already know the content of the wsdl file... right?

@@ -32,7 +32,7 @@ public class ConnectionAlreadyExistsException extends WonProtocolException
 
   public ConnectionAlreadyExistsException(final URI connectionURI, final URI fromNeedURI, final URI toNeedURI)
   {
-    super(MessageFormat.format("The connection between needs {0} and {1} that you wanted to open already exists with this URI: {2}", fromNeedURI.toString(), toNeedURI, connectionURI));
+    super(MessageFormat.format("The connection between needs {0} and {1} that you wanted to connect already exists with this URI: {2}", fromNeedURI.toString(), toNeedURI, connectionURI));
     this.connectionURI = connectionURI;
     this.fromNeedURI = fromNeedURI;
     this.toNeedURI = toNeedURI;

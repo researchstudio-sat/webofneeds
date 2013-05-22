@@ -85,7 +85,7 @@ public class TextDescriptionMatcher
 
     int numMatches = 0;
 
-    logger.debug("maxDoc: " + si.maxDoc());
+    logger.debug("maxDoc: {}", si.maxDoc());
     for (int i = 0; i < si.maxDoc(); i++) {
       try {
           try{
@@ -175,16 +175,17 @@ public class TextDescriptionMatcher
               String matchKey = fromURI.toString() + " <=> " + toURI.toString();
               String matchKey2 = toURI.toString() + " <=> " + fromURI.toString();
               if (this.knownMatches.contains(matchKey) || this.knownMatches.contains(matchKey2)) {
-                logger.debug("ignoring known match: " + matchKey);
+                logger.debug("ignoring known match: {}", matchKey);
                 //if we send one match, that's enough - but it seems we've sent it already, so break
                 break;
               } else {
                 //add the match key before sending the hint!
                 this.knownMatches.add(matchKey);
-                logger.debug("new match: " + matchKey);
+                logger.debug("new match: {}", matchKey);
                 logger.debug("sending hint..");
-                client.hint(fromURI, toURI, score, new URI("http://LDSpiderMatcher.webofneeds"));
-                client.hint(toURI, fromURI, score, new URI("http://LDSpiderMatcher.webofneeds"));
+                //TODO: Add rdf content
+                client.hint(fromURI, toURI, score, new URI("http://LDSpiderMatcher.webofneeds"), null);
+                client.hint(toURI, fromURI, score, new URI("http://LDSpiderMatcher.webofneeds"), null);
                 logger.debug("hint sent.");
                 //check if we have enough matches
                 if (++numMatches > MAX_MATCHES) break;
@@ -202,14 +203,15 @@ public class TextDescriptionMatcher
           }
 
         } else {
-          logger.debug("Nothing found similar to " + fromUriString);
+          logger.debug("Nothing found similar to {}", fromUriString);
         }
       } catch (IOException e) {
-        logger.warn("Could not generate similarity query with document " + i + "!", e);  //To change body of catch statement use File | Settings | File Templates.
+        logger.warn("Could not generate similarity query with document {}!",i , e);
       }
     }
 
-    logger.debug("done matching. Known matches: \n {}", Arrays.toString(knownMatches.toArray(new String[knownMatches.size()])));
+    if (logger.isInfoEnabled())
+      logger.info("Done matching. Known matches: \n {}", Arrays.toString(knownMatches.toArray(new String[knownMatches.size()])));
   }
 
   private Model convertNTriplesToModel(String ntriples)

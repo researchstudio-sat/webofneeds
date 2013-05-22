@@ -1,5 +1,8 @@
 package won.protocol.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,6 +13,7 @@ import java.util.Date;
  */
 public class DateTimeUtils
 {
+  private static final Logger logger = LoggerFactory.getLogger(DateTimeUtils.class);
   private static SimpleDateFormat sdf;
 
   public static String format(Date date) {
@@ -28,7 +32,7 @@ public class DateTimeUtils
     try{
       return sdf.parse(date);
     } catch (ParseException e) {
-      e.printStackTrace();
+      logger.warn("caught ParseException:", e);
     } finally {
       return null;
     }

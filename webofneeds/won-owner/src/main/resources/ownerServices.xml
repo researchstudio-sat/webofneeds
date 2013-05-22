@@ -23,22 +23,26 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-    <!-- REST stuff
 
+    <!-- REST stuff
     <context:component-scan base-package="won.protocol.rest">
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
-    </context:component-scan>-->
+    </context:component-scan>
+    -->
 
     <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
+
+    <bean id="ownerProtocolNeedClientFactory" class="won.owner.ws.OwnerProtocolNeedWebServiceClientFactory" />
+
+    <bean id="ownerProtocolOwnerServiceImpl" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
 
     <!-- protocol-level services -->
 
     <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
         <property name="linkedDataRestClient" ref="linkedDataRestClient" />
         <property name="uriService" ref="uriService" />
+        <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
     </bean>
-
-    <bean id="ownerProtocolOwnerServiceImpl" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
 
     <bean id="uriService" class="won.owner.service.impl.URIService">
         <property name="ownerProtocolOwnerServiceEndpointURI" value="${uri.owner.protocol.endpoint}" />
@@ -49,7 +53,10 @@
         <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
     </bean>
 
+    <!-- Model Mapper for RDF -->
     <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
 
+    <!-- RDF Utility Service -->
+    <bean id="rdfUtils" class="won.protocol.util.RdfUtils"></bean>
 </beans>

@@ -16,35 +16,21 @@
 
 package won.node.ws;
 
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import won.node.protocol.impl.OwnerProtocolNeedServiceImpl;
 import won.protocol.exception.*;
-import won.protocol.model.Connection;
-import won.protocol.model.Match;
-import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.util.LazySpringBeanAutowiringSupport;
+import won.protocol.util.RdfUtils;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-import javax.servlet.ServletContext;
-import javax.xml.ws.WebServiceContext;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URI;
-import java.util.Collection;
 
 /**
  * User: fkleedorfer
@@ -56,6 +42,8 @@ import java.util.Collection;
 public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowiringSupport implements OwnerProtocolNeedWebServiceEndpoint {
     @Autowired
     private OwnerProtocolNeedService ownerProtocolNeedService;
+    @Autowired
+    private RdfUtils rdfUtils;
 
     protected boolean isWired() {
         return ownerProtocolNeedService != null;
@@ -68,15 +56,27 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     }
 
     @WebMethod
-    public void close(@WebParam(name = "connectionURI") final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "content") final String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         wireDependenciesLazily();
-        ownerProtocolNeedService.close(connectionURI);
+        ownerProtocolNeedService.open(connectionURI, rdfUtils.toModel(content));
     }
 
     @WebMethod
-    public URI connectTo(@WebParam(name = "needURI") final URI needURI, @WebParam(name = "otherNeedURI") final URI otherNeedURI, @WebParam(name = "message") final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+    public void close(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "content") final String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         wireDependenciesLazily();
-        return ownerProtocolNeedService.connectTo(needURI, otherNeedURI, message);
+        ownerProtocolNeedService.close(connectionURI, rdfUtils.toModel(content));
+    }
+
+    @WebMethod
+    public URI createNeed(@WebParam(name = "ownerURI") final URI ownerURI, @WebParam(name = "content") final String content, @WebParam(name = "activate") final boolean activate) throws IllegalNeedContentException {
+        wireDependenciesLazily();
+        return ownerProtocolNeedService.createNeed(ownerURI, rdfUtils.toModel(content), activate);
+    }
+
+    @WebMethod
+    public URI connect(@WebParam(name = "needURI") final URI needURI, @WebParam(name = "otherNeedURI") final URI otherNeedURI, @WebParam(name = "content") final String content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+        wireDependenciesLazily();
+        return ownerProtocolNeedService.connect(needURI, otherNeedURI, rdfUtils.toModel(content));
     }
 
     @WebMethod
@@ -89,17 +89,6 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     public void activate(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedException {
         wireDependenciesLazily();
         ownerProtocolNeedService.activate(needURI);
-    }
-
-    @WebMethod
-    public URI createNeed(@WebParam(name = "ownerURI") final URI ownerURI, @WebParam(name = "content") final String content, @WebParam(name = "activate") final boolean activate) throws IllegalNeedContentException {
-        wireDependenciesLazily();
-
-        Model m = ModelFactory.createDefaultModel();
-        StringReader sr = new StringReader(content);
-        m.read(sr, null, "TTL");
-
-        return ownerProtocolNeedService.createNeed(ownerURI, m, activate);
     }
 
     @WebMethod(exclude = true)
