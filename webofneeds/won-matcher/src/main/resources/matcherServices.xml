@@ -33,4 +33,8 @@
     <bean id="matcherProtocolNeedServiceClient" class="won.matcher.protocol.impl.MatcherProtocolNeedServiceClient">
         <property name="linkedDataRestClient" ref="linkedDataRestClient" />
     </bean>
+
+    <!-- RDF Utility Service -->
+    <bean id="rdfUtils" class="won.protocol.util.RdfUtils"></bean>
+
 </beans>
