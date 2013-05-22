@@ -73,7 +73,7 @@ public class RestController {
     @Autowired
     private DataReloadService dataReloadService;
 
-    private LRUMap<URI, NeedPojo> cachedNeeds = new LRUMap<URI, NeedPojo>(200,5000);
+    private LRUMap<URI, NeedPojo> cachedNeeds = new LRUMap<URI, NeedPojo>(200,1000);
 
 
     public void setDataReloadService(DataReloadService dataReloadService) {
