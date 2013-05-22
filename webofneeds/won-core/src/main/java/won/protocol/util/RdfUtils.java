@@ -7,11 +7,9 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 /**
- * Created with IntelliJ IDEA.
  * User: gabriel
  * Date: 20.05.13
  * Time: 20:19
- * To change this template use File | Settings | File Templates.
  */
 public class RdfUtils {
 

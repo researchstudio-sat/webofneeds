@@ -44,6 +44,7 @@ import java.util.List;
 public class NeedInformationServiceImpl implements NeedInformationService
 {
 
+  @Autowired
   private RDFStorageService rdfStorage;
   @Autowired
   private NeedRepository needRepository;
@@ -150,7 +151,8 @@ public class NeedInformationServiceImpl implements NeedInformationService
   public Model readNeedContent(final URI needURI) throws NoSuchNeedException
   {
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-    return rdfStorage.loadContent(DataAccessUtils.loadNeed(needRepository, needURI));
+    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+    return rdfStorage.loadContent(need);
   }
 
   @Override
@@ -164,7 +166,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   @Override
   public Model readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
   {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return null;
   }
 
   //TODO implement paging

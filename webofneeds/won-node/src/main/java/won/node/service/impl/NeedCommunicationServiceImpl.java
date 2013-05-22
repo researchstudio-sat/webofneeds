@@ -78,15 +78,14 @@ public class NeedCommunicationServiceImpl implements
 
   @Autowired
   private NeedRepository needRepository;
-
   @Autowired
   private ConnectionRepository connectionRepository;
-
   @Autowired
   private MatchRepository matchRepository;
-
   @Autowired
   private EventRepository eventRepository;
+  @Autowired
+  private RDFStorageService rdfStorageService;
 
   @Override
   public void hint(final URI needURI, final URI otherNeedURI, final double score, final URI originator, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
@@ -137,24 +136,23 @@ public class NeedCommunicationServiceImpl implements
     event.setOriginatorUri(match.getOriginator());
     eventRepository.saveAndFlush(event);
 
+    rdfStorageService.storeContent(event, content);
+
     executorService.execute(new Runnable()
     {
       @Override
       public void run()
       {
-
         //here, we don't really need to handle exceptions, as we don't want to flood matching services with error messages
-
         try {
           ownerProtocolOwnerService.hint(needURI, otherNeedURI, score, originator, content);
         } catch (NoSuchNeedException e) {
           logger.warn("error sending hint message to owner - no such need:", e);
         } catch (IllegalMessageForNeedStateException e) {
-          logger.warn("error sending hint content to owner- illegal need state:", e);
+          logger.warn("error sending hint content to owner - illegal need state:", e);
         } catch (Exception e) {
           logger.warn("error sending hint content to owner:", e);
         }
-
       }
     });
   }
@@ -222,6 +220,8 @@ public class NeedCommunicationServiceImpl implements
       event.setOriginatorUri(con.getConnectionURI());
       eventRepository.saveAndFlush(event);
 
+      rdfStorageService.storeContent(event, content);
+
       final Connection connectionForRunnable = con;
       //send to need
       executorService.execute(new Runnable()
@@ -253,7 +253,6 @@ public class NeedCommunicationServiceImpl implements
     }
   }
 
-
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
@@ -270,15 +269,17 @@ public class NeedCommunicationServiceImpl implements
       throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
     //Create new connection object on our side
 
-    //check if there already exists a connection between those two
-    //we have multiple options:
-    //a) no connection exists -> create new
-    //b) a connection exists in state ESTABLISHED -> error content
-    //c) a connection exists in state REQUEST_SENT. Our request was first, we won't accept a request
-    //   from the other side. They have to accept/deny ours! -> error content
-    //d) a connection exists in state REQUEST_RECEIVED. The remote side contacts us repeatedly, it seems.
-    //   -> error content
-    //e) a connection exists in state CLOSED -> create new
+    /**
+     * check if there already exists a connection between those two
+     * we have multiple options:
+     * a) no connection exists -> create new
+     * b) a connection exists in state ESTABLISHED -> error content
+     * c) a connection exists in state REQUEST_SENT. Our request was first, we won't accept a request
+     * from the other side. They have to accept/deny ours! -> error content
+     * d) a connection exists in state REQUEST_RECEIVED. The remote side contacts us repeatedly, it seems.
+     * -> error content
+     * e) a connection exists in state CLOSED -> create new
+     */
     List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
     if (existingConnections.size() > 0) {
       for (Connection conn : existingConnections) {
@@ -318,6 +319,8 @@ public class NeedCommunicationServiceImpl implements
       event.setOriginatorUri(con.getRemoteConnectionURI());
       eventRepository.saveAndFlush(event);
 
+      rdfStorageService.storeContent(event, content);
+
       final Connection connectionForRunnable = con;
       executorService.execute(new Runnable()
       {
@@ -346,7 +349,6 @@ public class NeedCommunicationServiceImpl implements
       return con.getConnectionURI();
     }
   }
-
 
   private boolean isNeedActive(final Need need)
   {
@@ -391,5 +393,10 @@ public class NeedCommunicationServiceImpl implements
   public void setOwnerFacingConnectionCommunicationService(final ConnectionCommunicationService ownerFacingConnectionCommunicationService)
   {
     this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
+  }
+
+  public void setRdfStorageService(final RDFStorageService rdfStorageService)
+  {
+    this.rdfStorageService = rdfStorageService;
   }
 }

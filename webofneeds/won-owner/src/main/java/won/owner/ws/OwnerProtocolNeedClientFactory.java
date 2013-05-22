@@ -18,7 +18,7 @@ import java.net.URI;
  * User: atus
  * Date: 08.05.13
  */
-public class OwnerProtocolNeedWebServiceClientFactory extends AbstractClientFactory<OwnerProtocolNeedWebServiceClient>
+public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerProtocolNeedWebServiceClient>
 {
   /* default wsdl location */
   private static final String WSDL_LOCATION = "?wsdl";

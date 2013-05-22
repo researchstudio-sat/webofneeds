@@ -12,11 +12,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * Created with IntelliJ IDEA.
  * User: gabriel
  * Date: 14.02.13
  * Time: 15:00
- * To change this template use File | Settings | File Templates.
  */
 public class MatcherCLI {
 

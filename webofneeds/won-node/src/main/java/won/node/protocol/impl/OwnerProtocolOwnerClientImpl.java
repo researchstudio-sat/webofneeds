@@ -25,6 +25,7 @@ import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.RdfUtils;
 import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
 
 import java.io.StringWriter;
@@ -38,6 +39,8 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
 
   @Autowired
   private OwnerProtocolOwnerClientFactory clientFactory;
+  @Autowired
+  private RdfUtils rdfUtils;
 
   @Override
   public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException
@@ -77,10 +80,7 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}", connectionURI));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
-
-      StringWriter sw = new StringWriter();
-      content.write(sw, "TTL");
-      proxy.open(connectionURI, sw.toString());
+      proxy.open(connectionURI, rdfUtils.toString(content));
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {
@@ -94,9 +94,7 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}", connectionURI));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
-      StringWriter sw = new StringWriter();
-      content.write(sw, "TTL");
-      proxy.close(connectionURI, sw.toString());
+      proxy.close(connectionURI, rdfUtils.toString(content));
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {
