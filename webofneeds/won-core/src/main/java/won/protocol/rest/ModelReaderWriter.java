@@ -53,9 +53,7 @@ public class ModelReaderWriter implements MessageBodyWriter<Model>, MessageBodyR
   @Override
   public void writeTo(Model model, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException
   {
-    if (logger.isTraceEnabled()) {
-      logger.trace("writeTo called on GraphWriter, mediaType=" + mediaType);
-    }
+    logger.debug("writeTo called on GraphWriter, mediaType={}", mediaType);
     try {
       model.write(entityStream,mimeTypeToJenaLanguage(mediaType, DEFAULT_RDF_LANGUAGE));
     } finally {
@@ -74,9 +72,9 @@ public class ModelReaderWriter implements MessageBodyWriter<Model>, MessageBodyR
   public Model readFrom(Class<Model> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException
   {
     Model model = ModelFactory.createDefaultModel();
-    logger.trace("readFrom called on GraphWriter, mediaType=" + mediaType);
+    logger.debug("readFrom called on GraphWriter, mediaType={}", mediaType);
     String jenaLanguage = mimeTypeToJenaLanguage(mediaType, DEFAULT_RDF_LANGUAGE);
-    logger.debug("converted mediaType " + mediaType + " to jena language " + jenaLanguage);
+    logger.debug("converted mediaType {} to jena language {}", mediaType, jenaLanguage);
     model.read(entityStream, jenaLanguage);
     return model;
   }

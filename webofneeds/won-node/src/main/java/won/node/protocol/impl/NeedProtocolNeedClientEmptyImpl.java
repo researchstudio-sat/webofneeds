@@ -34,19 +34,20 @@ public class NeedProtocolNeedClientEmptyImpl implements NeedProtocolNeedService
   @Override
   public URI connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info(MessageFormat.format("need-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, other connection {2} and message {3}",needURI, otherNeedURI, otherConnectionURI, message));
+    logger.info("need-facing: CONNECTION_REQUESTED called for own need {}, other need {}, other connection {} and message {}",
+        new Object[]{needURI, otherNeedURI, otherConnectionURI, message});
     return null;
   }
 
   @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));
+    logger.info("need-facing: CLOSE called for connection {}", connectionURI);
   }
 
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info(MessageFormat.format("need-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI,message));
+    logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
   }
 }

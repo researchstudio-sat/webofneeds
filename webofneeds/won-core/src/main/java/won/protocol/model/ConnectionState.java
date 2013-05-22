@@ -16,6 +16,8 @@
 
 package won.protocol.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -32,6 +34,8 @@ public enum ConnectionState
   REQUEST_RECEIVED("RequestReceived"),
   CONNECTED("Connected"),
   CLOSED("Closed");
+
+  private static final Logger logger = LoggerFactory.getLogger(ConnectionState.class);
 
   private String name;
 
@@ -133,7 +137,7 @@ public enum ConnectionState
       if (state.name.equals(fragment))
         return state;
 
-    System.err.println("No enum could be matched for: " + fragment);
+    logger.warn("No enum could be matched for: {}", fragment);
     return null;
   }
 }

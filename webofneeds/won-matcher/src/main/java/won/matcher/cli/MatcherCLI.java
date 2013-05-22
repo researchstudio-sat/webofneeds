@@ -1,5 +1,7 @@
 package won.matcher.cli;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.protocol.exception.IllegalMessageForNeedStateException;
@@ -19,6 +21,8 @@ import java.net.URISyntaxException;
  * To change this template use File | Settings | File Templates.
  */
 public class MatcherCLI {
+
+    private static final Logger logger = LoggerFactory.getLogger(MatcherCLI.class);
 
     public static void main(String[] args) {
         String need1 = "http://localhost:8080/won/ld/resource/need/1";
@@ -47,11 +51,11 @@ public class MatcherCLI {
         try {
             client.hint(new URI(need1), new URI(need2), score, new URI(org));
         } catch (URISyntaxException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("Exception caught:", e);
         } catch (IllegalMessageForNeedStateException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("Exception caught:", e);
         } catch (NoSuchNeedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("Exception caught:", e);
         }
     }
 }

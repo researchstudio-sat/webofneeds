@@ -90,7 +90,8 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public void hint(final URI needURI, final URI otherNeedURI, final double score, final URI originator) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    logger.info("HINT received for need {} referring to need {} with score {} from originator {}", new Object[]{needURI, otherNeedURI, score, originator});
+    logger.info("HINT received for need {} referring to need {} with score {} from originator {}",
+        new Object[]{needURI, otherNeedURI, score, originator});
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
@@ -147,11 +148,11 @@ public class NeedCommunicationServiceImpl implements
         try {
           ownerProtocolOwnerService.hintReceived(needURI, otherNeedURI, score, originator);
         } catch (NoSuchNeedException e) {
-          logger.debug("error sending hintReceived message to owner - no such need:", e);
+          logger.warn("error sending hintReceived message to owner - no such need:", e);
         } catch (IllegalMessageForNeedStateException e) {
-          logger.debug("error sending hintReceived message to owner- illegal need state:", e);
+          logger.warn("error sending hintReceived message to owner - illegal need state:", e);
         } catch (Exception e) {
-          logger.debug("error sending hintReceived message to owner:", e);
+          logger.warn("error sending hintReceived message to owner:", e);
         }
 
       }
@@ -161,7 +162,8 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public URI connectTo(final URI needURI, final URI otherNeedURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info("CONNECT_TO received for need {} referring to need {} with message {}", new Object[]{needURI, otherNeedURI, message});
+    logger.info("CONNECT_TO received for need {} referring to need {} with message {}",
+        new Object[]{needURI, otherNeedURI, message});
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (needURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
@@ -238,9 +240,9 @@ public class NeedCommunicationServiceImpl implements
             try {
               NeedCommunicationServiceImpl.this.needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
             } catch (NoSuchConnectionException e1) {
-              logger.debug("caught NoSuchConnectionException:", e1);
+              logger.warn("caught NoSuchConnectionException:", e1);
             } catch (IllegalMessageForConnectionStateException e1) {
-              logger.debug("caught IllegalMessageForConnectionStateException:", e1);
+              logger.warn("caught IllegalMessageForConnectionStateException:", e1);
             }
           }
         }
@@ -254,7 +256,8 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public URI connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info("CONNECTION_REQUESTED received for need {} referring to need {} (connection {}) with message '{}'", new Object[]{needURI, otherNeedURI, otherConnectionURI, message});
+    logger.info("CONNECTION_REQUESTED received for need {} referring to need {} (connection {}) with message '{}'",
+        new Object[]{needURI, otherNeedURI, otherConnectionURI, message});
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (otherConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
@@ -331,9 +334,9 @@ public class NeedCommunicationServiceImpl implements
             try {
               NeedCommunicationServiceImpl.this.ownerFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI());
             } catch (NoSuchConnectionException e1) {
-              logger.debug("caught NoSuchConnectionException:", e1);
+              logger.warn("caught NoSuchConnectionException:", e1);
             } catch (IllegalMessageForConnectionStateException e1) {
-              logger.debug("caught IllegalMessageForConnectionStateException:", e1);
+              logger.warn("caught IllegalMessageForConnectionStateException:", e1);
             }
           }
         }

@@ -115,7 +115,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
       try {
         ownerFacingConnectionCommunicationService.close(connURI);
       } catch (WonProtocolException e) {
-        logger.debug("caught exception when trying to close connection", e);
+        logger.warn("caught exception when trying to close connection", e);
       }
     }
   }

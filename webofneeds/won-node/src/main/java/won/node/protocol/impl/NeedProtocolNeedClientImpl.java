@@ -43,13 +43,14 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   @Override
   public URI connectionRequested(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info(MessageFormat.format("need-facing: CONNECTION_REQUESTED called for other need {0}, own need {1}, own connection {2} and message {3}", needURI, otherNeedURI, otherConnectionURI, message));
+    logger.info("need-facing: CONNECTION_REQUESTED called for other need {}, own need {}, own connection {} and message {}",
+        new Object[]{needURI, otherNeedURI, otherConnectionURI, message});
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForNeed(needURI);
       return proxy.connectionRequested(needURI, otherNeedURI, otherConnectionURI, message);
     } catch (MalformedURLException e) {
       //TODO think this through: what happens if we return null here?
-      logger.warn("couldnt create URL for needProtocolEndpoint", e);
+      logger.warn("couldn't create URL for needProtocolEndpoint", e);
     }
     return null;
   }
@@ -57,24 +58,24 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));
+    logger.info("need-facing: CLOSE called for connection {}", connectionURI);
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForConnection(connectionURI);
       proxy.close(connectionURI);
     } catch (MalformedURLException e) {
-      logger.warn("couldnt create URL for needProtocolEndpoint", e);
+      logger.warn("couldn't create URL for needProtocolEndpoint", e);
     }
   }
 
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info(MessageFormat.format("need-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
+    logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = getNeedProtocolEndpointForConnection(connectionURI);
       proxy.sendTextMessage(connectionURI, message);
     } catch (MalformedURLException e) {
-      logger.warn("couldnt create URL for needProtocolEndpoint", e);
+      logger.warn("couldn't create URL for needProtocolEndpoint", e);
     }
   }
 
@@ -82,7 +83,7 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   {
     //TODO: fetch endpoint information for the need and store in db?
     URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.NEED_PROTOCOL_ENDPOINT);
-    logger.info("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
+    logger.debug("need protocol endpoint of need {} is {}", needURI, needProtocolEndpoint);
     if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
     NeedProtocolNeedWebServiceClient client = new NeedProtocolNeedWebServiceClient(URI.create(needProtocolEndpoint.toString() + "?wsdl").toURL());
     return client.getNeedProtocolNeedWebServiceEndpointPort();
@@ -92,7 +93,7 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   {
     //TODO: fetch endpoint information for the need and store in db?
     URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.NEED_PROTOCOL_ENDPOINT);
-    logger.info("need protocol endpoint of connection {} is {}", connectionURI.toString(), needProtocolEndpoint.toString());
+    logger.debug("need protocol endpoint of connection {} is {}", connectionURI, needProtocolEndpoint);
     if (needProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
     NeedProtocolNeedWebServiceClient client = new NeedProtocolNeedWebServiceClient(URI.create(needProtocolEndpoint.toString() + "?wsdl").toURL());
     return client.getNeedProtocolNeedWebServiceEndpointPort();

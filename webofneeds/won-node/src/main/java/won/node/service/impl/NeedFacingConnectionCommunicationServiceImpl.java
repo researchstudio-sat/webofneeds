@@ -57,7 +57,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("CLOSE received from the need side for connection {}",new Object[]{connectionURI});
+    logger.info("CLOSE received from the need side for connection {}", connectionURI);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
@@ -82,7 +82,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
         try{
           ownerFacingConnectionClient.close(connectionURI);
         } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
+          logger.warn("caught WonProtocolException:", e);
         }
       }
     });
@@ -91,7 +91,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("SEND_TEXT_MESSAGE received from the need side for connection {} with message '{}'",new Object[]{connectionURI,message});
+    logger.info("SEND_TEXT_MESSAGE received from the need side for connection {} with message '{}'", connectionURI, message);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     if (message == null) throw new IllegalArgumentException("message is not set");
     //load connection, checking if it exists
@@ -115,7 +115,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
         try {
           ownerFacingConnectionClient.sendTextMessage(connectionURI, message);
         } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
+          logger.warn("caught WonProtocolException:", e);
         }
       }
     });

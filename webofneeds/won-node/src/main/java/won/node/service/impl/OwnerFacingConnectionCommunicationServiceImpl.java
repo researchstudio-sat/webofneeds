@@ -54,7 +54,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
    @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("CLOSE received from the owner side for connection {}",new Object[]{connectionURI});
+    logger.info("CLOSE received from the owner side for connection {}", connectionURI);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
@@ -81,7 +81,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
           try {
             needFacingConnectionClient.close(connectionForRunnable.getRemoteConnectionURI());
           } catch (WonProtocolException e) {
-            logger.debug("caught Exception:", e);
+            logger.warn("caught WonProtocolException:", e);
           }
         }
       });
@@ -91,7 +91,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'",new Object[]{connectionURI,message});
+    logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     if (message == null) throw new IllegalArgumentException("message is not set");
     //load connection, checking if it exists
@@ -116,7 +116,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
         try {
           needFacingConnectionClient.sendTextMessage(remoteConnectionURI, message);
         } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
+          logger.warn("caught WonProtocolException:", e);
         }
       }
     });

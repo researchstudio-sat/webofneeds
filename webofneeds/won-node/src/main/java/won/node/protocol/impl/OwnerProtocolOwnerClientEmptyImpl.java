@@ -58,56 +58,58 @@ public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerServ
   @Override
   public void hintReceived(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI) throws NoSuchNeedException
   {
-    logger.info(MessageFormat.format("owner-facing: HINT_RECEIVED called for own need {0}, other need {1}, with score {2} from originator {3}",  ownNeedURI,otherNeedURI,score,originatorURI));
+    logger.info("owner-facing: HINT_RECEIVED called for own need {}, other need {}, with score {} from originator {}",
+        new Object[]{ownNeedURI, otherNeedURI, score, originatorURI});
       try {
           OwnerProtocolOwnerWebServiceEndpoint proxy = getOwnerProtocolEndpointForNeed(ownNeedURI);
           proxy.hintReceived(ownNeedURI, otherNeedURI, score, originatorURI);
       } catch (MalformedURLException e) {
           logger.warn("couldn't create URL for needProtocolEndpoint", e);
       } catch (IllegalMessageForNeedStateException e) {
-          e.printStackTrace();
+          logger.warn("caught IllegalMessageForNeedStateException:", e);
       }
   }
 
   @Override
   public void connectionRequested(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final String message) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
   {
-    logger.info(MessageFormat.format("owner-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, own connection {2} and message ''{3}''", ownNeedURI,otherNeedURI,ownConnectionURI,message));
+    logger.info("owner-facing: CONNECTION_REQUESTED called for own need {}, other need {}, own connection {} and message ''{}''",
+        new Object[]{ownNeedURI, otherNeedURI, ownConnectionURI, message});
       try {
           OwnerProtocolOwnerWebServiceEndpoint proxy = getOwnerProtocolEndpointForNeed(ownNeedURI);
           proxy.connectionRequested(ownNeedURI, otherNeedURI, ownConnectionURI, message);
       } catch (MalformedURLException e) {
           logger.warn("couldn't create URL for needProtocolEndpoint", e);
       } catch (IllegalMessageForNeedStateException e) {
-          e.printStackTrace();
+          logger.warn("caught IllegalMessageForConnectionStateException", e);
       }
   }
 
   @Override
   public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}",connectionURI));
+    logger.info("owner-facing: CLOSE called for connection {}",connectionURI);
       try {
           OwnerProtocolOwnerWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
           proxy.close(connectionURI);
       } catch (MalformedURLException e) {
           logger.warn("couldn't create URL for needProtocolEndpoint", e);
       } catch (NoSuchNeedException e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+          logger.warn("caught NoSuchConnectionException:", e);
       }
   }
 
   @Override
   public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info(MessageFormat.format("owner-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}",connectionURI, message));
+    logger.info("owner-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
       try {
           OwnerProtocolOwnerWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
           proxy.sendTextMessage(connectionURI, message);
       } catch (MalformedURLException e) {
           logger.warn("couldn't create URL for needProtocolEndpoint", e);
       } catch (NoSuchNeedException e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+          logger.warn("caught NoSuchConnectionException:", e);
       }
   }
 
@@ -116,7 +118,7 @@ public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerServ
     {
         //TODO: fetch endpoint information for the need and store in db?
       //  URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.OWNER_PROTOCOL_ENDPOINT);
-      //  logger.info("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
+      //  logger.debug("need protocol endpoint of need {} is {}", needURI, needProtocolEndpoint);
       //  if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
 
         Need own = needRepository.findByNeedURI(needURI).get(0);
@@ -128,7 +130,7 @@ public class OwnerProtocolOwnerClientEmptyImpl implements OwnerProtocolOwnerServ
             NoSuchNeedException {
         //TODO: fetch endpoint information for the need and store in db?
       //  URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.OWNER_PROTOCOL_ENDPOINT);
-      //  logger.info("need protocol endpoint of connection {} is {}", connectionURI.toString(), needProtocolEndpoint.toString());
+      //  logger.debug("need protocol endpoint of connection {} is {}", connectionURI, needProtocolEndpoint);
       //  if (needProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
 
         return getOwnerProtocolEndpointForNeed(connectionRepository.findByConnectionURI(connectionURI).get(0).getNeedURI());

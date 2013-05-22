@@ -71,7 +71,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
 
     @Override
     public void deactivate(URI needURI) throws NoSuchNeedException {
-        logger.info(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
+        logger.info("need-facing: DEACTIVATE called for need {}", needURI);
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy =getOwnerProtocolEndpointForNeed(needURI);
 
@@ -92,7 +92,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     @Override
     public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0}", connectionURI));
+        logger.info("need-facing: CLOSE called for connection {}", connectionURI);
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
             List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
@@ -112,7 +112,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     public void sendTextMessage(final URI connectionURI, final String message)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.debug(MessageFormat.format("need-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
+        logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForConnection(connectionURI);
             List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
@@ -150,7 +150,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Override
   public URI createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException
   {
-    logger.info(MessageFormat.format("need-facing: CREATE_NEED called for need {0}, with content {1} and activate {2}", ownerURI, content, activate));
+    logger.info("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
+        new Object[]{ownerURI, content, activate});
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed();
 
@@ -169,14 +170,15 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {
-      e.printStackTrace();
+      logger.warn("caught NoSuchNeedException:", e);
     }
     return null;
   }
 
   public URI createNeed(URI ownerURI, Model content, boolean activate, String wonURI) throws IllegalNeedContentException
   {
-    logger.info(MessageFormat.format("need-facing: CREATE_NEED called for need {0}, with content {1} and activate {2}", ownerURI, content, activate));
+    logger.info("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
+        new Object[]{ownerURI, content, activate});
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = getHardcodedOwnerProtocolEndpointForNeed(wonURI);
 
@@ -195,7 +197,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {
-      e.printStackTrace();
+      logger.warn("caught NoSuchNeedException:", e);
     }
     return null;
   }
@@ -204,7 +206,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Override
   public void activate(URI needURI) throws NoSuchNeedException
   {
-    logger.info(MessageFormat.format("need-facing: ACTIVATE called for need {0}", needURI));
+    logger.info("need-facing: ACTIVATE called for need {}", needURI);
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForNeed(needURI);
 
@@ -229,7 +231,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Override
   public URI connectTo(URI needURI, URI otherNeedURI, String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info(MessageFormat.format("need-facing: CONNECT_TO called for other need {0}, own need {1} and message {2}", needURI, otherNeedURI, message));
+    logger.info("need-facing: CONNECT_TO called for other need {}, own need {} and message {}",
+        new Object[]{needURI, otherNeedURI, message});
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = getOwnerProtocolEndpointForNeed(needURI);
       URI uri = proxy.connectTo(needURI, otherNeedURI, message);
@@ -273,14 +276,14 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Override
   public Collection<URI> listNeedURIs(int page)
   {
-    logger.debug(MessageFormat.format("need-facing: LIST_NEED_URIS called for page {0}", page));
+    logger.debug("need-facing: LIST_NEED_URIS called for page {}", page);
     return getHardcodedCollectionResource(NEED_URI_PATH_PREFIX + "?page=" + page);
   }
 
   @Override
   public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException
   {
-    logger.debug(MessageFormat.format("need-facing: LIST_CONNECTION_URIS called for need {0}", needURI));
+    logger.debug("need-facing: LIST_CONNECTION_URIS called for need {}", needURI);
 
     // TODO: probably wrong
     return getHardcodedCollectionResource(needURI, NEED_CONNECTION_URI_PATH_SUFFIX);
@@ -296,14 +299,14 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Override
   public Collection<URI> listConnectionURIs(int page)
   {
-    logger.debug(MessageFormat.format("need-facing: LIST_CONNECTION_URIS called for page {0}", page));
+    logger.debug("need-facing: LIST_CONNECTION_URIS called for page {}", page);
     return getHardcodedCollectionResource(CONNECTION_URI_PATH_PREFIX + "?page=" + page);
   }
 
   @Override
   public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException
   {
-    logger.debug(MessageFormat.format("need-facing: LIST_CONNECTION_URIS called for need {0} and page {1}", needURI, page));
+    logger.debug("need-facing: LIST_CONNECTION_URIS called for need {} and page {}", needURI, page);
     return getHardcodedCollectionResource(needURI, NEED_CONNECTION_URI_PATH_SUFFIX + "?page=" + page);
   }
 
@@ -311,7 +314,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Override
   public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException
   {
-    logger.debug(MessageFormat.format("need-facing: GET_MATCHES called for need {0}", needURI));
+    logger.debug("need-facing: GET_MATCHES called for need {}", needURI);
     //TODO: implement this
     return null;
   }
@@ -319,7 +322,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Override
   public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException
   {
-    logger.debug(MessageFormat.format("need-facing: GET_MATCHES called for need {0} and page {1}", needURI, page));
+    logger.debug("need-facing: GET_MATCHES called for need {} and page {}", needURI, page);
     //TODO: implement this
     return null;
   }
@@ -327,7 +330,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Override
   public Need readNeed(URI needURI) throws NoSuchNeedException
   {
-    logger.debug(MessageFormat.format("need-facing: READ_NEED called for need {0}", needURI));
+    logger.debug("need-facing: READ_NEED called for need {}", needURI);
 
     Need n = needModelMapper.fromModel(readNeedContent(needURI));
     n.setOwnerURI(uriService.getOwnerProtocolOwnerServiceEndpointURI());
@@ -337,7 +340,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Override
   public Model readNeedContent(URI needURI) throws NoSuchNeedException
   {
-    logger.debug(MessageFormat.format("need-facing: READ_NEED_CONTENT called for need {0}", needURI));
+    logger.debug("need-facing: READ_NEED_CONTENT called for need {}", needURI);
 
     return getHardcodedNeedResource(needURI, "");
   }
@@ -345,7 +348,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Override
   public Connection readConnection(URI connectionURI) throws NoSuchConnectionException
   {
-    logger.debug(MessageFormat.format("need-facing: READ_CONNECTION called for connection {0}", connectionURI));
+    logger.debug("need-facing: READ_CONNECTION called for connection {}", connectionURI);
 
     return connectionModelMapper.fromModel(readConnectionContent(connectionURI));
   }
@@ -359,7 +362,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Override
   public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException
   {
-    logger.debug(MessageFormat.format("need-facing: READ_CONNECTION_CONTENT called for connection {0}", connectionURI));
+    logger.debug("need-facing: READ_CONNECTION_CONTENT called for connection {}", connectionURI);
     URI connectionProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.OWNER_PROTOCOL_ENDPOINT);
     logger.debug("need protocol endpoint of need {} is {}", connectionURI.toString(), connectionProtocolEndpoint.toString());
     if (connectionProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
