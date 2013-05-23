@@ -16,6 +16,8 @@
     <h1>New need</h1>
 
     <form:form method="POST" action="create">
+        <input type="hidden" name="_anonymize" value="on" />
+        <input type="hidden" name="deliveryMethod" value="DELIVERY_MODE_DIRECT_DOWNLOAD" />
         <table>
             <tr>
                 <td><form:label path="title">Need title:</form:label></td>
@@ -33,10 +35,10 @@
                     <form:options items="${enumValues}" />
                 </form:select></td>
             </tr>
-            <tr>
+            <!--tr>
                 <td><form:label path="anonymize">Anonymize owner:</form:label></td>
                 <td><form:checkbox path="anonymize" /></td>
-            </tr>
+            </tr-->
             <tr>
                 <td><form:label path="wonNode">WoN Node:</form:label></td>
                 <td><form:input path="wonNode" /></td>
@@ -57,12 +59,12 @@
                 <td><form:label path="currency">Currency</form:label> </td>
                 <td><form:input path="currency" /></td>
             </tr>
-            <tr>
+            <!--tr>
                 <td><form:label path="deliveryMethod">Delivery method</form:label> </td>
                 <td><form:select path="deliveryMethod">
                     <form:options items="${enumValues}" />
                 </form:select></td>
-            </tr>
+            </tr-->
 
             <tr>
                 <td><form:label path="latitude">Latitude:</form:label></td>

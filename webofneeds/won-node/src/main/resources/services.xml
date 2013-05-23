@@ -57,6 +57,7 @@
         <property name="needFacingConnectionCommunicationService" ref="needFacingConnectionCommunicationService" />
         <property name="URIService" ref="uriService" />
         <property name="executorService" ref="threadPoolExecutor" />
+        <property name="rdfStorageService" ref="rdfStorageRef" />
     </bean>
 
     <bean id="needInformationService" class="won.node.service.impl.NeedInformationServiceImpl">
@@ -76,11 +77,13 @@
           class="won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl">
         <property name="ownerFacingConnectionClient" ref="ownerProtocolOwnerClient" />
         <property name="executorService" ref="threadPoolExecutor" />
+        <property name="rdfStorageService" ref="rdfStorageRef" />
     </bean>
 
     <bean id="ownerFacingConnectionCommunicationService" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl">
         <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
         <property name="executorService" ref="threadPoolExecutor" />
+        <property name="rdfStorageService" ref="rdfStorageRef" />
     </bean>
 
     <bean id="uriService" class="won.node.service.impl.URIService">

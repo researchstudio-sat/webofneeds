@@ -32,7 +32,7 @@
 
     <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
 
-    <bean id="ownerProtocolNeedClientFactory" class="won.owner.ws.OwnerProtocolNeedWebServiceClientFactory" />
+    <bean id="ownerProtocolNeedClientFactory" class="won.owner.ws.OwnerProtocolNeedClientFactory" />
 
     <bean id="ownerProtocolOwnerServiceImpl" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
 

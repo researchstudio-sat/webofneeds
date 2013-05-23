@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.service.impl.URIService;
-import won.owner.ws.OwnerProtocolNeedWebServiceClientFactory;
+import won.owner.ws.OwnerProtocolNeedClientFactory;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedService;
@@ -46,7 +46,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   private URIService uriService;
 
   @Autowired
-  private OwnerProtocolNeedWebServiceClientFactory clientFactory;
+  private OwnerProtocolNeedClientFactory clientFactory;
 
   @Autowired
   private ChatMessageRepository chatMessageRepository;
@@ -402,7 +402,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     this.uriService = uriService;
   }
 
-  public void setClientFactory(final OwnerProtocolNeedWebServiceClientFactory clientFactory)
+  public void setClientFactory(final OwnerProtocolNeedClientFactory clientFactory)
   {
     this.clientFactory = clientFactory;
   }

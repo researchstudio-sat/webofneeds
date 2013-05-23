@@ -69,8 +69,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   private int pageSize = 0;
 
+  @Autowired
   private RDFStorageService rdfStorage;
-
   @Autowired
   private NeedModelMapper needModelMapper;
   @Autowired
@@ -82,6 +82,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   private NeedInformationService needInformationService;
 
+  //TODO: move this somewhere central?
   static {
     PREFIX_MAPPING.setNsPrefix("won", WON.getURI());
     PREFIX_MAPPING.setNsPrefix("rdf", RDF.getURI());
@@ -185,12 +186,18 @@ public class LinkedDataServiceImpl implements LinkedDataService
     //add event members and attach them
     for (ConnectionEvent e : events) {
       Resource eventMember = model.createResource(WON.toResource(e.getType()));
-      if (e.getOriginatorUri() != null) {
+      if (e.getOriginatorUri() != null)
           eventMember.addProperty(WON.HAS_ORIGINATOR, e.getOriginatorUri().toString());
-      }
-      if (e.getCreationDate() != null){
+
+      if (e.getCreationDate() != null)
           eventMember.addProperty(WON.OCCURED_AT, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
+
+      Model additionalDataModel = rdfStorage.loadContent(e);
+      if (additionalDataModel != null) {
+        Resource additionalData = additionalDataModel.getResource(WON.ADDITIONAL_DATA_CONTAINER.getURI().toString());
+        model.add(model.createStatement(eventMember, WON.HAS_ADDITIONAL_DATA, additionalData));
       }
+
       model.add(model.createStatement(eventContainer, RDFS.member, eventMember));
     }
 
@@ -250,7 +257,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     model.setNsPrefixes(PREFIX_MAPPING);
     model.setNsPrefix("won-res", this.resourceURIPrefix);
   }
-
 
   public void setNeedResourceURIPrefix(final String needResourceURIPrefix)
   {
