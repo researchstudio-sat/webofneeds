@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.model.BasicNeedType;
 import won.protocol.model.NeedState;
+import won.protocol.vocabulary.DC;
 import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.GRDeliveryMethod;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -37,7 +37,6 @@ public class NeedPojo
   private Double upperPriceLimit;
   private Double lowerPriceLimit;
   private String currency;
-  private GRDeliveryMethod deliveryMethod;
 
   private Double latitude;
   private Double longitude;
@@ -71,7 +70,7 @@ public class NeedPojo
 
     Statement needContent = need.getProperty(WON.HAS_CONTENT);
     if (needContent != null) {
-      Statement titleStat = needContent.getResource().getProperty(WON.TITLE);
+      Statement titleStat = needContent.getResource().getProperty(DC.TITLE);
       if (titleStat != null) title = titleStat.getString();
 
       Statement textDescriptionStat = needContent.getResource().getProperty(WON.TEXT_DESCRIPTION);
@@ -116,12 +115,6 @@ public class NeedPojo
 
         Statement upperStat = priceSpecification.getResource().getProperty(WON.HAS_UPPER_PRICE_LIMIT);
         if (upperStat != null) upperPriceLimit = upperStat.getDouble();
-      }
-
-      Statement deliveryStat = needModality.getProperty(WON.AVAILABLE_DELIVERY_METHOD);
-      if (deliveryStat != null) {
-        URI uri = URI.create(deliveryStat.getResource().getURI());
-        deliveryMethod = GRDeliveryMethod.parseString(uri.getFragment());
       }
 
     }
@@ -236,16 +229,6 @@ public class NeedPojo
   public void setCurrency(String currency)
   {
     this.currency = currency;
-  }
-
-  public GRDeliveryMethod getDeliveryMethod()
-  {
-    return deliveryMethod;
-  }
-
-  public void setDeliveryMethod(final GRDeliveryMethod deliveryMethod)
-  {
-    this.deliveryMethod = deliveryMethod;
   }
 
   public Double getLatitude()

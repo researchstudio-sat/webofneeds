@@ -25,6 +25,7 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.vocabulary.DC;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.GR;
 import won.protocol.vocabulary.WON;
@@ -236,7 +237,7 @@ public class RestController {
             // need content
             Resource needContent = needModel.createResource(WON.NEED_CONTENT);
             if (!needPojo.getTitle().isEmpty())
-                needContent.addProperty(WON.TITLE, needPojo.getTitle(), XSDDatatype.XSDstring);
+                needContent.addProperty(DC.TITLE, needPojo.getTitle(), XSDDatatype.XSDstring);
             if (!needPojo.getTextDescription().isEmpty())
                 needContent.addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
             needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
@@ -248,8 +249,6 @@ public class RestController {
 
             // need modalities
             Resource needModality = needModel.createResource(WON.NEED_MODALITY);
-
-            needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_DELIVERY_METHOD, GR.toResource(needPojo.getDeliveryMethod())));
 
             // TODO: store need modalities in separate objects to enable easier checking and multiple instances
             //price and currency
