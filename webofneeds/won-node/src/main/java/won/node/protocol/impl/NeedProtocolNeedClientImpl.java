@@ -47,8 +47,8 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
 
-    logger.info("need-facing: CONNECTION_REQUESTED called for other need {}, own need {}, own connection {}, message {} and content {}",
-        new Object[]{needURI, otherNeedURI, otherConnectionURI, message, content});
+    logger.info("need-facing: CONNECT called for other need {}, own need {}, own connection {}, and content {}",
+        new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForNeed(needURI);
       return proxy.connect(needURI, otherNeedURI, otherConnectionURI, rdfUtils.toString(content));
