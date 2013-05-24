@@ -38,10 +38,7 @@ import won.protocol.service.NeedInformationService;
 import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.DateTimeUtils;
 import won.protocol.util.NeedModelMapper;
-import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.GR;
-import won.protocol.vocabulary.LDP;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.*;
 
 import java.net.URI;
 import java.util.Collection;
@@ -91,6 +88,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     PREFIX_MAPPING.setNsPrefix("geo", GEO.getURI());
     PREFIX_MAPPING.setNsPrefix("gr", GR.getURI());
     PREFIX_MAPPING.setNsPrefix("xsd", XSD.getURI());
+    PREFIX_MAPPING.setNsPrefix("dc", DC.getURI());
   }
 
   public Model listNeedURIs(final int page)
