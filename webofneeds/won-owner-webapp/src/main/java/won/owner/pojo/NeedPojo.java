@@ -3,11 +3,11 @@ package won.owner.pojo;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.vocabulary.DC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.model.BasicNeedType;
 import won.protocol.model.NeedState;
-import won.protocol.vocabulary.DC;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
@@ -70,7 +70,7 @@ public class NeedPojo
 
     Statement needContent = need.getProperty(WON.HAS_CONTENT);
     if (needContent != null) {
-      Statement titleStat = needContent.getResource().getProperty(DC.TITLE);
+      Statement titleStat = needContent.getResource().getProperty(DC.title);
       if (titleStat != null) title = titleStat.getString();
 
       Statement textDescriptionStat = needContent.getResource().getProperty(WON.TEXT_DESCRIPTION);

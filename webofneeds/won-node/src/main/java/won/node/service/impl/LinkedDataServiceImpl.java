@@ -22,6 +22,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
+import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
@@ -38,7 +39,10 @@ import won.protocol.service.NeedInformationService;
 import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.DateTimeUtils;
 import won.protocol.util.NeedModelMapper;
-import won.protocol.vocabulary.*;
+import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.GR;
+import won.protocol.vocabulary.LDP;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;
@@ -185,10 +189,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
     for (ConnectionEvent e : events) {
       Resource eventMember = model.createResource(WON.toResource(e.getType()));
       if (e.getOriginatorUri() != null)
-          eventMember.addProperty(WON.HAS_ORIGINATOR, e.getOriginatorUri().toString());
+        eventMember.addProperty(WON.HAS_ORIGINATOR, e.getOriginatorUri().toString());
 
       if (e.getCreationDate() != null)
-          eventMember.addProperty(WON.OCCURED_AT, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
+        eventMember.addProperty(WON.OCCURED_AT, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
 
       Model additionalDataModel = rdfStorage.loadContent(e);
       if (additionalDataModel != null) {

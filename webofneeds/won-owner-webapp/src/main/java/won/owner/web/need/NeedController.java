@@ -3,6 +3,7 @@ package won.owner.web.need;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.DC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +29,7 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
-import won.protocol.util.DateTimeUtils;
-import won.protocol.vocabulary.DC;
 import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.GR;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -129,7 +127,7 @@ public class NeedController
       // need content
       Resource needContent = needModel.createResource(WON.NEED_CONTENT);
       if (!needPojo.getTitle().isEmpty())
-        needContent.addProperty(DC.TITLE, needPojo.getTitle(), XSDDatatype.XSDstring);
+        needContent.addProperty(DC.title, needPojo.getTitle(), XSDDatatype.XSDstring);
       if (!needPojo.getTextDescription().isEmpty())
         needContent.addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
       needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
