@@ -14,27 +14,45 @@
  * limitations under the License.
  */
 
-package won.protocol.exception;
+package won.protocol.ws.fault.info;
 
 import java.net.URI;
-import java.text.MessageFormat;
 
 /**
  * User: fkleedorfer
- * Date: 02.11.12
+ * Date: 24.05.13
  */
-public class NeedInactiveExepction extends WonProtocolException
+public class NoSuchConnectionFaultInfo
 {
-  private URI needURI;
+  private URI unknownConnectionURI;
+  private String message;
 
-  public NeedInactiveExepction(final URI needURI)
+  @Override
+  public String toString()
   {
-    super(MessageFormat.format("Your request for need {0} is not processed as the need is currently inactive.", needURI));
-    this.needURI = needURI;
+    return "NoSuchConnectionFaultInfo{" +
+        "unknownConnectionURI=" + unknownConnectionURI +
+        ", message='" + message + '\'' +
+        '}';
   }
 
-  public URI getNeedURI()
+  public String getMessage()
   {
-    return needURI;
+    return message;
+  }
+
+  public void setMessage(final String message)
+  {
+    this.message = message;
+  }
+
+  public URI getUnknownConnectionURI()
+  {
+    return unknownConnectionURI;
+  }
+
+  public void setUnknownConnectionURI(final URI unknownConnectionURI)
+  {
+    this.unknownConnectionURI = unknownConnectionURI;
   }
 }

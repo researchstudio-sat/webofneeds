@@ -17,6 +17,7 @@ import won.protocol.util.NeedModelMapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
+import won.protocol.ws.fault.*;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -90,6 +91,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       needRepository.saveAndFlush(need);
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    } catch (NoSuchNeedFault noSuchNeedFault) {
+      throw NoSuchNeedFault.toException(noSuchNeedFault);
     }
   }
 
@@ -110,6 +113,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       needRepository.saveAndFlush(need);
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    } catch (NoSuchNeedFault noSuchNeedFault) {
+      throw NoSuchNeedFault.toException(noSuchNeedFault);
     }
   }
 
@@ -130,6 +135,10 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       connectionRepository.saveAndFlush(con);
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+      throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+    } catch (NoSuchConnectionFault noSuchConnectionFault) {
+      throw NoSuchConnectionFault.toException(noSuchConnectionFault);
     }
   }
 
@@ -143,7 +152,13 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       if (cons.size() != 1)
         throw new NoSuchConnectionException(connectionURI);
 
-      proxy.close(connectionURI, rdfUtils.toString(content));
+      try {
+        proxy.close(connectionURI, rdfUtils.toString(content));
+      } catch (NoSuchConnectionFault noSuchConnectionFault) {
+        throw NoSuchConnectionFault.toException(noSuchConnectionFault);
+      } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+        throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+      }
 
       Connection con = cons.get(0);
       con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
@@ -179,6 +194,10 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
 
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+      throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+    } catch (NoSuchConnectionFault noSuchConnectionFault) {
+      throw NoSuchConnectionFault.toException(noSuchConnectionFault);
     }
   }
 
@@ -208,6 +227,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {
       logger.warn("caught NoSuchNeedException:", e);
+    } catch (IllegalNeedContentFault illegalNeedContentFault) {
+      throw IllegalNeedContentFault.toException(illegalNeedContentFault);
     }
     return null;
   }
@@ -248,6 +269,12 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {
       logger.warn("caught NoSuchNeedException", e);
+    } catch (NoSuchNeedFault noSuchNeedFault) {
+      throw NoSuchNeedFault.toException(noSuchNeedFault);
+    } catch (ConnectionAlreadyExistsFault connectionAlreadyExistsFault) {
+      throw ConnectionAlreadyExistsFault.toException(connectionAlreadyExistsFault);
+    } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
+      throw IllegalMessageForNeedStateFault.toException(illegalMessageForNeedStateFault);
     }
     return null;
   }

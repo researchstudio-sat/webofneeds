@@ -25,6 +25,9 @@ import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.util.LazySpringBeanAutowiringSupport;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.MatcherProtocolNeedWebServiceEndpoint;
+import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
+import won.protocol.ws.fault.NoSuchNeedFault;
+import won.protocol.ws.fault.info.NoSuchNeedFaultInfo;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -53,9 +56,16 @@ public class MatcherProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAut
             @WebParam(name = "score") final double score,
             @WebParam(name = "originatorURI") final URI originatorURI,
             @WebParam(name = "content") final String content
-            ) throws NoSuchNeedException, IllegalMessageForNeedStateException {
+            ) throws NoSuchNeedFault, IllegalMessageForNeedStateFault {
         wireDependenciesLazily();
+
+      try {
         matcherProtocolNeedService.hint(needURI, otherNeedURI, score, originatorURI, rdfUtils.toModel(content));
+      } catch (NoSuchNeedException e) {
+        throw NoSuchNeedFault.fromException(e);
+      } catch (IllegalMessageForNeedStateException e) {
+        throw IllegalMessageForNeedStateFault.fromException(e);
+      }
     }
 
     @Override

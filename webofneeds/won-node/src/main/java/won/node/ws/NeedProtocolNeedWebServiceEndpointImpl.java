@@ -16,20 +16,21 @@
 
 package won.node.ws;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.util.LazySpringBeanAutowiringSupport;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
+import won.protocol.ws.fault.ConnectionAlreadyExistsFault;
+import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
+import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
+import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-import java.io.StringReader;
 import java.net.URI;
 
 /**
@@ -56,37 +57,62 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
           @WebParam(name = "otherNeedURI") final URI otherNeedURI,
           @WebParam(name = "otherConnectionURI") final URI otherConnectionURI,
           @WebParam(name = "content") final String content)
-        throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+        throws NoSuchNeedException, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault
   {
     wireDependenciesLazily();
-    return needProtocolNeedService.connect(needURI, otherNeedURI, otherConnectionURI, rdfUtils.toModel(content));
+    try {
+      return needProtocolNeedService.connect(needURI, otherNeedURI, otherConnectionURI, rdfUtils.toModel(content));
+    } catch (IllegalMessageForNeedStateException e) {
+      throw IllegalMessageForNeedStateFault.fromException(e);
+    } catch (ConnectionAlreadyExistsException e) {
+      throw ConnectionAlreadyExistsFault.fromException(e);
+    }
   }
 
   @Override
   @WebMethod
   public void open(@WebParam(name = "connectionURI") final URI connectionURI,
-                   @WebParam(name = "content") final String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+                   @WebParam(name = "content") final String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
+  {
       wireDependenciesLazily();
+    try {
       needProtocolNeedService.open(connectionURI, rdfUtils.toModel(content));
+    } catch (NoSuchConnectionException e) {
+      throw NoSuchConnectionFault.fromException(e);
+    } catch (IllegalMessageForConnectionStateException e) {
+      throw IllegalMessageForConnectionStateFault.fromException(e);
+    }
   }
 
   @Override
   @WebMethod
   public void close(@WebParam(name = "connectionURI") final URI connectionURI,
-                    @WebParam(name = "content") final String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+                    @WebParam(name = "content") final String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
   {
     wireDependenciesLazily();
-    needProtocolNeedService.close(connectionURI, rdfUtils.toModel(content));
+    try {
+      needProtocolNeedService.close(connectionURI, rdfUtils.toModel(content));
+    } catch (NoSuchConnectionException e) {
+      throw NoSuchConnectionFault.fromException(e);
+    } catch (IllegalMessageForConnectionStateException e) {
+      throw IllegalMessageForConnectionStateFault.fromException(e);
+    }
   }
 
   @Override
   @WebMethod
   public void sendTextMessage(
       @WebParam(name = "connectionURI") final URI connectionURI,
-      @WebParam(name = "message") final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+      @WebParam(name = "message") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
   {
     wireDependenciesLazily();
-    needProtocolNeedService.sendTextMessage(connectionURI, message);
+    try {
+      needProtocolNeedService.sendTextMessage(connectionURI, message);
+    } catch (NoSuchConnectionException e) {
+      throw NoSuchConnectionFault.fromException(e);
+    } catch (IllegalMessageForConnectionStateException e) {
+      throw IllegalMessageForConnectionStateFault.fromException(e);
+    }
   }
 
   @WebMethod(exclude = true)

@@ -10,6 +10,8 @@ import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.MatcherProtocolNeedWebServiceEndpoint;
+import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
+import won.protocol.ws.fault.NoSuchNeedFault;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -41,6 +43,10 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
       proxy.hint(needURI, otherNeed, score, originator, rdfUtils.toString(content));
     } catch (MalformedURLException e) {
       logger.warn("caught MalformedURLException:", e);
+    } catch (NoSuchNeedFault noSuchNeedFault) {
+      throw NoSuchNeedFault.toException(noSuchNeedFault);
+    } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
+      throw IllegalMessageForNeedStateFault.toException(illegalMessageForNeedStateFault);
     }
   }
 

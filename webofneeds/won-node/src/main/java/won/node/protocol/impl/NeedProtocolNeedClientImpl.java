@@ -24,6 +24,10 @@ import won.protocol.util.RdfUtils;
 import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.*;
 import won.protocol.need.NeedProtocolNeedService;
+import won.protocol.ws.fault.ConnectionAlreadyExistsFault;
+import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
+import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
+import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -55,6 +59,10 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
     } catch (MalformedURLException e) {
       //TODO think this through: what happens if we return null here?
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    } catch (ConnectionAlreadyExistsFault connectionAlreadyExistsFault) {
+      throw ConnectionAlreadyExistsFault.toException(connectionAlreadyExistsFault);
+    } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
+      throw IllegalMessageForNeedStateFault.toException(illegalMessageForNeedStateFault);
     }
     return null;
   }
@@ -67,6 +75,10 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
             proxy.open(connectionURI, rdfUtils.toString(content));
         } catch (MalformedURLException e) {
             logger.warn("couldnt create URL for needProtocolEndpoint", e);
+        } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+          throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+        } catch (NoSuchConnectionFault noSuchConnectionFault) {
+          throw NoSuchConnectionFault.toException(noSuchConnectionFault);
         }
     }
 
@@ -79,6 +91,10 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
       proxy.close(connectionURI, rdfUtils.toString(content));
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+      throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+    } catch (NoSuchConnectionFault noSuchConnectionFault) {
+      throw NoSuchConnectionFault.toException(noSuchConnectionFault);
     }
   }
 
@@ -91,6 +107,10 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
       proxy.sendTextMessage(connectionURI, message);
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+      throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+    } catch (NoSuchConnectionFault noSuchConnectionFault) {
+      throw NoSuchConnectionFault.toException(noSuchConnectionFault);
     }
   }
 

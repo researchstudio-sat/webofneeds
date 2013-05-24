@@ -22,11 +22,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.owner.OwnerProtocolOwnerService;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedRepository;
-import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
+import won.protocol.ws.fault.*;
 
 import java.io.StringWriter;
 import java.net.MalformedURLException;
@@ -43,7 +41,7 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
   private RdfUtils rdfUtils;
 
   @Override
-  public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException
+  public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
     logger.info(MessageFormat.format("owner-facing: HINT_RECEIVED called for own need {0}, other need {1}, with score {2} from originator {3} and content {4}", ownNeedURI, otherNeedURI, score, originatorURI, content));
     try {
@@ -53,8 +51,10 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
       proxy.hint(ownNeedURI, otherNeedURI, score, originatorURI, sw.toString());
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
-    } catch (IllegalMessageForNeedStateException e) {
-      e.printStackTrace();
+    } catch (NoSuchNeedFault noSuchNeedFault) {
+      throw NoSuchNeedFault.toException(noSuchNeedFault);
+    } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
+      logger.warn("couldn't send hint", illegalMessageForNeedStateFault);
     }
   }
 
@@ -69,8 +69,12 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
       proxy.connect(ownNeedURI, otherNeedURI, ownConnectionURI, sw.toString());
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
-    } catch (IllegalMessageForNeedStateException e) {
-      e.printStackTrace();
+    } catch (NoSuchNeedFault noSuchNeedFault) {
+      NoSuchNeedFault.toException(noSuchNeedFault);
+    } catch (ConnectionAlreadyExistsFault connectionAlreadyExistsFault) {
+      throw ConnectionAlreadyExistsFault.toException(connectionAlreadyExistsFault);
+    } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
+      logger.warn("couldn't send hint", illegalMessageForNeedStateFault);
     }
   }
 
@@ -84,7 +88,11 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {
-      e.printStackTrace();
+      logger.warn("could not get owner protocol endpoint", e);
+    }catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+      throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+    } catch (NoSuchConnectionFault noSuchConnectionFault) {
+      throw NoSuchConnectionFault.toException(noSuchConnectionFault);
     }
   }
 
@@ -98,7 +106,11 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {
-      e.printStackTrace();
+      logger.warn("could not get owner protocol endpoint", e);
+    } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+      illegalMessageForConnectionStateFault.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } catch (NoSuchConnectionFault noSuchConnectionFault) {
+      noSuchConnectionFault.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
   }
 
@@ -112,7 +124,11 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {
-      e.printStackTrace();
+      logger.warn("could not get owner protocol endpoint", e);
+    } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+      throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+    } catch (NoSuchConnectionFault noSuchConnectionFault) {
+      throw NoSuchConnectionFault.toException(noSuchConnectionFault);
     }
   }
 

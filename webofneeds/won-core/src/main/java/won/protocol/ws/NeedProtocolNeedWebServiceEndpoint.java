@@ -16,8 +16,11 @@
 
 package won.protocol.ws;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.exception.*;
+import won.protocol.exception.NoSuchNeedException;
+import won.protocol.ws.fault.ConnectionAlreadyExistsFault;
+import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
+import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
+import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -43,18 +46,18 @@ public interface NeedProtocolNeedWebServiceEndpoint
           @WebParam(name = "otherNeedURI") URI otherNeedURI,
           @WebParam(name = "otherConnectionURI") URI otherConnectionURI,
           @WebParam(name = "message") String content)
-        throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+        throws NoSuchNeedException, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault;
 
   @WebMethod
   void open(@WebParam(name = "connectionURI") URI connectionURI,
-               @WebParam(name = "content") String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+               @WebParam(name = "content") String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 
   @WebMethod
   void close(@WebParam(name = "connectionURI") URI connectionURI,
-          @WebParam(name = "content") String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+          @WebParam(name = "content") String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 
   @WebMethod
   void sendTextMessage(
       @WebParam(name = "connectionURI") URI connectionURI,
-      @WebParam(name = "message") String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+      @WebParam(name = "message") String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 }
