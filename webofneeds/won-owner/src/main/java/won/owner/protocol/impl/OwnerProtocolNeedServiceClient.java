@@ -169,7 +169,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   }
 
   @Override
-  public void sendTextMessage(final URI connectionURI, final String message)
+  public void textMessage(final URI connectionURI, final String message)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.debug("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
@@ -181,7 +181,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       Connection con = cons.get(0);
 
       //send text message
-      proxy.sendTextMessage(connectionURI, message);
+      proxy.textMessage(connectionURI, message);
 
       ChatMessage chatMessage = new ChatMessage();
       chatMessage.setCreationDate(new Date());

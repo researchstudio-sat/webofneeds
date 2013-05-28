@@ -56,6 +56,6 @@ public interface ConnectionCommunicationService
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendTextMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void textMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 }

@@ -87,7 +87,7 @@ public class ConnectionController {
         Connection con = cons.get(0);
 
         try {
-            ownerService.sendTextMessage(con.getConnectionURI(), text.getText());
+            ownerService.textMessage(con.getConnectionURI(), text.getText());
         } catch (Exception e) {
           logger.warn("error sending text message");
           return "error sending text message: " + e.getMessage();

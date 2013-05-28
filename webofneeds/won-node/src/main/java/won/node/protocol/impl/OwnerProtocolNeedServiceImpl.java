@@ -93,8 +93,8 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     }
 
     @Override
-    public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        this.connectionCommunicationService.sendTextMessage(connectionURI, message);
+    public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        this.connectionCommunicationService.textMessage(connectionURI, message);
     }
 
     @Override

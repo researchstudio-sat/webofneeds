@@ -129,7 +129,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   }
 
   @Override
-  public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("SEND_TEXT_MESSAGE received from the need side for connection {} with message '{}'", connectionURI, message);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
@@ -153,7 +153,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       public void run()
       {
         try {
-          ownerFacingConnectionClient.sendTextMessage(connectionURI, message);
+          ownerFacingConnectionClient.textMessage(connectionURI, message);
         } catch (WonProtocolException e) {
           logger.warn("caught WonProtocolException:", e);
         }

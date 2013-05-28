@@ -99,12 +99,12 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   }
 
   @Override
-  public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connectionURI);
-      proxy.sendTextMessage(connectionURI, message);
+      proxy.textMessage(connectionURI, message);
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {

@@ -48,11 +48,11 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     }
 
     @WebMethod
-    public void sendTextMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "message") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
+    public void textMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "message") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
     {
         wireDependenciesLazily();
       try {
-        ownerProtocolNeedService.sendTextMessage(connectionURI, message);
+        ownerProtocolNeedService.textMessage(connectionURI, message);
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {
