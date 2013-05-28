@@ -134,7 +134,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   }
 
   @Override
-  public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
@@ -159,7 +159,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       public void run()
       {
         try {
-          needFacingConnectionClient.sendTextMessage(remoteConnectionURI, message);
+          needFacingConnectionClient.textMessage(remoteConnectionURI, message);
         } catch (WonProtocolException e) {
           logger.warn("caught WonProtocolException:", e);
         }

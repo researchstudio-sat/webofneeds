@@ -34,7 +34,7 @@ import java.net.URI;
 public interface OwnerProtocolNeedWebServiceEndpoint
 {
   @WebMethod
-  public void sendTextMessage(@WebParam(name="connectionURI") final URI connectionURI, @WebParam(name="message") final String message)
+  public void textMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "message") final String message)
           throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 
   @WebMethod
