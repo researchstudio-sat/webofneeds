@@ -3,12 +3,12 @@ package won.owner.pojo;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.vocabulary.DC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.model.BasicNeedType;
 import won.protocol.model.NeedState;
 import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.GRDeliveryMethod;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -37,7 +37,6 @@ public class NeedPojo
   private Double upperPriceLimit;
   private Double lowerPriceLimit;
   private String currency;
-  private GRDeliveryMethod deliveryMethod;
 
   private Double latitude;
   private Double longitude;
@@ -48,6 +47,8 @@ public class NeedPojo
   private Integer recurTimes;
   private boolean recurInfiniteTimes;
 
+    private long needId = -1;
+
   public NeedPojo()
   {
 
@@ -55,6 +56,7 @@ public class NeedPojo
 
   public NeedPojo(URI needUri, final Model model)
   {
+    this.needURI = needUri.toString();
     Resource need = model.getResource(needUri.toString());
     creationDate = need.getProperty(WON.NEED_CREATION_DATE).getString();
 
@@ -68,7 +70,7 @@ public class NeedPojo
 
     Statement needContent = need.getProperty(WON.HAS_CONTENT);
     if (needContent != null) {
-      Statement titleStat = needContent.getResource().getProperty(WON.TITLE);
+      Statement titleStat = needContent.getResource().getProperty(DC.title);
       if (titleStat != null) title = titleStat.getString();
 
       Statement textDescriptionStat = needContent.getResource().getProperty(WON.TEXT_DESCRIPTION);
@@ -113,12 +115,6 @@ public class NeedPojo
 
         Statement upperStat = priceSpecification.getResource().getProperty(WON.HAS_UPPER_PRICE_LIMIT);
         if (upperStat != null) upperPriceLimit = upperStat.getDouble();
-      }
-
-      Statement deliveryStat = needModality.getProperty(WON.AVAILABLE_DELIVERY_METHOD);
-      if (deliveryStat != null) {
-        URI uri = URI.create(deliveryStat.getResource().getURI());
-        deliveryMethod = GRDeliveryMethod.parseString(uri.getFragment());
       }
 
     }
@@ -235,16 +231,6 @@ public class NeedPojo
     this.currency = currency;
   }
 
-  public GRDeliveryMethod getDeliveryMethod()
-  {
-    return deliveryMethod;
-  }
-
-  public void setDeliveryMethod(final GRDeliveryMethod deliveryMethod)
-  {
-    this.deliveryMethod = deliveryMethod;
-  }
-
   public Double getLatitude()
   {
     return latitude;
@@ -314,4 +300,14 @@ public class NeedPojo
   {
     this.recurInfiniteTimes = recurInfiniteTimes;
   }
+
+    public long getNeedId()
+    {
+        return needId;
+    }
+
+    public void setNeedId(long needId)
+    {
+        this.needId = needId;
+    }
 }

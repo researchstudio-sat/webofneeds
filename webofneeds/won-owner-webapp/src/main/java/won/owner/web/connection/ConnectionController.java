@@ -10,19 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.TextMessagePojo;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 
-import java.util.Date;
 import java.util.List;
-
-import static won.protocol.model.ConnectionState.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -94,7 +87,7 @@ public class ConnectionController {
         Connection con = cons.get(0);
 
         try {
-            ownerService.sendTextMessage(con.getConnectionURI(), text.getText());
+            ownerService.textMessage(con.getConnectionURI(), text.getText());
         } catch (Exception e) {
           logger.warn("error sending text message");
           return "error sending text message: " + e.getMessage();
@@ -112,7 +105,7 @@ public class ConnectionController {
         Connection con = cons.get(0);
         try {
             //TODO: ConnectionURI should be used here instead
-            ownerService.connectTo(con.getNeedURI(), con.getRemoteNeedURI(), "");
+            ownerService.connect(con.getNeedURI(), con.getRemoteNeedURI(), null);
         } catch (Exception e) {
           logger.warn("error during accept", e);
           return "error during accept: " + e.getMessage();
@@ -128,7 +121,8 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
-            ownerService.close(con.getConnectionURI());
+            //TODO: add rdf graph
+            ownerService.close(con.getConnectionURI(), null);
         } catch (Exception e) {
           logger.warn("error during deny", e);
           return "error during deny: " + e.getMessage();
@@ -144,7 +138,8 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
-            ownerService.close(con.getConnectionURI());
+            //TODO: add rdf graph
+            ownerService.close(con.getConnectionURI(), null);
         } catch (Exception e) {
           logger.warn("error during close", e);
           return "error during close: " + e.getMessage();

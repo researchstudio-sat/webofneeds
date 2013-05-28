@@ -98,7 +98,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     need.setState(NeedState.ACTIVE);
-    need = needRepository.saveAndFlush(need);
+    needRepository.saveAndFlush(need);
   }
 
   @Override
@@ -113,9 +113,10 @@ public class NeedManagementServiceImpl implements NeedManagementService
     Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());
     for (URI connURI : connectionURIs) {
       try {
-        ownerFacingConnectionCommunicationService.close(connURI);
+        //TODO: ADD content
+        ownerFacingConnectionCommunicationService.close(connURI, null);
       } catch (WonProtocolException e) {
-        logger.debug("caught exception when trying to close connection", e);
+        logger.warn("caught exception when trying to close connection", e);
       }
     }
   }

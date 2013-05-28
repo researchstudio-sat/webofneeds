@@ -4,7 +4,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.service.LinkedDataService;
@@ -15,6 +14,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Date: 2/15/11
@@ -74,6 +76,9 @@ public class LinkedDataRestService {
     //prefix for human readable pages
     private String pageURIPrefix;
 
+    //date format for Expires header (rfc 1123)
+    private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyyy HH:mm:ss z";
+
     @Autowired
     private LinkedDataService linkedDataService;
 
@@ -88,7 +93,9 @@ public class LinkedDataRestService {
         String requestUri = uriInfo.getRequestUri().toString();
 
         String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), dataUri.getPath());
-        return Response.seeOther(URI.create(redirectToURI)).build();
+
+        //TODO: actually the expiry information should be the same as that of the resource that is redirected to
+        return markAsNeverExpires(Response.seeOther(URI.create(redirectToURI))).build();
     }
 
     @GET
@@ -102,7 +109,8 @@ public class LinkedDataRestService {
         String requestUri = uriInfo.getRequestUri().toString();
 
         String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), pageUriPrefix.getPath());
-        return Response.seeOther(URI.create(redirectToURI)).build();
+      //TODO: actually the expiry information should be the same as that of the resource that is redirected to
+        return markAsNeverExpires(Response.seeOther(URI.create(redirectToURI))).build();
     }
 
     @GET
@@ -113,7 +121,7 @@ public class LinkedDataRestService {
             @DefaultValue("-1") @QueryParam("page") int page) {
         logger.debug("listNeedURIs() called");
         Model model = linkedDataService.listNeedURIs(page);
-      return addLocationHeaderIfNecessary(Response.ok(model), uriInfo.getRequestUri(), URI.create(this.needResourceURIPrefix)).build();
+      return markAsAlreadyExpired(addLocationHeaderIfNecessary(Response.ok(model), uriInfo.getRequestUri(), URI.create(this.needResourceURIPrefix))) .build();
     }
 
     @GET
@@ -124,7 +132,7 @@ public class LinkedDataRestService {
             @DefaultValue("-1") @QueryParam("page") int page) {
         logger.debug("listNeedURIs() called");
         Model model = linkedDataService.listConnectionURIs(page);
-      return addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), URI.create(this.connectionResourceURIPrefix)).build();
+      return markAsAlreadyExpired(addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), URI.create(this.connectionResourceURIPrefix))).build();
     }
 
 
@@ -138,7 +146,8 @@ public class LinkedDataRestService {
         URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
         try {
            Model model = linkedDataService.getNeedModel(needUri);
-           return addLocationHeaderIfNecessary(Response.ok(model), uriInfo.getRequestUri(), needUri).build();
+           //TODO: need information does change over time. The immutable need information should never expire, the mutable should
+           return markAsAlreadyExpired(addLocationHeaderIfNecessary(Response.ok(model), uriInfo.getRequestUri(), needUri)).build();
         } catch (NoSuchNeedException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -156,7 +165,8 @@ public class LinkedDataRestService {
 
         try {
           Model model = linkedDataService.getConnectionModel(connectionUri);
-          return addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), connectionUri).build();
+          //TODO: connection information does change over time. The immutable connection information should never expire, the mutable should
+          return markAsNeverExpires(addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), connectionUri)).build();
 
         } catch (NoSuchConnectionException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -176,29 +186,13 @@ public class LinkedDataRestService {
 
         try {
             Model model = linkedDataService.listConnectionURIs(page, needUri);
-            return addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), needUri).build();
+            return markAsAlreadyExpired(addLocationHeaderIfNecessary(Response.ok(model),uriInfo.getRequestUri(), needUri)).build();
         } catch (NoSuchNeedException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
 
-  /**
-   * Checks if the actual URI is the same as the canonical URI; if not, adds a Location header to the response builder
-   * indicating the canonical URI.
-   * @param builder
-   * @param actualURI
-   * @param canonicalURI
-   * @return
-   */
-    private Response.ResponseBuilder addLocationHeaderIfNecessary(Response.ResponseBuilder builder, URI actualURI, URI canonicalURI){
-      if(!canonicalURI.resolve(actualURI).equals(canonicalURI)) {
-        //the request URI is the canonical URI, it may be a DNS alias or relative
-        //according to http://www.w3.org/TR/ldp/#general we have to include
-        //the canonical URI in the lcoation header here
-        return builder.header(HTTP.HEADER_LOCATION, canonicalURI.toString());
-      }
-      return builder;
-    }
+
 
 
     public void setNeedResourceURIPrefix(String needResourceURIPrefix) {
@@ -224,4 +218,63 @@ public class LinkedDataRestService {
     public void setPageURIPrefix(final String pageURIPrefix) {
         this.pageURIPrefix = pageURIPrefix;
     }
+
+    /**
+     * Checks if the actual URI is the same as the canonical URI; if not, adds a Location header to the response builder
+     * indicating the canonical URI.
+     * @param builder
+     * @param actualURI
+     * @param canonicalURI
+     * @return
+     */
+    private Response.ResponseBuilder addLocationHeaderIfNecessary(Response.ResponseBuilder builder, URI actualURI, URI canonicalURI){
+      if(!canonicalURI.resolve(actualURI).equals(canonicalURI)) {
+        //the request URI is the canonical URI, it may be a DNS alias or relative
+        //according to http://www.w3.org/TR/ldp/#general we have to include
+        //the canonical URI in the lcoation header here
+        return builder.header(HTTP.HEADER_LOCATION, canonicalURI.toString());
+      }
+      return builder;
+    }
+
+    /**
+     * Sets the Date and Expires header fields such that the response will be treated as 'never expires'
+     * (and will therefore be cached forever)
+     * @param res
+     * @return
+     */
+    private Response.ResponseBuilder markAsNeverExpires(Response.ResponseBuilder res){
+      SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC_1123);
+      return res
+          .header(HTTP.HEADER_EXPIRES, dateFormat.format(getNeverExpiresDate()))
+          .header(HTTP.HEADER_DATE, dateFormat.format(new Date()))
+          ;
+    }
+
+  /**
+   * Sets the Date and Expires header fields such that the response will be treated as 'already expired'
+   * (and will therefore not be cached)
+   * @param res
+   * @return
+   */
+  private Response.ResponseBuilder markAsAlreadyExpired(Response.ResponseBuilder res){
+    Date headerDate = new Date();
+    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC_1123);
+    String formattedDate = dateFormat.format(headerDate);
+    return res
+      .header(HTTP.HEADER_EXPIRES, formattedDate)
+      .header(HTTP.HEADER_DATE, formattedDate)
+      ;
+  }
+
+    //Calculates a date that, according to http spec, means 'never expires'
+    //See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+    private Date getNeverExpiresDate(){
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(new Date());
+      cal.set(Calendar.YEAR,cal.get(Calendar.YEAR)+1);
+      return cal.getTime();
+    }
+
+
 }

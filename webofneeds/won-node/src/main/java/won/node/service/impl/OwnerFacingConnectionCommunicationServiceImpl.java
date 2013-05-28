@@ -16,6 +16,7 @@
 
 package won.node.service.impl;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ import java.util.concurrent.ExecutorService;
 public class OwnerFacingConnectionCommunicationServiceImpl implements ConnectionCommunicationService
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
+
   private ConnectionCommunicationService needFacingConnectionClient;
 
   private ExecutorService executorService;
@@ -48,13 +50,54 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   private ConnectionRepository connectionRepository;
   @Autowired
   private ChatMessageRepository chatMessageRepository;
-    @Autowired
-    private EventRepository eventRepository;
+  @Autowired
+  private EventRepository eventRepository;
+  @Autowired
+  private RDFStorageService rdfStorageService;
 
-   @Override
-  public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  @Override
+  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("CLOSE received from the owner side for connection {}",new Object[]{connectionURI});
+    logger.info("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+    //load connection, checking if it exists
+    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+    //perform state transit
+    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_OPEN);
+    //set new state and save in the db
+    con.setState(nextState);
+    //save in the db
+    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
+
+    ConnectionEvent event = new ConnectionEvent();
+    event.setConnectionURI(con.getConnectionURI());
+    event.setType(ConnectionEventType.OWNER_OPEN);
+    event.setOriginatorUri(con.getRemoteConnectionURI());
+    eventRepository.saveAndFlush(event);
+
+    rdfStorageService.storeContent(event, content);
+
+    //inform the other side
+    if (con.getRemoteConnectionURI() != null) {
+      executorService.execute(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          try {
+            needFacingConnectionClient.open(connectionForRunnable.getRemoteConnectionURI(), content);
+          } catch (WonProtocolException e) {
+            logger.debug("caught Exception:", e);
+          }
+        }
+      });
+    }
+  }
+
+  @Override
+  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  {
+    logger.info("CLOSE received from the owner side for connection {0} with content {1}", connectionURI, content);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
@@ -71,6 +114,8 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     event.setOriginatorUri(con.getRemoteConnectionURI());
     eventRepository.saveAndFlush(event);
 
+    rdfStorageService.storeContent(event, content);
+
     //inform the other side
     if (con.getRemoteConnectionURI() != null) {
       executorService.execute(new Runnable()
@@ -79,9 +124,9 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
         public void run()
         {
           try {
-            needFacingConnectionClient.close(connectionForRunnable.getRemoteConnectionURI());
+            needFacingConnectionClient.close(connectionForRunnable.getRemoteConnectionURI(), content);
           } catch (WonProtocolException e) {
-            logger.debug("caught Exception:", e);
+            logger.warn("caught WonProtocolException:", e);
           }
         }
       });
@@ -89,9 +134,9 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   }
 
   @Override
-  public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'",new Object[]{connectionURI,message});
+    logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     if (message == null) throw new IllegalArgumentException("message is not set");
     //load connection, checking if it exists
@@ -114,9 +159,9 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       public void run()
       {
         try {
-          needFacingConnectionClient.sendTextMessage(remoteConnectionURI, message);
+          needFacingConnectionClient.textMessage(remoteConnectionURI, message);
         } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
+          logger.warn("caught WonProtocolException:", e);
         }
       }
     });
@@ -141,14 +186,17 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   /**
    * Calculates the connectionState resulting from the message in the current connection state.
    * Checks if the specified message is allowed in the connection's state and throws an exception if not.
+   *
    * @param con
    * @param msg
    * @return
-   * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the connection's current state
+   * @throws won.protocol.exception.IllegalMessageForConnectionStateException
+   *          if the message is not allowed in the connection's current state
    */
-  private ConnectionState performStateTransit(Connection con, ConnectionEventType msg) throws IllegalMessageForConnectionStateException{
-    if (!msg.isMessageAllowed(con.getState())){
-      throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(),con.getState());
+  private ConnectionState performStateTransit(Connection con, ConnectionEventType msg) throws IllegalMessageForConnectionStateException
+  {
+    if (!msg.isMessageAllowed(con.getState())) {
+      throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(), con.getState());
     }
     return con.getState().transit(msg);
   }
@@ -156,5 +204,10 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   public void setExecutorService(final ExecutorService executorService)
   {
     this.executorService = executorService;
+  }
+
+  public void setRdfStorageService(final RDFStorageService rdfStorageService)
+  {
+    this.rdfStorageService = rdfStorageService;
   }
 }

@@ -41,7 +41,7 @@ public class NeedModelMapper implements ModelMapper<Need>
     if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
 
     Resource needRes = needIt.next();
-    logger.debug("processing need resource " + needRes.getURI());
+    logger.debug("processing need resource {}", needRes.getURI());
 
     need.setNeedURI(URI.create(needRes.getURI()));
 
@@ -51,7 +51,7 @@ public class NeedModelMapper implements ModelMapper<Need>
       need.setCreationDate(DateTimeUtils.parse(dateTime));
       logger.debug("found needCreationDate literal value '{}'",dateStat.getObject().asLiteral().getString());
     } else {
-      logger.debug("no needCreationDate property found for need resource " + needRes.getURI());
+      logger.debug("no needCreationDate property found for need resource {}", needRes.getURI());
     }
 
     Statement stateStat = needRes.getProperty(WON.IS_IN_STATE);
@@ -60,7 +60,7 @@ public class NeedModelMapper implements ModelMapper<Need>
       need.setState(NeedState.parseString(uri.getFragment()));
       logger.debug("found isInState literal value '{}'",stateStat.getObject().asResource().getURI());
     }  else {
-      logger.debug("no isInState property found for need resource " + needRes.getURI());
+      logger.debug("no isInState property found for need resource {}", needRes.getURI());
     }
 
     return need;

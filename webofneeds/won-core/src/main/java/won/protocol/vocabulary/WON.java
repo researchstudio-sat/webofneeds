@@ -50,14 +50,13 @@ public class WON
 
   public static final Property HAS_CONTENT = m.createProperty(BASE_URI, "hasContent");
   public static final Resource NEED_CONTENT = m.createResource(BASE_URI + "NeedContent");
-  public static final Property TITLE = m.createProperty(BASE_URI, "title");
-  public static final Property TEXT_DESCRIPTION = m.createProperty(BASE_URI, "textDescription");
-  public static final Property CONTENT_DESCRIPTION = m.createProperty(BASE_URI, "contentDescription");
-  public static final Property HEIGHT = m.createProperty(BASE_URI, "height");
-  public static final Property DEPTH = m.createProperty(BASE_URI, "depth");
-  public static final Property WIDTH = m.createProperty(BASE_URI, "width");
-  public static final Property WEIGHT = m.createProperty(BASE_URI, "weight");
-  public static final Property QUANTITATIVE_PROPERTY = m.createProperty(BASE_URI, "quantitativeProperty");
+  public static final Property TEXT_DESCRIPTION = m.createProperty(BASE_URI, "hasTextDescription");
+  public static final Property CONTENT_DESCRIPTION = m.createProperty(BASE_URI, "hasContentDescription");
+  public static final Property HEIGHT = m.createProperty(BASE_URI, "hasHeight");
+  public static final Property DEPTH = m.createProperty(BASE_URI, "hasDepth");
+  public static final Property WIDTH = m.createProperty(BASE_URI, "hasWidth");
+  public static final Property WEIGHT = m.createProperty(BASE_URI, "hasWeight");
+  public static final Property QUANTITATIVE_PROPERTY = m.createProperty(BASE_URI, "hasQuantitativeProperty");
 
   public static final Property HAS_OWNER = m.createProperty(BASE_URI, "hasOwner");
   public static final Resource OWNER = m.createResource(BASE_URI + "Owner");
@@ -74,10 +73,13 @@ public class WON
   public static final Property HAS_EVENT_CONTAINER = m.createProperty(BASE_URI, "hasEventContainer");
   public static final Resource EVENT_CONTAINER = m.createResource(BASE_URI + "EventContainer");
   public static final Resource EVENT = m.createResource(BASE_URI + "Event");
-  public static final Property OCCURED_AT = m.createProperty(BASE_URI, "occuredAt");
+  public static final Property OCCURED_AT = m.createProperty(BASE_URI, "hasTimeStamp");
   public static final Property HAS_ORIGINATOR = m.createProperty(BASE_URI, "hasOriginator");
 
-  public static final Property HAS_NEED_MODALITY = m.createProperty(BASE_URI, "hasMeedModality");
+  public static final Property HAS_ADDITIONAL_DATA = m.createProperty(BASE_URI, "hasAdditionalData");
+  public static final Resource ADDITIONAL_DATA_CONTAINER = m.createResource(BASE_URI + "AdditionalDataContainer");
+
+  public static final Property HAS_NEED_MODALITY = m.createProperty(BASE_URI, "hasNeedModality");
   public static final Resource NEED_MODALITY = m.createResource(BASE_URI + "NeedModality");
 
   public static final Property HAS_PRICE_SPECIFICATION = m.createProperty(BASE_URI, "hasPriceSpecification");
@@ -86,25 +88,22 @@ public class WON
   public static final Property HAS_UPPER_PRICE_LIMIT = m.createProperty(BASE_URI, "hasUpperPriceLimit");
   public static final Property HAS_CURRENCY = m.createProperty(BASE_URI, "hasCurrency");
 
-  public static final Property AVAILABLE_AT_LOCATION = m.createProperty(BASE_URI, "availableAtLocation");
-  public static final Resource LOCATION = m.createResource(BASE_URI + "Location");
+  public static final Property AVAILABLE_AT_LOCATION = m.createProperty(BASE_URI, "hasLocationSpecification");
+  public static final Resource LOCATION = m.createResource(BASE_URI + "LocationSpecification");
   public static final Property IS_CONCEALED = m.createProperty(BASE_URI, "isConcealed");
   public static final Resource REGION = m.createResource(BASE_URI + "Region");
   public static final Property HAS_ISO_CODE = m.createProperty(BASE_URI, "hasISOCode");
 
-  public static final Property AVAILABLE_DELIVERY_METHOD = m.createProperty(BASE_URI, "availableDeliveryMethod");
-
-  public static final Property AVAILABLE_AT_TIME = m.createProperty(BASE_URI, "availableAtTime");
-  public static final Resource TIME_CONSTRAINT = m.createResource(BASE_URI + "TimeConstraint");
-  public static final Property START_TIME = m.createProperty(BASE_URI, "startTime");
-  public static final Property END_TIME = m.createProperty(BASE_URI, "endTime");
-  public static final Property RECUR_IN = m.createProperty(BASE_URI, "recurIn");
-  public static final Property RECUR_TIMES = m.createProperty(BASE_URI, "recurTimes");
-  public static final Property RECUR_INFINITE_TIMES = m.createProperty(BASE_URI, "recurInfiniteTimes");
+  public static final Property AVAILABLE_AT_TIME = m.createProperty(BASE_URI, "hasTimeSpecification");
+  public static final Resource TIME_CONSTRAINT = m.createResource(BASE_URI + "TimeSpecification");
+  public static final Property START_TIME = m.createProperty(BASE_URI, "hasStartTime");
+  public static final Property END_TIME = m.createProperty(BASE_URI, "hasEndTime");
+  public static final Property RECUR_IN = m.createProperty(BASE_URI, "hasRecursIn");
+  public static final Property RECUR_TIMES = m.createProperty(BASE_URI, "hasRecursTimes");
+  public static final Property RECUR_INFINITE_TIMES = m.createProperty(BASE_URI, "hasRecurInfiniteTimes");
 
   // Resource individuals
   public static final Resource EVENT_TYPE_CLOSE = m.createResource(ConnectionEventType.OWNER_CLOSE.getURI().toString());
-  public static final Resource EVENT_TYPE_PREPARE = m.createResource(ConnectionEventType.OWNER_PREPARE.getURI().toString());
   public static final Resource EVENT_TYPE_OPEN = m.createResource(ConnectionEventType.OWNER_OPEN.getURI().toString());
   public static final Resource EVENT_TYPE_HINT = m.createResource(ConnectionEventType.MATCHER_HINT.getURI().toString());
 
@@ -116,7 +115,6 @@ public class WON
   public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
 
   public static final Resource CONNECTION_STATE_SUGGESTED = m.createResource(ConnectionState.SUGGESTED.getURI().toString());
-  public static final Resource CONNECTION_STATE_PREPARED = m.createResource(ConnectionState.PREPARED.getURI().toString());
   public static final Resource CONNECTION_STATE_REQUEST_SENT = m.createResource(ConnectionState.REQUEST_SENT.getURI().toString());
   public static final Resource CONNECTION_STATE_REQUEST_RECEIVED = m.createResource(ConnectionState.REQUEST_RECEIVED.getURI().toString());
   public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
@@ -187,8 +185,6 @@ public class WON
       case OWNER_OPEN:
       case PARTNER_OPEN:
         return EVENT_TYPE_OPEN;
-      case OWNER_PREPARE:
-        return EVENT_TYPE_PREPARE;
       default:
         throw new IllegalStateException("No such case specified for " + type.name());
     }
@@ -205,8 +201,6 @@ public class WON
     switch (type) {
       case SUGGESTED:
         return CONNECTION_STATE_SUGGESTED;
-      case PREPARED:
-        return CONNECTION_STATE_PREPARED;
       case REQUEST_SENT:
         return CONNECTION_STATE_REQUEST_SENT;
       case REQUEST_RECEIVED:

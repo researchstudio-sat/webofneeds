@@ -16,6 +16,8 @@
 
 package won.protocol.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -27,11 +29,12 @@ import java.net.URI;
 public enum ConnectionState
 {
   SUGGESTED("Suggested"),
-  PREPARED("Prepared"),
   REQUEST_SENT("RequestSent"),
   REQUEST_RECEIVED("RequestReceived"),
   CONNECTED("Connected"),
   CLOSED("Closed");
+
+  private static final Logger logger = LoggerFactory.getLogger(ConnectionState.class);
 
   private String name;
 
@@ -43,8 +46,6 @@ public enum ConnectionState
   public static ConnectionState create(ConnectionEventType msg)
   {
     switch (msg) {
-      case OWNER_PREPARE:
-        return PREPARED;
       case MATCHER_HINT:
         return SUGGESTED;
       case OWNER_OPEN:
@@ -60,19 +61,8 @@ public enum ConnectionState
     switch (this) {
       case SUGGESTED:
         switch (msg) {
-          case OWNER_PREPARE:
-            return PREPARED;
-          case PARTNER_OPEN:
-            return REQUEST_RECEIVED;
-          case OWNER_CLOSE:
-            return CLOSED;
-          case PARTNER_CLOSE:
-            return CLOSED;
-        }
-      case PREPARED:
-        switch (msg) {
           case OWNER_OPEN:
-            return REQUEST_SENT;
+                return REQUEST_SENT;
           case PARTNER_OPEN:
             return REQUEST_RECEIVED;
           case OWNER_CLOSE:
@@ -133,7 +123,7 @@ public enum ConnectionState
       if (state.name.equals(fragment))
         return state;
 
-    System.err.println("No enum could be matched for: " + fragment);
+    logger.warn("No enum could be matched for: {}", fragment);
     return null;
   }
 }

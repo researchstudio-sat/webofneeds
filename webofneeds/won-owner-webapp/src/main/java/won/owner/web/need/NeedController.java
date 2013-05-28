@@ -3,6 +3,7 @@ package won.owner.web.need;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.DC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,7 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
-import won.protocol.util.DateTimeUtils;
 import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.GR;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -128,7 +127,7 @@ public class NeedController
       // need content
       Resource needContent = needModel.createResource(WON.NEED_CONTENT);
       if (!needPojo.getTitle().isEmpty())
-        needContent.addProperty(WON.TITLE, needPojo.getTitle(), XSDDatatype.XSDstring);
+        needContent.addProperty(DC.title, needPojo.getTitle(), XSDDatatype.XSDstring);
       if (!needPojo.getTextDescription().isEmpty())
         needContent.addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
       needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
@@ -140,8 +139,6 @@ public class NeedController
 
       // need modalities
       Resource needModality = needModel.createResource(WON.NEED_MODALITY);
-
-      needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_DELIVERY_METHOD, GR.toResource(needPojo.getDeliveryMethod())));
 
       // TODO: store need modalities in separate objects to enable easier checking and multiple instances
       //price and currency
@@ -195,7 +192,7 @@ public class NeedController
         return "redirect:/need/" + needs.get(0).getId().toString();
       // return viewNeed(need.getId().toString(), model);
     } catch (IllegalNeedContentException e) {
-      e.printStackTrace();
+      logger.warn("caught IllegalNeedContentException:", e);
     }
 
     model.addAttribute("command", new NeedPojo());
@@ -282,16 +279,16 @@ public class NeedController
         return "noNeedFound";
 
       Need need1 = needs.get(0);
-      ownerService.connectTo(need1.getNeedURI(), new URI(needPojo.getNeedURI()), "");
+      ownerService.connect(need1.getNeedURI(), new URI(needPojo.getNeedURI()), null);
       return "redirect:/need/" + need1.getId().toString();//viewNeed(need1.getId().toString(), model);
     } catch (URISyntaxException e) {
-      e.printStackTrace();
+      logger.warn("caught URISyntaxException:", e);
     } catch (ConnectionAlreadyExistsException e) {
-      e.printStackTrace();
+      logger.warn("caught ConnectionAlreadyExistsException:", e);
     } catch (IllegalMessageForNeedStateException e) {
-      e.printStackTrace();
+      logger.warn("caught IllegalMessageForNeedStateException:", e);
     } catch (NoSuchNeedException e) {
-      e.printStackTrace();
+      logger.warn("caught NoSuchNeedException:", e);
     }
 
     return "noNeedFound";
@@ -311,7 +308,7 @@ public class NeedController
         ownerService.activate(need.getNeedURI());
       }
     } catch (NoSuchNeedException e) {
-      e.printStackTrace();
+      logger.warn("caught NoSuchNeedException:", e);
     }
     return "redirect:/need/" + need.getId().toString();
     //return viewNeed(need.getId().toString(), model);
@@ -329,14 +326,14 @@ public class NeedController
         List<Need> needs = needRepository.findByNeedURI(match.getFromNeed());
         if (!needs.isEmpty())
           ret = "redirect:/need/" + needs.get(0).getId().toString();//viewNeed(needs.get(0).getId().toString(), model);
-        ownerService.connectTo(match.getFromNeed(), match.getToNeed(), "");
+        ownerService.connect(match.getFromNeed(), match.getToNeed(), null);
       }
     } catch (ConnectionAlreadyExistsException e) {
-      e.printStackTrace();
+      logger.warn("caught ConnectionAlreadyExistsException:", e);
     } catch (IllegalMessageForNeedStateException e) {
-      e.printStackTrace();
+      logger.warn("caught IllegalMessageForNeedStateException:", e);
     } catch (NoSuchNeedException e) {
-      e.printStackTrace();
+      logger.warn("caught NoSuchNeedException:", e);
     }
 
     return ret;
