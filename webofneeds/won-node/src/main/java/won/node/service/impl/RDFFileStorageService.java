@@ -73,9 +73,10 @@ public class RDFFileStorageService implements RDFStorageService {
         try {
             m = ModelFactory.createDefaultModel();
             // use the FileManager to find the input file
-            in = FileManager.get().open(path + "/" + filename);
+            String absolutePathName = path + "/" + filename;
+            in = FileManager.get().open(absolutePathName);
             if (in == null) {
-                throw new IllegalArgumentException("File: offer.ttl not found");
+                throw new IllegalArgumentException("File: '" + absolutePathName +"' not found");
             }
             m.read(in, null, "TTL");
         } finally {
