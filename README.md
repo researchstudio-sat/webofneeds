@@ -35,3 +35,6 @@ won-owner
 
 matching-service
 - the matching-service crawls the won-nodes and looks for need and offer entries with corresponding values.
+
+
+See also: http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf
