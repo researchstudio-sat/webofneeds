@@ -107,9 +107,11 @@ public class WON
   public static final Resource EVENT_TYPE_OPEN = m.createResource(ConnectionEventType.OWNER_OPEN.getURI().toString());
   public static final Resource EVENT_TYPE_HINT = m.createResource(ConnectionEventType.MATCHER_HINT.getURI().toString());
 
-  public static final Resource BASIC_NEED_TYPE_DO = m.createResource(BasicNeedType.DO.getURI().toString());
-  public static final Resource BASIC_NEED_TYPE_GIVE = m.createResource(BasicNeedType.GIVE.getURI().toString());
-  public static final Resource BASIC_NEED_TYPE_TAKE = m.createResource(BasicNeedType.TAKE.getURI().toString());
+  public static final Resource BASIC_NEED_TYPE_DO_TOGETHER = m.createResource(BasicNeedType.DO_TOGETHER.getURI().toString());
+  public static final Resource BASIC_NEED_TYPE_SUPPLY = m.createResource(BasicNeedType.SUPPLY.getURI().toString());
+  public static final Resource BASIC_NEED_TYPE_DEMAND = m.createResource(BasicNeedType.DEMAND.getURI().toString());
+  public static final Resource BASIC_NEED_TYPE_CRITIQUE = m.createResource(BasicNeedType.CRITIQUE.getURI().toString());
+  public static final Property ALLOWS_MATCH_WITH = m.createProperty(BASE_URI, "allowsMatchWith");
 
   public static final Resource NEED_STATE_ACTIVE = m.createResource(NeedState.ACTIVE.getURI().toString());
   public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
@@ -157,12 +159,14 @@ public class WON
   public static Resource toResource(BasicNeedType type)
   {
     switch (type) {
-      case DO:
-        return BASIC_NEED_TYPE_DO;
-      case GIVE:
-        return BASIC_NEED_TYPE_GIVE;
-      case TAKE:
-        return BASIC_NEED_TYPE_TAKE;
+      case DO_TOGETHER:
+        return BASIC_NEED_TYPE_DO_TOGETHER;
+      case SUPPLY:
+        return BASIC_NEED_TYPE_SUPPLY;
+      case DEMAND:
+        return BASIC_NEED_TYPE_DEMAND;
+      case CRITIQUE:
+        return BASIC_NEED_TYPE_CRITIQUE;
       default:
         throw new IllegalStateException("No such case specified for " + type.name());
     }

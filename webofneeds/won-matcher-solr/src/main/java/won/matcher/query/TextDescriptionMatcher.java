@@ -252,9 +252,9 @@ public class TextDescriptionMatcher
 
   private boolean isCompatibleBasicNeedType(Resource fromType, Resource toType)
   {
-    return WON.BASIC_NEED_TYPE_DO.equals(fromType) && WON.BASIC_NEED_TYPE_DO.equals(toType) ||
-        WON.BASIC_NEED_TYPE_GIVE.equals(fromType) && WON.BASIC_NEED_TYPE_TAKE.equals(toType) ||
-        WON.BASIC_NEED_TYPE_TAKE.equals(fromType) && WON.BASIC_NEED_TYPE_GIVE.equals(toType);
+    return WON.BASIC_NEED_TYPE_DO_TOGETHER.equals(fromType) && WON.BASIC_NEED_TYPE_DO_TOGETHER.equals(toType) ||
+        WON.BASIC_NEED_TYPE_SUPPLY.equals(fromType) && WON.BASIC_NEED_TYPE_DEMAND.equals(toType) ||
+        WON.BASIC_NEED_TYPE_DEMAND.equals(fromType) && WON.BASIC_NEED_TYPE_SUPPLY.equals(toType);
   }
 
   private Point getPointIfPresent(String needURI, Model model)

@@ -122,6 +122,8 @@ public class NeedController
       Resource needResource = needModel.createResource(WON.NEED);
 
       // need type
+      Resource basicNeedType = needModel.createResource(WON.toResource(needPojo.getBasicNeedType()));
+      needModel.add(needModel.createStatement(basicNeedType, WON.ALLOWS_MATCH_WITH, WON.toResource(needPojo.getBasicNeedType().getMatchesWith())));
       needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
 
       // need content
