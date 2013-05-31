@@ -88,11 +88,11 @@ public class TextDescriptionMatcher
     logger.debug("maxDoc: {}", si.maxDoc());
     for (int i = 0; i < si.maxDoc(); i++) {
       try {
-          try{
-            Thread.sleep(TIMEOUT_BETWEEN_SEARHCES);
-          } catch (InterruptedException e ){
-              //swallow that one
-          }
+        try {
+          Thread.sleep(TIMEOUT_BETWEEN_SEARHCES);
+        } catch (InterruptedException e) {
+          //swallow that one
+        }
         query = mlt.like(i);
         String fromUriString = ir.document(i).getValues(FIELD_URL)[0]; //getValues() instead of get() just to make sure we don't have more than 1
         fromUriString = fromUriString.replaceAll("^<", "").replaceAll(">$", "");
@@ -156,7 +156,7 @@ public class TextDescriptionMatcher
               //ignore the match if the locations are more than MAX_DISTANCE_KM apart
               if (fromPoint != null) {
                 Point toPoint = getPointIfPresent(toUriString, toModel);
-                if (toPoint != null){
+                if (toPoint != null) {
                   double distance = Math.abs(fromPoint.distance(toPoint));
                   if (distance > MAX_DISTANCE_KM) {
                     logger.debug("geo points are too far apart ({} km), ignoring match {}", fromPoint.distance(toPoint), toURI.toString());
@@ -169,8 +169,8 @@ public class TextDescriptionMatcher
               logger.debug("score: {}, weighted score: {}", score, score * scoreWeight);
               score = score * scoreWeight;
               if (score < MATCH_THRESHOLD) {
-                  logger.debug("score {} is lower than match trheshold {}, ignoring match {}", new Object[]{score, MATCH_THRESHOLD, toURI.toString()});
-                  continue;
+                logger.debug("score {} is lower than match trheshold {}, ignoring match {}", new Object[]{score, MATCH_THRESHOLD, toURI.toString()});
+                continue;
               }
               String matchKey = fromURI.toString() + " <=> " + toURI.toString();
               String matchKey2 = toURI.toString() + " <=> " + fromURI.toString();
@@ -206,7 +206,7 @@ public class TextDescriptionMatcher
           logger.debug("Nothing found similar to {}", fromUriString);
         }
       } catch (IOException e) {
-        logger.warn("Could not generate similarity query with document {}!",i , e);
+        logger.warn("Could not generate similarity query with document {}!", i, e);
       }
     }
 
@@ -216,12 +216,12 @@ public class TextDescriptionMatcher
 
   private Model convertNTriplesToModel(String ntriples)
   {
-      Model model = ModelFactory.createDefaultModel();
-      try {
-        model.read(new StringReader(ntriples), WON.getURI(), "N-TRIPLES");
+    Model model = ModelFactory.createDefaultModel();
+    try {
+      model.read(new StringReader(ntriples), WON.getURI(), "N-TRIPLES");
     } catch (Exception e) {
-        logger.debug("could not convert ntriples to model",e);
-        logger.debug("triples were:\n{}", ntriples);
+      logger.debug("could not convert ntriples to model", e);
+      logger.debug("triples were:\n{}", ntriples);
     }
     return model;
   }
@@ -240,7 +240,7 @@ public class TextDescriptionMatcher
     return stmt.getObject().asResource();
   }
 
-   private Resource getBasicNeedType(String needURI, Model model)
+  private Resource getBasicNeedType(String needURI, Model model)
   {
     Statement stmt = model.getProperty(model.getResource(needURI), WON.HAS_BASIC_NEED_TYPE);
     if (stmt == null) {
@@ -252,15 +252,13 @@ public class TextDescriptionMatcher
 
   private boolean isCompatibleBasicNeedType(Resource fromType, Resource toType)
   {
-    return WON.BASIC_NEED_TYPE_DO.equals(fromType) && WON.BASIC_NEED_TYPE_DO.equals(toType) ||
-        WON.BASIC_NEED_TYPE_GIVE.equals(fromType) && WON.BASIC_NEED_TYPE_TAKE.equals(toType) ||
-        WON.BASIC_NEED_TYPE_TAKE.equals(fromType) && WON.BASIC_NEED_TYPE_GIVE.equals(toType);
+    return fromType.getProperty(WON.ALLOWS_MATCH_WITH).getResource().equals(toType);
   }
 
   private Point getPointIfPresent(String needURI, Model model)
   {
-    Resource modalityRes = getModality(needURI,model);
-    if (modalityRes == null ) {
+    Resource modalityRes = getModality(needURI, model);
+    if (modalityRes == null) {
       logger.debug("{} has no modality, can't look for location", needURI);
       return null;
     }
@@ -311,7 +309,7 @@ public class TextDescriptionMatcher
           Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
       double c = Math.abs(2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
       double d = R * c;
-      logger.debug("calculated a distance of {} km between {} and {}", new Object[]{d, this,other});
+      logger.debug("calculated a distance of {} km between {} and {}", new Object[]{d, this, other});
       return d;
     }
 
