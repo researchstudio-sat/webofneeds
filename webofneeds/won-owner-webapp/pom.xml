@@ -17,6 +17,7 @@
             <groupId>webofneeds</groupId>
             <artifactId>won-owner</artifactId>
             <version>${project.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
 
@@ -24,6 +25,7 @@
             <groupId>webofneeds</groupId>
             <artifactId>won-matcher</artifactId>
             <version>${project.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <!-- JSTL/Servlet-->
@@ -31,6 +33,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>${javax.servlet.jstl.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <!-- JAX-WS (webservices)-->
@@ -38,17 +41,20 @@
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
             <version>${com.sun.xml.ws.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-tools</artifactId>
             <version>${com.sun.xml.ws.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-spring</artifactId>
             <version>${com.sun.jersey.contribs-jersey-spring.version}</version>
+            <scope>${dependencies.scope}</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -78,61 +84,37 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${org.springframework.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${org.springframework.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>1.17.1</version>
-        </dependency>
-
-        <!-- Jersey + Spring -->
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-spring</artifactId>
-            <version>1.17.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-web</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-beans</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${com.sun.jersey.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
-            <version>1.17.1</version>
+            <version>${com.sun.jersey.version}</version>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${org.springframework.version}</version>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${org.springframework.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
     </dependencies>
 

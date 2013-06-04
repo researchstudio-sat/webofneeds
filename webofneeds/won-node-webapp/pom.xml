@@ -14,11 +14,13 @@
     <packaging>war</packaging>
     <name>WON node web application</name>
     <url>http://www.springframework.org/spring-ws</url>
+
     <dependencies>
         <dependency>
             <groupId>webofneeds</groupId>
             <artifactId>won-node</artifactId>
             <version>${project.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <!-- JAX-WS (webservices)-->
@@ -26,17 +28,20 @@
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
             <version>${com.sun.xml.ws.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-tools</artifactId>
             <version>${com.sun.xml.ws.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-spring</artifactId>
             <version>${com.sun.jersey.contribs-jersey-spring.version}</version>
+            <scope>${dependencies.scope}</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -69,11 +74,13 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${org.springframework.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>${org.springframework.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
     </dependencies>

@@ -13,13 +13,15 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>webofneeds</groupId>
     <artifactId>webofneeds</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Web of Needs module project</name>
+
     <modules>
         <module>won-core</module>
         <module>won-node-webapp</module>
@@ -30,6 +32,7 @@
         <module>won-matcher-solr</module>
         <module>won-ontology-validator</module>
     </modules>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -106,6 +109,7 @@
             </plugins>
         </pluginManagement>
     </build>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compile.compilerargs>
@@ -119,12 +123,13 @@
         <surefire.forkmode>once</surefire.forkmode>
         <surefire.reportformat>brief</surefire.reportformat>
         <surefire.usefile>false</surefire.usefile>
+        <dependencies.scope>compile</dependencies.scope>
 
         <!-- versions for various dependencies -->
         <solr.version>3.5.0</solr.version>
         <cglib.version>2.2.2</cglib.version>
-        <com.sun.jersey.version>1.9.1</com.sun.jersey.version>
-        <com.sun.jersey.contribs-jersey-spring.version>1.9.1</com.sun.jersey.contribs-jersey-spring.version>
+        <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
+        <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
         <com.sun.xml.version>2.0EA3</com.sun.xml.version>
         <com.sun.xml.ws.version>2.2.8-promoted-b146</com.sun.xml.ws.version>
         <junit.version>4.8.2</junit.version>
@@ -141,6 +146,7 @@
     </properties>
 
     <profiles>
+
         <profile>
             <id>skip-tests-localhost</id>
             <build>
@@ -170,18 +176,21 @@
                 </testResources>
             </build>
         </profile>
+
         <profile>
             <id>no-warn</id>
             <properties>
                 <maven.compile.compilerargs>-Xlint:none</maven.compile.compilerargs>
             </properties>
         </profile>
+
         <profile>
             <id>run-tests</id>
             <properties>
                 <surefire.skip>false</surefire.skip>
             </properties>
         </profile>
+
         <profile>
             <id>localhost</id>
             <activation>
@@ -206,6 +215,7 @@
                 </testResources>
             </build>
         </profile>
+
         <profile>
             <id>lan</id>
             <activation>
@@ -230,6 +240,7 @@
                 </testResources>
             </build>
         </profile>
+
         <profile>
             <!--
                 Profile for building wars for a specific deployment environment:
@@ -250,5 +261,77 @@
                 </testResources>
             </build>
         </profile>
+
+        <profile>
+            <id>copy-module-dependencies</id>
+            <properties>
+                <dependencies.scope>provided</dependencies.scope>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.8</version>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/copiedDependencies</outputDirectory>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>false</overWriteSnapshots>
+                                    <overWriteIfNewer>true</overWriteIfNewer>
+                                    <includeScope>provided</includeScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>copy-project-dependencies</id>
+            <properties>
+                <dependencies.scope>provided</dependencies.scope>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.8</version>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${session.executionRootDirectory}/target/copiedDependencies</outputDirectory>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>false</overWriteSnapshots>
+                                    <overWriteIfNewer>true</overWriteIfNewer>
+                                    <includeScope>provided</includeScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>skip-dependencies</id>
+            <properties>
+                <dependencies.scope>provided</dependencies.scope>
+            </properties>
+        </profile>
+
     </profiles>
 </project>
