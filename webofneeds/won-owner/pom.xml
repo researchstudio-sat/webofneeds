@@ -80,4 +80,17 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>${won.properties.dir}/owner</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>${won.properties.dir}/owner.test</directory>
+            </testResource>
+        </testResources>
+    </build>
+
 </project>
