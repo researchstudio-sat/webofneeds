@@ -83,12 +83,18 @@
     <build>
         <resources>
             <resource>
-                <directory>${won.properties.dir}/owner</directory>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${won.owner.properties.dir}</directory>
             </resource>
         </resources>
         <testResources>
             <testResource>
-                <directory>${won.properties.dir}/owner.test</directory>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>${won.owner-test.properties.dir}</directory>
             </testResource>
         </testResources>
     </build>
