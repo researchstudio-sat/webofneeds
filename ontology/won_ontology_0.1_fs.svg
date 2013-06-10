@@ -55,7 +55,7 @@ won:hasTimeStamp : xsd:DateTimeStamp</text>
 <text font-family="Dialog" font-size="12" x="871" y="838">
 won:hasOriginator : rdfs:Ressource</text>
 <text font-family="Dialog" font-size="12" x="871" y="855">
-won:hasEventStatement : owl:Thing</text>
+won:hasAdditionalInformation : owl:Thing</text>
 <rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="240" x="867" y="865"/>
 <polyline fill="none" points="995,665 995,782" stroke="#000000" stroke-width="1"/>
 <line fill="#000000" stroke="#000000" stroke-width="1" x1="988" x2="995" y1="770" y2="782"/>

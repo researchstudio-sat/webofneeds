@@ -69,6 +69,16 @@
     
 
 
+    <!-- http://purl.org/webofneeds/model#hasAdditionalInformation -->
+
+    <owl:ObjectProperty rdf:about="&won;hasAdditionalInformation">
+        <rdfs:comment rdf:datatype="&xsd;string">Contains additional information in form of an RDF graph about an event.</rdfs:comment>
+        <rdfs:domain rdf:resource="&won;Event"/>
+        <rdfs:range rdf:resource="&owl;Thing"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://purl.org/webofneeds/model#hasBasicNeedType -->
 
     <owl:ObjectProperty rdf:about="&won;hasBasicNeedType">
@@ -139,15 +149,6 @@
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:domain rdf:resource="&won;Connection"/>
         <rdfs:range rdf:resource="&won;EventContainer"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#hasEventStatement -->
-
-    <owl:ObjectProperty rdf:about="&won;hasEventStatement">
-        <rdfs:domain rdf:resource="&won;Event"/>
-        <rdfs:range rdf:resource="&owl;Thing"/>
     </owl:ObjectProperty>
     
 
