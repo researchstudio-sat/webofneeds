@@ -556,8 +556,8 @@ public class Validator
   {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
-        "SELECT ?event ?eventStatement WHERE {?event rdf:type won:Event. " +
-        "?event won:hasEventStatement ?eventStatement" +
+        "SELECT ?event ?additionalInfo WHERE {?event rdf:type won:Event. " +
+        "?event won:hasAdditionalInformation ?additionalInfo" +
         "}";
     Query query = QueryFactory.create(queryString);
     QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
@@ -572,7 +572,32 @@ public class Validator
       qExec.close();
     }
     String expected1 = "( ?event = <http://purl.org/webofneeds/example#Hint_01_1> ) " +
-        "( ?eventStatement = <http://purl.org/webofneeds/example#MatchExplanation_01> )";
+        "( ?additionalInfo = <http://purl.org/webofneeds/example#MatchExplanation_01> )";
+    assertThat(actualList, hasItems(expected1));
+    assertEquals("wrong number of results", 1, actualList.size());
+  }
+
+  @Test
+  public void testCQConstraint1()
+  {
+    System.out.println("executing queries...");
+    String queryString = sparqlPreface +
+        "SELECT ?need ?constraint WHERE {?need rdf:type won:Need. " +
+        "?need won:hasMatchingConstraint ?constraint" +
+        "}";
+    Query query = QueryFactory.create(queryString);
+    QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
+    List<String> actualList = new ArrayList<String>();
+    try {
+      ResultSet results = qExec.execSelect();
+      for (; results.hasNext(); ) {
+        QuerySolution soln = results.nextSolution();
+        actualList.add(soln.toString());
+      }
+    } finally {
+      qExec.close();
+    }
+    String expected1 = "( ?need = <http://purl.org/webofneeds/example#Need_01> ) ( ?constraint = <http://purl.org/webofneeds/example#MyCouchConstraint> )";
     assertThat(actualList, hasItems(expected1));
     assertEquals("wrong number of results", 1, actualList.size());
   }
@@ -582,14 +607,14 @@ public class Validator
    *
    * @param args
    */
-  public static void mainDeactivated(String[] args)
+  public static void mainDeactivated (String[] args)
   {
     loadOntologies();
     System.out.println("executing queries...");
 
     String queryString = sparqlPreface +
-        "SELECT ?event ?eventStatement WHERE {?event rdf:type won:Event. " +
-        "?event won:hasEventStatement ?eventStatement" +
+        "SELECT ?need ?constraint WHERE {?need rdf:type won:Need. " +
+        "?need won:hasMatchingConstraint ?constraint" +
         "}";
     Query query = QueryFactory.create(queryString);
     QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
