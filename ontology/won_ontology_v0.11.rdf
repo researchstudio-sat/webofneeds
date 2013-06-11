@@ -4,6 +4,7 @@
 <!DOCTYPE rdf:RDF [
     <!ENTITY schema_org "http://schema.rdfs.org/all#" >
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY oslc "http://open-services.net/ns/core#" >
     <!ENTITY gr "http://purl.org/goodrelations/v1#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY won "http://purl.org/webofneeds/model#" >
@@ -15,6 +16,7 @@
 <rdf:RDF xmlns="http://purl.org/webofneeds/model#"
      xml:base="http://purl.org/webofneeds/model"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:oslc="http://open-services.net/ns/core#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -22,6 +24,7 @@
      xmlns:gr="http://purl.org/goodrelations/v1#"
      xmlns:schema_org="http://schema.rdfs.org/all#">
     <owl:Ontology rdf:about="http://purl.org/webofneeds/model">
+        <owl:imports rdf:resource="http://open-services.net/ns/core#"/>
         <owl:imports rdf:resource="http://purl.org/goodrelations/v1"/>
         <owl:versionIRI rdf:resource="http://purl.org/webofneeds/model/0.1"/>
         <owl:imports rdf:resource="http://schema.rdfs.org/all"/>
@@ -176,6 +179,31 @@
     <owl:ObjectProperty rdf:about="&won;hasLocationSpecification">
         <rdfs:range rdf:resource="&won;LocationSpecification"/>
         <rdfs:domain rdf:resource="&won;NeedModality"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasMatchingConstraint -->
+
+    <owl:ObjectProperty rdf:about="&won;hasMatchingConstraint">
+        <rdfs:range rdf:resource="&oslc;ResourceShape"/>
+        <rdfs:domain rdf:resource="&won;Need"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasMaxValueConstraint -->
+
+    <owl:ObjectProperty rdf:about="&won;hasMaxValueConstraint">
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasMinValueConstraint -->
+
+    <owl:ObjectProperty rdf:about="&won;hasMinValueConstraint">
+        <rdfs:range rdf:resource="&xsd;decimal"/>
     </owl:ObjectProperty>
     
 
@@ -339,6 +367,26 @@
     <owl:DatatypeProperty rdf:about="&won;hasLowerPriceLimit">
         <rdfs:domain rdf:resource="&won;PriceSpecification"/>
         <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasMaxValueConstraint -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasMaxValueConstraint">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&oslc;Property"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasMinValueConstraint -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasMinValueConstraint">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&oslc;Property"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
     </owl:DatatypeProperty>
     
 
