@@ -15,9 +15,9 @@ import java.net.URI;
 public enum BasicNeedType
 {
 
-  DEMAND("Take"),
-  SUPPLY("Give"),
-  DO_TOGETHER("Do"),
+  DEMAND("Demand"),
+  SUPPLY("Supply"),
+  DO_TOGETHER("Do together"),
   CRITIQUE("Critique");
 
   private static final Logger logger = LoggerFactory.getLogger(BasicNeedType.class);
