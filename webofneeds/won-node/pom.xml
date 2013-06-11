@@ -3,19 +3,23 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>webofneeds</groupId>
         <artifactId>webofneeds</artifactId>
         <version>0.1-SNAPSHOT</version>
     </parent>
+
     <groupId>webofneeds</groupId>
     <artifactId>won-node</artifactId>
     <version>0.1-SNAPSHOT</version>
     <name>won-node</name>
     <url>http://maven.apache.org</url>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>webofneeds</groupId>
@@ -70,6 +74,22 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${won.node.properties.dir}</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>${won.node-test.properties.dir}</directory>
+            </testResource>
+        </testResources>
         <!--plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
