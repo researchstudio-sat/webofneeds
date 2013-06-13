@@ -39,10 +39,7 @@ import won.protocol.service.NeedInformationService;
 import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.DateTimeUtils;
 import won.protocol.util.NeedModelMapper;
-import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.GR;
-import won.protocol.vocabulary.LDP;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.*;
 
 import java.net.URI;
 import java.util.Collection;
@@ -93,6 +90,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     PREFIX_MAPPING.setNsPrefix("gr", GR.getURI());
     PREFIX_MAPPING.setNsPrefix("xsd", XSD.getURI());
     PREFIX_MAPPING.setNsPrefix("dc", DC.getURI());
+    PREFIX_MAPPING.setNsPrefix("sioc_t", SIOC_T.getURI());
   }
 
   public Model listNeedURIs(final int page)
@@ -192,7 +190,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
         eventMember.addProperty(WON.HAS_ORIGINATOR, e.getOriginatorUri().toString());
 
       if (e.getCreationDate() != null)
-        eventMember.addProperty(WON.OCCURED_AT, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
+        eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
 
       Model additionalDataModel = rdfStorage.loadContent(e);
       if (additionalDataModel != null) {

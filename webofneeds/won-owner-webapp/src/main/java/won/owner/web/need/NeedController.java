@@ -4,6 +4,7 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.SIOC_T;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -120,6 +122,8 @@ public class NeedController
       com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
       Resource needResource = needModel.createResource(WON.NEED);
+      if(!needPojo.getMatchingConstraint().isEmpty())
+        needResource.addProperty(WON.HAS_MATCHING_CONSTRAINT, needPojo.getMatchingConstraint());
 
       // need type
       Resource basicNeedType = needModel.createResource(WON.toResource(needPojo.getBasicNeedType()));
@@ -131,8 +135,18 @@ public class NeedController
       if (!needPojo.getTitle().isEmpty())
         needContent.addProperty(DC.title, needPojo.getTitle(), XSDDatatype.XSDstring);
       if (!needPojo.getTextDescription().isEmpty())
-        needContent.addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
-      needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
+        needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
+      if (!needPojo.getContentDescription().isEmpty())
+        needContent.addProperty(WON.HAS_CONTENT_DESCRIPTION, needPojo.getContentDescription());
+      if(!needPojo.getTags().isEmpty()) {
+        String[] tags = needPojo.getTags().split(",");
+        for(String tag : tags) {
+          Resource tagRes = needModel.createResource(SIOC_T.TAG).addProperty(RDFS.label, tag.trim());
+          needModel.add(needModel.createStatement(needContent, WON.HAS_TAG, tagRes));
+        }
+      }
+
+//      needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
 
       // owner
       if (needPojo.isAnonymize()) {
@@ -166,17 +180,17 @@ public class NeedController
 
       // time constraint
       if (!needPojo.getStartTime().isEmpty() || !needPojo.getEndTime().isEmpty()) {
-        Resource timeConstraint = needModel.createResource(WON.TIME_CONSTRAINT)
-            .addProperty(WON.RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
+        Resource timeConstraint = needModel.createResource(WON.TIME_SPECIFICATION)
+            .addProperty(WON.HAS_RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
         if (!needPojo.getStartTime().isEmpty())
-          timeConstraint.addProperty(WON.START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
+          timeConstraint.addProperty(WON.HAS_START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
         if (!needPojo.getEndTime().isEmpty())
-          timeConstraint.addProperty(WON.END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
+          timeConstraint.addProperty(WON.HAS_END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
         if (needPojo.getRecurIn() != null)
-          timeConstraint.addProperty(WON.RECUR_IN, Long.toString(needPojo.getRecurIn()));
+          timeConstraint.addProperty(WON.HAS_RECURS_IN, Long.toString(needPojo.getRecurIn()));
         if (needPojo.getRecurTimes() != null)
-          timeConstraint.addProperty(WON.RECUR_TIMES, Integer.toString(needPojo.getRecurTimes()));
-        needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_TIME, timeConstraint));
+          timeConstraint.addProperty(WON.HAS_RECURS_TIMES, Integer.toString(needPojo.getRecurTimes()));
+        needModel.add(needModel.createStatement(needModality, WON.HAS_TIME_SPECIFICATION, timeConstraint));
       }
 
       needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));

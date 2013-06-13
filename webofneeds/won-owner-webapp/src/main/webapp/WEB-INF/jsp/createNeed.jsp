@@ -45,7 +45,11 @@
             </tr>
             <tr>
                 <td><form:label path="textDescription">Text description:</form:label></td>
-                <td><form:textarea path="textDescription" rows="5" cols="30" /></td>
+                <td><form:textarea path="textDescription" rows="4" cols="30" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="tags">Tags:</form:label></td>
+                <td><form:textarea path="tags" rows="2" cols="30" /></td>
             </tr>
             <tr>
                 <td><form:label path="upperPriceLimit">Upper price limit:</form:label> </td>
@@ -86,6 +90,14 @@
             <tr>
                 <td><form:label path="recurInfiniteTimes">Recur inifinite times:</form:label></td>
                 <td><form:checkbox path="recurInfiniteTimes" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="matchingConstraint">Matching constraint:</form:label></td>
+                <td><form:textarea path="matchingConstraint" rows="4" cols="30" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="contentDescription">Content description:</form:label></td>
+                <td><form:textarea path="contentDescription" rows="4" cols="30" /></td>
             </tr>
             <tr>
                 <td colspan="2"><input type="submit" value="Submit"/></td>

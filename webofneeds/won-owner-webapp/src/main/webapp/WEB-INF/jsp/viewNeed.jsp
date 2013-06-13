@@ -21,6 +21,8 @@
         <dd><c:out value="${pojo.creationDate}" /></dd>
     <dt>Text description</dt>
         <dd><c:out value="${pojo.textDescription}" /></dd>
+    <dt>Tags</dt>
+        <dd><c:out value="${pojo.tags}" /></dd>
     <dt>Need type</dt>
         <dd><c:out value="${pojo.basicNeedType}" /></dd>
     <dt>Active</dt>
@@ -40,6 +42,14 @@
             Recur in:<c:out value="${pojo.recurIn}" /><br />
             Recur times:<c:out value="${pojo.recurTimes}" /><br />
             Recur infinite times:<c:out value="${pojo.recurInfiniteTimes}" /><br />
+        </dd>
+    <dt>Matching constraint:</dt>
+        <dd>
+            <c:out value="${pojo.matchingConstraint}" />
+        </dd>
+    <dt>Content description:</dt>
+        <dd>
+            <c:out value="${pojo.contentDescription}" />
         </dd>
 
 </dl>
