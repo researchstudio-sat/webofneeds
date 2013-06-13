@@ -17,7 +17,7 @@ public enum BasicNeedType
 
   DEMAND("Demand"),
   SUPPLY("Supply"),
-  DO_TOGETHER("Do together"),
+  DO_TOGETHER("Do_together"),
   CRITIQUE("Critique");
 
   private static final Logger logger = LoggerFactory.getLogger(BasicNeedType.class);
