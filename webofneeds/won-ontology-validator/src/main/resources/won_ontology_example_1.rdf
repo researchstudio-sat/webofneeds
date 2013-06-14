@@ -320,6 +320,12 @@
     
 
 
+    <!-- http://www.w3.org/2000/01/rdf-schema#label -->
+
+    <owl:DatatypeProperty rdf:about="&rdfs;label"/>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -577,6 +583,7 @@
     <!-- http://purl.org/webofneeds/example#NeedContent_01 -->
 
     <owl:NamedIndividual rdf:about="&wonex;NeedContent_01">
+        <rdf:type rdf:resource="&won;NeedContent"/>
         <terms:title rdf:datatype="&rdfs;Literal">Couch</terms:title>
         <terms:title rdf:datatype="&xsd;string">Couch</terms:title>
         <won:hasTextDescription rdf:datatype="&xsd;string">rote Couch mit integrierter Mäusefalle</won:hasTextDescription>
@@ -585,6 +592,8 @@
         <won:hasWeight rdf:resource="&wonex;CouchWeight"/>
         <won:hasWidth rdf:resource="&wonex;CouchWidth"/>
         <won:hasContentDescription rdf:resource="&wonex;MyCouch"/>
+        <won:hasTag rdf:resource="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/"/>
+        <won:hasTag rdf:resource="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/Recycled_Materials/"/>
     </owl:NamedIndividual>
     
 
@@ -767,6 +776,22 @@
     <!-- http://purl.org/webofneeds/model#hasWeight -->
 
     <owl:NamedIndividual rdf:about="&won;hasWeight"/>
+    
+
+
+    <!-- http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/ -->
+
+    <owl:NamedIndividual rdf:about="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/">
+        <rdfs:label rdf:datatype="&rdfs;Literal">Furniture</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/Recycled_Materials/ -->
+
+    <owl:NamedIndividual rdf:about="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/Recycled_Materials/">
+        <rdfs:label rdf:datatype="&rdfs;Literal">Recycled Materials</rdfs:label>
+    </owl:NamedIndividual>
     
 
 
