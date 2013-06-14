@@ -602,6 +602,35 @@ public class Validator
     assertEquals("wrong number of results", 1, actualList.size());
   }
 
+  @Test
+  public void testCQTag1()
+  {
+    System.out.println("executing queries...");
+    String queryString = sparqlPreface +
+        "SELECT ?need ?tag WHERE {?need rdf:type won:Need. " +
+        "?need won:hasContent ?content." +
+        "?content won:hasTag ?tag." +
+        "}";
+    Query query = QueryFactory.create(queryString);
+    QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
+    List<String> actualList = new ArrayList<String>();
+    try {
+      ResultSet results = qExec.execSelect();
+      for (; results.hasNext(); ) {
+        QuerySolution soln = results.nextSolution();
+        actualList.add(soln.toString());
+      }
+    } finally {
+      qExec.close();
+    }
+    String expected1 = "( ?need = <http://purl.org/webofneeds/example#Need_01> ) " +
+        "( ?tag = <http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/Recycled_Materials/> )";
+    String expected2 = "( ?need = <http://purl.org/webofneeds/example#Need_01> ) " +
+        "( ?tag = <http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/> )";
+    assertThat(actualList, hasItems(expected1, expected2));
+    assertEquals("wrong number of results", 2, actualList.size());
+  }
+
   /**
    * This method is for testing the queries. Just rename it to main and execute.
    *
@@ -613,8 +642,9 @@ public class Validator
     System.out.println("executing queries...");
 
     String queryString = sparqlPreface +
-        "SELECT ?need ?constraint WHERE {?need rdf:type won:Need. " +
-        "?need won:hasMatchingConstraint ?constraint" +
+        "SELECT ?need ?tag WHERE {?need rdf:type won:Need. " +
+        "?need won:hasContent ?content." +
+        "?content won:hasTag ?tag." +
         "}";
     Query query = QueryFactory.create(queryString);
     QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
