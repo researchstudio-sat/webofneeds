@@ -76,6 +76,12 @@ public class TextDescriptionMatcher
     si = solrCore.getSearcher().get();
     ir = si.getIndexReader();
 
+    String names = "";
+    for(String name : ir.getFieldNames(IndexReader.FieldOption.ALL))
+       names += "; " + name;
+
+    logger.debug("Fieldnames: {}", names);
+
     MoreLikeThis mlt = new MoreLikeThis(ir);
     mlt.setMinDocFreq(1);
     mlt.setMinTermFreq(1);
