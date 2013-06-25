@@ -1,0 +1,16 @@
+@prefix : <http://purl.org/webofneeds/example#> .
+@prefix v1: <http://purl.org/goodrelations/v1#> .
+@prefix all: <http://schema.rdfs.org/all#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won: <http://purl.org/webofneeds/model#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix wonex: <http://purl.org/webofneeds/example#> .
+@prefix schema: <http://schema.org/> .
+@prefix wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix travel: <http://example.org/travel#> .
+@base <http://purl.org/webofneeds/example> .
+
+
