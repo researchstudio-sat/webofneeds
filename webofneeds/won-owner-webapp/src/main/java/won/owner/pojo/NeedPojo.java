@@ -92,9 +92,7 @@ public class NeedPojo
       StmtIterator tagProps = needContent.listProperties(WON.HAS_TAG);
       StringBuilder tags = new StringBuilder();
       while (tagProps.hasNext()) {
-        Statement tagStat = tagProps.next();
-        logger.info("Found tag {}", tagStat.getString());
-        tags.append(tagStat.getObject().toString());
+        tags.append(tagProps.next().getObject().toString());
         if (tagProps.hasNext())
           tags.append(", ");
       }
