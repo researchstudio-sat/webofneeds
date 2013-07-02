@@ -49,6 +49,14 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>1.0</version>
+            </extension>
+        </extensions>
+
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -100,7 +108,7 @@
                                 <resource>
                                     <directory>${project.basedir}/src/main/resources</directory>
                                     <filtering>true</filtering>
-                                    <targetPath>${solr.home.directory}</targetPath>
+                                    <targetPath>${project.build.directory}/${solr.home.directory}</targetPath>
                                     <includes>
                                         <include>solr.xml</include>
                                     </includes>
@@ -108,7 +116,7 @@
                                 <!-- Copies configuration files -->
                                 <resource>
                                     <directory>${project.basedir}/src/main/config</directory>
-                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf</targetPath>
+                                    <targetPath>${project.build.directory}/${solr.home.directory}/${solr.default.core.directory}/conf</targetPath>
                                     <excludes>
                                         <exclude>lang</exclude>
                                         <exclude>velocity</exclude>
@@ -118,56 +126,17 @@
                                 <!-- Copies language specific configuration files -->
                                 <resource>
                                     <directory>${project.basedir}/src/main/config/lang</directory>
-                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf/lang</targetPath>
+                                    <targetPath>${project.build.directory}/${solr.home.directory}/${solr.default.core.directory}/conf/lang</targetPath>
                                 </resource>
                                 <!-- Copy Velocity macros and other files -->
                                 <resource>
                                     <directory>${project.basedir}/src/main/config/velocity</directory>
-                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf/velocity</targetPath>
+                                    <targetPath>${project.build.directory}/${solr.home.directory}/${solr.default.core.directory}/conf/velocity</targetPath>
                                 </resource>
                                 <!-- Copy XSL style sheets -->
                                 <resource>
                                     <directory>${project.basedir}/src/main/config/xslt</directory>
-                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf/xslt</targetPath>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <!-- Delete Solr configuration files clean clean phase is executed -->
-                    <execution>
-                        <id>clean-solr</id>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <failIfNotFound>false</failIfNotFound>
-                            <resources>
-                                <!-- Clean the overlays directory from the project root directory -->
-                                <resource>
-                                    <clean>true</clean>
-                                    <cleanEmptyDirectories>true</cleanEmptyDirectories>
-                                    <directory>${project.basedir}/overlays</directory>
-                                    <includes>
-                                        <include>**/**</include>
-                                    </includes>
-                                </resource>
-                                <!-- Remove the solr.xml file -->
-                                <resource>
-                                    <clean>true</clean>
-                                    <directory>${solr.home.directory}</directory>
-                                    <includes>
-                                        <include>solr.xml</include>
-                                    </includes>
-                                </resource>
-                                <!-- Remove the conf directory -->
-                                <resource>
-                                    <clean>true</clean>
-                                    <cleanEmptyDirectories>true</cleanEmptyDirectories>
-                                    <directory>${solr.home.directory}/${solr.default.core.directory}</directory>
-                                    <includes>
-                                        <include>conf</include>
-                                    </includes>
+                                    <targetPath>${project.build.directory}/${solr.home.directory}/${solr.default.core.directory}/conf/xslt</targetPath>
                                 </resource>
                             </resources>
                         </configuration>
@@ -222,4 +191,52 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>solr-deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>${assembly.version}</version>
+                        <configuration>
+                            <descriptorId>jar-with-dependencies</descriptorId>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>assemble</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>assembly</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>wagon-maven-plugin</artifactId>
+                        <version>${wagon.version}</version>
+                        <configuration>
+                            <serverId>${solr.dest.server}</serverId>
+                            <fromFile>${project.build.directory}/solr-jar-with-dependencies.jar</fromFile>
+                            <url>${solr.dest.dir}}</url>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>upload-war-to-server</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>upload-single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
 </project>

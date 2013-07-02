@@ -39,7 +39,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.2</version>
+                    <version>${assembly.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -111,6 +111,11 @@
                     <artifactId>cargo-maven2-plugin</artifactId>
                     <version>${cargo.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>wagon-maven-plugin</artifactId>
+                    <version>${wagon.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -150,6 +155,8 @@
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
         <cargo.version>1.4.2</cargo.version>
         <jrebel.version>1.1.3</jrebel.version>
+        <wagon.version>1.0-beta-3</wagon.version>
+        <assembly.version>2.2</assembly.version>
     </properties>
 
     <profiles>
