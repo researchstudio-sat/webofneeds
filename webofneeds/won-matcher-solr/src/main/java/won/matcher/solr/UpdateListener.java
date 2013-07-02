@@ -10,11 +10,9 @@ import org.slf4j.LoggerFactory;
 import won.matcher.query.TextDescriptionMatcher;
 
 /**
- * Created with IntelliJ IDEA.
  * User: gabriel
  * Date: 21.02.13
  * Time: 13:53
- * To change this template use File | Settings | File Templates.
  */
 public class UpdateListener implements SolrEventListener {//, SolrCoreAware {
     private Logger logger = LoggerFactory.getLogger(UpdateListener.class);;
