@@ -90,7 +90,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     PREFIX_MAPPING.setNsPrefix("gr", GR.getURI());
     PREFIX_MAPPING.setNsPrefix("xsd", XSD.getURI());
     PREFIX_MAPPING.setNsPrefix("dc", DC.getURI());
-    PREFIX_MAPPING.setNsPrefix("sioc_t", SIOC_T.getURI());
   }
 
   public Model listNeedURIs(final int page)

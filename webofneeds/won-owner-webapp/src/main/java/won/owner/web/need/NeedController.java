@@ -4,7 +4,6 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.DC;
-import com.hp.hpl.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.SIOC_T;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -141,12 +139,11 @@ public class NeedController
       if(!needPojo.getTags().isEmpty()) {
         String[] tags = needPojo.getTags().split(",");
         for(String tag : tags) {
-          Resource tagRes = needModel.createResource(SIOC_T.TAG).addProperty(RDFS.label, tag.trim());
-          needModel.add(needModel.createStatement(needContent, WON.HAS_TAG, tagRes));
+          needModel.add(needModel.createStatement(needContent, WON.HAS_TAG, tag.trim()));
         }
       }
 
-//      needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
+      needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
 
       // owner
       if (needPojo.isAnonymize()) {
