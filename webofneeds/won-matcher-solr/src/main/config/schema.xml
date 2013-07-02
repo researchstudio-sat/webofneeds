@@ -1,29 +1,141 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<schema name="todo" version="1.5">
-    <fields>
-        <field name="id" type="long" indexed="true" stored="true" required="true"/>
-        <field name="title" type="text_general" indexed="true" stored="true" required="true" multiValued="false"/>
-        <field name="description" type="text_general" indexed="true" stored="false" multiValued="false"/>
 
-        <field name="text" type="text_general" indexed="true" stored="false" multiValued="true"/>
-        <field name="_version_" type="long" indexed="true" stored="true"/>
-    </fields>
+<!--  
+ This is the SIREn/Solr schema file. This file should be named "schema.xml" and
+ should be in the conf directory under the solr home
+ (i.e. ./solr/conf/schema.xml by default) 
+ or located where the classloader for the Solr webapp can find it.
 
-    <uniqueKey>id</uniqueKey>
+ This example schema is the recommended starting point for users.
+ It should be kept correct and concise, usable out-of-the-box.
+ 
+ For more information, on how to customize this file, please see
+ http://wiki.apache.org/solr/SchemaXml
 
-    <copyField source="title" dest="text"/>
-    <copyField source="description" dest="text"/>
+ PERFORMANCE NOTE: this schema includes many optional features and should not
+ be used for benchmarking.  To improve performance one could
+  - set stored="false" for all fields possible (esp large fields) when you
+    only need to search on the field but don't need to return the original
+    value.
+  - set indexed="false" if you don't need to search on the field, but only
+    return the field as a result of searching on other indexed fields.
+  - remove all unneeded copyField statements
+  - for best index size and searching performance, set "index" to false
+    for all general text fields, use copyField to copy them to the
+    catchall "text" field, and use that for searching.
+  - For maximum indexing performance, use the StreamingUpdateSolrServer
+    java client.
+  - Remember to run the JVM in server mode, and use a higher logging level
+    that avoids logging every request
+-->
+
+<schema name="webofneeds" version="1.0">
 
     <types>
-        <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
-        <fieldType name="string" class="solr.StrField" sortMissingLast="true" />
-        <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
+
+        <!-- The StrField type is not analyzed, but indexed/stored verbatim. -->
+        <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+
+        <!-- A Trie based date field for faster date range queries and date faceting. -->
+        <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
+
+        <!-- A uri field that uses WhitespaceTokenizer and WordDelimiterFilter to
+             split URIs into multiple compoenents.  Stopwords is customized by
+             external files.
+             omitNorms is true since it is a short field, and it does not make
+             really sense on URI.
+             Does not use the ASCIIFoldingExpansionFilter since URIs should not
+             contain accented characters.
+        -->
+        <fieldType name="uri" class="solr.TextField" omitNorms="true" positionIncrementGap="100">
+            <analyzer type="index">
+
+                <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+
+                <!-- Splits words into subwords based on delimiters
+                     - split subwords based on case change
+                     - preserveOriginal="1" in order to preserve the original word.
+                     Removed split based on numerics to fix SND-355 and SND-1283
+                -->
+                <filter class="solr.WordDelimiterFilterFactory"
+                        generateWordParts="1"
+                        generateNumberParts="1"
+                        catenateWords="0"
+                        catenateNumbers="0"
+                        catenateAll="0"
+                        splitOnCaseChange="1"
+                        splitOnNumerics="0"
+                        preserveOriginal="1"/>
+
+                <!-- Filters out those tokens *not* having length min through max
+               inclusive. -->
+                <filter class="solr.LengthFilterFactory" min="2" max="256"/>
+
+                <!-- Change to lowercase text -->
+                <filter class="solr.LowerCaseFilterFactory"/>
+
+                <!-- Case insensitive stop word removal.
+                  add enablePositionIncrements=true in both the index and query
+                  analyzers to leave a 'gap' for more accurate phrase queries.
+                -->
+                <filter class="solr.StopFilterFactory"
+                        ignoreCase="true"
+                        words="stopwords.txt"
+                        enablePositionIncrements="true"
+                        />
+
+            </analyzer>
+            <analyzer type="query">
+                <!-- whitespace tokenizer to not tokenize URI -->
+                <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+
+                <!-- Filters out those tokens *not* having length min through max
+               inclusive. -->
+                <filter class="solr.LengthFilterFactory" min="2" max="256"/>
+
+                <filter class="solr.LowerCaseFilterFactory"/>
+
+                <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" enablePositionIncrements="true"/>
+
+                <!-- Replace Qnames by their name spaces in URIs. -->
+                <filter class="org.sindice.siren.solr.analysis.QNamesFilterFactory"
+                        qnames="qnames.txt"/>
+
+            </analyzer>
+        </fieldType>
+
+        <!--
+              The SIREn field type:
+                The top-level analyzers must be defined in the top-level analyzer
+          configuration file (ntriple-analyzers.xml) and the datatype analyzers in
+          the datatype analyzer configuration file (ntriples-datatypes.xml).
+
+                Field norms are not useful for SIREn fields. Set omitNorms to true reduces
+                memory consumption, and improve ranking.
+
+          omitTermFreqAndPositions *must* be set to false.
+            -->
+        <fieldType name="ntriple" class="org.sindice.siren.solr.schema.SirenField"
+                   omitNorms="true"
+                   omitTermFreqAndPositions="false"
+                   analyzerConfig="tuple-analyzers.xml"
+                   datatypeConfig="tuple-datatypes.xml"/>
+
+        <fieldType name="tabular" class="org.sindice.siren.solr.schema.SirenField"
+                   omitNorms="true"
+                   omitTermFreqAndPositions="false"
+                   analyzerConfig="tuple-analyzers.xml"
+                   datatypeConfig="tuple-datatypes.xml"/>
+
+        <fieldType name="text_general"
+                   class="solr.TextField"
+                   positionIncrementGap="100">
             <!-- Configures the analysis done at the index phase -->
             <analyzer type="index">
                 <!-- Uses word break rules of the Unicode Text Segmentation algorith when splitting text into words. -->
                 <tokenizer class="solr.StandardTokenizerFactory"/>
                 <!-- Removes words found from stopwords.txt file. This filter is case insensitive. -->
-                <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" enablePositionIncrements="true" />
+                <!--<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" enablePositionIncrements="true" />-->
                 <!-- Transforms text to lower case -->
                 <filter class="solr.LowerCaseFilterFactory"/>
             </analyzer>
@@ -32,12 +144,72 @@
                 <!-- Uses word break rules of the Unicode Text Segmentation algorith when splitting text into words. -->
                 <tokenizer class="solr.StandardTokenizerFactory"/>
                 <!-- Removes words found from stopwords.txt file. This filter is case insensitive. -->
-                <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" enablePositionIncrements="true" />
+                <!--<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" enablePositionIncrements="true" />-->
                 <!-- Applies synonyms found from the synonyms.txt file. -->
-                <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+                <!--<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>-->
                 <!-- Transforms text to lower case -->
                 <filter class="solr.LowerCaseFilterFactory"/>
             </analyzer>
         </fieldType>
+
+        <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
+
+        <fieldType name="tdouble" class="solr.TrieDoubleField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
+
     </types>
+
+    <fields>
+
+        <!-- The ID (URL) of the document
+             Use the 'string' field type (no tokenisation) -->
+        <field name="id" type="string" indexed="true" stored="true" required="true"/>
+
+        <!-- The URL of the document
+             Use the 'text' field type in order to be tokenised -->
+        <field name="url" type="uri" indexed="true" stored="true" required="true"/>
+
+        <!-- n-triple indexing scheme -->
+        <field name="ntriple" type="ntriple" indexed="true" stored="true" multiValued="false"/>
+
+        <!-- tabular indexing scheme -->
+        <!--<field name="tabular" type="tabular" indexed="true" stored="false" multiValued="false"/>-->
+
+        <field name="title" type="text_general" indexed="true" stored="true" required="false"/>
+        <field name="description" type="text_general" indexed="true" stored="false" required="false"/>
+
+        <field name="basicNeedType" type="string" indexed="true" stored="true" required="true"/>
+
+        <field name="tag" type="text" indexed="true" stored="true" required="false" multiValued="true"/>
+
+        <field name="startDate" type="tdate" indexed="true" stored="true" required="false" multiValued="true"/>
+        <field name="endDate" type="tdate" indexed="true" stored="true" required="false" multiValued="true"/>
+
+        <field name="minPrice" type="text" indexed="true" stored="true" required="false" multiValued="true"/>
+        <field name="maxPrice" type="text" indexed="true" stored="true" required="false" multiValued="true"/>
+
+
+        <field name="location" type="location" indexed="true" stored="true" required="false"/>
+        <dynamicField name="*_coordinate"  type="tdouble" indexed="true"  stored="false"/>
+    </fields>
+
+    <!-- Field to use to determine and enforce document uniqueness.
+       Unless this field is marked with required="false", it will be a required field
+    -->
+    <uniqueKey>id</uniqueKey>
+
+    <!-- field for the QueryParser to use when an explicit fieldname is absent -->
+    <defaultSearchField>ntriple</defaultSearchField>
+
+    <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
+    <solrQueryParser defaultOperator="AND"/>
+
+    <!-- copyField commands copy one field to another at the time a document
+    is added to the index.  It's used either to index the same field differently,
+    or to add multiple fields to the same field for easier/faster searching.  -->
+    <copyField source="url" dest="id"/>
+
+    <!-- Similarity is the scoring routine for each document vs. a query.
+    A custom similarity for Siren is specified here  -->
+    <similarity class="org.sindice.siren.similarity.SirenSimilarity"/>
+
 </schema>
