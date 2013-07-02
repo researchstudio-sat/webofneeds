@@ -59,4 +59,10 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
   {
     clientFactory.setLinkedDataRestClient(linkedDataRestClient);
   }
+
+  public void initializeDefault() {
+    rdfUtils = new RdfUtils();
+    clientFactory = new MatcherProtocolNeedClientFactory();
+    clientFactory.setLinkedDataRestClient(new LinkedDataRestClient());
+  }
 }
