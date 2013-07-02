@@ -156,6 +156,8 @@
 
         <fieldType name="tdouble" class="solr.TrieDoubleField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
 
+        <!--<fieldType name="tfloat" class="solr.TrieFloatField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>-->
+
     </types>
 
     <fields>
@@ -179,14 +181,13 @@
 
         <field name="basicNeedType" type="string" indexed="true" stored="true" required="true"/>
 
-        <field name="tag" type="text" indexed="true" stored="true" required="false" multiValued="true"/>
+        <field name="tag" type="text_general" indexed="true" stored="true" required="false" multiValued="true"/>
 
-        <field name="startDate" type="tdate" indexed="true" stored="true" required="false" multiValued="true"/>
-        <field name="endDate" type="tdate" indexed="true" stored="true" required="false" multiValued="true"/>
+        <field name="startTime" type="tdate" indexed="true" stored="true" required="false"/>
+        <field name="endTime" type="tdate" indexed="true" stored="true" required="false"/>
 
-        <field name="minPrice" type="text" indexed="true" stored="true" required="false" multiValued="true"/>
-        <field name="maxPrice" type="text" indexed="true" stored="true" required="false" multiValued="true"/>
-
+        <field name="lowerPriceLimit" type="tdouble" indexed="true" stored="true" required="false"/>
+        <field name="upperPriceLimit" type="tdouble" indexed="true" stored="true" required="false"/>
 
         <field name="location" type="location" indexed="true" stored="true" required="false"/>
         <dynamicField name="*_coordinate"  type="tdouble" indexed="true"  stored="false"/>
