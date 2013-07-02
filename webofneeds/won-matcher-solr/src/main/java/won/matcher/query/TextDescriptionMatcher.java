@@ -11,10 +11,12 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similar.MoreLikeThis;
+import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.matcher.protocol.impl.MatcherProtocolNeedClientFactory;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
@@ -31,17 +33,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
  * User: gabriel
  * Date: 21.02.13
  * Time: 15:38
- * To change this template use File | Settings | File Templates.
  */
 public class TextDescriptionMatcher
 {
-  Logger logger;
-  SolrCore solrCore;
-  MatcherProtocolNeedServiceClient client;
+  private Logger logger;
+  private SolrCore solrCore;
+  private MatcherProtocolNeedServiceClient client;
   private Set<String> knownMatches = new HashSet();
   private static final String FIELD_NTRIPLE = "ntriple";
   private static final String FIELD_URL = "url";
@@ -55,7 +55,7 @@ public class TextDescriptionMatcher
     this.solrCore = solrCore;
     logger = LoggerFactory.getLogger(TextDescriptionMatcher.class);
     client = new MatcherProtocolNeedServiceClient();
-    client.setLinkedDataRestClient(new LinkedDataRestClient());
+    client.initializeDefault();
   }
 
   public TextDescriptionMatcher()
@@ -65,41 +65,39 @@ public class TextDescriptionMatcher
 
   public void executeQuery()
   {
-    SolrIndexSearcher si = null;
-    IndexReader ir = null;
     logger.debug("executeQuery called!!");
-    //TODO: Deprecated.
-    //if(SolrCore.openHandles.keySet().isEmpty())
-    //    return;
-    //solrCore = SolrCore.openHandles.keySet().iterator().next();
-    solrCore = SolrCore.getSolrCore();
-    si = solrCore.getSearcher().get();
-    ir = si.getIndexReader();
 
-    MoreLikeThis mlt = new MoreLikeThis(ir);
-    mlt.setMinDocFreq(1);
-    mlt.setMinTermFreq(1);
-    mlt.setFieldNames(new String[]{FIELD_NTRIPLE});
+    CoreContainer coreContainer = new CoreContainer();
+    solrCore = coreContainer.getCore("webofneeds");
+
+    SolrIndexSearcher solrIndexSearcher = solrCore.getSearcher().get();
+    IndexReader indexReader = solrIndexSearcher.getIndexReader();
+
+    MoreLikeThis moreLikeThis = new MoreLikeThis(indexReader);
+    moreLikeThis.setMinDocFreq(1);
+    moreLikeThis.setMinTermFreq(1);
+    moreLikeThis.setFieldNames(new String[]{FIELD_NTRIPLE});
+
     Query query = null;
-    TopDocs tdocs = null;
+    TopDocs topDocs = null;
 
     int numMatches = 0;
 
-    logger.debug("maxDoc: {}", si.maxDoc());
-    for (int i = 0; i < si.maxDoc(); i++) {
+    logger.debug("maxDoc: {}", solrIndexSearcher.maxDoc());
+    for (int i = 0; i < solrIndexSearcher.maxDoc(); i++) {
       try {
         try {
           Thread.sleep(TIMEOUT_BETWEEN_SEARHCES);
         } catch (InterruptedException e) {
           //swallow that one
         }
-        query = mlt.like(i);
-        String fromUriString = ir.document(i).getValues(FIELD_URL)[0]; //getValues() instead of get() just to make sure we don't have more than 1
+        query = moreLikeThis.like(i);
+        String fromUriString = indexReader.document(i).getValues(FIELD_URL)[0]; //getValues() instead of get() just to make sure we don't have more than 1
         fromUriString = fromUriString.replaceAll("^<", "").replaceAll(">$", "");
         URI fromURI = URI.create(fromUriString);
 
         //now load the triples from the doc and make a model so we can perform some basic checks
-        String fromNtriples = ir.document(i).get(FIELD_NTRIPLE);
+        String fromNtriples = indexReader.document(i).get(FIELD_NTRIPLE);
         Model fromModel = convertNTriplesToModel(fromNtriples);
         //check if we are talking about a need here. If not, don't consider the matches
         if (!isNeed(fromURI.toString(), fromModel)) {
@@ -111,15 +109,15 @@ public class TextDescriptionMatcher
         Resource fromBasicNeedType = getBasicNeedType(fromUriString, fromModel);
         Point fromPoint = getPointIfPresent(fromUriString, fromModel);
 
-        tdocs = si.search(query, 10);
-        logger.debug("Found {} hits for doc {}", tdocs.totalHits, ir.document(i).getValues(FIELD_URL)[0]);
-        if (tdocs.totalHits > 0) {
-          logger.debug("MaxScore: {}", tdocs.getMaxScore());
+        topDocs = solrIndexSearcher.search(query, 10);
+        logger.debug("Found {} hits for doc {}", topDocs.totalHits, indexReader.document(i).getValues(FIELD_URL)[0]);
+        if (topDocs.totalHits > 0) {
+          logger.debug("MaxScore: {}", topDocs.getMaxScore());
 
-          ScoreDoc[] scoreDocs = tdocs.scoreDocs;
+          ScoreDoc[] scoreDocs = topDocs.scoreDocs;
           for (int docInd = 0; docInd < scoreDocs.length; docInd++) {
             try {
-              Document toDoc = ir.document(tdocs.scoreDocs[docInd].doc);
+              Document toDoc = indexReader.document(topDocs.scoreDocs[docInd].doc);
               String toUriString = toDoc.getValues(FIELD_URL)[0];
               toUriString = toUriString.replaceAll("^<", "").replaceAll(">$", "");
               URI toURI = new URI(toUriString);
@@ -128,7 +126,7 @@ public class TextDescriptionMatcher
               logger.debug("from document url: {}", fromURI);
               logger.debug("to document url: {}", toURI);
               //TODO fix this hack! how do we keep the score in (0,1)?
-              double score = tdocs.scoreDocs[docInd].score / 10;
+              double score = topDocs.scoreDocs[docInd].score / 10;
               score = Math.max(0, Math.min(1, score));
 
 
@@ -242,17 +240,24 @@ public class TextDescriptionMatcher
 
   private Resource getBasicNeedType(String needURI, Model model)
   {
-    Statement stmt = model.getProperty(model.getResource(needURI), WON.HAS_BASIC_NEED_TYPE);
-    if (stmt == null) {
+    Statement needTypeStatement = model.getResource(needURI).getProperty(WON.HAS_BASIC_NEED_TYPE);
+    if (needTypeStatement == null)
       return null;
-    }
-    return stmt.getObject().asResource();
-  }
 
+    return needTypeStatement.getResource();
+  }
 
   private boolean isCompatibleBasicNeedType(Resource fromType, Resource toType)
   {
-    return fromType.getProperty(WON.ALLOWS_MATCH_WITH).getResource().equals(toType);
+    Statement allowedMatchStatement = fromType.getProperty(WON.ALLOWS_MATCH_WITH);
+    if(allowedMatchStatement == null){
+      logger.debug("No allowsMatchWith property found. Assuming allowed.");
+      return true;
+    }
+
+    logger.info("DEBUG MATCHER: "+allowedMatchStatement.getResource().getURI());
+
+    return allowedMatchStatement.getResource().equals(toType);
   }
 
   private Point getPointIfPresent(String needURI, Model model)
