@@ -44,6 +44,8 @@ public class TextDescriptionMatcher
   MatcherProtocolNeedServiceClient client;
   private Set<String> knownMatches = new HashSet();
   private static final String FIELD_NTRIPLE = "ntriple";
+  private static final String FIELD_TITLE = "title";
+  private static final String FIELD_DESCRIPTION = "description";
   private static final String FIELD_URL = "url";
   private static final int MAX_MATCHES = 3;
   private static double MAX_DISTANCE_KM = 15;
@@ -76,16 +78,10 @@ public class TextDescriptionMatcher
     si = solrCore.getSearcher().get();
     ir = si.getIndexReader();
 
-    String names = "";
-    for(String name : ir.getFieldNames(IndexReader.FieldOption.ALL))
-       names += "; " + name;
-
-    logger.debug("Fieldnames: {}", names);
-
     MoreLikeThis mlt = new MoreLikeThis(ir);
     mlt.setMinDocFreq(1);
     mlt.setMinTermFreq(1);
-    mlt.setFieldNames(new String[]{FIELD_NTRIPLE});
+    mlt.setFieldNames(new String[]{FIELD_TITLE, FIELD_DESCRIPTION});
     Query query = null;
     TopDocs tdocs = null;
 
