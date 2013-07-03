@@ -16,6 +16,7 @@ import org.apache.solr.core.SolrCore;
 import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 import won.matcher.protocol.impl.MatcherProtocolNeedClientFactory;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.protocol.exception.IllegalMessageForNeedStateException;
@@ -24,6 +25,7 @@ import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
@@ -40,11 +42,16 @@ import java.util.Set;
 public class TextDescriptionMatcher
 {
   private Logger logger;
+
   private SolrCore solrCore;
+
   private MatcherProtocolNeedServiceClient client;
+
   private Set<String> knownMatches = new HashSet();
+
   private static final String FIELD_NTRIPLE = "ntriple";
   private static final String FIELD_URL = "url";
+
   private static final int MAX_MATCHES = 3;
   private static double MAX_DISTANCE_KM = 15;
   private static final double MATCH_THRESHOLD = 0.1;
@@ -52,8 +59,10 @@ public class TextDescriptionMatcher
 
   public TextDescriptionMatcher(SolrCore solrCore)
   {
-    this.solrCore = solrCore;
     logger = LoggerFactory.getLogger(TextDescriptionMatcher.class);
+
+    this.solrCore = solrCore;
+
     client = new MatcherProtocolNeedServiceClient();
     client.initializeDefault();
   }
@@ -67,7 +76,14 @@ public class TextDescriptionMatcher
   {
     logger.debug("executeQuery called!!");
 
-    CoreContainer coreContainer = new CoreContainer();
+    CoreContainer.Initializer initializer = new CoreContainer.Initializer();
+    CoreContainer coreContainer = null;
+    try {
+      coreContainer = initializer.initialize();
+    } catch (Exception e) {
+      logger.error("Failed to initialize core container. Stopping.", e);
+      return;
+    }
     solrCore = coreContainer.getCore("webofneeds");
 
     SolrIndexSearcher solrIndexSearcher = solrCore.getSearcher().get();
