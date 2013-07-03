@@ -1,5 +1,6 @@
 package won.matcher.query;
 
+import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ public class QueryBase
 
   public void executeQuery()
   {
+
     //get last commited document
 
     //get set of documents to compare to (filter + more like this)
