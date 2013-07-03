@@ -58,7 +58,7 @@
               <lib dir="./lib" />
     -->
 
-  <!-- A 'dir' option by itself adds any files found in the directory 
+  <!-- A 'dir' option by itself adds any files found in the directory
        to the classpath, this is useful for including all jars in a
        directory.
 

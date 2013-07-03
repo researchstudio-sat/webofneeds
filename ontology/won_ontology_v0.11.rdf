@@ -2,6 +2,7 @@
 
 
 <!DOCTYPE rdf:RDF [
+    <!ENTITY sioc "http://rdfs.org/sioc/types#" >
     <!ENTITY schema_org "http://schema.rdfs.org/all#" >
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
     <!ENTITY oslc "http://open-services.net/ns/core#" >
@@ -15,6 +16,7 @@
 
 <rdf:RDF xmlns="http://purl.org/webofneeds/model#"
      xml:base="http://purl.org/webofneeds/model"
+     xmlns:sioc="http://rdfs.org/sioc/types#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:oslc="http://open-services.net/ns/core#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
@@ -195,6 +197,8 @@
     <!-- http://purl.org/webofneeds/model#hasMaxValueConstraint -->
 
     <owl:ObjectProperty rdf:about="&won;hasMaxValueConstraint">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&oslc;Property"/>
         <rdfs:range rdf:resource="&xsd;decimal"/>
     </owl:ObjectProperty>
     
@@ -203,6 +207,8 @@
     <!-- http://purl.org/webofneeds/model#hasMinValueConstraint -->
 
     <owl:ObjectProperty rdf:about="&won;hasMinValueConstraint">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&oslc;Property"/>
         <rdfs:range rdf:resource="&xsd;decimal"/>
     </owl:ObjectProperty>
     
@@ -262,6 +268,15 @@
         <rdf:type rdf:resource="&owl;SymmetricProperty"/>
         <rdfs:domain rdf:resource="&won;Connection"/>
         <rdfs:range rdf:resource="&won;Connection"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasTag -->
+
+    <owl:ObjectProperty rdf:about="&won;hasTag">
+        <rdfs:domain rdf:resource="&won;NeedContent"/>
+        <rdfs:range rdf:resource="&sioc;Tag"/>
     </owl:ObjectProperty>
     
 
@@ -375,8 +390,6 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasMaxValueConstraint">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:domain rdf:resource="&oslc;Property"/>
-        <rdfs:range rdf:resource="&xsd;decimal"/>
     </owl:DatatypeProperty>
     
 
@@ -385,8 +398,6 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasMinValueConstraint">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:domain rdf:resource="&oslc;Property"/>
-        <rdfs:range rdf:resource="&xsd;decimal"/>
     </owl:DatatypeProperty>
     
 
@@ -680,6 +691,12 @@
     <!-- http://purl.org/webofneeds/model#TimeSpecification -->
 
     <owl:Class rdf:about="&won;TimeSpecification"/>
+    
+
+
+    <!-- http://rdfs.org/sioc/types#Tag -->
+
+    <owl:Class rdf:about="&sioc;Tag"/>
     
 
 
