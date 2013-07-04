@@ -16,7 +16,7 @@ import java.util.Collection;
  * User: atus
  * Date: 03.07.13
  */
-public class Main
+public class SolrTesterMain
 {
 
   public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException, SolrServerException

@@ -63,6 +63,7 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     //add all queries
     queries = new HashSet<AbstractExtendedQuery>();
 
+
     knownMatches = new HashSet();
   }
 
