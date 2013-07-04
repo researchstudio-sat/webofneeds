@@ -1,13 +1,10 @@
-package won.matcher.solr;
+package won.matcher.solr.old;
 
 import org.apache.solr.common.util.NamedList;
-import org.apache.solr.core.SolrCore;
 import org.apache.solr.core.SolrEventListener;
 import org.apache.solr.search.SolrIndexSearcher;
-import org.apache.solr.util.plugin.SolrCoreAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.matcher.query.TextDescriptionMatcher;
 
 /**
  * User: gabriel

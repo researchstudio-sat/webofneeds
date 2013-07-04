@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.matcher.query.AbstractExtendedQuery;
+import won.matcher.query.IntegerRangeFilterQuery;
 import won.protocol.rest.LinkedDataRestClient;
 
 import java.io.IOException;
@@ -61,7 +62,6 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
 
     //add all queries
     queries = new HashSet<AbstractExtendedQuery>();
-
 
     knownMatches = new HashSet();
   }

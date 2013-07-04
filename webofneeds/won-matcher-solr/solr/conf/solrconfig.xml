@@ -456,9 +456,10 @@
 
   <lib dir="../../webofneeds" regex=".*\.jar" />
 
-  <updateHandler class="solr.DirectUpdateHandler2">
-    <listener event="postCommit" class="won.matcher.solr.UpdateListener" />
-  </updateHandler>
+  <!-- old plugin -->
+  <!--<updateHandler class="solr.DirectUpdateHandler2">
+    <listener event="postCommit" class="won.matcher.solr.old.UpdateListener" />
+  </updateHandler>-->
 
   <!-- config for the admin interface -->
   <admin>

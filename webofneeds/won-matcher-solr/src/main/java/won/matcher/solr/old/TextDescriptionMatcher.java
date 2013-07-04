@@ -1,4 +1,4 @@
-package won.matcher.query;
+package won.matcher.solr.old;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -16,16 +16,12 @@ import org.apache.solr.core.SolrCore;
 import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-import won.matcher.protocol.impl.MatcherProtocolNeedClientFactory;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
