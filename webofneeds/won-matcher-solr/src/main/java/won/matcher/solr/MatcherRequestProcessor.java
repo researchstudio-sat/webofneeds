@@ -1,18 +1,24 @@
 package won.matcher.solr;
 
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.*;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
+import org.apache.solr.search.SolrIndexSearcher;
 import org.apache.solr.update.*;
 import org.apache.solr.update.processor.UpdateRequestProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
-import won.matcher.query.AbstractExtendedQuery;
+import won.matcher.query.AbstractQuery;
 import won.matcher.query.IntegerRangeFilterQuery;
-import won.protocol.rest.LinkedDataRestClient;
+import won.matcher.query.TextMatcherQuery;
+import won.matcher.query.TimeRangeFilterQuery;
+import won.protocol.solr.SolrFields;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,9 +34,9 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
 
   private SolrCore solrCore;
 
-  private Set<String> knownMatches;
+  private HashMap<String, ScoreDoc[]> knownMatches;
 
-  private Set<AbstractExtendedQuery> queries;
+  private Set<AbstractQuery> queries;
 
   private static final int MAX_MATCHES = 3;
   private static final double MATCH_THRESHOLD = 0.1;
@@ -56,9 +62,13 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     client.initializeDefault();
 
     //add all queries
-    queries = new HashSet<AbstractExtendedQuery>();
+    queries = new HashSet<AbstractQuery>();
 
-    knownMatches = new HashSet();
+    queries.add(new IntegerRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.FIELD_LOWERPRICE, SolrFields.FIELD_UPPERPRICE));
+    queries.add(new TimeRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.FIELD_STARTTIME, SolrFields.FIELD_ENDTIME));
+    queries.add(new TextMatcherQuery(BooleanClause.Occur.MUST, new String[] {SolrFields.FIELD_TITLE, SolrFields.FIELD_DESCRIPTION} ));
+
+    knownMatches = new HashMap();
   }
 
   @Override
@@ -67,12 +77,25 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     super.processAdd(cmd);
     logger.debug("Matcher add called");
 
+    //init
+    BooleanQuery linkedQueries = new BooleanQuery();
+    TopDocs topDocs;
+
     //get last commited document
     SolrInputDocument inputDocument = cmd.getSolrInputDocument();
 
+    //get index
+    SolrIndexSearcher solrIndexSearcher = solrCore.getSearcher().get();
+
     //get set of documents to compare to (filter + more like this, etc)
+    for(AbstractQuery query : queries) {
+        linkedQueries.add(query.getQuery(solrIndexSearcher, inputDocument), query.getOccur());
+    }
 
     //compare and select best match(es) for hints
+    topDocs = solrIndexSearcher.search(linkedQueries, 10);
+    knownMatches.put(inputDocument.getField(SolrFields.FIELD_URL).getValue().toString(),
+            topDocs.scoreDocs);
   }
 
   @Override
@@ -82,16 +105,5 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     logger.info("Matcher finish called.");
 
     //cleanup or send prepared matches
-  }
-
-  public boolean checkMatchExists(String uri1, String uri2)
-  {
-    return knownMatches.contains(uri1 + " <=> " + uri2);
-  }
-
-  public void insertNewMatch(String uri1, String uri2)
-  {
-    knownMatches.add(uri1 + " <=> " + uri2);
-    knownMatches.add(uri2 + " <=> " + uri1);
   }
 }

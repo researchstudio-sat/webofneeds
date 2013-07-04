@@ -4,6 +4,8 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
+import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.search.SolrIndexSearcher;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,24 +14,29 @@ import org.apache.lucene.search.Query;
  * Time: 16:12
  * To change this template use File | Settings | File Templates.
  */
-public class TimeRangeFilterQuery {
-    private static final String FIELD_START_TIME = "startTime";
-    private static final String FIELD_END_TIME = "endTime";
+public class TimeRangeFilterQuery extends AbstractQuery {
+    private String lowerBoundField;
+    private String upperBoundField;
 
-    private BooleanQuery query;
+    public TimeRangeFilterQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField) {
+        super(occur);
+        this.lowerBoundField = lowerBoundField;
+        this.upperBoundField = upperBoundField;
+    }
 
-    public TimeRangeFilterQuery(long lower, long upper) {
-       Query nq1 = NumericRangeQuery.newLongRange(FIELD_START_TIME, lower, upper, true, true);
-       Query nq2 = NumericRangeQuery.newLongRange(FIELD_END_TIME, lower, upper, true, true);
+    public Query getQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument) {
+       long lower = Long.parseLong(inputDocument.getField(lowerBoundField).getValue().toString());
+       long upper = Long.parseLong(inputDocument.getField(upperBoundField).getValue().toString());
 
-       query = new BooleanQuery();
+       Query nq1 = NumericRangeQuery.newLongRange(lowerBoundField, lower, upper, true, true);
+       Query nq2 = NumericRangeQuery.newLongRange(upperBoundField, lower, upper, true, true);
+
+       BooleanQuery query = new BooleanQuery();
 
        //one of the two query must match at least one document
        query.add(nq1, BooleanClause.Occur.SHOULD);
        query.add(nq2, BooleanClause.Occur.SHOULD);
-    }
 
-    public Query getQuery() {
-        return query;
+       return query;
     }
 }
