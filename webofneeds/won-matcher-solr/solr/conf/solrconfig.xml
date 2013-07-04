@@ -448,11 +448,11 @@
 
   <requestHandler name="mlt" class="solr.MoreLikeThisHandler" />
 
-  <updateRequestProcessors name="webofneeds" default="true">
+  <updateRequestProcessorChain  name="webofneeds" default="true">
     <processor class="won.matcher.solr.MatcherUpdateProcessorFactory" />
     <processor class="solr.LogUpdateProcessorFactory" />
     <processor class="solr.RunUpdateProcessorFactory" />
-  </updateRequestProcessors>
+  </updateRequestProcessorChain >
 
   <lib dir="../../webofneeds" regex=".*\.jar" />
 

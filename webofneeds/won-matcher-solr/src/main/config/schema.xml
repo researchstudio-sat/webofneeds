@@ -156,7 +156,7 @@
 
         <fieldType name="tdouble" class="solr.TrieDoubleField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
 
-        <!--<fieldType name="tfloat" class="solr.TrieFloatField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>-->
+        <fieldType name="tfloat" class="solr.TrieFloatField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
 
     </types>
 
@@ -214,3 +214,4 @@
     <similarity class="org.sindice.siren.similarity.SirenSimilarity"/>
 
 </schema>
+
