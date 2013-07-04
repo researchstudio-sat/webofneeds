@@ -22,7 +22,6 @@ import java.util.Set;
  */
 public class MatcherRequestProcessor extends UpdateRequestProcessor
 {
-
   private Logger logger = LoggerFactory.getLogger(getClass());
 
   private MatcherProtocolNeedServiceClient client;
@@ -33,17 +32,13 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
 
   private Set<AbstractExtendedQuery> queries;
 
-  protected static final String FIELD_NTRIPLE = "ntriple";
-  private static final String FIELD_URL = "url";
-
   private static final int MAX_MATCHES = 3;
   private static final double MATCH_THRESHOLD = 0.1;
-  private static final long TIMEOUT_BETWEEN_SEARHCES = 1000; //timeout in millis
 
   public MatcherRequestProcessor(UpdateRequestProcessor next)
   {
     super(next);
-    logger.info("MATCHER INITIALIZED.");
+    logger.debug("Matcher initialize called");
 
     //get solr core
     CoreContainer.Initializer initializer = new CoreContainer.Initializer();
@@ -63,7 +58,6 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     //add all queries
     queries = new HashSet<AbstractExtendedQuery>();
 
-
     knownMatches = new HashSet();
   }
 
@@ -71,7 +65,7 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
   public void processAdd(final AddUpdateCommand cmd) throws IOException
   {
     super.processAdd(cmd);
-    logger.info("MATCHER ADD");
+    logger.debug("Matcher add called");
 
     //get last commited document
     SolrInputDocument inputDocument = cmd.getSolrInputDocument();
@@ -85,7 +79,7 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
   public void finish() throws IOException
   {
     super.finish();
-    logger.info("MATCHER FINISH");
+    logger.info("Matcher finish called.");
 
     //cleanup or send prepared matches
   }
