@@ -180,8 +180,9 @@
         <field name="description" type="text_general" indexed="true" stored="false" required="false"/>
 
         <field name="basicNeedType" type="string" indexed="true" stored="true" required="true"/>
+        <field name="matchingBasicNeedType" type="string" indexed="true" stored="true" required="true" multiValued="true"/>
 
-        <field name="tag" type="text_general" indexed="true" stored="true" required="false" multiValued="true"/>
+        <field name="tag" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
 
         <field name="startTime" type="tdate" indexed="true" stored="true" required="false"/>
         <field name="endTime" type="tdate" indexed="true" stored="true" required="false"/>
