@@ -164,11 +164,11 @@
 
         <!-- The ID (URL) of the document
              Use the 'string' field type (no tokenisation) -->
-        <field name="id" type="string" indexed="true" stored="true" required="true"/>
+        <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
 
         <!-- The URL of the document
              Use the 'text' field type in order to be tokenised -->
-        <field name="url" type="uri" indexed="true" stored="true" required="true"/>
+        <field name="url" type="uri" indexed="true" stored="true" required="true" multiValued="false"/>
 
         <!-- n-triple indexing scheme -->
         <field name="ntriple" type="ntriple" indexed="true" stored="true" multiValued="false"/>
@@ -176,22 +176,21 @@
         <!-- tabular indexing scheme -->
         <!--<field name="tabular" type="tabular" indexed="true" stored="false" multiValued="false"/>-->
 
-        <field name="title" type="text_general" indexed="true" stored="true" required="false"/>
-        <field name="description" type="text_general" indexed="true" stored="false" required="false"/>
+        <field name="title" type="text_general" indexed="true" stored="true" required="false" multiValued="false"/>
+        <field name="description" type="text_general" indexed="true" stored="false" required="false" multiValued="false"/>
 
-        <field name="basicNeedType" type="string" indexed="true" stored="true" required="true"/>
-        <field name="matchingBasicNeedType" type="string" indexed="true" stored="true" required="true" multiValued="true"/>
+        <field name="basicNeedType" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
 
         <field name="tag" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
 
-        <field name="startTime" type="tdate" indexed="true" stored="true" required="false"/>
-        <field name="endTime" type="tdate" indexed="true" stored="true" required="false"/>
+        <field name="startTime" type="tdate" indexed="true" stored="true" required="false" multiValued="false"/>
+        <field name="endTime" type="tdate" indexed="true" stored="true" required="false" multiValued="false"/>
 
-        <field name="lowerPriceLimit" type="tdouble" indexed="true" stored="true" required="false"/>
-        <field name="upperPriceLimit" type="tdouble" indexed="true" stored="true" required="false"/>
+        <field name="lowerPriceLimit" type="tdouble" indexed="true" stored="true" required="false" multiValued="false"/>
+        <field name="upperPriceLimit" type="tdouble" indexed="true" stored="true" required="false" multiValued="false"/>
 
-        <field name="location" type="location" indexed="true" stored="true" required="false"/>
-        <dynamicField name="*_coordinate"  type="tdouble" indexed="true"  stored="false"/>
+        <field name="location" type="location" indexed="true" stored="true" required="false" multiValued="false"/>
+        <dynamicField name="*_coordinate"  type="tdouble" indexed="true"  stored="false" multiValued="false"/>
     </fields>
 
     <!-- Field to use to determine and enforce document uniqueness.
