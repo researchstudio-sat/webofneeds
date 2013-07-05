@@ -28,14 +28,15 @@ public class SolrTesterMain
     EmbeddedSolrServer server = new EmbeddedSolrServer(coreContainer, "webofneeds");
 
     server.add(getTestData());
-    Thread.sleep(75*1000);
+
+    Thread.sleep(10 * 1000);
 
     server.add(getTestData2());
   }
 
   public static Collection<SolrInputDocument> getTestData()
   {
-    Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+    Collection<SolrInputDocument> docs = new ArrayList<>();
 
     SolrInputDocument doc1 = new SolrInputDocument();
     doc1.addField(SolrFields.URL, "http://www.examle.com/ld/need/1");
@@ -48,6 +49,7 @@ public class SolrTesterMain
     doc1.addField(SolrFields.TAG, "used");
     doc1.addField(SolrFields.LOWER_PRICE_LIMIT, 10.0);
     doc1.addField(SolrFields.UPPER_PRICE_LIMIT, 100.0);
+    doc1.addField(SolrFields.LOCATION, "48.2087,16.3726");
 
     docs.add(doc1);
 
@@ -60,16 +62,16 @@ public class SolrTesterMain
     doc2.addField(SolrFields.TAG, "dirty");
     doc2.addField(SolrFields.TAG, "couch");
     doc2.addField(SolrFields.LOWER_PRICE_LIMIT, 50.0);
+    doc2.addField(SolrFields.LOCATION, "48.2088,16.3724");
 
     docs.add(doc2);
 
     return docs;
   }
 
-
   public static Collection<SolrInputDocument> getTestData2()
   {
-    Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+    Collection<SolrInputDocument> docs = new ArrayList<>();
 
     SolrInputDocument doc1 = new SolrInputDocument();
     doc1.addField(SolrFields.URL, "http://www.examle.com/ld/need/3");
@@ -79,6 +81,7 @@ public class SolrTesterMain
     doc1.addField(SolrFields.TAG, "sofa");
     doc1.addField(SolrFields.TAG, "furniture");
     doc1.addField(SolrFields.UPPER_PRICE_LIMIT, 150.0);
+    doc1.addField(SolrFields.LOCATION, "48.2088,16.3726");
 
     docs.add(doc1);
 
@@ -93,6 +96,7 @@ public class SolrTesterMain
     doc2.addField(SolrFields.TAG, "couch");
     doc2.addField(SolrFields.TAG, "leather");
     doc2.addField(SolrFields.UPPER_PRICE_LIMIT, 50.0);
+    doc2.addField(SolrFields.LOCATION, "48.2087,16.3725");
 
     docs.add(doc2);
 

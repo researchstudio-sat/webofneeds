@@ -10,10 +10,7 @@ import org.apache.solr.update.processor.UpdateRequestProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
-import won.matcher.query.AbstractQuery;
-import won.matcher.query.IntegerRangeFilterQuery;
-import won.matcher.query.TextMatcherQuery;
-import won.matcher.query.TimeRangeFilterQuery;
+import won.matcher.query.*;
 import won.protocol.solr.SolrFields;
 
 import java.io.IOException;
@@ -62,10 +59,11 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
 
     //add all queries
     queries = new HashSet<AbstractQuery>();
-
+    queries.add(new BasicNeedTypeQuery(SolrFields.BASIC_NEED_TYPE));
     queries.add(new IntegerRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
     queries.add(new TimeRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.START_TIME, SolrFields.END_TIME));
-    queries.add(new TextMatcherQuery(BooleanClause.Occur.MUST, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
+    queries.add(new TextMatcherQuery(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
+    queries.add(new SpatialQuery(BooleanClause.Occur.SHOULD, SolrFields.LOCATION, solrCore));
 
     knownMatches = new HashMap();
   }
@@ -96,11 +94,11 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     //compare and select best match(es) for hints
     topDocs = solrIndexSearcher.search(linkedQueries, 10);
 
-    knownMatches.put(inputDocument.getField(SolrFields.URL).getValue().toString(),
-        topDocs.scoreDocs);
+
+    if (topDocs.scoreDocs.length != 0)
+      knownMatches.put(inputDocument.getFieldValue(SolrFields.URL).toString(), topDocs.scoreDocs);
 
     for (String match : knownMatches.keySet()) {
-
       StringBuilder sb = new StringBuilder();
       for (ScoreDoc score : knownMatches.get(match))
         sb.append(String.format("\ndocument: %s\tscore:%2.3f", score.doc, score.score));
