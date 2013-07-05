@@ -29,7 +29,7 @@ public class TimeRangeFilterQuery extends AbstractQuery
     if (!inputDocument.containsKey(lowerBoundField) || !inputDocument.containsKey(upperBoundField))
       return null;
 
-    long lower = Long.parseLong(inputDocument.getField(lowerBoundField).toString());
+    long lower = Long.parseLong(inputDocument.getField(lowerBoundField).getValue().toString());
     long upper = Long.parseLong(inputDocument.getField(upperBoundField).getValue().toString());
 
     Query nq1 = NumericRangeQuery.newLongRange(lowerBoundField, lower, upper, true, true);
