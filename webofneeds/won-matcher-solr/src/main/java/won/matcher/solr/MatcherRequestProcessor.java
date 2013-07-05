@@ -1,12 +1,11 @@
 package won.matcher.solr;
 
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.*;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.search.SolrIndexSearcher;
-import org.apache.solr.update.*;
+import org.apache.solr.update.AddUpdateCommand;
 import org.apache.solr.update.processor.UpdateRequestProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +63,9 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     //add all queries
     queries = new HashSet<AbstractQuery>();
 
-    queries.add(new IntegerRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.FIELD_LOWERPRICE, SolrFields.FIELD_UPPERPRICE));
-    queries.add(new TimeRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.FIELD_STARTTIME, SolrFields.FIELD_ENDTIME));
-    queries.add(new TextMatcherQuery(BooleanClause.Occur.MUST, new String[] {SolrFields.FIELD_TITLE, SolrFields.FIELD_DESCRIPTION} ));
+    queries.add(new IntegerRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
+    queries.add(new TimeRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.START_TIME, SolrFields.END_TIME));
+    queries.add(new TextMatcherQuery(BooleanClause.Occur.MUST, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
 
     knownMatches = new HashMap();
   }
@@ -88,14 +87,26 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     SolrIndexSearcher solrIndexSearcher = solrCore.getSearcher().get();
 
     //get set of documents to compare to (filter + more like this, etc)
-    for(AbstractQuery query : queries) {
-        linkedQueries.add(query.getQuery(solrIndexSearcher, inputDocument), query.getOccur());
+    for (AbstractQuery query : queries) {
+      Query q = query.getQuery(solrIndexSearcher, inputDocument);
+      if (q != null)
+        linkedQueries.add(q, query.getOccur());
     }
 
     //compare and select best match(es) for hints
     topDocs = solrIndexSearcher.search(linkedQueries, 10);
-    knownMatches.put(inputDocument.getField(SolrFields.FIELD_URL).getValue().toString(),
-            topDocs.scoreDocs);
+
+    knownMatches.put(inputDocument.getField(SolrFields.URL).getValue().toString(),
+        topDocs.scoreDocs);
+
+    for (String match : knownMatches.keySet()) {
+
+      StringBuilder sb = new StringBuilder();
+      for (ScoreDoc score : knownMatches.get(match))
+        sb.append(String.format("\ndocument: %s\tscore:%2.3f", score.doc, score.score));
+
+      logger.info("document: " + match + " " + sb.toString());
+    }
   }
 
   @Override

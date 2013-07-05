@@ -6,23 +6,24 @@ package won.protocol.solr;
  */
 public class SolrFields
 {
-  public static final String FIELD_URL = "url";
+  public static final String URL = "url";
 
-  public static final String FIELD_NTRIPLE = "ntriple";
+  public static final String NTRIPLE = "ntriple";
 
-  public static final String FIELD_TITLE = "title";
-  public static final String FIELD_DESCRIPTION = "description";
+  public static final String TITLE = "title";
+  public static final String DESCRIPTION = "description";
 
-  public static final String FIELD_BASIC_NEED_TYPE = "basicNeedType";
+  public static final String BASIC_NEED_TYPE = "basicNeedType";
+  public static final String MATCHING_BASIC_NEED_TYPE = "basicNeedType";
 
-  public static final String FIELD_LOCATION = "location";
+  public static final String LOCATION = "location";
 
-  public static final String FIELD_LOWERPRICE = "lowerPriceLimit";
-  public static final String FIELD_UPPERPRICE = "upperPriceLimit";
+  public static final String LOWER_PRICE_LIMIT = "lowerPriceLimit";
+  public static final String UPPER_PRICE_LIMIT = "upperPriceLimit";
 
-  public static final String FIELD_STARTTIME = "startTime";
-  public static final String FIELD_ENDTIME = "endTime";
+  public static final String START_TIME = "startTime";
+  public static final String END_TIME = "endTime";
 
-  public static final String FIELD_TAG = "tag";
+  public static final String TAG = "tag";
 
 }
