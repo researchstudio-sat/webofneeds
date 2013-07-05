@@ -14,7 +14,7 @@ public class SolrFields
   public static final String DESCRIPTION = "description";
 
   public static final String BASIC_NEED_TYPE = "basicNeedType";
-  public static final String MATCHING_BASIC_NEED_TYPE = "basicNeedType";
+  public static final String MATCHING_BASIC_NEED_TYPE = "matchingBasicNeedType";
 
   public static final String LOCATION = "location";
 
