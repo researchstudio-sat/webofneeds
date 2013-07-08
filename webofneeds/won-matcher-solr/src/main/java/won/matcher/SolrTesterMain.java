@@ -6,6 +6,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.xml.sax.SAXException;
 import won.protocol.solr.SolrFields;
+import won.protocol.vocabulary.WON;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class SolrTesterMain
 
     server.add(getTestData());
 
-    Thread.sleep(10 * 1000);
+    Thread.sleep(75 * 1000);
 
     server.add(getTestData2());
   }
@@ -42,27 +43,28 @@ public class SolrTesterMain
     doc1.addField(SolrFields.URL, "http://www.examle.com/ld/need/1");
     doc1.addField(SolrFields.TITLE, "Sofa");
     doc1.addField(SolrFields.DESCRIPTION, "I have a very nice red sofa to give away.");
-    doc1.addField(SolrFields.BASIC_NEED_TYPE, "SUPPLY");
+    doc1.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
     doc1.addField(SolrFields.TAG, "sofa");
     doc1.addField(SolrFields.TAG, "red");
     doc1.addField(SolrFields.TAG, "leather");
     doc1.addField(SolrFields.TAG, "used");
     doc1.addField(SolrFields.LOWER_PRICE_LIMIT, 10.0);
     doc1.addField(SolrFields.UPPER_PRICE_LIMIT, 100.0);
-    doc1.addField(SolrFields.LOCATION, "48.2087,16.3726");
+    doc1.addField(SolrFields.LOCATION, "48.2088,16.3726");
 
     docs.add(doc1);
 
+    //11km away from other points
     SolrInputDocument doc2 = new SolrInputDocument();
     doc2.addField(SolrFields.URL, "http://www.examle.com/ld/need/2");
     doc2.addField(SolrFields.TITLE, "Sofa or couch");
     doc2.addField(SolrFields.DESCRIPTION, "I am giving away my couch.");
-    doc2.addField(SolrFields.BASIC_NEED_TYPE, "SUPPLY");
+    doc2.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
     doc2.addField(SolrFields.TAG, "blue");
     doc2.addField(SolrFields.TAG, "dirty");
     doc2.addField(SolrFields.TAG, "couch");
     doc2.addField(SolrFields.LOWER_PRICE_LIMIT, 50.0);
-    doc2.addField(SolrFields.LOCATION, "48.2088,16.3724");
+    doc2.addField(SolrFields.LOCATION, "48.3089,16.3726");
 
     docs.add(doc2);
 
@@ -77,7 +79,7 @@ public class SolrTesterMain
     doc1.addField(SolrFields.URL, "http://www.examle.com/ld/need/3");
     doc1.addField(SolrFields.TITLE, "Sofa");
     doc1.addField(SolrFields.DESCRIPTION, "I need a sofa.");
-    doc1.addField(SolrFields.BASIC_NEED_TYPE, "NEED");
+    doc1.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
     doc1.addField(SolrFields.TAG, "sofa");
     doc1.addField(SolrFields.TAG, "furniture");
     doc1.addField(SolrFields.UPPER_PRICE_LIMIT, 150.0);
@@ -89,14 +91,14 @@ public class SolrTesterMain
     doc2.addField(SolrFields.URL, "http://www.examle.com/ld/need/4");
     doc2.addField(SolrFields.TITLE, "Looking for sofa or couch");
     doc2.addField(SolrFields.DESCRIPTION, "I am looking for a sofa or a couch for my living room.");
-    doc2.addField(SolrFields.BASIC_NEED_TYPE, "NEED");
+    doc2.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
     doc2.addField(SolrFields.TAG, "sofa");
     doc2.addField(SolrFields.TAG, "blue");
     doc2.addField(SolrFields.TAG, "red");
     doc2.addField(SolrFields.TAG, "couch");
     doc2.addField(SolrFields.TAG, "leather");
     doc2.addField(SolrFields.UPPER_PRICE_LIMIT, 50.0);
-    doc2.addField(SolrFields.LOCATION, "48.2087,16.3725");
+    doc2.addField(SolrFields.LOCATION, "48.2088,16.3726");
 
     docs.add(doc2);
 

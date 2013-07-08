@@ -67,7 +67,7 @@ public class SpatialQuery extends AbstractQuery
 
     Query query = ((LatLonType) latLon).createSpatialQuery(qParser, options);
 
-    logger.info(query.toString());
+    logger.info("Spatial query: " + query.toString());
 
     return query;
   }

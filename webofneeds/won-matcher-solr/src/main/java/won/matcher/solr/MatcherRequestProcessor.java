@@ -59,11 +59,11 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
 
     //add all queries
     queries = new HashSet<AbstractQuery>();
-    queries.add(new BasicNeedTypeQuery(SolrFields.BASIC_NEED_TYPE));
-    queries.add(new IntegerRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
-    queries.add(new TimeRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.START_TIME, SolrFields.END_TIME));
-    queries.add(new TextMatcherQuery(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
-    queries.add(new SpatialQuery(BooleanClause.Occur.SHOULD, SolrFields.LOCATION, solrCore));
+    queries.add(new BasicNeedTypeQuery(BooleanClause.Occur.MUST, SolrFields.BASIC_NEED_TYPE));
+//    queries.add(new IntegerRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
+//    queries.add(new TimeRangeFilterQuery(BooleanClause.Occur.SHOULD, SolrFields.START_TIME, SolrFields.END_TIME));
+//    queries.add(new TextMatcherQuery(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
+    queries.add(new SpatialQuery(BooleanClause.Occur.MUST, SolrFields.LOCATION, solrCore));
 
     knownMatches = new HashMap();
   }

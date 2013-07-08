@@ -22,9 +22,9 @@ public class BasicNeedTypeQuery extends AbstractQuery
 
   private final String needTypeField;
 
-  public BasicNeedTypeQuery(String needTypeField)
+  public BasicNeedTypeQuery(BooleanClause.Occur occur, String needTypeField)
   {
-    super(BooleanClause.Occur.MUST);
+    super(occur);
     this.needTypeField = needTypeField;
   }
 
@@ -33,13 +33,13 @@ public class BasicNeedTypeQuery extends AbstractQuery
   {
     if (!inputDocument.containsKey(needTypeField))
       return null;
+
     String matchingNeedType = getMatchingNeedType(inputDocument.getFieldValue(needTypeField).toString());
     if(matchingNeedType == null)
       return null;
 
-    logger.info("Matching need type = " + matchingNeedType);
-
     Query query = new TermQuery(new Term(needTypeField, matchingNeedType));
+    logger.info("Need type query: " + query.toString());
 
     return query;
   }
