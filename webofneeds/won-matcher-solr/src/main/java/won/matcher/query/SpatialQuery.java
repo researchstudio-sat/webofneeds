@@ -46,16 +46,6 @@ public class SpatialQuery extends AbstractQuery
     if (!inputDocument.containsKey(locationField))
       return null;
 
-    NamedList<String> namedList = new NamedList<>();
-    namedList.add("sfield", locationField);
-    namedList.add("pt", inputDocument.getFieldValue(locationField).toString());
-    namedList.add("d", String.valueOf(MAX_DISTANCE));
-    SolrParams solrParams = SolrParams.toSolrParams(namedList);
-
-    SolrQueryRequest sqr = new LocalSolrQueryRequest(solrCore, solrParams);
-
-    SpatialFilterQParser qParser = new SpatialFilterQParser("geofilt", null, solrParams, sqr, false);
-
     FieldType latLon = indexSearcher.getSchema().getFieldTypeByName(locationField);
 
     SpatialOptions options = new SpatialOptions();
@@ -65,6 +55,14 @@ public class SpatialQuery extends AbstractQuery
     options.pointStr = inputDocument.getFieldValue(locationField).toString();
     options.field = new SchemaField(locationField, latLon);
 
+    NamedList<String> solrParamsList = new NamedList<>();
+    solrParamsList.add("sfield", locationField);
+    solrParamsList.add("pt", inputDocument.getFieldValue(locationField).toString());
+    solrParamsList.add("d", String.valueOf(MAX_DISTANCE));
+    SolrParams solrParams = SolrParams.toSolrParams(solrParamsList);
+
+    SolrQueryRequest sqr = new LocalSolrQueryRequest(solrCore, solrParams);
+    SpatialFilterQParser qParser = new SpatialFilterQParser("geofilt", null, solrParams, sqr, false);
     Query query = ((LatLonType) latLon).createSpatialQuery(qParser, options);
 
     logger.info("Spatial query: " + query.toString());
