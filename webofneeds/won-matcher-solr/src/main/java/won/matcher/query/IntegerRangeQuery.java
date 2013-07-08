@@ -9,15 +9,15 @@ import org.apache.solr.search.SolrIndexSearcher;
 
 /**
  * User: gabriel
- * Date: 02.07.13
- * Time: 16:12
+ * Date: 03.07.13
+ * Time: 12:56
  */
-public class TimeRangeFilterQuery extends AbstractQuery
+public class IntegerRangeQuery extends AbstractQuery
 {
   private String lowerBoundField;
   private String upperBoundField;
 
-  public TimeRangeFilterQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField)
+  public IntegerRangeQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField)
   {
     super(occur);
     this.lowerBoundField = lowerBoundField;
@@ -29,11 +29,11 @@ public class TimeRangeFilterQuery extends AbstractQuery
     if (!inputDocument.containsKey(lowerBoundField) || !inputDocument.containsKey(upperBoundField))
       return null;
 
-    long lower = Long.parseLong(inputDocument.getFieldValue(lowerBoundField).toString());
-    long upper = Long.parseLong(inputDocument.getFieldValue(upperBoundField).toString());
+    double lower = Double.parseDouble(inputDocument.getFieldValue(lowerBoundField).toString());
+    double upper = Double.parseDouble(inputDocument.getFieldValue(upperBoundField).toString());
 
-    Query nq1 = NumericRangeQuery.newLongRange(lowerBoundField, lower, upper, true, true);
-    Query nq2 = NumericRangeQuery.newLongRange(upperBoundField, lower, upper, true, true);
+    Query nq1 = NumericRangeQuery.newDoubleRange(lowerBoundField, lower, upper, true, true);
+    Query nq2 = NumericRangeQuery.newDoubleRange(upperBoundField, lower, upper, true, true);
 
     BooleanQuery query = new BooleanQuery();
 
