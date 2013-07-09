@@ -120,6 +120,7 @@ public class WONPresenceHandler extends WONCoreStanzaHandler {
 
         StanzaBuilder stanzaBuilder = StanzaBuilder.createPresenceStanza(from, to, oldPresenceStanza.getXMLLang(), oldPresenceStanza.getPresenceType(),
                 oldPresenceStanza.getShow(), newStatus);
+        stanzaBuilder.addAttribute("id",oldPresenceStanza.getID());
 
         stanzaBuilder.addPreparedElement(new XMLElementBuilder("nick", "http://jabber.org/protocol/nick").addText(newNickname).build());
 

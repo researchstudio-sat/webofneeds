@@ -50,7 +50,10 @@
     </bean>
 
     <!-- XMPP Server -->
-    <bean id="xmppServer" class="won.xmpp.WONXmppServerImpl" />
+    <bean id="xmppServer" class="won.xmpp.WONXmppServerImpl">
+        <constructor-arg name="hostname" value="${xmpp.hostname}" />
+        <property name="connectionProxyInitString" value="${xmpp.proxies}"/>
+    </bean>
 
     <!-- Configure transaction management -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">

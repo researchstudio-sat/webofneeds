@@ -26,6 +26,7 @@ import org.apache.vysper.xmpp.addressing.EntityFormatException;
 import org.apache.vysper.xmpp.addressing.EntityImpl;
 import org.apache.vysper.xmpp.authentication.AccountCreationException;
 import org.apache.vysper.xmpp.authentication.AccountManagement;
+import org.apache.vysper.xmpp.modules.core.bind.handler.BindIQHandler;
 import org.apache.vysper.xmpp.modules.extension.xep0054_vcardtemp.VcardTempModule;
 import org.apache.vysper.xmpp.modules.extension.xep0077_inbandreg.InBandRegistrationModule;
 import org.apache.vysper.xmpp.modules.extension.xep0092_software_version.SoftwareVersionModule;
@@ -61,25 +62,30 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private String hostname = "sat016";
+    private String hostname = null;
     
     private String wonDomain = "won."+hostname;
     private XMPPServer server;
 
+    private S2SEndpoint s2s;
+
     private StorageProviderRegistry providerRegistry;
 
     final WONUserAuthentication accountManagement;
-
     private WONRoutingModule routingModule;
 
-    public WONXmppServerImpl(){
+    public WONXmppServerImpl(String hostname){
 
+        this.hostname = hostname;
+        this.wonDomain = "won." + hostname;
+        logger.info("Creating xmpp server with hostname : "+ hostname);
         accountManagement = new WONUserAuthentication();
         providerRegistry = new WONStorageProviderRegistry(accountManagement, new MemoryRosterManager());
         //accountManagement = (WONUserAuthentication) providerRegistry.retrieve(AccountManagement.class);
         server = new XMPPServer(hostname);
         server.addEndpoint(new C2SEndpoint());
-        server.addEndpoint(new S2SEndpoint());
+        s2s = new S2SEndpoint();
+        server.addEndpoint(s2s);
         server.setStorageProviderRegistry(providerRegistry);
         //configuring Modules
         //Change here for additional XMPP features
@@ -114,7 +120,7 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
             //for TESTING purpose
             server.getServerRuntimeContext().getServerFeatures().setRelayingToFederationServers(true);
 
-            initializeUsers();
+            //initializeUsers();
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -126,15 +132,15 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
     }
 
     @Override
-    public void createXmppConnectionProxy(String ownerBareJid, String ownProxyJid, String partnerProxyJid, String nickname)
+    public void createXmppConnectionProxy(String ownerBareJid, String ownProxyJid, String partnerProxyBareJid, String nickname)
     throws XmppAcountCreationException{
         try {
-            //String ownProxyBareJid = ownProxyJid + "@"+wonDomain;
+            String ownProxyBareJid = ownProxyJid + "@"+wonDomain;
             //String partnerProxyBareJid = partnerProxyJid + "@"+wonDomain;
 
             Entity ownerEntity = EntityImpl.parse(ownerBareJid);
-            Entity ownProxyEntity = EntityImpl.parse(ownProxyJid);
-            Entity partnerProxyEntity = EntityImpl.parse(partnerProxyJid);
+            Entity ownProxyEntity = EntityImpl.parse(ownProxyBareJid);
+            Entity partnerProxyEntity = EntityImpl.parse(partnerProxyBareJid);
 
             /*Owner should have been registered with a password*/
             if(!accountManagement.verifyAccountExists(ownerEntity)){
@@ -153,12 +159,12 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
             accountManagement.addUser(ownProxyEntity, "password1");
 
 
-            NeedProxy newProxy = routingModule.addProxy(ownProxyJid, ownerBareJid, partnerProxyJid);
+            NeedProxy newProxy = routingModule.addProxy(ownProxyBareJid, ownerBareJid, partnerProxyBareJid);
 
             newProxy.setNickname(nickname);
             //TODO update roster of the owner
 
-            logger.info(String.format("connectionProxy with jid: %s successfully created!", ownProxyJid+ "@"+wonDomain));
+            logger.info(String.format("connectionProxy with jid: %s successfully created!", ownProxyBareJid));
 
 
         } catch (EntityFormatException e) {
@@ -231,8 +237,8 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
             routingModule.addProxy(proxy2, user1, proxy1);
             */
 
-            createXmppConnectionProxy(admin, "proxy1"+"@"+wonDomain, "proxy2"+"@"+wonDomain, "I am admin and need a car");
-            createXmppConnectionProxy(user1, "proxy2"+"@"+wonDomain, "proxy1"+"@"+wonDomain, "I am user1 and have a car");
+            createXmppConnectionProxy(admin, "proxy1", "proxy2"+"@"+wonDomain, "I am admin and need a car");
+            createXmppConnectionProxy(user1, "proxy2", "proxy1"+"@"+wonDomain, "I am user1 and have a car");
 
 
 
@@ -277,5 +283,28 @@ public class WONXmppServerImpl implements InitializingBean, DisposableBean, WONX
     public void destroy() throws Exception {
         logger.info("destroying server");
         server.stop();
+        logger.info("server stopped!");
+    }
+
+
+
+    public void setConnectionProxyInitString(String connections){
+
+        for(String connection : connections.split(";")){
+            String connSplit[] = connection.split(":");
+            try {
+                logger.info("creating user "+ connSplit[0]);
+                accountManagement.addUser(EntityImpl.parse(connSplit[0]), "password1");
+                logger.info(String.format("creating connection proxy: %s : %s : %s : %s",connSplit[0], connSplit[1], connSplit[2], connSplit[3]  ));
+                createXmppConnectionProxy(connSplit[0], connSplit[1], connSplit[2], connSplit[3]);
+            } catch (XmppAcountCreationException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (AccountCreationException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (EntityFormatException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        }
     }
 }

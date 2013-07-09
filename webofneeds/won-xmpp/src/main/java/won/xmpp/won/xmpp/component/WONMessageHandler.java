@@ -122,6 +122,8 @@ public class WONMessageHandler extends WONCoreStanzaHandler {
         MessageStanza oldMsgStanza = new MessageStanza(oldStanza);
         StanzaBuilder stanzaBuilder = StanzaBuilder.createMessageStanza(from, to, oldMsgStanza.getXMLLang(), oldMsgStanza.getBody(oldMsgStanza.getXMLLang()));
         stanzaBuilder.addAttribute("type", "chat");
+        stanzaBuilder.addAttribute("id", oldMsgStanza.getID());
+
 
         WONRoutingModule router = serverRuntimeContext.getModule(WONRoutingModule.class);
         if(router == null){

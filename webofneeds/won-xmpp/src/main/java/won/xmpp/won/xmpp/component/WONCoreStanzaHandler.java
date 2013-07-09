@@ -51,46 +51,55 @@ public abstract class WONCoreStanzaHandler extends XMPPCoreStanzaHandler {
         if(subdomain == null)
             throw new Exception("Component subdomain cannot be null!");
 
+        String resource = null;
+
         subdomain = subdomain + "." + serverCtx.getServerEnitity().getDomain();
         logger.info("from subdomain: " + subdomain);
         Entity from = stanza.getFrom();
 
         //TODO: if resource is not set
-        /*if (from == null || !from.isResourceSet()) {
+        if (from == null || !from.isResourceSet()) {
             // rewrite stanza with new from
-            String resource = serverCtx.getResourceRegistry()
+            resource = serverCtx.getResourceRegistry()
                     .getUniqueResourceForSession(sessionContext);
             if (resource == null)
                 throw new IllegalStateException("could not determine unique resource");
             from = new EntityImpl(sessionContext.getInitiatingEntity(), resource);
 
-        } */
+        }
 
-        if (subdomain.equals(from.getDomain())){
+        resource = from.getResource();
+
+        if(!subdomain.equals(stanza.getTo().getDomain())){
+            logger.info("recipient from outside domain: " + stanza.getTo().getDomain());
+            throw new IllegalStateException("Recipient address outside of component");
+
+        }
+
+
+
+       if (subdomain.equals(from.getDomain())){
             //msg comes from a proxy inside the component
 
-            if(!subdomain.equals(stanza.getTo().getDomain())){
-                //throw new IllegalStateException("Recipient address outside of component");
-                logger.info("recipient from outside domain: " + stanza.getTo().getDomain());
-            }
-            //msg goes to another Proxy
-            String toJid = stanza.getTo().getBareJID().toString();
 
-            if(!router.hasProxy(toJid)){
+            //msg goes to another Proxy
+            String toBareJid = stanza.getTo().getBareJID().toString();
+
+            if(!router.hasProxy(toBareJid)){
                 logger.info("Target proxy cannot be found!");
                 return null;
             }
 
-            if(!router.getProxy(toJid).getOtherProxyJid().equals(from.getBareJID().toString())){
-                logger.info(String.format("Invalid source proxy: %s , for destination proxy: %s ", from.getBareJID().toString(), toJid));
+            if(!router.getProxy(toBareJid).getOtherProxyJid().equals(from.getBareJID().toString())){
+                logger.info(String.format("Invalid source proxy: %s , for destination proxy: %s ", from.getBareJID().toString(), toBareJid));
                 return null;
             }
             // so we direct it to TO's owner
-            String ownerJid = router.getProxy(stanza.getTo().getBareJID().toString()).getOwner().getJid();
+            String ownerJid = router.getProxy(toBareJid).getOwner().getJid();
             logger.info("owner Jid for " + stanza.getTo().getFullQualifiedName() + " : " + ownerJid);
             Entity owner = EntityImpl.parse(ownerJid);
-
-            stanzaBuilder = buildCoreStanza(stanza.getTo(), owner, stanza, serverCtx, sessionContext);
+            Entity newSrc = new EntityImpl(stanza.getTo(),resource);
+            stanzaBuilder = buildCoreStanza(newSrc, owner, stanza, serverCtx, sessionContext);
 
             return stanzaBuilder.build();
 
@@ -100,50 +109,54 @@ public abstract class WONCoreStanzaHandler extends XMPPCoreStanzaHandler {
         }else{
 
             //msg comes from outside of the component
-            if(subdomain.equals(stanza.getTo().getDomain())){
-                //msg goes to a Proxy inside the component
-                String toJid = stanza.getTo().getBareJID().toString();
 
-                if(!router.hasProxy(toJid)){
-                    logger.info("Target proxy cannot be found! : " + toJid);
-                    return null;
-                }
+            String toBareJid = stanza.getTo().getBareJID().toString();
 
-                NeedProxy toProxy = router.getProxy(toJid);
-
-                //check if msg comes from authorized owner
-                if(!stanza.getFrom().getBareJID().toString().equals(toProxy.getOwner().getJid())){
-                    logger.info("Incoming Message to Proxy : "+ toProxy.getJid() + " from invalid owner! : " + stanza.getFrom().getBareJID());
-                    return null;
-                }
-
-                // no we make a new msg stanza from OtherProxy to it's Owner
-
-                String otherProxyJid = toProxy.getOtherProxyJid();
-
-                if(!router.hasProxy(otherProxyJid)){
-                    logger.debug("Target proxy cannot be found! : " + otherProxyJid);
-                    return null;
-                }
-                logger.info("other proxy Jid for "+ stanza.getTo().getFullQualifiedName() + " : " + otherProxyJid);
-
-                //String otherOwnerJid = router.getProxy(otherProxyJid).getOwner().getJid();
-
-                Entity otherProxy = EntityImpl.parse(otherProxyJid);
-                Entity toProxyEntity = EntityImpl.parse(toJid);
-                //Entity otherOwner = EntityImpl.parse(otherOwnerJid);
-
-
-                stanzaBuilder = buildCoreStanza(toProxyEntity, otherProxy, stanza, serverCtx, sessionContext);
-
-
-                return stanzaBuilder.build();
-
-
+            //check if we have the dest address
+            if(!router.hasProxy(toBareJid)){
+                logger.info("Target proxy cannot be found! : " + toBareJid);
+                return null;
             }
+
+            NeedProxy toProxy = router.getProxy(toBareJid);
+
+            String destJid = null; //our new destination
+
+            //check if msg comes from authorized owner
+            if(stanza.getFrom().getBareJID().toString().equals(toProxy.getOwner().getJid())){
+                destJid = toProxy.getOtherProxyJid();
+
+            }else if(stanza.getFrom().getBareJID().toString().equals(toProxy.getOtherProxyJid())){
+
+                //msg comes from another proxy from another server
+                destJid = toProxy.getOwner().getJid();
+                logger.info("owner Jid for " + stanza.getTo().getFullQualifiedName() + " : " + destJid);
+
+            }else{
+                logger.info("Unauthorized incoming stanza for proxy: "+ toBareJid);
+                return null;
+            }
+
+            // now we make a new msg stanza from incoming toJid to destJid
+
+
+            logger.info("Destination Jid for "+ stanza.getTo().getFullQualifiedName() + " : " + destJid);
+
+
+            Entity destProxy = EntityImpl.parse(destJid);
+
+           Entity newSrc = new EntityImpl(stanza.getTo(),resource);
+
+           stanzaBuilder = buildCoreStanza(newSrc, destProxy, stanza, serverCtx, sessionContext);
+
+
+            return stanzaBuilder.build();
+
+
+
         }
 
-        return null;
+
     }
 
 
