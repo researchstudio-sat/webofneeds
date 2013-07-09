@@ -1,6 +1,5 @@
 package won.matcher.solr;
 
-import com.sun.corba.se.spi.servicecontext.SendingContextServiceContext;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.*;
@@ -14,8 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.matcher.query.*;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchNeedException;
 import won.protocol.solr.SolrFields;
 
 import java.io.IOException;
@@ -41,7 +38,7 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
   private Set<AbstractQuery> queries;
 
   private static final int MAX_MATCHES = 3;
-  private static final double MATCH_THRESHOLD = 0.1;
+  private static final double MATCH_THRESHOLD = 0.4;
 
   public MatcherRequestProcessor(UpdateRequestProcessor next)
   {
@@ -64,12 +61,13 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     client.initializeDefault();
 
     //add all queries
-    queries = new HashSet<AbstractQuery>();
+    queries = new HashSet<>();
     queries.add(new BasicNeedTypeQuery(BooleanClause.Occur.MUST, SolrFields.BASIC_NEED_TYPE));
 //    queries.add(new IntegerRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
 //    queries.add(new LongRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.START_TIME, SolrFields.END_TIME));
-//    queries.add(new TextMatcherQuery(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
-    queries.add(new SpatialQuery(BooleanClause.Occur.MUST, SolrFields.LOCATION, solrCore));
+    queries.add(new TextMatcherQuery(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
+//    queries.add(new MultipleValueFieldQuery(BooleanClause.Occur.SHOULD, SolrFields.TAG));
+//    queries.add(new SpatialQuery(BooleanClause.Occur.MUST, SolrFields.LOCATION, solrCore));
 
     knownMatches = new HashMap();
   }
@@ -81,7 +79,7 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     logger.debug("Matcher add called");
 
     //init
-    BooleanQuery linkedQueries = new BooleanQuery();
+    BooleanQuery booleanQuery = new BooleanQuery();
     TopDocs topDocs;
 
     //get last commited document
@@ -93,13 +91,15 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     //get set of documents to compare to (filter + more like this, etc)
     for (AbstractQuery query : queries) {
       Query q = query.getQuery(solrIndexSearcher, inputDocument);
-      if (q != null)
-        linkedQueries.add(q, query.getOccur());
+      if (q != null) {
+        logger.info("query: "+ q.toString());
+        booleanQuery.add(q, query.getOccur());
+      }
     }
+    logger.info("long query: " + booleanQuery.toString());
 
     //compare and select best match(es) for hints
-    topDocs = solrIndexSearcher.search(linkedQueries, 10);
-
+    topDocs = solrIndexSearcher.search(booleanQuery, 10);
 
     if (topDocs.scoreDocs.length != 0)
       knownMatches.put(inputDocument.getFieldValue(SolrFields.URL).toString(), topDocs.scoreDocs);
