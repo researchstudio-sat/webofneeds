@@ -6,8 +6,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.search.SolrIndexSearcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
@@ -18,8 +16,6 @@ import java.io.IOException;
  */
 public class BasicNeedTypeQuery extends AbstractQuery
 {
-  private Logger logger = LoggerFactory.getLogger(getClass());
-
   private final String needTypeField;
 
   public BasicNeedTypeQuery(BooleanClause.Occur occur, String needTypeField)
@@ -35,11 +31,10 @@ public class BasicNeedTypeQuery extends AbstractQuery
       return null;
 
     String matchingNeedType = getMatchingNeedType(inputDocument.getFieldValue(needTypeField).toString());
-    if(matchingNeedType == null)
+    if (matchingNeedType == null)
       return null;
 
     Query query = new TermQuery(new Term(needTypeField, matchingNeedType));
-    logger.info("Need type query: " + query.toString());
 
     return query;
   }

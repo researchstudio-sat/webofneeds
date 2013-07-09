@@ -15,8 +15,6 @@ import org.apache.solr.schema.SchemaField;
 import org.apache.solr.search.SolrIndexSearcher;
 import org.apache.solr.search.SpatialFilterQParser;
 import org.apache.solr.search.SpatialOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -26,8 +24,6 @@ import java.io.IOException;
  */
 public class SpatialQuery extends AbstractQuery
 {
-  private Logger logger = LoggerFactory.getLogger(getClass());
-
   private final int MAX_DISTANCE = 10;
 
   private String locationField;
@@ -64,8 +60,6 @@ public class SpatialQuery extends AbstractQuery
     SolrQueryRequest sqr = new LocalSolrQueryRequest(solrCore, solrParams);
     SpatialFilterQParser qParser = new SpatialFilterQParser("geofilt", null, solrParams, sqr, false);
     Query query = ((LatLonType) latLon).createSpatialQuery(qParser, options);
-
-    logger.info("Spatial query: " + query.toString());
 
     return query;
   }
