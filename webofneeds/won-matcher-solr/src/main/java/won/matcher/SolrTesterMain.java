@@ -68,6 +68,21 @@ public class SolrTesterMain
 
     docs.add(doc2);
 
+    SolrInputDocument doc3 = new SolrInputDocument();
+    doc3.addField(SolrFields.URL, "http://www.examle.com/ld/need/3");
+    doc3.addField(SolrFields.TITLE, "House");
+    doc3.addField(SolrFields.DESCRIPTION, "Selling a 3 story house in the suburbs of Vienna. Ideal for a big family with kids.");
+    doc3.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc3.addField(SolrFields.TAG, "house");
+    doc3.addField(SolrFields.TAG, "family");
+    doc3.addField(SolrFields.TAG, "suburbs");
+    doc3.addField(SolrFields.TAG, "kids");
+    doc3.addField(SolrFields.LOWER_PRICE_LIMIT, 100000.0);
+    doc3.addField(SolrFields.UPPER_PRICE_LIMIT, 500000.0);
+    doc3.addField(SolrFields.LOCATION, "48.2088,16.3726");
+
+    docs.add(doc3);
+
     return docs;
   }
 
@@ -75,32 +90,45 @@ public class SolrTesterMain
   {
     Collection<SolrInputDocument> docs = new ArrayList<>();
 
-    SolrInputDocument doc1 = new SolrInputDocument();
-    doc1.addField(SolrFields.URL, "http://www.examle.com/ld/need/3");
-    doc1.addField(SolrFields.TITLE, "Sofa");
-    doc1.addField(SolrFields.DESCRIPTION, "I need a sofa.");
-    doc1.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc1.addField(SolrFields.TAG, "sofa");
-    doc1.addField(SolrFields.TAG, "furniture");
-    doc1.addField(SolrFields.UPPER_PRICE_LIMIT, 150.0);
-    doc1.addField(SolrFields.LOCATION, "48.2088,16.3726");
+    SolrInputDocument doc4 = new SolrInputDocument();
+    doc4.addField(SolrFields.URL, "http://www.examle.com/ld/need/4");
+    doc4.addField(SolrFields.TITLE, "Sofa");
+    doc4.addField(SolrFields.DESCRIPTION, "I need a sofa.");
+    doc4.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc4.addField(SolrFields.TAG, "sofa");
+    doc4.addField(SolrFields.TAG, "furniture");
+    doc4.addField(SolrFields.UPPER_PRICE_LIMIT, 150.0);
+    doc4.addField(SolrFields.LOCATION, "48.2088,16.3726");
 
-    docs.add(doc1);
+    docs.add(doc4);
 
-    SolrInputDocument doc2 = new SolrInputDocument();
-    doc2.addField(SolrFields.URL, "http://www.examle.com/ld/need/4");
-    doc2.addField(SolrFields.TITLE, "Looking for sofa or couch");
-    doc2.addField(SolrFields.DESCRIPTION, "I am looking for a sofa or a couch for my living room.");
-    doc2.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc2.addField(SolrFields.TAG, "sofa");
-    doc2.addField(SolrFields.TAG, "blue");
-    doc2.addField(SolrFields.TAG, "red");
-    doc2.addField(SolrFields.TAG, "couch");
-    doc2.addField(SolrFields.TAG, "leather");
-    doc2.addField(SolrFields.UPPER_PRICE_LIMIT, 50.0);
-    doc2.addField(SolrFields.LOCATION, "48.2088,16.3726");
+    SolrInputDocument doc5 = new SolrInputDocument();
+    doc5.addField(SolrFields.URL, "http://www.examle.com/ld/need/5");
+    doc5.addField(SolrFields.TITLE, "Looking for sofa or couch");
+    doc5.addField(SolrFields.DESCRIPTION, "I am looking for a sofa or a couch for my living room.");
+    doc5.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc5.addField(SolrFields.TAG, "sofa");
+    doc5.addField(SolrFields.TAG, "blue");
+    doc5.addField(SolrFields.TAG, "red");
+    doc5.addField(SolrFields.TAG, "couch");
+    doc5.addField(SolrFields.TAG, "leather");
+    doc5.addField(SolrFields.UPPER_PRICE_LIMIT, 50.0);
+    doc5.addField(SolrFields.LOCATION, "48.2088,16.3726");
 
-    docs.add(doc2);
+    docs.add(doc5);
+
+    SolrInputDocument doc6 = new SolrInputDocument();
+    doc6.addField(SolrFields.URL, "http://www.examle.com/ld/need/6");
+    doc6.addField(SolrFields.TITLE, "Looking for a place to live");
+    doc6.addField(SolrFields.DESCRIPTION, "Me and my family are looking for a house or a large apartment! Thank you.");
+    doc6.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc6.addField(SolrFields.TAG, "house");
+    doc6.addField(SolrFields.TAG, "apartment");
+    doc6.addField(SolrFields.TAG, "family");
+    doc6.addField(SolrFields.UPPER_PRICE_LIMIT, 250000.0);
+    doc6.addField(SolrFields.LOCATION, "48.2088,16.3726");
+
+    docs.add(doc6);
 
     return docs;
   }
