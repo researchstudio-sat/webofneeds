@@ -449,17 +449,16 @@
   <requestHandler name="mlt" class="solr.MoreLikeThisHandler" />
 
   <updateRequestProcessorChain  name="webofneeds" default="true">
-    <processor class="won.matcher.solr.MatcherUpdateProcessorFactory" />
+    <processor class="won.matcher.solr.MatcherUpdateRequestProcessorFactory" />
     <processor class="solr.LogUpdateProcessorFactory" />
     <processor class="solr.RunUpdateProcessorFactory" />
   </updateRequestProcessorChain >
 
   <lib dir="../../webofneeds" regex=".*\.jar" />
 
-  <!-- old plugin -->
-  <!--<updateHandler class="solr.DirectUpdateHandler2">
-    <listener event="postCommit" class="won.matcher.solr.old.UpdateListener" />
-  </updateHandler>-->
+  <updateHandler class="solr.DirectUpdateHandler2">
+    <listener event="postCommit" class="won.matcher.solr.UpdateListener" />
+  </updateHandler>
 
   <!-- config for the admin interface -->
   <admin>

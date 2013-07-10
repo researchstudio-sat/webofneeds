@@ -1,4 +1,4 @@
-package won.matcher.solr.old;
+package won.matcher.old;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;

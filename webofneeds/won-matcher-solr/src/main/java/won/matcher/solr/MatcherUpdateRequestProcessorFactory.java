@@ -9,11 +9,11 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
  * User: atus
  * Date: 03.07.13
  */
-public class MatcherUpdateProcessorFactory extends UpdateRequestProcessorFactory
+public class MatcherUpdateRequestProcessorFactory extends UpdateRequestProcessorFactory
 {
   @Override
   public UpdateRequestProcessor getInstance(final SolrQueryRequest req, final SolrQueryResponse rsp, final UpdateRequestProcessor next)
   {
-    return new MatcherRequestProcessor(next);
+    return new MatcherUpdateRequestProcessor(next);
   }
 }

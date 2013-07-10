@@ -1,4 +1,4 @@
-package won.matcher.solr;
+package won.matcher;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
@@ -7,14 +7,15 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.search.SolrIndexSearcher;
-import org.apache.solr.update.AddUpdateCommand;
-import org.apache.solr.update.processor.UpdateRequestProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.matcher.query.*;
+import won.matcher.solr.DocumentStorage;
 import won.protocol.solr.SolrFields;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ import java.util.Set;
  * User: atus
  * Date: 03.07.13
  */
-public class MatcherRequestProcessor extends UpdateRequestProcessor
+public class Matcher
 {
   private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -40,21 +41,15 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
   private static final int MAX_MATCHES = 3;
   private static final double MATCH_THRESHOLD = 0.4;
 
-  public MatcherRequestProcessor(UpdateRequestProcessor next)
+  public Matcher() throws IOException, SAXException, ParserConfigurationException
   {
-    super(next);
-    logger.debug("Matcher initialize called");
+    logger.debug("Matcher initialized");
 
     //get solr core
     CoreContainer.Initializer initializer = new CoreContainer.Initializer();
-    CoreContainer coreContainer = null;
-    try {
-      coreContainer = initializer.initialize();
-    } catch (Exception e) {
-      logger.error("Failed to initialize core container. Stopping.", e);
-      return;
-    }
+    CoreContainer coreContainer = initializer.initialize();
     solrCore = coreContainer.getCore("webofneeds");
+
 
     //setup matcher client
     client = new MatcherProtocolNeedServiceClient();
@@ -72,18 +67,13 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     knownMatches = new HashMap();
   }
 
-  @Override
-  public void processAdd(final AddUpdateCommand cmd) throws IOException
+  public void processDocument(SolrInputDocument inputDocument) throws IOException
   {
-    super.processAdd(cmd);
     logger.debug("Matcher add called");
 
     //init
     BooleanQuery booleanQuery = new BooleanQuery();
     TopDocs topDocs;
-
-    //get last commited document
-    SolrInputDocument inputDocument = cmd.getSolrInputDocument();
 
     //get index
     SolrIndexSearcher solrIndexSearcher = solrCore.getSearcher().get();
@@ -113,10 +103,8 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
     }
   }
 
-  @Override
   public void finish() throws IOException
   {
-    super.finish();
     logger.info("Matcher finish called.");
     //cleanup or send prepared matches
 
@@ -130,7 +118,7 @@ public class MatcherRequestProcessor extends UpdateRequestProcessor
       for (ScoreDoc score : knownMatches.get(match)) {
         Document document = indexReader.document(score.doc);
         URI toDoc = URI.create(document.get(SolrFields.URL));
-        log.info(String.format("Sending hint %s -> %s :: %3.2f",fromDoc,toDoc,score.score));
+        logger.info(String.format("Sending hint %s -> %s :: %3.2f",fromDoc,toDoc,score.score));
         //client.hint(fromDoc, toDoc, score.score, originator, null);
       }
     }
