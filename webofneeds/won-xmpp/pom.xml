@@ -8,6 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>won-xmpp</artifactId>
+    <groupId>webofneeds</groupId>
 
     <name>won-xmpp</name>
     <url>http://maven.apache.org</url>
@@ -20,7 +21,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -41,27 +42,21 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.6</version>
+            <version>${org.slf4j.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-            <version>3.1.2.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>3.1.2.RELEASE</version>
+            <version>${org.springframework.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
         <dependency>
             <groupId>webofneeds</groupId>
             <artifactId>won-core</artifactId>
             <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.1</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
 
