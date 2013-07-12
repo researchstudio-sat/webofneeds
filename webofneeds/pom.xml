@@ -137,6 +137,7 @@
 
         <!-- versions for various dependencies -->
         <solr.version>3.5.0</solr.version>
+        <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>

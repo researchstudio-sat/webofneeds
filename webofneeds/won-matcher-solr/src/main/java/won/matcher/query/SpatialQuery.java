@@ -51,7 +51,7 @@ public class SpatialQuery extends AbstractQuery
     options.pointStr = inputDocument.getFieldValue(locationField).toString();
     options.field = new SchemaField(locationField, latLon);
 
-    NamedList<String> solrParamsList = new NamedList<>();
+    NamedList<String> solrParamsList = new NamedList();
     solrParamsList.add("sfield", locationField);
     solrParamsList.add("pt", inputDocument.getFieldValue(locationField).toString());
     solrParamsList.add("d", String.valueOf(MAX_DISTANCE));

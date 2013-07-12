@@ -34,7 +34,7 @@ public class MultipleValueFieldQuery extends AbstractQuery
       return null;
 
     Collection<Object> tags = inputDocument.getFieldValues(tagField);
-    List<Query> queries = new ArrayList<>();
+    List<Query> queries = new ArrayList();
     for (Object tag : tags) {
       TermQuery termQuery = new TermQuery(new Term(tagField, tag.toString()));
       queries.add(termQuery);

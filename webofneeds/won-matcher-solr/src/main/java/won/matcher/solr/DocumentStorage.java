@@ -17,7 +17,7 @@ public class DocumentStorage
 
   private DocumentStorage()
   {
-    storage = new ConcurrentLinkedQueue<>();
+    storage = new ConcurrentLinkedQueue();
   }
 
   public static DocumentStorage getInstance()

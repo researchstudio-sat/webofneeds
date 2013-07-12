@@ -12,25 +12,37 @@ import org.apache.solr.search.SolrIndexSearcher;
  * Date: 03.07.13
  * Time: 12:56
  */
-public class IntegerRangeQuery extends AbstractQuery
+public class DoubleRangeQuery extends AbstractQuery
 {
   private String lowerBoundField;
   private String upperBoundField;
 
-  public IntegerRangeQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField)
-  {
+  /**  Infinite Range Querys problem should not be solved here
+  public enum Infinite { UPPER_BOUND, LOWER_BOUND }
+
+  private String boundField;
+  private Infinite boundType;
+
+  public DoubleRangeQuery(BooleanClause.Occur occur, String boundField, Infinite boundType) {
+     super(occur);
+
+     this.boundField = boundField;
+     this.boundType = boundType;
+  }*/
+
+  public DoubleRangeQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField) {
     super(occur);
     this.lowerBoundField = lowerBoundField;
     this.upperBoundField = upperBoundField;
   }
 
-  public Query getQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument)
-  {
+  public Query getQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument) {
+
     if (!inputDocument.containsKey(lowerBoundField) || !inputDocument.containsKey(upperBoundField))
       return null;
 
-    double lower = Double.parseDouble(inputDocument.getFieldValue(lowerBoundField).toString());
-    double upper = Double.parseDouble(inputDocument.getFieldValue(upperBoundField).toString());
+    double lower = getField(inputDocument, lowerBoundField);
+    double upper = getField(inputDocument, upperBoundField);
 
     Query nq1 = NumericRangeQuery.newDoubleRange(lowerBoundField, lower, upper, true, true);
     Query nq2 = NumericRangeQuery.newDoubleRange(upperBoundField, lower, upper, true, true);
@@ -42,5 +54,9 @@ public class IntegerRangeQuery extends AbstractQuery
     query.add(nq2, BooleanClause.Occur.SHOULD);
 
     return query;
+  }
+
+  private double getField(SolrInputDocument inputDocument, String fieldName) {
+      return Double.parseDouble(inputDocument.getFieldValue(fieldName).toString());
   }
 }
