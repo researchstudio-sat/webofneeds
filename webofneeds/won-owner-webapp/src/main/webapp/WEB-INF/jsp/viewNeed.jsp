@@ -31,8 +31,6 @@
         <dd>Upper limit: <c:out value="${pojo.upperPriceLimit}" /><br />
         Lower limit: <c:out value="${pojo.lowerPriceLimit}" /><br />
         Currency <c:out value="${pojo.currency}" /></dd>
-    <dt>Delivery method</dt>
-        <dd><c:out value="${pojo.deliveryMethod}" /></dd>
     <dt>Location</dt>
         <dd>Latitude: <c:out value="${pojo.latitude}" /><br />
         Longitude: <c:out value="${pojo.longitude}" /></dd>
@@ -74,9 +72,9 @@
     var refresh = function(){
         document.getElementById("iMatches").contentDocument.location.reload(true);
         document.getElementById("iConnections").contentDocument.location.reload(true);
-        setTimeout(refresh, 2000);
+        setTimeout(refresh, 15000);
     };
-    setTimeout(refresh, 2000);
+    setTimeout(refresh, 15000);
 </script>
 </body>
 </html>

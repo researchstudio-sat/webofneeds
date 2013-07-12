@@ -59,45 +59,12 @@
     
 
 
-    <!-- http://purl.org/goodrelations/v1#availableDeliveryMethods -->
+    <!-- http://purl.org/webofneeds/model#allowsMatchWith -->
 
-    <rdf:Description rdf:about="&gr;availableDeliveryMethods">
-        <rdfs:domain rdf:resource="&won;NeedModality"/>
-    </rdf:Description>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#availableAtLocation -->
-
-    <owl:ObjectProperty rdf:about="&won;availableAtLocation">
-        <rdfs:range rdf:resource="&won;Location"/>
-        <rdfs:domain rdf:resource="&won;NeedModality"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#availableAtTime -->
-
-    <owl:ObjectProperty rdf:about="&won;availableAtTime">
-        <rdfs:domain rdf:resource="&won;NeedModality"/>
-        <rdfs:range rdf:resource="&won;TimeConstraint"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#contentDescription -->
-
-    <owl:ObjectProperty rdf:about="&won;contentDescription">
-        <rdfs:domain rdf:resource="&won;NeedContent"/>
-        <rdfs:range rdf:resource="&owl;Thing"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#depth -->
-
-    <owl:ObjectProperty rdf:about="&won;depth">
-        <rdfs:subPropertyOf rdf:resource="&won;quantitativeProperty"/>
+    <owl:ObjectProperty rdf:about="&won;allowsMatchWith">
+        <rdf:type rdf:resource="&owl;SymmetricProperty"/>
+        <rdfs:range rdf:resource="&won;BasicNeedType"/>
+        <rdfs:domain rdf:resource="&won;BasicNeedType"/>
     </owl:ObjectProperty>
     
 
@@ -140,12 +107,74 @@
     
 
 
+    <!-- http://purl.org/webofneeds/model#hasContentDescription -->
+
+    <owl:ObjectProperty rdf:about="&won;hasContentDescription">
+        <rdfs:domain rdf:resource="&won;NeedContent"/>
+        <rdfs:range rdf:resource="&owl;Thing"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasCurrency -->
+
+    <owl:ObjectProperty rdf:about="&won;hasCurrency">
+        <rdfs:domain rdf:resource="&won;PriceSpecification"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasDepth -->
+
+    <owl:ObjectProperty rdf:about="&won;hasDepth">
+        <rdfs:subPropertyOf rdf:resource="&won;hasQuantitativeProperty"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://purl.org/webofneeds/model#hasEventContainer -->
 
     <owl:ObjectProperty rdf:about="&won;hasEventContainer">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:domain rdf:resource="&won;Connection"/>
         <rdfs:range rdf:resource="&won;EventContainer"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasEventStatement -->
+
+    <owl:ObjectProperty rdf:about="&won;hasEventStatement">
+        <rdfs:domain rdf:resource="&won;Event"/>
+        <rdfs:range rdf:resource="&owl;Thing"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasHeight -->
+
+    <owl:ObjectProperty rdf:about="&won;hasHeight">
+        <rdfs:subPropertyOf rdf:resource="&won;hasQuantitativeProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasISOCode -->
+
+    <owl:ObjectProperty rdf:about="&won;hasISOCode">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;Region"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasLocationSpecification -->
+
+    <owl:ObjectProperty rdf:about="&won;hasLocationSpecification">
+        <rdfs:range rdf:resource="&won;LocationSpecification"/>
+        <rdfs:domain rdf:resource="&won;NeedModality"/>
     </owl:ObjectProperty>
     
 
@@ -187,6 +216,15 @@
     
 
 
+    <!-- http://purl.org/webofneeds/model#hasQuantitativeProperty -->
+
+    <owl:ObjectProperty rdf:about="&won;hasQuantitativeProperty">
+        <rdfs:range rdf:resource="&gr;QuantitativeValue"/>
+        <rdfs:domain rdf:resource="&won;NeedContent"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://purl.org/webofneeds/model#hasRemoteConnection -->
 
     <owl:ObjectProperty rdf:about="&won;hasRemoteConnection">
@@ -199,10 +237,37 @@
     
 
 
-    <!-- http://purl.org/webofneeds/model#height -->
+    <!-- http://purl.org/webofneeds/model#hasTextDescription -->
 
-    <owl:ObjectProperty rdf:about="&won;height">
-        <rdfs:subPropertyOf rdf:resource="&won;quantitativeProperty"/>
+    <owl:ObjectProperty rdf:about="&won;hasTextDescription">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;NeedContent"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasTimeSpecification -->
+
+    <owl:ObjectProperty rdf:about="&won;hasTimeSpecification">
+        <rdfs:domain rdf:resource="&won;NeedModality"/>
+        <rdfs:range rdf:resource="&won;TimeSpecification"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasWeight -->
+
+    <owl:ObjectProperty rdf:about="&won;hasWeight">
+        <rdfs:subPropertyOf rdf:resource="&won;hasQuantitativeProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasWidth -->
+
+    <owl:ObjectProperty rdf:about="&won;hasWidth">
+        <rdfs:subPropertyOf rdf:resource="&won;hasQuantitativeProperty"/>
     </owl:ObjectProperty>
     
 
@@ -217,27 +282,12 @@
     
 
 
-    <!-- http://purl.org/webofneeds/model#quantitativeProperty -->
+    <!-- http://purl.org/webofneeds/model#title -->
 
-    <owl:ObjectProperty rdf:about="&won;quantitativeProperty">
-        <rdfs:range rdf:resource="&gr;QuantitativeValue"/>
+    <owl:ObjectProperty rdf:about="&won;title">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:domain rdf:resource="&won;NeedContent"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#weight -->
-
-    <owl:ObjectProperty rdf:about="&won;weight">
-        <rdfs:subPropertyOf rdf:resource="&won;quantitativeProperty"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#width -->
-
-    <owl:ObjectProperty rdf:about="&won;width">
-        <rdfs:subPropertyOf rdf:resource="&won;quantitativeProperty"/>
+        <rdfs:range rdf:resource="&rdfs;Literal"/>
     </owl:ObjectProperty>
     
 
@@ -255,26 +305,22 @@
 
     <!-- http://purl.org/dc/terms/title -->
 
-    <owl:DatatypeProperty rdf:about="http://purl.org/dc/terms/title">
-        <owl:equivalentProperty rdf:resource="&won;title"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#endTime -->
-
-    <owl:DatatypeProperty rdf:about="&won;endTime">
-        <rdfs:domain rdf:resource="&won;TimeConstraint"/>
-        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
-    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://purl.org/dc/terms/title"/>
     
 
 
     <!-- http://purl.org/webofneeds/model#hasCurrency -->
 
-    <owl:DatatypeProperty rdf:about="&won;hasCurrency">
-        <rdfs:domain rdf:resource="&won;PriceSpecification"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
+    <owl:DatatypeProperty rdf:about="&won;hasCurrency"/>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasEndTime -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasEndTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;TimeSpecification"/>
+        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
     </owl:DatatypeProperty>
     
 
@@ -283,8 +329,6 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasISOCode">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:domain rdf:resource="&won;Region"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 
@@ -294,6 +338,64 @@
     <owl:DatatypeProperty rdf:about="&won;hasLowerPriceLimit">
         <rdfs:domain rdf:resource="&won;PriceSpecification"/>
         <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasRecursIn -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasRecursIn">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;TimeSpecification"/>
+        <rdfs:range rdf:resource="&xsd;duration"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasRecursInfiniteTimes -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasRecursInfiniteTimes">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;TimeSpecification"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasRecursTimes -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasRecursTimes">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;TimeSpecification"/>
+        <rdfs:range rdf:resource="&xsd;integer"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasStartTime -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasStartTime">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;TimeSpecification"/>
+        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasTextDescription -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasTextDescription">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasTimeStamp -->
+
+    <owl:DatatypeProperty rdf:about="&won;hasTimeStamp">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&won;Event"/>
+        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
     </owl:DatatypeProperty>
     
 
@@ -311,7 +413,7 @@
 
     <owl:DatatypeProperty rdf:about="&won;isConcealed">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:domain rdf:resource="&won;Location"/>
+        <rdfs:domain rdf:resource="&won;LocationSpecification"/>
         <rdfs:range rdf:resource="&xsd;boolean"/>
     </owl:DatatypeProperty>
     
@@ -349,16 +451,6 @@
     
 
 
-    <!-- http://purl.org/webofneeds/model#occurredAt -->
-
-    <owl:DatatypeProperty rdf:about="&won;occurredAt">
-        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:domain rdf:resource="&won;Event"/>
-        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
-    </owl:DatatypeProperty>
-    
-
-
     <!-- http://purl.org/webofneeds/model#ownerProtocolEndpoint -->
 
     <owl:DatatypeProperty rdf:about="&won;ownerProtocolEndpoint">
@@ -366,53 +458,6 @@
         <rdfs:comment xml:lang="en">Points to the ownerProtocol webservice endpoint of the need. I.e., owner applications can communicate with the need through this endpoint.</rdfs:comment>
         <rdfs:domain rdf:resource="&won;Need"/>
         <rdfs:range rdf:resource="&xsd;anyURI"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#recurIn -->
-
-    <owl:DatatypeProperty rdf:about="&won;recurIn">
-        <rdfs:domain rdf:resource="&won;TimeConstraint"/>
-        <rdfs:range rdf:resource="&xsd;duration"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#recurTimes -->
-
-    <owl:DatatypeProperty rdf:about="&won;recurTimes">
-        <rdfs:domain rdf:resource="&won;TimeConstraint"/>
-        <rdfs:range rdf:resource="&xsd;integer"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#startTime -->
-
-    <owl:DatatypeProperty rdf:about="&won;startTime">
-        <rdfs:domain rdf:resource="&won;TimeConstraint"/>
-        <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#textDescription -->
-
-    <owl:DatatypeProperty rdf:about="&won;textDescription">
-        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:domain rdf:resource="&won;NeedContent"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://purl.org/webofneeds/model#title -->
-
-    <owl:DatatypeProperty rdf:about="&won;title">
-        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:domain rdf:resource="&won;NeedContent"/>
-        <rdfs:range rdf:resource="&rdfs;Literal"/>
     </owl:DatatypeProperty>
     
 
@@ -525,9 +570,9 @@
     
 
 
-    <!-- http://purl.org/webofneeds/model#Location -->
+    <!-- http://purl.org/webofneeds/model#LocationSpecification -->
 
-    <owl:Class rdf:about="&won;Location"/>
+    <owl:Class rdf:about="&won;LocationSpecification"/>
     
 
 
@@ -569,14 +614,6 @@
     
 
 
-    <!-- http://purl.org/webofneeds/model#Prepare -->
-
-    <owl:Class rdf:about="&won;Prepare">
-        <rdfs:subClassOf rdf:resource="&won;Event"/>
-    </owl:Class>
-    
-
-
     <!-- http://purl.org/webofneeds/model#PriceSpecification -->
 
     <owl:Class rdf:about="&won;PriceSpecification"/>
@@ -586,14 +623,14 @@
     <!-- http://purl.org/webofneeds/model#Region -->
 
     <owl:Class rdf:about="&won;Region">
-        <rdfs:subClassOf rdf:resource="&won;Location"/>
+        <rdfs:subClassOf rdf:resource="&won;LocationSpecification"/>
     </owl:Class>
     
 
 
-    <!-- http://purl.org/webofneeds/model#TimeConstraint -->
+    <!-- http://purl.org/webofneeds/model#TimeSpecification -->
 
-    <owl:Class rdf:about="&won;TimeConstraint"/>
+    <owl:Class rdf:about="&won;TimeSpecification"/>
     
 
 
@@ -616,7 +653,7 @@
     <!-- http://www.w3.org/2003/01/geo/wgs84_pos#Point -->
 
     <owl:Class rdf:about="http://www.w3.org/2003/01/geo/wgs84_pos#Point">
-        <rdfs:subClassOf rdf:resource="&won;Location"/>
+        <rdfs:subClassOf rdf:resource="&won;LocationSpecification"/>
     </owl:Class>
     
 
@@ -644,6 +681,7 @@
 
     <owl:NamedIndividual rdf:about="&won;Do">
         <rdf:type rdf:resource="&won;BasicNeedType"/>
+        <allowsMatchWith rdf:resource="&won;Do"/>
     </owl:NamedIndividual>
     
 
@@ -652,6 +690,7 @@
 
     <owl:NamedIndividual rdf:about="&won;Give">
         <rdf:type rdf:resource="&won;BasicNeedType"/>
+        <allowsMatchWith rdf:resource="&won;Take"/>
     </owl:NamedIndividual>
     
 
@@ -668,6 +707,7 @@
 
     <owl:NamedIndividual rdf:about="&won;Take">
         <rdf:type rdf:resource="&won;BasicNeedType"/>
+        <allowsMatchWith rdf:resource="&won;Give"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 

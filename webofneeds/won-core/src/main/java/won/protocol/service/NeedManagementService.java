@@ -34,10 +34,6 @@ public interface NeedManagementService
   /**
    * Creates a new need with the specified content, ownerURI and active state.
    *
-   *
-   *
-   *
-   *
    * @param ownerURI
    * @param content
    * @param activate

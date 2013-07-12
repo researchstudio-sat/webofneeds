@@ -1,5 +1,7 @@
 package won.protocol.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -15,6 +17,8 @@ public enum BasicNeedType
   TAKE("Take"),
   GIVE("Give"),
   DO("Do"),;
+
+  private static final Logger logger = LoggerFactory.getLogger(BasicNeedType.class);
 
   private String name;
 
@@ -40,7 +44,7 @@ public enum BasicNeedType
       if (state.name.equals(fragment))
         return state;
 
-    System.err.println("No enum could be matched for: " + fragment);
+    logger.warn("No enum could be matched for: {}", fragment);
     return null;
   }
 

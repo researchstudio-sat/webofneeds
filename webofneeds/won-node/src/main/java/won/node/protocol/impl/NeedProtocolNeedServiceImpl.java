@@ -16,6 +16,7 @@
 
 package won.node.protocol.impl;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.*;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.service.ConnectionCommunicationService;
@@ -33,21 +34,26 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   protected ConnectionCommunicationService connectionCommunicationService;
 
   @Override
-  public URI connectionRequested(final URI need, final URI otherNeedURI, final URI otherConnectionURI, final String message) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public URI connect(final URI need, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    return this.needFacingNeedCommunicationService.connectionRequested(need, otherNeedURI, otherConnectionURI, message);
+    return this.needFacingNeedCommunicationService.connect(need, otherNeedURI, otherConnectionURI, content);
   }
 
   @Override
-  public void close(final URI connectionURI) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    connectionCommunicationService.close(connectionURI);
+  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+      connectionCommunicationService.open(connectionURI, content);
   }
 
   @Override
-  public void sendTextMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    connectionCommunicationService.sendTextMessage(connectionURI, message);
+    connectionCommunicationService.close(connectionURI, content);
+  }
+
+  @Override
+  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  {
+    connectionCommunicationService.textMessage(connectionURI, message);
   }
 
   public void setNeedFacingNeedCommunicationService(final NeedFacingNeedCommunicationService needFacingNeedCommunicationService)

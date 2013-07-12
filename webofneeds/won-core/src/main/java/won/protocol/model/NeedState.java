@@ -32,7 +32,7 @@ public enum NeedState
   INACTIVE("Inactive"),
   ACTIVE("Active");
 
-  final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(NeedState.class);
   private String name;
 
   private NeedState(String name)
@@ -57,7 +57,7 @@ public enum NeedState
       if(state.name.equals(fragment))
         return state;
 
-    System.err.println("No enum could be matched for: " + fragment);
+    logger.warn("No enum could be matched for: {}", fragment);
     return null;
   }
 }

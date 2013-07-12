@@ -47,6 +47,8 @@ public class TextDescriptionMatcher
   private static final String FIELD_URL = "url";
   private static final int MAX_MATCHES = 3;
   private static double MAX_DISTANCE_KM = 15;
+  private static final double MATCH_THRESHOLD = 0.1;
+  private static final long TIMEOUT_BETWEEN_SEARHCES = 1000; //timeout in millis
 
   public TextDescriptionMatcher(SolrCore solrCore)
   {
@@ -83,9 +85,14 @@ public class TextDescriptionMatcher
 
     int numMatches = 0;
 
-    logger.debug("maxDoc: " + si.maxDoc());
+    logger.debug("maxDoc: {}", si.maxDoc());
     for (int i = 0; i < si.maxDoc(); i++) {
       try {
+          try{
+            Thread.sleep(TIMEOUT_BETWEEN_SEARHCES);
+          } catch (InterruptedException e ){
+              //swallow that one
+          }
         query = mlt.like(i);
         String fromUriString = ir.document(i).getValues(FIELD_URL)[0]; //getValues() instead of get() just to make sure we don't have more than 1
         fromUriString = fromUriString.replaceAll("^<", "").replaceAll(">$", "");
@@ -150,7 +157,7 @@ public class TextDescriptionMatcher
               if (fromPoint != null) {
                 Point toPoint = getPointIfPresent(toUriString, toModel);
                 if (toPoint != null){
-                  double distance = fromPoint.distance(toPoint);
+                  double distance = Math.abs(fromPoint.distance(toPoint));
                   if (distance > MAX_DISTANCE_KM) {
                     logger.debug("geo points are too far apart ({} km), ignoring match {}", fromPoint.distance(toPoint), toURI.toString());
                     continue;
@@ -161,19 +168,24 @@ public class TextDescriptionMatcher
 
               logger.debug("score: {}, weighted score: {}", score, score * scoreWeight);
               score = score * scoreWeight;
+              if (score < MATCH_THRESHOLD) {
+                  logger.debug("score {} is lower than match trheshold {}, ignoring match {}", new Object[]{score, MATCH_THRESHOLD, toURI.toString()});
+                  continue;
+              }
               String matchKey = fromURI.toString() + " <=> " + toURI.toString();
               String matchKey2 = toURI.toString() + " <=> " + fromURI.toString();
               if (this.knownMatches.contains(matchKey) || this.knownMatches.contains(matchKey2)) {
-                logger.debug("ignoring known match: " + matchKey);
+                logger.debug("ignoring known match: {}", matchKey);
                 //if we send one match, that's enough - but it seems we've sent it already, so break
                 break;
               } else {
                 //add the match key before sending the hint!
                 this.knownMatches.add(matchKey);
-                logger.debug("new match: " + matchKey);
+                logger.debug("new match: {}", matchKey);
                 logger.debug("sending hint..");
-                client.hint(fromURI, toURI, score, new URI("http://LDSpiderMatcher.webofneeds"));
-                client.hint(toURI, fromURI, score, new URI("http://LDSpiderMatcher.webofneeds"));
+                //TODO: Add rdf content
+                client.hint(fromURI, toURI, score, new URI("http://LDSpiderMatcher.webofneeds"), null);
+                client.hint(toURI, fromURI, score, new URI("http://LDSpiderMatcher.webofneeds"), null);
                 logger.debug("hint sent.");
                 //check if we have enough matches
                 if (++numMatches > MAX_MATCHES) break;
@@ -191,20 +203,26 @@ public class TextDescriptionMatcher
           }
 
         } else {
-          logger.debug("Nothing found similar to " + fromUriString);
+          logger.debug("Nothing found similar to {}", fromUriString);
         }
       } catch (IOException e) {
-        logger.warn("Could not generate similarity query with document " + i + "!", e);  //To change body of catch statement use File | Settings | File Templates.
+        logger.warn("Could not generate similarity query with document {}!",i , e);
       }
     }
 
-    logger.debug("done matching. Known matches: \n {}", Arrays.toString(knownMatches.toArray(new String[knownMatches.size()])));
+    if (logger.isInfoEnabled())
+      logger.info("Done matching. Known matches: \n {}", Arrays.toString(knownMatches.toArray(new String[knownMatches.size()])));
   }
 
   private Model convertNTriplesToModel(String ntriples)
   {
-    Model model = ModelFactory.createDefaultModel();
-    model.read(new StringReader(ntriples), WON.getURI(), "N-TRIPLES");
+      Model model = ModelFactory.createDefaultModel();
+      try {
+        model.read(new StringReader(ntriples), WON.getURI(), "N-TRIPLES");
+    } catch (Exception e) {
+        logger.debug("could not convert ntriples to model",e);
+        logger.debug("triples were:\n{}", ntriples);
+    }
     return model;
   }
 
@@ -291,7 +309,7 @@ public class TextDescriptionMatcher
 
       double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
           Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
-      double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      double c = Math.abs(2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
       double d = R * c;
       logger.debug("calculated a distance of {} km between {} and {}", new Object[]{d, this,other});
       return d;
