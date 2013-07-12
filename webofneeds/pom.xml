@@ -13,13 +13,15 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>webofneeds</groupId>
     <artifactId>webofneeds</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Web of Needs module project</name>
+
     <modules>
         <module>won-core</module>
         <module>won-node-webapp</module>
@@ -31,6 +33,7 @@
         <module>won-ontology-validator</module>
         <module>won-xmpp</module>
     </modules>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -104,9 +107,15 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.7</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <version>${cargo.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compile.compilerargs>
@@ -120,12 +129,13 @@
         <surefire.forkmode>once</surefire.forkmode>
         <surefire.reportformat>brief</surefire.reportformat>
         <surefire.usefile>false</surefire.usefile>
+        <dependencies.scope>compile</dependencies.scope>
 
         <!-- versions for various dependencies -->
         <solr.version>3.5.0</solr.version>
         <cglib.version>2.2.2</cglib.version>
-        <com.sun.jersey.version>1.9.1</com.sun.jersey.version>
-        <com.sun.jersey.contribs-jersey-spring.version>1.9.1</com.sun.jersey.contribs-jersey-spring.version>
+        <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
+        <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
         <com.sun.xml.version>2.0EA3</com.sun.xml.version>
         <com.sun.xml.ws.version>2.2.8-promoted-b146</com.sun.xml.ws.version>
         <junit.version>4.8.2</junit.version>
@@ -139,6 +149,8 @@
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <org.hsqldb.version>2.2.9</org.hsqldb.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
+        <cargo.version>1.4.2</cargo.version>
+        <jrebel.version>1.1.3</jrebel.version>
     </properties>
 
     <profiles>
@@ -171,85 +183,142 @@
                 </testResources>
             </build>
         </profile>
+
         <profile>
             <id>no-warn</id>
             <properties>
                 <maven.compile.compilerargs>-Xlint:none</maven.compile.compilerargs>
             </properties>
         </profile>
+
         <profile>
             <id>run-tests</id>
             <properties>
                 <surefire.skip>false</surefire.skip>
             </properties>
         </profile>
+
         <profile>
             <id>localhost</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <build>
+            <properties>
+                <won.node.properties.dir>src/main/resources.localhost</won.node.properties.dir>
+                <won.node-test.properties.dir>src/test/resources.localhost</won.node-test.properties.dir>
+                <won.owner.properties.dir>src/main/resources.localhost</won.owner.properties.dir>
+                <won.owner-test.properties.dir>src/test/resources.localhost</won.owner-test.properties.dir>
+            </properties>
+            <!--<build>
                 <resources>
-                    <resource>
-                        <directory>src/main/resources</directory>
-                    </resource>
                     <resource>
                         <directory>src/main/resources.localhost</directory>
                     </resource>
                 </resources>
                 <testResources>
                     <testResource>
-                        <directory>src/test/resources</directory>
-                    </testResource>
-                    <testResource>
                         <directory>src/test/resources.localhost</directory>
                     </testResource>
                 </testResources>
-            </build>
+            </build>-->
         </profile>
+
         <profile>
-            <id>lan</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
+            <id>copy-module-dependencies</id>
+            <properties>
+                <dependencies.scope>provided</dependencies.scope>
+            </properties>
             <build>
-                <resources>
-                    <resource>
-                        <directory>src/main/resources</directory>
-                    </resource>
-                    <resource>
-                        <directory>src/main/resources.lan</directory>
-                    </resource>
-                </resources>
-                <testResources>
-                    <testResource>
-                        <directory>src/test/resources</directory>
-                    </testResource>
-                    <testResource>
-                        <directory>src/test/resources.lan</directory>
-                    </testResource>
-                </testResources>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.8</version>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/copiedDependencies</outputDirectory>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>false</overWriteSnapshots>
+                                    <overWriteIfNewer>true</overWriteIfNewer>
+                                    <includeScope>provided</includeScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
+
         <profile>
-            <!--
-                Profile for building wars for a specific deployment environment:
-                *) Place environment-specific settings in src/main/resources.{serverId}
-                *) When building, set the environment variable deployServerId (from the command line: -DserverId=[serverId])
-            -->
-            <id>forServer</id>
+            <id>copy-project-dependencies</id>
+            <properties>
+                <dependencies.scope>provided</dependencies.scope>
+            </properties>
             <build>
-                <resources>
-                    <resource>
-                        <directory>src/main/resources.${serverId}</directory>
-                    </resource>
-                </resources>
-                <testResources>
-                    <testResource>
-                        <directory>src/test/resources.${serverId}</directory>
-                    </testResource>
-                </testResources>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.8</version>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${session.executionRootDirectory}/target/copiedDependencies</outputDirectory>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>false</overWriteSnapshots>
+                                    <overWriteIfNewer>true</overWriteIfNewer>
+                                    <includeScope>provided</includeScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>skip-dependencies</id>
+            <properties>
+                <dependencies.scope>provided</dependencies.scope>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>jrebel</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.zeroturnaround</groupId>
+                        <artifactId>jrebel-maven-plugin</artifactId>
+                        <version>${jrebel.version}</version>
+                        <executions>
+                            <execution>
+                                <id>generate-rebel-xml</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <configuration>
+                                    <rootPath>${project.basedir}</rootPath>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
     </profiles>
+
 </project>
