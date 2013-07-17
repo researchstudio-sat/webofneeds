@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.matcher.query.AbstractQuery;
 import won.matcher.query.BasicNeedTypeQuery;
+import won.matcher.query.SelfFilterQuery;
 import won.matcher.query.TextMatcherQuery;
 import won.protocol.solr.SolrFields;
 
@@ -52,9 +53,10 @@ public class Matcher
     queries.add(new BasicNeedTypeQuery(BooleanClause.Occur.MUST, SolrFields.BASIC_NEED_TYPE));
 //    queries.add(new DoubleRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
 //    queries.add(new TimeRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.START_TIME, SolrFields.END_TIME));
-    queries.add(new TextMatcherQuery(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
+    queries.add(new TextMatcherQuery(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION, SolrFields.TAG}));
 //    queries.add(new MultipleValueFieldQuery(BooleanClause.Occur.SHOULD, SolrFields.TAG));
 //    queries.add(new SpatialQuery(BooleanClause.Occur.MUST, SolrFields.LOCATION, solrCore));
+    queries.add(new SelfFilterQuery(SolrFields.URL));
 
     knownMatches = new HashMap();
   }
@@ -75,6 +77,7 @@ public class Matcher
         booleanQuery.add(q, query.getOccur());
       }
     }
+
     logger.info("long query: " + booleanQuery.toString());
 
     //compare and select best match(es) for hints
