@@ -44,12 +44,9 @@ public class TextMatcherQuery extends AbstractQuery
     mlt.setFieldNames(fields);
 
     BooleanQuery booleanQuery = new BooleanQuery();
-//    for (String field : fields)
-//      if (inputDocument.getField(field) != null) {
     Query query = mlt.like(documentId);
     BooleanClause clause = new BooleanClause(query, BooleanClause.Occur.SHOULD);
     booleanQuery.add(clause);
-//      }
 
     if (booleanQuery.clauses().size() == 0)
       return null;
