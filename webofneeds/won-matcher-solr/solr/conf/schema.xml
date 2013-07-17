@@ -177,7 +177,7 @@
         <!--<field name="tabular" type="tabular" indexed="true" stored="false" multiValued="false"/>-->
 
         <field name="title" type="text_general" indexed="true" stored="true" required="false" multiValued="false"/>
-        <field name="description" type="text_general" indexed="true" stored="false" required="false" multiValued="false"/>
+        <field name="description" type="text_general" indexed="true" stored="false" required="false" termVectors="true" multiValued="false"/>
 
         <field name="basicNeedType" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
 

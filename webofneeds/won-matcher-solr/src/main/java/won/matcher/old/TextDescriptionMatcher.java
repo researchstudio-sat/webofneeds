@@ -262,12 +262,12 @@ public class TextDescriptionMatcher
   private boolean isCompatibleBasicNeedType(Resource fromType, Resource toType)
   {
     Statement allowedMatchStatement = fromType.getProperty(WON.ALLOWS_MATCH_WITH);
-    if(allowedMatchStatement == null){
+    if (allowedMatchStatement == null) {
       logger.debug("No allowsMatchWith property found. Assuming allowed.");
       return true;
     }
 
-    logger.info("DEBUG MATCHER: "+allowedMatchStatement.getResource().getURI());
+    logger.info("DEBUG MATCHER: " + allowedMatchStatement.getResource().getURI());
 
     return allowedMatchStatement.getResource().equals(toType);
   }

@@ -20,19 +20,20 @@
             <version>${solr.version}</version>
             <type>war</type>
         </dependency>
+
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
             <version>${solr.version}</version>
         </dependency>
 
-        <!-- SIREn -->
+        <!-- SIREn
         <dependency>
             <groupId>org.sindice.siren</groupId>
             <artifactId>siren-solr</artifactId>
             <version>${siren.version}</version>
             <type>jar</type>
-        </dependency>
+        </dependency>-->
 
         <!-- Web of Needs -->
         <dependency>
@@ -47,14 +48,14 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- TESTING ONLY-->
+        <!-- TESTING ONLY
         <dependency>
             <artifactId>solr-solrj</artifactId>
             <groupId>org.apache.solr</groupId>
             <version>${solr.version}</version>
             <type>jar</type>
             <scope>compile</scope>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -65,7 +66,7 @@
     </dependencies>
 
     <build>
-        <finalName>${artifactId}-${version}</finalName>
+        <finalName>${project.artifactId}-${project.version}</finalName>
         <filters>
             <filter>src/main/profiles/config.properties</filter>
         </filters>
@@ -127,7 +128,7 @@
                                 <resource>
                                     <directory>${project.basedir}/solr</directory>
                                     <filtering>true</filtering>
-                                    <targetPath>${project.build.directory}/${artifactId}-${version}</targetPath>
+                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}</targetPath>
                                     <includes>
                                         <include>solr.xml</include>
                                     </includes>
@@ -135,7 +136,7 @@
                                 <!-- Copies configuration files -->
                                 <resource>
                                     <directory>${project.basedir}/solr/conf</directory>
-                                    <targetPath>${project.build.directory}/${artifactId}-${version}/conf</targetPath>
+                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/conf</targetPath>
                                 </resource>
                             </resources>
                         </configuration>
@@ -154,7 +155,7 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/${artifactId}-${version}/WEB-INF/lib</outputDirectory>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/WEB-INF/lib</outputDirectory>
                             <classifier>packed</classifier>
                             <archive>
                                 <manifest>

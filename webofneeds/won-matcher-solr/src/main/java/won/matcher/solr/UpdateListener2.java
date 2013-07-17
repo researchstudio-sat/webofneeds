@@ -35,7 +35,7 @@ public class UpdateListener2  extends UpdateRequestProcessorFactory implements S
         logger.info("Initiating Matcher.");
 
         try {
-            matcher = new Matcher();
+            matcher = new Matcher(null);
         } catch (Exception e) {
             logger.error("Failed to initialize core container in Matcher. Aborting.", e);
         }

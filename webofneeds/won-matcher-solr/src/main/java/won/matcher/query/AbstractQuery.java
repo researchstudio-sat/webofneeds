@@ -1,6 +1,5 @@
 package won.matcher.query;
 
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.SolrInputDocument;
@@ -16,13 +15,15 @@ public abstract class AbstractQuery
 {
   private BooleanClause.Occur occur;
 
-  protected AbstractQuery(BooleanClause.Occur occur) {
-      this.occur = occur;
+  protected AbstractQuery(BooleanClause.Occur occur)
+  {
+    this.occur = occur;
   }
 
   public abstract Query getQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument) throws IOException;
 
-  public BooleanClause.Occur getOccur() {
+  public BooleanClause.Occur getOccur()
+  {
     return occur;
   }
 

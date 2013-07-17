@@ -9,8 +9,10 @@ import org.apache.lucene.search.BooleanClause;
  * Time: 19:38
  * To change this template use File | Settings | File Templates.
  */
-public class TimeRangeQuery extends LongRangeQuery {
-    public TimeRangeQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField) {
-        super(occur, lowerBoundField, upperBoundField);
-    }
+public class TimeRangeQuery extends LongRangeQuery
+{
+  public TimeRangeQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField)
+  {
+    super(occur, lowerBoundField, upperBoundField);
+  }
 }

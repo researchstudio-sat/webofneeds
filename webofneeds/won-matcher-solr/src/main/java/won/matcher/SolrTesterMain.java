@@ -30,7 +30,7 @@ public class SolrTesterMain
 
     server.add(getTestData());
 
-    Thread.sleep(75 * 1000);
+    Thread.sleep(13 * 1000);
 
     server.add(getTestData2());
   }
