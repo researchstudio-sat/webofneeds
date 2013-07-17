@@ -27,13 +27,13 @@
             <version>${solr.version}</version>
         </dependency>
 
-        <!-- SIREn
+        <!-- SIREn-->
         <dependency>
             <groupId>org.sindice.siren</groupId>
             <artifactId>siren-solr</artifactId>
             <version>${siren.version}</version>
             <type>jar</type>
-        </dependency>-->
+        </dependency>
 
         <!-- Web of Needs -->
         <dependency>
