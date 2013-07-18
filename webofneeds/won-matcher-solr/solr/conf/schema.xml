@@ -40,7 +40,7 @@
         <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
 
         <!-- A uri field that uses WhitespaceTokenizer and WordDelimiterFilter to
-             split URIs into multiple compoenents.  Stopwords is customized by
+             split URIs into multiple components.  Stopwords is customized by
              external files.
              omitNorms is true since it is a short field, and it does not make
              really sense on URI.
@@ -121,11 +121,11 @@
                    analyzerConfig="tuple-analyzers.xml"
                    datatypeConfig="tuple-datatypes.xml"/>
 
-        <fieldType name="tabular" class="org.sindice.siren.solr.schema.SirenField"
+        <!--<fieldType name="tabular" class="org.sindice.siren.solr.schema.SirenField"
                    omitNorms="true"
                    omitTermFreqAndPositions="false"
                    analyzerConfig="tuple-analyzers.xml"
-                   datatypeConfig="tuple-datatypes.xml"/>
+                   datatypeConfig="tuple-datatypes.xml"/>-->
 
         <fieldType name="text_general"
                    class="solr.TextField"
@@ -163,12 +163,12 @@
     <fields>
 
         <!-- The ID (URL) of the document
-             Use the 'string' field type (no tokenisation) -->
-        <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
+             Use the 'string' field type (no tokenisation)
+        <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false"/>-->
 
         <!-- The URL of the document
              Use the 'text' field type in order to be tokenised -->
-        <field name="url" type="uri" indexed="true" stored="true" required="true" multiValued="false"/>
+        <field name="url" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
 
         <!-- n-triple indexing scheme -->
         <field name="ntriple" type="ntriple" indexed="true" stored="true" multiValued="false"/>
@@ -196,7 +196,7 @@
     <!-- Field to use to determine and enforce document uniqueness.
        Unless this field is marked with required="false", it will be a required field
     -->
-    <uniqueKey>id</uniqueKey>
+    <uniqueKey>url</uniqueKey>
 
     <!-- field for the QueryParser to use when an explicit fieldname is absent -->
     <defaultSearchField>ntriple</defaultSearchField>
@@ -206,8 +206,8 @@
 
     <!-- copyField commands copy one field to another at the time a document
     is added to the index.  It's used either to index the same field differently,
-    or to add multiple fields to the same field for easier/faster searching.  -->
-    <copyField source="url" dest="id"/>
+    or to add multiple fields to the same field for easier/faster searching.
+    <copyField source="url" dest="id"/>-->
 
     <!-- Similarity is the scoring routine for each document vs. a query.
     A custom similarity for Siren is specified here  -->
