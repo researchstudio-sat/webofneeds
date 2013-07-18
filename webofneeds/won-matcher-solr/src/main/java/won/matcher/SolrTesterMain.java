@@ -30,14 +30,14 @@ public class SolrTesterMain
 
     server.add(getTestData());
 
-    Thread.sleep(13 * 1000);
+    //Thread.sleep(7 * 1000);
 
     server.add(getTestData2());
   }
 
   public static Collection<SolrInputDocument> getTestData()
   {
-    Collection<SolrInputDocument> docs = new ArrayList();
+    Collection<SolrInputDocument> docs = new ArrayList<>();
 
     SolrInputDocument doc1 = new SolrInputDocument();
     doc1.addField(SolrFields.URL, "http://www.examle.com/ld/need/1");
@@ -88,7 +88,7 @@ public class SolrTesterMain
 
   public static Collection<SolrInputDocument> getTestData2()
   {
-    Collection<SolrInputDocument> docs = new ArrayList();
+    Collection<SolrInputDocument> docs = new ArrayList<>();
 
     SolrInputDocument doc4 = new SolrInputDocument();
     doc4.addField(SolrFields.URL, "http://www.examle.com/ld/need/4");

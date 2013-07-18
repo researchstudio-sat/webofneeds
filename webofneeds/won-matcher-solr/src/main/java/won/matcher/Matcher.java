@@ -49,7 +49,7 @@ public class Matcher
     client.initializeDefault();
 
     //add all queries
-    queries = new HashSet();
+    queries = new HashSet<>();
     queries.add(new BasicNeedTypeQuery(BooleanClause.Occur.MUST, SolrFields.BASIC_NEED_TYPE));
 //    queries.add(new DoubleRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
 //    queries.add(new TimeRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.START_TIME, SolrFields.END_TIME));
@@ -58,7 +58,7 @@ public class Matcher
 //    queries.add(new SpatialQuery(BooleanClause.Occur.MUST, SolrFields.LOCATION, solrCore));
     queries.add(new SelfFilterQuery(SolrFields.URL));
 
-    knownMatches = new HashMap();
+    knownMatches = new HashMap<>();
   }
 
   public void processDocument(SolrInputDocument inputDocument) throws IOException
