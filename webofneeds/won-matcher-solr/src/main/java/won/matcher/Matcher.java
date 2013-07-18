@@ -8,10 +8,7 @@ import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
-import won.matcher.query.AbstractQuery;
-import won.matcher.query.BasicNeedTypeQuery;
-import won.matcher.query.SelfFilterQuery;
-import won.matcher.query.TextMatcherQuery;
+import won.matcher.query.*;
 import won.protocol.solr.SolrFields;
 
 import java.io.IOException;
@@ -51,11 +48,11 @@ public class Matcher
     //add all queries
     queries = new HashSet<>();
     queries.add(new BasicNeedTypeQuery(BooleanClause.Occur.MUST, SolrFields.BASIC_NEED_TYPE));
-//    queries.add(new DoubleRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
-//    queries.add(new TimeRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.START_TIME, SolrFields.END_TIME));
-    queries.add(new TextMatcherQuery(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION, SolrFields.TAG}));
-//    queries.add(new MultipleValueFieldQuery(BooleanClause.Occur.SHOULD, SolrFields.TAG));
-//    queries.add(new SpatialQuery(BooleanClause.Occur.MUST, SolrFields.LOCATION, solrCore));
+    queries.add(new DoubleRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
+    queries.add(new TimeRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.TIME_START, SolrFields.TIME_END));
+    queries.add(new TextMatcherQuery(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
+    queries.add(new MultipleValueFieldQuery(BooleanClause.Occur.SHOULD, SolrFields.TAG));
+    queries.add(new SpatialQuery(BooleanClause.Occur.MUST, SolrFields.LOCATION));
     queries.add(new SelfFilterQuery(SolrFields.URL));
 
     knownMatches = new HashMap<>();

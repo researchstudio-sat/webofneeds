@@ -27,13 +27,11 @@ public class SpatialQuery extends AbstractQuery
   private final int MAX_DISTANCE = 10;
 
   private String locationField;
-  private SolrCore solrCore;
 
-  public SpatialQuery(BooleanClause.Occur occur, String locationField, SolrCore solrCore)
+  public SpatialQuery(BooleanClause.Occur occur, String locationField)
   {
     super(occur);
     this.locationField = locationField;
-    this.solrCore = solrCore;
   }
 
   @Override
@@ -57,6 +55,7 @@ public class SpatialQuery extends AbstractQuery
     solrParamsList.add("d", String.valueOf(MAX_DISTANCE));
     SolrParams solrParams = SolrParams.toSolrParams(solrParamsList);
 
+    SolrCore solrCore = indexSearcher.getCore();
     SolrQueryRequest sqr = new LocalSolrQueryRequest(solrCore, solrParams);
     SpatialFilterQParser qParser = new SpatialFilterQParser("geofilt", null, solrParams, sqr, false);
     Query query = ((LatLonType) latLon).createSpatialQuery(qParser, options);
