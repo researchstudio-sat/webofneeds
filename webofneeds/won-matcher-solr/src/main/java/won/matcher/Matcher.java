@@ -63,8 +63,6 @@ public class Matcher
 
   public void processDocument(SolrInputDocument inputDocument) throws IOException
   {
-    logger.debug("Matcher add called");
-
     //init
     BooleanQuery booleanQuery = new BooleanQuery();
     TopDocs topDocs;
@@ -97,7 +95,6 @@ public class Matcher
 
   public void finish() throws IOException
   {
-    logger.info("Matcher finish called.");
     //cleanup or send prepared matches
 
 //    try {
