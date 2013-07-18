@@ -20,8 +20,8 @@ public class SolrFields
   public static final String LOWER_PRICE_LIMIT = "lowerPriceLimit";
   public static final String UPPER_PRICE_LIMIT = "upperPriceLimit";
 
-  public static final String START_TIME = "startTime";
-  public static final String END_TIME = "endTime";
+  public static final String TIME_START = "startTime";
+  public static final String TIME_END = "endTime";
 
   public static final String TAG = "tag";
 

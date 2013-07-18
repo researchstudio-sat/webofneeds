@@ -51,6 +51,8 @@ public class SolrTesterMain
     doc1.addField(SolrFields.LOWER_PRICE_LIMIT, 10.0);
     doc1.addField(SolrFields.UPPER_PRICE_LIMIT, 100.0);
     doc1.addField(SolrFields.LOCATION, "48.2088,16.3726");
+    doc1.addField(SolrFields.TIME_START, "2013-08-01T00:01:00.000Z");
+    doc1.addField(SolrFields.TIME_END, "2013-08-30T23:00:00.000Z");
 
     docs.add(doc1);
 
@@ -65,6 +67,8 @@ public class SolrTesterMain
     doc2.addField(SolrFields.TAG, "couch");
     doc2.addField(SolrFields.LOWER_PRICE_LIMIT, 50.0);
     doc2.addField(SolrFields.LOCATION, "48.3089,16.3726");
+    doc2.addField(SolrFields.TIME_START, "2013-07-01T00:01:00.000Z");
+    doc2.addField(SolrFields.TIME_END, "2013-08-30T23:00:00.000Z");
 
     docs.add(doc2);
 
@@ -99,6 +103,9 @@ public class SolrTesterMain
     doc4.addField(SolrFields.TAG, "furniture");
     doc4.addField(SolrFields.UPPER_PRICE_LIMIT, 150.0);
     doc4.addField(SolrFields.LOCATION, "48.2088,16.3726");
+    doc4.addField(SolrFields.TIME_START, "2013-06-01T00:01:00.000Z");
+    doc4.addField(SolrFields.TIME_END, "2013-07-30T23:00:00.000Z");
+
 
     docs.add(doc4);
 
@@ -114,6 +121,8 @@ public class SolrTesterMain
     doc5.addField(SolrFields.TAG, "leather");
     doc5.addField(SolrFields.UPPER_PRICE_LIMIT, 50.0);
     doc5.addField(SolrFields.LOCATION, "48.2088,16.3726");
+    doc5.addField(SolrFields.TIME_START, "2013-07-01T00:01:00.000Z");
+    doc5.addField(SolrFields.TIME_END, "2013-09-30T23:00:00.000Z");
 
     docs.add(doc5);
 
