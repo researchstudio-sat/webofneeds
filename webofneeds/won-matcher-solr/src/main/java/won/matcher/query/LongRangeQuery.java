@@ -14,8 +14,8 @@ import org.apache.solr.search.SolrIndexSearcher;
  */
 public class LongRangeQuery extends AbstractQuery
 {
-  private String lowerBoundField;
-  private String upperBoundField;
+  protected String lowerBoundField;
+  protected String upperBoundField;
 
   public LongRangeQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField)
   {
@@ -26,11 +26,11 @@ public class LongRangeQuery extends AbstractQuery
 
   public Query getQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument)
   {
-    if (!inputDocument.containsKey(lowerBoundField) || !inputDocument.containsKey(upperBoundField))
+    if (!inputDocument.containsKey(lowerBoundField) && !inputDocument.containsKey(upperBoundField))
       return null;
 
-    long lower = Long.parseLong(inputDocument.getFieldValue(lowerBoundField).toString());
-    long upper = Long.parseLong(inputDocument.getFieldValue(upperBoundField).toString());
+    Long lower = getField(inputDocument, lowerBoundField);
+    Long upper = getField(inputDocument, upperBoundField);
 
     Query nq1 = NumericRangeQuery.newLongRange(lowerBoundField, lower, upper, true, true);
     Query nq2 = NumericRangeQuery.newLongRange(upperBoundField, lower, upper, true, true);
@@ -42,5 +42,12 @@ public class LongRangeQuery extends AbstractQuery
     query.add(nq2, BooleanClause.Occur.SHOULD);
 
     return query;
+  }
+
+  protected Long getField(SolrInputDocument inputDocument, String fieldName)
+  {
+    if (inputDocument.containsKey(fieldName))
+      return Long.parseLong(inputDocument.getFieldValue(fieldName).toString());
+    else return null;
   }
 }

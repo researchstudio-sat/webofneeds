@@ -17,21 +17,6 @@ public class DoubleRangeQuery extends AbstractQuery
   private String lowerBoundField;
   private String upperBoundField;
 
-  /**
-   * Infinite Range Querys problem should not be solved here
-   * public enum Infinite { UPPER_BOUND, LOWER_BOUND }
-   * <p/>
-   * private String boundField;
-   * private Infinite boundType;
-   * <p/>
-   * public DoubleRangeQuery(BooleanClause.Occur occur, String boundField, Infinite boundType) {
-   * super(occur);
-   * <p/>
-   * this.boundField = boundField;
-   * this.boundType = boundType;
-   * }
-   */
-
   public DoubleRangeQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField)
   {
     super(occur);
@@ -41,12 +26,11 @@ public class DoubleRangeQuery extends AbstractQuery
 
   public Query getQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument)
   {
-
-    if (!inputDocument.containsKey(lowerBoundField) || !inputDocument.containsKey(upperBoundField))
+    if (!inputDocument.containsKey(lowerBoundField) && !inputDocument.containsKey(upperBoundField))
       return null;
 
-    double lower = getField(inputDocument, lowerBoundField);
-    double upper = getField(inputDocument, upperBoundField);
+    Double lower = getField(inputDocument, lowerBoundField);
+    Double upper = getField(inputDocument, upperBoundField);
 
     Query nq1 = NumericRangeQuery.newDoubleRange(lowerBoundField, lower, upper, true, true);
     Query nq2 = NumericRangeQuery.newDoubleRange(upperBoundField, lower, upper, true, true);
@@ -60,8 +44,10 @@ public class DoubleRangeQuery extends AbstractQuery
     return query;
   }
 
-  private double getField(SolrInputDocument inputDocument, String fieldName)
+  private Double getField(SolrInputDocument inputDocument, String fieldName)
   {
-    return Double.parseDouble(inputDocument.getFieldValue(fieldName).toString());
+    if (inputDocument.containsKey(fieldName))
+      return Double.parseDouble(inputDocument.getFieldValue(fieldName).toString());
+    else return null;
   }
 }
