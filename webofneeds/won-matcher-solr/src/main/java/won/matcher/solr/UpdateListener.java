@@ -23,20 +23,20 @@ public class UpdateListener implements SolrEventListener
   @Override
   public void init(NamedList namedList)
   {
-    logger.info("initiating matcher");
+    logger.debug("initiating matcher");
     documentStorage = DocumentStorage.getInstance();
   }
 
   @Override
   public void postCommit()
   {
-    logger.info("postCommit called");
+    logger.debug("postCommit called");
   }
 
   @Override
   public void newSearcher(SolrIndexSearcher solrIndexSearcher, SolrIndexSearcher solrIndexSearcher2)
   {
-    logger.info("newSearcher called");
+    logger.debug("newSearcher called");
 
     Matcher matcher = new Matcher(solrIndexSearcher);
 
@@ -44,14 +44,10 @@ public class UpdateListener implements SolrEventListener
       try {
         matcher.processDocument(documentStorage.pop());
       } catch (IOException e) {
-        logger.error("Exception while processing document", e);
+        logger.error(e.getMessage(), e);
       }
 
-    try {
-      matcher.finish();
-    } catch (IOException e) {
-      logger.error("Exception while sending matches", e);
-    }
+    matcher.finish();
   }
 
 }

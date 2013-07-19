@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.matcher.query.*;
+import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchNeedException;
 import won.protocol.solr.SolrFields;
 
 import java.io.IOException;
@@ -29,11 +31,11 @@ public class Matcher
 
   private SolrIndexSearcher solrIndexSearcher;
 
-  private HashMap<String, ScoreDoc[]> knownMatches;
+  private HashMap<String, TopDocs> matches;
 
   private Set<AbstractQuery> queries;
 
-  private static final int MAX_MATCHES = 3;
+  private static final int MAX_MATCHES = 5;
   private static final double MATCH_THRESHOLD = 0.4;
 
   public Matcher(SolrIndexSearcher solrIndexSearcher)
@@ -55,63 +57,48 @@ public class Matcher
     queries.add(new SpatialQuery(BooleanClause.Occur.MUST, SolrFields.LOCATION));
     queries.add(new SelfFilterQuery(SolrFields.URL));
 
-    knownMatches = new HashMap<>();
+    matches = new HashMap<>();
   }
 
   public void processDocument(SolrInputDocument inputDocument) throws IOException
   {
-    //init
+    //combine all the queries
     BooleanQuery booleanQuery = new BooleanQuery();
-    TopDocs topDocs;
-
-    //get set of documents to compare to (filter + more like this, etc)
     for (AbstractQuery query : queries) {
       Query q = query.getQuery(solrIndexSearcher, inputDocument);
       if (q != null) {
-        logger.info("query: " + q.toString());
+        logger.debug("Simple query: {}", q.toString());
         booleanQuery.add(q, query.getOccur());
       }
     }
+    logger.debug("Final solr query: {}", booleanQuery.toString());
 
-    logger.info("long query: " + booleanQuery.toString());
+    //get top MAX_MATCHES
+    TopDocs topDocs = solrIndexSearcher.search(booleanQuery, MAX_MATCHES);
 
-    //compare and select best match(es) for hints
-    topDocs = solrIndexSearcher.search(booleanQuery, 10);
-
-    if (topDocs.scoreDocs.length != 0)
-      knownMatches.put(inputDocument.getFieldValue(SolrFields.URL).toString(), topDocs.scoreDocs);
-
-    for (String match : knownMatches.keySet()) {
-      StringBuilder sb = new StringBuilder();
-      for (ScoreDoc score : knownMatches.get(match))
-        sb.append(String.format("\ndocument: %s\tscore:%2.3f", score.doc, score.score));
-
-      logger.info("document: " + match + " " + sb.toString());
-    }
+    //if no matches or not good enough skip them
+    if (topDocs.scoreDocs.length != 0 && topDocs.getMaxScore() >= MATCH_THRESHOLD)
+      matches.put(inputDocument.getFieldValue(SolrFields.URL).toString(), topDocs);
   }
 
-  public void finish() throws IOException
+  //send matches and stuff
+  public void finish()
   {
-    //cleanup or send prepared matches
+    try {
+      URI originator = URI.create("http://LDSpiderMatcher.webofneeds");
+      IndexReader indexReader = solrIndexSearcher.getIndexReader();
 
-//    try {
-    URI originator = URI.create("http://LDSpiderMatcher.webofneeds");
-
-    IndexReader indexReader = solrIndexSearcher.getIndexReader();
-
-    for (String match : knownMatches.keySet()) {
-      URI fromDoc = URI.create(match);
-      for (ScoreDoc score : knownMatches.get(match)) {
-        Document document = indexReader.document(score.doc);
-        URI toDoc = URI.create(document.get(SolrFields.URL));
-        logger.info(String.format("Sending hint %s -> %s :: %3.2f", fromDoc, toDoc, score.score));
-        //client.hint(fromDoc, toDoc, score.score, originator, null);
+      for (String match : matches.keySet()) {
+        URI fromDoc = URI.create(match);
+        for (ScoreDoc scoreDoc : matches.get(match).scoreDocs) {
+          Document document = indexReader.document(scoreDoc.doc);
+          URI toDoc = URI.create(document.get(SolrFields.URL));
+          client.hint(fromDoc, toDoc, scoreDoc.score, originator, null);
+          logger.debug("Sending hint {} -> {} :: {}", new Object[] {fromDoc, toDoc, scoreDoc.score});
+        }
       }
+    } catch (NoSuchNeedException | IllegalMessageForNeedStateException | IOException e) {
+      logger.error(e.getMessage(), e);
     }
-//    } catch (NoSuchNeedException e) {
-//      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//    } catch (IllegalMessageForNeedStateException e) {
-//      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//    }
   }
 }
