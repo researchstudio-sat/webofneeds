@@ -40,12 +40,14 @@
             <groupId>webofneeds</groupId>
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>webofneeds</groupId>
             <artifactId>won-matcher</artifactId>
             <version>${project.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <!-- TESTING ONLY
@@ -79,6 +81,14 @@
 
         <plugins>
             <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.source.version}</source>
+                    <target>${java.target.version}</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
                 <version>1.0-alpha-2</version>
@@ -107,6 +117,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>com.github.goldin</groupId>
                 <artifactId>copy-maven-plugin</artifactId>
@@ -128,7 +139,8 @@
                                 <resource>
                                     <directory>${project.basedir}/solr</directory>
                                     <filtering>true</filtering>
-                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}</targetPath>
+                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}
+                                    </targetPath>
                                     <includes>
                                         <include>solr.xml</include>
                                     </includes>
@@ -136,7 +148,9 @@
                                 <!-- Copies configuration files -->
                                 <resource>
                                     <directory>${project.basedir}/solr/conf</directory>
-                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/conf</targetPath>
+                                    <targetPath>
+                                        ${project.build.directory}/${project.artifactId}-${project.version}/conf
+                                    </targetPath>
                                 </resource>
                             </resources>
                         </configuration>
@@ -144,7 +158,29 @@
                 </executions>
             </plugin>
 
-          <plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.4</version>
@@ -155,7 +191,9 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/WEB-INF/lib</outputDirectory>
+                            <outputDirectory>
+                                ${project.build.directory}/${project.artifactId}-${project.version}/WEB-INF/lib
+                            </outputDirectory>
                             <classifier>packed</classifier>
                             <archive>
                                 <manifest>
