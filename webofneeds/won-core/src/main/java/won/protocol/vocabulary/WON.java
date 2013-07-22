@@ -70,6 +70,7 @@ public class WON
   public static final Resource CONNECTION = m.createResource(BASE_URI + "Connection");
   public static final Property HAS_CONNECTION_STATE = m.createProperty(BASE_URI, "hasConnectionState");
   public static final Property HAS_REMOTE_CONNECTION = m.createProperty(BASE_URI, "hasRemoteConnection");
+  public static final Property HAS_REMOTE_NEED = m.createProperty(BASE_URI, "hasRemoteNeed");
   public static final Property BELONGS_TO_NEED = m.createProperty(BASE_URI, "belongsToNeed");
 
   public static final Property HAS_EVENT_CONTAINER = m.createProperty(BASE_URI, "hasEventContainer");
