@@ -213,8 +213,11 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
         new Object[]{ownerURI, content, activate});
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(wonURI == null ? null : URI.create(wonURI));
+      content.setNsPrefix("",ownerURI.toString());
+      String modelAsString = rdfUtils.toString(content);
+      logger.info("model as String: \n "  + modelAsString);
 
-      URI uri = proxy.createNeed(ownerURI, rdfUtils.toString(content), activate);
+      URI uri = proxy.createNeed(ownerURI, modelAsString , activate);
 
       Need need = new Need();
       need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);

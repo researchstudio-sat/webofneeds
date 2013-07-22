@@ -119,13 +119,11 @@ public class NeedController
 
       com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
-      Resource needResource = needModel.createResource(WON.NEED);
-      if(!needPojo.getMatchingConstraint().isEmpty())
+      Resource needResource = needModel.createResource(ownerURI.toString(), WON.NEED);
+      if (!needPojo.getMatchingConstraint().isEmpty())
         needResource.addProperty(WON.HAS_MATCHING_CONSTRAINT, needPojo.getMatchingConstraint());
 
       // need type
-      Resource basicNeedType = needModel.createResource(WON.toResource(needPojo.getBasicNeedType()));
-      needModel.add(needModel.createStatement(basicNeedType, WON.ALLOWS_MATCH_WITH, WON.toResource(needPojo.getBasicNeedType().getMatchesWith())));
       needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
 
       // need content
@@ -136,9 +134,9 @@ public class NeedController
         needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
       if (!needPojo.getContentDescription().isEmpty())
         needContent.addProperty(WON.HAS_CONTENT_DESCRIPTION, needPojo.getContentDescription());
-      if(!needPojo.getTags().isEmpty()) {
+      if (!needPojo.getTags().isEmpty()) {
         String[] tags = needPojo.getTags().split(",");
-        for(String tag : tags) {
+        for (String tag : tags) {
           needModel.add(needModel.createStatement(needContent, WON.HAS_TAG, tag.trim()));
         }
       }

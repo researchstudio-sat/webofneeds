@@ -16,8 +16,10 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,6 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.vocabulary.WON;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
@@ -70,14 +71,13 @@ public class NeedManagementServiceImpl implements NeedManagementService
     need.setNeedURI(URIService.createNeedURI(need));
     need = needRepository.saveAndFlush(need);
 
+    content.setNsPrefix("", need.getNeedURI().toString());
+
     Resource needRes = content.createResource(need.getNeedURI().toString());
 
     // Here we use the received model and reattach its parts to create a new one. The problem was we do not have a needURI when creating the need so now it gets saved properly.
-    ResIterator contentIterator = content.listSubjectsWithProperty(RDF.type, WON.NEED);
-    Resource contentNeed = contentIterator.next();
-    if (contentIterator.hasNext()) {
-      logger.warn("Multiple nodes of type won:Need found in RDF need description from owner. If this happens regularly, check the OwnerProtocol RDF handling.");
-    }
+    Resource contentNeed = content.getResource(ownerURI.toString());
+
     StmtIterator iterator = contentNeed.listProperties();
     while (iterator.hasNext()) {
       Statement s = iterator.next();
