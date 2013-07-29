@@ -47,8 +47,6 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
 {
   @Autowired
   private NeedProtocolNeedService needProtocolNeedService;
-  @Autowired
-  private RdfUtils rdfUtils;
 
   @Override
   @WebMethod
@@ -61,7 +59,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
   {
     wireDependenciesLazily();
     try {
-      return needProtocolNeedService.connect(needURI, otherNeedURI, otherConnectionURI, rdfUtils.toModel(content));
+      return needProtocolNeedService.connect(needURI, otherNeedURI, otherConnectionURI, RdfUtils.toModel(content));
     } catch (IllegalMessageForNeedStateException e) {
       throw IllegalMessageForNeedStateFault.fromException(e);
     } catch (ConnectionAlreadyExistsException e) {
@@ -76,7 +74,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
   {
       wireDependenciesLazily();
     try {
-      needProtocolNeedService.open(connectionURI, rdfUtils.toModel(content));
+      needProtocolNeedService.open(connectionURI, RdfUtils.toModel(content));
     } catch (NoSuchConnectionException e) {
       throw NoSuchConnectionFault.fromException(e);
     } catch (IllegalMessageForConnectionStateException e) {
@@ -91,7 +89,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
   {
     wireDependenciesLazily();
     try {
-      needProtocolNeedService.close(connectionURI, rdfUtils.toModel(content));
+      needProtocolNeedService.close(connectionURI, RdfUtils.toModel(content));
     } catch (NoSuchConnectionException e) {
       throw NoSuchConnectionFault.fromException(e);
     } catch (IllegalMessageForConnectionStateException e) {

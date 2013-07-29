@@ -40,8 +40,6 @@ import java.net.URI;
 public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowiringSupport implements OwnerProtocolNeedWebServiceEndpoint {
     @Autowired
     private OwnerProtocolNeedService ownerProtocolNeedService;
-    @Autowired
-    private RdfUtils rdfUtils;
 
     protected boolean isWired() {
         return ownerProtocolNeedService != null;
@@ -64,7 +62,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     public void open(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "content") final String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         wireDependenciesLazily();
       try {
-        ownerProtocolNeedService.open(connectionURI, rdfUtils.toModel(content));
+        ownerProtocolNeedService.open(connectionURI, RdfUtils.toModel(content));
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {
@@ -76,7 +74,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     public void close(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "content") final String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         wireDependenciesLazily();
       try {
-        ownerProtocolNeedService.close(connectionURI, rdfUtils.toModel(content));
+        ownerProtocolNeedService.close(connectionURI, RdfUtils.toModel(content));
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {
@@ -89,7 +87,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     {
         wireDependenciesLazily();
       try {
-        return ownerProtocolNeedService.createNeed(ownerURI, rdfUtils.toModel(content), activate);
+        return ownerProtocolNeedService.createNeed(ownerURI, RdfUtils.toModel(content), activate);
       } catch (IllegalNeedContentException e) {
         throw IllegalNeedContentFault.fromException(e);
       }
@@ -100,7 +98,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     {
         wireDependenciesLazily();
       try {
-        return ownerProtocolNeedService.connect(needURI, otherNeedURI, rdfUtils.toModel(content));
+        return ownerProtocolNeedService.connect(needURI, otherNeedURI, RdfUtils.toModel(content));
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (IllegalMessageForNeedStateException e) {

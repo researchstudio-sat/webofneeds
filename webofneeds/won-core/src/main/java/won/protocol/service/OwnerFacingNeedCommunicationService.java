@@ -46,7 +46,8 @@ public interface OwnerFacingNeedCommunicationService
    *
    * @param needURI the URI of the need
    * @param otherNeedURI the remote need to connect to
-   * @param content (optional) a rdf graph for the remote need's owner
+   * @param content (optional) a rdf graph for the remote need's owner. The null releative URI ('<>') inside that graph,
+   *                as well as the base URI of the graph will be attached to the resource identifying the event.
    * @throws won.protocol.exception.NoSuchNeedException if needURI is not a known need URI
    * @throws won.protocol.exception.IllegalMessageForNeedStateException if the need is not in active state
    * @throws won.protocol.exception.ConnectionAlreadyExistsException if there already is a connection between the specified needs

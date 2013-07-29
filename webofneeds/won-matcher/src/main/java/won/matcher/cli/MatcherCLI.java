@@ -24,7 +24,7 @@ public class MatcherCLI
     String need1 = "http://localhost:8080/won/ld/resource/need/1";
     String need2 = "http://localhost:8080/won/ld/resource/need/2";
     String org = "http://localhost:8080/matcher";
-    int score = 1;
+    double score = 1;
 
     for (int i = 0; i < args.length; i++) {
       if (args[i].equals("-h")) {
@@ -37,7 +37,7 @@ public class MatcherCLI
       } else if (args[i].equals("-o")) {
         org = args[++i];
       } else if (args[i].equals("-s")) {
-        score = Integer.parseInt(args[++i]);
+        score = Double.parseDouble(args[++i]);
       }
     }
 

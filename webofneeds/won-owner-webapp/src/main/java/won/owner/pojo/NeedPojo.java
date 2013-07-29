@@ -5,7 +5,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.DC;
-import com.hp.hpl.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.model.BasicNeedType;
@@ -66,8 +65,15 @@ public class NeedPojo
     Resource need = model.getResource(needUri.toString());
     creationDate = need.getProperty(WON.NEED_CREATION_DATE).getString();
 
-    if (need.getProperty(WON.HAS_MATCHING_CONSTRAINT) != null)
-      matchingConstraint = need.getProperty(WON.HAS_MATCHING_CONSTRAINT).getString();
+    if (need.getProperty(WON.HAS_MATCHING_CONSTRAINT) != null) {
+      /*Model tmpModel = ModelFactory.createDefaultModel();
+      tmpModel.add(model.listStatements(need, WON.HAS_MATCHING_CONSTRAINT, (RDFNode) null));
+      StringWriter stringWriter = new StringWriter(500);
+      tmpModel.write(stringWriter, "TTL", this.needURI);
+      matchingConstraint = stringWriter.toString();
+      */
+      matchingConstraint = " [RDF CONTENT] ";
+    }
 
     //TODO: add owner
 
@@ -87,7 +93,7 @@ public class NeedPojo
       if (textDescriptionStat != null) textDescription = textDescriptionStat.getString();
 
       Statement contentDescriptionStat = needContent.getProperty(WON.HAS_CONTENT_DESCRIPTION);
-      if (contentDescriptionStat != null) contentDescription = contentDescriptionStat.getString();
+      if (contentDescriptionStat != null) contentDescription = " [ RDF CONTENT ] ";
 
       StmtIterator tagProps = needContent.listProperties(WON.HAS_TAG);
       StringBuilder tags = new StringBuilder();

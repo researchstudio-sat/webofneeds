@@ -29,15 +29,13 @@ import java.net.URI;
 public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAutowiringSupport implements OwnerProtocolOwnerWebServiceEndpoint {
     @Autowired
     private OwnerProtocolOwnerService ownerProtocolOwnerService;
-    @Autowired
-    private RdfUtils rdfUtils;
 
     @Override
     public void hint(@WebParam(name = "ownNeedURI") URI ownNeedURI, @WebParam(name = "otherNeedURI") URI otherNeedURI, @WebParam(name = "score") double score, @WebParam(name = "originatorURI") URI originatorURI, @WebParam(name = "content") String content) throws NoSuchNeedFault, IllegalMessageForNeedStateFault
     {
         wireDependenciesLazily();
       try {
-        ownerProtocolOwnerService.hint(ownNeedURI, otherNeedURI, score, originatorURI, rdfUtils.toModel(content));
+        ownerProtocolOwnerService.hint(ownNeedURI, otherNeedURI, score, originatorURI, RdfUtils.toModel(content));
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (IllegalMessageForNeedStateException e) {
@@ -49,7 +47,7 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     public void connect(@WebParam(name = "ownNeedURI") URI ownNeedURI, @WebParam(name = "otherNeedURI") URI otherNeedURI, @WebParam(name = "ownConnectionURI") URI ownConnectionURI, @WebParam(name = "content") String content) throws NoSuchNeedFault, ConnectionAlreadyExistsFault, IllegalMessageForNeedStateFault {
         wireDependenciesLazily();
       try {
-        ownerProtocolOwnerService.connect(ownNeedURI, otherNeedURI, ownConnectionURI, rdfUtils.toModel(content));
+        ownerProtocolOwnerService.connect(ownNeedURI, otherNeedURI, ownConnectionURI, RdfUtils.toModel(content));
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (ConnectionAlreadyExistsException e) {
@@ -64,7 +62,7 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     {
         wireDependenciesLazily();
       try {
-        ownerProtocolOwnerService.open(connectionURI, rdfUtils.toModel(content));
+        ownerProtocolOwnerService.open(connectionURI, RdfUtils.toModel(content));
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {
@@ -76,7 +74,7 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     public void close(@WebParam(name = "connectionURI") URI connectionURI, @WebParam(name = "content") String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         wireDependenciesLazily();
       try {
-        ownerProtocolOwnerService.close(connectionURI, rdfUtils.toModel(content));
+        ownerProtocolOwnerService.close(connectionURI, RdfUtils.toModel(content));
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {

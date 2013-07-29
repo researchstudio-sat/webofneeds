@@ -2,6 +2,7 @@ package won.owner.web.need;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.DC;
 import org.slf4j.Logger;
@@ -29,9 +30,11 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -120,8 +123,11 @@ public class NeedController
       com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
       Resource needResource = needModel.createResource(ownerURI.toString(), WON.NEED);
-      if (!needPojo.getMatchingConstraint().isEmpty())
-        needResource.addProperty(WON.HAS_MATCHING_CONSTRAINT, needPojo.getMatchingConstraint());
+
+      if (!needPojo.getMatchingConstraint().isEmpty()) {
+        attachRdfToModelViaBlanknode(needPojo.getMatchingConstraint(), "TTL", needResource, WON.HAS_MATCHING_CONSTRAINT, needModel);
+      }
+
 
       // need type
       needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
@@ -133,7 +139,7 @@ public class NeedController
       if (!needPojo.getTextDescription().isEmpty())
         needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
       if (!needPojo.getContentDescription().isEmpty())
-        needContent.addProperty(WON.HAS_CONTENT_DESCRIPTION, needPojo.getContentDescription());
+        attachRdfToModelViaBlanknode(needPojo.getContentDescription(), "TTL", needContent, WON.HAS_CONTENT_DESCRIPTION, needModel);
       if (!needPojo.getTags().isEmpty()) {
         String[] tags = needPojo.getTags().split(",");
         for (String tag : tags) {
@@ -209,6 +215,18 @@ public class NeedController
     model.addAttribute("command", new NeedPojo());
 
     return "createNeed";
+  }
+
+  private void attachRdfToModelViaBlanknode(final String rdfAsString, final String rdfLanguage, final Resource resourceToLinkTo, final Property propertyToLinkThrough, final com.hp.hpl.jena.rdf.model.Model modelToModify)
+  {
+    com.hp.hpl.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
+    String baseURI= "no:uri";
+    model.setNsPrefix("", baseURI);
+    model.read(new StringReader(rdfAsString), baseURI, rdfLanguage);
+    Resource linkingBlankNode = model.createResource();
+    RdfUtils.replaceBaseURI(model,linkingBlankNode);
+    resourceToLinkTo.addProperty(propertyToLinkThrough, linkingBlankNode);
+    modelToModify.add(model);
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)

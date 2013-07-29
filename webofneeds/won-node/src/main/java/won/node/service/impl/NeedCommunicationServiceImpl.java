@@ -17,6 +17,8 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,8 @@ import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WON;
 
 import javax.persistence.PersistenceException;
 import java.net.URI;
@@ -119,16 +123,25 @@ public class NeedCommunicationServiceImpl implements
       return;
     }
 
-    /* Create connection */
-    Connection con = new Connection();
-    con.setNeedURI(needURI);
-    con.setState(ConnectionState.SUGGESTED);
-    con.setRemoteNeedURI(otherNeedURI);
-    //save connection (this creates a new id)
-    con = connectionRepository.saveAndFlush(con);
-    //create and set new uri
-    con.setConnectionURI(URIService.createConnectionURI(con));
-    con = connectionRepository.saveAndFlush(con);
+    List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
+    Connection con = null;
+    if (connections.size() > 0){
+      //TODO: impose unique constratint on connections
+      con = connections.get(0);
+    }
+
+    if (con == null) {
+      /* Create connection */
+      con = new Connection();
+      con.setNeedURI(needURI);
+      con.setState(ConnectionState.SUGGESTED);
+      con.setRemoteNeedURI(otherNeedURI);
+      //save connection (this creates a new id)
+      con = connectionRepository.saveAndFlush(con);
+      //create and set new uri
+      con.setConnectionURI(URIService.createConnectionURI(con));
+      con = connectionRepository.saveAndFlush(con);
+    }
 
     ConnectionEvent event = new ConnectionEvent();
     event.setConnectionURI(con.getConnectionURI());
@@ -136,7 +149,17 @@ public class NeedCommunicationServiceImpl implements
     event.setOriginatorUri(match.getOriginator());
     eventRepository.saveAndFlush(event);
 
-    rdfStorageService.storeContent(event, content);
+    //TODO: define what content may contain and check that here! May content contain any RDF or must it be linked to the <> node?
+    Model matchDataModel = ModelFactory.createDefaultModel();
+    Resource eventNode = matchDataModel.createResource(this.URIService.createEventURI(con,event).toString());
+    eventNode.addLiteral(WON.HAS_MATCH_SCORE, score);
+    matchDataModel.setNsPrefix("",eventNode.getURI().toString());
+    if (content != null) {
+      RdfUtils.replaceBaseURI(content, eventNode);
+      matchDataModel.add(content);
+    }
+
+    rdfStorageService.storeContent(event, matchDataModel);
 
     executorService.execute(new Runnable()
     {
@@ -219,8 +242,8 @@ public class NeedCommunicationServiceImpl implements
       event.setType(ConnectionEventType.OWNER_OPEN);
       event.setOriginatorUri(con.getConnectionURI());
       eventRepository.saveAndFlush(event);
+      saveAdditionalContentForEvent(content, con, event);
 
-      rdfStorageService.storeContent(event, content);
 
       final Connection connectionForRunnable = con;
       //send to need
@@ -252,6 +275,8 @@ public class NeedCommunicationServiceImpl implements
       return con.getConnectionURI();
     }
   }
+
+
 
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
@@ -319,7 +344,7 @@ public class NeedCommunicationServiceImpl implements
       event.setOriginatorUri(con.getRemoteConnectionURI());
       eventRepository.saveAndFlush(event);
 
-      rdfStorageService.storeContent(event, content);
+      saveAdditionalContentForEvent(content, con, event);
 
       final Connection connectionForRunnable = con;
       executorService.execute(new Runnable()
@@ -354,6 +379,25 @@ public class NeedCommunicationServiceImpl implements
   {
     return NeedState.ACTIVE == need.getState();
   }
+
+  /**
+   * Stores additional data if there is any in the specified model.
+   * @param content
+   * @param con
+   * @param event
+   */
+  private void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event)
+  {
+    //TODO: define what content may contain and check that here! May content contain any RDF or must it be linked to the <> node?
+    Model extraDataModel = ModelFactory.createDefaultModel();
+    Resource eventNode = extraDataModel.createResource(this.URIService.createEventURI(con,event).toString());
+    extraDataModel.setNsPrefix("",eventNode.getURI().toString());
+    if (content != null) {
+      RdfUtils.replaceBaseURI(content, eventNode);
+      rdfStorageService.storeContent(event, extraDataModel);
+    }
+  }
+
 
   public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerService ownerProtocolOwnerService)
   {

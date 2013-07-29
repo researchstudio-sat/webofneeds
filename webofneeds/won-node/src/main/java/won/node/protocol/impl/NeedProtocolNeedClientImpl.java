@@ -44,9 +44,6 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
   @Autowired
   private NeedProtocolNeedClientFactory clientFactory;
 
-  @Autowired
-  private RdfUtils rdfUtils;
-
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
@@ -55,7 +52,7 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
         new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForNeed(needURI);
-      return proxy.connect(needURI, otherNeedURI, otherConnectionURI, rdfUtils.toString(content));
+      return proxy.connect(needURI, otherNeedURI, otherConnectionURI, RdfUtils.toString(content));
     } catch (MalformedURLException e) {
       //TODO think this through: what happens if we return null here?
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
@@ -72,7 +69,7 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
         logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connectionURI));
         try {
             NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connectionURI);
-            proxy.open(connectionURI, rdfUtils.toString(content));
+            proxy.open(connectionURI, RdfUtils.toString(content));
         } catch (MalformedURLException e) {
             logger.warn("couldnt create URL for needProtocolEndpoint", e);
         } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
@@ -88,7 +85,7 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
     logger.info("need-facing: CLOSE called for connection {}", connectionURI);
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connectionURI);
-      proxy.close(connectionURI, rdfUtils.toString(content));
+      proxy.close(connectionURI, RdfUtils.toString(content));
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
@@ -119,9 +116,5 @@ public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
     this.clientFactory = clientFactory;
   }
 
-  public void setRdfUtils(final RdfUtils rdfUtils)
-  {
-    this.rdfUtils = rdfUtils;
-  }
 
 }

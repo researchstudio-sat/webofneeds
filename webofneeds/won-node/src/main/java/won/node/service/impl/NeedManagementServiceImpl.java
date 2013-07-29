@@ -17,9 +17,6 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +32,7 @@ import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.util.RdfUtils;
 
 import java.net.URI;
 import java.util.Collection;
@@ -70,27 +68,14 @@ public class NeedManagementServiceImpl implements NeedManagementService
     //now, create the need URI and save again
     need.setNeedURI(URIService.createNeedURI(need));
     need = needRepository.saveAndFlush(need);
-
-    content.setNsPrefix("", need.getNeedURI().toString());
-
-    Resource needRes = content.createResource(need.getNeedURI().toString());
-
-    // Here we use the received model and reattach its parts to create a new one. The problem was we do not have a needURI when creating the need so now it gets saved properly.
-    Resource contentNeed = content.getResource(ownerURI.toString());
-
-    StmtIterator iterator = contentNeed.listProperties();
-    while (iterator.hasNext()) {
-      Statement s = iterator.next();
-      Resource subject = s.getSubject();
-      needRes.addProperty(s.getPredicate(), s.getObject());
-    }
-
-    content.removeAll(contentNeed, null, null);
+    String baseURI = need.getNeedURI().toString();
+    RdfUtils.replaceBaseURI(content, baseURI);
 
     rdfStorage.storeContent(need, content);
 
     return need.getNeedURI();
   }
+
 
   @Override
   public void activate(final URI needURI) throws NoSuchNeedException

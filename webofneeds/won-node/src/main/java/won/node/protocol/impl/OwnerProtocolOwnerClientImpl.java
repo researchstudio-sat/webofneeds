@@ -37,8 +37,6 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
 
   @Autowired
   private OwnerProtocolOwnerClientFactory clientFactory;
-  @Autowired
-  private RdfUtils rdfUtils;
 
   @Override
   public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
@@ -84,7 +82,7 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}", connectionURI));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
-      proxy.open(connectionURI, rdfUtils.toString(content));
+      proxy.open(connectionURI, RdfUtils.toString(content));
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {
@@ -102,7 +100,7 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}", connectionURI));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
-      proxy.close(connectionURI, rdfUtils.toString(content));
+      proxy.close(connectionURI, RdfUtils.toString(content));
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {

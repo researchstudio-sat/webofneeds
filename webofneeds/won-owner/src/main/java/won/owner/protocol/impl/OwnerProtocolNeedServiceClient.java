@@ -70,9 +70,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Autowired
   private ConnectionModelMapper connectionModelMapper;
 
-  @Autowired
-  private RdfUtils rdfUtils;
-
   @Override
   public void activate(URI needURI) throws NoSuchNeedException
   {
@@ -128,7 +125,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       if (cons.size() != 1)
         throw new NoSuchConnectionException(connectionURI);
 
-      proxy.open(connectionURI, rdfUtils.toString(content));
+      proxy.open(connectionURI, RdfUtils.toString(content));
 
       Connection con = cons.get(0);
       con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
@@ -153,7 +150,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
         throw new NoSuchConnectionException(connectionURI);
 
       try {
-        proxy.close(connectionURI, rdfUtils.toString(content));
+        proxy.close(connectionURI, RdfUtils.toString(content));
       } catch (NoSuchConnectionFault noSuchConnectionFault) {
         throw NoSuchConnectionFault.toException(noSuchConnectionFault);
       } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
@@ -214,7 +211,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(wonURI == null ? null : URI.create(wonURI));
       content.setNsPrefix("",ownerURI.toString());
-      String modelAsString = rdfUtils.toString(content);
+      String modelAsString = RdfUtils.toString(content);
       logger.info("model as String: \n "  + modelAsString);
 
       URI uri = proxy.createNeed(ownerURI, modelAsString , activate);
@@ -243,7 +240,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     logger.info("need-facing: CONNECT called for other need {}, own need {} and content {}", new Object[]{needURI, otherNeedURI, content});
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
-      URI uri = proxy.connect(needURI, otherNeedURI, rdfUtils.toString(content));
+      URI uri = proxy.connect(needURI, otherNeedURI, RdfUtils.toString(content));
 
       List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri);
       if (existingConnections.size() > 0) {

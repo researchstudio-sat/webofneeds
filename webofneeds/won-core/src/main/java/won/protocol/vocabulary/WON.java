@@ -82,6 +82,8 @@ public class WON
   public static final Property HAS_ADDITIONAL_DATA = m.createProperty(BASE_URI, "hasAdditionalData");
   public static final Resource ADDITIONAL_DATA_CONTAINER = m.createResource(BASE_URI + "AdditionalDataContainer");
 
+  public static final Property HAS_MATCH_SCORE = m.createProperty(BASE_URI, "hasMatchScore");
+
   public static final Property HAS_NEED_MODALITY = m.createProperty(BASE_URI, "hasNeedModality");
   public static final Resource NEED_MODALITY = m.createResource(BASE_URI + "NeedModality");
 
@@ -124,6 +126,8 @@ public class WON
   public static final Resource CONNECTION_STATE_REQUEST_RECEIVED = m.createResource(ConnectionState.REQUEST_RECEIVED.getURI().toString());
   public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
   public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
+
+
 
   /**
    * Returns the base URI for this schema.
