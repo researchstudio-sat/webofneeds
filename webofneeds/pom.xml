@@ -118,6 +118,21 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <!--
+                    Yuck! we're disabling the deploy plugin because we
+                    abuse the maven lifecycle. This way, mvn deploy deploys our artifact via cargo.
+                -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+        </plugins>
     </build>
 
     <properties>
@@ -162,7 +177,7 @@
 
     <profiles>
         <profile>
-            <id>skip-tests-localhost</id>
+            <id>skip-tests</id>
             <build>
                 <plugins>
                     <plugin>
@@ -172,22 +187,6 @@
                         </configuration>
                     </plugin>
                 </plugins>
-                <resources>
-                    <resource>
-                        <directory>src/main/resources</directory>
-                    </resource>
-                    <resource>
-                        <directory>src/main/resources.localhost</directory>
-                    </resource>
-                </resources>
-                <testResources>
-                    <testResource>
-                        <directory>src/test/resources</directory>
-                    </testResource>
-                    <testResource>
-                        <directory>src/test/resources.localhost</directory>
-                    </testResource>
-                </testResources>
             </build>
         </profile>
 
@@ -195,13 +194,6 @@
             <id>no-warn</id>
             <properties>
                 <maven.compile.compilerargs>-Xlint:none</maven.compile.compilerargs>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>run-tests</id>
-            <properties>
-                <surefire.skip>false</surefire.skip>
             </properties>
         </profile>
 
@@ -216,25 +208,10 @@
                 <won.owner.properties.dir>src/main/resources.localhost</won.owner.properties.dir>
                 <won.owner-test.properties.dir>src/test/resources.localhost</won.owner-test.properties.dir>
             </properties>
-            <!--<build>
-                <resources>
-                    <resource>
-                        <directory>src/main/resources.localhost</directory>
-                    </resource>
-                </resources>
-                <testResources>
-                    <testResource>
-                        <directory>src/test/resources.localhost</directory>
-                    </testResource>
-                </testResources>
-            </build>-->
         </profile>
 
         <profile>
             <id>copy-module-dependencies</id>
-            <properties>
-                <dependencies.scope>provided</dependencies.scope>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -243,8 +220,8 @@
                         <version>2.8</version>
                         <executions>
                             <execution>
-                                <id>copy-dependencies</id>
-                                <phase>package</phase>
+                                <id>copy-module-dependencies</id>
+                                <phase>verify</phase>
                                 <goals>
                                     <goal>copy-dependencies</goal>
                                 </goals>
@@ -253,7 +230,6 @@
                                     <overWriteReleases>false</overWriteReleases>
                                     <overWriteSnapshots>false</overWriteSnapshots>
                                     <overWriteIfNewer>true</overWriteIfNewer>
-                                    <includeScope>provided</includeScope>
                                 </configuration>
                             </execution>
                         </executions>
@@ -263,10 +239,11 @@
         </profile>
 
         <profile>
+            <!--
+            copies all project dependencies to the folder where mvn
+            is executed (<exec-dir>/target/copiedDependencies)
+            -->
             <id>copy-project-dependencies</id>
-            <properties>
-                <dependencies.scope>provided</dependencies.scope>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -275,8 +252,9 @@
                         <version>2.8</version>
                         <executions>
                             <execution>
-                                <id>copy-dependencies</id>
-                                <phase>package</phase>
+                                <!-- don't use this same id in module pom.xmls, say won-owner-webapp -->
+                                <id>copy-project-dependencies</id>
+                                <phase>verify</phase>
                                 <goals>
                                     <goal>copy-dependencies</goal>
                                 </goals>
@@ -285,7 +263,6 @@
                                     <overWriteReleases>false</overWriteReleases>
                                     <overWriteSnapshots>false</overWriteSnapshots>
                                     <overWriteIfNewer>true</overWriteIfNewer>
-                                    <includeScope>provided</includeScope>
                                 </configuration>
                             </execution>
                         </executions>

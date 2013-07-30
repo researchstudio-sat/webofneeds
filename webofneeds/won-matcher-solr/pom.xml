@@ -126,7 +126,7 @@
                     <!-- Copy Solr configuration file when compile phase is executed -->
                     <execution>
                         <id>copy-solr-config</id>
-                        <phase>compile</phase>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>

@@ -132,6 +132,7 @@
             </testResource>
         </testResources>
         <plugins>
+
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
@@ -162,8 +163,8 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>deploy-tomcat</id>
-                        <phase>integration-test</phase>
+                        <id>deploy-owner-tomcat</id>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>deployer-redeploy</goal>
                         </goals>
@@ -176,7 +177,7 @@
                 <version>2.8</version>
                 <executions>
                     <execution>
-                        <id>copy-dependencies</id>
+                        <id>copy-dependencies-to-owner-webapp</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
