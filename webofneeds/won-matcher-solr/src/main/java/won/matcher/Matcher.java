@@ -56,6 +56,7 @@ public class Matcher
     queries.add(new MultipleValueFieldQuery(BooleanClause.Occur.SHOULD, SolrFields.TAG));
     queries.add(new SpatialQuery(BooleanClause.Occur.MUST, SolrFields.LOCATION));
     queries.add(new SelfFilterQuery(SolrFields.URL));
+    queries.add(new TriplesQuery(BooleanClause.Occur.SHOULD, SolrFields.NTRIPLE));
 
     matches = new HashMap<>();
   }
