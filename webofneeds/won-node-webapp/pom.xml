@@ -16,6 +16,12 @@
     <url>http://www.springframework.org/spring-ws</url>
 
     <dependencies>
+        <!--
+
+                 Warning! Only to be used in connection with the
+                 <dependencyManagement> section in the parent pom!
+
+        -->
         <dependency>
             <groupId>webofneeds</groupId>
             <artifactId>won-node</artifactId>
@@ -27,59 +33,26 @@
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
-            <version>${com.sun.xml.ws.version}</version>
             <scope>${dependencies.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-tools</artifactId>
-            <version>${com.sun.xml.ws.version}</version>
             <scope>${dependencies.scope}</scope>
         </dependency>
-
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-spring</artifactId>
-            <version>${com.sun.jersey.contribs-jersey-spring.version}</version>
             <scope>${dependencies.scope}</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-web</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-beans</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-aop</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>${org.springframework.version}</version>
             <scope>${dependencies.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>${org.springframework.version}</version>
             <scope>${dependencies.scope}</scope>
         </dependency>
 

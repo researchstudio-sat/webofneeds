@@ -20,6 +20,12 @@
     </properties>
 
     <dependencies>
+        <!--
+
+                  Warning! Only to be used in connection with the
+                  <dependencyManagement> section in the parent pom!
+
+         -->
         <dependency>
             <groupId>webofneeds</groupId>
             <artifactId>won-core</artifactId>

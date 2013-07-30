@@ -13,26 +13,29 @@
     <artifactId>won-matcher-solr</artifactId>
 
     <dependencies>
+        <!--
+
+                  Warning! Only to be used in connection with the
+                  <dependencyManagement> section in the parent pom!
+
+         -->
+
         <!-- Solr -->
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr</artifactId>
-            <version>${solr.version}</version>
             <type>war</type>
         </dependency>
 
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-            <version>${solr.version}</version>
         </dependency>
 
         <!-- SIREn-->
         <dependency>
             <groupId>org.sindice.siren</groupId>
             <artifactId>siren-solr</artifactId>
-            <version>${siren.version}</version>
-            <type>jar</type>
         </dependency>
 
         <!-- Web of Needs -->
@@ -50,19 +53,9 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
-        <!-- TESTING ONLY
-        <dependency>
-            <artifactId>solr-solrj</artifactId>
-            <groupId>org.apache.solr</groupId>
-            <version>${solr.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>-->
-
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
         </dependency>
 
     </dependencies>
