@@ -124,24 +124,13 @@
                         <configuration>
                             <resources>
                                 <!--
-                                    Copies solr.xml to correct directory and applies properties
-                                    filtering to it.
+                                    Copies the complete siren folder to the target dir
                                 -->
                                 <resource>
-                                    <directory>${project.basedir}/solr</directory>
+                                    <directory>${project.basedir}/siren</directory>
                                     <filtering>true</filtering>
-                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}
-                                    </targetPath>
-                                    <includes>
-                                        <include>solr.xml</include>
-                                    </includes>
-                                </resource>
-                                <!-- Copies configuration files -->
-                                <resource>
-                                    <directory>${project.basedir}/solr/conf</directory>
-                                    <targetPath>
-                                        ${project.build.directory}/${project.artifactId}-${project.version}/conf
-                                    </targetPath>
+                                    <preservePath>true</preservePath>
+                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren</targetPath>
                                 </resource>
                             </resources>
                         </configuration>
@@ -167,52 +156,35 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
+                        <id>build-matcher-jar</id>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>assembly</goal>
                         </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                            <includeGroupIds>${project.groupId}</includeGroupIds>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
                         <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
                         <configuration>
-                            <outputDirectory>
-                                ${project.build.directory}/${project.artifactId}-${project.version}/WEB-INF/lib
-                            </outputDirectory>
-                            <classifier>packed</classifier>
-                            <archive>
-                                <manifest>
-                                    <addClasspath>true</addClasspath>
-                                    <classpathPrefix>lib/</classpathPrefix>
-                                </manifest>
-                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren</outputDirectory>
+                            <finalName>won-matcher-plugin</finalName>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-
-
+            <!--
+                TODO for the motivated
+                automatically do this:
+                * zip the target siren folder
+                * scp to server
+                * sshexec (goldin) to
+                    * unpack and
+                    * chown to tomcat (user/group should be a property in settings)
+                    * restart tomcat (command should be set in settings)
+             -->
         </plugins>
     </build>
 </project>
