@@ -37,8 +37,11 @@ public class Matcher
 
   private static final int MAX_MATCHES = 5;
   private static final double MATCH_THRESHOLD = 0.4;
+    private static final float MIN_SCORE = 0;
+    private static final float MAX_SCORE = 100;
 
-  public Matcher(SolrIndexSearcher solrIndexSearcher)
+
+    public Matcher(SolrIndexSearcher solrIndexSearcher)
   {
     logger.debug("Matcher initialized");
     this.solrIndexSearcher = solrIndexSearcher;
@@ -77,6 +80,8 @@ public class Matcher
     //get top MAX_MATCHES
     TopDocs topDocs = solrIndexSearcher.search(booleanQuery, MAX_MATCHES);
 
+    logger.debug("found {} matches", topDocs.totalHits);
+
     //if no matches or not good enough skip them
     if (topDocs.scoreDocs.length != 0 && topDocs.getMaxScore() >= MATCH_THRESHOLD)
       matches.put(inputDocument.getFieldValue(SolrFields.URL).toString(), topDocs);
@@ -94,7 +99,7 @@ public class Matcher
         for (ScoreDoc scoreDoc : matches.get(match).scoreDocs) {
           Document document = indexReader.document(scoreDoc.doc);
           URI toDoc = URI.create(document.get(SolrFields.URL));
-          client.hint(fromDoc, toDoc, scoreDoc.score, originator, null);
+          client.hint(fromDoc, toDoc, normalizeScore(scoreDoc.score), originator, null);
           logger.debug("Sending hint {} -> {} :: {}", new Object[] {fromDoc, toDoc, scoreDoc.score});
         }
       }
@@ -102,4 +107,13 @@ public class Matcher
       logger.error(e.getMessage(), e);
     }
   }
+
+    /**
+     * Maps the input value between MIN_SCORE and MAX_SCORE linearly to [0,1]
+     * @param score
+     * @return
+     */
+    private double normalizeScore(float score) {
+        return Math.min(1,Math.max(0,(score - MIN_SCORE)/(MAX_SCORE-MIN_SCORE)));
+    }
 }
