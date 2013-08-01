@@ -16,14 +16,26 @@
 
 package won.matcher.query;
 
+import com.hp.hpl.jena.graph.*;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.sparql.util.NodeFactory;
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.search.SolrIndexSearcher;
+import org.sindice.siren.search.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.protocol.solr.SolrFields;
+import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Collection;
 
 /**
@@ -33,22 +45,102 @@ import java.util.Collection;
 public class TriplesQuery extends AbstractQuery
 {
   private String field;
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
-  public TriplesQuery(final BooleanClause.Occur occur, final String fields)
+
+    public TriplesQuery(final BooleanClause.Occur occur, final String field)
   {
     super(occur);
-    this.field = fields;
+    this.field = field;
   }
 
   @Override
   public Query getQuery(final SolrIndexSearcher indexSearcher, final SolrInputDocument inputDocument) throws IOException
   {
-    Collection<Object> triples =  inputDocument.getFieldValues(field);
+    logger.debug("creating exact triples query");
+    String triples = (String) inputDocument.getFieldValue(field);
+    logger.debug("plain ntriples field value: {}",triples);
+    String docURI = (String) inputDocument.getFieldValue(SolrFields.URL);
+    logger.debug("docURI: {}", docURI);
     Model model = toModel(triples);
-    return null;
+    logger.debug("ntriples converted to jena model: {}", model);
+    //identify the node where the free description starts
+    Resource needNode = model.getResource(docURI);
+    logger.debug("needNode:{}", needNode);
+    if (needNode == null) return null;
+    Resource contentNode = needNode.getPropertyResourceValue(WON.HAS_CONTENT);
+    logger.debug("contentNode:{}", contentNode);
+    if (contentNode == null) return null;
+    Resource contentDescriptionNode = contentNode.getPropertyResourceValue(WON.HAS_CONTENT_DESCRIPTION);
+    logger.debug("contentDescriptionNode:{}", contentDescriptionNode);
+    if (contentDescriptionNode == null) return null;
+
+    //extract the subgraph containing the free description
+    Graph graph = model.getGraph();
+    GraphExtract graphExtract = new GraphExtract(TripleBoundary.stopNowhere);
+    Graph subGraph = graphExtract.extract(contentDescriptionNode.asNode(),graph);
+    logger.debug("extracted a subgraph of size {} from model of size {}", subGraph.size(), graph.size());
+
+    //create and return the siren query
+    return createQueryForGraph(subGraph);
   }
 
-  private Model toModel(Collection<Object> fieldValues) {
-    return ModelFactory.createDefaultModel();
+    private Query createQueryForGraph(Graph graph) {
+        BooleanQuery query = new BooleanQuery();
+        ExtendedIterator<Triple> tripleIterator =  graph.find(null, null, null);
+        while (tripleIterator.hasNext()){
+            Triple triple = tripleIterator.next();
+            query.add(createQueryForTriple(triple), BooleanClause.Occur.MUST);
+        }
+        logger.debug("created this boolean query:{}", query);
+        return query;
+    }
+
+    private Query createQueryForTriple(Triple triple) {
+        //for s,p,o of the triple, we create a SirenTermQuery with its value, wrapped in a SirenBooleanQuery with Occur.MUST
+        // and put it into a SirenCellQuery (one for each of s, p, and o)
+        // then, we aggregate the three SirenCellQueries into a SirenTupleQuery
+
+        // Create a tuple query that combines the two cell queries
+        final SirenTupleQuery tq = new SirenTupleQuery();
+
+        //subject
+        if (!triple.getSubject().isBlank()){
+            final SirenBooleanQuery bq1 = new SirenBooleanQuery();
+            bq1.add(new SirenTermQuery(
+                        new Term(this.field, triple.getSubject().toString())),
+                        SirenBooleanClause.Occur.MUST);
+            final SirenCellQuery cq1 = new SirenCellQuery(bq1);
+            cq1.setConstraint(0);
+            tq.add(cq1, SirenTupleClause.Occur.MUST);
+        }
+
+        //predicate (could it ever be a blank node??)
+        if (!triple.getPredicate().isBlank()){
+            final SirenBooleanQuery bq2 = new SirenBooleanQuery();
+            bq2.add(new SirenTermQuery(
+                        new Term(this.field, triple.getPredicate().toString())),
+                        SirenBooleanClause.Occur.MUST);
+            final SirenCellQuery cq2 = new SirenCellQuery(bq2);
+            cq2.setConstraint(1);
+            tq.add(cq2, SirenTupleClause.Occur.MUST);
+        }
+        //object
+        if (!triple.getObject().isBlank()){
+            final SirenBooleanQuery bq3 = new SirenBooleanQuery();
+            bq3.add(new SirenTermQuery(
+                        new Term(this.field, triple.getObject().toString())),
+                        SirenBooleanClause.Occur.MUST);
+            final SirenCellQuery cq3 = new SirenCellQuery(bq3);
+            cq3.setConstraint(2);
+            tq.add(cq3, SirenTupleClause.Occur.MUST);
+        }
+        return tq;
+    }
+
+    private Model toModel(String fieldValue) {
+    Model model = ModelFactory.createDefaultModel();
+    model.read(new StringReader(fieldValue), "", "N3");
+    return model;
   }
 }
