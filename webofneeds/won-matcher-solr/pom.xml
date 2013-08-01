@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <packaging>jar</packaging>
     <artifactId>won-matcher-solr</artifactId>
 
     <dependencies>
@@ -25,17 +25,20 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr</artifactId>
             <type>war</type>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <!-- SIREn-->
         <dependency>
             <groupId>org.sindice.siren</groupId>
             <artifactId>siren-solr</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <!-- Web of Needs -->
@@ -117,7 +120,7 @@
                     <!-- Copy Solr configuration file when compile phase is executed -->
                     <execution>
                         <id>copy-solr-config</id>
-                        <phase>compile</phase>
+                        <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
@@ -132,6 +135,11 @@
                                     <preservePath>true</preservePath>
                                     <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren</targetPath>
                                 </resource>
+                                <resource>
+                                    <directory>${project.build.directory}</directory>
+                                    <include>${build.finalName}.jar</include>
+                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</targetPath>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
@@ -144,7 +152,7 @@
                         <configuration>
                             <resources>
                                 <resource>
-                                    <targetPath>scp://install:97xxk7zz@sat001:/won/SIREn/siren-solr/webofneeds/</targetPath>
+                                    <targetPath>${solr.upload.dest}</targetPath>
                                     <directory>${project.build.directory}/${project.artifactId}-${project.version}</directory>
                                     <preservePath>true</preservePath>
                                 </resource>
@@ -156,20 +164,37 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>build-matcher-jar</id>
+                        <id>copy-dependencies-to-solr-dir</id>
+                        <phase>pre-integration-test</phase>
                         <goals>
-                            <goal>assembly</goal>
+                            <goal>copy-dependencies</goal>
                         </goals>
-                        <phase>package</phase>
                         <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren</outputDirectory>
-                            <finalName>won-matcher-plugin</finalName>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <excludeScope>provided</excludeScope>
+                            <includeScope>compile</includeScope>
+                            <excludeGroupIds>${project.groupId}</excludeGroupIds>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-won-dependencies-to-solr-dir</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
+                            <includeScope>test</includeScope> <!--should select all required project artifacts irrespective of scope-->
                         </configuration>
                     </execution>
                 </executions>
