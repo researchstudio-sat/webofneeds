@@ -29,7 +29,6 @@ import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
-import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
@@ -85,8 +84,6 @@ public class NeedCommunicationServiceImpl implements
   @Autowired
   private ConnectionRepository connectionRepository;
   @Autowired
-  private MatchRepository matchRepository;
-  @Autowired
   private EventRepository eventRepository;
   @Autowired
   private RDFStorageService rdfStorageService;
@@ -106,22 +103,6 @@ public class NeedCommunicationServiceImpl implements
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (!isNeedActive(need))
       throw new IllegalMessageForNeedStateException(needURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
-
-
-    //TODO: Remove Matchrepository
-    //save match
-    Match match = new Match();
-    match.setFromNeed(needURI);
-    match.setToNeed(otherNeedURI);
-    match.setScore(score);
-    match.setOriginator(originator);
-    try {
-      matchRepository.saveAndFlush(match);
-    } catch (PersistenceException e) {
-      //TODO: catch a more specific exception (EntityExistsException?)
-      logger.warn("error while trying to store match", e);
-      return;
-    }
 
     List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
     Connection con = null;
@@ -146,7 +127,7 @@ public class NeedCommunicationServiceImpl implements
     ConnectionEvent event = new ConnectionEvent();
     event.setConnectionURI(con.getConnectionURI());
     event.setType(ConnectionEventType.MATCHER_HINT);
-    event.setOriginatorUri(match.getOriginator());
+    event.setOriginatorUri(originator);
     eventRepository.saveAndFlush(event);
 
     //TODO: define what content may contain and check that here! May content contain any RDF or must it be linked to the <> node?

@@ -20,7 +20,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
-import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.service.ConnectionCommunicationService;
@@ -100,16 +99,6 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     @Override
     public Collection<URI> listNeedURIs() {
         return this.needInformationService.listNeedURIs();
-    }
-
-    @Override
-    public Collection<Match> listMatches(final URI needURI) throws NoSuchNeedException {
-        return this.needInformationService.listMatches(needURI);
-    }
-
-    @Override
-    public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException {
-        return this.needInformationService.listMatches(needURI, page);
     }
 
     @Override
