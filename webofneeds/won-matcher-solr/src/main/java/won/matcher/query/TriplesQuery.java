@@ -20,7 +20,6 @@ import com.hp.hpl.jena.graph.*;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.sparql.util.NodeFactory;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
@@ -36,7 +35,6 @@ import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Collection;
 
 /**
  * User: fkleedorfer
@@ -90,7 +88,7 @@ public class TriplesQuery extends AbstractQuery
         ExtendedIterator<Triple> tripleIterator =  graph.find(null, null, null);
         while (tripleIterator.hasNext()){
             Triple triple = tripleIterator.next();
-            query.add(createQueryForTriple(triple), BooleanClause.Occur.MUST);
+            query.add(createQueryForTriple(triple), BooleanClause.Occur.SHOULD);
         }
         logger.debug("created this boolean query:{}", query);
         return query;
@@ -108,34 +106,44 @@ public class TriplesQuery extends AbstractQuery
         if (!triple.getSubject().isBlank()){
             final SirenBooleanQuery bq1 = new SirenBooleanQuery();
             bq1.add(new SirenTermQuery(
-                        new Term(this.field, triple.getSubject().toString())),
-                        SirenBooleanClause.Occur.MUST);
+                        new Term(this.field, toQuotedString(triple.getSubject()))),
+                        SirenBooleanClause.Occur.SHOULD);
             final SirenCellQuery cq1 = new SirenCellQuery(bq1);
             cq1.setConstraint(0);
-            tq.add(cq1, SirenTupleClause.Occur.MUST);
+            tq.add(cq1, SirenTupleClause.Occur.SHOULD);
         }
 
         //predicate (could it ever be a blank node??)
         if (!triple.getPredicate().isBlank()){
             final SirenBooleanQuery bq2 = new SirenBooleanQuery();
             bq2.add(new SirenTermQuery(
-                        new Term(this.field, triple.getPredicate().toString())),
-                        SirenBooleanClause.Occur.MUST);
+                        new Term(this.field, toQuotedString(triple.getPredicate()))),
+                        SirenBooleanClause.Occur.SHOULD);
             final SirenCellQuery cq2 = new SirenCellQuery(bq2);
             cq2.setConstraint(1);
-            tq.add(cq2, SirenTupleClause.Occur.MUST);
+            tq.add(cq2, SirenTupleClause.Occur.SHOULD);
         }
         //object
         if (!triple.getObject().isBlank()){
             final SirenBooleanQuery bq3 = new SirenBooleanQuery();
             bq3.add(new SirenTermQuery(
-                        new Term(this.field, triple.getObject().toString())),
-                        SirenBooleanClause.Occur.MUST);
+                        new Term(this.field, toQuotedString(triple.getObject()))),
+                        SirenBooleanClause.Occur.SHOULD);
             final SirenCellQuery cq3 = new SirenCellQuery(bq3);
             cq3.setConstraint(2);
-            tq.add(cq3, SirenTupleClause.Occur.MUST);
+            tq.add(cq3, SirenTupleClause.Occur.SHOULD);
         }
         return tq;
+    }
+
+    /**
+     * adds <..> around an URI.
+     * @param node
+     * @return
+     */
+    private String toQuotedString(Node node){
+      if (node.isURI()) return "<" + node.toString() + ">";
+      return node.toString();
     }
 
     private Model toModel(String fieldValue) {
