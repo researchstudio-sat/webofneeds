@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <packaging>jar</packaging>
     <artifactId>won-matcher-solr</artifactId>
 
     <dependencies>
@@ -25,17 +25,20 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr</artifactId>
             <type>war</type>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <!-- SIREn-->
         <dependency>
             <groupId>org.sindice.siren</groupId>
             <artifactId>siren-solr</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <!-- Web of Needs -->
@@ -84,7 +87,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
                 <configuration>
                     <files>
                         <!-- Properties are read from profile specific property file -->
@@ -114,36 +116,45 @@
             <plugin>
                 <groupId>com.github.goldin</groupId>
                 <artifactId>copy-maven-plugin</artifactId>
-                <version>0.2.5</version>
                 <executions>
                     <!-- Copy Solr configuration file when compile phase is executed -->
                     <execution>
                         <id>copy-solr-config</id>
-                        <phase>deploy</phase>
+                        <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
                         <configuration>
                             <resources>
                                 <!--
-                                    Copies solr.xml to correct directory and applies properties
-                                    filtering to it.
+                                    Copies the complete siren folder to the target dir
                                 -->
                                 <resource>
-                                    <directory>${project.basedir}/solr</directory>
+                                    <directory>${project.basedir}/siren</directory>
                                     <filtering>true</filtering>
-                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}
-                                    </targetPath>
-                                    <includes>
-                                        <include>solr.xml</include>
-                                    </includes>
+                                    <preservePath>true</preservePath>
+                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren</targetPath>
                                 </resource>
-                                <!-- Copies configuration files -->
                                 <resource>
-                                    <directory>${project.basedir}/solr/conf</directory>
-                                    <targetPath>
-                                        ${project.build.directory}/${project.artifactId}-${project.version}/conf
-                                    </targetPath>
+                                    <directory>${project.build.directory}</directory>
+                                    <include>${build.finalName}.jar</include>
+                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</targetPath>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>upload-to-server</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <targetPath>${solr.upload.dest}</targetPath>
+                                    <directory>${project.build.directory}/${project.artifactId}-${project.version}</directory>
+                                    <preservePath>true</preservePath>
                                 </resource>
                             </resources>
                         </configuration>
@@ -154,72 +165,51 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.8</version>
                 <executions>
                     <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
+                        <id>copy-dependencies-to-solr-dir</id>
+                        <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <excludeScope>provided</excludeScope>
+                            <includeScope>compile</includeScope>
+                            <excludeGroupIds>${project.groupId}</excludeGroupIds>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-won-dependencies-to-solr-dir</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <includeGroupIds>${project.groupId}</includeGroupIds>
+                            <includeScope>test</includeScope> <!--should select all required project artifacts irrespective of scope-->
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>
-                                ${project.build.directory}/${project.artifactId}-${project.version}/WEB-INF/lib
-                            </outputDirectory>
-                            <classifier>packed</classifier>
-                            <archive>
-                                <manifest>
-                                    <addClasspath>true</addClasspath>
-                                    <classpathPrefix>lib/</classpathPrefix>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <overlays>
-                        <overlay>
-                            <groupId>org.apache.solr</groupId>
-                            <artifactId>solr</artifactId>
-                        </overlay>
-                    </overlays>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>war</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
+            <!--
+                TODO for the motivated
+                automatically do this:
+                * zip the target siren folder
+                * scp to server
+                * sshexec (goldin) to
+                    * unpack and
+                    * chown to tomcat (user/group should be a property in settings)
+                    * restart tomcat (command should be set in settings)
+             -->
         </plugins>
     </build>
 </project>

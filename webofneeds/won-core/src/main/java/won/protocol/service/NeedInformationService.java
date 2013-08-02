@@ -21,7 +21,6 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
-import won.protocol.model.Match;
 import won.protocol.model.Need;
 
 import java.net.URI;
@@ -140,24 +139,4 @@ public interface NeedInformationService {
      */
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
-    /**
-     * Retrieves a page of the list of match URIs (regardless of state) for the specified local need URI.
-     *
-     * @param needURI the URI of the need
-     * @param page the page number
-     * @return a collection of match objects.
-     * @throws won.protocol.exception.NoSuchNeedException
-     *          if needURI is not a known need URI
-     */
-    public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException;
-
-    /**
-     * Retrieves a page of the list of match URIs (regardless of state) for the specified local need URI.
-     *
-     * @param needURI the URI of the need
-     * @return a collection of match objects.
-     * @throws won.protocol.exception.NoSuchNeedException
-     *          if needURI is not a known need URI
-     */
-    public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException;
 }

@@ -324,22 +324,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   }
 
   @Override
-  public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException
-  {
-    logger.debug("need-facing: GET_MATCHES called for need {}", needURI);
-    //TODO: implement this
-    return null;
-  }
-
-  @Override
-  public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException
-  {
-    logger.debug("need-facing: GET_MATCHES called for need {} and page {}", needURI, page);
-    //TODO: implement this
-    return null;
-  }
-
-  @Override
   public Need readNeed(URI needURI) throws NoSuchNeedException
   {
     logger.debug("need-facing: READ_NEED called for need {}", needURI);
