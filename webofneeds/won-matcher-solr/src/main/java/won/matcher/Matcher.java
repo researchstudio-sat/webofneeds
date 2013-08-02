@@ -54,7 +54,7 @@ public class Matcher
   private Set<AbstractQuery> queries;
 
   private static final int MAX_MATCHES = 5;
-  private static final double MATCH_THRESHOLD = 0.4;
+  private static final double MATCH_THRESHOLD = 1.0;
     private static final float MIN_SCORE = 0;
     private static final float MAX_SCORE = 10;
 
@@ -123,6 +123,10 @@ public class Matcher
           URI toDoc = URI.create(document.get(SolrFields.URL));
           logger.debug("preparing to send match between {} and {}", fromDoc, toDoc);
           if (toDoc.equals(fromDoc)) continue;
+          if (scoreDoc.score < MATCH_THRESHOLD) {
+            logger.debug("score {} lower than threshold {}, suppressed match between {} and {}", new Object[]{scoreDoc.score, MATCH_THRESHOLD, fromDoc, toDoc});
+            continue;
+          }
           double normalizedScore = normalizeScore(scoreDoc.score);
           logger.debug("score of {} was normalized to {}", scoreDoc.score, normalizedScore);
           if (isNewHint(fromDoc,toDoc, normalizedScore)){
