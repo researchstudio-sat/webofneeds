@@ -1,0 +1,10 @@
+@prefix dbres: <http://dbpedia.org/resource/>.
+@prefix dbprop: <http://dbpedia.org/property/>
+@prefix dbont: <http://dbpedia.org/ontology/>.
+@prefix fc: <http://furniture.com/ontology/>.
+<> a dbres:Table;
+  dbprop:material dbr:Wood;
+  dbprop:material dbr:Oak;
+  fc:productionYear "1974".  
+
+   
