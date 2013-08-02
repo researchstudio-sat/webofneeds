@@ -6,12 +6,10 @@
         <artifactId>webofneeds</artifactId>
         <groupId>webofneeds</groupId>
         <version>0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
     <artifactId>won-matcher-solr</artifactId>
-
     <dependencies>
         <!--
 
@@ -76,13 +74,6 @@
         </resources>
 
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.source.version}</source>
-                    <target>${java.target.version}</target>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -178,13 +169,13 @@
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <excludeScope>provided</excludeScope>
-                            <includeScope>compile</includeScope>
                             <excludeGroupIds>${project.groupId}</excludeGroupIds>
                         </configuration>
                     </execution>
                     <execution>
+
                         <id>copy-won-dependencies-to-solr-dir</id>
-                        <phase>pre-integration-test</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
@@ -194,7 +185,7 @@
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <includeGroupIds>${project.groupId}</includeGroupIds>
-                            <includeScope>test</includeScope> <!--should select all required project artifacts irrespective of scope-->
+                            <includeScope>test</includeScope> <!-- should select all required project artifacts irrespective of scope -->
                         </configuration>
                     </execution>
                 </executions>
