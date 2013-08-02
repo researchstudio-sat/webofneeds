@@ -3,73 +3,91 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>webofneeds</groupId>
         <artifactId>webofneeds</artifactId>
         <version>0.1-SNAPSHOT</version>
     </parent>
+
     <groupId>webofneeds</groupId>
     <artifactId>won-node</artifactId>
     <version>0.1-SNAPSHOT</version>
     <name>won-node</name>
     <url>http://maven.apache.org</url>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
+        <!--
+
+                 Warning! Only to be used in connection with the
+                 <dependencyManagement> section in the parent pom!
+
+        -->
         <dependency>
             <groupId>webofneeds</groupId>
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <!-- spring stuff -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>${org.springframework.version}</version>
         </dependency>
         <!-- servlet stuff -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
-            <version>1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
         </dependency>
 
         <!-- TESTING -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>${org.springframework.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>${cglib.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- HSQL STUFF -->
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>${org.hsqldb.version}</version>
         </dependency>
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${won.node.properties.dir}</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>${won.node-test.properties.dir}</directory>
+            </testResource>
+        </testResources>
         <!--plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

@@ -9,37 +9,62 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <packaging>jar</packaging>
     <artifactId>won-matcher-solr</artifactId>
 
     <dependencies>
+        <!--
+
+                  Warning! Only to be used in connection with the
+                  <dependencyManagement> section in the parent pom!
+
+         -->
+
+        <!-- Solr -->
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr</artifactId>
-            <version>${solr.version}</version>
             <type>war</type>
+            <scope>${dependencies.scope}</scope>
         </dependency>
+
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-            <version>${solr.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
+
+        <!-- SIREn-->
+        <dependency>
+            <groupId>org.sindice.siren</groupId>
+            <artifactId>siren-solr</artifactId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
+        <!-- Web of Needs -->
         <dependency>
             <groupId>webofneeds</groupId>
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>webofneeds</groupId>
             <artifactId>won-matcher</artifactId>
             <version>${project.version}</version>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
         </dependency>
 
     </dependencies>
 
     <build>
-        <finalName>solr</finalName>
+        <finalName>${project.artifactId}-${project.version}</finalName>
         <filters>
             <filter>src/main/profiles/config.properties</filter>
         </filters>
@@ -49,11 +74,19 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+
         <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.source.version}</source>
+                    <target>${java.target.version}</target>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
                 <configuration>
                     <files>
                         <!-- Properties are read from profile specific property file -->
@@ -79,95 +112,49 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>com.github.goldin</groupId>
                 <artifactId>copy-maven-plugin</artifactId>
-                <version>0.2.5</version>
                 <executions>
                     <!-- Copy Solr configuration file when compile phase is executed -->
                     <execution>
                         <id>copy-solr-config</id>
-                        <phase>compile</phase>
+                        <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
                         <configuration>
                             <resources>
                                 <!--
-                                    Copies solr.xml to correct directory and applies properties
-                                    filtering to it.
+                                    Copies the complete siren folder to the target dir
                                 -->
                                 <resource>
-                                    <directory>${project.basedir}/src/main/resources</directory>
+                                    <directory>${project.basedir}/siren</directory>
                                     <filtering>true</filtering>
-                                    <targetPath>${solr.home.directory}</targetPath>
-                                    <includes>
-                                        <include>solr.xml</include>
-                                    </includes>
+                                    <preservePath>true</preservePath>
+                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren</targetPath>
                                 </resource>
-                                <!-- Copies configuration files -->
                                 <resource>
-                                    <directory>${project.basedir}/src/main/config</directory>
-                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf</targetPath>
-                                    <excludes>
-                                        <exclude>lang</exclude>
-                                        <exclude>velocity</exclude>
-                                        <exclude>xslt</exclude>
-                                    </excludes>
-                                </resource>
-                                <!-- Copies language specific configuration files -->
-                                <resource>
-                                    <directory>${project.basedir}/src/main/config/lang</directory>
-                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf/lang</targetPath>
-                                </resource>
-                                <!-- Copy Velocity macros and other files -->
-                                <resource>
-                                    <directory>${project.basedir}/src/main/config/velocity</directory>
-                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf/velocity</targetPath>
-                                </resource>
-                                <!-- Copy XSL style sheets -->
-                                <resource>
-                                    <directory>${project.basedir}/src/main/config/xslt</directory>
-                                    <targetPath>${solr.home.directory}/${solr.default.core.directory}/conf/xslt</targetPath>
+                                    <directory>${project.build.directory}</directory>
+                                    <include>${build.finalName}.jar</include>
+                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</targetPath>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
-                    <!-- Delete Solr configuration files clean clean phase is executed -->
                     <execution>
-                        <id>clean-solr</id>
-                        <phase>clean</phase>
+                        <id>upload-to-server</id>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <failIfNotFound>false</failIfNotFound>
                             <resources>
-                                <!-- Clean the overlays directory from the project root directory -->
                                 <resource>
-                                    <clean>true</clean>
-                                    <cleanEmptyDirectories>true</cleanEmptyDirectories>
-                                    <directory>${project.basedir}/overlays</directory>
-                                    <includes>
-                                        <include>**/**</include>
-                                    </includes>
-                                </resource>
-                                <!-- Remove the solr.xml file -->
-                                <resource>
-                                    <clean>true</clean>
-                                    <directory>${solr.home.directory}</directory>
-                                    <includes>
-                                        <include>solr.xml</include>
-                                    </includes>
-                                </resource>
-                                <!-- Remove the conf directory -->
-                                <resource>
-                                    <clean>true</clean>
-                                    <cleanEmptyDirectories>true</cleanEmptyDirectories>
-                                    <directory>${solr.home.directory}/${solr.default.core.directory}</directory>
-                                    <includes>
-                                        <include>conf</include>
-                                    </includes>
+                                    <targetPath>${solr.upload.dest}</targetPath>
+                                    <directory>${project.build.directory}/${project.artifactId}-${project.version}</directory>
+                                    <preservePath>true</preservePath>
                                 </resource>
                             </resources>
                         </configuration>
@@ -177,49 +164,52 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
+                <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <id>copy-dependencies-to-solr-dir</id>
+                        <phase>pre-integration-test</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.basedir}/solr/contrib/webofneeds</outputDirectory>
-                            <classifier>similarityQuery</classifier>
-                            <archive>
-                                <manifest>
-                                    <addClasspath>true</addClasspath>
-                                    <classpathPrefix>lib/</classpathPrefix>
-                                </manifest>
-                            </archive>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <excludeScope>provided</excludeScope>
+                            <includeScope>compile</includeScope>
+                            <excludeGroupIds>${project.groupId}</excludeGroupIds>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-won-dependencies-to-solr-dir</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
+                            <includeScope>test</includeScope> <!--should select all required project artifacts irrespective of scope-->
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>8.1.8.v20121106</version>
-                <configuration>
-                    <stopPort>9966</stopPort>
-                    <stopKey>stop</stopKey>
-                    <connectors>
-                        <!-- Listen to port 8983 -->
-                        <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
-                            <port>8983</port>
-                            <maxIdleTime>60000</maxIdleTime>
-                        </connector>
-                    </connectors>
-                    <!-- Read system properties from profile specific configuration file -->
-                    <systemPropertiesFile>${project.basedir}/src/main/profiles/config.properties</systemPropertiesFile>
-                    <webApp>
-                        <contextPath>/solr</contextPath>
-                    </webApp>
-                </configuration>
-            </plugin>
+            <!--
+                TODO for the motivated
+                automatically do this:
+                * zip the target siren folder
+                * scp to server
+                * sshexec (goldin) to
+                    * unpack and
+                    * chown to tomcat (user/group should be a property in settings)
+                    * restart tomcat (command should be set in settings)
+             -->
         </plugins>
     </build>
 </project>

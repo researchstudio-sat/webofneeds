@@ -45,8 +45,6 @@ import java.net.URI;
 public class MatcherProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowiringSupport implements MatcherProtocolNeedWebServiceEndpoint {
     @Autowired
     private MatcherProtocolNeedService matcherProtocolNeedService;
-    @Autowired
-    private RdfUtils rdfUtils;
 
     @Override
     @WebMethod
@@ -60,7 +58,7 @@ public class MatcherProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAut
         wireDependenciesLazily();
 
       try {
-        matcherProtocolNeedService.hint(needURI, otherNeedURI, score, originatorURI, rdfUtils.toModel(content));
+        matcherProtocolNeedService.hint(needURI, otherNeedURI, score, originatorURI, RdfUtils.toModel(content));
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (IllegalMessageForNeedStateException e) {

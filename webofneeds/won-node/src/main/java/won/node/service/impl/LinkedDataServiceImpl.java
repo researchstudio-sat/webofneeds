@@ -39,6 +39,7 @@ import won.protocol.service.NeedInformationService;
 import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.DateTimeUtils;
 import won.protocol.util.NeedModelMapper;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.GR;
 import won.protocol.vocabulary.LDP;
@@ -148,6 +149,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
     setNsPrefixes(model);
 
     Model needModel = needModelMapper.toModel(need);
+    //merge needModel and model
+    model.add(needModel.listStatements());
+    model.setNsPrefix("",need.getNeedURI().toString());
+
     Resource needResource = model.getResource(needUri.toString());
     addProtocolEndpoints(model, needResource);
 
@@ -155,8 +160,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Resource connectionsContainer = model.createResource(need.getNeedURI().toString() + "/connections/", LDP.CONTAINER);
     model.add(model.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
 
-    //merge needModel and model
-    model.add(needModel.listStatements());
 
     return model;
   }
@@ -175,6 +178,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     Model model = connectionModelMapper.toModel(connection);
     setNsPrefixes(model);
+    model.setNsPrefix("",connection.getConnectionURI().toString());
 
     //create connection member
     Resource connectionMember = model.getResource(connection.getConnectionURI().toString());
@@ -183,23 +187,25 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     //create event container and attach it to the member
     Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
-    model.add(model.createStatement(connectionMember, WON.HAS_EVENT_CONTAINER, eventContainer));
+    connectionMember.addProperty(WON.HAS_EVENT_CONTAINER,eventContainer);
+    eventContainer.addProperty(WON.HAS_REMOTE_NEED,model.createResource(connection.getRemoteNeedURI().toString()));
 
     //add event members and attach them
     for (ConnectionEvent e : events) {
       Resource eventMember = model.createResource(WON.toResource(e.getType()));
       if (e.getOriginatorUri() != null)
-        eventMember.addProperty(WON.HAS_ORIGINATOR, e.getOriginatorUri().toString());
+        eventMember.addProperty(WON.HAS_ORIGINATOR, model.createResource(e.getOriginatorUri().toString()));
 
       if (e.getCreationDate() != null)
-        eventMember.addProperty(WON.OCCURED_AT, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
+        eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
 
       Model additionalDataModel = rdfStorage.loadContent(e);
-      if (additionalDataModel != null) {
-        Resource additionalData = additionalDataModel.getResource(WON.ADDITIONAL_DATA_CONTAINER.getURI().toString());
+      if (additionalDataModel != null && additionalDataModel.size() > 0) {
+        Resource additionalData = additionalDataModel.createResource();
+        RdfUtils.replaceBaseURI(additionalDataModel, additionalData);
         model.add(model.createStatement(eventMember, WON.HAS_ADDITIONAL_DATA, additionalData));
+        model.add(additionalDataModel);
       }
-
       model.add(model.createStatement(eventContainer, RDFS.member, eventMember));
     }
 
@@ -216,6 +222,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
+    model.setNsPrefix("", needURI.toString());
 
     Resource connections = null;
     if (page >= 0)
@@ -257,7 +264,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private void setNsPrefixes(final Model model)
   {
     model.setNsPrefixes(PREFIX_MAPPING);
-    model.setNsPrefix("won-res", this.resourceURIPrefix);
   }
 
   public void setNeedResourceURIPrefix(final String needResourceURIPrefix)

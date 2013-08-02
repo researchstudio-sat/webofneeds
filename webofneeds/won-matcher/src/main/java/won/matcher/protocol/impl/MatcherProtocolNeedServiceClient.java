@@ -15,7 +15,6 @@ import won.protocol.ws.fault.NoSuchNeedFault;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.text.MessageFormat;
 
 /**
  * User: gabriel
@@ -26,8 +25,6 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
-  private RdfUtils rdfUtils;
   @Autowired
   private MatcherProtocolNeedClientFactory clientFactory;
 
@@ -40,7 +37,7 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
     try {
       MatcherProtocolNeedWebServiceEndpoint proxy = clientFactory.getMatcherProtocolEndpointForNeed(needURI);
 
-      proxy.hint(needURI, otherNeed, score, originator, rdfUtils.toString(content));
+      proxy.hint(needURI, otherNeed, score, originator, RdfUtils.toString(content));
     } catch (MalformedURLException e) {
       logger.warn("caught MalformedURLException:", e);
     } catch (NoSuchNeedFault noSuchNeedFault) {
@@ -58,5 +55,10 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
   public void setLinkedDataRestClient(final LinkedDataRestClient linkedDataRestClient)
   {
     clientFactory.setLinkedDataRestClient(linkedDataRestClient);
+  }
+
+  public void initializeDefault() {
+    clientFactory = new MatcherProtocolNeedClientFactory();
+    clientFactory.setLinkedDataRestClient(new LinkedDataRestClient());
   }
 }

@@ -30,4 +30,5 @@ public interface MatchRepository extends WonRepository<Match>
 {
   public List<Match> findByFromNeed(URI fromNeed);
   public List<Match> findByFromNeed(URI fromNeed,Sort sort);
+  public List<Match> findByFromNeedAndToNeedAndOriginator(URI fromNeed, URI toNeed, URI originator);
 }

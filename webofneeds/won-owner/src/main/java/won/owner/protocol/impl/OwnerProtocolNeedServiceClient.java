@@ -70,9 +70,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   @Autowired
   private ConnectionModelMapper connectionModelMapper;
 
-  @Autowired
-  private RdfUtils rdfUtils;
-
   @Override
   public void activate(URI needURI) throws NoSuchNeedException
   {
@@ -128,7 +125,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       if (cons.size() != 1)
         throw new NoSuchConnectionException(connectionURI);
 
-      proxy.open(connectionURI, rdfUtils.toString(content));
+      proxy.open(connectionURI, RdfUtils.toString(content));
 
       Connection con = cons.get(0);
       con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
@@ -153,7 +150,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
         throw new NoSuchConnectionException(connectionURI);
 
       try {
-        proxy.close(connectionURI, rdfUtils.toString(content));
+        proxy.close(connectionURI, RdfUtils.toString(content));
       } catch (NoSuchConnectionFault noSuchConnectionFault) {
         throw NoSuchConnectionFault.toException(noSuchConnectionFault);
       } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
@@ -213,8 +210,11 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
         new Object[]{ownerURI, content, activate});
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(wonURI == null ? null : URI.create(wonURI));
+      content.setNsPrefix("",ownerURI.toString());
+      String modelAsString = RdfUtils.toString(content);
+      logger.info("model as String: \n "  + modelAsString);
 
-      URI uri = proxy.createNeed(ownerURI, rdfUtils.toString(content), activate);
+      URI uri = proxy.createNeed(ownerURI, modelAsString , activate);
 
       Need need = new Need();
       need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
@@ -240,7 +240,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     logger.info("need-facing: CONNECT called for other need {}, own need {} and content {}", new Object[]{needURI, otherNeedURI, content});
     try {
       OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
-      URI uri = proxy.connect(needURI, otherNeedURI, rdfUtils.toString(content));
+      URI uri = proxy.connect(needURI, otherNeedURI, RdfUtils.toString(content));
 
       List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri);
       if (existingConnections.size() > 0) {
@@ -321,22 +321,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   {
     logger.debug("need-facing: LIST_CONNECTION_URIS called for need {} and page {}", needURI, page);
     return getHardcodedCollectionResource(needURI, NEED_CONNECTION_URI_PATH_SUFFIX + "?page=" + page);
-  }
-
-  @Override
-  public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException
-  {
-    logger.debug("need-facing: GET_MATCHES called for need {}", needURI);
-    //TODO: implement this
-    return null;
-  }
-
-  @Override
-  public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException
-  {
-    logger.debug("need-facing: GET_MATCHES called for need {} and page {}", needURI, page);
-    //TODO: implement this
-    return null;
   }
 
   @Override

@@ -2,6 +2,7 @@ package won.owner.web.need;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.DC;
 import org.slf4j.Logger;
@@ -29,9 +30,11 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -119,7 +122,12 @@ public class NeedController
 
       com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
-      Resource needResource = needModel.createResource(WON.NEED);
+      Resource needResource = needModel.createResource(ownerURI.toString(), WON.NEED);
+
+      if (!needPojo.getMatchingConstraint().isEmpty()) {
+        attachRdfToModelViaBlanknode(needPojo.getMatchingConstraint(), "TTL", needResource, WON.HAS_MATCHING_CONSTRAINT, needModel);
+      }
+
 
       // need type
       needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
@@ -129,7 +137,16 @@ public class NeedController
       if (!needPojo.getTitle().isEmpty())
         needContent.addProperty(DC.title, needPojo.getTitle(), XSDDatatype.XSDstring);
       if (!needPojo.getTextDescription().isEmpty())
-        needContent.addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
+        needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
+      if (!needPojo.getContentDescription().isEmpty())
+        attachRdfToModelViaBlanknode(needPojo.getContentDescription(), "TTL", needContent, WON.HAS_CONTENT_DESCRIPTION, needModel);
+      if (!needPojo.getTags().isEmpty()) {
+        String[] tags = needPojo.getTags().split(",");
+        for (String tag : tags) {
+          needModel.add(needModel.createStatement(needContent, WON.HAS_TAG, tag.trim()));
+        }
+      }
+
       needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
 
       // owner
@@ -164,17 +181,17 @@ public class NeedController
 
       // time constraint
       if (!needPojo.getStartTime().isEmpty() || !needPojo.getEndTime().isEmpty()) {
-        Resource timeConstraint = needModel.createResource(WON.TIME_CONSTRAINT)
-            .addProperty(WON.RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
+        Resource timeConstraint = needModel.createResource(WON.TIME_SPECIFICATION)
+            .addProperty(WON.HAS_RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
         if (!needPojo.getStartTime().isEmpty())
-          timeConstraint.addProperty(WON.START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
+          timeConstraint.addProperty(WON.HAS_START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
         if (!needPojo.getEndTime().isEmpty())
-          timeConstraint.addProperty(WON.END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
+          timeConstraint.addProperty(WON.HAS_END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
         if (needPojo.getRecurIn() != null)
-          timeConstraint.addProperty(WON.RECUR_IN, Long.toString(needPojo.getRecurIn()));
+          timeConstraint.addProperty(WON.HAS_RECURS_IN, Long.toString(needPojo.getRecurIn()));
         if (needPojo.getRecurTimes() != null)
-          timeConstraint.addProperty(WON.RECUR_TIMES, Integer.toString(needPojo.getRecurTimes()));
-        needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_TIME, timeConstraint));
+          timeConstraint.addProperty(WON.HAS_RECURS_TIMES, Integer.toString(needPojo.getRecurTimes()));
+        needModel.add(needModel.createStatement(needModality, WON.HAS_TIME_SPECIFICATION, timeConstraint));
       }
 
       needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
@@ -198,6 +215,18 @@ public class NeedController
     model.addAttribute("command", new NeedPojo());
 
     return "createNeed";
+  }
+
+  private void attachRdfToModelViaBlanknode(final String rdfAsString, final String rdfLanguage, final Resource resourceToLinkTo, final Property propertyToLinkThrough, final com.hp.hpl.jena.rdf.model.Model modelToModify)
+  {
+    com.hp.hpl.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
+    String baseURI= "no:uri";
+    model.setNsPrefix("", baseURI);
+    model.read(new StringReader(rdfAsString), baseURI, rdfLanguage);
+    Resource linkingBlankNode = model.createResource();
+    RdfUtils.replaceBaseURI(model,linkingBlankNode);
+    resourceToLinkTo.addProperty(propertyToLinkThrough, linkingBlankNode);
+    modelToModify.add(model);
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)

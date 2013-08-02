@@ -13,131 +13,153 @@
     <artifactId>won-owner-webapp</artifactId>
 
     <dependencies>
+        <!--
+
+                 Warning! Only to be used in connection with the
+                 <dependencyManagement> section in the parent pom!
+
+        -->
         <dependency>
             <groupId>webofneeds</groupId>
             <artifactId>won-owner</artifactId>
             <version>${project.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
-
-
         <dependency>
             <groupId>webofneeds</groupId>
             <artifactId>won-matcher</artifactId>
             <version>${project.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <!-- JSTL/Servlet-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
-            <version>${javax.servlet.jstl.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <!-- JAX-WS (webservices)-->
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
-            <version>${com.sun.xml.ws.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-tools</artifactId>
-            <version>${com.sun.xml.ws.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-spring</artifactId>
-            <version>${com.sun.jersey.contribs-jersey-spring.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-web</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-beans</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-aop</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${org.springframework.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${org.springframework.version}</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>1.17.1</version>
-        </dependency>
-
-        <!-- Jersey + Spring -->
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-spring</artifactId>
-            <version>1.17.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-web</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-beans</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
-            <version>1.17.1</version>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
+            <scope>${dependencies.scope}</scope>
         </dependency>
     </dependencies>
 
 
     <build>
         <finalName>owner</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+        <plugins>
+
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <version>${cargo.version}</version>
+                <configuration>
+                    <container>
+                        <containerId>tomcat7x</containerId>
+                        <type>remote</type>
+                    </container>
+                    <configuration>
+                        <type>runtime</type>
+                        <properties>
+                            <cargo.remote.uri>${tomcat.url}</cargo.remote.uri>
+                            <cargo.remote.username>${tomcat.user}</cargo.remote.username>
+                            <cargo.remote.password>${tomcat.password}</cargo.remote.password>
+                        </properties>
+                    </configuration>
+                    <deployer>
+                        <type>remote</type>
+                    </deployer>
+                    <deployables>
+                        <deployable>
+                            <groupId>webofneeds</groupId>
+                            <artifactId>won-owner-webapp</artifactId>
+                            <type>war</type>
+                        </deployable>
+                    </deployables>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>deploy-owner-tomcat</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deployer-redeploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies-to-owner-webapp</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>

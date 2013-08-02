@@ -26,7 +26,6 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
-import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.NeedInformationService;
 import won.protocol.util.DataAccessUtils;
@@ -52,8 +51,6 @@ public class NeedInformationServiceImpl implements NeedInformationService
   private ConnectionRepository connectionRepository;
   @Autowired
   private EventRepository eventRepository;
-  @Autowired
-  private MatchRepository matchRepository;
 
   private static final int DEFAULT_PAGE_SIZE = 500;
 
@@ -169,23 +166,6 @@ public class NeedInformationServiceImpl implements NeedInformationService
     return null;
   }
 
-  //TODO implement paging
-  @Override
-  public Collection<Match> listMatches(URI needURI, int page) throws NoSuchNeedException
-  {
-    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    return matchRepository.findByFromNeed(need.getNeedURI(), new Sort(Sort.Direction.DESC, "score"));
-  }
-
-  @Override
-  public Collection<Match> listMatches(URI needURI) throws NoSuchNeedException
-  {
-    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    return matchRepository.findByFromNeed(need.getNeedURI(), new Sort(Sort.Direction.DESC, "score"));
-  }
-
   public void setNeedRepository(final NeedRepository needRepository)
   {
     this.needRepository = needRepository;
@@ -194,11 +174,6 @@ public class NeedInformationServiceImpl implements NeedInformationService
   public void setConnectionRepository(final ConnectionRepository connectionRepository)
   {
     this.connectionRepository = connectionRepository;
-  }
-
-  public void setMatchRepository(final MatchRepository matchRepository)
-  {
-    this.matchRepository = matchRepository;
   }
 
   private boolean isNeedActive(final Need need)

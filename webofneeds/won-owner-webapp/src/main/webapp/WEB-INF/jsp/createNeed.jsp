@@ -45,7 +45,11 @@
             </tr>
             <tr>
                 <td><form:label path="textDescription">Text description:</form:label></td>
-                <td><form:textarea path="textDescription" rows="5" cols="30" /></td>
+                <td><form:textarea path="textDescription" rows="4" cols="30" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="tags">Tags:</form:label></td>
+                <td><form:textarea path="tags" rows="2" cols="30" /></td>
             </tr>
             <tr>
                 <td><form:label path="upperPriceLimit">Upper price limit:</form:label> </td>
@@ -86,6 +90,30 @@
             <tr>
                 <td><form:label path="recurInfiniteTimes">Recur inifinite times:</form:label></td>
                 <td><form:checkbox path="recurInfiniteTimes" /></td>
+            </tr>
+            <tr>
+                <td><form:label path="matchingConstraint">Matching constraint:</form:label></td>
+                <td><form:textarea path="matchingConstraint" rows="10" cols="80" />
+                    <br >
+                    NOTES:
+                    <UL>
+                        <LI>TURTLE format expected</LI>
+                        <LI>Only ONE constraint can be specified here</LI>
+                        <LI>use the null relative URI for referring to the constraint node. It will be attached to the rest of the need graph. This looks like this: <pre>&lt;&gt; a &lt;http://purl.org/webofneeds/model#MatchingConstraint&gt; </pre></LI>
+                    </UL>
+
+                </td>
+            </tr>
+            <tr>
+                <td><form:label path="contentDescription">Content description:</form:label></td>
+                <td><form:textarea path="contentDescription" rows="10" cols="80" />
+                    <br >
+                    NOTES:
+                    <UL>
+                        <LI>TURTLE format expected</LI>
+                        <LI>use the null relative URI for referring to the content node. It will be attached to the rest of the need graph. This looks like this: <pre>&lt;&gt; a &lt;http://dbpedia.org/resource/Couch&gt; </pre></LI>
+                    </UL>
+                </td>
             </tr>
             <tr>
                 <td colspan="2"><input type="submit" value="Submit"/></td>

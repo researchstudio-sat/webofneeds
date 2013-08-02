@@ -12,11 +12,9 @@ import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
-import org.springframework.util.*;
 import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -61,12 +59,18 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
         if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
 
-        //save match
-        Match match = new Match();
-        match.setFromNeed(ownNeedURI);
-        match.setToNeed(otherNeedURI);
+        List<Match> matches = matchRepository.findByFromNeedAndToNeedAndOriginator(ownNeedURI, otherNeedURI, originatorURI);
+        Match match = null;
+        if (matches.size() > 0){
+          match = matches.get(0);
+        } else {
+          //save match
+          match = new Match();
+          match.setFromNeed(ownNeedURI);
+          match.setToNeed(otherNeedURI);
+          match.setOriginator(originatorURI);
+        }
         match.setScore(score);
-        match.setOriginator(originatorURI);
         matchRepository.saveAndFlush(match);
     }
 

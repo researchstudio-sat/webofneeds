@@ -6,7 +6,8 @@
     <!ENTITY terms "http://purl.org/dc/terms/" >
     <!ENTITY all "http://schema.rdfs.org/all#" >
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
-    <!ENTITY v1 "http://purl.org/goodrelations/v1#" >
+    <!ENTITY oslc "http://open-services.net/ns/core#" >
+    <!ENTITY gr "http://purl.org/goodrelations/v1#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY won "http://purl.org/webofneeds/model#" >
     <!ENTITY wonex "http://purl.org/webofneeds/example#" >
@@ -18,16 +19,17 @@
 
 <rdf:RDF xmlns="http://purl.org/webofneeds/example#"
      xml:base="http://purl.org/webofneeds/example"
-     xmlns:v1="http://purl.org/goodrelations/v1#"
-     xmlns:schema="http://schema.org/"
-     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:wonex="http://purl.org/webofneeds/example#"
      xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#"
      xmlns:terms="http://purl.org/dc/terms/"
+     xmlns:oslc="http://open-services.net/ns/core#"
+     xmlns:schema="http://schema.org/"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:won="http://purl.org/webofneeds/model#"
+     xmlns:gr="http://purl.org/goodrelations/v1#"
      xmlns:all="http://schema.rdfs.org/all#">
     <owl:Ontology rdf:about="http://purl.org/webofneeds/example">
         <owl:imports rdf:resource="http://purl.org/webofneeds/model"/>
@@ -111,6 +113,12 @@
     <!-- http://purl.org/webofneeds/model#hasEventContainer -->
 
     <owl:AnnotationProperty rdf:about="&won;hasEventContainer"/>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasEventStatement -->
+
+    <owl:AnnotationProperty rdf:about="&won;hasEventStatement"/>
     
 
 
@@ -231,6 +239,56 @@
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://open-services.net/ns/core#describes -->
+
+    <owl:ObjectProperty rdf:about="&oslc;describes"/>
+    
+
+
+    <!-- http://open-services.net/ns/core#occurs -->
+
+    <owl:ObjectProperty rdf:about="&oslc;occurs"/>
+    
+
+
+    <!-- http://open-services.net/ns/core#property -->
+
+    <owl:ObjectProperty rdf:about="&oslc;property"/>
+    
+
+
+    <!-- http://open-services.net/ns/core#propertyDefinition -->
+
+    <owl:ObjectProperty rdf:about="&oslc;propertyDefinition"/>
+    
+
+
+    <!-- http://open-services.net/ns/core#valueShape -->
+
+    <owl:ObjectProperty rdf:about="&oslc;valueShape"/>
+    
+
+
+    <!-- http://purl.org/webofneeds/example#hasMatchExplanation -->
+
+    <owl:ObjectProperty rdf:about="&wonex;hasMatchExplanation">
+        <rdfs:domain rdf:resource="&wonex;MatchExplanation"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
     // Data properties
     //
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -239,11 +297,15 @@
     
 
 
+    <!-- http://open-services.net/ns/core#allowedValue -->
+
+    <owl:DatatypeProperty rdf:about="&oslc;allowedValue"/>
+    
+
+
     <!-- http://purl.org/webofneeds/example#hasMatchExplanation -->
 
     <owl:DatatypeProperty rdf:about="&wonex;hasMatchExplanation">
-        <rdfs:domain rdf:resource="&wonex;MatchExplanation"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
         <rdfs:subPropertyOf rdf:resource="&owl;topDataProperty"/>
     </owl:DatatypeProperty>
     
@@ -255,6 +317,12 @@
         <rdfs:domain rdf:resource="&wonex;MatchExplanation"/>
         <rdfs:range rdf:resource="&xsd;float"/>
     </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.w3.org/2000/01/rdf-schema#label -->
+
+    <owl:DatatypeProperty rdf:about="&rdfs;label"/>
     
 
 
@@ -340,6 +408,24 @@
     
 
 
+    <!-- http://open-services.net/ns/core#Exactly-one -->
+
+    <owl:NamedIndividual rdf:about="&oslc;Exactly-one"/>
+    
+
+
+    <!-- http://purl.org/goodrelations/v1#hasUnitOfMeasurement -->
+
+    <owl:NamedIndividual rdf:about="&gr;hasUnitOfMeasurement"/>
+    
+
+
+    <!-- http://purl.org/goodrelations/v1#hasValue -->
+
+    <owl:NamedIndividual rdf:about="&gr;hasValue"/>
+    
+
+
     <!-- http://purl.org/webofneeds/example#Connection_01_1 -->
 
     <owl:NamedIndividual rdf:about="&wonex;Connection_01_1">
@@ -380,9 +466,9 @@
     <!-- http://purl.org/webofneeds/example#CouchDepth -->
 
     <owl:NamedIndividual rdf:about="&wonex;CouchDepth">
-        <rdf:type rdf:resource="&v1;QuantitativeValue"/>
-        <v1:hasValue rdf:datatype="&rdfs;Literal">50</v1:hasValue>
-        <v1:hasUnitOfMeasurement rdf:datatype="&xsd;string">cm</v1:hasUnitOfMeasurement>
+        <rdf:type rdf:resource="&gr;QuantitativeValue"/>
+        <gr:hasValue rdf:datatype="&rdfs;Literal">50</gr:hasValue>
+        <gr:hasUnitOfMeasurement rdf:datatype="&xsd;string">cm</gr:hasUnitOfMeasurement>
     </owl:NamedIndividual>
     
 
@@ -390,9 +476,9 @@
     <!-- http://purl.org/webofneeds/example#CouchHeight -->
 
     <owl:NamedIndividual rdf:about="&wonex;CouchHeight">
-        <rdf:type rdf:resource="&v1;QuantitativeValue"/>
-        <v1:hasValue rdf:datatype="&rdfs;Literal">50</v1:hasValue>
-        <v1:hasUnitOfMeasurement rdf:datatype="&xsd;string">cm</v1:hasUnitOfMeasurement>
+        <rdf:type rdf:resource="&gr;QuantitativeValue"/>
+        <gr:hasValue rdf:datatype="&rdfs;Literal">50</gr:hasValue>
+        <gr:hasUnitOfMeasurement rdf:datatype="&xsd;string">cm</gr:hasUnitOfMeasurement>
     </owl:NamedIndividual>
     
 
@@ -408,9 +494,9 @@
     <!-- http://purl.org/webofneeds/example#CouchWeight -->
 
     <owl:NamedIndividual rdf:about="&wonex;CouchWeight">
-        <rdf:type rdf:resource="&v1;QuantitativeValue"/>
-        <v1:hasValue rdf:datatype="&rdfs;Literal">120</v1:hasValue>
-        <v1:hasUnitOfMeasurement rdf:datatype="&xsd;string">kg</v1:hasUnitOfMeasurement>
+        <rdf:type rdf:resource="&gr;QuantitativeValue"/>
+        <gr:hasValue rdf:datatype="&rdfs;Literal">120</gr:hasValue>
+        <gr:hasUnitOfMeasurement rdf:datatype="&xsd;string">kg</gr:hasUnitOfMeasurement>
     </owl:NamedIndividual>
     
 
@@ -418,9 +504,9 @@
     <!-- http://purl.org/webofneeds/example#CouchWidth -->
 
     <owl:NamedIndividual rdf:about="&wonex;CouchWidth">
-        <rdf:type rdf:resource="&v1;QuantitativeValue"/>
-        <v1:hasValue rdf:datatype="&rdfs;Literal">250</v1:hasValue>
-        <v1:hasUnitOfMeasurement rdf:datatype="&xsd;string">cm</v1:hasUnitOfMeasurement>
+        <rdf:type rdf:resource="&gr;QuantitativeValue"/>
+        <gr:hasValue rdf:datatype="&rdfs;Literal">250</gr:hasValue>
+        <gr:hasUnitOfMeasurement rdf:datatype="&xsd;string">cm</gr:hasUnitOfMeasurement>
     </owl:NamedIndividual>
     
 
@@ -440,6 +526,7 @@
     <owl:NamedIndividual rdf:about="&wonex;Hint_01_1">
         <rdf:type rdf:resource="&won;Hint"/>
         <won:hasTimeStamp rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:05+02:00</won:hasTimeStamp>
+        <won:hasAdditionalInformation rdf:resource="&wonex;MatchExplanation_01"/>
         <won:hasEventStatement rdf:resource="&wonex;MatchExplanation_01"/>
         <won:hasOriginator rdf:resource="&wonex;Matcher_01"/>
     </owl:NamedIndividual>
@@ -472,9 +559,31 @@
     
 
 
+    <!-- http://purl.org/webofneeds/example#MyCouchConstraint -->
+
+    <owl:NamedIndividual rdf:about="&wonex;MyCouchConstraint">
+        <rdf:type rdf:resource="&oslc;ResourceShape"/>
+        <oslc:property rdf:resource="&wonex;MyCouchConstraintPropertyWeight"/>
+        <oslc:describes rdf:resource="http://www.freebase.com/m/02crq1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://purl.org/webofneeds/example#MyCouchConstraintPropertyWeight -->
+
+    <owl:NamedIndividual rdf:about="&wonex;MyCouchConstraintPropertyWeight">
+        <rdf:type rdf:resource="&oslc;Property"/>
+        <oslc:occurs rdf:resource="&oslc;Exactly-one"/>
+        <oslc:valueShape rdf:resource="&wonex;WeightConstraint_1"/>
+        <oslc:propertyDefinition rdf:resource="&won;hasWeight"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://purl.org/webofneeds/example#NeedContent_01 -->
 
     <owl:NamedIndividual rdf:about="&wonex;NeedContent_01">
+        <rdf:type rdf:resource="&won;NeedContent"/>
         <terms:title rdf:datatype="&rdfs;Literal">Couch</terms:title>
         <terms:title rdf:datatype="&xsd;string">Couch</terms:title>
         <won:hasTextDescription rdf:datatype="&xsd;string">rote Couch mit integrierter Mäusefalle</won:hasTextDescription>
@@ -483,6 +592,8 @@
         <won:hasWeight rdf:resource="&wonex;CouchWeight"/>
         <won:hasWidth rdf:resource="&wonex;CouchWidth"/>
         <won:hasContentDescription rdf:resource="&wonex;MyCouch"/>
+        <won:hasTag rdf:resource="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/"/>
+        <won:hasTag rdf:resource="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/Recycled_Materials/"/>
     </owl:NamedIndividual>
     
 
@@ -525,6 +636,7 @@
         <rdf:type rdf:resource="&won;Need"/>
         <won:needCreationDate rdf:datatype="&xsd;dateTimeStamp">2013-04-04T07:26:00+02:00</won:needCreationDate>
         <won:hasConnections rdf:resource="&wonex;Connections_01"/>
+        <won:hasMatchingConstraint rdf:resource="&wonex;MyCouchConstraint"/>
         <won:hasContent rdf:resource="&wonex;NeedContent_01"/>
         <won:hasNeedModality rdf:resource="&wonex;NeedModality_01_1"/>
         <won:hasNeedModality rdf:resource="&wonex;NeedModality_01_2"/>
@@ -619,6 +731,38 @@
     
 
 
+    <!-- http://purl.org/webofneeds/example#WeightConstraint_1 -->
+
+    <owl:NamedIndividual rdf:about="&wonex;WeightConstraint_1">
+        <rdf:type rdf:resource="&oslc;ResourceShape"/>
+        <oslc:property rdf:resource="&wonex;WeightConstraint_1_HasValue"/>
+        <oslc:property rdf:resource="&wonex;WeightConstraint_1_Unit"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://purl.org/webofneeds/example#WeightConstraint_1_HasValue -->
+
+    <owl:NamedIndividual rdf:about="&wonex;WeightConstraint_1_HasValue">
+        <rdf:type rdf:resource="&oslc;Property"/>
+        <won:hasMaxValueConstraint rdf:datatype="&rdfs;Literal">500</won:hasMaxValueConstraint>
+        <oslc:occurs rdf:resource="&oslc;Exactly-one"/>
+        <oslc:propertyDefinition rdf:resource="&gr;hasValue"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://purl.org/webofneeds/example#WeightConstraint_1_Unit -->
+
+    <owl:NamedIndividual rdf:about="&wonex;WeightConstraint_1_Unit">
+        <rdf:type rdf:resource="&oslc;Property"/>
+        <oslc:allowedValue rdf:datatype="&xsd;string">kg</oslc:allowedValue>
+        <oslc:occurs rdf:resource="&oslc;Exactly-one"/>
+        <oslc:propertyDefinition rdf:resource="&gr;hasUnitOfMeasurement"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://purl.org/webofneeds/example#Österreich -->
 
     <owl:NamedIndividual rdf:about="&wonex;Österreich">
@@ -626,6 +770,34 @@
         <won:hasISOCode rdf:datatype="&xsd;string">AT</won:hasISOCode>
         <won:isConcealed rdf:datatype="&xsd;boolean">false</won:isConcealed>
     </owl:NamedIndividual>
+    
+
+
+    <!-- http://purl.org/webofneeds/model#hasWeight -->
+
+    <owl:NamedIndividual rdf:about="&won;hasWeight"/>
+    
+
+
+    <!-- http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/ -->
+
+    <owl:NamedIndividual rdf:about="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/">
+        <rdfs:label rdf:datatype="&rdfs;Literal">Furniture</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/Recycled_Materials/ -->
+
+    <owl:NamedIndividual rdf:about="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/Recycled_Materials/">
+        <rdfs:label rdf:datatype="&rdfs;Literal">Recycled Materials</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.freebase.com/m/02crq1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.freebase.com/m/02crq1"/>
 </rdf:RDF>
 
 

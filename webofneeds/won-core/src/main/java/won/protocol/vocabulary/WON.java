@@ -27,7 +27,7 @@ import won.protocol.model.NeedState;
 
 /**
  * WON vocabulary.
- *
+ * <p/>
  * User: fkleedorfer
  * Date: 20.11.12
  */
@@ -41,6 +41,7 @@ public class WON
   public static final Property NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "needProtocolEndpoint");
   public static final Property MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "matcherProtocolEndpoint");
   public static final Property OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "ownerProtocolEndpoint");
+  public static final Property HAS_MATCHING_CONSTRAINT = m.createProperty(BASE_URI, "hasMatchingConstraint");
 
   public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
   public static final Resource NEED_STATE = m.createResource(BASE_URI + "NeedState");
@@ -50,13 +51,14 @@ public class WON
 
   public static final Property HAS_CONTENT = m.createProperty(BASE_URI, "hasContent");
   public static final Resource NEED_CONTENT = m.createResource(BASE_URI + "NeedContent");
-  public static final Property TEXT_DESCRIPTION = m.createProperty(BASE_URI, "hasTextDescription");
-  public static final Property CONTENT_DESCRIPTION = m.createProperty(BASE_URI, "hasContentDescription");
-  public static final Property HEIGHT = m.createProperty(BASE_URI, "hasHeight");
-  public static final Property DEPTH = m.createProperty(BASE_URI, "hasDepth");
-  public static final Property WIDTH = m.createProperty(BASE_URI, "hasWidth");
-  public static final Property WEIGHT = m.createProperty(BASE_URI, "hasWeight");
-  public static final Property QUANTITATIVE_PROPERTY = m.createProperty(BASE_URI, "hasQuantitativeProperty");
+  public static final Property HAS_TEXT_DESCRIPTION = m.createProperty(BASE_URI, "hasTextDescription");
+  public static final Property HAS_CONTENT_DESCRIPTION = m.createProperty(BASE_URI, "hasContentDescription");
+  public static final Property HAS_TAG = m.createProperty(BASE_URI, "hasTag");
+  public static final Property HAS_HEIGHT = m.createProperty(BASE_URI, "hasHeight");
+  public static final Property HAS_DEPTH = m.createProperty(BASE_URI, "hasDepth");
+  public static final Property HAS_WIDTH = m.createProperty(BASE_URI, "hasWidth");
+  public static final Property HAS_WEIGHT = m.createProperty(BASE_URI, "hasWeight");
+  public static final Property HAS_QUANTITATIVE_PROPERTY = m.createProperty(BASE_URI, "hasQuantitativeProperty");
 
   public static final Property HAS_OWNER = m.createProperty(BASE_URI, "hasOwner");
   public static final Resource OWNER = m.createResource(BASE_URI + "Owner");
@@ -68,16 +70,19 @@ public class WON
   public static final Resource CONNECTION = m.createResource(BASE_URI + "Connection");
   public static final Property HAS_CONNECTION_STATE = m.createProperty(BASE_URI, "hasConnectionState");
   public static final Property HAS_REMOTE_CONNECTION = m.createProperty(BASE_URI, "hasRemoteConnection");
+  public static final Property HAS_REMOTE_NEED = m.createProperty(BASE_URI, "hasRemoteNeed");
   public static final Property BELONGS_TO_NEED = m.createProperty(BASE_URI, "belongsToNeed");
 
   public static final Property HAS_EVENT_CONTAINER = m.createProperty(BASE_URI, "hasEventContainer");
   public static final Resource EVENT_CONTAINER = m.createResource(BASE_URI + "EventContainer");
   public static final Resource EVENT = m.createResource(BASE_URI + "Event");
-  public static final Property OCCURED_AT = m.createProperty(BASE_URI, "hasTimeStamp");
+  public static final Property HAS_TIME_STAMP = m.createProperty(BASE_URI, "hasTimeStamp");
   public static final Property HAS_ORIGINATOR = m.createProperty(BASE_URI, "hasOriginator");
 
   public static final Property HAS_ADDITIONAL_DATA = m.createProperty(BASE_URI, "hasAdditionalData");
   public static final Resource ADDITIONAL_DATA_CONTAINER = m.createResource(BASE_URI + "AdditionalDataContainer");
+
+  public static final Property HAS_MATCH_SCORE = m.createProperty(BASE_URI, "hasMatchScore");
 
   public static final Property HAS_NEED_MODALITY = m.createProperty(BASE_URI, "hasNeedModality");
   public static final Resource NEED_MODALITY = m.createResource(BASE_URI + "NeedModality");
@@ -89,27 +94,29 @@ public class WON
   public static final Property HAS_CURRENCY = m.createProperty(BASE_URI, "hasCurrency");
 
   public static final Property AVAILABLE_AT_LOCATION = m.createProperty(BASE_URI, "hasLocationSpecification");
-  public static final Resource LOCATION = m.createResource(BASE_URI + "LocationSpecification");
+  public static final Resource LOCATION_SPECIFICATION = m.createResource(BASE_URI + "LocationSpecification");
   public static final Property IS_CONCEALED = m.createProperty(BASE_URI, "isConcealed");
   public static final Resource REGION = m.createResource(BASE_URI + "Region");
   public static final Property HAS_ISO_CODE = m.createProperty(BASE_URI, "hasISOCode");
 
-  public static final Property AVAILABLE_AT_TIME = m.createProperty(BASE_URI, "hasTimeSpecification");
-  public static final Resource TIME_CONSTRAINT = m.createResource(BASE_URI + "TimeSpecification");
-  public static final Property START_TIME = m.createProperty(BASE_URI, "hasStartTime");
-  public static final Property END_TIME = m.createProperty(BASE_URI, "hasEndTime");
-  public static final Property RECUR_IN = m.createProperty(BASE_URI, "hasRecursIn");
-  public static final Property RECUR_TIMES = m.createProperty(BASE_URI, "hasRecursTimes");
-  public static final Property RECUR_INFINITE_TIMES = m.createProperty(BASE_URI, "hasRecurInfiniteTimes");
+  public static final Property HAS_TIME_SPECIFICATION = m.createProperty(BASE_URI, "hasTimeSpecification");
+  public static final Resource TIME_SPECIFICATION = m.createResource(BASE_URI + "TimeSpecification");
+  public static final Property HAS_START_TIME = m.createProperty(BASE_URI, "hasStartTime");
+  public static final Property HAS_END_TIME = m.createProperty(BASE_URI, "hasEndTime");
+  public static final Property HAS_RECURS_IN = m.createProperty(BASE_URI, "hasRecursIn");
+  public static final Property HAS_RECURS_TIMES = m.createProperty(BASE_URI, "hasRecursTimes");
+  public static final Property HAS_RECUR_INFINITE_TIMES = m.createProperty(BASE_URI, "hasRecurInfiniteTimes");
 
   // Resource individuals
   public static final Resource EVENT_TYPE_CLOSE = m.createResource(ConnectionEventType.OWNER_CLOSE.getURI().toString());
   public static final Resource EVENT_TYPE_OPEN = m.createResource(ConnectionEventType.OWNER_OPEN.getURI().toString());
   public static final Resource EVENT_TYPE_HINT = m.createResource(ConnectionEventType.MATCHER_HINT.getURI().toString());
 
-  public static final Resource BASIC_NEED_TYPE_DO = m.createResource(BasicNeedType.DO.getURI().toString());
-  public static final Resource BASIC_NEED_TYPE_GIVE = m.createResource(BasicNeedType.GIVE.getURI().toString());
-  public static final Resource BASIC_NEED_TYPE_TAKE = m.createResource(BasicNeedType.TAKE.getURI().toString());
+  public static final Resource BASIC_NEED_TYPE_DO_TOGETHER = m.createResource(BasicNeedType.DO_TOGETHER.getURI().toString());
+  public static final Resource BASIC_NEED_TYPE_SUPPLY = m.createResource(BasicNeedType.SUPPLY.getURI().toString());
+  public static final Resource BASIC_NEED_TYPE_DEMAND = m.createResource(BasicNeedType.DEMAND.getURI().toString());
+  public static final Resource BASIC_NEED_TYPE_CRITIQUE = m.createResource(BasicNeedType.CRITIQUE.getURI().toString());
+  public static final Property ALLOWS_MATCH_WITH = m.createProperty(BASE_URI, "allowsMatchWith");
 
   public static final Resource NEED_STATE_ACTIVE = m.createResource(NeedState.ACTIVE.getURI().toString());
   public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
@@ -119,6 +126,8 @@ public class WON
   public static final Resource CONNECTION_STATE_REQUEST_RECEIVED = m.createResource(ConnectionState.REQUEST_RECEIVED.getURI().toString());
   public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
   public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
+
+
 
   /**
    * Returns the base URI for this schema.
@@ -157,12 +166,14 @@ public class WON
   public static Resource toResource(BasicNeedType type)
   {
     switch (type) {
-      case DO:
-        return BASIC_NEED_TYPE_DO;
-      case GIVE:
-        return BASIC_NEED_TYPE_GIVE;
-      case TAKE:
-        return BASIC_NEED_TYPE_TAKE;
+      case DO_TOGETHER:
+        return BASIC_NEED_TYPE_DO_TOGETHER;
+      case SUPPLY:
+        return BASIC_NEED_TYPE_SUPPLY;
+      case DEMAND:
+        return BASIC_NEED_TYPE_DEMAND;
+      case CRITIQUE:
+        return BASIC_NEED_TYPE_CRITIQUE;
       default:
         throw new IllegalStateException("No such case specified for " + type.name());
     }

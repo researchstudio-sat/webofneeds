@@ -3,6 +3,7 @@ package won.owner.pojo;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.DC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ public class NeedPojo
   private String wonNode;
 
   private String textDescription;
+  private String tags;
   private String creationDate;
 
   // using objects to be able to check for null
@@ -47,7 +49,10 @@ public class NeedPojo
   private Integer recurTimes;
   private boolean recurInfiniteTimes;
 
-    private long needId = -1;
+  private String matchingConstraint;
+  private String contentDescription;
+
+  private long needId = -1;
 
   public NeedPojo()
   {
@@ -60,6 +65,16 @@ public class NeedPojo
     Resource need = model.getResource(needUri.toString());
     creationDate = need.getProperty(WON.NEED_CREATION_DATE).getString();
 
+    if (need.getProperty(WON.HAS_MATCHING_CONSTRAINT) != null) {
+      /*Model tmpModel = ModelFactory.createDefaultModel();
+      tmpModel.add(model.listStatements(need, WON.HAS_MATCHING_CONSTRAINT, (RDFNode) null));
+      StringWriter stringWriter = new StringWriter(500);
+      tmpModel.write(stringWriter, "TTL", this.needURI);
+      matchingConstraint = stringWriter.toString();
+      */
+      matchingConstraint = " [RDF CONTENT] ";
+    }
+
     //TODO: add owner
 
     Statement basicNeedStat = need.getProperty(WON.HAS_BASIC_NEED_TYPE);
@@ -68,13 +83,26 @@ public class NeedPojo
       basicNeedType = BasicNeedType.parseString(uri.getFragment());
     }
 
-    Statement needContent = need.getProperty(WON.HAS_CONTENT);
-    if (needContent != null) {
-      Statement titleStat = needContent.getResource().getProperty(DC.title);
+    Statement needContentStatement = need.getProperty(WON.HAS_CONTENT);
+    if (needContentStatement != null) {
+      Resource needContent = needContentStatement.getResource();
+      Statement titleStat = needContent.getProperty(DC.title);
       if (titleStat != null) title = titleStat.getString();
 
-      Statement textDescriptionStat = needContent.getResource().getProperty(WON.TEXT_DESCRIPTION);
+      Statement textDescriptionStat = needContent.getProperty(WON.HAS_TEXT_DESCRIPTION);
       if (textDescriptionStat != null) textDescription = textDescriptionStat.getString();
+
+      Statement contentDescriptionStat = needContent.getProperty(WON.HAS_CONTENT_DESCRIPTION);
+      if (contentDescriptionStat != null) contentDescription = " [ RDF CONTENT ] ";
+
+      StmtIterator tagProps = needContent.listProperties(WON.HAS_TAG);
+      StringBuilder tags = new StringBuilder();
+      while (tagProps.hasNext()) {
+        tags.append(tagProps.next().getObject().toString());
+        if (tagProps.hasNext())
+          tags.append(", ");
+      }
+      this.tags = tags.toString();
     }
 
     Statement needModality = need.getProperty(WON.HAS_NEED_MODALITY);
@@ -86,22 +114,22 @@ public class NeedPojo
         longitude = location.getProperty(GEO.LONGITUDE).getDouble();
       }
 
-      Statement timeConstraints = needModality.getResource().getProperty(WON.AVAILABLE_AT_TIME);
+      Statement timeConstraints = needModality.getResource().getProperty(WON.HAS_TIME_SPECIFICATION);
       if (timeConstraints != null) {
 
-        Statement startTimeStat = timeConstraints.getResource().getProperty(WON.START_TIME);
+        Statement startTimeStat = timeConstraints.getResource().getProperty(WON.HAS_START_TIME);
         if (startTimeStat != null) startTime = startTimeStat.getString();
 
-        Statement endTimeStat = timeConstraints.getResource().getProperty(WON.END_TIME);
+        Statement endTimeStat = timeConstraints.getResource().getProperty(WON.HAS_END_TIME);
         if (endTimeStat != null) endTime = endTimeStat.getString();
 
-        Statement timeConstraintStat = timeConstraints.getResource().getProperty(WON.RECUR_IN);
+        Statement timeConstraintStat = timeConstraints.getResource().getProperty(WON.HAS_RECURS_IN);
         if (timeConstraintStat != null) recurIn = timeConstraintStat.getLong();
 
-        Statement recurTimesStat = timeConstraints.getResource().getProperty(WON.RECUR_TIMES);
+        Statement recurTimesStat = timeConstraints.getResource().getProperty(WON.HAS_RECURS_TIMES);
         if (recurTimesStat != null) recurTimes = recurTimesStat.getInt();
 
-        recurInfiniteTimes = timeConstraints.getResource().getProperty(WON.RECUR_INFINITE_TIMES).getBoolean();
+        recurInfiniteTimes = timeConstraints.getResource().getProperty(WON.HAS_RECUR_INFINITE_TIMES).getBoolean();
       }
 
       Statement priceSpecification = needModality.getResource().getProperty(WON.HAS_PRICE_SPECIFICATION);
@@ -189,6 +217,16 @@ public class NeedPojo
   public void setTextDescription(final String textDescription)
   {
     this.textDescription = textDescription;
+  }
+
+  public String getTags()
+  {
+    return tags;
+  }
+
+  public void setTags(final String tags)
+  {
+    this.tags = tags;
   }
 
   public String getNeedURI()
@@ -301,13 +339,33 @@ public class NeedPojo
     this.recurInfiniteTimes = recurInfiniteTimes;
   }
 
-    public long getNeedId()
-    {
-        return needId;
-    }
+  public long getNeedId()
+  {
+    return needId;
+  }
 
-    public void setNeedId(long needId)
-    {
-        this.needId = needId;
-    }
+  public void setNeedId(long needId)
+  {
+    this.needId = needId;
+  }
+
+  public String getContentDescription()
+  {
+    return contentDescription;
+  }
+
+  public void setContentDescription(final String contentDescription)
+  {
+    this.contentDescription = contentDescription;
+  }
+
+  public String getMatchingConstraint()
+  {
+    return matchingConstraint;
+  }
+
+  public void setMatchingConstraint(final String matchingConstraint)
+  {
+    this.matchingConstraint = matchingConstraint;
+  }
 }

@@ -31,7 +31,8 @@ public interface ConnectionCommunicationService
    * Opens a connection identified by connectionURI. A rdf graph can be sent along with the request.
    *
    * @param connectionURI the URI of the connection
-   * @param content a rdf graph describing properties of the event
+   * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
+   *                as well as the base URI of the graph will be attached to the resource identifying the event.
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
@@ -41,7 +42,8 @@ public interface ConnectionCommunicationService
    * Closes the connection identified by the specified URI.
    *
    * @param connectionURI the URI of the connection
-   * @param content a rdf graph describing properties of the event
+   * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
+   *                as well as the base URI of the graph will be attached to the resource identifying the event.
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */

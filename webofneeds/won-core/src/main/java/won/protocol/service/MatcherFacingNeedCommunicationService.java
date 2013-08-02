@@ -35,7 +35,8 @@ public interface MatcherFacingNeedCommunicationService
    * @param otherNeed  URI of the other need (may be on the local needserver)
    * @param score      match score between 0.0 (bad) and 1.0 (good). Implementations treat lower values as 0.0 and higher values as 1.0.
    * @param originator an URI identifying the calling entity
-   * @param content
+   * @param content (optional) an optional RDF graph containing more detailed information about the hint. The null releative URI ('<>') inside that graph,
+   *                as well as the base URI of the graph will be attached to the resource identifying the match event.
    * @throws won.protocol.exception.NoSuchNeedException
    *          if needURI is not a known need URI
    * @throws won.protocol.exception.IllegalMessageForNeedStateException

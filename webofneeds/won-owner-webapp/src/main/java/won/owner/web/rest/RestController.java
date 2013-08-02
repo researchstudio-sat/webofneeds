@@ -231,7 +231,7 @@ public class RestController
       if (!needPojo.getTitle().isEmpty())
         needContent.addProperty(DC.title, needPojo.getTitle(), XSDDatatype.XSDstring);
       if (!needPojo.getTextDescription().isEmpty())
-        needContent.addProperty(WON.TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
+        needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
       needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
 
       // owner
@@ -266,17 +266,17 @@ public class RestController
 
       // time constraint
       if (!needPojo.getStartTime().isEmpty() || !needPojo.getEndTime().isEmpty()) {
-        Resource timeConstraint = needModel.createResource(WON.TIME_CONSTRAINT)
-            .addProperty(WON.RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
+        Resource timeConstraint = needModel.createResource(WON.TIME_SPECIFICATION)
+            .addProperty(WON.HAS_RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
         if (!needPojo.getStartTime().isEmpty())
-          timeConstraint.addProperty(WON.START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
+          timeConstraint.addProperty(WON.HAS_START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
         if (!needPojo.getEndTime().isEmpty())
-          timeConstraint.addProperty(WON.END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
+          timeConstraint.addProperty(WON.HAS_END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
         if (needPojo.getRecurIn() != null)
-          timeConstraint.addProperty(WON.RECUR_IN, Long.toString(needPojo.getRecurIn()));
+          timeConstraint.addProperty(WON.HAS_RECURS_IN, Long.toString(needPojo.getRecurIn()));
         if (needPojo.getRecurTimes() != null)
-          timeConstraint.addProperty(WON.RECUR_TIMES, Integer.toString(needPojo.getRecurTimes()));
-        needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_TIME, timeConstraint));
+          timeConstraint.addProperty(WON.HAS_RECURS_TIMES, Integer.toString(needPojo.getRecurTimes()));
+        needModel.add(needModel.createStatement(needModality, WON.HAS_TIME_SPECIFICATION, timeConstraint));
       }
 
       needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
