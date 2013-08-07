@@ -359,6 +359,16 @@
                 <scope>test</scope>
             </dependency>
 
+
+            <dependency>
+                <artifactId>solr-solrj</artifactId>
+                <groupId>org.apache.solr</groupId>
+                <version>${solr.version}</version>
+            </dependency>
+
+
+            <!-- END: used for testing solr -->
+
         </dependencies>
     </dependencyManagement>
 

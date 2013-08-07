@@ -54,10 +54,19 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
+        <!-- START: used for testing solr -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+            <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <artifactId>solr-solrj</artifactId>
+            <groupId>org.apache.solr</groupId>
+            <scope>compile</scope>
+        </dependency>
+        <!-- END: used for testing solr -->
 
     </dependencies>
 
@@ -172,8 +181,8 @@
                             <excludeGroupIds>${project.groupId}</excludeGroupIds>
                         </configuration>
                     </execution>
-                    <execution>
 
+                    <execution>
                         <id>copy-won-dependencies-to-solr-dir</id>
                         <phase>package</phase>
                         <goals>

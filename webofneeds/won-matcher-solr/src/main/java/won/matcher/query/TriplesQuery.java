@@ -35,6 +35,8 @@ import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: fkleedorfer
@@ -42,6 +44,8 @@ import java.io.StringReader;
  */
 public class TriplesQuery extends AbstractQuery
 {
+  private static final Pattern PATTERN_REMOVE_QUOTES = Pattern.compile("\"(.+)\".*");
+
   private String field;
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -57,11 +61,27 @@ public class TriplesQuery extends AbstractQuery
   {
     logger.debug("creating exact triples query");
     String triples = (String) inputDocument.getFieldValue(field);
+    if (triples == null) {
+      logger.debug("no triples found, omitting triples query");
+      return null;
+    }
     logger.debug("plain ntriples field value: {}",triples);
     String docURI = (String) inputDocument.getFieldValue(SolrFields.URL);
     logger.debug("docURI: {}", docURI);
     Model model = toModel(triples);
     logger.debug("ntriples converted to jena model: {}", model);
+    //Graph subGraph = extractRelevantSubgraph(docURI, model);
+    Graph subGraph = model.getGraph();
+    if (subGraph == null) return null;
+
+    //create and return the siren query
+    return createQueryForGraph(subGraph);
+    //return createTestQuery();
+  }
+
+
+  private Graph extractRelevantSubgraph(final String docURI, final Model model)
+  {
     //identify the node where the free description starts
     Resource needNode = model.getResource(docURI);
     logger.debug("needNode:{}", needNode);
@@ -78,23 +98,31 @@ public class TriplesQuery extends AbstractQuery
     GraphExtract graphExtract = new GraphExtract(TripleBoundary.stopNowhere);
     Graph subGraph = graphExtract.extract(contentDescriptionNode.asNode(),graph);
     logger.debug("extracted a subgraph of size {} from model of size {}", subGraph.size(), graph.size());
-
-    //create and return the siren query
-    return createQueryForGraph(subGraph);
+    return subGraph;
   }
 
-    private Query createQueryForGraph(Graph graph) {
-        BooleanQuery query = new BooleanQuery();
-        ExtendedIterator<Triple> tripleIterator =  graph.find(null, null, null);
-        while (tripleIterator.hasNext()){
-            Triple triple = tripleIterator.next();
-            query.add(createQueryForTriple(triple), BooleanClause.Occur.SHOULD);
-        }
-        logger.debug("created this boolean query:{}", query);
-        return query;
+  private Query createTestQuery(){
+      Query query = new SirenTermQuery(new Term(this.field, "Wood"));
+      logger.debug("created this query: {}",query);
+      return query;
     }
 
-    private Query createQueryForTriple(Triple triple) {
+    private Query createQueryForGraph(Graph graph) {
+      BooleanQuery query = new BooleanQuery();
+      ExtendedIterator<Triple> tripleIterator =  graph.find(null, null, null);
+      while (tripleIterator.hasNext()){
+        Triple triple = tripleIterator.next();
+        Query newQuery = createQueryForTriple(triple);
+        if (newQuery != null) {
+          query.add(newQuery, BooleanClause.Occur.SHOULD);
+        }
+        return query;
+      }
+      logger.debug("created this query:{}", query);
+      return query;
+    }
+
+  private Query createQueryForTriple(Triple triple) {
         //for s,p,o of the triple, we create a SirenTermQuery with its value, wrapped in a SirenBooleanQuery with Occur.MUST
         // and put it into a SirenCellQuery (one for each of s, p, and o)
         // then, we aggregate the three SirenCellQueries into a SirenTupleQuery
@@ -107,10 +135,10 @@ public class TriplesQuery extends AbstractQuery
             final SirenBooleanQuery bq1 = new SirenBooleanQuery();
             bq1.add(new SirenTermQuery(
                         new Term(this.field, toQuotedString(triple.getSubject()))),
-                        SirenBooleanClause.Occur.SHOULD);
+                        SirenBooleanClause.Occur.MUST);
             final SirenCellQuery cq1 = new SirenCellQuery(bq1);
             cq1.setConstraint(0);
-            tq.add(cq1, SirenTupleClause.Occur.SHOULD);
+            tq.add(cq1, SirenTupleClause.Occur.MUST);
         }
 
         //predicate (could it ever be a blank node??)
@@ -118,20 +146,20 @@ public class TriplesQuery extends AbstractQuery
             final SirenBooleanQuery bq2 = new SirenBooleanQuery();
             bq2.add(new SirenTermQuery(
                         new Term(this.field, toQuotedString(triple.getPredicate()))),
-                        SirenBooleanClause.Occur.SHOULD);
+                        SirenBooleanClause.Occur.MUST);
             final SirenCellQuery cq2 = new SirenCellQuery(bq2);
             cq2.setConstraint(1);
-            tq.add(cq2, SirenTupleClause.Occur.SHOULD);
+            tq.add(cq2, SirenTupleClause.Occur.MUST);
         }
         //object
         if (!triple.getObject().isBlank()){
             final SirenBooleanQuery bq3 = new SirenBooleanQuery();
             bq3.add(new SirenTermQuery(
                         new Term(this.field, toQuotedString(triple.getObject()))),
-                        SirenBooleanClause.Occur.SHOULD);
+                        SirenBooleanClause.Occur.MUST);
             final SirenCellQuery cq3 = new SirenCellQuery(bq3);
             cq3.setConstraint(2);
-            tq.add(cq3, SirenTupleClause.Occur.SHOULD);
+            tq.add(cq3, SirenTupleClause.Occur.MUST);
         }
         return tq;
     }
@@ -142,7 +170,15 @@ public class TriplesQuery extends AbstractQuery
      * @return
      */
     private String toQuotedString(Node node){
-      if (node.isURI()) return "<" + node.toString() + ">";
+      if (node.isURI()) return node.toString().toLowerCase();
+      if (node.isLiteral()) {
+        String nodeAsString = node.toString().toLowerCase();
+        Matcher matcher = PATTERN_REMOVE_QUOTES.matcher(nodeAsString);
+        if (matcher.matches()){
+          return matcher.group(1);
+        }
+        return nodeAsString;
+      }
       return node.toString();
     }
 

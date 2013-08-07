@@ -16,6 +16,7 @@
 
 package won.matcher;
 
+import com.sun.jersey.api.client.UniformInterfaceException;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.*;
@@ -54,7 +55,7 @@ public class Matcher
   private Set<AbstractQuery> queries;
 
   private static final int MAX_MATCHES = 5;
-  private static final double MATCH_THRESHOLD = 1.0;
+  private static final double MATCH_THRESHOLD = 0.05;
     private static final float MIN_SCORE = 0;
     private static final float MAX_SCORE = 10;
 
@@ -104,6 +105,8 @@ public class Matcher
     if (topDocs.scoreDocs.length != 0 && topDocs.getMaxScore() >= MATCH_THRESHOLD) {
       matches.add(new MatchResult(url, topDocs));
       logger.debug("found {} matches for {}", topDocs.totalHits, url);
+    } else {
+      logger.debug("Found only {} matches with highest score {} for {}. Not sending any hints", new Object[]{topDocs.scoreDocs.length, topDocs.getMaxScore(), url});
     }
   }
 
@@ -111,17 +114,17 @@ public class Matcher
   //send matches and stuff
   public void finish()
   {
-    try {
-      URI originator = URI.create("http://LDSpiderMatcher.webofneeds");
-      IndexReader indexReader = solrIndexSearcher.getIndexReader();
+    URI originator = URI.create("http://LDSpiderMatcher.webofneeds");
+    IndexReader indexReader = solrIndexSearcher.getIndexReader();
 
-      while(!matches.isEmpty()){
-        MatchResult match = matches.poll();
-        URI fromDoc = URI.create(match.getUrl());
-        for (ScoreDoc scoreDoc : match.getTopDocs().scoreDocs) {
+    while (!matches.isEmpty()) {
+      MatchResult match = matches.poll();
+      URI fromDoc = URI.create(match.getUrl());
+      for (ScoreDoc scoreDoc : match.getTopDocs().scoreDocs) {
+        try {
           Document document = indexReader.document(scoreDoc.doc);
           URI toDoc = URI.create(document.get(SolrFields.URL));
-          logger.debug("preparing to send match between {} and {}", fromDoc, toDoc);
+          logger.debug("preparing to send match between {} and {} with score {}", new Object[]{fromDoc, toDoc,scoreDoc.score});
           if (toDoc.equals(fromDoc)) continue;
           if (scoreDoc.score < MATCH_THRESHOLD) {
             logger.debug("score {} lower than threshold {}, suppressed match between {} and {}", new Object[]{scoreDoc.score, MATCH_THRESHOLD, fromDoc, toDoc});
@@ -129,17 +132,22 @@ public class Matcher
           }
           double normalizedScore = normalizeScore(scoreDoc.score);
           logger.debug("score of {} was normalized to {}", scoreDoc.score, normalizedScore);
-          if (isNewHint(fromDoc,toDoc, normalizedScore)){
-            client.hint(fromDoc, toDoc, normalizedScore, originator, null);
-            logger.debug("Sending hint {} -> {} :: {}", new Object[] {fromDoc, toDoc, normalizedScore});
+          if (isNewHint(fromDoc, toDoc, normalizedScore)) {
+            try {
+              logger.debug("Sending hint {} -> {} :: {}", new Object[]{fromDoc, toDoc, normalizedScore});
+              client.hint(fromDoc, toDoc, normalizedScore, originator, null);
+            } catch (NoSuchNeedException | IllegalMessageForNeedStateException | UniformInterfaceException e) {
+              logger.error("error sending hint", e);
+            }
           } else {
-            logger.debug("Suppressed duplicate hint {} -> {} :: {}", new Object[] {fromDoc, toDoc, normalizedScore});
+            logger.debug("Suppressed duplicate hint {} -> {} :: {}", new Object[]{fromDoc, toDoc, normalizedScore});
           }
+        } catch (IOException e) {
+          logger.error("error reading document from solr index", e);
         }
       }
-    } catch (NoSuchNeedException | IllegalMessageForNeedStateException | IOException e) {
-      logger.error(e.getMessage(), e);
     }
+
   }
 
     /**
