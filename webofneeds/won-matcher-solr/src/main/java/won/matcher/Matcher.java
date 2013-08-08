@@ -55,7 +55,7 @@ public class Matcher
   private Set<AbstractQuery> queries;
 
   private static final int MAX_MATCHES = 5;
-  private static final double MATCH_THRESHOLD = 0.05;
+  private static final double MATCH_THRESHOLD = 0.5;
     private static final float MIN_SCORE = 0;
     private static final float MAX_SCORE = 10;
 

@@ -155,17 +155,13 @@ public class SolrTesterMain
 
     docs.add(doc6);
 
+    //a document with ntriples content
     SolrInputDocument doc7 = new SolrInputDocument();
     doc7.addField(SolrFields.URL, "http://www.example.com/ld/need/7");
     doc7.addField(SolrFields.TITLE, "Table");
     doc7.addField(SolrFields.DESCRIPTION, "");
     doc7.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
     doc7.addField(SolrFields.TAG, "table");
-    //doc7.addField(SolrFields.NTRIPLE,
-        //"<http://www.example.com/something> <http://furniture.com/ontology/productionYear> \"1974\" .\n"
-        // +
-        //"<http://www.example.com/something> <http://dbpedia.org/property/material> <http://dbpedia.org/resource/Wood> .\n"
-      //  );
     doc7.addField(SolrFields.NTRIPLE, "_:b3 <http://furniture.com/ontology/productionYear> \"1974\" .\n" +
         "_:b3 <http://dbpedia.org/property/material> <http://dbpedia.org/resource/Oak> .\n" +
         "_:b3 <http://dbpedia.org/property/material> <http://dbpedia.org/resource/Wood> .\n" +
@@ -177,6 +173,7 @@ public class SolrTesterMain
 
     docs.add(doc7);
 
+    //another document with ntriples content identical to doc7, the rest different
     SolrInputDocument doc8 = new SolrInputDocument();
     doc8.addField(SolrFields.URL, "http://www.example.com/ld/need/8");
     doc8.addField(SolrFields.TITLE, "Tisch");
@@ -198,7 +195,44 @@ public class SolrTesterMain
     //);
     docs.add(doc8);
 
+    //another document with ntriples content slightly different from doc 7 and 8, the rest different from all others
+    SolrInputDocument doc9= new SolrInputDocument();
+    doc9.addField(SolrFields.URL, "http://www.example.com/ld/need/9");
+    doc9.addField(SolrFields.TITLE, "mesa");
+    doc9.addField(SolrFields.DESCRIPTION, "");
+    doc9.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc9.addField(SolrFields.TAG, "mesa");
+    doc9.addField(SolrFields.NTRIPLE, "_:b3 <http://furniture.com/ontology/productionYear> \"1974\" .\n" +
+        "_:b3 <http://dbpedia.org/property/material> <http://dbpedia.org/resource/Pine> .\n" +
+        "_:b3 <http://dbpedia.org/property/material> <http://dbpedia.org/resource/Wood> .\n" +
+        "_:b3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/resource/Table> .\n" +
+        "<http://www.example.com/ld/need/9> <http://purl.org/webofneeds/model#hasContent> _:b2 .\n" +
+        "_:b2 <http://purl.org/webofneeds/model#hasContentDescription> _:b3 .\n" +
+        "_:b2 <http://purl.org/dc/elements/1.1/title> \"Table\"^^<http://www.w3.org/2001/XMLSchema#string> .\n" +
+        "_:b2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/webofneeds/model#NeedContent> .\n");
+//    doc8.addField(SolrFields.NTRIPLE,
+    //        "<http://www.example.com/something> <http://furniture.com/ontology/productionYear> \"1974\" .\n"
+    //        +
+    //    "<http://www.example.com/something> <http://dbpedia.org/property/material> <http://dbpedia.org/resource/Wood> . \n"
+    //);
+    docs.add(doc9);
 
+    //another document with ntriples content identical to doc7 (the blank nodes are named differently), the rest different
+    SolrInputDocument doc10 = new SolrInputDocument();
+    doc10.addField(SolrFields.URL, "http://www.example.com/ld/need/10");
+    doc10.addField(SolrFields.TITLE, "Bord");
+    doc10.addField(SolrFields.DESCRIPTION, "");
+    doc10.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc10.addField(SolrFields.TAG, "bord");
+    doc10.addField(SolrFields.NTRIPLE, "_:bl3 <http://furniture.com/ontology/productionYear> \"1974\" .\n" +
+        "_:bl3 <http://dbpedia.org/property/material> <http://dbpedia.org/resource/Oak> .\n" +
+        "_:bl3 <http://dbpedia.org/property/material> <http://dbpedia.org/resource/Wood> .\n" +
+        "_:bl3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/resource/Table> .\n" +
+        "<http://www.example.com/ld/need/10> <http://purl.org/webofneeds/model#hasContent> _:bl2 .\n" +
+        "_:bl2 <http://purl.org/webofneeds/model#hasContentDescription> _:bl3 .\n" +
+        "_:bl2 <http://purl.org/dc/elements/1.1/title> \"Table\"^^<http://www.w3.org/2001/XMLSchema#string> .\n" +
+        "_:bl2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/webofneeds/model#NeedContent> .\n");
+    docs.add(doc10);
     return docs;
   }
 

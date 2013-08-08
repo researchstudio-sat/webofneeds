@@ -70,8 +70,8 @@ public class TriplesQuery extends AbstractQuery
     logger.debug("docURI: {}", docURI);
     Model model = toModel(triples);
     logger.debug("ntriples converted to jena model: {}", model);
-    //Graph subGraph = extractRelevantSubgraph(docURI, model);
-    Graph subGraph = model.getGraph();
+    Graph subGraph = extractRelevantSubgraph(docURI, model);
+    //Graph subGraph = model.getGraph();
     if (subGraph == null) return null;
 
     //create and return the siren query
@@ -101,11 +101,6 @@ public class TriplesQuery extends AbstractQuery
     return subGraph;
   }
 
-  private Query createTestQuery(){
-      Query query = new SirenTermQuery(new Term(this.field, "Wood"));
-      logger.debug("created this query: {}",query);
-      return query;
-    }
 
     private Query createQueryForGraph(Graph graph) {
       BooleanQuery query = new BooleanQuery();
@@ -116,7 +111,6 @@ public class TriplesQuery extends AbstractQuery
         if (newQuery != null) {
           query.add(newQuery, BooleanClause.Occur.SHOULD);
         }
-        return query;
       }
       logger.debug("created this query:{}", query);
       return query;
