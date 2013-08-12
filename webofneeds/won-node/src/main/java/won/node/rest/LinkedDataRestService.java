@@ -77,7 +77,7 @@ public class LinkedDataRestService {
     private String pageURIPrefix;
 
     //date format for Expires header (rfc 1123)
-    private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyyy HH:mm:ss z";
+    private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
 
     @Autowired
     private LinkedDataService linkedDataService;
@@ -147,7 +147,7 @@ public class LinkedDataRestService {
         try {
            Model model = linkedDataService.getNeedModel(needUri);
            //TODO: need information does change over time. The immutable need information should never expire, the mutable should
-           return markAsAlreadyExpired(addLocationHeaderIfNecessary(Response.ok(model), uriInfo.getRequestUri(), needUri)).build();
+           return markAsNeverExpires(addLocationHeaderIfNecessary(Response.ok(model), uriInfo.getRequestUri(), needUri)).build();
         } catch (NoSuchNeedException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
