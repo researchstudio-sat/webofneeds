@@ -48,7 +48,7 @@
                 <td><form:textarea path="textDescription" rows="4" cols="30" /></td>
             </tr>
             <tr>
-                <td><form:label path="tags">Tags:</form:label></td>
+                <td><form:label path="tags">comma-separated Tags:</form:label></td>
                 <td><form:textarea path="tags" rows="2" cols="30" /></td>
             </tr>
             <tr>
