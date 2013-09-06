@@ -14,11 +14,16 @@ import java.util.Date;
  * Date: 18.07.13
  * Time: 14:38
  */
-public class TimeRangeQuery extends LongRangeQuery
+public class TimeRangeQueryFactory extends LongRangeQueryFactory
 {
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  public TimeRangeQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField)
+  public TimeRangeQueryFactory(BooleanClause.Occur occur, float boost, String lowerBoundField, String upperBoundField)
+  {
+    super(occur, boost, lowerBoundField, upperBoundField);
+  }
+
+  public TimeRangeQueryFactory(final BooleanClause.Occur occur, final String lowerBoundField, final String upperBoundField)
   {
     super(occur, lowerBoundField, upperBoundField);
   }

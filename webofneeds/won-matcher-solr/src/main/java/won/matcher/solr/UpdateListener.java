@@ -6,6 +6,7 @@ import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.matcher.Matcher;
+import won.matcher.processor.HintSender;
 
 import java.io.IOException;
 
@@ -39,6 +40,7 @@ public class UpdateListener implements SolrEventListener
     logger.debug("newSearcher called");
 
     Matcher matcher = new Matcher(solrIndexSearcher);
+    matcher.addMatchProcessor(new HintSender());
 
     while (documentStorage.hasNext())
       try {
@@ -47,7 +49,7 @@ public class UpdateListener implements SolrEventListener
         logger.error(e.getMessage(), e);
       }
 
-    matcher.finish();
+    matcher.callMatchProcessors();
   }
 
 }

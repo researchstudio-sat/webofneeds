@@ -17,18 +17,24 @@ import java.util.List;
  * User: atus
  * Date: 09.07.13
  */
-public class MultipleValueFieldQuery extends AbstractQuery
+public class MultipleValueFieldQueryFactory extends AbstractQueryFactory
 {
   private String tagField;
 
-  public MultipleValueFieldQuery(BooleanClause.Occur occur, String tagField)
+  public MultipleValueFieldQueryFactory(BooleanClause.Occur occur, float boost, String tagField)
+  {
+    super(occur, boost);
+    this.tagField = tagField;
+  }
+
+  public MultipleValueFieldQueryFactory(final BooleanClause.Occur occur, final String tagField)
   {
     super(occur);
     this.tagField = tagField;
   }
 
   @Override
-  public Query getQuery(final SolrIndexSearcher indexSearcher, final SolrInputDocument inputDocument) throws IOException
+  public Query createQuery(final SolrIndexSearcher indexSearcher, final SolrInputDocument inputDocument) throws IOException
   {
     if (!inputDocument.containsKey(tagField))
       return null;

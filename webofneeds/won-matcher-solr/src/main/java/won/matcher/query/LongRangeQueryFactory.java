@@ -12,19 +12,26 @@ import org.apache.solr.search.SolrIndexSearcher;
  * Date: 02.07.13
  * Time: 16:12
  */
-public class LongRangeQuery extends AbstractQuery
+public class LongRangeQueryFactory extends AbstractQueryFactory
 {
   protected String lowerBoundField;
   protected String upperBoundField;
 
-  public LongRangeQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField)
+  public LongRangeQueryFactory(BooleanClause.Occur occur, float boost, String lowerBoundField, String upperBoundField)
+  {
+    super(occur, boost);
+    this.lowerBoundField = lowerBoundField;
+    this.upperBoundField = upperBoundField;
+  }
+
+  public LongRangeQueryFactory(final BooleanClause.Occur occur, final String lowerBoundField, final String upperBoundField)
   {
     super(occur);
     this.lowerBoundField = lowerBoundField;
     this.upperBoundField = upperBoundField;
   }
 
-  public Query getQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument)
+  public Query createQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument)
   {
     if (!inputDocument.containsKey(lowerBoundField) && !inputDocument.containsKey(upperBoundField))
       return null;

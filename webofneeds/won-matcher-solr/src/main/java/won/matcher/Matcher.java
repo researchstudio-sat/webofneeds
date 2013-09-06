@@ -16,23 +16,25 @@
 
 package won.matcher;
 
-import com.sun.jersey.api.client.UniformInterfaceException;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.*;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.search.QueryParsing;
 import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.matcher.processor.MatchProcessor;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.matcher.query.*;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchNeedException;
+import won.matcher.query.rdf.TriplesQueryFactory;
 import won.protocol.solr.SolrFields;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -52,49 +54,58 @@ public class Matcher
 
   private ConcurrentLinkedQueue<MatchResult> matches;
 
-  private Set<AbstractQuery> queries;
+  private Set<QueryFactory> queryFactories;
+
+  private List<MatchProcessor> matchProcessors = new ArrayList<MatchProcessor>();
+
+  private static final boolean SUPPRESS_HINTS = true;
 
   private static final int MAX_MATCHES = 5;
-  private static final double MATCH_THRESHOLD = 0.5;
+  private static final double MATCH_THRESHOLD = 0.2;
     private static final float MIN_SCORE = 0;
     private static final float MAX_SCORE = 10;
 
 
-    public Matcher(SolrIndexSearcher solrIndexSearcher)
+  public Matcher(SolrIndexSearcher solrIndexSearcher)
   {
     logger.debug("Matcher initialized");
     this.solrIndexSearcher = solrIndexSearcher;
 
-    //setup matcher client
-    client = new MatcherProtocolNeedServiceClient();
-    client.initializeDefault();
+
 
     //add all queries
-    queries = new HashSet<>();
-    queries.add(new BasicNeedTypeQuery(BooleanClause.Occur.MUST, SolrFields.BASIC_NEED_TYPE));
-    queries.add(new DoubleRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
-    queries.add(new TimeRangeQuery(BooleanClause.Occur.SHOULD, SolrFields.TIME_START, SolrFields.TIME_END));
-    queries.add(new TextMatcherQuery(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
-    queries.add(new MultipleValueFieldQuery(BooleanClause.Occur.SHOULD, SolrFields.TAG));
-    queries.add(new SpatialQuery(BooleanClause.Occur.MUST, SolrFields.LOCATION));
-    queries.add(new SelfFilterQuery(SolrFields.URL));
-    queries.add(new TriplesQuery(BooleanClause.Occur.SHOULD, SolrFields.NTRIPLE));
+    queryFactories = new HashSet<>();
+    queryFactories.add(new BasicNeedTypeQueryFactory(BooleanClause.Occur.MUST, SolrFields.BASIC_NEED_TYPE));
+    queryFactories.add(new DoubleRangeQueryFactory(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
+    queryFactories.add(new TimeRangeQueryFactory(BooleanClause.Occur.SHOULD, SolrFields.TIME_START, SolrFields.TIME_END));
+    queryFactories.add(new TextMatcherQueryFactory(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
+    queryFactories.add(new MultipleValueFieldQueryFactory(BooleanClause.Occur.SHOULD, SolrFields.TAG));
+    queryFactories.add(new SpatialQueryFactory(BooleanClause.Occur.MUST, SolrFields.LOCATION));
+    queryFactories.add(new SelfFilterQueryFactory(SolrFields.URL));
+    queryFactories.add(new TriplesQueryFactory(BooleanClause.Occur.SHOULD, SolrFields.NTRIPLE));
 
     matches = new ConcurrentLinkedQueue<MatchResult>();
+  }
+
+  public void addMatchProcessor(MatchProcessor processor) {
+    logger.info("adding matchProcessor of type {}", processor.getClass().getName());
+    this.matchProcessors.add(processor);
   }
 
   public void processDocument(SolrInputDocument inputDocument) throws IOException
   {
     //combine all the queries
     BooleanQuery booleanQuery = new BooleanQuery();
-    for (AbstractQuery query : queries) {
-      Query q = query.getQuery(solrIndexSearcher, inputDocument);
+    for (QueryFactory queryFactory : queryFactories) {
+      Query q = queryFactory.createQuery(solrIndexSearcher, inputDocument);
       if (q != null) {
+        q.setBoost(queryFactory.getBoost());
         logger.debug("Simple query: {}", q.toString());
-        booleanQuery.add(q, query.getOccur());
+        booleanQuery.add(q, queryFactory.getOccur());
       }
     }
-    logger.debug("Final solr query: {}", booleanQuery.toString());
+
+    logger.debug("Final solr query: {}", QueryParsing.toString(booleanQuery, solrIndexSearcher.getSchema()));
 
     //get top MAX_MATCHES
     TopDocs topDocs = solrIndexSearcher.search(booleanQuery, MAX_MATCHES);
@@ -108,11 +119,21 @@ public class Matcher
     } else {
       logger.debug("Found only {} matches with highest score {} for {}. Not sending any hints", new Object[]{topDocs.scoreDocs.length, topDocs.getMaxScore(), url});
     }
+
+    /*
+    if (logger.isDebugEnabled()){
+      //explain all scored document scores
+      for (int i = 0; i < topDocs.scoreDocs.length; i++) {
+        Explanation explanation = solrIndexSearcher.explain(booleanQuery,topDocs.scoreDocs[i].doc);
+        logger.debug("explanation for score doc {}: \n{}",topDocs.scoreDocs[i].doc, explanation);
+      }
+    }
+    */
   }
 
 
-  //send matches and stuff
-  public void finish()
+  //send matches
+  public void callMatchProcessors()
   {
     URI originator = URI.create("http://LDSpiderMatcher.webofneeds");
     IndexReader indexReader = solrIndexSearcher.getIndexReader();
@@ -133,11 +154,9 @@ public class Matcher
           double normalizedScore = normalizeScore(scoreDoc.score);
           logger.debug("score of {} was normalized to {}", scoreDoc.score, normalizedScore);
           if (isNewHint(fromDoc, toDoc, normalizedScore)) {
-            try {
-              logger.debug("Sending hint {} -> {} :: {}", new Object[]{fromDoc, toDoc, normalizedScore});
-              client.hint(fromDoc, toDoc, normalizedScore, originator, null);
-            } catch (NoSuchNeedException | IllegalMessageForNeedStateException | UniformInterfaceException e) {
-              logger.error("error sending hint", e);
+            logger.debug("calling MatchProcessors for match {} -> {} :: {}", new Object[]{fromDoc, toDoc, normalizedScore});
+            for (MatchProcessor proc: matchProcessors){
+              proc.process(fromDoc,toDoc,normalizedScore,originator,null);
             }
           } else {
             logger.debug("Suppressed duplicate hint {} -> {} :: {}", new Object[]{fromDoc, toDoc, normalizedScore});
@@ -160,7 +179,7 @@ public class Matcher
     }
 
     private boolean isNewHint(URI fromURI, URI toURI, double score){
-      return this.hintMemory.add(""+fromURI + toURI + Double.toString(score));
+      return this.hintMemory.add("" + fromURI + toURI + Double.toString(score));
     }
 
     private class MatchResult {
