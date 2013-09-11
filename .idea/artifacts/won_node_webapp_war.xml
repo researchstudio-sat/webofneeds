@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="won-node-webapp:war">
+    <output-path>$PROJECT_DIR$/webofneeds/won-node-webapp/target</output-path>
+    <root id="archive" name="won.war">
+      <element id="artifact" artifact-name="won-node-webapp:war exploded" />
+    </root>
+  </artifact>
+</component>

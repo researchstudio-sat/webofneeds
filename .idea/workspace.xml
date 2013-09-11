@@ -1,0 +1,2315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="3c655462-7be9-4bd8-9733-4adea99005a7" name="Default" comment="" />
+    <ignored path="webofneeds.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <file path="/Dummy.txt" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1378896822243" ignored="false" />
+    <file path="/pom.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1373649937290" ignored="false" />
+    <file path="/fragment.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1375880731397" ignored="false" />
+    <file path="/MatcherServiceUnitTests.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1360849756018" ignored="false" />
+    <file path="/matcherApplicationContext.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1360849212716" ignored="false" />
+    <file path="/matcherServices.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1360849513865" ignored="false" />
+    <file path="/MatcherCLI.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023663401" ignored="false" />
+    <file path="/MatcherProtocolNeedServiceClient.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368188689365" ignored="false" />
+    <file path="/RDFStorageService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369228231599" ignored="false" />
+    <file path="/RDFFileStorage.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1360929490831" ignored="false" />
+    <file path="/needserver.properties" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1360928562463" ignored="false" />
+    <file path="/RDFFileStorageService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369228663698" ignored="false" />
+    <file path="/applicationContext.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1360929695871" ignored="false" />
+    <file path="/services.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369074618013" ignored="false" />
+    <file path="/NeedManagementServiceImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1378896258873" ignored="false" />
+    <file path="/NeedInformationServiceImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1363711201474" ignored="false" />
+    <file path="/NeedController.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1367940756302" ignored="false" />
+    <file path="/NeedInformationService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366812731561" ignored="false" />
+    <file path="/OwnerProtocolNeedServiceClient.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369075519537" ignored="false" />
+    <file path="/OwnerProtocolNeedWebServiceEndpointImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369074858491" ignored="false" />
+    <file path="/RDFStorageException.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1360939240650" ignored="false" />
+    <file path="/WON.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1378816036359" ignored="false" />
+    <file path="/LinkedDataServiceImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366883017821" ignored="false" />
+    <file path="/offer.ttl" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1360941239025" ignored="false" />
+    <file path="/NeedPojo.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1360942689278" ignored="false" />
+    <file path="/createNeed.jsp" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1360942796815" ignored="false" />
+    <file path="/UpdateListener.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1362409235938" ignored="false" />
+    <file path="/TextDescriptionMatcher.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1372774603857" ignored="false" />
+    <file path="/config.properties" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1361532102896" ignored="false" />
+    <file path="/HOWTO" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1361532081433" ignored="false" />
+    <file path="/OwnerProtocolOwnerServiceImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368183421145" ignored="false" />
+    <file path="/DataAccessUtils.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1363037161166" ignored="false" />
+    <file path="/NeedServerIntegrationTests.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1367941426655" ignored="false" />
+    <file path="/OwnerProtocolNeedService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1363689206976" ignored="false" />
+    <file path="/LinkedDataRestService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1363708051796" ignored="false" />
+    <file path="/LinkedDataService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1363708226367" ignored="false" />
+    <file path="/a.dummy" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1378730661532" ignored="false" />
+    <file path="/MatcherProtocolNeedServiceImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023545105" ignored="false" />
+    <file path="/OwnerProtocolNeedServiceImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368029085969" ignored="false" />
+    <file path="/OwnerProtocolNeedWebServiceEndpoint.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369748524808" ignored="false" />
+    <file path="/index.html" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1365000535894" ignored="false" />
+    <file path="/listNeeds.jsp" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1365076535974" ignored="false" />
+    <file path="/ownerServices.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366195021135" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/demo/src/resources/org/apache/lucene/demo/xmlparser/WEB-INF/web.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1365512775410" ignored="false" />
+    <file path="/DataReloadService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366192108386" ignored="false" />
+    <file path="/DuplicateConnectionException.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1365514342095" ignored="false" />
+    <file path="/NeedModelMapper.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1378808199121" ignored="false" />
+    <file path="/ConnectionModelMapper.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366116545075" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-owner-webapp/src/main/webapp/WEB-INF/connectionController-servlet.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1367237433180" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-owner-webapp/src/main/webapp/WEB-INF/needController-servlet.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1367237433175" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-owner-webapp/src/main/webapp/WEB-INF/spring-ws-servlet.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1367237433176" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-owner-webapp/src/main/webapp/WEB-INF/jsp/manageConnection.jsp" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366119454980" ignored="false" />
+    <file path="/Need.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366285954839" ignored="false" />
+    <file path="/ConnectionEventState.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366201688302" ignored="false" />
+    <file path="/ConnectionEvent.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366285535782" ignored="false" />
+    <file path="/Match.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366290400372" ignored="false" />
+    <file path="/Executor.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366287249591" ignored="false" />
+    <file path="/Event.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813483317" ignored="false" />
+    <file path="/ConnectionState.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1367940295240" ignored="false" />
+    <file path="/ConnectionEventType.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1367940182738" ignored="false" />
+    <file path="/ConnectionController.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368027698414" ignored="false" />
+    <file path="/NeedFacingConnectionCommunicationServiceImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368028993243" ignored="false" />
+    <file path="/OwnerFacingConnectionCommunicationServiceImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368182574563" ignored="false" />
+    <file path="/NeedCommunicationServiceImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1377698166159" ignored="false" />
+    <file path="/EventRepository.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366812688721" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/example-DIH/solr/solr/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757540" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/solrj/src/java/org/apache/noggit/JSONParser.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757540" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/example/example-DIH/solr/rss/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757540" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/example/example-DIH/solr/mail/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757540" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/extraction/src/test-files/extraction/solr/collection1/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757540" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/uima/src/test-files/uima/uima-tokenizers-solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757540" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler-extras/src/test-files/dihextras/solr/collection1/conf/dataimport-solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757540" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/example-DIH/solr/rss/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757541" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler/src/test-files/dih/solr/collection1/conf/dataimport-solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757541" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/uima/src/test-files/uima/solr/collection1/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757541" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/example-DIH/solr/mail/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757541" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test-files/solr/collection1/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757541" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/analysis/common/src/test/org/apache/lucene/analysis/charfilter/HTMLStripCharFilterTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295338" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/example-DIH/solr/tika/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler/src/test-files/dih/solr/collection1/conf/dataimport-nodatasource-solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/solr/collection1/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295353" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/example/example-DIH/solr/tika/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler/src/test-files/dih/solr/collection1/conf/contentstream-solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler/src/java/org/apache/solr/handler/dataimport/EventListener.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test-files/solr/collection1/conf/solrconfig-elevate.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/clustering/src/test-files/clustering/solr/collection1/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/solr-webapp/webapp/js/require.js" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/solrj/src/java/org/apache/solr/common/params/EventParams.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test-files/solr/collection1/conf/solrconfig-querysender.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/example/example-DIH/solr/solr/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/example-DIH/solr/db/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test-files/solr/collection1/conf/solrconfig-querysender-noquery.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/example/solr/collection1/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295346" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/example/example-DIH/solr/db/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/webapp/web/js/require.js" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1366813757542" ignored="false" />
+    <file path="/OwnerFacingNeedCommunicationService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1367584778134" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/codecs/lucene40/values/Bytes.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295330" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/codecs/src/java/org/apache/lucene/codecs/memory/MemoryPostingsFormat.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295330" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/suggest/src/test/org/apache/lucene/search/suggest/analyzing/FuzzySuggesterTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295330" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/suggest/src/test/org/apache/lucene/search/suggest/analyzing/AnalyzingSuggesterTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295330" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler/src/java/org/apache/solr/handler/dataimport/DIHCache.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295331" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/solrj/src/test-files/solrj/solr/collection1/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295331" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/queryparser/src/java/org/apache/lucene/queryparser/flexible/standard/processors/OpenRangeQueryNodeProcessor.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295331" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/webapp/web/js/scripts/schema-browser.js" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295331" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/codecs/lucene40/Lucene40StoredFieldsReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295331" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/webapp/web/js/scripts/logging.js" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295332" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/search/SearcherManager.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295332" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/search/SearcherLifetimeManager.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295332" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/update/DirectUpdateHandler2.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295332" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/codecs/lucene40/Lucene40PostingsReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295332" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/webapp/web/js/lib/jquery.jstree.js" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295333" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/update/CommitUpdateCommand.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295333" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestSegmentMerger.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295333" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/solrj/src/test/org/apache/solr/client/solrj/embedded/TestSolrProperties.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295333" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/highlighter/src/test/org/apache/lucene/search/vectorhighlight/BreakIteratorBoundaryScannerTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295333" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/request/UnInvertedField.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295334" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestNRTThreads.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295334" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/solrj/src/test/org/apache/solr/client/solrj/embedded/SolrExampleJettyTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295334" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/store/NRTCachingDirectory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295334" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/solrj/src/test/org/apache/solr/client/solrj/embedded/MultiCoreExampleJettyTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295334" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/highlighter/src/test/org/apache/lucene/search/highlight/HighlighterTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295335" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestPersistentSnapshotDeletionPolicy.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295335" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/PerfRunData.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295335" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/store/LockObtainFailedException.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295335" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/queryparser/src/java/org/apache/lucene/queryparser/flexible/standard/nodes/AbstractRangeQueryNode.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295335" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/util/BitSetPerf.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295336" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/store/CompoundFileWriter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295336" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/codecs/lucene3x/Lucene3xTermVectorsReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295336" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/codecs/lucene3x/Lucene3xTermVectorsFormat.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295336" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/store/FSDirectory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295337" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/codecs/lucene3x/Lucene3xStoredFieldsReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295337" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/store/Directory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295337" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/util/IOUtils.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295337" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/codecs/lucene3x/Lucene3xSegmentInfoReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295337" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/java/org/apache/lucene/facet/search/FacetResultsHandler.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295338" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/handler/loader/XMLLoader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295338" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/codecs/lucene3x/Lucene3xNormsProducer.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295338" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/codecs/lucene3x/Lucene3xFields.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295338" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/example/multicore/core1/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295339" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler/src/java/org/apache/solr/handler/dataimport/SortedMapBackedCache.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295339" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler/src/test/org/apache/solr/handler/dataimport/TestSortedMapBackedCache.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295339" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/example/multicore/core0/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295339" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestIndexWriterWithThreads.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295339" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler/src/java/org/apache/solr/handler/dataimport/XPathRecordReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295340" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/java/org/apache/lucene/facet/index/OrdinalMappingAtomicReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295340" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestIndexWriterOnDiskFull.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295340" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestIndexWriterLockRelease.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295340" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestIndexWriterExceptions.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295340" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestIndexWriterDelete.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295341" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestIndexWriterCommit.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295341" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestIndexWriter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295341" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/search/TermRangeTermsEnum.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295341" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/search/TermRangeQuery.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295342" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/codecs/PostingsFormat.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295342" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/handler/component/FieldFacetStats.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295342" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/search/FieldCacheRangeFilter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295342" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler/src/java/org/apache/solr/handler/dataimport/FileDataSource.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295342" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/handler/component/StatsComponent.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295343" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/search/NRTManager.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295343" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/search/NRTManagerReopenThread.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295343" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/document/TestBinaryDocument.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295344" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/examples/org/apache/lucene/facet/example/simple/SimpleMain.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295344" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/examples/org/apache/lucene/facet/example/simple/SimpleIndexer.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295344" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/search/TestStressLucene.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295344" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/util/SimplePostTool.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295344" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/examples/org/apache/lucene/facet/example/multiCL/MultiCLIndexer.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295344" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/search/NumericRangeQuery.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295344" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/examples/org/apache/lucene/facet/example/merge/TaxonomyMergeUtils.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295344" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/search/NumericRangeFilter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295344" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/suggest/src/test/org/apache/lucene/search/spell/TestSpellChecker.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295344" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/examples/org/apache/lucene/facet/example/association/CategoryAssociationsMain.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295345" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/examples/org/apache/lucene/facet/example/association/CategoryAssociationsIndexer.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295345" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/handler/admin/ShowFileRequestHandler.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295345" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestDirectoryReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295345" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/misc/src/java/org/apache/lucene/store/NativeUnixDirectory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295345" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestDeletionPolicy.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295345" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestCrash.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295345" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestCompoundFile.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295345" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler/src/java/org/apache/solr/handler/dataimport/BinFileDataSource.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295346" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/solrj/src/test/org/apache/solr/client/solrj/MultiCoreExampleTestBase.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295346" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestBackwardsCompatibility3x.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295346" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestBackwardsCompatibility.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295346" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/search/TestReload.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295346" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/search/TestRecovery.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295346" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/Test2BTerms.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295346" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/tasks/SearchTask.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295346" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/solr-webapp/webapp/js/scripts/threads.js" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295346" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/solr-webapp/webapp/js/scripts/schema-browser.js" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295347" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/test/org/apache/lucene/benchmark/byTask/TestPerfTasksLogic.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295347" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/SnapshotDeletionPolicy.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295347" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/solr-webapp/webapp/js/scripts/logging.js" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295347" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/tasks/WarmTask.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295347" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/StandardDirectoryReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295347" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/solrj/src/java/org/apache/solr/common/util/ContentStream.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295347" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/tasks/SearchTravTask.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295347" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/tasks/SearchTravRetVectorHighlightTask.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295347" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/tasks/SearchTravRetTask.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295348" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/tasks/SearchTravRetLoadFieldSelectorTask.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295348" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/tasks/SearchTravRetHighlightTask.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295348" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/codecs/lucene3x/TestTermInfosReaderIndex.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295348" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/solr-webapp/webapp/js/lib/jquery.jstree.js" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295348" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/handler/SnapShooter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295348" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/multicore/core1/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295348" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/analysis/common/src/java/org/apache/lucene/analysis/hi/HindiStemmer.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295348" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/handler/SnapPuller.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295348" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/test/org/apache/lucene/facet/search/TestMultipleCategoryLists.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295349" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/tasks/NearRealtimeReaderTask.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295349" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/update/UpdateLog.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295349" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/schema/OpenExchangeRatesOrgProviderTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295349" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/test/org/apache/lucene/facet/search/TestDemoFacets.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295349" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/queryparser/src/resources/org/apache/lucene/queryparser/xml/LuceneCoreQuery.dtd" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295349" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/update/TransactionLog.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295349" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/suggest/src/java/org/apache/lucene/search/spell/SpellChecker.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295349" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/tasks/CommitTaxonomyIndexTask.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295349" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/test-framework/src/java/org/apache/lucene/util/_TestUtil.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295350" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/demo/src/java/org/apache/lucene/demo/xmlparser/FormBasedXmlQueryDemo.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295350" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/handler/DocumentAnalysisRequestHandler.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295350" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/update/SolrIndexSplitter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295350" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/feeds/TrecContentSource.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295350" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/search/spans/TestSpansAdvanced2.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295350" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/test-framework/src/java/org/apache/lucene/util/LuceneTestCase.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295350" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/SegmentCoreReaders.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295350" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/core/SolrCore.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295350" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/ReadersAndLiveDocs.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295350" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/core/SolrConfig.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295351" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/ReaderManager.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295351" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/test-framework/src/java/org/apache/lucene/store/SlowOpeningMockIndexInputWrapper.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295351" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/PersistentSnapshotDeletionPolicy.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295351" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/TestExternalCodecs.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295351" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/test-framework/src/java/org/apache/lucene/store/SlowClosingMockIndexInputWrapper.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295351" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/TestDemo.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295351" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/test-framework/src/java/org/apache/lucene/store/MockLockFactoryWrapper.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295351" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/test-framework/src/java/org/apache/lucene/store/MockIndexInputWrapper.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295351" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/feeds/EnwikiContentSource.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295352" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/test-framework/src/java/org/apache/lucene/store/MockDirectoryWrapper.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295352" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/SegmentInfos.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295352" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/SegmentInfo.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295352" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/queryparser/docs/xml/cctree.js" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295352" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/tasks/ReadTask.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295352" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/test-framework/src/java/org/apache/lucene/util/LineFileDocs.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295352" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/example/multicore/core0/conf/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295352" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/test/org/apache/lucene/facet/taxonomy/directory/TestDirectoryTaxonomyWriter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295352" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/test-framework/src/java/org/apache/lucene/util/CloseableDirectory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295353" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/test/org/apache/lucene/facet/taxonomy/directory/TestDirectoryTaxonomyReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295353" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/test-framework/src/java/org/apache/lucene/index/RandomCodec.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295353" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/benchmark/src/java/org/apache/lucene/benchmark/byTask/tasks/OpenIndexTask.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295353" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/test/org/apache/lucene/facet/taxonomy/TestTaxonomyCombined.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295353" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/test-framework/src/java/org/apache/lucene/index/RandomIndexWriter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295353" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/sandbox/src/java/org/apache/lucene/sandbox/queries/SlowCollatedTermRangeTermsEnum.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295353" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/sandbox/src/java/org/apache/lucene/sandbox/queries/SlowCollatedTermRangeQuery.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295353" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/CheckIndex.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295353" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/CompositeReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295354" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/TestTrie.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295354" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/LiveIndexWriterConfig.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295354" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/langid/src/test/org/apache/solr/update/processor/LanguageIdentifierUpdateProcessorFactoryTestCase.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295354" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/langid/src/test/org/apache/solr/update/processor/LangDetectLanguageIdentifierUpdateProcessorFactoryTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295354" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/TestDistributedSearch.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295354" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/TestDistributedGrouping.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295354" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/IndexWriterConfig.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295354" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/solrj/src/java/org/apache/solr/client/solrj/impl/XMLResponseParser.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295354" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/IndexWriter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295355" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/IndexReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295355" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/analysis/common/src/java/org/apache/lucene/analysis/en/KStemData5.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295355" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/solrj/src/java/org/apache/solr/client/solrj/impl/HttpSolrServer.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295355" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/IndexFormatTooOldException.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295355" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/IndexFormatTooNewException.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295355" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/solrj/src/java/org/apache/solr/client/solrj/impl/ConcurrentUpdateSolrServer.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295355" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/IndexFileDeleter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295355" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/cloud/RecoveryStrategy.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295355" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/DirectoryReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295355" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/queryparser/src/test/org/apache/lucene/queryparser/flexible/standard/TestQPHelper.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295356" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/java/org/apache/lucene/facet/util/ScoredDocIdsUtils.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295356" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/highlighter/src/java/org/apache/lucene/search/vectorhighlight/FieldTermStack.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295356" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/DocumentsWriterPerThreadPool.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295356" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/index/DocumentsWriter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295357" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/search/SolrIndexSearcher.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295357" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/queryparser/src/test/org/apache/lucene/queryparser/util/QueryParserTestBase.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295357" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/analysis/LegacyHTMLStripCharFilter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295357" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/util/OpenBitSet.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295357" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/analysis/common/src/java/org/apache/lucene/analysis/util/ClasspathResourceLoader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295358" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/core/TestLazyCores.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295358" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/search/LFUCache.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295358" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/core/TestArbitraryIndexDir.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295358" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/core/RAMDirectoryFactoryTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295359" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/store/TestRAMDirectory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295359" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/java/org/apache/lucene/util/RamUsageEstimator.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295359" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/dataimporthandler-extras/src/java/org/apache/solr/handler/dataimport/MailEntityProcessor.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295359" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/store/TestMockDirectoryWrapper.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295359" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/store/TestLockFactory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295360" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/java/org/apache/lucene/facet/taxonomy/directory/DirectoryTaxonomyWriter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295360" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/test-framework/src/java/org/apache/solr/cloud/ChaosMonkey.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295360" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/webapp/web/js/scripts/threads.js" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295360" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/test-framework/src/java/org/apache/solr/cloud/AbstractZkTestCase.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295360" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/store/TestDirectory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295360" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/java/org/apache/solr/search/FastLRUCache.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295361" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/facet/src/java/org/apache/lucene/facet/taxonomy/TaxonomyReader.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295361" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/analysis/common/src/test/org/apache/lucene/analysis/miscellaneous/TestASCIIFoldingFilter.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295361" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/test-framework/src/java/org/apache/solr/core/MockFSDirectoryFactory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295361" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/lucene/core/src/test/org/apache/lucene/index/TestSnapshotDeletionPolicy.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295361" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/test-framework/src/java/org/apache/solr/core/MockDirectoryFactory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295362" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/contrib/clustering/src/test/org/apache/solr/handler/clustering/AbstractClusteringTestCase.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295362" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher-solr/solr/src/solr/core/src/test/org/apache/solr/cloud/CollectionsAPIDistributedZkTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023295362" ignored="false" />
+    <file path="/OwnerProtocolOwnerWebServiceEndpointImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369074984946" ignored="false" />
+    <file path="/OwnerProtocolOwnerWebServiceEndpoint.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369748546039" ignored="false" />
+    <file path="/AbstractOwnerProtocolOwnerService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1367941200902" ignored="false" />
+    <file path="/MockOwnerService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1367941381358" ignored="false" />
+    <file path="/NeedFacingNeedCommunicationService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368023422575" ignored="false" />
+    <file path="/MatcherProtocolNeedWebServiceEndpointImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369074708447" ignored="false" />
+    <file path="/ConnectionCommunicationService.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369748629138" ignored="false" />
+    <file path="/NeedProtocolNeedServiceImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368028719455" ignored="false" />
+    <file path="/NeedProtocolNeedWebServiceEndpointImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369074773814" ignored="false" />
+    <file path="/NeedProtocolNeedClientImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368189670665" ignored="false" />
+    <file path="/OwnerProtocolOwnerClientEmptyImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368028139766" ignored="false" />
+    <file path="/NeedProtocolNeedClientEmptyImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368029228632" ignored="false" />
+    <file path="/NeedProtocolNeedWebServiceEndpoint.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369748558776" ignored="false" />
+    <file path="/OwnerProtocolOwnerClientImpl.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1377272045498" ignored="false" />
+    <file path="/MatcherProtocolNeedWebServiceEndpoint.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1368188111824" ignored="false" />
+    <file path="/RdfUtils.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1369075984786" ignored="false" />
+    <file path="/solrconfig.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1372073471085" ignored="false" />
+    <file path="/DateRangeFilterQuery.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1372849152735" ignored="false" />
+    <file path="/TextMatcherQuery.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1372951489026" ignored="false" />
+    <file path="/IntegerRangeFilterQuery.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1372948796550" ignored="false" />
+    <file path="/QueryBase.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1372852143597" ignored="false" />
+    <file path="/MatcherTest.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1372855448060" ignored="false" />
+    <file path="/TimeRangeFilterQuery.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1372948822139" ignored="false" />
+    <file path="/MatcherRequestProcessor.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1372951234287" ignored="false" />
+    <file path="/AbstractExtendedQuery.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1372948471015" ignored="false" />
+    <file path="/AbstractQueryFactory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1372945440691" ignored="false" />
+    <file path="/MatcherUpdateRequestProcessorFactory.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1373555452202" ignored="false" />
+    <file path="/UpdateListener2.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1373555933886" ignored="false" />
+    <file path="$USER_HOME$/.m2/settings.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1373638603941" ignored="false" />
+    <file path="/TimeRangeQuery.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1373650710809" ignored="false" />
+    <file path="/DoubleRangeQuery.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1373651598675" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher/src/main/resources/matcherServices.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1375880067811" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-ontology-validator/pom.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1375880067812" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/solr/SolrFields.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1375880067812" ignored="false" />
+    <file path="$PROJECT_DIR$/webofneeds/won-matcher/pom.xml" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1375880067814" ignored="false" />
+    <file path="$APPLICATION_HOME_DIR$/plugins/jsp/lib/jsp-impl.jar!/standardSchemas/jspdirectives.xsd" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1377698602012" ignored="false" />
+    <file path="$APPLICATION_HOME_DIR$/plugins/jsp/lib/jsp-impl.jar!/standardSchemas/jspxml2.xsd" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1377698602012" ignored="false" />
+    <file path="/Facet.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1377874806192" ignored="false" />
+    <file path="/FacetRepository.java" changelist="3c655462-7be9-4bd8-9733-4adea99005a7" time="1378826332861" ignored="false" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="DatabaseView">
+    <flatten value="false" />
+    <groupTables value="false" />
+    <sortChildren value="false" />
+  </component>
+  <component name="DebuggerManager">
+    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </breakpoint_any>
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <breakpoint_rules />
+    <ui_properties />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="webofneeds" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="NeedCommunicationServiceImpl.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webofneeds/won-node/src/main/java/won/node/service/impl/NeedCommunicationServiceImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="236" column="93" selection-start="9816" selection-end="9816" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OwnerProtocolNeedServiceClient.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webofneeds/won-owner/src/main/java/won/owner/protocol/impl/OwnerProtocolNeedServiceClient.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="34" column="13" selection-start="1044" selection-end="1044" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="offer.ttl" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webofneeds/won-owner-webapp/src/main/resources/offer.ttl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
+              <folding />
+            </state>
+          </provider>
+          <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NeedController.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/webofneeds/won-owner-webapp/src/main/java/won/owner/web/need/NeedController.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="176" column="68" selection-start="6461" selection-end="6461" vertical-scroll-proportion="0.4894068">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NeedManagementServiceImpl.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webofneeds/won-node/src/main/java/won/node/service/impl/NeedManagementServiceImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="84" column="81" selection-start="3272" selection-end="3272" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="services.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webofneeds/won-node/src/main/resources/services.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="29.04">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FacetRepository.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/repository/FacetRepository.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="18" column="43" selection-start="401" selection-end="401" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ModelMapper.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/util/ModelMapper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="11" column="10" selection-start="233" selection-end="233" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Facet.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/model/Facet.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="20" column="24" selection-start="386" selection-end="386" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NeedModelMapper.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/util/NeedModelMapper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="38" column="110" selection-start="1078" selection-end="1375" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="devel" />
+      </map>
+    </option>
+  </component>
+  <component name="GitLogSettings">
+    <option name="myStructureFilterPaths" />
+    <option name="myDateState">
+      <MyDateState />
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/webofneeds/won-matcher-solr/src/main/java/won/matcher/solr/UpdateListener2.java" />
+        <option value="$PROJECT_DIR$/webofneeds/won-node-webapp/pom.xml" />
+        <option value="$PROJECT_DIR$/webofneeds/won-matcher-solr/pom.xml" />
+        <option value="$PROJECT_DIR$/webofneeds/won-matcher-solr/src/main/java/won/matcher/query/TimeRangeQuery.java" />
+        <option value="$PROJECT_DIR$/webofneeds/won-matcher-solr/src/main/java/won/matcher/query/DoubleRangeQuery.java" />
+        <option value="$PROJECT_DIR$/webofneeds/pom.xml" />
+        <option value="$PROJECT_DIR$/webofneeds/won-matcher-solr/src/main/java/won/matcher/SolrTesterMain.java" />
+        <option value="$PROJECT_DIR$/webofneeds/won-matcher-solr/src/main/java/won/matcher/Matcher.java" />
+        <option value="$PROJECT_DIR$/webofneeds/won-node/src/main/java/won/node/protocol/impl/OwnerProtocolOwnerClientImpl.java" />
+        <option value="$PROJECT_DIR$/webofneeds/won-node/src/main/java/won/node/service/impl/NeedCommunicationServiceImpl.java" />
+        <option value="$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/model/Connection.java" />
+        <option value="$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/model/Facet.java" />
+        <option value="$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/util/NeedModelMapper.java" />
+        <option value="$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/vocabulary/WON.java" />
+        <option value="$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/repository/FacetRepository.java" />
+        <option value="$PROJECT_DIR$/webofneeds/won-node/src/main/java/won/node/service/impl/NeedManagementServiceImpl.java" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+        <option name="lookForNested" value="true" />
+      </MavenImportingSettings>
+    </option>
+    <option name="enabledProfiles">
+      <list>
+        <option value="copy-project-dependencies" />
+        <option value="localhost" />
+        <option value="default" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="won-matcher-solr" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="won-matcher-solr" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Plugins" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$PluginsNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="won-matcher-solr" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Lifecycle" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$LifecycleNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="won-matcher" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="won-matcher" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Lifecycle" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$LifecycleNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="WON node web application" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Web of Needs module project" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Web of Needs module project" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Lifecycle" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$LifecycleNode" />
+        </PATH_ELEMENT>
+      </PATH>
+    </treeState>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-1929" />
+    <option name="y" value="-9" />
+    <option name="width" value="1938" />
+    <option name="height" value="1170" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner-webapp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner-webapp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webapp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner-webapp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner-webapp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner-webapp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="need" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner-webapp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="connection" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner-webapp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pojo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources.localhost" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ws" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="impl" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="owner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="impl" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ws" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="impl" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rest" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="impl" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="protocol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="protocol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="util" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="protocol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="repository" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webofneeds" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="won-core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="protocol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="model" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="309" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="327" />
+    <property name="OverrideImplement.combined" value="false" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="recentsLimit" value="5" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="331" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="333" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="1005" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="1013" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="326" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="320" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="FullScreen" value="false" />
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
+    <property name="ChangesBrowser.SHOW_FLATTEN" value="false" />
+    <property name="options.lastSelected" value="vcs.Git" />
+    <property name="project.structure.side.proportion" value="0.24739884" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="restartRequiresConfirmation" value="true" />
+    <property name="options.searchVisible" value="true" />
+    <property name="dynamic.classpath" value="false" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="won.matcher.service.impl" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\gabriel\workspace\webofneeds\webofneeds\won-matcher-solr\src\main" />
+      <recent name="C:\Users\gabriel\workspace\webofneeds\webofneeds\won-matcher-solr\src\main\config" />
+      <recent name="C:\Users\gabriel\workspace\webofneeds\webofneeds\won-matcher-solr\web\WEB-INF" />
+      <recent name="C:\Users\gabriel\workspace\webofneeds\webofneeds\won-matcher-solr\src\main\resources" />
+      <recent name="C:\Users\gabriel\workspace\webofneeds\webofneeds\won-matcher-solr\src\main\resources\conf" />
+    </key>
+    <key name="ExtractSuperBase.RECENT_KEYS">
+      <recent name="won.node.ws" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\gabriel\workspace\webofneeds\webofneeds\won-matcher-solr\src\main\profiles" />
+      <recent name="C:\Users\gabriel\workspace\webofneeds\webofneeds\won-matcher-solr\src\main\resources" />
+      <recent name="C:\Users\gabriel\workspace\webofneeds\webofneeds\won-matcher-solr\src\main" />
+      <recent name="C:\Users\gabriel\workspace\webofneeds\webofneeds" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.SolrTesterMain">
+    <configuration default="false" name="MatcherCLI" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="won.matcher.cli.MatcherCLI" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="-n1 http://localhost:8080/won/ld/resource/need/1 -n2 http://localhost:8080/won/ld/resource/need/2" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="won-matcher" />
+      <envs />
+      <RunnerSettings RunnerId="JRebel Debug">
+        <option name="DEBUG_PORT" value="" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="SolrTesterMain" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="won.matcher.SolrTesterMain" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/webofneeds" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="won-matcher-solr" />
+      <envs />
+      <RunnerSettings RunnerId="JRebel Debug">
+        <option name="DEBUG_PORT" value="" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="true" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list />
+            </option>
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugSession" factoryName="Local" singleton="true">
+      <JSDebuggerConfigurationSettings>
+        <option name="engineId" value="embedded" />
+        <option name="fileUrl" />
+      </JSDebuggerConfigurationSettings>
+      <method />
+    </configuration>
+    <configuration default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local">
+      <deployment />
+      <server-settings>
+        <option name="BASE_DIRECTORY_NAME" value="_webofneeds" />
+      </server-settings>
+      <predefined_log_file id="Tomcat" enabled="true" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="65006" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="JRebel" />
+      <RunnerSettings RunnerId="JRebel Debug">
+        <option name="DEBUG_PORT" value="65007" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="JRebel">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="JRebel Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method />
+    </configuration>
+    <configuration default="false" name="Node + Owner" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 7.0">
+      <option name="COMMON_VM_ARGUMENTS" value="-XX:MaxPermSize=128M" />
+      <option name="UPDATING_POLICY" value="restart-server" />
+      <deployment>
+        <artifact name="won-node-webapp:war exploded">
+          <settings>
+            <option name="CONTEXT_PATH" value="/won" />
+          </settings>
+        </artifact>
+        <artifact name="won-owner-webapp:war exploded">
+          <settings>
+            <option name="CONTEXT_PATH" value="/owner" />
+          </settings>
+        </artifact>
+      </deployment>
+      <server-settings>
+        <option name="BASE_DIRECTORY_NAME" value="Unnamed_webofneeds" />
+      </server-settings>
+      <predefined_log_file id="Tomcat" enabled="true" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="65006" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="JRebel" />
+      <RunnerSettings RunnerId="JRebel Debug">
+        <option name="DEBUG_PORT" value="65007" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="JRebel">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="JRebel Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method>
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="won-node-webapp:war exploded" />
+          <artifact name="won-owner-webapp:war exploded" />
+        </option>
+      </method>
+    </configuration>
+    <configuration default="false" name="Solr" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 7.0">
+      <deployment>
+        <artifact name="won-matcher-solr:jar">
+          <settings>
+            <option name="CONTEXT_PATH" value="/" />
+          </settings>
+        </artifact>
+      </deployment>
+      <server-settings>
+        <option name="BASE_DIRECTORY_NAME" value="_webofneeds" />
+      </server-settings>
+      <predefined_log_file id="Tomcat" enabled="true" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="65006" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="JRebel" />
+      <RunnerSettings RunnerId="JRebel Debug">
+        <option name="DEBUG_PORT" value="65007" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="JRebel">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="JRebel Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method>
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="won-matcher-solr:jar" />
+        </option>
+      </method>
+    </configuration>
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="Tomcat Server.Node + Owner" />
+      <item index="1" class="java.lang.String" itemvalue="Tomcat Server.Solr" />
+      <item index="2" class="java.lang.String" itemvalue="Application.MatcherCLI" />
+      <item index="3" class="java.lang.String" itemvalue="Application.SolrTesterMain" />
+    </list>
+    <recent_temporary>
+      <list size="2">
+        <item index="0" class="java.lang.String" itemvalue="Application.SolrTesterMain" />
+        <item index="1" class="java.lang.String" itemvalue="Application.MatcherCLI" />
+      </list>
+    </recent_temporary>
+    <configuration name="&lt;template&gt;" type="TestNG" default="true" selected="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    </configuration>
+    <configuration name="&lt;template&gt;" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" default="true" selected="false">
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m" />
+    </configuration>
+    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
+      <Host>localhost</Host>
+      <Port>5050</Port>
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="TodoView" selected-index="0">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-1929" y="-9" width="1938" height="1170" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32845187" sideWeight="0.4977778" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="JRebel Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17533937" sideWeight="0.50237215" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="JRebel" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.11354582" sideWeight="0.49762782" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30179283" sideWeight="0.4997531" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32845187" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.16236162" sideWeight="0.6693227" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.328341" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22720085" sideWeight="0.67607224" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3306773" sideWeight="0.49530864" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32392776" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2488889" sideWeight="0.67081445" order="6" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="CHECK_NEW_TODO" value="true" />
+    <option name="myTodoPanelSettings">
+      <value>
+        <are-packages-shown value="false" />
+        <are-modules-shown value="false" />
+        <flatten-packages value="false" />
+        <is-autoscroll-to-source value="false" />
+      </value>
+    </option>
+    <option name="PERFORM_UPDATE_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_COMMIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_EDIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_CHECKOUT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_ROLLBACK_IN_BACKGROUND" value="false" />
+    <option name="CHECK_LOCALLY_CHANGED_CONFLICTS_IN_BACKGROUND" value="false" />
+    <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
+    <option name="SHOW_ONLY_CHANGED_IN_SELECTION_DIFF" value="true" />
+    <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="true" />
+    <option name="DEFAULT_PATCH_EXTENSION" value="patch" />
+    <option name="SHORT_DIFF_HORIZONTALLY" value="true" />
+    <option name="SHORT_DIFF_EXTRA_LINES" value="2" />
+    <option name="SOFT_WRAPS_IN_SHORT_DIFF" value="true" />
+    <option name="INCLUDE_TEXT_INTO_PATCH" value="false" />
+    <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
+    <option name="SHOW_FILE_HISTORY_DETAILS" value="true" />
+    <option name="SHOW_VCS_ERROR_NOTIFICATIONS" value="true" />
+    <option name="SHOW_DIRTY_RECURSIVELY" value="false" />
+    <option name="LIMIT_HISTORY" value="true" />
+    <option name="MAXIMUM_HISTORY_ROWS" value="1000" />
+    <option name="UPDATE_FILTER_SCOPE_NAME" />
+    <option name="USE_COMMIT_MESSAGE_MARGIN" value="false" />
+    <option name="COMMIT_MESSAGE_MARGIN_SIZE" value="72" />
+    <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
+    <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
+    <option name="LAST_COMMIT_MESSAGE" value="create need on server accepts now facets" />
+    <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
+    <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
+    <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
+    <option name="ACTIVE_VCS_NAME" />
+    <option name="UPDATE_GROUP_BY_PACKAGES" value="false" />
+    <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
+    <option name="UPDATE_FILTER_BY_SCOPE" value="false" />
+    <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
+    <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
+    <MESSAGE value="solr setup has been finished" />
+    <MESSAGE value="solr plugin execute similarity queries" />
+    <MESSAGE value="abandoned; rewrite in new branch" />
+    <MESSAGE value="first draft of the owner using linked data for information retrieval" />
+    <MESSAGE value="refactoring for use of linked data for need information service, decoupling of owner and node" />
+    <MESSAGE value="decoupling of owner and node finished; owner works now again" />
+    <MESSAGE value="reload data link has been added to list needs" />
+    <MESSAGE value="DataReloadService Been added&#10;" />
+    <MESSAGE value="ModelMapper has been implemented&#10;" />
+    <MESSAGE value="Refactoring: ModelMapper is now a Spring managed Bean; DuplicateStateException was replaced with IllegalStateException&#10;" />
+    <MESSAGE value="Need-Model has been updated; Event-Model has been created" />
+    <MESSAGE value="Connection state machine has been changed according to the new ontology" />
+    <MESSAGE value="Merge with devel-ontology-impl" />
+    <MESSAGE value="Some files went missing during merge; now they are added again" />
+    <MESSAGE value="deny and accept Methods have been removed" />
+    <MESSAGE value="connectTo &amp; connectionReceived works now again" />
+    <MESSAGE value="ConnectionEvents are now saved to the database" />
+    <MESSAGE value="refactoring and renaming of web service methods" />
+    <MESSAGE value="rdf-graphs of conections events can now be saved &amp; loaded with the store/loadContent methods" />
+    <MESSAGE value="fixed bug: there was a problem when a need and a connection event have the same id" />
+    <MESSAGE value="refactoring: sendTextMessage is now called textMessage" />
+    <MESSAGE value="check for fieldnames" />
+    <MESSAGE value="Some refactoring has been done and two filters have been implemented" />
+    <MESSAGE value="a war file containing solr, siren and won-matcher-plugin can now be generated with &quot;mvn package&quot;; UpdateListener2 ist a proposal to implement the updatelistener without a singleton" />
+    <MESSAGE value="create need on server accepts now facets" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-node/src/main/java/won/node/service/impl/RDFStorageService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="17" selection-start="319" selection-end="319" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-node/src/main/java/won/node/service/impl/RDFFileStorageService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="13" selection-start="1162" selection-end="1162" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/vocabulary/WON.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="67" column="79" selection-start="3566" selection-end="3566" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#0#10964#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/repository/WonRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="17" selection-start="1153" selection-end="1153" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/repository/NeedRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="31" selection-start="330" selection-end="398" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-node/src/main/resources/services.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="29.04">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-node/src/main/resources/applicationContext.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.1591623">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/util/ModelMapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="10" selection-start="233" selection-end="233" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/model/Facet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="24" selection-start="386" selection-end="386" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/util/NeedModelMapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="110" selection-start="1078" selection-end="1375" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-core/src/main/java/won/protocol/repository/FacetRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="43" selection-start="401" selection-end="401" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-node/src/main/java/won/node/service/impl/NeedManagementServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="84" column="81" selection-start="3272" selection-end="3272" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-node/src/main/java/won/node/service/impl/NeedCommunicationServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="236" column="93" selection-start="9816" selection-end="9816" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-owner/src/main/java/won/owner/protocol/impl/OwnerProtocolNeedServiceClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="13" selection-start="1044" selection-end="1044" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-owner-webapp/src/main/resources/offer.ttl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webofneeds/won-owner-webapp/src/main/java/won/owner/web/need/NeedController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="176" column="68" selection-start="6461" selection-end="6461" vertical-scroll-proportion="0.4894068">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <last-edited>won-node-webapp:war</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.24739884" />
+                <option value="0.5" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>Spring</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.7</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>won-matcher-solr</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.13967438" />
+                <option value="0.5" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>1.7</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>Maven: org.apache.solr:solr:4.1.0</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.24739884" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
+
