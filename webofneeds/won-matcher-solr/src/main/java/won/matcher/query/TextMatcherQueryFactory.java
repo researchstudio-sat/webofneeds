@@ -40,7 +40,6 @@ public class TextMatcherQueryFactory extends AbstractQueryFactory
     if (documentId == -1)
       return null;
 
-    logger.info("Found document: " + indexSearcher.getReader().document(documentId).getFieldable(SolrFields.URL).toString());
 
     MoreLikeThis mlt = new MoreLikeThis(indexSearcher.getReader());
 

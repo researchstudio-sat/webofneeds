@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package won.matcher.query.rdf.algebra.expr;
+package won.matcher.query.rdf.expr;
 
 import com.hp.hpl.jena.sparql.algebra.op.OpBGP;
 import com.hp.hpl.jena.sparql.expr.*;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.sindice.siren.search.SirenBooleanClause;
+import org.sindice.siren.search.SirenBooleanQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.matcher.query.rdf.algebra.TriplesToSirenQuery;
-import won.matcher.query.rdf.algebra.expr.library.MapE_GreaterThan;
-import won.matcher.query.rdf.algebra.expr.library.MapE_GreaterThanOrEqual;
-import won.matcher.query.rdf.algebra.expr.library.MapE_LessThan;
-import won.matcher.query.rdf.algebra.expr.library.MapE_LessThanOrEqual;
+import won.matcher.query.rdf.RdfToSirenQuery;
+import won.matcher.query.rdf.expr.library.*;
 
 import java.util.*;
 
@@ -46,7 +44,10 @@ public class ExprToSirenQuery
     mappers.put(E_LessThan.class, new MapE_LessThan());
     mappers.put(E_GreaterThanOrEqual.class, new MapE_GreaterThanOrEqual());
     mappers.put(E_LessThanOrEqual.class, new MapE_LessThanOrEqual());
-
+    mappers.put(E_Equals.class, new MapE_Equals());
+    mappers.put(E_NotEquals.class, new MapE_NotEquals());
+    mappers.put(E_OneOf.class, new MapE_OneOf());
+    mappers.put(E_NotOneOf.class, new MapE_NotOneOf());
   }
 
 
@@ -54,8 +55,8 @@ public class ExprToSirenQuery
     return new ArrayList<QueriesForVariables>();
   }
 
-  public static BooleanQuery createQueryForBGPWithExpressions(final OpBGP opBGP, final ExprList expressions, final String field){
-    QueryGenerator queryGenerator = new QueryGenerator(opBGP, field);
+  public static BooleanQuery createQueryForBGPWithExpressions(final OpBGP opBGP, final ExprList expressions, final String field, RdfToSirenQuery rdfToSirenQuery){
+    QueryGenerator queryGenerator = new QueryGenerator(opBGP, field, rdfToSirenQuery);
     BooleanQuery ret = new BooleanQuery();
     for (Expr expr: expressions){
       ExprWalker.walk(queryGenerator,expr);
@@ -152,18 +153,27 @@ public class ExprToSirenQuery
     private Stack<QueryGenerationContext> contextStack;
     private OpBGP opBGP;
     private String field;
+    private RdfToSirenQuery rdfToSirenQuery;
 
-    private QueryGenerator(OpBGP opBGP, String field)
+    private QueryGenerator(OpBGP opBGP, String field, RdfToSirenQuery rdfToSirenQuery)
     {
       this.contextStack = new Stack<QueryGenerationContext>();
       this.opBGP = opBGP;
       this.field = field;
+      this.rdfToSirenQuery = rdfToSirenQuery;
     }
 
     private BooleanQuery getQuery(){
       if (this.contextStack == null || this.contextStack.empty()) return new BooleanQuery();
-      BooleanQuery query =  TriplesToSirenQuery.createQueryForTriples(this.opBGP.getPattern().getList(), contextStack.peek().getQueriesForVariables(), this.field);
-      return query;
+      QueryGenerationContext ctx = contextStack.peek();
+      logger.debug("getting final query from this context: {}", ctx);
+      if (ctx.getQueriesForVariables() != null){
+        //we still have variables with restrictions - we have to generate more queries
+        return (rdfToSirenQuery.createQueryForTriples(this.opBGP.getPattern().getList(), ctx.getQueriesForVariables(), this.field));
+      }
+      //no more queries to generate, we're already done
+      return ctx.getQuery();
+
     }
 
     @Override
@@ -206,9 +216,11 @@ public class ExprToSirenQuery
         if (ctx.getVariables().size() == 1) {
           ExpressionToQueryMapper mapper = mappers.get(func.getClass());
           if (mapper != null){
-            SirenBooleanClause clause = mapper.mapExpression(func,this.field, SirenBooleanClause.Occur.MUST);
+            SirenBooleanQuery query = mapper.mapExpression(func,this.field, SirenBooleanClause.Occur.MUST, rdfToSirenQuery);
             //as we just created ctx, there are no queries for variables. By adding a clause, we set the only such mapping
-            ctx.addClauseForVariable(ctx.getVariables().iterator().next(), clause);
+            for (SirenBooleanClause clause: query.getClauses()){
+              ctx.addClauseForVariable(ctx.getVariables().iterator().next(), clause);
+            }
           }
         }
       }
@@ -228,7 +240,26 @@ public class ExprToSirenQuery
     public void visit(final ExprFunctionN func)
     {
       logger.debug("visiting: {}",func);
-      //we only support 'in' and 'not in' without variables contained in the expressions.
+      QueryGenerationContext ctx = new QueryGenerationContext();
+      QueryGenerationContext[] subContexts = new QueryGenerationContext[func.numArgs()];
+      //pop N times for each argument of func
+      logger.debug("processing function {} with {} arguments", func, func.numArgs());
+      for (int i = 0; i < func.numArgs(); i++){
+        subContexts[i] = contextStack.pop();
+        ctx.addVariables(subContexts[i].getVariables());
+      }
+      if (logger.isDebugEnabled()) logger.debug("found {} variables in subexpressions", ctx.getVariables().size());
+      if (ctx.getVariables().size() == 1) {
+        //we only support 'in' and 'not in' without variables contained in the expressions.
+        ExpressionToQueryMapper mapper = mappers.get(func.getClass());
+        if (mapper != null){
+          SirenBooleanQuery query = mapper.mapExpression(func, field, SirenBooleanClause.Occur.SHOULD, rdfToSirenQuery);
+          for (SirenBooleanClause clause: query.getClauses()){
+            ctx.addClauseForVariable(ctx.getVariables().iterator().next(), clause);
+          }
+        }
+      }
+      contextStack.push(ctx);
       logger.debug("current queryGenerationContext: {}", this.contextStack.peek());
     }
 
@@ -269,14 +300,15 @@ public class ExprToSirenQuery
     private void addToContext(QueryGenerationContext ctx, QueryGenerationContext ctxToAdd){
 
       if (ctx.getLogicalMode().isCompatible(ctxToAdd.getLogicalMode())){
-        //join queries for variables
+        //if we're in AND (OR) mode and the ctx we want to add also has AND (OR) mode, we can just add the
+        //queries for the variables and not build the query right away
         SirenBooleanClause.Occur occur = ctx.getLogicalMode() == LogicalAggregationMode.AND ? SirenBooleanClause.Occur.MUST : SirenBooleanClause.Occur.SHOULD;
         ctx.addQueriesForVariablesFromOtherContext(ctxToAdd.getQueriesForVariables(), occur);
         ctx.addVariables(ctxToAdd.getVariables());
       } else {
         //the subexpression is not compatible with the expression (not another && or || but the opposite):
         //generate main boolean queries from subquery and add results to ctx.queries with the occur determined by the logical mode
-        BooleanQuery query =  TriplesToSirenQuery.createQueryForTriples(this.opBGP.getPattern().getList(),ctxToAdd.getQueriesForVariables(),this.field);
+        BooleanQuery query =  rdfToSirenQuery.createQueryForTriples(this.opBGP.getPattern().getList(),ctxToAdd.getQueriesForVariables(),this.field);
         BooleanClause.Occur occur = ctx.getLogicalMode() == LogicalAggregationMode.AND ? BooleanClause.Occur.MUST : BooleanClause.Occur.SHOULD;
         ctx.addBooleanClause(new BooleanClause(query,occur));
       }

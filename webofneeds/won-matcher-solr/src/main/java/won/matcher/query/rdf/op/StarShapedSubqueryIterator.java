@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.matcher.query.rdf;
+package won.matcher.query.rdf.op;
 
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;

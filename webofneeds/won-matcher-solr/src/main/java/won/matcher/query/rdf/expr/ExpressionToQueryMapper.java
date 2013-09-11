@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package won.matcher.query.rdf.algebra.expr;
+package won.matcher.query.rdf.expr;
 
 import com.hp.hpl.jena.sparql.expr.Expr;
 import org.sindice.siren.search.SirenBooleanClause;
+import org.sindice.siren.search.SirenBooleanQuery;
+import won.matcher.query.rdf.RdfToSirenQuery;
 
 /**
  * User: fkleedorfer
@@ -25,5 +27,5 @@ import org.sindice.siren.search.SirenBooleanClause;
  */
 public interface ExpressionToQueryMapper
 {
-  SirenBooleanClause mapExpression(Expr expression, String field, SirenBooleanClause.Occur occur);
+  SirenBooleanQuery mapExpression(Expr expression, String field, SirenBooleanClause.Occur occur, final RdfToSirenQuery rdfToSirenQuery);
 }

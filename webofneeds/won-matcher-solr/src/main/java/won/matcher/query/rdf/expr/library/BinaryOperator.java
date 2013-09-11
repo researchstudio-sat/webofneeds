@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package won.matcher.query.rdf.algebra.expr.library;
+package won.matcher.query.rdf.expr.library;
 
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.expr.ExprFunction2;
 import org.sindice.siren.search.SirenBooleanClause;
+import org.sindice.siren.search.SirenBooleanQuery;
 import org.sindice.siren.search.SirenPrimitiveQuery;
-import won.matcher.query.rdf.algebra.expr.ExpressionToQueryMapper;
+import won.matcher.query.rdf.RdfToSirenQuery;
+import won.matcher.query.rdf.expr.ExpressionToQueryMapper;
 
 import java.util.Set;
 
@@ -31,8 +33,10 @@ import java.util.Set;
  */
 public abstract class BinaryOperator implements ExpressionToQueryMapper
 {
+
+
   @Override
-  public final SirenBooleanClause mapExpression(final Expr expression, String field, SirenBooleanClause.Occur occur)
+  public final SirenBooleanQuery mapExpression(final Expr expression, String field, SirenBooleanClause.Occur occur, final RdfToSirenQuery rdfToSirenQuery)
   {
     ExprFunction2 func2 = (ExprFunction2) expression;
     Expr arg1 = func2.getArg1();
@@ -40,23 +44,29 @@ public abstract class BinaryOperator implements ExpressionToQueryMapper
     Set<Var> vars = arg1.getVarsMentioned();
     if (vars.size() > 1) throw new IllegalArgumentException("Exactly one variable expected in expression but found more in arg1");
     if (vars.size() == 1){
-      SirenPrimitiveQuery rangeQuery = mapExpressionWithValueOnRightSide(arg2, field);
-      if (rangeQuery == null) return null;
-      return new SirenBooleanClause(rangeQuery,occur);
+      SirenPrimitiveQuery rangeQuery = mapExpressionWithValueOnRightSide(arg2, field, rdfToSirenQuery);
+      return wrap(rangeQuery, occur);      
     }
     //2nd arg is the variable
     vars = arg2.getVarsMentioned();
     if (vars.size() > 1) throw new IllegalArgumentException("Exactly one variable expected in expression but found more in arg2");
     if (vars.size() == 1){
-      SirenPrimitiveQuery rangeQuery = mapExpressionWithValueOnLeftSide(arg1, field);
-      if (rangeQuery == null) return null;
-      return new SirenBooleanClause(rangeQuery,occur);
+      SirenPrimitiveQuery rangeQuery = mapExpressionWithValueOnLeftSide(arg1, field, rdfToSirenQuery);
+      return wrap(rangeQuery, occur);
     }
     throw new IllegalArgumentException("Exactly one variable expected in expression but none was provided.");
   }
 
-  protected abstract SirenPrimitiveQuery mapExpressionWithValueOnRightSide(Expr value, String field);
+  private SirenBooleanQuery wrap(final SirenPrimitiveQuery rangeQuery, final SirenBooleanClause.Occur occur)
+  {
+    if (rangeQuery == null) return null;
+    SirenBooleanQuery query = new SirenBooleanQuery();
+    query.add(rangeQuery,occur);
+    return query;
+  }
 
-  protected abstract SirenPrimitiveQuery mapExpressionWithValueOnLeftSide(Expr value, String field);
+  protected abstract SirenPrimitiveQuery mapExpressionWithValueOnRightSide(Expr value, String field, final RdfToSirenQuery rdfToSirenQuery);
+
+  protected abstract SirenPrimitiveQuery mapExpressionWithValueOnLeftSide(Expr value, String field, final RdfToSirenQuery rdfToSirenQuery);
 
 }

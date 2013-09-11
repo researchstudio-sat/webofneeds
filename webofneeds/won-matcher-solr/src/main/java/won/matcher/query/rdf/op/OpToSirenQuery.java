@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.matcher.query.rdf.algebra;
+package won.matcher.query.rdf.op;
 
 import com.hp.hpl.jena.sparql.algebra.Op;
 import com.hp.hpl.jena.sparql.algebra.OpVisitorBase;
@@ -26,8 +26,8 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.matcher.query.rdf.algebra.expr.ExprToSirenQuery;
-import won.matcher.query.rdf.algebra.expr.TransformFilterCNF;
+import won.matcher.query.rdf.RdfToSirenQuery;
+import won.matcher.query.rdf.expr.ExprToSirenQuery;
 
 import java.util.Stack;
 
@@ -44,6 +44,7 @@ public class OpToSirenQuery
 
   private Stack<ExprList> expressionStack = new Stack<ExprList>();
   private String field;
+  private RdfToSirenQuery rdfToSirenQuery;
 
 
   /**
@@ -52,14 +53,15 @@ public class OpToSirenQuery
    * @param field
    * @return
    */
-  public static BooleanQuery createQuery(Op op, String field){
-     OpToSirenQuery creator = new OpToSirenQuery(field);
+  public static BooleanQuery createQuery(Op op, String field, RdfToSirenQuery rdfToSirenQuery){
+     OpToSirenQuery creator = new OpToSirenQuery(field, rdfToSirenQuery);
      return creator.doCreateQuery(op);
   }
 
-  private OpToSirenQuery(String field)
+  private OpToSirenQuery(String field, final RdfToSirenQuery rdfToSirenQuery)
   {
     this.field = field;
+    this.rdfToSirenQuery = rdfToSirenQuery;
   }
 
 
@@ -88,7 +90,8 @@ public class OpToSirenQuery
         expressions = new ExprList(expressionStack.peek());
       }
       //add the expressions of the filter, transforming them to CNF first
-      expressions.addAll(TransformFilterCNF.translateFilterExpressionsToCNF(opFilter));
+      //expressions.addAll(TransformFilterCNF.translateFilterExpressionsToCNF(opFilter));
+      expressions.addAll(opFilter.getExprs());
       //push onto the stack
       logger.debug("pushing onto stack: " + expressions);
       expressionStack.push(expressions);
@@ -119,9 +122,9 @@ public class OpToSirenQuery
       }
       logger.debug("expressions:" + expressions);
       if (expressions.isEmpty()) {
-        query.add(TriplesToSirenQuery.createQueryForTriples(opBGP.getPattern().getList(),null,field), BooleanClause.Occur.MUST);
+        query.add(rdfToSirenQuery.createQueryForTriples(opBGP.getPattern().getList(), null, field), BooleanClause.Occur.MUST);
       } else {
-        query.add(ExprToSirenQuery.createQueryForBGPWithExpressions(opBGP,expressions,field), BooleanClause.Occur.MUST);
+        query.add(ExprToSirenQuery.createQueryForBGPWithExpressions(opBGP,expressions,field, rdfToSirenQuery), BooleanClause.Occur.MUST);
       }
 
     }

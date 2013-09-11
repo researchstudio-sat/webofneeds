@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package won.matcher.query.rdf.algebra.expr.library.util;
+package won.matcher.query.rdf.expr.library.util;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.sparql.engine.binding.BindingFactory;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.expr.NodeValue;
-import com.hp.hpl.jena.sparql.function.FunctionEnvBase;
 import org.sindice.siren.search.SirenNumericRangeQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,13 +59,13 @@ public class NumericRangeUtils
 
   public SirenNumericRangeQuery newLessThanRange(String field, Expr thresholdExpr, boolean includeThreshold){
     logger.debug("newLessThanRange for expr:'{}', includeThreshold:{}", thresholdExpr, includeThreshold);
-    NodeValue nv = evaluate(thresholdExpr);
+    NodeValue nv = ExprUtils.evaluate(thresholdExpr);
     return getHandler(nv).newLessThanRange(field, nv,includeThreshold);
   }
 
   public SirenNumericRangeQuery newGreaterThanRange(String field, Expr thresholdExpr, boolean includeThreshold){
     logger.debug("newGreaterThanRange for expr:'{}', includeThreshold:{}", thresholdExpr, includeThreshold);
-    NodeValue nv = evaluate(thresholdExpr);
+    NodeValue nv = ExprUtils.evaluate(thresholdExpr);
     return getHandler(nv).newGreaterThanRange(field, nv, includeThreshold);
   }
 
@@ -80,16 +78,6 @@ public class NumericRangeUtils
     if (handler != null) return handler;
     return this.handlerMap.get(DEFAULT_HANDLER);
   }
-
-  /**
-   * Assumes no variables inside expression, evaluates with empty binding and new function environment.
-   * @param expression
-   * @return
-   */
-  private NodeValue evaluate(Expr expression) {
-    return expression.eval(BindingFactory.binding(), new FunctionEnvBase());
-  }
-
 
 
   private interface NumericRangeHandler

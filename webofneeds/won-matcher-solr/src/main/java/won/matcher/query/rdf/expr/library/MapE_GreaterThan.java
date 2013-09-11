@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package won.matcher.query.rdf.algebra.expr.library;
+package won.matcher.query.rdf.expr.library;
 
 import com.hp.hpl.jena.sparql.expr.Expr;
 import org.sindice.siren.search.SirenPrimitiveQuery;
-import won.matcher.query.rdf.algebra.expr.library.util.NumericRangeUtils;
+import won.matcher.query.rdf.RdfToSirenQuery;
+import won.matcher.query.rdf.expr.library.util.NumericRangeUtils;
 
 /**
  * Maps '>' to a Siren query, expecting exactly one variable its the expressions.
@@ -27,14 +28,15 @@ import won.matcher.query.rdf.algebra.expr.library.util.NumericRangeUtils;
  */
 public class MapE_GreaterThan extends BinaryOperator
 {
+
   @Override
-  protected SirenPrimitiveQuery mapExpressionWithValueOnRightSide(final Expr value, final String field)
+  protected SirenPrimitiveQuery mapExpressionWithValueOnRightSide(final Expr value, final String field, final RdfToSirenQuery rdfToSirenQuery)
   {
     return NumericRangeUtils.getInstance().newGreaterThanRange(field,value,false);
   }
 
   @Override
-  protected SirenPrimitiveQuery mapExpressionWithValueOnLeftSide(final Expr value, final String field)
+  protected SirenPrimitiveQuery mapExpressionWithValueOnLeftSide(final Expr value, final String field, final RdfToSirenQuery rdfToSirenQuery)
   {
     return NumericRangeUtils.getInstance().newLessThanRange(field, value, false);
   }

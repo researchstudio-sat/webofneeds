@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.matcher.query.rdf.algebra;
+package won.matcher.query.rdf.op;
 
 import com.hp.hpl.jena.sparql.algebra.Op;
 import com.hp.hpl.jena.sparql.algebra.OpVars;

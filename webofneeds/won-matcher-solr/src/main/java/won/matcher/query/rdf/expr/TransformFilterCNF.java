@@ -1,4 +1,4 @@
-package won.matcher.query.rdf.algebra.expr;
+package won.matcher.query.rdf.expr;
 
 import com.hp.hpl.jena.sparql.algebra.Op;
 import com.hp.hpl.jena.sparql.algebra.TransformCopy;

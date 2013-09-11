@@ -14,28 +14,30 @@
  * limitations under the License.
  */
 
-package won.matcher.query.rdf.algebra.expr.library;
+package won.matcher.query.rdf.expr.library;
 
 import com.hp.hpl.jena.sparql.expr.Expr;
 import org.sindice.siren.search.SirenPrimitiveQuery;
-import won.matcher.query.rdf.algebra.expr.library.util.NumericRangeUtils;
+import won.matcher.query.rdf.RdfToSirenQuery;
+import won.matcher.query.rdf.expr.library.util.NumericRangeUtils;
 
 /**
- * Maps '>' to a Siren query, expecting exactly one variable its the expressions.
+ * Maps '<=' to a Siren query, expecting exactly one variable its the expressions.
  * User: fkleedorfer
  * Date: 02.09.13
  */
-public class MapE_LessThan extends BinaryOperator
+public class MapE_LessThanOrEqual extends BinaryOperator
 {
   @Override
-  protected SirenPrimitiveQuery mapExpressionWithValueOnRightSide(final Expr value, final String field)
+  protected SirenPrimitiveQuery mapExpressionWithValueOnRightSide(final Expr value, final String field, final RdfToSirenQuery rdfToSirenQuery)
   {
-    return NumericRangeUtils.getInstance().newLessThanRange(field, value, false);
+    return NumericRangeUtils.getInstance().newLessThanRange(field,value,true);
   }
 
   @Override
-  protected SirenPrimitiveQuery mapExpressionWithValueOnLeftSide(final Expr value, final String field)
+  protected SirenPrimitiveQuery mapExpressionWithValueOnLeftSide(final Expr value, final String field, final RdfToSirenQuery rdfToSirenQuery)
   {
-    return NumericRangeUtils.getInstance().newGreaterThanRange(field, value, false);
+    return NumericRangeUtils.getInstance().newGreaterThanRange(field, value, true);
   }
+
 }

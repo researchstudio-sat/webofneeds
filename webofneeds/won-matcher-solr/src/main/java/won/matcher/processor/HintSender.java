@@ -45,6 +45,7 @@ public class HintSender implements MatchProcessor
   public void process(final URI from, final URI to, final double score, final URI originator, final Model explanation)
   {
     try {
+      logger.debug("sending hint from {} to {}", from, to);
       client.hint(from, to, score, originator, explanation);
     } catch (NoSuchNeedException e) {
       logger.debug("hint failed: no need found with URI {}", e.getUnknownNeedURI());

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.matcher.query.rdf.algebra.expr;
+package won.matcher.query.rdf.expr;
 
 import org.sindice.siren.search.SirenBooleanClause;
 import org.sindice.siren.search.SirenBooleanQuery;
@@ -71,8 +71,16 @@ public class QueriesForVariables
         SirenBooleanQuery newQuery = new SirenBooleanQuery();
         newQuery.add(query,addWithOccur);
         newQuery.add(entry.getValue(),addWithOccur);
+        this.queryMap.put(entry.getKey(), newQuery);
       }
     }
   }
 
+  @Override
+  public String toString()
+  {
+    return "QueriesForVariables{" +
+         queryMap +
+        '}';
+  }
 }

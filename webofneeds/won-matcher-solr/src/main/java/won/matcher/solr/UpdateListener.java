@@ -49,7 +49,7 @@ public class UpdateListener implements SolrEventListener
         logger.error(e.getMessage(), e);
       }
 
-    matcher.callMatchProcessors();
+    matcher.processMatches();
   }
 
 }

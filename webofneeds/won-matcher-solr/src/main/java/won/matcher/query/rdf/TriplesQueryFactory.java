@@ -36,10 +36,8 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.schema.IndexSchema;
 import org.apache.solr.search.SolrIndexSearcher;
-import org.sindice.siren.search.SirenBooleanClause;
-import org.sindice.siren.search.SirenBooleanQuery;
-import org.sindice.siren.search.SirenTupleClause;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.spin.arq.ARQFactory;
@@ -49,15 +47,17 @@ import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.vocabulary.SP;
 import org.topbraid.spin.vocabulary.SPIN;
 import won.matcher.query.AbstractQueryFactory;
-import won.matcher.query.rdf.algebra.OpToSirenQuery;
-import won.matcher.query.rdf.algebra.QueryCleaner;
-import won.matcher.query.rdf.algebra.RemoveUnusedVars;
+import won.matcher.query.rdf.op.OpToSirenQuery;
+import won.matcher.query.rdf.op.QueryCleaner;
+import won.matcher.query.rdf.op.RemoveUnusedVars;
+import won.matcher.query.rdf.op.StarShapedSubqueryIterator;
 import won.protocol.solr.SolrFields;
 import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,12 +68,8 @@ import java.util.regex.Pattern;
 public class TriplesQueryFactory extends AbstractQueryFactory
 {
   private static final Pattern PATTERN_REMOVE_QUOTES = Pattern.compile("\"(.+)\".*");
-  private static final BooleanClause.Occur DEFAULT_OCCUR = BooleanClause.Occur.SHOULD;
-  private static final SirenBooleanClause.Occur OCCUR_LITERAL = SirenBooleanClause.Occur.SHOULD;
-  private static final SirenTupleClause.Occur OCCUR_TRIPLE = SirenTupleClause.Occur.SHOULD;
-  private static final BooleanClause.Occur OCCUR_STAR = BooleanClause.Occur.SHOULD;
-  private static final BooleanClause.Occur OCCUR_ALL = BooleanClause.Occur.SHOULD;
-
+  private IndexSchema indexSchema = null;
+  private RdfToSirenQuery rdfToSirenQuery;
 
 
   private String field;
@@ -85,15 +81,17 @@ public class TriplesQueryFactory extends AbstractQueryFactory
   }
 
 
-    public TriplesQueryFactory(final BooleanClause.Occur occur, float boost, final String field)
+    public TriplesQueryFactory(final BooleanClause.Occur occur, float boost, final String field, final IndexSchema indexSchema)
   {
     super(occur, boost);
     this.field = field;
+    this.indexSchema = indexSchema;
+    this.rdfToSirenQuery = new RdfToSirenQuery(this.indexSchema, field);
   }
 
-  public TriplesQueryFactory(final BooleanClause.Occur occur, final String field)
+  public TriplesQueryFactory(final BooleanClause.Occur occur, final String field, final IndexSchema indexSchema)
   {
-    this(occur, 1.0f, field);
+    this(occur, 1f, field, indexSchema);
     this.field = field;
   }
 
@@ -146,26 +144,6 @@ public class TriplesQueryFactory extends AbstractQueryFactory
     return new SubModel(m,model.listStatements(contentNode,WON.HAS_CONTENT_DESCRIPTION, contentDescriptionNode).next());
   }
 
-  /**
-   * Extracts all subgraphs from the specified model that are attached to it via won:attachSpinWhereClause
-   * and returns a ModelWithRoot collection mapping the subject of these triples to the subgraphs attached to them.
-   * @param model
-   * @return
-   */
-  private Collection<SubModel> extractSPINSubgraphs(final Model model){
-    StmtIterator triplesWithWhere = model.listStatements(null, WON.EMBED_SPIN_ASK, (RDFNode) null);
-    List<SubModel> spinWhereClauses = new ArrayList<SubModel>();
-    while(triplesWithWhere.hasNext()) {
-      Statement attachingTriple = triplesWithWhere.next();
-      //TODO we run into trouble if the SPIN expression references back into the non-SPIN graph when we use stopNowhere!
-      GraphExtract graphExtract = new GraphExtract(TripleBoundary.stopNowhere);
-      Graph subGraph = graphExtract.extract(attachingTriple.getObject().asNode(),model.getGraph());
-      Model m = ModelFactory.createModelForGraph(subGraph);
-      spinWhereClauses.add(new SubModel(m,attachingTriple));
-    }
-    return spinWhereClauses;
-  }
-
 
   /**
    * Creates a Lucene (siren) query for the specified ModelWithRoot object.
@@ -178,7 +156,7 @@ public class TriplesQueryFactory extends AbstractQueryFactory
     graphWithoutSpinQueries.add(modelWithRoot.getModel());
 
     //extract all attached SPIN ask queries as graphs
-    Collection<SubModel> spinQueryGraphs = extractSPINSubgraphs(modelWithRoot.getModel());
+    Collection<SubModel> spinQueryGraphs = SPINUtils.extractSPINSubgraphs(this, modelWithRoot.getModel());
     if (spinQueryGraphs.size() > 0) {
       logger.debug("identified {} SPIN ask queries", spinQueryGraphs.size());
       //remove all triples that are inside the where clauses from the original model
@@ -193,10 +171,15 @@ public class TriplesQueryFactory extends AbstractQueryFactory
       }
       //remove all attachment triples as well
       graphWithoutSpinQueries.remove(graphWithoutSpinQueries.listStatements(null, WON.EMBED_SPIN_ASK, (RDFNode) null));
-
-
       logger.debug("size of content description graph without SPIN where clauses: {}", graphWithoutSpinQueries.size());
     }
+
+    //build query for non-SPIN model:
+    // * iterate over subjects, collect all incoming and outgoing RDF links
+    // * build a star-shaped SirenBooleanQuery for the subject
+    // * collect all such queries in a map indexed by subject
+    // * aggregate all queries in one boolean query
+
 
     Op jenaOp = createOpForGraph(graphWithoutSpinQueries);
     jenaOp = attachSpinQueriesToOp(jenaOp, spinQueryGraphs);
@@ -207,42 +190,10 @@ public class TriplesQueryFactory extends AbstractQueryFactory
       Op starShapedSubQueryOp = starShapedSubQueryOpIterator.next();
       starShapedSubQueryOp = cleanupQuery(starShapedSubQueryOp);
       logger.debug("starshaped subquery op: {}", starShapedSubQueryOp);
-      Map<String, SirenBooleanQuery> variableRestrictions = new HashMap<String, SirenBooleanQuery>();
-      Query starShapedBooleanQuery = OpToSirenQuery.createQuery(starShapedSubQueryOp, this.field);
+      Query starShapedBooleanQuery = OpToSirenQuery.createQuery(starShapedSubQueryOp, this.field, rdfToSirenQuery);
       query.add(starShapedBooleanQuery, BooleanClause.Occur.SHOULD);
       logger.debug("created this siren query for star shaped subquery: {}",starShapedBooleanQuery);
     }
-
-
-
-    /*
-
-
-
-    //build query for non-SPIN model:
-    // * iterate over subjects, collect all incoming and outgoing RDF links
-    // * build a star-shaped SirenBooleanQuery for the subject
-    // * collect all such queries in a map indexed by subject
-    // * aggregate all queries in one boolean query
-
-    ResIterator subjectIterator = graphWithoutSpinQueries.listSubjects();
-    while (subjectIterator.hasNext()){
-      Resource subject = subjectIterator.next();
-      logger.debug("creating star-shaped subquery for subject: {}",subject);
-      Query starShapedQuery = createStarShapedQueryForRdfNode(subject, graphWithoutSpinQueries);
-      logger.debug("query for subject: {}", starShapedQuery);
-      query.add(starShapedQuery,
-          OCCUR_STAR);
-    }
-
-
-//    //build queries for SPIN graphs
-//    for(ModelWithRoot spinWhereClauseGraph: spinWhereClauseGraphs){
-//      Query queryForSpinWhereClause = createQueryForSpinWhereClause(spinWhereClauseGraph);
-//      query.add(queryForSpinWhereClause, BooleanClause.Occur.SHOULD);
-//    }
-
-    */
 
     logger.debug("created this query:{}", query);
     return query;
@@ -268,7 +219,7 @@ public class TriplesQueryFactory extends AbstractQueryFactory
       //replace ?this
       logger.debug("extracted this spin query: {}", spinQuery);
       //convert to ARQ query
-      com.hp.hpl.jena.query.Query jenaQuery = ARQFactory.get().createQuery(spinQuery);
+      com.hp.hpl.jena.query.Query jenaQuery = ARQFactory.get().createQuery(modelWithRoot.getModel(), spinQuery.toString());
       //now convert to Op
       Op subOp = Algebra.compile(jenaQuery);
       logger.debug("extracted query as op: {}", subOp);
@@ -285,7 +236,7 @@ public class TriplesQueryFactory extends AbstractQueryFactory
       }, subOp);
       logger.debug("query with ?this replaced: {}", subOp);
       //merge with main
-      result = OpJoin.createReduce(result,subOp);
+      result = OpJoin.create(result,subOp);
     }
     com.hp.hpl.jena.query.Query q = OpAsQuery.asQuery(result);
     q.setQueryAskType();
@@ -411,29 +362,5 @@ public class TriplesQueryFactory extends AbstractQueryFactory
     return model;
   }
 
-  /**
-   * Wrapper around model to hold a subgraph extracted from a bigger graph along with the statement that connected
-   * the subgraph with the bigger graph.
-   */
-  private class SubModel
-  {
-    private Model model;
-    private Statement attachingStatement;
 
-    public Model getModel()
-    {
-      return model;
-    }
-
-    public Statement getAttachingStatement()
-    {
-      return attachingStatement;
-    }
-
-    private SubModel(final Model model, final Statement attachingStatement)
-    {
-      this.model = model;
-      this.attachingStatement = attachingStatement;
-    }
-  }
 }
