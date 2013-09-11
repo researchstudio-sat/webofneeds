@@ -327,6 +327,8 @@ public class NeedCommunicationServiceImpl implements
 
       saveAdditionalContentForEvent(content, con, event);
 
+      //TODO: Add Connection to Facet
+
       final Connection connectionForRunnable = con;
       executorService.execute(new Runnable()
       {

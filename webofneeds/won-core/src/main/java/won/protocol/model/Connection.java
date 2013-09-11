@@ -37,6 +37,9 @@ public class Connection
   /* The uri of the connection's need object */
   @Column( name = "needURI")
   private URI needURI;
+  /* The uri of the facet's type */
+  @Column( name = "typeURI")
+  private URI typeURI;
   /* The URI of the remote connection */
   @Column( name = "remoteConnectionURI")
   private URI remoteConnectionURI;

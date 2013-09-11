@@ -64,6 +64,9 @@ public class WON
   public static final Resource OWNER = m.createResource(BASE_URI + "Owner");
   public static final Resource ANONYMIZED_OWNER = m.createResource(BASE_URI + "AnonymizedOwner");
 
+  public static final Property HAS_FACET = m.createProperty(BASE_URI, "hasFacet");
+  public static final Resource FACET = m.createResource(BASE_URI + "Facet");
+
   public static final Property HAS_CONNECTIONS = m.createProperty(BASE_URI, "hasConnections");
   public static final Resource CONNECTION_CONTAINER = m.createResource(BASE_URI + "ConnectionContainer");
 

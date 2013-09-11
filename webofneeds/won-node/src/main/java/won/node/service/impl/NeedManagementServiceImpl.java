@@ -16,7 +16,8 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +25,18 @@ import org.springframework.stereotype.Component;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
+import won.protocol.model.Facet;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;
@@ -54,6 +58,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
   @Autowired
   private NeedRepository needRepository;
+  @Autowired
+  private FacetRepository facetRepository;
 
   @Override
   public URI createNeed(final URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException
@@ -72,6 +78,23 @@ public class NeedManagementServiceImpl implements NeedManagementService
     RdfUtils.replaceBaseURI(content, baseURI);
 
     rdfStorage.storeContent(need, content);
+
+    ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
+    if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
+
+    Resource needRes = needIt.next();
+    logger.debug("processing need resource {}", needRes.getURI());
+
+    StmtIterator stmtIterator = content.listStatements(needRes, WON.HAS_FACET, (RDFNode) null);
+    if(!stmtIterator.hasNext())
+      throw new IllegalArgumentException("at least one RDF node must be of type won:Facet");
+    else
+      do {
+        Facet facet = new Facet();
+        facet.setNeedURI(need.getNeedURI());
+        facet.setTypeURI(URI.create(stmtIterator.next().getObject().asResource().getURI()));
+        facetRepository.save(facet);
+      } while(stmtIterator.hasNext());
 
     return need.getNeedURI();
   }
