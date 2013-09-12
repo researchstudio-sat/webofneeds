@@ -30,6 +30,7 @@
         <module>won-owner-webapp</module>
         <module>won-matcher</module>
         <module>won-matcher-solr</module>
+        <module>won-matcher-webapp</module>
         <module>won-ontology-validator</module>
     </modules>
 
@@ -299,6 +300,12 @@
                 </exclusions>
             </dependency>
 
+            <dependency>
+                <groupId>com.github.jsonld-java</groupId>
+                <artifactId>jsonld-java</artifactId>
+                <version>${com.github.jsonld-java.version}</version>
+            </dependency>
+
             <!-- dreaded XML stuff -->
             <dependency>
                 <groupId>xml-apis</groupId>
@@ -350,7 +357,7 @@
                 <groupId>cglib</groupId>
                 <artifactId>cglib</artifactId>
                 <version>${cglib.version}</version>
-                <scope>test</scope>
+                <!--<scope>test</scope>-->
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -517,6 +524,7 @@
         <junit.version>4.11</junit.version>
         <log4j.version>1.2.17</log4j.version>
         <org.apache.jena.version>2.10.0</org.apache.jena.version>
+        <com.github.jsonld-java.version>0.2</com.github.jsonld-java.version>
         <org.hibernate.version>4.1.8.Final</org.hibernate.version>
         <org.springframework.data.commons.version>1.4.0.RELEASE</org.springframework.data.commons.version>
         <org.springframework.data.jpa.version>1.2.0.RELEASE</org.springframework.data.jpa.version>
