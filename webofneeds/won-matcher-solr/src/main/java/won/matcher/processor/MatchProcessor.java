@@ -14,33 +14,17 @@
  * limitations under the License.
  */
 
-package won.matcher.query;
+package won.matcher.processor;
 
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.Query;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.search.SolrIndexSearcher;
+import com.hp.hpl.jena.rdf.model.Model;
 
-import java.io.IOException;
+import java.net.URI;
 
 /**
- * User: gabriel
- * Date: 04.07.13
+ * User: fkleedorfer
+ * Date: 06.09.13
  */
-public abstract class AbstractQuery
+public interface MatchProcessor
 {
-  private BooleanClause.Occur occur;
-
-  protected AbstractQuery(BooleanClause.Occur occur)
-  {
-    this.occur = occur;
-  }
-
-  public abstract Query getQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument) throws IOException;
-
-  public BooleanClause.Occur getOccur()
-  {
-    return occur;
-  }
-
+  public void process(URI from, URI to, double score, final URI originator, Model explanation);
 }

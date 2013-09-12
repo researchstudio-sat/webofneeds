@@ -1,0 +1,56 @@
+/*
+ * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package won.matcher.processor;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
+import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchNeedException;
+
+import java.net.URI;
+
+/**
+ * User: fkleedorfer
+ * Date: 06.09.13
+ */
+public class HintSender implements MatchProcessor
+{
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private MatcherProtocolNeedServiceClient client;
+
+  public HintSender()
+  {
+    //setup matcher client
+    client = new MatcherProtocolNeedServiceClient();
+    client.initializeDefault();
+  }
+
+  @Override
+  public void process(final URI from, final URI to, final double score, final URI originator, final Model explanation)
+  {
+    try {
+      logger.debug("sending hint from {} to {}", from, to);
+      client.hint(from, to, score, originator, explanation);
+    } catch (NoSuchNeedException e) {
+      logger.debug("hint failed: no need found with URI {}", e.getUnknownNeedURI());
+    } catch (IllegalMessageForNeedStateException e) {
+      logger.debug("hint failed: illegal state '{}' for hint to need {}", e.getNeedState(), e.getNeedURI());
+    }
+  }
+}

@@ -39,6 +39,13 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
+        <!-- SPIN -->
+        <dependency>
+            <groupId>org.topbraid</groupId>
+            <artifactId>spin</artifactId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
         <!-- Web of Needs -->
         <dependency>
             <groupId>webofneeds</groupId>
@@ -54,6 +61,8 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
+
+
         <!-- START: used for testing solr -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -66,7 +75,12 @@
             <groupId>org.apache.solr</groupId>
             <scope>compile</scope>
         </dependency>
+
         <!-- END: used for testing solr -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
 
     </dependencies>
 

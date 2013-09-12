@@ -22,20 +22,26 @@ import java.io.IOException;
  * User: atus
  * Date: 05.07.13
  */
-public class SpatialQuery extends AbstractQuery
+public class SpatialQueryFactory extends AbstractQueryFactory
 {
   private final int MAX_DISTANCE = 10;
 
   private String locationField;
 
-  public SpatialQuery(BooleanClause.Occur occur, String locationField)
+  public SpatialQueryFactory(BooleanClause.Occur occur, float boost, String locationField)
+  {
+    super(occur, boost);
+    this.locationField = locationField;
+  }
+
+  public SpatialQueryFactory(final BooleanClause.Occur occur, final String locationField)
   {
     super(occur);
     this.locationField = locationField;
   }
 
   @Override
-  public Query getQuery(final SolrIndexSearcher indexSearcher, final SolrInputDocument inputDocument) throws IOException
+  public Query createQuery(final SolrIndexSearcher indexSearcher, final SolrInputDocument inputDocument) throws IOException
   {
     if (!inputDocument.containsKey(locationField))
       return null;

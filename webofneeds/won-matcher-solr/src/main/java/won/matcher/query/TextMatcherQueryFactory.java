@@ -16,25 +16,30 @@ import java.io.IOException;
  * Date: 02.07.13
  * Time: 16:13
  */
-public class TextMatcherQuery extends AbstractQuery
+public class TextMatcherQueryFactory extends AbstractQueryFactory
 {
   private Logger logger = LoggerFactory.getLogger(getClass());
 
   private String[] fields;
 
-  public TextMatcherQuery(BooleanClause.Occur occur, String[] fields)
+  public TextMatcherQueryFactory(BooleanClause.Occur occur, float boost, String[] fields)
+  {
+    super(occur, boost);
+    this.fields = fields;
+  }
+
+  public TextMatcherQueryFactory(final BooleanClause.Occur occur, final String[] fields)
   {
     super(occur);
     this.fields = fields;
   }
 
-  public Query getQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument) throws IOException
+  public Query createQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument) throws IOException
   {
     int documentId = getDocumentId(indexSearcher, inputDocument);
     if (documentId == -1)
       return null;
 
-    logger.info("Found document: " + indexSearcher.getReader().document(documentId).getFieldable(SolrFields.URL).toString());
 
     MoreLikeThis mlt = new MoreLikeThis(indexSearcher.getReader());
 

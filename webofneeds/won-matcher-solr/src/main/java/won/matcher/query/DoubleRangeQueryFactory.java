@@ -28,19 +28,26 @@ import org.apache.solr.search.SolrIndexSearcher;
  * Date: 03.07.13
  * Time: 12:56
  */
-public class DoubleRangeQuery extends AbstractQuery
+public class DoubleRangeQueryFactory extends AbstractQueryFactory
 {
   private String lowerBoundField;
   private String upperBoundField;
 
-  public DoubleRangeQuery(BooleanClause.Occur occur, String lowerBoundField, String upperBoundField)
+  public DoubleRangeQueryFactory(BooleanClause.Occur occur, float boost, String lowerBoundField, String upperBoundField)
+  {
+    super(occur, boost);
+    this.lowerBoundField = lowerBoundField;
+    this.upperBoundField = upperBoundField;
+  }
+
+  public DoubleRangeQueryFactory(final BooleanClause.Occur occur, final String lowerBoundField, final String upperBoundField)
   {
     super(occur);
     this.lowerBoundField = lowerBoundField;
     this.upperBoundField = upperBoundField;
   }
 
-  public Query getQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument)
+  public Query createQuery(SolrIndexSearcher indexSearcher, SolrInputDocument inputDocument)
   {
     if (!inputDocument.containsKey(lowerBoundField) && !inputDocument.containsKey(upperBoundField))
       return null;

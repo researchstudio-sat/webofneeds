@@ -59,6 +59,46 @@
                 <type>jar</type>
             </dependency>
 
+            <!-- SPIN -->
+            <dependency>
+                <groupId>org.topbraid</groupId>
+                <artifactId>spin</artifactId>
+                <version>1.3.0</version>
+            </dependency>
+
+            <!-- RDF STUFF -->
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-core</artifactId>
+                <version>${org.apache.jena.core.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>xml-apis</artifactId>
+                        <groupId>xml-apis</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xerces</groupId>
+                        <artifactId>xercesImpl</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-arq</artifactId>
+                <version>${org.apache.jena.arq.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>xml-apis</artifactId>
+                        <groupId>xml-apis</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xerces</groupId>
+                        <artifactId>xercesImpl</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
             <!-- Servlet API -->
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -266,39 +306,7 @@
             </dependency>
 
 
-            <!-- RDF STUFF -->
-            <dependency>
-                <groupId>org.apache.jena</groupId>
-                <artifactId>apache-jena-libs</artifactId>
-                <type>pom</type>
-                <version>${org.apache.jena.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>xml-apis</artifactId>
-                        <groupId>xml-apis</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xercesImpl</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
 
-            <dependency>
-                <groupId>org.apache.jena</groupId>
-                <artifactId>jena-arq</artifactId>
-                <version>${org.apache.jena.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>xml-apis</artifactId>
-                        <groupId>xml-apis</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xercesImpl</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
 
             <dependency>
                 <groupId>com.github.jsonld-java</groupId>
@@ -495,6 +503,12 @@
 
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>org.topbraid</id>
+            <url>http://www.topquadrant.com/repository/spin/</url>
+        </repository>
+    </repositories>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -523,15 +537,17 @@
         <com.sun.xml.ws.version>2.2.8-promoted-b146</com.sun.xml.ws.version>
         <junit.version>4.11</junit.version>
         <log4j.version>1.2.17</log4j.version>
-        <org.apache.jena.version>2.10.0</org.apache.jena.version>
         <com.github.jsonld-java.version>0.2</com.github.jsonld-java.version>
+        <org.apache.jena.version>2.9.2</org.apache.jena.version>
+        <org.apache.jena.core.version>2.7.2</org.apache.jena.core.version>
+        <org.apache.jena.arq.version>2.9.2</org.apache.jena.arq.version>
         <org.hibernate.version>4.1.8.Final</org.hibernate.version>
         <org.springframework.data.commons.version>1.4.0.RELEASE</org.springframework.data.commons.version>
         <org.springframework.data.jpa.version>1.2.0.RELEASE</org.springframework.data.jpa.version>
         <org.springframework.version>3.1.2.RELEASE</org.springframework.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
-        <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <org.hsqldb.version>2.2.9</org.hsqldb.version>
+        <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
         <cargo.version>1.4.2</cargo.version>
         <jrebel.version>1.1.3</jrebel.version>

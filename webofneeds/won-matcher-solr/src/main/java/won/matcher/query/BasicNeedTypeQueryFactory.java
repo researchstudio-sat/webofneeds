@@ -14,18 +14,24 @@ import java.io.IOException;
  * User: atus
  * Date: 05.07.13
  */
-public class BasicNeedTypeQuery extends AbstractQuery
+public class BasicNeedTypeQueryFactory extends AbstractQueryFactory
 {
   private final String needTypeField;
 
-  public BasicNeedTypeQuery(BooleanClause.Occur occur, String needTypeField)
+  public BasicNeedTypeQueryFactory(BooleanClause.Occur occur, float boost, String needTypeField)
+  {
+    super(occur, boost);
+    this.needTypeField = needTypeField;
+  }
+
+  public BasicNeedTypeQueryFactory(final BooleanClause.Occur occur, final String needTypeField)
   {
     super(occur);
     this.needTypeField = needTypeField;
   }
 
   @Override
-  public Query getQuery(final SolrIndexSearcher indexSearcher, final SolrInputDocument inputDocument) throws IOException
+  public Query createQuery(final SolrIndexSearcher indexSearcher, final SolrInputDocument inputDocument) throws IOException
   {
     if (!inputDocument.containsKey(needTypeField))
       return null;

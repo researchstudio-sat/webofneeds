@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<!--  
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
  This is the SIREn/Solr datatype analyzer configuration file. This file should 
  be referenced by a SIREn FieldType in the "schema.xml" and should be in the 
  conf directory under the solr home (i.e. ./solr/conf/ by default) 
@@ -150,28 +166,28 @@
     indexed per value, slightly larger index size, and faster range queries.
     A precisionStep of 0 disables indexing at different precision levels.
   -->
-  <datatype name="xsd:int" class="org.sindice.siren.solr.schema.TrieDatatype"
+  <datatype name="http://www.w3.org/2001/XMLSchema#int" class="org.sindice.siren.solr.schema.TrieDatatype"
                            precisionStep="4"
                            type="int"/>
                            
   <!--
     Numeric datatype that indexes an long literal.
   -->
-  <datatype name="xsd:long" class="org.sindice.siren.solr.schema.TrieDatatype"
+  <datatype name="http://www.w3.org/2001/XMLSchema#long" class="org.sindice.siren.solr.schema.TrieDatatype"
                             precisionStep="4"
                             type="long"/>
                            
   <!--
     Numeric datatype that indexes an float literal.
   -->
-  <datatype name="xsd:float" class="org.sindice.siren.solr.schema.TrieDatatype"
+  <datatype name="http://www.w3.org/2001/XMLSchema#float" class="org.sindice.siren.solr.schema.TrieDatatype"
                              precisionStep="4"
                              type="float"/>
                              
   <!--
     Numeric datatype that indexes an float literal.
   -->
-  <datatype name="xsd:double" class="org.sindice.siren.solr.schema.TrieDatatype"
+  <datatype name="http://www.w3.org/2001/XMLSchema#double" class="org.sindice.siren.solr.schema.TrieDatatype"
                               precisionStep="4"
                               type="double"/>
 
