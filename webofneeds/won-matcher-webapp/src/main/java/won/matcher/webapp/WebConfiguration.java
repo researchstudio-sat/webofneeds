@@ -25,7 +25,16 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
     public void configureMessageConverters(List<HttpMessageConverter<?>> httpMessageConverters) {
 
         //httpMessageConverters.add(new RdfModelConverter(new MediaType("text", "csv")));
-        httpMessageConverters.add(new RdfModelConverter(new MediaType("application", "ld+json")));
+
+        MediaType[] rdfTypes = {
+            new MediaType("application", "ld+json"),
+            new MediaType("application", "rdf+xml"),
+            new MediaType("application", "x-turtle"),
+            new MediaType("text", "plain"),
+            new MediaType("text", "turtle"),
+            new MediaType("text", "rdf+n3")
+        };
+        httpMessageConverters.add(new RdfModelConverter(rdfTypes));
         //TODO stopped here (verify the media type is possible), test the RIOT json-ld capabilities
     }
 }
