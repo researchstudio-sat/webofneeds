@@ -25,4 +25,5 @@ public class SolrFields
 
   public static final String TAG = "tag";
 
+  public static final String KEYWORD_SEARCH = "keywordsearch";
 }

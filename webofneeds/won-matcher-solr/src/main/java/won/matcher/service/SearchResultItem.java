@@ -26,9 +26,21 @@ import java.net.URI;
  */
 public class SearchResultItem
 {
+  /**
+   * The match score (betwee 0 and 1)
+   */
   private float score;
+  /**
+   * An RDF model containing title, tags, image links and the first N characters of the content
+   */
   private Model model;
+  /**
+   * The URI of the need
+   */
   private URI uri;
+  /**
+   * An optional RDF model containing an explanation for the search result
+   */
   private Model explanation;
 
   public SearchResultItem(final float score, final Model model, final URI uri, final Model explanation)

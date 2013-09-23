@@ -107,51 +107,65 @@ public class Matcher
    */
   public void processDocument(SolrInputDocument inputDocument) throws IOException
   {
-    String url = null;
+    String url = inputDocument.getFieldValue(SolrFields.URL).toString();
     try {
-      //combine all the queries
-      BooleanQuery booleanQuery = new BooleanQuery();
-      for (QueryFactory queryFactory : queryFactories) {
-        Query q = queryFactory.createQuery(solrIndexSearcher, inputDocument);
-        if (q != null) {
-          q.setBoost(queryFactory.getBoost());
-          logger.debug("Simple query: {}", q.toString());
-          booleanQuery.add(q, queryFactory.getOccur());
-        }
-      }
-
-      logger.debug("Final solr query: {}", QueryParsing.toString(booleanQuery, solrIndexSearcher.getSchema()));
-
-      //get top MAX_MATCHES
-      TopDocs topDocs = solrIndexSearcher.search(booleanQuery, MAX_MATCHES);
-
-      url = inputDocument.getFieldValue(SolrFields.URL).toString();
-
-      //if no matches or not good enough skip them
-      if (topDocs.scoreDocs.length != 0 && topDocs.getMaxScore() >= MATCH_THRESHOLD) {
-        matches.add(new MatchResult(url, topDocs));
-        logger.debug("found {} matches for {}", topDocs.totalHits, url);
-      } else {
-        logger.debug("Found only {} matches with highest score {} for {}. Not sending any hints", new Object[]{topDocs.scoreDocs.length, topDocs.getMaxScore(), url});
-      }
-      if (logger.isDebugEnabled()){
-        logger.debug("matches for {}: ", url);
-        for (int i = 0; i < topDocs.scoreDocs.length; i++) {
-          logger.debug("score {}: {}", topDocs.scoreDocs[i].score, this.solrIndexSearcher.getReader().document(topDocs.scoreDocs[i].doc).get(SolrFields.URL));
-        }
-      }
-      /*
-      if (logger.isDebugEnabled()){
-        //explain all scored document scores
-        for (int i = 0; i < topDocs.scoreDocs.length; i++) {
-          Explanation explanation = solrIndexSearcher.explain(booleanQuery,topDocs.scoreDocs[i].doc);
-          logger.debug("explanation for score doc {}: \n{}",topDocs.scoreDocs[i].doc, explanation);
-        }
-      }
-      */
+      BooleanQuery booleanQuery = createQueryForDocument(inputDocument);
+      processQuery(url, booleanQuery);
     } catch (Throwable t) {
       logger.info("caught throwable while processing doc with url {}", url, t);
     }
+  }
+
+
+
+
+  /**
+   * Executes queries for the specified document. Matches are stored in an internal
+   * queue and are processed in <code>processMatches()</code>.
+   * @param url
+   * @param booleanQuery
+   * @throws IOException
+   */
+  private void processQuery(final String url, final BooleanQuery booleanQuery) throws IOException
+  {
+    logger.debug("Final solr query: {}", QueryParsing.toString(booleanQuery, solrIndexSearcher.getSchema()));
+    //get top MAX_MATCHES
+    TopDocs topDocs = solrIndexSearcher.search(booleanQuery, MAX_MATCHES);
+    //if no matches or not good enough skip them
+    if (topDocs.scoreDocs.length != 0 && topDocs.getMaxScore() >= MATCH_THRESHOLD) {
+      matches.add(new MatchResult(url, topDocs));
+      logger.debug("found {} matches for {}", topDocs.totalHits, url);
+    } else {
+      logger.debug("Found only {} matches with highest score {} for {}. Not sending any hints", new Object[]{topDocs.scoreDocs.length, topDocs.getMaxScore(), url});
+    }
+    if (logger.isDebugEnabled()){
+      logger.debug("matches for {}: ", url);
+      for (int i = 0; i < topDocs.scoreDocs.length; i++) {
+        logger.debug("score {}: {}", topDocs.scoreDocs[i].score, this.solrIndexSearcher.getReader().document(topDocs.scoreDocs[i].doc).get(SolrFields.URL));
+      }
+    }
+  }
+
+  /**
+   * Creates and returns a query that is used to identify the most similar documents for the specified document.
+   * Used internally from processDocument(), but can safely be used externally.
+   * @param inputDocument
+   * @return
+   * @throws IOException
+   */
+  public BooleanQuery createQueryForDocument(final SolrInputDocument inputDocument) throws IOException
+  {
+    //combine all the queries
+    BooleanQuery booleanQuery = new BooleanQuery();
+    for (QueryFactory queryFactory : queryFactories) {
+      Query q = queryFactory.createQuery(solrIndexSearcher, inputDocument);
+      if (q != null) {
+        q.setBoost(queryFactory.getBoost());
+        logger.debug("Simple query: {}", q.toString());
+        booleanQuery.add(q, queryFactory.getOccur());
+      }
+    }
+    return booleanQuery;
   }
 
 

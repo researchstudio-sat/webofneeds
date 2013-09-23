@@ -321,16 +321,7 @@ public class SolrMatcherTests
 
 
 
-  private static String getNTriples(String filename, String baseURI) throws FileNotFoundException
-  {
-    File file = new File(filename);
-    if (!file.exists()) {
-      System.err.println("file not found: " + file.getAbsolutePath());
-    }
-    Model model = readTTL(filename, baseURI);
-    convertTextualSparqlToSpinRDF(model);
-    return toNTriples(model, baseURI);
-  }
+
 
   private static void convertTextualSparqlToSpinRDF(final Model model)
   {
@@ -341,7 +332,16 @@ public class SolrMatcherTests
     // replaced by their representation in SPIN RDF.
     SPINUtils.replaceSpinTextWithSpinRdf(model);
   }
-
+  private static String getNTriples(String filename, String baseURI) throws FileNotFoundException
+  {
+    File file = new File(filename);
+    if (!file.exists()) {
+      System.err.println("file not found: " + file.getAbsolutePath());
+    }
+    Model model = readTTL(filename, baseURI);
+    convertTextualSparqlToSpinRDF(model);
+    return toNTriples(model, baseURI);
+  }
   private static Model readTTL(String filename, String baseURI) throws FileNotFoundException
   {
     System.out.println("loading ntriples data for " + baseURI + " from " + filename);
