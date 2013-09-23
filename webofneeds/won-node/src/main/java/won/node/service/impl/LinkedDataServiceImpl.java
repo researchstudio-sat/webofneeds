@@ -197,7 +197,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
         eventMember.addProperty(WON.HAS_ORIGINATOR, model.createResource(e.getOriginatorUri().toString()));
 
       if (e.getCreationDate() != null)
-        eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
+        eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.toLiteral(e.getCreationDate()), XSDDatatype.XSDdateTime);
 
       Model additionalDataModel = rdfStorage.loadContent(e);
       if (additionalDataModel != null && additionalDataModel.size() > 0) {

@@ -24,7 +24,10 @@ public class NeedModelMapper implements ModelMapper<Need>
   {
     Model model = ModelFactory.createDefaultModel();
     Resource needResource = model.createResource(need.getNeedURI().toString(), WON.NEED);
-    model.add(model.createStatement(needResource, WON.NEED_CREATION_DATE, DateTimeUtils.format(need.getCreationDate())));
+    Literal creationDate = DateTimeUtils.toLiteral(need.getCreationDate(), model);
+    if (creationDate != null) {
+      model.add(model.createStatement(needResource, WON.NEED_CREATION_DATE, creationDate));
+    }
     model.add(model.createStatement(needResource, WON.IS_IN_STATE, WON.toResource(need.getState())));
 
     // We don't add the need owner's endpoint here as this is confidential information
@@ -47,8 +50,7 @@ public class NeedModelMapper implements ModelMapper<Need>
 
     Statement dateStat = needRes.getProperty(WON.NEED_CREATION_DATE);
     if (dateStat != null && dateStat.getObject().isLiteral()) {
-      String dateTime = dateStat.getObject().asLiteral().getString();
-      need.setCreationDate(DateTimeUtils.parse(dateTime));
+      need.setCreationDate(DateTimeUtils.toDate(dateStat.getObject().asLiteral(), model));
       logger.debug("found needCreationDate literal value '{}'",dateStat.getObject().asLiteral().getString());
     } else {
       logger.debug("no needCreationDate property found for need resource {}", needRes.getURI());
