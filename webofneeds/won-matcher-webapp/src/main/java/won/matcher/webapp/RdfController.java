@@ -2,6 +2,9 @@ package won.matcher.webapp;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.vocabulary.VCARD;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,8 +31,10 @@ public class RdfController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public com.hp.hpl.jena.rdf.model.Model getSearchResults() {
+    //public com.hp.hpl.jena.rdf.model.Model getSearchResults(com.hp.hpl.jena.rdf.model.Model query) { //TODO spring tries to instantiate the interface for some reason q.q
         System.out.println("GOT HERE! 1 -------------------------");
-        Model model = ModelFactory.createDefaultModel(); //TODO temp changme
+        //TODO call matcher service
+        Model model = getTestModelDeleteMe();
         System.out.println("GOT HERE! 2 -------------------------");
 
         return model;
@@ -57,4 +62,25 @@ public class RdfController {
     public void setBookCase(@RequestBody BookCase bookCase) {
         this.bookCase = bookCase;
     }*/
+    private Model getTestModelDeleteMe() {
+        // some definitions
+        String personURI    = "http://somewhere/JohnSmith";
+        String givenName    = "John";
+        String familyName   = "Smith";
+        String fullName     = givenName + " " + familyName;
+
+        // create an empty Model
+        Model model = ModelFactory.createDefaultModel();
+
+        // create the resource
+        //   and add the properties cascading style
+        Resource johnSmith
+                = model.createResource(personURI)
+                .addProperty(VCARD.FN, fullName)
+                .addProperty(VCARD.N,
+                        model.createResource()
+                                .addProperty(VCARD.Given, givenName)
+                                .addProperty(VCARD.Family, familyName));
+        return model;
+    }
 }
