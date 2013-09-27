@@ -130,6 +130,9 @@ public class WON
   public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
   public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
 
+  //search result model (TODO: we may want to put those into their own ontology)
+  public static final Property SEARCH_RESULT_URI = m.createProperty(BASE_URI,"uri");
+  public static final Property SEARCH_RESULT_PREVIEW = m.createProperty(BASE_URI, "preview");
 
 
   /**

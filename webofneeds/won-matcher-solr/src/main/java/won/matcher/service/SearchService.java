@@ -24,16 +24,22 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.util.Version;
+import org.apache.solr.core.CoreContainer;
 import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 import won.matcher.Matcher;
 import won.matcher.solr.NeedSolrInputDocumentBuilder;
 import won.protocol.solr.SolrFields;
 import won.protocol.util.NeedModelBuilder;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -53,36 +59,48 @@ public class SearchService
    */
   private URI originatorURI;
 
-  public SearchService(final SolrIndexSearcher solrIndexSearcher, final Matcher matcher, final ScoreTransformer scoreTransformer, final URI originatorURI)
+  /**
+   * Constructor that instantiates a CoreContainer with specified config file and solr directory, then creates a new
+   * SolrIndexSearcher for the specified core.
+   * @param solrConfigFile
+   * @param solrHome
+   * @param coreName
+   * @param scoreTransformer
+   * @param originatorURI
+   * @throws IOException
+   * @throws SAXException
+   * @throws ParserConfigurationException
+   */
+  public SearchService(File solrHome, File solrConfigFile, String coreName, final ScoreTransformer scoreTransformer, final URI originatorURI) throws IOException, SAXException, ParserConfigurationException
   {
-    this.solrIndexSearcher = solrIndexSearcher;
-    this.matcher = matcher;
+    CoreContainer coreContainer = new CoreContainer();
+    coreContainer.load(solrHome.getAbsolutePath(), solrConfigFile);
+    this.solrIndexSearcher = coreContainer.getCore(coreName).newSearcher(coreName);
+    this.matcher = new Matcher(this.solrIndexSearcher, scoreTransformer, originatorURI);
     this.originatorURI = originatorURI;
     this.scoreTransformer = scoreTransformer;
   }
 
   public SearchResult search(String keywords, int numResults){
-    try {
-      Query query = createKeywordQuery(keywords);
-      return createSearchResult(this.solrIndexSearcher.search(query, numResults), this.originatorURI);
-    } catch (Throwable t) {
-      logger.info("could not perform keyword search", t);
-    }
-    return null;
+   return search(keywords, null, numResults);
   }
-
-
 
   public SearchResult search(String keywords, Model needModel, int numResults){
     try {
-      Query query = createKeywordQuery(keywords);
-      NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
-      NeedModelBuilder needModelBuilder = new NeedModelBuilder();
-      needModelBuilder.copyValuesFromProduct(needModel);
-      needModelBuilder.copyValuesToBuilder(builder);
-      BooleanQuery combinedQuery = matcher.createQueryForDocument(builder.build());
-      combinedQuery.add(query, BooleanClause.Occur.MUST);
-      return createSearchResult(this.solrIndexSearcher.search(combinedQuery, numResults), this.originatorURI);
+      BooleanQuery combinedQuery = new BooleanQuery();
+      if (keywords != null && keywords.length() > 0) {
+        combinedQuery.add(createKeywordQuery(keywords), BooleanClause.Occur.MUST);
+      }
+      if (needModel != null && needModel.size() > 0) {
+        NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
+        NeedModelBuilder needModelBuilder = new NeedModelBuilder();
+        needModelBuilder.copyValuesFromProduct(needModel);
+        needModelBuilder.copyValuesToBuilder(builder);
+        combinedQuery.add(matcher.createQueryForDocument(builder.build()),BooleanClause.Occur.MUST);
+      }
+      if (combinedQuery.getClauses().length > 0) {
+        return createSearchResult(this.solrIndexSearcher.search(combinedQuery, numResults), this.originatorURI);
+      }
     } catch (Throwable t) {
       logger.info("could not perform keyword search", t);
     }
@@ -90,18 +108,9 @@ public class SearchService
   }
 
   public SearchResult search(Model needModel, int numResults){
-    try {
-      NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
-      NeedModelBuilder needModelBuilder = new NeedModelBuilder();
-      needModelBuilder.copyValuesFromProduct(needModel);
-      needModelBuilder.copyValuesToBuilder(builder);
-      BooleanQuery combinedQuery = matcher.createQueryForDocument(builder.build());
-      return createSearchResult(this.solrIndexSearcher.search(combinedQuery, numResults), this.originatorURI);
-    } catch (Throwable t) {
-      logger.info("could not perform need search", t);
-    }
-    return null;
+    return search(null, needModel, numResults);
   }
+
 
 
   private Query createKeywordQuery(final String keywords) throws ParseException
@@ -112,19 +121,27 @@ public class SearchService
   }
 
   private SearchResult createSearchResult(TopDocs topDocs, URI originatorURI){
+    List<SearchResultItem> items = new ArrayList();
     try {
       IndexReader indexReader = this.solrIndexSearcher.getIndexReader();
-      if (topDocs.totalHits == 0) return new SearchResult(new ArrayList());
+      if (topDocs.totalHits == 0) return new SearchResult(this.originatorURI, items);
+      logger.debug("search yields {} results", topDocs.totalHits);
       for (int i = 0; i < topDocs.totalHits; i++){
         ScoreDoc scoreDoc = topDocs.scoreDocs[i];
-        Document doc = indexReader.document(scoreDoc.doc);
-        Model resultContent = createSearchResultModel(doc);
-        SearchResultItem item = new SearchResultItem(scoreTransformer.transform(scoreDoc.score),resultContent,URI.create(doc.get(SolrFields.URL)),  null);
+        logger.debug("processing result {} with score {}", i, scoreDoc.score);
+        if (scoreTransformer.isAboveInputThreshold(scoreDoc.score)){
+          float transformedScore = scoreTransformer.transform(scoreDoc.score);
+          logger.debug("score {} transformed to {}", scoreDoc.score, transformedScore);
+          Document doc = indexReader.document(scoreDoc.doc);
+          Model resultContent = createSearchResultModel(doc);
+          SearchResultItem item = new SearchResultItem(scoreTransformer.transform(scoreDoc.score),resultContent,URI.create(doc.get(SolrFields.URL)),  null);
+          items.add(item);
+        }
       }
     } catch (Throwable t) {
       logger.info("could not create search result", t);
     }
-    return new SearchResult(new ArrayList());
+    return new SearchResult(this.originatorURI,items);
   }
 
   private Model createSearchResultModel(final Document document)
@@ -151,4 +168,6 @@ public class SearchService
         //.addInterval(document.get(SolrFields.TIME_START), document.get(SolrFields.TIME_END)) TODO: we don't have time intervals in the solr doc yet.
         .build();
   }
+
+
 }

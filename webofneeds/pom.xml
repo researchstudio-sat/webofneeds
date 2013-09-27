@@ -98,6 +98,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-jsonld</artifactId>
+                <version>0.0.1-jena2.7.2-backport</version>
+            </dependency>
 
             <!-- Servlet API -->
             <dependency>
@@ -187,6 +192,11 @@
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-jpa</artifactId>
                 <version>${org.springframework.data.jpa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-solr</artifactId>
+                <version>1.0.0.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
@@ -587,6 +597,8 @@
                 <won.node-test.properties.dir>src/test/resources.localhost</won.node-test.properties.dir>
                 <won.owner.properties.dir>src/main/resources.localhost</won.owner.properties.dir>
                 <won.owner-test.properties.dir>src/test/resources.localhost</won.owner-test.properties.dir>
+                <won.matcher.properties.dir>src/main/resources.localhost</won.matcher.properties.dir>
+                <won.matcher-test.properties.dir>src/test/resources.localhost</won.matcher-test.properties.dir>
             </properties>
         </profile>
 

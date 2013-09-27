@@ -28,6 +28,7 @@ import won.matcher.processor.MatchProcessor;
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.matcher.query.*;
 import won.matcher.query.rdf.TriplesQueryFactory;
+import won.matcher.service.ScoreTransformer;
 import won.protocol.solr.SolrFields;
 
 import java.io.IOException;
@@ -49,6 +50,10 @@ public class Matcher
 
   private SolrIndexSearcher solrIndexSearcher;
 
+  private ScoreTransformer scoreTransformer;
+
+  private URI originatorURI;
+
   private Set<String> hintMemory = new HashSet<String>();
 
   private ConcurrentLinkedQueue<MatchResult> matches;
@@ -60,9 +65,6 @@ public class Matcher
   private static final boolean SUPPRESS_HINTS = true;
 
   private static final int MAX_MATCHES = 5;
-  private static final double MATCH_THRESHOLD = 0.2;
-    private static final float MIN_SCORE = 0;
-    private static final float MAX_SCORE = 10;
 
   /**
    * Creates Solr/SIREn queries for <code>SolrIndexDocument</code>s and delegates actions for identified matches to
@@ -71,10 +73,12 @@ public class Matcher
    *
    * @param solrIndexSearcher
    */
-  public Matcher(SolrIndexSearcher solrIndexSearcher)
+  public Matcher(SolrIndexSearcher solrIndexSearcher, ScoreTransformer scoreTransformer, URI originatorURI)
   {
     logger.debug("Matcher initialized");
     this.solrIndexSearcher = solrIndexSearcher;
+    this.scoreTransformer = scoreTransformer;
+    this.originatorURI = originatorURI;
 
     //add all queries
     queryFactories = new HashSet<>();
@@ -132,7 +136,8 @@ public class Matcher
     //get top MAX_MATCHES
     TopDocs topDocs = solrIndexSearcher.search(booleanQuery, MAX_MATCHES);
     //if no matches or not good enough skip them
-    if (topDocs.scoreDocs.length != 0 && topDocs.getMaxScore() >= MATCH_THRESHOLD) {
+
+    if (topDocs.scoreDocs.length != 0 && scoreTransformer.isAboveInputThreshold(topDocs.getMaxScore())) {
       matches.add(new MatchResult(url, topDocs));
       logger.debug("found {} matches for {}", topDocs.totalHits, url);
     } else {
@@ -175,7 +180,7 @@ public class Matcher
    */
   public void processMatches()
   {
-    URI originator = URI.create("http://LDSpiderMatcher.webofneeds");
+
     IndexReader indexReader = solrIndexSearcher.getIndexReader();
 
     while (!matches.isEmpty()) {
@@ -187,16 +192,16 @@ public class Matcher
           URI toDoc = URI.create(document.get(SolrFields.URL));
           logger.debug("preparing to send match between {} and {} with score {}", new Object[]{fromDoc, toDoc,scoreDoc.score});
           if (toDoc.equals(fromDoc)) continue;
-          if (scoreDoc.score < MATCH_THRESHOLD) {
-            logger.debug("score {} lower than threshold {}, suppressed match between {} and {}", new Object[]{scoreDoc.score, MATCH_THRESHOLD, fromDoc, toDoc});
+          if (!scoreTransformer.isAboveInputThreshold(scoreDoc.score)) {
+            logger.debug("score {} lower than threshold {}, suppressed match between {} and {}", new Object[]{scoreDoc.score, scoreTransformer.getInputThreshold(), fromDoc, toDoc});
             continue;
           }
-          double normalizedScore = normalizeScore(scoreDoc.score);
+          double normalizedScore = scoreTransformer.transform(scoreDoc.score);
           logger.debug("score of {} was normalized to {}", scoreDoc.score, normalizedScore);
           if (isNewHint(fromDoc, toDoc, normalizedScore)) {
             logger.debug("calling MatchProcessors for match {} -> {} :: {}", new Object[]{fromDoc, toDoc, normalizedScore});
             for (MatchProcessor proc: matchProcessors){
-              proc.process(fromDoc,toDoc,normalizedScore,originator,null);
+              proc.process(fromDoc,toDoc,normalizedScore,originatorURI,null);
             }
           } else {
             logger.debug("Suppressed duplicate hint {} -> {} :: {}", new Object[]{fromDoc, toDoc, normalizedScore});
@@ -209,14 +214,6 @@ public class Matcher
 
   }
 
-    /**
-     * Maps the input value between MIN_SCORE and MAX_SCORE linearly to [0,1]
-     * @param score
-     * @return
-     */
-    private double normalizeScore(float score) {
-        return Math.min(1,Math.max(0,(score - MIN_SCORE)/(MAX_SCORE-MIN_SCORE)));
-    }
 
     private boolean isNewHint(URI fromURI, URI toURI, double score){
       return this.hintMemory.add("" + fromURI + toURI + Double.toString(score));

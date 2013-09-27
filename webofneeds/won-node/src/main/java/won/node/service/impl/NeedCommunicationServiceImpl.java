@@ -38,7 +38,6 @@ import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
-import javax.persistence.PersistenceException;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -136,7 +135,7 @@ public class NeedCommunicationServiceImpl implements
     eventNode.addLiteral(WON.HAS_MATCH_SCORE, score);
     matchDataModel.setNsPrefix("",eventNode.getURI().toString());
     if (content != null) {
-      RdfUtils.replaceBaseURI(content, eventNode);
+      RdfUtils.replaceBaseResource(content, eventNode);
       matchDataModel.add(content);
     }
 
@@ -374,7 +373,7 @@ public class NeedCommunicationServiceImpl implements
     Resource eventNode = extraDataModel.createResource(this.URIService.createEventURI(con,event).toString());
     extraDataModel.setNsPrefix("",eventNode.getURI().toString());
     if (content != null) {
-      RdfUtils.replaceBaseURI(content, eventNode);
+      RdfUtils.replaceBaseResource(content, eventNode);
       rdfStorageService.storeContent(event, extraDataModel);
     }
   }

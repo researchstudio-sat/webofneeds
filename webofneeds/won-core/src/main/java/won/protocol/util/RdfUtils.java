@@ -6,6 +6,8 @@ import com.hp.hpl.jena.util.ResourceUtils;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: gabriel
@@ -66,7 +68,7 @@ public class RdfUtils
    * @param model
    * @param replacement
    */
-  public static void replaceBaseURI(final Model model, final Resource replacement)
+  public static void replaceBaseResource(final Model model, final Resource replacement)
   {
     String baseURI = model.getNsPrefixURI("");
     if (baseURI == null) return;
@@ -87,5 +89,36 @@ public class RdfUtils
     }
   }
 
+  /**
+   * Adds the specified objectModel to the model of the specified subject, linking the subject with the objectModel's
+   * resource identifying its base URI via the specified property.
+   * @param subject
+   * @param property
+   * @param objectModel
+   */
+  public static void attachModelByBaseResource(final Resource subject, final Property property, final Model objectModel){
+    Model subjectModel = subject.getModel();
+    Resource blanknodeForBaseUri = subjectModel.createResource();
+    subject.addProperty(property, blanknodeForBaseUri);
+    RdfUtils.replaceBaseResource(objectModel, blanknodeForBaseUri);
+    //add all of specified model to the subject's model
+    subjectModel.add(objectModel);
+    subjectModel.setNsPrefixes(mergeNsPrefixes(subjectModel.getNsPrefixMap(), objectModel.getNsPrefixMap()));
+  }
+
+  /**
+   * Creates a new Map object containing all prefixes from both specified maps. When prefix mappings clash, the mappings
+   * from prioritaryPrefixes are used.
+   * @param prioritaryPrefixes
+   * @param additionalPrefixes
+   * @return
+   */
+  public static Map<String, String> mergeNsPrefixes(final Map<String, String> prioritaryPrefixes, final Map<String, String> additionalPrefixes)
+  {
+    Map<String, String> mergedPrefixes = new HashMap<String, String>();
+    mergedPrefixes.putAll(additionalPrefixes);
+    mergedPrefixes.putAll(prioritaryPrefixes); //overwrites the additional prefixes when clashing
+    return mergedPrefixes;
+  }
 
 }

@@ -1,11 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.springapp</groupId>
+    <groupId>webofneeds</groupId>
     <artifactId>won-matcher-webapp</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
-    <name>won-matcher-webapp</name>
+    <name>WON matcher web application</name>
 
     <parent>
         <groupId>webofneeds</groupId>
@@ -14,43 +13,45 @@
     </parent>
 
     <dependencies>
+        <!-- internal dependencies -->
+        <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-matcher-solr</artifactId>
+            <version>${project.version}</version>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
+        <!-- spring dependencies -->
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-solr</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
-
-
-        <dependency> <!--TODO deleteme -->
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.1</version>
-            <scope>provided</scope>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
+
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -58,50 +59,63 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- servlet & web layer dependencies -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
         <dependency>
-            <groupId>com.github.jsonld-java</groupId>
-            <artifactId>jsonld-java</artifactId>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
-        <!--<dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson</artifactId>
-            <version>4.8.2</version>
-        </dependency>-->
+
+
+        <!-- RDF dependencies -->
         <dependency>
             <groupId>org.apache.jena</groupId>
-            <artifactId>apache-jena-libs</artifactId>
-            <type>pom</type>
+            <artifactId>jena-core</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-jsonld</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
 
     </dependencies>
 
     <build>
-        <finalName>won-matcher-webapp</finalName>
+        <finalName>matcher</finalName>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <includes>
-                        <include>**/*Tests.java</include>
-                    </includes>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies-to-node-webapp</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
+                        </configuration>
+                    </execution>
+                </executions>
+
             </plugin>
         </plugins>
     </build>

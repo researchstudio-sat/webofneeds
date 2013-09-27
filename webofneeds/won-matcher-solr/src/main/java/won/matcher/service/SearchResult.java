@@ -16,6 +16,7 @@
 
 package won.matcher.service;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,10 +26,12 @@ import java.util.List;
  */
 public class SearchResult
 {
+  private URI originator;
   private List<SearchResultItem> items;
 
-  public SearchResult(final List<SearchResultItem> items)
+  public SearchResult(URI originator, final List<SearchResultItem> items)
   {
+    this.originator = originator;
     this.items = Collections.unmodifiableList(items);
   }
 
@@ -37,4 +40,8 @@ public class SearchResult
     return items;
   }
 
+  public URI getOriginator()
+  {
+    return originator;
+  }
 }

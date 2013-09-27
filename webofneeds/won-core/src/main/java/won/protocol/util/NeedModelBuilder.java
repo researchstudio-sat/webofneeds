@@ -35,7 +35,6 @@ import java.util.Date;
 public class NeedModelBuilder extends NeedBuilderBase<Model>
 {
 
-
   @Override
   public Model build()
   {
@@ -216,6 +215,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
   private Model buildNeedModel()
   {
     Model needModel = ModelFactory.createDefaultModel();
+    DefaultPrefixUtils.setDefaultPrefixes(needModel);
     if (getURI() != null) {
       needModel.setNsPrefix("",getURI().toString());
     }
@@ -289,7 +289,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     if (getContentDescription() != null) {
       Model contentDescriptionModel = getContentDescription();
       Resource linkingBlankNode = needModel.createResource();
-      RdfUtils.replaceBaseURI(contentDescriptionModel, linkingBlankNode);
+      RdfUtils.replaceBaseResource(contentDescriptionModel, linkingBlankNode);
       needContent.addProperty(WON.HAS_CONTENT_DESCRIPTION, linkingBlankNode);
       needModel.add(contentDescriptionModel);
     }

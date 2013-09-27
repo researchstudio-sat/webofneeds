@@ -1,15 +1,35 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:solr="http://www.springframework.org/schema/data/solr"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/data/solr http://www.springframework.org/schema/data/solr/spring-solr-1.0.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:component-scan base-package="won.matcher.webapp"/> <!-- searches here for annotated classes -->
+
+    <context:property-placeholder location="classpath:matcher.properties" />
+
+    <!-- solr server via spring-data-solr. Below are the two options for embedded and http variants -->
+    <!-- http variant
+    <solr:solr-server id="solrServer" url="http://locahost:8983/solr" />
+    -->
+    <!-- embedded variant -->
+    <solr:embedded-solr-server id="solrServer" solrHome="${matcher.solr.home}" />
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 
+    <bean id="searchService" class="won.matcher.service.SearchService">
+        <constructor-arg index="0" value="${matcher.solr.home}" />
+        <constructor-arg index="1" value="${matcher.solr.configfile}" />
+        <constructor-arg index="2" value="${matcher.solr.corename}" />
+        <constructor-arg index="3">
+            <bean class="won.matcher.service.ScoreTransformer"/>
+        </constructor-arg>
+        <constructor-arg index="4" value="${matcher.uri}" />
+    </bean>
 </beans>

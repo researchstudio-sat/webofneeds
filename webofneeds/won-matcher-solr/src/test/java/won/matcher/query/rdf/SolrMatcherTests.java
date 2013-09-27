@@ -40,6 +40,7 @@ import org.sindice.siren.search.*;
 import org.xml.sax.SAXException;
 import won.matcher.Matcher;
 import won.matcher.processor.MatchProcessor;
+import won.matcher.service.ScoreTransformer;
 import won.protocol.solr.SolrFields;
 import won.protocol.vocabulary.WON;
 
@@ -285,15 +286,18 @@ public class SolrMatcherTests
 
   private void assertTopHit(String docId, String topHitDocNum) throws IOException
   {
-    Matcher m = new Matcher(searcher);
+    Matcher m = new Matcher(searcher,new ScoreTransformer(), URI.create("http://www.example.com/matcher"));
     HintCountingMatchProcessor proc = new HintCountingMatchProcessor();
     m.addMatchProcessor(proc);
-    m.processDocument(testDocuments.get(makeNeedUriString(docId))); //doc nr 11 is the one containing SPIN
+    m.processDocument(testDocuments.get(makeNeedUriString(docId)));
     m.processMatches();
     List<MatchScore> scores = proc.getMatchScores(makeNeedUri(docId));
     Assert.assertTrue(scores.size() > 0);
     //we know that doc 12 is the best match
     URI topHit = scores.get(0).uri;
+    for (int i = 0; i < scores.size(); i++) {
+      System.out.println(" match " + i + ": " + scores.get(i));
+    }
     Assert.assertEquals(makeNeedUri(topHitDocNum), topHit);
   }
 
@@ -415,6 +419,15 @@ public class SolrMatcherTests
     {
       this.uri = uri;
       this.score = score;
+    }
+
+    @Override
+    public String toString()
+    {
+      return "MatchScore{" +
+          "uri=" + uri +
+          ", score=" + score +
+          '}';
     }
   }
 

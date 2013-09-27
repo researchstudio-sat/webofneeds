@@ -224,7 +224,7 @@ public class NeedController
     model.setNsPrefix("", baseURI);
     model.read(new StringReader(rdfAsString), baseURI, rdfLanguage);
     Resource linkingBlankNode = model.createResource();
-    RdfUtils.replaceBaseURI(model,linkingBlankNode);
+    RdfUtils.replaceBaseResource(model, linkingBlankNode);
     resourceToLinkTo.addProperty(propertyToLinkThrough, linkingBlankNode);
     modelToModify.add(model);
   }

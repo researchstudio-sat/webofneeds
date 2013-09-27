@@ -104,7 +104,7 @@ public class NeedSolrInputDocumentBuilder extends NeedBuilderBase<SolrInputDocum
     if (contentDescription != null){
       StringWriter writer = new StringWriter();
       NeedModelBuilder needModelBuilder = new NeedModelBuilder();
-      copyValuesTo(needModelBuilder);
+      copyValuesToBuilder(needModelBuilder);
       Model model = needModelBuilder.build();
       model.write(writer, FileUtils.langNTriple, getURI().toString());
       doc.addField(field, writer.toString());
