@@ -8,7 +8,7 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
     <packaging>war</packaging>
-    <name>WON owner web application</name>
+    <name>Owner Webapp</name>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>won-owner-webapp</artifactId>
 

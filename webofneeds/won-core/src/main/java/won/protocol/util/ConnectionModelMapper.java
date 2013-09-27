@@ -3,7 +3,6 @@ package won.protocol.util;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WON;
@@ -18,7 +17,6 @@ import java.net.URI;
 public class ConnectionModelMapper implements ModelMapper<Connection>
 {
 
-  //TODO: needs rewriting
   @Override
   public Model toModel(Connection connection)
   {

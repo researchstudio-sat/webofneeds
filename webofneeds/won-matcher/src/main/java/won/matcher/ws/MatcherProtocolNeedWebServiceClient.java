@@ -24,7 +24,6 @@ public class MatcherProtocolNeedWebServiceClient extends Service {
 
 
     /**
-     * TODO: We want to be able to pass the web service URI directly here... We already know the content of the wsdl file... right?
      * @param wsdlLocation
      */
     public MatcherProtocolNeedWebServiceClient(URL wsdlLocation) {

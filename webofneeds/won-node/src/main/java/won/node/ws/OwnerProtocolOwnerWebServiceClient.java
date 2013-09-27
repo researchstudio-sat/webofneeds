@@ -21,7 +21,6 @@ public class OwnerProtocolOwnerWebServiceClient extends Service {
 
 
     /**
-     * TODO: We want to be able to pass the web service URI directly here... We already know the content of the wsdl file... right?
      * @param wsdlLocation
      */
     public OwnerProtocolOwnerWebServiceClient(URL wsdlLocation) {

@@ -188,7 +188,6 @@ public class NeedCommunicationServiceImpl implements
     List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
     if (existingConnections.size() > 0) {
       for (Connection conn : existingConnections) {
-        //TODO: Move this to the transition() - Method in ConnectionState
         if (ConnectionState.CONNECTED == conn.getState() ||
             ConnectionState.REQUEST_SENT == conn.getState()) {
           throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);

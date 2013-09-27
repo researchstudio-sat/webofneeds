@@ -12,7 +12,7 @@
     <artifactId>won-node-webapp</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>WON node web application</name>
+    <name>Node Webapp</name>
     <url>http://www.springframework.org/spring-ws</url>
 
     <dependencies>

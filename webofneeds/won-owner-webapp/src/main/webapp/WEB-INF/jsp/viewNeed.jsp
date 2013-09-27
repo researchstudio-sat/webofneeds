@@ -43,10 +43,6 @@
             Recur times:<c:out value="${pojo.recurTimes}" /><br />
             Recur infinite times:<c:out value="${pojo.recurInfiniteTimes}" /><br />
         </dd>
-    <dt>Matching constraint:</dt>
-        <dd>
-            <c:out value="${pojo.matchingConstraint}" />
-        </dd>
     <dt>Content description:</dt>
         <dd>
             <c:out value="${pojo.contentDescription}" />

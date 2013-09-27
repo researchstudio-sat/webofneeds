@@ -26,7 +26,7 @@
     </parent>
     <artifactId>won-core</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <name>won-core</name>
+    <name>Core</name>
 
     <dependencies>
         <!--

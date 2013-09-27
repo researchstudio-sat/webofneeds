@@ -97,7 +97,6 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURI, otherNeedURI);
         if (existingConnections.size() > 0){
             for(Connection conn: existingConnections){
-                //TODO: Move this to the transition() - Method in ConnectionState
                 if (ConnectionState.CONNECTED == conn.getState() ||
                         ConnectionState.REQUEST_RECEIVED == conn.getState()) {
                     throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),ownNeedURI,otherNeedURI);
@@ -111,14 +110,8 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
             con.setNeedURI(ownNeedURI);
             con.setState(ConnectionState.REQUEST_RECEIVED);
             con.setRemoteNeedURI(otherNeedURI);
-
-            //TODO problem: remote connection URI not available here! Do we need it? Do we adapt the interface? (using core interface - we could split it)
-            //con.setRemoteConnectionURI(otherConnectionURI);
-            //create and set new uri
             con.setConnectionURI(ownConnectionURI);
             connectionRepository.saveAndFlush(con);
-
-            //TODO: do we save the connection message? where? as a chat message?
         }
     }
 

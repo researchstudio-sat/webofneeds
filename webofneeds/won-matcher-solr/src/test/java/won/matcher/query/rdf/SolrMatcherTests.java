@@ -329,10 +329,11 @@ public class SolrMatcherTests
 
   private static void convertTextualSparqlToSpinRDF(final Model model)
   {
-    // TODO: SPAQRL queries embedded in the RDF can't use the ns prefixes of the surrounding
+    // SPAQRL queries embedded in the RDF can't use the ns prefixes of the surrounding
     // RDF when it has been converted to ntriples, this leads to an error.
     // The quick fix is to add @prefix declarations in all embedded SPARQL queries, but obviously,
-    // that's not ideal. Solution: when a document is added to the index, all sp:text triples should be
+    // that's not ideal.
+    // Solution: when a document is added to the index, all sp:text triples should be
     // replaced by their representation in SPIN RDF.
     SPINUtils.replaceSpinTextWithSpinRdf(model);
   }

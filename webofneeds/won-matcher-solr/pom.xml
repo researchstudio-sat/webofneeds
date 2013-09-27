@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
     <groupId>webofneeds</groupId>
-    <artifactId>won-matcher-solr</artifactId>
+    <artifactId>Matcher</artifactId>
     <dependencies>
         <!--
 

@@ -13,7 +13,7 @@
     <groupId>webofneeds</groupId>
     <artifactId>won-node</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <name>won-node</name>
+    <name>Node</name>
     <url>http://maven.apache.org</url>
 
     <properties>

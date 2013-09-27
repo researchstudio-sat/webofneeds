@@ -20,7 +20,7 @@
     <artifactId>webofneeds</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Web of Needs module project</name>
+    <name>Web of Needs Main</name>
 
     <modules>
         <module>won-core</module>

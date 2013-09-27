@@ -159,8 +159,7 @@ based on whichever limit is hit first.  -->
         -->
         <autoCommit>
             <maxDocs>10</maxDocs>
-            <!--TODO: set this back to 60s. Using 5s for testing-->
-            <maxTime>1000</maxTime>
+            <maxTime>1000</maxTime> <!-- 1s for testing purposes - not for use in production! -->
         </autoCommit>
 
         <listener event="postCommit" class="solr.OptimizeSchedulerListener">

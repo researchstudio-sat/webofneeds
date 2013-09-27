@@ -242,7 +242,6 @@ public class RestController
       // need modalities
       Resource needModality = needModel.createResource(WON.NEED_MODALITY);
 
-      // TODO: store need modalities in separate objects to enable easier checking and multiple instances
       //price and currency
       if (needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
         Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
@@ -282,7 +281,6 @@ public class RestController
       needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
 
       if (needPojo.getWonNode().equals("")) {
-        //TODO: this is a temporary hack, please fix. The protocol expects boolean and we have an enum for needState
         needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
       } else {
         needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, needPojo.getWonNode());

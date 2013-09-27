@@ -59,8 +59,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
   public URI createNeed(final URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException
   {
     if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
-    //TODO: when we have RDF handling, check that the graph is valid here.
-
     Need need = new Need();
     need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
     need.setOwnerURI(ownerURI);
@@ -94,11 +92,9 @@ public class NeedManagementServiceImpl implements NeedManagementService
     need.setState(NeedState.INACTIVE);
     need = needRepository.saveAndFlush(need);
     //close all connections
-    //TODO: add a filter to the method/repo to filter only non-closed connections
     Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());
     for (URI connURI : connectionURIs) {
       try {
-        //TODO: ADD content
         ownerFacingConnectionCommunicationService.close(connURI, null);
       } catch (WonProtocolException e) {
         logger.warn("caught exception when trying to close connection", e);

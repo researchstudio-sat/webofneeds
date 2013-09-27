@@ -73,9 +73,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   private NeedInformationService needInformationService;
 
-  //TODO: move this somewhere central?
-  static {
-  }
 
   public Model listNeedURIs(final int page)
   {

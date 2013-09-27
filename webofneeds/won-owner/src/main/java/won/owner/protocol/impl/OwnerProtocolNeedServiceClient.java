@@ -233,7 +233,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     return null;
   }
 
-  //TODO: add connect Method which takes a connectionURI as a argument
   @Override
   public URI connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
@@ -245,7 +244,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri);
       if (existingConnections.size() > 0) {
         for (Connection conn : existingConnections) {
-          //TODO: Move this to the transition() - Method in ConnectionState
           if (ConnectionState.CONNECTED == conn.getState() ||
               ConnectionState.REQUEST_SENT == conn.getState()) {
             throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);
@@ -297,8 +295,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
   public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException
   {
     logger.debug("need-facing: LIST_CONNECTION_URIS called for need {}", needURI);
-
-    // TODO: probably wrong
     return getHardcodedCollectionResource(needURI, NEED_CONNECTION_URI_PATH_SUFFIX);
   }
 

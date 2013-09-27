@@ -104,7 +104,6 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
-            //TODO: ConnectionURI should be used here instead
             ownerService.connect(con.getNeedURI(), con.getRemoteNeedURI(), null);
         } catch (Exception e) {
           logger.warn("error during accept", e);
@@ -121,7 +120,6 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
-            //TODO: add rdf graph
             ownerService.close(con.getConnectionURI(), null);
         } catch (Exception e) {
           logger.warn("error during deny", e);
@@ -138,7 +136,6 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
-            //TODO: add rdf graph
             ownerService.close(con.getConnectionURI(), null);
         } catch (Exception e) {
           logger.warn("error during close", e);

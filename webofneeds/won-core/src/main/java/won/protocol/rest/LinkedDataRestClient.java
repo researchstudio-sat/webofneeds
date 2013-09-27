@@ -27,7 +27,6 @@ import java.net.URI;
 /**
  * User: fkleedorfer
  * Date: 28.11.12
- * TODO: refactor project and move this code into a module to be required by owner and won-node
  */
 public class LinkedDataRestClient
 {

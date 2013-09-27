@@ -84,7 +84,6 @@ public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
     private static String combinedMimeType(MediaType mediaType, String defaultLanguage) {
         String type = mediaType.getType();
         String subtype = mediaType.getSubtype();
-        //TODO: is this correct? Check Media Type specs!
         if (type == null || subtype == null) return defaultLanguage;
         return type + "/" + subtype;
     }
