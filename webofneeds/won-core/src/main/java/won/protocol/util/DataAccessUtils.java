@@ -34,34 +34,49 @@ import java.util.List;
 public class DataAccessUtils
 {
 
-  /**
-   * Loads the specified need from the database and raises an exception if it is not found.
-   *
-   * @param needURI
-   * @throws won.protocol.exception.NoSuchNeedException
-   * @return the connection
-   */
-  public static Need loadNeed(NeedRepository needRepository, final URI needURI) throws NoSuchNeedException
-  {
-    List<Need> needs = needRepository.findByNeedURI(needURI);
-    if (needs.size() == 0) throw new NoSuchNeedException(needURI);
-    if (needs.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}", needURI));
-    return needs.get(0);
-  }
+    /**
+    * Loads the specified need from the database and raises an exception if it is not found.
+    *
+    * @param needURI
+    * @throws won.protocol.exception.NoSuchNeedException
+    * @return the connection
+    */
+    public static Need loadNeed(NeedRepository needRepository, final URI needURI) throws NoSuchNeedException
+    {
+        List<Need> needs = needRepository.findByNeedURI(needURI);
+        if (needs.size() == 0) throw new NoSuchNeedException(needURI);
+        if (needs.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}", needURI));
+        return needs.get(0);
+    }
 
-  /**
-   * Loads the specified connection from the database and raises an exception if it is not found.
-   * @param connectionRepository
-   * @param connectionURI
-   * @return
-   * @throws NoSuchConnectionException
-   */
-  public static Connection loadConnection(ConnectionRepository connectionRepository, final URI connectionURI) throws NoSuchConnectionException
-  {
-    List<Connection> connections = connectionRepository.findByConnectionURI(connectionURI);
-    if (connections.size() == 0) throw new NoSuchConnectionException(connectionURI);
-    if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple connections found with URI {0}",connectionURI));
-    return connections.get(0);
-  }
+    /**
+    * Loads the specified connection from the database and raises an exception if it is not found.
+    * @param connectionRepository
+    * @param connectionURI
+    * @return
+    * @throws NoSuchConnectionException
+    */
+    public static Connection loadConnection(ConnectionRepository connectionRepository, final URI connectionURI) throws NoSuchConnectionException
+    {
+        List<Connection> connections = connectionRepository.findByConnectionURI(connectionURI);
+        if (connections.size() == 0) throw new NoSuchConnectionException(connectionURI);
+        if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple connections found with URI {0}",connectionURI));
+        return connections.get(0);
+    }
+
+    /**
+     * Loads the specified connection from the database and raises an exception if it is not found.
+     * @param connectionRepository
+     * @param connectionURI
+     * @return
+     * @throws NoSuchConnectionException
+     */
+    public static List<Connection> loadConnections(ConnectionRepository connectionRepository, final URI connectionURI) throws NoSuchConnectionException
+    {
+        List<Connection> connections = connectionRepository.findByConnectionURI(connectionURI);
+        if (connections.size() == 0) throw new NoSuchConnectionException(connectionURI);
+        if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple connections found with URI {0}",connectionURI));
+        return connections;
+    }
 
 }

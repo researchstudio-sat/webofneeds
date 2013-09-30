@@ -17,9 +17,13 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ResIterator;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.node.facet.impl.FacetImplRegistry;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
@@ -27,8 +31,10 @@ import won.protocol.model.*;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
+import won.protocol.repository.FacetRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Date;
@@ -46,12 +52,16 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
   private ExecutorService executorService;
 
+  private FacetImplRegistry reg;
+
   @Autowired
   private ConnectionRepository connectionRepository;
   @Autowired
   private ChatMessageRepository chatMessageRepository;
   @Autowired
   private EventRepository eventRepository;
+  @Autowired
+  private FacetRepository facetRepository;
   @Autowired
   private RDFStorageService rdfStorageService;
 
@@ -139,33 +149,9 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     if (message == null) throw new IllegalArgumentException("message is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit (should not result in state change)
-    //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
-    //construct chatMessage object to store in the db
-    ChatMessage chatMessage = new ChatMessage();
-    chatMessage.setCreationDate(new Date());
-    chatMessage.setLocalConnectionURI(con.getConnectionURI());
-    chatMessage.setMessage(message);
-    chatMessage.setOriginatorURI(con.getNeedURI());
-    //save in the db
-    chatMessageRepository.saveAndFlush(chatMessage);
-    final URI remoteConnectionURI = con.getRemoteConnectionURI();
-    //inform the other side
-    executorService.execute(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        try {
-          needFacingConnectionClient.textMessage(remoteConnectionURI, message);
-        } catch (WonProtocolException e) {
-          logger.warn("caught WonProtocolException:", e);
-        }
-      }
-    });
 
+    reg.get(FacetType.getFacetType(DataAccessUtils.loadConnection(connectionRepository,connectionURI).getTypeURI()))
+            .textMessage(connectionURI, message);
   }
 
   public void setNeedFacingConnectionClient(final ConnectionCommunicationService needFacingConnectionClient)
@@ -210,4 +196,12 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   {
     this.rdfStorageService = rdfStorageService;
   }
+
+    public FacetImplRegistry getReg() {
+        return reg;
+    }
+
+    public void setReg(FacetImplRegistry reg) {
+        this.reg = reg;
+    }
 }

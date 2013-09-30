@@ -63,7 +63,15 @@ public class Connection
         '}';
   }
 
-  public Long getId() {
+    public URI getTypeURI() {
+        return typeURI;
+    }
+
+    public void setTypeURI(URI typeURI) {
+        this.typeURI = typeURI;
+    }
+
+    public Long getId() {
       return id;
   }
 

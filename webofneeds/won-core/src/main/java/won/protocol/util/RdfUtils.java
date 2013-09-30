@@ -85,5 +85,6 @@ public class RdfUtils
       model.add(newStmt);
       iterator.remove();
     }
+    model.setNsPrefix("", replacement.getURI());
   }
 }

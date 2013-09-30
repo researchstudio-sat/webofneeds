@@ -27,6 +27,28 @@
     <!--- RDF Storage -->
     <bean id="rdfStorageRef" class="won.node.service.impl.RDFFileStorageService" />
 
+    <!--- Facet Registry -->
+    <bean id="facetImplRegistryRef" class="won.node.facet.impl.FacetImplRegistry" >
+        <property name="map" ref="facetMap" />
+    </bean>
+
+    <bean id="facetMap" class="java.util.HashMap">
+        <constructor-arg index="0" type="java.util.Map">
+            <map key-type="won.protocol.model.FacetType" value-type="won.node.facet.impl.FacetImpl">
+                <entry key="#{T(won.protocol.model.FacetType).ControlFacet}" value-ref="controlFacetImplRef" />
+                <entry key="#{T(won.protocol.model.FacetType).OwnerFacet}" value-ref="ownerFacetImplRef" />
+                <entry key="#{T(won.protocol.model.FacetType).GroupFacet}" value-ref="groupFacetImplRef" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="controlFacetImplRef" class="won.node.facet.impl.ControlFacetImpl" />
+    <bean id="ownerFacetImplRef" class="won.node.facet.impl.OwnerFacetImpl" >
+        <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
+        <property name="executorService" ref="threadPoolExecutor" />
+    </bean>
+    <bean id="groupFacetImplRef" class="won.node.facet.impl.GroupFacetImpl" />
+
     <!-- protocol-level services -->
 
     <bean id="needProtocolNeedService" class="won.node.protocol.impl.NeedProtocolNeedServiceImpl">
@@ -84,6 +106,7 @@
         <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
         <property name="executorService" ref="threadPoolExecutor" />
         <property name="rdfStorageService" ref="rdfStorageRef" />
+        <property name="reg" ref="facetImplRegistryRef" />
     </bean>
 
     <bean id="uriService" class="won.node.service.impl.URIService">
@@ -93,7 +116,6 @@
         <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
         <property name="pageURIPrefix" value="${uri.prefix.page}" />
         <property name="generalURIPrefix" value="${uri.prefix}" />
-
     </bean>
 
     <bean id="linkedDataService" class="won.node.service.impl.LinkedDataServiceImpl">

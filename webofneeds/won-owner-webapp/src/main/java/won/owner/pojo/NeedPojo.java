@@ -8,11 +8,16 @@ import com.hp.hpl.jena.vocabulary.DC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.model.BasicNeedType;
+import won.protocol.model.Facet;
+import won.protocol.model.FacetType;
 import won.protocol.model.NeedState;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * User: Gabriel
@@ -28,6 +33,11 @@ public class NeedPojo
   private String title;
   private BasicNeedType basicNeedType;
   private NeedState state;
+  private String[] needFacetURIs;
+  private String[] facetURIs = FacetType.getNames();
+  private String ownFacetURI;
+  private String remoteFacetURI;
+  private String[] facetTypes = new String[]{"http://purl.org/webofneeds/model#OwnerFacet"};
   private boolean anonymize;
   private String wonNode;
 
@@ -57,6 +67,15 @@ public class NeedPojo
   public NeedPojo()
   {
 
+  }
+
+  public NeedPojo(List<Facet> facets) {
+    needFacetURIs = new String[facets.size()];
+    int i = 0;
+
+    for(Facet facet : facets) {
+        needFacetURIs[i++] = facet.getFacetType().getURI().toString();
+    }
   }
 
   public NeedPojo(URI needUri, final Model model)
@@ -132,8 +151,8 @@ public class NeedPojo
         recurInfiniteTimes = timeConstraints.getResource().getProperty(WON.HAS_RECUR_INFINITE_TIMES).getBoolean();
       }
 
-      Statement priceSpecification = needModality.getResource().getProperty(WON.HAS_PRICE_SPECIFICATION);
-      if (priceSpecification != null) {
+       Statement priceSpecification = needModality.getResource().getProperty(WON.HAS_PRICE_SPECIFICATION);
+       if (priceSpecification != null) {
 
         Statement currencyStat = priceSpecification.getResource().getProperty(WON.HAS_CURRENCY);
         if (currencyStat != null) currency = currencyStat.getString();
@@ -147,6 +166,48 @@ public class NeedPojo
 
     }
 
+  }
+
+  public String[] getNeedFacetURIs() {
+      return needFacetURIs;
+  }
+
+  public void setNeedFacetURIs(String[] needFacetURIs) {
+      this.needFacetURIs = needFacetURIs;
+  }
+
+  public String getOwnFacetURI() {
+        return ownFacetURI;
+  }
+
+  public void setOwnFacetURI(String ownFacetURI) {
+        this.ownFacetURI = ownFacetURI;
+  }
+
+  public String getRemoteFacetURI() {
+        return remoteFacetURI;
+  }
+
+  public void setRemoteFacetURI(String remoteFacetURI) {
+        this.remoteFacetURI = remoteFacetURI;
+  }
+
+  public String[] getFacetTypes() {
+     return facetTypes;
+  }
+
+  public void setFacetTypes(String[] facetTypes) {
+     this.facetTypes = facetTypes;
+  }
+
+  public String[] getFacetURIs() {
+      for(String s : facetURIs)
+         System.out.println(s);
+      return facetURIs;
+  }
+
+  public void setFacetURIs(String[] facetURIs) {
+        this.facetURIs = facetURIs;
   }
 
   public String getCreationDate()

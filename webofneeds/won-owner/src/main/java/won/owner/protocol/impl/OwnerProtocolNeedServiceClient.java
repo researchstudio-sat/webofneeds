@@ -1,7 +1,7 @@
 package won.owner.protocol.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +60,9 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
 
   @Autowired
   private EventRepository eventRepository;
+
+  @Autowired
+  private FacetRepository facetRepository;
 
   @Autowired
   private MatchRepository matchRepository;
@@ -222,7 +225,24 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       need.setNeedURI(uri);
       needRepository.saveAndFlush(need);
 
-      return uri;
+        ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
+        if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
+
+        Resource needRes = needIt.next();
+        logger.debug("processing need resource {}", needRes.getURI());
+
+        StmtIterator stmtIterator = content.listStatements(needRes, WON.HAS_FACET, (RDFNode) null);
+        if(!stmtIterator.hasNext())
+            throw new IllegalArgumentException("at least one RDF node must be of type won:HAS_FACET");
+        else
+            do {
+                Facet facet = new Facet();
+                facet.setNeedURI(need.getNeedURI());
+                facet.setTypeURI(URI.create(stmtIterator.next().getObject().asResource().getURI()));
+                facetRepository.save(facet);
+            } while(stmtIterator.hasNext());
+
+        return uri;
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {

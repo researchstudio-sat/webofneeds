@@ -59,7 +59,22 @@
     <table>
         <tr>
             <td><form:label path="needURI">Need URI:</form:label></td>
-            <td><form:input path="needURI" /></td>
+            <td><form:input path="needURI" /></td>        needFacetURIs
+        </tr>
+        <tr>
+            <td>My Facet type:</td>
+            <td><form:select path="ownFacetURI">
+                    <form:options items="${command.needFacetURIs}"/>
+                </form:select>
+            </td>
+        </tr>
+        <tr>
+            <td>Remote Facet type:</td>
+            <td>
+                <form:select path="remoteFacetURI">
+                    <form:options items="${command.facetURIs}"/>
+                </form:select>
+            </td>
         </tr>
         <tr>
             <td colspan="2">

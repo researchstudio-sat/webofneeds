@@ -16,9 +16,8 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,6 @@ import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
-import javax.persistence.PersistenceException;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -140,7 +138,20 @@ public class NeedCommunicationServiceImpl implements
       matchDataModel.add(content);
     }
 
+    ResIterator facetIt = content.listSubjectsWithProperty(RDF.type, WON.FACET);
+    if (!facetIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Facet");
+
+    Resource facetRes = facetIt.next();
+    con.setTypeURI(URI.create(facetRes.getURI()));
+    connectionRepository.saveAndFlush(con);
+
     rdfStorageService.storeContent(event, matchDataModel);
+
+    ResIterator remoteFacetIt = content.listSubjectsWithProperty(RDF.type, WON.HAS_REMOTE_FACET);
+    if (!remoteFacetIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:RemoteFacet");
+
+    //TODO: This should just remove RemoteFacet from content and replace the value of Facet with the one from RemoteFacet
+    final Model remoteFacetModel = remoteFacetIt.next().getModel();
 
     executorService.execute(new Runnable()
     {
@@ -149,7 +160,7 @@ public class NeedCommunicationServiceImpl implements
       {
         //here, we don't really need to handle exceptions, as we don't want to flood matching services with error messages
         try {
-          ownerProtocolOwnerService.hint(needURI, otherNeedURI, score, originator, content);
+          ownerProtocolOwnerService.hint(needURI, otherNeedURI, score, originator, remoteFacetModel);
         } catch (NoSuchNeedException e) {
           logger.warn("error sending hint message to owner - no such need:", e);
         } catch (IllegalMessageForNeedStateException e) {
@@ -225,6 +236,28 @@ public class NeedCommunicationServiceImpl implements
       eventRepository.saveAndFlush(event);
       saveAdditionalContentForEvent(content, con, event);
 
+      Resource baseRes = content.getResource(content.getNsPrefixURI(""));
+      StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
+
+      if (!stmtIterator.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:hasFacet");
+
+      Statement facetStat = stmtIterator.next();
+
+      con.setTypeURI(URI.create(facetStat.getObject().asResource().getURI()));
+      con = connectionRepository.saveAndFlush(con);
+
+      stmtIterator = baseRes.listProperties(WON.HAS_REMOTE_FACET);
+      if (!stmtIterator.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:hasRemoteFacet");
+
+      //TODO: This should just remove RemoteFacet from content and replace the value of Facet with the one from RemoteFacet
+
+      final Model remoteFacetModel = ModelFactory.createDefaultModel();
+
+      remoteFacetModel.setNsPrefix("", "no:uri");
+      baseRes = remoteFacetModel.createResource(remoteFacetModel.getNsPrefixURI(""));
+      Resource remoteFacetResource = stmtIterator.next().getObject().asResource();
+      baseRes.addProperty(WON.HAS_FACET, remoteFacetModel.createResource(remoteFacetResource.getURI()));
+      remoteFacetModel.write(System.out, "TTL", "baseUri");
 
       final Connection connectionForRunnable = con;
       //send to need
@@ -234,7 +267,7 @@ public class NeedCommunicationServiceImpl implements
         public void run()
         {
           try {
-            URI remoteConnectionURI = needProtocolNeedService.connect(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), content);
+            URI remoteConnectionURI = needProtocolNeedService.connect(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), remoteFacetModel);
             connectionForRunnable.setRemoteConnectionURI(remoteConnectionURI);
             connectionRepository.saveAndFlush(connectionForRunnable);
           } catch (WonProtocolException e) {
@@ -327,7 +360,14 @@ public class NeedCommunicationServiceImpl implements
 
       saveAdditionalContentForEvent(content, con, event);
 
-      //TODO: Add Connection to Facet
+        Resource baseRes = content.getResource(content.getNsPrefixURI(""));
+        StmtIterator stmtIterator = content.listStatements(baseRes, WON.HAS_FACET, (RDFNode) null);
+
+        if (!stmtIterator.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Facet: " + content.toString());
+
+        Resource facetRes = stmtIterator.next().getObject().asResource();
+        con.setTypeURI(URI.create(facetRes.getURI()));
+        con = connectionRepository.saveAndFlush(con);
 
       final Connection connectionForRunnable = con;
       executorService.execute(new Runnable()

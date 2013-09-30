@@ -87,7 +87,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
     StmtIterator stmtIterator = content.listStatements(needRes, WON.HAS_FACET, (RDFNode) null);
     if(!stmtIterator.hasNext())
-      throw new IllegalArgumentException("at least one RDF node must be of type won:Facet");
+      throw new IllegalArgumentException("at least one RDF node must be of type won:HAS_FACET");
     else
       do {
         Facet facet = new Facet();

@@ -13,6 +13,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public interface FacetRepository extends WonRepository<Facet> {
+    List<Facet> findByNeedURI(URI needURI);
 
     List<Facet> findByNeedURIAndTypeURI(URI needURI, URI typeURI);
 }

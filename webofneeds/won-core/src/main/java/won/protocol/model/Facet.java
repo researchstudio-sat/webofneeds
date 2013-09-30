@@ -33,6 +33,10 @@ public class Facet {
         return needURI;
     }
 
+    public FacetType getFacetType() {
+        return FacetType.getFacetType(typeURI);
+    }
+
     public void setNeedURI(URI needURI) {
         this.needURI = needURI;
     }

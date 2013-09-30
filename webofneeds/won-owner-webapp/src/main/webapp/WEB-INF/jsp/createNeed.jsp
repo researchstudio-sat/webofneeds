@@ -52,6 +52,10 @@
                 <td><form:textarea path="tags" rows="2" cols="30" /></td>
             </tr>
             <tr>
+                <td>Facet type:</td>
+                <td><form:checkboxes items="${command.facetURIs}" path="facetTypes" /></td>
+            </tr>
+            <tr>
                 <td><form:label path="upperPriceLimit">Upper price limit:</form:label> </td>
                 <td><form:input path="upperPriceLimit" /></td>
             </tr>

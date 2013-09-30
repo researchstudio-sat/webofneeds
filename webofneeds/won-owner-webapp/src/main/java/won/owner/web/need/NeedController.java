@@ -22,11 +22,10 @@ import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.model.Match;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
+import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.FacetRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
@@ -58,6 +57,9 @@ public class NeedController
   private NeedRepository needRepository;
 
   @Autowired
+  private FacetRepository facetRepository;
+
+  @Autowired
   private MatchRepository matchRepository;
 
   @Autowired
@@ -68,7 +70,6 @@ public class NeedController
 
   @Autowired
   private DataReloadService dataReloadService;
-
 
   public void setDataReloadService(DataReloadService dataReloadService)
   {
@@ -148,6 +149,10 @@ public class NeedController
       }
 
       needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
+
+      for(String ft : needPojo.getFacetTypes()) {
+          needModel.add(needModel.createStatement(needResource, WON.HAS_FACET, needModel.createResource(ft)));
+      }
 
       // owner
       if (needPojo.isAnonymize()) {
@@ -259,7 +264,8 @@ public class NeedController
     Need need = needs.get(0);
     model.addAttribute("active", need.getState() != NeedState.ACTIVE ? "activate" : "deactivate");
     model.addAttribute("needURI", need.getNeedURI());
-    model.addAttribute("command", new NeedPojo());
+    List<Facet> facets = facetRepository.findByNeedURI(need.getNeedURI());
+    model.addAttribute("command", new NeedPojo(facets));
 
     LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
     NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
@@ -308,7 +314,15 @@ public class NeedController
         return "noNeedFound";
 
       Need need1 = needs.get(0);
-      ownerService.connect(need1.getNeedURI(), new URI(needPojo.getNeedURI()), null);
+
+      com.hp.hpl.jena.rdf.model.Model facetModel = ModelFactory.createDefaultModel();
+
+      facetModel.setNsPrefix("", "no:uri");
+      Resource baseRes = facetModel.createResource(facetModel.getNsPrefixURI(""));
+      baseRes.addProperty(WON.HAS_FACET, facetModel.createResource(needPojo.getOwnFacetURI()));
+      baseRes.addProperty(WON.HAS_REMOTE_FACET, facetModel.createResource(needPojo.getRemoteFacetURI()));
+
+      ownerService.connect(need1.getNeedURI(), new URI(needPojo.getNeedURI()), facetModel);
       return "redirect:/need/" + need1.getId().toString();//viewNeed(need1.getId().toString(), model);
     } catch (URISyntaxException e) {
       logger.warn("caught URISyntaxException:", e);

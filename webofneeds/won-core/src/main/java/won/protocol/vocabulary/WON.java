@@ -66,6 +66,9 @@ public class WON
 
   public static final Property HAS_FACET = m.createProperty(BASE_URI, "hasFacet");
   public static final Resource FACET = m.createResource(BASE_URI + "Facet");
+  //This property is used in the rdf-model part of connect (from owner) and hint
+  //to specify a facet to which a connection is created
+  public static final Property HAS_REMOTE_FACET = m.createProperty(BASE_URI + "hasRemoteFacet");
 
   public static final Property HAS_CONNECTIONS = m.createProperty(BASE_URI, "hasConnections");
   public static final Resource CONNECTION_CONTAINER = m.createResource(BASE_URI + "ConnectionContainer");
