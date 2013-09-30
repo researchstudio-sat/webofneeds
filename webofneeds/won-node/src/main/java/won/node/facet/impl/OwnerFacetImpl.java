@@ -3,7 +3,6 @@ package won.node.facet.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.service.impl.RDFStorageService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
@@ -82,6 +81,8 @@ public class OwnerFacetImpl extends FacetImpl {
         });
 
     }
+
+
 
     public void setNeedFacingConnectionClient(ConnectionCommunicationService needFacingConnectionClient) {
         this.needFacingConnectionClient = needFacingConnectionClient;

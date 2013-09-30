@@ -30,11 +30,10 @@ import java.net.URI;
  */
 @WebService(serviceName = "ownerProtocol", targetNamespace = "http://www.webofneeds.org/protocol/owner/soap/1.0/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
-//TODO: shouldn't we extend one of our protocol interfaces here?
 public interface OwnerProtocolNeedWebServiceEndpoint
 {
   @WebMethod
-  public void textMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "message") final String message)
+  public void textMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "content") final String message)
           throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 
   @WebMethod

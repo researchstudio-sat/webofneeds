@@ -47,7 +47,10 @@
         <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
         <property name="executorService" ref="threadPoolExecutor" />
     </bean>
-    <bean id="groupFacetImplRef" class="won.node.facet.impl.GroupFacetImpl" />
+    <bean id="groupFacetImplRef" class="won.node.facet.impl.GroupFacetImpl" >
+        <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
+        <property name="executorService" ref="threadPoolExecutor" />
+    </bean>
 
     <!-- protocol-level services -->
 

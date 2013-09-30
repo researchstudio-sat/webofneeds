@@ -53,8 +53,10 @@ public class GroupFacetImpl extends FacetImpl {
     @Override
     public void textMessage(URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //load connection, checking if it exists
-        List<Connection> cons = DataAccessUtils.loadConnections(connectionRepository, connectionURI);
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+      List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
+          ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
+
 
         //if(facetRepository.findByNeedURIAndTypeURI(con.getNeedURI(), con.getTypeURI()) == ??)
 
@@ -69,7 +71,7 @@ public class GroupFacetImpl extends FacetImpl {
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);
         for (Connection c : cons) {
-            if (c.getState() == ConnectionState.CONNECTED) {
+
                 final URI remoteConnectionURI = c.getRemoteConnectionURI();
                 //inform the other side
                 executorService.execute(new Runnable()
@@ -84,8 +86,17 @@ public class GroupFacetImpl extends FacetImpl {
                         }
                     }
                 });
-            }
         }
 
     }
+
+  public void setExecutorService(final ExecutorService executorService)
+  {
+    this.executorService = executorService;
+  }
+
+  public void setNeedFacingConnectionClient(final ConnectionCommunicationService needFacingConnectionClient)
+  {
+    this.needFacingConnectionClient = needFacingConnectionClient;
+  }
 }

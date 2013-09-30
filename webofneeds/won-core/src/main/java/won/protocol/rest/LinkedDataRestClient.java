@@ -48,6 +48,9 @@ public class LinkedDataRestClient
     cc.getClasses().add(ModelReaderWriter.class);
     Client c = Client.create(cc);
     WebResource r = c.resource(resourceURI);
+    //TODO: improve error handling
+    //If a ClientHandlerException is thrown here complaining that it can't read a Model with MIME media type text/html,
+    //it was probably the wrong resourceURI
     return r.accept(RDFMediaType.APPLICATION_RDF_XML).get(Model.class);
   }
 

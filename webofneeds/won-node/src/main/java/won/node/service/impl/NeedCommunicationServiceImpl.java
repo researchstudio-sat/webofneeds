@@ -239,7 +239,11 @@ public class NeedCommunicationServiceImpl implements
       Resource baseRes = content.getResource(content.getNsPrefixURI(""));
       StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
 
-      if (!stmtIterator.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:hasFacet");
+      if (!stmtIterator.hasNext()) {
+        logger.debug("connect(needURI, otherNeedURI, content): content is:");
+        content.write(System.out,"TTL", "no:uri");
+        throw new IllegalArgumentException("at least one RDF node must be of type won:hasFacet");
+      }
 
       Statement facetStat = stmtIterator.next();
 

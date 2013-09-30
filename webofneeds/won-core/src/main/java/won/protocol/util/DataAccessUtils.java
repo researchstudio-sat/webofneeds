@@ -63,20 +63,4 @@ public class DataAccessUtils
         if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple connections found with URI {0}",connectionURI));
         return connections.get(0);
     }
-
-    /**
-     * Loads the specified connection from the database and raises an exception if it is not found.
-     * @param connectionRepository
-     * @param connectionURI
-     * @return
-     * @throws NoSuchConnectionException
-     */
-    public static List<Connection> loadConnections(ConnectionRepository connectionRepository, final URI connectionURI) throws NoSuchConnectionException
-    {
-        List<Connection> connections = connectionRepository.findByConnectionURI(connectionURI);
-        if (connections.size() == 0) throw new NoSuchConnectionException(connectionURI);
-        if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple connections found with URI {0}",connectionURI));
-        return connections;
-    }
-
 }

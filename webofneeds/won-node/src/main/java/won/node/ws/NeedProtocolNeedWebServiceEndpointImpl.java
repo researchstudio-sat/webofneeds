@@ -101,7 +101,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
   @WebMethod
   public void textMessage(
           @WebParam(name = "connectionURI") final URI connectionURI,
-          @WebParam(name = "message") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
+          @WebParam(name = "content") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
   {
     wireDependenciesLazily();
     try {

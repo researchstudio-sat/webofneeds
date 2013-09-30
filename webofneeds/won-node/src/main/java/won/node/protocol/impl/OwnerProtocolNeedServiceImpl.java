@@ -83,7 +83,7 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
 
     @Override
     public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        this.connectionCommunicationService.close(connectionURI, content);
+        this.connectionCommunicationService.open(connectionURI, content);
     }
 
     @Override
