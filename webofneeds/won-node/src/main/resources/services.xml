@@ -44,11 +44,12 @@
 
     <bean id="controlFacetImplRef" class="won.node.facet.impl.ControlFacetImpl" />
     <bean id="ownerFacetImplRef" class="won.node.facet.impl.OwnerFacetImpl" >
-        <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
+        <property name="ownerFacingConnectionClient" ref="ownerProtocolOwnerClient" />
         <property name="executorService" ref="threadPoolExecutor" />
     </bean>
     <bean id="groupFacetImplRef" class="won.node.facet.impl.GroupFacetImpl" >
         <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
+        <property name="ownerFacingConnectionClient" ref="ownerProtocolOwnerClient" />
         <property name="executorService" ref="threadPoolExecutor" />
     </bean>
 
@@ -103,6 +104,7 @@
         <property name="ownerFacingConnectionClient" ref="ownerProtocolOwnerClient" />
         <property name="executorService" ref="threadPoolExecutor" />
         <property name="rdfStorageService" ref="rdfStorageRef" />
+        <property name="reg" ref="facetImplRegistryRef" />
     </bean>
 
     <bean id="ownerFacingConnectionCommunicationService" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl">

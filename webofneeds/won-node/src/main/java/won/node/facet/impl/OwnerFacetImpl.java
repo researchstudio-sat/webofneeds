@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutorService;
 public class OwnerFacetImpl extends FacetImpl {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ConnectionCommunicationService needFacingConnectionClient;
+    private ConnectionCommunicationService ownerFacingConnectionClient;
 
     private ExecutorService executorService;
 
@@ -49,14 +49,11 @@ public class OwnerFacetImpl extends FacetImpl {
     }
 
     @Override
-    public void textMessage(URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-
-        //if(facetRepository.findByNeedURIAndTypeURI(con.getNeedURI(), con.getTypeURI()) == ??)
-
         //perform state transit (should not result in state change)
-        //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
+        //ConnectionState nextState = performStateTransit(con, ConnectionEventType.PARTNER_MESSAGE);
         //construct chatMessage object to store in the db
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setCreationDate(new Date());
@@ -65,27 +62,23 @@ public class OwnerFacetImpl extends FacetImpl {
         chatMessage.setOriginatorURI(con.getNeedURI());
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);
-        final URI remoteConnectionURI = con.getRemoteConnectionURI();
-        //inform the other side
+        //send to the need side
         executorService.execute(new Runnable()
         {
             @Override
             public void run()
             {
                 try {
-                    needFacingConnectionClient.textMessage(remoteConnectionURI, message);
+                    ownerFacingConnectionClient.textMessage(connectionURI, message);
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
                 }
             }
         });
-
     }
 
-
-
-    public void setNeedFacingConnectionClient(ConnectionCommunicationService needFacingConnectionClient) {
-        this.needFacingConnectionClient = needFacingConnectionClient;
+    public void setOwnerFacingConnectionClient(ConnectionCommunicationService ownerFacingConnectionClient) {
+        this.ownerFacingConnectionClient = ownerFacingConnectionClient;
     }
 
     public void setExecutorService(ExecutorService executorService) {

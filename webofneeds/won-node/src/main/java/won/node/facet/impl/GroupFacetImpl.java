@@ -33,6 +33,7 @@ public class GroupFacetImpl extends FacetImpl {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ConnectionCommunicationService needFacingConnectionClient;
+    private ConnectionCommunicationService ownerFacingConnectionClient;
 
     private ExecutorService executorService;
 
@@ -63,16 +64,17 @@ public class GroupFacetImpl extends FacetImpl {
         //perform state transit (should not result in state change)
         //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
         //construct chatMessage object to store in the db
-        ChatMessage chatMessage = new ChatMessage();
+        /*ChatMessage chatMessage = new ChatMessage();
         chatMessage.setCreationDate(new Date());
         chatMessage.setLocalConnectionURI(con.getConnectionURI());
         chatMessage.setMessage(message);
         chatMessage.setOriginatorURI(con.getNeedURI());
         //save in the db
-        chatMessageRepository.saveAndFlush(chatMessage);
+        chatMessageRepository.saveAndFlush(chatMessage);      */
         for (Connection c : cons) {
 
                 final URI remoteConnectionURI = c.getRemoteConnectionURI();
+                final URI ownerURI = c.getConnectionURI();
                 //inform the other side
                 executorService.execute(new Runnable()
                 {
@@ -89,6 +91,10 @@ public class GroupFacetImpl extends FacetImpl {
         }
 
     }
+
+  public void setOwnerFacingConnectionClient(ConnectionCommunicationService ownerFacingConnectionClient) {
+    this.ownerFacingConnectionClient = ownerFacingConnectionClient;
+  }
 
   public void setExecutorService(final ExecutorService executorService)
   {

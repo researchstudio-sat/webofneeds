@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.node.facet.impl.FacetImplRegistry;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
@@ -46,6 +47,8 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   private ConnectionCommunicationService ownerFacingConnectionClient;
 
   private ExecutorService executorService;
+
+  private FacetImplRegistry reg;
 
   @Autowired
   private ConnectionRepository connectionRepository;
@@ -134,31 +137,9 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     logger.info("SEND_TEXT_MESSAGE received from the need side for connection {} with message '{}'", connectionURI, message);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     if (message == null) throw new IllegalArgumentException("message is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit (should not result in state change)
-    //ConnectionState nextState = performStateTransit(con, ConnectionEventType.PARTNER_MESSAGE);
-    //construct chatMessage object to store in the db
-    ChatMessage chatMessage = new ChatMessage();
-    chatMessage.setCreationDate(new Date());
-    chatMessage.setLocalConnectionURI(con.getConnectionURI());
-    chatMessage.setMessage(message);
-    chatMessage.setOriginatorURI(con.getNeedURI());
-    //save in the db
-    chatMessageRepository.saveAndFlush(chatMessage);
-    //send to the need side
-    executorService.execute(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        try {
-          ownerFacingConnectionClient.textMessage(connectionURI, message);
-        } catch (WonProtocolException e) {
-          logger.warn("caught WonProtocolException:", e);
-        }
-      }
-    });
+
+    reg.get(FacetType.getFacetType(DataAccessUtils.loadConnection(connectionRepository,connectionURI).getTypeURI()))
+        .textMessage(connectionURI, message);
 
   }
 
@@ -179,6 +160,10 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(), con.getState());
     }
     return con.getState().transit(msg);
+  }
+
+  public void setReg(FacetImplRegistry reg) {
+    this.reg = reg;
   }
 
   public void setOwnerFacingConnectionClient(final ConnectionCommunicationService ownerFacingConnectionClient)

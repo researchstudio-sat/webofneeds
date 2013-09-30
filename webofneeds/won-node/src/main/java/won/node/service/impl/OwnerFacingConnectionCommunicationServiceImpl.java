@@ -149,9 +149,35 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     if (message == null) throw new IllegalArgumentException("message is not set");
+      //load connection, checking if it exists
+      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
 
-    reg.get(FacetType.getFacetType(DataAccessUtils.loadConnection(connectionRepository,connectionURI).getTypeURI()))
-            .textMessage(connectionURI, message);
+      //if(facetRepository.findByNeedURIAndTypeURI(con.getNeedURI(), con.getTypeURI()) == ??)
+
+      //perform state transit (should not result in state change)
+      //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
+      //construct chatMessage object to store in the db
+      ChatMessage chatMessage = new ChatMessage();
+      chatMessage.setCreationDate(new Date());
+      chatMessage.setLocalConnectionURI(con.getConnectionURI());
+      chatMessage.setMessage(message);
+      chatMessage.setOriginatorURI(con.getNeedURI());
+      //save in the db
+      chatMessageRepository.saveAndFlush(chatMessage);
+      final URI remoteConnectionURI = con.getRemoteConnectionURI();
+      //inform the other side
+      executorService.execute(new Runnable()
+      {
+          @Override
+          public void run()
+          {
+              try {
+                  needFacingConnectionClient.textMessage(remoteConnectionURI, message);
+              } catch (WonProtocolException e) {
+                  logger.warn("caught WonProtocolException:", e);
+              }
+          }
+      });
   }
 
   public void setNeedFacingConnectionClient(final ConnectionCommunicationService needFacingConnectionClient)
