@@ -16,6 +16,7 @@
 
 package won.node.ws;
 
+import com.hp.hpl.jena.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.need.NeedProtocolNeedService;
@@ -59,7 +60,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
   {
     wireDependenciesLazily();
     try {
-      return needProtocolNeedService.connect(needURI, otherNeedURI, otherConnectionURI, RdfUtils.toModel(content));
+      return needProtocolNeedService.connect(needURI, otherNeedURI, otherConnectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
     } catch (IllegalMessageForNeedStateException e) {
       throw IllegalMessageForNeedStateFault.fromException(e);
     } catch (ConnectionAlreadyExistsException e) {
@@ -74,7 +75,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
   {
       wireDependenciesLazily();
     try {
-      needProtocolNeedService.open(connectionURI, RdfUtils.toModel(content));
+      needProtocolNeedService.open(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
     } catch (NoSuchConnectionException e) {
       throw NoSuchConnectionFault.fromException(e);
     } catch (IllegalMessageForConnectionStateException e) {
@@ -89,7 +90,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
   {
     wireDependenciesLazily();
     try {
-      needProtocolNeedService.close(connectionURI, RdfUtils.toModel(content));
+      needProtocolNeedService.close(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
     } catch (NoSuchConnectionException e) {
       throw NoSuchConnectionFault.fromException(e);
     } catch (IllegalMessageForConnectionStateException e) {

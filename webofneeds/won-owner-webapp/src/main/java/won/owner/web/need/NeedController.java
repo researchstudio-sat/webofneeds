@@ -34,7 +34,6 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -212,14 +211,8 @@ public class NeedController
 
   private void attachRdfToModelViaBlanknode(final String rdfAsString, final String rdfLanguage, final Resource resourceToLinkTo, final Property propertyToLinkThrough, final com.hp.hpl.jena.rdf.model.Model modelToModify)
   {
-    com.hp.hpl.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
-    String baseURI= "no:uri";
-    model.setNsPrefix("", baseURI);
-    model.read(new StringReader(rdfAsString), baseURI, rdfLanguage);
-    Resource linkingBlankNode = model.createResource();
-    RdfUtils.replaceBaseResource(model, linkingBlankNode);
-    resourceToLinkTo.addProperty(propertyToLinkThrough, linkingBlankNode);
-    modelToModify.add(model);
+    com.hp.hpl.jena.rdf.model.Model model = RdfUtils.readRdfSnippet(rdfAsString, rdfLanguage);
+    RdfUtils.attachModelByBaseResource(resourceToLinkTo,propertyToLinkThrough, model);
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
