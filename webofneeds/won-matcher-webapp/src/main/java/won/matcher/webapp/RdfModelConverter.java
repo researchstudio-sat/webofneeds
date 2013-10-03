@@ -42,11 +42,6 @@ public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
 
     @Override
     protected Model readInternal(Class<? extends Model> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
-        System.out.println("Input: ");
-        for(MediaType t : httpInputMessage.getHeaders().getAccept()) { //media types
-            System.out.println(t); //empty here
-        }
-        System.out.println(httpInputMessage.getHeaders().getContentType()); //application/ld+json, (register converter for all types, use this method to determine what the user wants)
         Model model = ModelFactory.createDefaultModel();
         String jenaType = mimeTypeToJenaLanguage(httpInputMessage.getHeaders().getContentType(), FileUtils.langTurtle);
         if (jenaType.equals("JSON-LD")){
