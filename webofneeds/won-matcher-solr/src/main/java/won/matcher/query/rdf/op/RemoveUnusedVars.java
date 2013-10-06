@@ -42,7 +42,7 @@ public class RemoveUnusedVars extends TransformBase
       if (((OpBGP) subOp).getPattern().size() == 0){
         return OpNull.create();
       }
-      Collection<Var> varsInPattern = OpVars.allVars(subOp);
+      Collection<Var> varsInPattern = OpVars.mentionedVars(subOp);
       ExprList expressions = opFilter.getExprs();
       ExprList keepExpressions = new ExprList();
       for (Expr expr: expressions){
