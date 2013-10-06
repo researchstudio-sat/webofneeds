@@ -1,10 +1,11 @@
 package won.owner.web.rest;
 
-import com.fasterxml.jackson.databind.util.LRUMap;
+
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.DC;
+import org.apache.commons.collections.map.LRUMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,8 @@ public class RestController
   @Autowired
   private DataReloadService dataReloadService;
 
-  private LRUMap<URI, NeedPojo> cachedNeeds = new LRUMap<URI, NeedPojo>(200, 1000);
+  //TODO: this is a quick fix and the only reason for us to use commons-collections. Rework to use ehcache!
+  private LRUMap cachedNeeds = new LRUMap(200, 1000);
 
 
   public void setDataReloadService(DataReloadService dataReloadService)
@@ -142,7 +144,7 @@ public class RestController
       else
         matchUri = match.getToNeed();
       logger.debug("using needUri: {} ", matchUri);
-      NeedPojo matchedNeed = this.cachedNeeds.get(matchUri);
+      NeedPojo matchedNeed = (NeedPojo) this.cachedNeeds.get(matchUri);
       if (matchedNeed == null) {
         List<Need> matchNeeds = needRepository.findByNeedURI(matchUri);
         logger.debug("found {} needs for uri {} in repo", matchNeeds.size(), matchUri);

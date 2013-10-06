@@ -67,6 +67,12 @@
             <artifactId>commons-httpclient</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
+
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
     </dependencies>
 
 
