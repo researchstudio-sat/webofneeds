@@ -38,14 +38,6 @@
         <!-- REST stuff -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
         </dependency>
 
@@ -116,6 +108,11 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-jsonld</artifactId>
+            <scope>${dependencies.scope}</scope>
         </dependency>
         <dependency>
             <groupId>xml-apis</groupId>

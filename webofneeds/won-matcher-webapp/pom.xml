@@ -100,11 +100,7 @@
             <artifactId>jena-arq</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-jsonld</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
+
 
     </dependencies>
 

@@ -1,14 +1,16 @@
 package won.owner.web.rest;
 
+import com.fasterxml.jackson.databind.util.LRUMap;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.DC;
-import org.codehaus.jackson.map.util.LRUMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
 import won.owner.service.impl.DataReloadService;
@@ -26,24 +28,19 @@ import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created with IntelliJ IDEA.
- * User: MrM
- * Date: 21.04.13
- * Time: 11:56
- * To change this template use File | Settings | File Templates.
- */
-@Service
-@Path("/")
+@Controller
+@RequestMapping("/")
 public class RestController
 {
-
 
   final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -106,6 +103,10 @@ public class RestController
   @GET
   @Path("/{needId}/matches")
   @Produces(MediaType.APPLICATION_JSON)
+  @RequestMapping(
+      value="/{needId}/matches",
+      produces = MediaType.APPLICATION_JSON,
+      method = RequestMethod.GET)
   public List<NeedPojo> findMatches(@PathParam("needId") long needId)
   {
 
@@ -164,10 +165,12 @@ public class RestController
   }
 
 
-  @POST
-  @Path("/create")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
+  @RequestMapping(
+      value = "/create",
+      consumes = MediaType.APPLICATION_JSON,
+      produces = MediaType.APPLICATION_JSON,
+      method = RequestMethod.POST
+      )
   public NeedPojo createNeed(NeedPojo needPojo)
   {
 
@@ -178,9 +181,11 @@ public class RestController
   }
 
 
-  @GET
-  @Path("/")
-  @Produces(MediaType.APPLICATION_JSON)
+  @RequestMapping(
+      value = "/",
+      produces = MediaType.APPLICATION_JSON,
+      method = RequestMethod.GET
+  )
   public List<NeedPojo> getAllNeeds()
   {
 

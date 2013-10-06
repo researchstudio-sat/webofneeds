@@ -228,65 +228,12 @@
                 <version>${com.sun.xml.ws.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.sun.jersey.contribs</groupId>
-                <artifactId>jersey-spring</artifactId>
-                <version>${com.sun.jersey.contribs-jersey-spring.version}</version>
-
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-web</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-beans</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-context</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-aop</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-core</artifactId>
-                <version>${com.sun.jersey.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-server</artifactId>
-                <version>${com.sun.jersey.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-client</artifactId>
                 <version>${com.sun.jersey.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-json</artifactId>
-                <version>${com.sun.jersey.version}</version>
-            </dependency>
-
-
-
 
             <!-- ORM  -->
             <dependency>
@@ -554,7 +501,7 @@
         <org.hibernate.version>4.1.8.Final</org.hibernate.version>
         <org.springframework.data.commons.version>1.4.0.RELEASE</org.springframework.data.commons.version>
         <org.springframework.data.jpa.version>1.2.0.RELEASE</org.springframework.data.jpa.version>
-        <org.springframework.version>3.1.2.RELEASE</org.springframework.version>
+        <org.springframework.version>3.2.4.RELEASE</org.springframework.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
         <org.hsqldb.version>2.2.9</org.hsqldb.version>
         <postgresql.version>9.1-901.jdbc4</postgresql.version>

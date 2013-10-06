@@ -1,4 +1,4 @@
-package won.matcher.webapp;
+package won.protocol.rest;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -17,15 +17,20 @@ import java.io.IOException;
 //import org.codehaus.jackson.map.JsonSerializableWithType
 
 /**
- * Created with IntelliJ IDEA.
- * User: moru
- * Date: 11/09/13
- * Time: 13:30
- * To change this template use File | Settings | File Templates.
+ * HttpMessageConverter for using jena models with Spring WebMVC. Supports all formats jena supports plus JSON-LD.
  */
 public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
+    public static final MediaType[] MEDIA_TYPES = {
+          new MediaType("application", "ld+json"),
+          new MediaType("application", "rdf+xml"),
+          new MediaType("application", "x-turtle"),
+          new MediaType("text", "plain"),
+          new MediaType("text", "turtle"),
+          new MediaType("text", "rdf+n3")
+      };
 
     public RdfModelConverter() {
+      this(RdfModelConverter.MEDIA_TYPES);
     }
 
     public RdfModelConverter(MediaType supportedMediaType) {
