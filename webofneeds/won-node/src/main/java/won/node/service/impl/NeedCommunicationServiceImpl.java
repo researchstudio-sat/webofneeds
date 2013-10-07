@@ -18,6 +18,8 @@ package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -240,7 +242,7 @@ public class NeedCommunicationServiceImpl implements
 
       if (!stmtIterator.hasNext()) {
         logger.debug("connect(needURI, otherNeedURI, content): content is:");
-        content.write(System.out,"TTL", "no:uri");
+        RDFDataMgr.write(System.out, content, Lang.TTL);
         throw new IllegalArgumentException("at least one RDF node must be of type won:hasFacet");
       }
 
@@ -260,7 +262,7 @@ public class NeedCommunicationServiceImpl implements
       baseRes = remoteFacetModel.createResource(remoteFacetModel.getNsPrefixURI(""));
       Resource remoteFacetResource = stmtIterator.next().getObject().asResource();
       baseRes.addProperty(WON.HAS_FACET, remoteFacetModel.createResource(remoteFacetResource.getURI()));
-      remoteFacetModel.write(System.out, "TTL", "baseUri");
+      RDFDataMgr.write(System.out, remoteFacetModel, Lang.TTL);
 
       final Connection connectionForRunnable = con;
       //send to need
