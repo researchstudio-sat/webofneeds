@@ -1,158 +1,471 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg height="1014" version="1.1" width="1718" xmlns="http://www.w3.org/2000/svg">
-<rect fill="#99cc00" height="71" stroke="#99cc00" stroke-width="1" width="93" x="398" y="262"/>
-<rect fill="none" height="71" stroke="#000000" stroke-width="1" width="93" x="398" y="262"/>
-<text font-family="Dialog" font-size="12" x="416" y="276">
+<svg height="1038" version="1.1" width="1718" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#99cc00" height="71" stroke="#99cc00" stroke-width="1" width="93" x="398" y="286"/>
+<rect fill="none" height="71" stroke="#000000" stroke-width="1" width="93" x="398" y="286"/>
+<text font-family="Dialog" font-size="12" x="416" y="300">
 gr:Offering</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="93" x="398" y="286"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="93" x="398" y="309"/>
-<rect fill="#ffffff" height="139" stroke="#ffffff" stroke-width="1" width="286" x="550" y="286"/>
-<rect fill="none" height="139" stroke="#000000" stroke-width="1" width="286" x="550" y="286"/>
-<text font-family="Dialog" font-size="12" x="665" y="300">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="93" x="398" y="310"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="93" x="398" y="333"/>
+<rect fill="#ffffff" height="139" stroke="#ffffff" stroke-width="1" width="286" x="550" y="310"/>
+<rect fill="none" height="139" stroke="#000000" stroke-width="1" width="286" x="550" y="310"/>
+<text font-family="Dialog" font-size="12" x="665" y="324">
 won:Need</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="286" x="550" y="310"/>
-<text font-family="Dialog" font-size="12" x="554" y="325">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="286" x="550" y="334"/>
+<text font-family="Dialog" font-size="12" x="554" y="349">
 won:needCreationDate : xsd:DateTimeStamp</text>
-<text font-family="Dialog" font-size="12" x="554" y="342">
+<text font-family="Dialog" font-size="12" x="554" y="366">
 won:matcherProtocolEndpoint : xsd:anyURI</text>
-<text font-family="Dialog" font-size="12" x="554" y="359">
+<text font-family="Dialog" font-size="12" x="554" y="383">
 won:needProtocolEndpoint : xsd:anyURI</text>
-<text font-family="Dialog" font-size="12" x="554" y="376">
+<text font-family="Dialog" font-size="12" x="554" y="400">
 won:ownerProtocolEndpoint : xsd:anyURI</text>
-<text font-family="Dialog" font-size="12" x="554" y="393">
+<text font-family="Dialog" font-size="12" x="554" y="417">
 won:hasMatchingConstraint : oslc:ResourceShape</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="286" x="550" y="403"/>
-<polyline fill="none" points="490,302 550,302" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="550,302 538,309 538,295" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="550,302 538,309 538,295" stroke="#000000" stroke-width="1"/>
-<rect fill="#99cc00" height="68" stroke="#99cc00" stroke-width="1" width="145" x="942" y="462"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="145" x="942" y="462"/>
-<text font-family="Dialog" font-size="12" x="947" y="476">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="286" x="550" y="427"/>
+<polyline fill="none" points="490,326 550,326" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="550,326 538,333 538,319" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="550,326 538,333 538,319" stroke="#000000" stroke-width="1"/>
+<rect fill="#99cc00" height="68" stroke="#99cc00" stroke-width="1" width="145" x="942" y="486"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="145" x="942" y="486"/>
+<text font-family="Dialog" font-size="12" x="947" y="500">
 ldp:CompositeContainer</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="145" x="942" y="486"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="145" x="942" y="507"/>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="120" x="998" y="598"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="120" x="998" y="598"/>
-<text font-family="Dialog" font-size="12" x="1003" y="612">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="145" x="942" y="510"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="145" x="942" y="531"/>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="120" x="998" y="622"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="120" x="998" y="622"/>
+<text font-family="Dialog" font-size="12" x="1003" y="636">
 won:EventContainer</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="120" x="998" y="622"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="120" x="998" y="643"/>
-<polyline fill="none" points="1054,598 1054,529" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="1054,529 1061,541 1047,541" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="1054,529 1061,541 1047,541" stroke="#000000" stroke-width="1"/>
-<rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="109" x="734" y="614"/>
-<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="109" x="734" y="614"/>
-<text font-family="Dialog" font-size="12" x="744" y="628">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="120" x="998" y="646"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="120" x="998" y="667"/>
+<polyline fill="none" points="1054,622 1054,553" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="1054,553 1061,565 1047,565" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="1054,553 1061,565 1047,565" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="109" x="734" y="638"/>
+<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="109" x="734" y="638"/>
+<text font-family="Dialog" font-size="12" x="744" y="652">
 won:Connection</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="109" x="734" y="638"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="109" x="734" y="659"/>
-<rect fill="#ffffff" height="105" stroke="#ffffff" stroke-width="1" width="240" x="934" y="782"/>
-<rect fill="none" height="105" stroke="#000000" stroke-width="1" width="240" x="934" y="782"/>
-<text font-family="Dialog" font-size="12" x="1026" y="796">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="109" x="734" y="662"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="109" x="734" y="683"/>
+<rect fill="#ffffff" height="105" stroke="#ffffff" stroke-width="1" width="240" x="934" y="806"/>
+<rect fill="none" height="105" stroke="#000000" stroke-width="1" width="240" x="934" y="806"/>
+<text font-family="Dialog" font-size="12" x="1026" y="820">
 won:Event</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="240" x="934" y="806"/>
-<text font-family="Dialog" font-size="12" x="938" y="821">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="240" x="934" y="830"/>
+<text font-family="Dialog" font-size="12" x="938" y="845">
 won:hasTimeStamp : xsd:DateTimeStamp</text>
-<text font-family="Dialog" font-size="12" x="938" y="838">
+<text font-family="Dialog" font-size="12" x="938" y="862">
 won:hasOriginator : rdfs:Ressource</text>
-<text font-family="Dialog" font-size="12" x="938" y="855">
+<text font-family="Dialog" font-size="12" x="938" y="879">
 won:hasAdditionalInformation : owl:Thing</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="240" x="934" y="865"/>
-<polyline fill="none" points="1062,665 1062,782" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="1055" x2="1062" y1="770" y2="782"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="1069" x2="1062" y1="770" y2="782"/>
-<text font-family="Dialog" font-size="12" x="1065" y="728">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="240" x="934" y="889"/>
+<polyline fill="none" points="1062,689 1062,806" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1055" x2="1062" y1="794" y2="806"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1069" x2="1062" y1="794" y2="806"/>
+<text font-family="Dialog" font-size="12" x="1065" y="752">
 rdfs:member</text>
-<polyline fill="none" points="842,630 998,630" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="986" x2="998" y1="637" y2="630"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="986" x2="998" y1="623" y2="630"/>
-<text font-family="Dialog" font-size="12" x="863" y="616">
+<polyline fill="none" points="842,654 998,654" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="986" x2="998" y1="661" y2="654"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="986" x2="998" y1="647" y2="654"/>
+<text font-family="Dialog" font-size="12" x="863" y="640">
 won:hasEventContainer</text>
-<polyline fill="none" points="734,670 646,670 646,646 734,646" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="722" x2="734" y1="653" y2="646"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="722" x2="734" y1="639" y2="646"/>
-<text font-family="Dialog" font-size="12" x="560" y="689">
+<polyline fill="none" points="734,694 646,694 646,670 734,670" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="722" x2="734" y1="677" y2="670"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="722" x2="734" y1="663" y2="670"/>
+<text font-family="Dialog" font-size="12" x="560" y="713">
 won:hasRemoteConnection</text>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="96" x="1126" y="910"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="96" x="1126" y="910"/>
-<text font-family="Dialog" font-size="12" x="1144" y="924">
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="96" x="1126" y="934"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="96" x="1126" y="934"/>
+<text font-family="Dialog" font-size="12" x="1144" y="948">
 won:Close</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="96" x="1126" y="934"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="96" x="1126" y="955"/>
-<rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="95" x="1014" y="910"/>
-<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="95" x="1014" y="910"/>
-<text font-family="Dialog" font-size="12" x="1033" y="924">
-won:Open</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="95" x="1014" y="934"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="95" x="1014" y="955"/>
-<polyline fill="none" points="1150,910 1150,886" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="1150,886 1157,898 1143,898" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="1150,886 1157,898 1143,898" stroke="#000000" stroke-width="1"/>
-<polyline fill="none" points="1062,910 1062,886" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="1062,886 1069,898 1055,898" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="1062,886 1069,898 1055,898" stroke="#000000" stroke-width="1"/>
-<rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="94" x="902" y="910"/>
-<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="94" x="902" y="910"/>
-<text font-family="Dialog" font-size="12" x="925" y="924">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="96" x="1126" y="958"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="96" x="1126" y="979"/>
+<rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="95" x="1014" y="934"/>
+<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="95" x="1014" y="934"/>
+<text font-family="Dialog" font-size="12" x="1025" y="948">
+won:Connect</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="95" x="1014" y="958"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="95" x="1014" y="979"/>
+<polyline fill="none" points="1150,934 1150,910" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="1150,910 1157,922 1143,922" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="1150,910 1157,922 1143,922" stroke="#000000" stroke-width="1"/>
+<polyline fill="none" points="1062,934 1062,910" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="1062,910 1069,922 1055,922" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="1062,910 1069,922 1055,922" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="67" stroke="#ffffff" stroke-width="1" width="94" x="902" y="934"/>
+<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="94" x="902" y="934"/>
+<text font-family="Dialog" font-size="12" x="925" y="948">
 won:Hint</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="94" x="902" y="934"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="94" x="902" y="955"/>
-<polyline fill="none" points="964,910 964,886" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="964,886 971,898 957,898" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="964,886 971,898 957,898" stroke="#000000" stroke-width="1"/>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="80" x="702" y="14"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="80" x="702" y="14"/>
-<text font-family="Dialog" font-size="12" x="715" y="28">
-won:Take</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="80" x="702" y="38"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="80" x="702" y="59"/>
-<rect fill="#ffffff" height="71" stroke="#ffffff" stroke-width="1" width="80" x="798" y="14"/>
-<rect fill="none" height="71" stroke="#000000" stroke-width="1" width="80" x="798" y="14"/>
-<text font-family="Dialog" font-size="12" x="813" y="28">
-won:Give</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="80" x="798" y="38"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="80" x="798" y="61"/>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="153" x="710" y="462"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="153" x="710" y="462"/>
-<text font-family="Dialog" font-size="12" x="715" y="476">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="94" x="902" y="958"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="94" x="902" y="979"/>
+<polyline fill="none" points="964,934 964,910" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="964,910 971,922 957,922" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="964,910 971,922 957,922" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="84" x="622" y="96"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="84" x="622" y="96"/>
+<text font-family="Dialog" font-size="12" x="627" y="110">
+won:Demand</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="84" x="622" y="120"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="84" x="622" y="141"/>
+<rect fill="#ffffff" height="71" stroke="#ffffff" stroke-width="1" width="80" x="622" y="14"/>
+<rect fill="none" height="71" stroke="#000000" stroke-width="1" width="80" x="622" y="14"/>
+<text font-family="Dialog" font-size="12" x="630" y="28">
+won:Supply</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="80" x="622" y="38"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="80" x="622" y="61"/>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="153" x="710" y="486"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="153" x="710" y="486"/>
+<text font-family="Dialog" font-size="12" x="715" y="500">
 won:ConnectionContainer</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="153" x="710" y="486"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="153" x="710" y="507"/>
-<polyline fill="none" points="774,424 774,462" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="767" x2="774" y1="450" y2="462"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="781" x2="774" y1="450" y2="462"/>
-<text font-family="Dialog" font-size="12" x="782" y="449">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="153" x="710" y="510"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="153" x="710" y="531"/>
+<polyline fill="none" points="774,448 774,486" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="767" x2="774" y1="474" y2="486"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="781" x2="774" y1="474" y2="486"/>
+<text font-family="Dialog" font-size="12" x="782" y="473">
 won:hasConnections</text>
-<polyline fill="none" points="790,529 790,614" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="783" x2="790" y1="602" y2="614"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="797" x2="790" y1="602" y2="614"/>
-<text font-family="Dialog" font-size="12" x="793" y="569">
+<polyline fill="none" points="790,553 790,638" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="783" x2="790" y1="626" y2="638"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="797" x2="790" y1="626" y2="638"/>
+<text font-family="Dialog" font-size="12" x="793" y="593">
 rdfs:member</text>
-<polyline fill="none" points="862,489 942,489" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="942,489 930,496 930,482" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="942,489 930,496 930,482" stroke="#000000" stroke-width="1"/>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="123" x="776" y="158"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="123" x="776" y="158"/>
-<text font-family="Dialog" font-size="12" x="781" y="172">
+<polyline fill="none" points="862,513 942,513" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="942,513 930,520 930,506" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="942,513 930,520 930,506" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="123" x="764" y="182"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="123" x="764" y="182"/>
+<text font-family="Dialog" font-size="12" x="769" y="196">
 won:BasicNeedType</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="123" x="776" y="182"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="123" x="776" y="203"/>
-<polyline fill="none" points="826,286 826,225" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="833" x2="826" y1="237" y2="225"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="819" x2="826" y1="237" y2="225"/>
-<text font-family="Dialog" font-size="12" x="837" y="261">
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="123" x="764" y="206"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="123" x="764" y="227"/>
+<polyline fill="none" points="826,310 826,249" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="833" x2="826" y1="261" y2="249"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="819" x2="826" y1="261" y2="249"/>
+<text font-family="Dialog" font-size="12" x="837" y="285">
 won:hasBasicNeedType</text>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="781" x2="781" y1="81" y2="86"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="781" x2="781" y1="91" y2="96"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="781" x2="781" y1="101" y2="106"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="781" x2="781" y1="111" y2="116"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="781" x2="781" y1="121" y2="126"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="781" x2="781" y1="131" y2="136"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="781" x2="781" y1="141" y2="146"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="781" x2="781" y1="151" y2="156"/>
-<polygon fill="#ffffff" points="781,158 774,146 788,146" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="781,158 774,146 788,146" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="705" x2="710" y1="134" y2="134"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="715" x2="720" y1="134" y2="134"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="725" x2="730" y1="134" y2="134"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="735" x2="740" y1="134" y2="134"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="745" x2="750" y1="134" y2="134"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="755" x2="760" y1="134" y2="134"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="765" x2="770" y1="134" y2="134"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="775" x2="780" y1="134" y2="134"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="134" y2="139"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="144" y2="149"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="154" y2="159"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="164" y2="169"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="782" x2="782" y1="174" y2="179"/>
+<polygon fill="#ffffff" points="782,182 775,170 789,170" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="782,182 775,170 789,170" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="701" x2="706" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="711" x2="716" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="721" x2="726" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="731" x2="736" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="741" x2="746" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="751" x2="756" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="761" x2="766" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="771" x2="776" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="781" x2="786" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="791" x2="796" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="801" x2="806" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="54" y2="59"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="64" y2="69"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="74" y2="79"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="84" y2="89"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="94" y2="99"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="104" y2="109"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="114" y2="119"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="124" y2="129"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="134" y2="139"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="144" y2="149"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="154" y2="159"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="164" y2="169"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="806" x2="806" y1="174" y2="179"/>
+<polygon fill="#ffffff" points="806,182 799,170 813,170" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="806,182 799,170 813,170" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="110" x="998" y="358"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="110" x="998" y="358"/>
+<text font-family="Dialog" font-size="12" x="1003" y="372">
+won:NeedModality</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="110" x="998" y="382"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="110" x="998" y="403"/>
+<polyline fill="none" points="835,397 998,397" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="986" x2="998" y1="404" y2="397"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="986" x2="998" y1="390" y2="397"/>
+<text font-family="Dialog" font-size="12" x="843" y="370">
+won:hasNeedModality (1..*)</text>
+<rect fill="#ffffff" height="105" stroke="#ffffff" stroke-width="1" width="208" x="1070" y="150"/>
+<rect fill="none" height="105" stroke="#000000" stroke-width="1" width="208" x="1070" y="150"/>
+<text font-family="Dialog" font-size="12" x="1112" y="164">
+won:PriceSpecification</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="208" x="1070" y="174"/>
+<text font-family="Dialog" font-size="12" x="1074" y="189">
+won:hasLowerPriceLimit : xsd:float</text>
+<text font-family="Dialog" font-size="12" x="1074" y="206">
+won:hasUpperPriceLimit : xsd:float</text>
+<text font-family="Dialog" font-size="12" x="1074" y="223">
+won:hasCurrency : xsd:string</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="208" x="1070" y="233"/>
+<polyline fill="none" points="1086,358 1086,254" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1093" x2="1086" y1="266" y2="254"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1079" x2="1086" y1="266" y2="254"/>
+<text font-family="Dialog" font-size="12" x="1089" y="305">
+won:hasPriceSpecification (1..*)</text>
+<rect fill="#ffffff" height="71" stroke="#ffffff" stroke-width="1" width="159" x="1334" y="366"/>
+<rect fill="none" height="71" stroke="#000000" stroke-width="1" width="159" x="1334" y="366"/>
+<text font-family="Dialog" font-size="12" x="1342" y="380">
+won:LocationSpecification</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="159" x="1334" y="390"/>
+<text font-family="Dialog" font-size="12" x="1338" y="405">
+won:isConcealed : Boolean</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="159" x="1334" y="415"/>
+<polyline fill="none" points="1107,390 1334,390" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1322" x2="1334" y1="397" y2="390"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1322" x2="1334" y1="383" y2="390"/>
+<text font-family="Dialog" font-size="12" x="1112" y="382">
+won:hasLocationSpecification (1..*)</text>
+<rect fill="#99cc00" height="88" stroke="#99cc00" stroke-width="1" width="137" x="1350" y="246"/>
+<rect fill="none" height="88" stroke="#000000" stroke-width="1" width="137" x="1350" y="246"/>
+<text font-family="Dialog" font-size="12" x="1392" y="260">
+geo:Point</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="137" x="1350" y="270"/>
+<text font-family="Dialog" font-size="12" x="1354" y="285">
+geo:longitude : xsd:float</text>
+<text font-family="Dialog" font-size="12" x="1354" y="302">
+geo:latitude : xsd:float</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="137" x="1350" y="312"/>
+<rect fill="#ffffff" height="139" stroke="#ffffff" stroke-width="1" width="242" x="1238" y="510"/>
+<rect fill="none" height="139" stroke="#000000" stroke-width="1" width="242" x="1238" y="510"/>
+<text font-family="Dialog" font-size="12" x="1297" y="524">
+won:TimeSpecification</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="242" x="1238" y="534"/>
+<text font-family="Dialog" font-size="12" x="1242" y="549">
+won:hasStartTime : xsd:DateTimeStamp</text>
+<text font-family="Dialog" font-size="12" x="1242" y="566">
+won:hasEndTime : xsd:DateTimeStamp</text>
+<text font-family="Dialog" font-size="12" x="1242" y="583">
+won:hasRecursIn : xsd:duration</text>
+<text font-family="Dialog" font-size="12" x="1242" y="600">
+won:hasRecursTimes : xsd:integer</text>
+<text font-family="Dialog" font-size="12" x="1242" y="617">
+won:hasRecursInfiniteTimes : xsd:boolean</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="242" x="1238" y="627"/>
+<polyline fill="none" points="1107,425 1238,510" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1224" x2="1238" y1="509" y2="510"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="1231" x2="1238" y1="497" y2="510"/>
+<text font-family="Dialog" font-size="12" x="1179" y="466">
+won:hasTimeSpecification (1..*)</text>
+<polyline fill="none" points="1436,333 1436,366" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="1436,366 1429,354 1443,354" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="1436,366 1429,354 1443,354" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="92" stroke="#ffffff" stroke-width="1" width="186" x="1518" y="246"/>
+<rect fill="none" height="92" stroke="#000000" stroke-width="1" width="186" x="1518" y="246"/>
+<text font-family="Dialog" font-size="12" x="1578" y="260">
+won:Region</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="186" x="1518" y="270"/>
+<text font-family="Dialog" font-size="12" x="1522" y="285">
+won:hasISOCode : xsd:string</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="186" x="1518" y="305"/>
+<polyline fill="none" points="1526,337 1526,382 1492,382" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="1492,382 1504,375 1504,389" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="1492,382 1504,375 1504,389" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="72" x="374" y="398"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="72" x="374" y="398"/>
+<text font-family="Dialog" font-size="12" x="379" y="412">
+won:Owner</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="72" x="374" y="422"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="72" x="374" y="443"/>
+<rect fill="#99cc00" height="67" stroke="#99cc00" stroke-width="1" width="120" x="398" y="519"/>
+<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="120" x="398" y="519"/>
+<text font-family="Dialog" font-size="12" x="414" y="533">
+schema:Person</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="120" x="398" y="543"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="120" x="398" y="564"/>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="142" x="150" y="414"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="142" x="150" y="414"/>
+<text font-family="Dialog" font-size="12" x="157" y="428">
+won:AnonymizedOwner</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="142" x="150" y="438"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="142" x="150" y="459"/>
+<polyline fill="none" points="291,446 374,446" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="374,446 362,453 362,439" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="374,446 362,453 362,439" stroke="#000000" stroke-width="1"/>
+<polyline fill="none" points="437,519 437,465" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="437,465 444,477 430,477" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="437,465 444,477 430,477" stroke="#000000" stroke-width="1"/>
+<polyline fill="none" points="550,398 445,398" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="457" x2="445" y1="391" y2="398"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="457" x2="445" y1="405" y2="398"/>
+<text font-family="Dialog" font-size="12" x="454" y="420">
+won:hasOwner</text>
+<rect fill="#ffffff" height="122" stroke="#ffffff" stroke-width="1" width="270" x="254" y="670"/>
+<rect fill="none" height="122" stroke="#000000" stroke-width="1" width="270" x="254" y="670"/>
+<text font-family="Dialog" font-size="12" x="339" y="684">
+won:NeedContent</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="270" x="254" y="694"/>
+<text font-family="Dialog" font-size="12" x="258" y="709">
+won:hasTextDescription : xsd:string</text>
+<text font-family="Dialog" font-size="12" x="258" y="726">
+won:hasContentDescription : owl:Thing</text>
+<text font-family="Dialog" font-size="12" x="258" y="743">
+dc:title : rdfs:Literal</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="270" x="254" y="761"/>
+<polyline fill="none" points="590,448 590,670 523,670" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="535" x2="523" y1="663" y2="670"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="535" x2="523" y1="677" y2="670"/>
+<text font-family="Dialog" font-size="12" x="498" y="623">
+won:hasContent</text>
+<rect fill="#99cc00" height="122" stroke="#99cc00" stroke-width="1" width="215" x="262" y="902"/>
+<rect fill="none" height="122" stroke="#000000" stroke-width="1" width="215" x="262" y="902"/>
+<text font-family="Dialog" font-size="12" x="315" y="916">
+gr:QuantitativeValue</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="215" x="262" y="926"/>
+<text font-family="Dialog" font-size="12" x="266" y="941">
+gr:hasUnitOfMeasurement : xsd:string</text>
+<text font-family="Dialog" font-size="12" x="266" y="958">
+gr:hasMinValue : rdfs:Literal</text>
+<text font-family="Dialog" font-size="12" x="266" y="975">
+gr:hasMaxValue : rdfs:Literal</text>
+<text font-family="Dialog" font-size="12" x="266" y="992">
+gr:hasValue : rdfs:Literal</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="215" x="262" y="1002"/>
+<polyline fill="none" points="278,791 278,902" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="271" x2="278" y1="890" y2="902"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="285" x2="278" y1="890" y2="902"/>
+<text font-family="Dialog" font-size="12" x="90" y="834">
+won:hasQuantitativeProperty (1..*)</text>
+<polyline fill="none" points="374,791 374,902" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="367" x2="374" y1="890" y2="902"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="381" x2="374" y1="890" y2="902"/>
+<text font-family="Dialog" font-size="12" x="377" y="872">
+won:hasDepth</text>
+<polyline fill="none" points="334,791 334,902" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="327" x2="334" y1="890" y2="902"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="341" x2="334" y1="890" y2="902"/>
+<text font-family="Dialog" font-size="12" x="337" y="845">
+won:hasHeight</text>
+<polyline fill="none" points="422,791 422,902" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="415" x2="422" y1="890" y2="902"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="429" x2="422" y1="890" y2="902"/>
+<text font-family="Dialog" font-size="12" x="424" y="826">
+won:hasWidth</text>
+<polyline fill="none" points="462,791 462,902" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="455" x2="462" y1="890" y2="902"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="469" x2="462" y1="890" y2="902"/>
+<text font-family="Dialog" font-size="12" x="465" y="851">
+won:hasWeight</text>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="94" x="422" y="182"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="94" x="422" y="182"/>
+<text font-family="Dialog" font-size="12" x="427" y="196">
+won:NeedState</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="94" x="422" y="206"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="94" x="422" y="227"/>
+<polyline fill="none" points="582,310 582,222 515,222" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="527" x2="515" y1="215" y2="222"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="527" x2="515" y1="229" y2="222"/>
+<text font-family="Dialog" font-size="12" x="532" y="215">
+won:isInState</text>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="68" x="374" y="86"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="68" x="374" y="86"/>
+<text font-family="Dialog" font-size="12" x="379" y="100">
+won:Active</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="68" x="374" y="110"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="68" x="374" y="131"/>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="77" x="470" y="86"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="77" x="470" y="86"/>
+<text font-family="Dialog" font-size="12" x="475" y="100">
+won:Inactive</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="77" x="470" y="110"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="77" x="470" y="131"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="430" x2="430" y1="153" y2="158"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="430" x2="430" y1="163" y2="168"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="430" x2="430" y1="173" y2="178"/>
+<polygon fill="#ffffff" points="430,182 423,170 437,170" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="430,182 423,170 437,170" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="502" x2="502" y1="153" y2="158"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="502" x2="502" y1="163" y2="168"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="502" x2="502" y1="173" y2="178"/>
+<polygon fill="#ffffff" points="502,182 495,170 509,170" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="502,182 495,170 509,170" stroke="#000000" stroke-width="1"/>
+<rect fill="#99cc00" height="68" stroke="#99cc00" stroke-width="1" width="127" x="238" y="518"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="127" x="238" y="518"/>
+<text font-family="Dialog" font-size="12" x="243" y="532">
+schema:Organization</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="127" x="238" y="542"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="127" x="238" y="563"/>
+<polyline fill="none" points="318,518 318,502 398,502 398,465" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="398,465 405,477 391,477" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="398,465 405,477 391,477" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="127" x="726" y="798"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="127" x="726" y="798"/>
+<text font-family="Dialog" font-size="12" x="731" y="812">
+won:ConnectionState</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="127" x="726" y="822"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="127" x="726" y="843"/>
+<polyline fill="none" points="790,704 790,798" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="783" x2="790" y1="786" y2="798"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="797" x2="790" y1="786" y2="798"/>
+<text font-family="Dialog" font-size="12" x="791" y="756">
+won:hasConnectionState</text>
+<polyline fill="none" points="764,222 666,222 666,198 764,198" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="752" x2="764" y1="205" y2="198"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="752" x2="764" y1="191" y2="198"/>
+<text font-family="Dialog" font-size="12" x="616" y="241">
+won:allowsMatchWith</text>
+<rect fill="#ffffff" height="88" stroke="#ffffff" stroke-width="1" width="239" x="110" y="118"/>
+<rect fill="none" height="88" stroke="#000000" stroke-width="1" width="239" x="110" y="118"/>
+<text font-family="Dialog" font-size="12" x="194" y="132">
+oslc:Property</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="239" x="110" y="142"/>
+<text font-family="Dialog" font-size="12" x="114" y="157">
+won:hasMinValueConstraint : xsd:decimal</text>
+<text font-family="Dialog" font-size="12" x="114" y="174">
+won:hasMaxValueConstraint : xsd:decimal</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="239" x="110" y="184"/>
+<rect fill="#99cc00" height="71" stroke="#99cc00" stroke-width="1" width="126" x="14" y="694"/>
+<rect fill="none" height="71" stroke="#000000" stroke-width="1" width="126" x="14" y="694"/>
+<text font-family="Dialog" font-size="12" x="53" y="708">
+sioc:Tag</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="126" x="14" y="718"/>
+<text font-family="Dialog" font-size="12" x="18" y="733">
+rdfs:label : rdfs:Literal</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="126" x="14" y="743"/>
+<polyline fill="none" points="254,718 139,718" stroke="#000000" stroke-width="1"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="151" x2="139" y1="711" y2="718"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="151" x2="139" y1="725" y2="718"/>
+<text font-family="Dialog" font-size="12" x="150" y="703">
+won:hasTag (*..*)</text>
+<rect fill="#ffffff" height="71" stroke="#ffffff" stroke-width="1" width="104" x="885" y="95"/>
+<rect fill="none" height="71" stroke="#000000" stroke-width="1" width="104" x="885" y="95"/>
+<text font-family="Dialog" font-size="12" x="902" y="109">
+won:Critique</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="104" x="885" y="119"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="104" x="885" y="142"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="885" x2="880" y1="134" y2="134"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="875" x2="870" y1="134" y2="134"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="865" x2="862" y1="134" y2="134"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="862" x2="862" y1="134" y2="139"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="862" x2="862" y1="144" y2="149"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="862" x2="862" y1="154" y2="159"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="862" x2="862" y1="164" y2="169"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="862" x2="862" y1="174" y2="179"/>
+<polygon fill="#ffffff" points="862,182 855,170 869,170" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="862,182 855,170 869,170" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="104" x="886" y="17"/>
+<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="104" x="886" y="17"/>
+<text font-family="Dialog" font-size="12" x="891" y="31">
+won:Do_together</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="104" x="886" y="41"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="104" x="886" y="62"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="886" x2="881" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="876" x2="871" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="866" x2="861" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="856" x2="851" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="846" x2="841" y1="54" y2="54"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="54" y2="59"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="64" y2="69"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="74" y2="79"/>
 <line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="84" y2="89"/>
 <line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="94" y2="99"/>
 <line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="104" y2="109"/>
@@ -160,275 +473,9 @@ won:hasBasicNeedType</text>
 <line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="124" y2="129"/>
 <line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="134" y2="139"/>
 <line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="144" y2="149"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="154" y2="158"/>
-<polygon fill="#ffffff" points="838,158 831,146 845,146" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="838,158 831,146 845,146" stroke="#000000" stroke-width="1"/>
-<rect fill="#ffffff" height="72" stroke="#ffffff" stroke-width="1" width="95" x="894" y="14"/>
-<rect fill="none" height="72" stroke="#000000" stroke-width="1" width="95" x="894" y="14"/>
-<text font-family="Dialog" font-size="12" x="920" y="28">
-won:Do</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="95" x="894" y="38"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="95" x="894" y="61"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="894" x2="894" y1="85" y2="90"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="894" x2="894" y1="95" y2="100"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="894" x2="894" y1="105" y2="110"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="894" x2="894" y1="115" y2="120"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="894" x2="894" y1="125" y2="130"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="894" x2="894" y1="135" y2="140"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="894" x2="894" y1="145" y2="150"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="894" x2="894" y1="155" y2="158"/>
-<polygon fill="#ffffff" points="894,158 887,146 901,146" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="894,158 887,146 901,146" stroke="#000000" stroke-width="1"/>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="110" x="998" y="334"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="110" x="998" y="334"/>
-<text font-family="Dialog" font-size="12" x="1003" y="348">
-won:NeedModality</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="110" x="998" y="358"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="110" x="998" y="379"/>
-<polyline fill="none" points="835,373 998,373" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="986" x2="998" y1="380" y2="373"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="986" x2="998" y1="366" y2="373"/>
-<text font-family="Dialog" font-size="12" x="843" y="346">
-won:hasNeedModality (1..*)</text>
-<rect fill="#ffffff" height="105" stroke="#ffffff" stroke-width="1" width="208" x="1070" y="126"/>
-<rect fill="none" height="105" stroke="#000000" stroke-width="1" width="208" x="1070" y="126"/>
-<text font-family="Dialog" font-size="12" x="1112" y="140">
-won:PriceSpecification</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="208" x="1070" y="150"/>
-<text font-family="Dialog" font-size="12" x="1074" y="165">
-won:hasLowerPriceLimit : xsd:float</text>
-<text font-family="Dialog" font-size="12" x="1074" y="182">
-won:hasUpperPriceLimit : xsd:float</text>
-<text font-family="Dialog" font-size="12" x="1074" y="199">
-won:hasCurrency : xsd:string</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="208" x="1070" y="209"/>
-<polyline fill="none" points="1086,334 1086,230" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="1093" x2="1086" y1="242" y2="230"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="1079" x2="1086" y1="242" y2="230"/>
-<text font-family="Dialog" font-size="12" x="1089" y="281">
-won:hasPriceSpecification (1..*)</text>
-<rect fill="#ffffff" height="71" stroke="#ffffff" stroke-width="1" width="159" x="1334" y="342"/>
-<rect fill="none" height="71" stroke="#000000" stroke-width="1" width="159" x="1334" y="342"/>
-<text font-family="Dialog" font-size="12" x="1342" y="356">
-won:LocationSpecification</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="159" x="1334" y="366"/>
-<text font-family="Dialog" font-size="12" x="1338" y="381">
-won:isConcealed : Boolean</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="159" x="1334" y="391"/>
-<polyline fill="none" points="1107,366 1334,366" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="1322" x2="1334" y1="373" y2="366"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="1322" x2="1334" y1="359" y2="366"/>
-<text font-family="Dialog" font-size="12" x="1112" y="358">
-won:hasLocationSpecification (1..*)</text>
-<rect fill="#99cc00" height="88" stroke="#99cc00" stroke-width="1" width="137" x="1350" y="222"/>
-<rect fill="none" height="88" stroke="#000000" stroke-width="1" width="137" x="1350" y="222"/>
-<text font-family="Dialog" font-size="12" x="1392" y="236">
-geo:Point</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="137" x="1350" y="246"/>
-<text font-family="Dialog" font-size="12" x="1354" y="261">
-geo:longitude : xsd:float</text>
-<text font-family="Dialog" font-size="12" x="1354" y="278">
-geo:latitude : xsd:float</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="137" x="1350" y="288"/>
-<rect fill="#ffffff" height="139" stroke="#ffffff" stroke-width="1" width="242" x="1238" y="486"/>
-<rect fill="none" height="139" stroke="#000000" stroke-width="1" width="242" x="1238" y="486"/>
-<text font-family="Dialog" font-size="12" x="1297" y="500">
-won:TimeSpecification</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="242" x="1238" y="510"/>
-<text font-family="Dialog" font-size="12" x="1242" y="525">
-won:hasStartTime : xsd:DateTimeStamp</text>
-<text font-family="Dialog" font-size="12" x="1242" y="542">
-won:hasEndTime : xsd:DateTimeStamp</text>
-<text font-family="Dialog" font-size="12" x="1242" y="559">
-won:hasRecursIn : xsd:duration</text>
-<text font-family="Dialog" font-size="12" x="1242" y="576">
-won:hasRecursTimes : xsd:integer</text>
-<text font-family="Dialog" font-size="12" x="1242" y="593">
-won:hasRecursInfiniteTimes : xsd:boolean</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="242" x="1238" y="603"/>
-<polyline fill="none" points="1107,401 1238,486" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="1224" x2="1238" y1="485" y2="486"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="1231" x2="1238" y1="473" y2="486"/>
-<text font-family="Dialog" font-size="12" x="1179" y="442">
-won:hasTimeSpecification (1..*)</text>
-<polyline fill="none" points="1436,309 1436,342" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="1436,342 1429,330 1443,330" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="1436,342 1429,330 1443,330" stroke="#000000" stroke-width="1"/>
-<rect fill="#ffffff" height="92" stroke="#ffffff" stroke-width="1" width="186" x="1518" y="222"/>
-<rect fill="none" height="92" stroke="#000000" stroke-width="1" width="186" x="1518" y="222"/>
-<text font-family="Dialog" font-size="12" x="1578" y="236">
-won:Region</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="186" x="1518" y="246"/>
-<text font-family="Dialog" font-size="12" x="1522" y="261">
-won:hasISOCode : xsd:string</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="186" x="1518" y="281"/>
-<polyline fill="none" points="1526,313 1526,358 1492,358" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="1492,358 1504,351 1504,365" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="1492,358 1504,351 1504,365" stroke="#000000" stroke-width="1"/>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="72" x="374" y="374"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="72" x="374" y="374"/>
-<text font-family="Dialog" font-size="12" x="379" y="388">
-won:Owner</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="72" x="374" y="398"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="72" x="374" y="419"/>
-<rect fill="#99cc00" height="67" stroke="#99cc00" stroke-width="1" width="120" x="398" y="495"/>
-<rect fill="none" height="67" stroke="#000000" stroke-width="1" width="120" x="398" y="495"/>
-<text font-family="Dialog" font-size="12" x="414" y="509">
-schema:Person</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="120" x="398" y="519"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="120" x="398" y="540"/>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="142" x="150" y="390"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="142" x="150" y="390"/>
-<text font-family="Dialog" font-size="12" x="157" y="404">
-won:AnonymizedOwner</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="142" x="150" y="414"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="142" x="150" y="435"/>
-<polyline fill="none" points="291,422 374,422" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="374,422 362,429 362,415" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="374,422 362,429 362,415" stroke="#000000" stroke-width="1"/>
-<polyline fill="none" points="437,495 437,441" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="437,441 444,453 430,453" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="437,441 444,453 430,453" stroke="#000000" stroke-width="1"/>
-<polyline fill="none" points="550,374 445,374" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="457" x2="445" y1="367" y2="374"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="457" x2="445" y1="381" y2="374"/>
-<text font-family="Dialog" font-size="12" x="454" y="396">
-won:hasOwner</text>
-<rect fill="#ffffff" height="122" stroke="#ffffff" stroke-width="1" width="270" x="254" y="646"/>
-<rect fill="none" height="122" stroke="#000000" stroke-width="1" width="270" x="254" y="646"/>
-<text font-family="Dialog" font-size="12" x="339" y="660">
-won:NeedContent</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="270" x="254" y="670"/>
-<text font-family="Dialog" font-size="12" x="258" y="685">
-won:hasTextDescription : xsd:string</text>
-<text font-family="Dialog" font-size="12" x="258" y="702">
-won:hasContentDescription : owl:Thing</text>
-<text font-family="Dialog" font-size="12" x="258" y="719">
-dc:title : rdfs:Literal</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="270" x="254" y="737"/>
-<polyline fill="none" points="590,424 590,646 523,646" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="535" x2="523" y1="639" y2="646"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="535" x2="523" y1="653" y2="646"/>
-<text font-family="Dialog" font-size="12" x="498" y="599">
-won:hasContent</text>
-<rect fill="#99cc00" height="122" stroke="#99cc00" stroke-width="1" width="215" x="262" y="878"/>
-<rect fill="none" height="122" stroke="#000000" stroke-width="1" width="215" x="262" y="878"/>
-<text font-family="Dialog" font-size="12" x="315" y="892">
-gr:QuantitativeValue</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="215" x="262" y="902"/>
-<text font-family="Dialog" font-size="12" x="266" y="917">
-gr:hasUnitOfMeasurement : xsd:string</text>
-<text font-family="Dialog" font-size="12" x="266" y="934">
-gr:hasMinValue : rdfs:Literal</text>
-<text font-family="Dialog" font-size="12" x="266" y="951">
-gr:hasMaxValue : rdfs:Literal</text>
-<text font-family="Dialog" font-size="12" x="266" y="968">
-gr:hasValue : rdfs:Literal</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="215" x="262" y="978"/>
-<polyline fill="none" points="278,767 278,878" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="271" x2="278" y1="866" y2="878"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="285" x2="278" y1="866" y2="878"/>
-<text font-family="Dialog" font-size="12" x="90" y="810">
-won:hasQuantitativeProperty (1..*)</text>
-<polyline fill="none" points="374,767 374,878" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="367" x2="374" y1="866" y2="878"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="381" x2="374" y1="866" y2="878"/>
-<text font-family="Dialog" font-size="12" x="377" y="848">
-won:hasDepth</text>
-<polyline fill="none" points="334,767 334,878" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="327" x2="334" y1="866" y2="878"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="341" x2="334" y1="866" y2="878"/>
-<text font-family="Dialog" font-size="12" x="337" y="821">
-won:hasHeight</text>
-<polyline fill="none" points="422,767 422,878" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="415" x2="422" y1="866" y2="878"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="429" x2="422" y1="866" y2="878"/>
-<text font-family="Dialog" font-size="12" x="424" y="802">
-won:hasWidth</text>
-<polyline fill="none" points="462,767 462,878" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="455" x2="462" y1="866" y2="878"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="469" x2="462" y1="866" y2="878"/>
-<text font-family="Dialog" font-size="12" x="465" y="827">
-won:hasWeight</text>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="94" x="494" y="158"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="94" x="494" y="158"/>
-<text font-family="Dialog" font-size="12" x="499" y="172">
-won:NeedState</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="94" x="494" y="182"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="94" x="494" y="203"/>
-<polyline fill="none" points="614,286 614,198 587,198" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="599" x2="587" y1="191" y2="198"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="599" x2="587" y1="205" y2="198"/>
-<text font-family="Dialog" font-size="12" x="524" y="257">
-won:isInState</text>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="68" x="446" y="62"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="68" x="446" y="62"/>
-<text font-family="Dialog" font-size="12" x="451" y="76">
-won:Active</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="68" x="446" y="86"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="68" x="446" y="107"/>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="77" x="542" y="62"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="77" x="542" y="62"/>
-<text font-family="Dialog" font-size="12" x="547" y="76">
-won:Inactive</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="77" x="542" y="86"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="77" x="542" y="107"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="502" x2="502" y1="129" y2="134"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="502" x2="502" y1="139" y2="144"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="502" x2="502" y1="149" y2="154"/>
-<polygon fill="#ffffff" points="502,158 495,146 509,146" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="502,158 495,146 509,146" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="574" x2="574" y1="129" y2="134"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="574" x2="574" y1="139" y2="144"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="574" x2="574" y1="149" y2="154"/>
-<polygon fill="#ffffff" points="574,158 567,146 581,146" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="574,158 567,146 581,146" stroke="#000000" stroke-width="1"/>
-<rect fill="#99cc00" height="68" stroke="#99cc00" stroke-width="1" width="127" x="238" y="494"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="127" x="238" y="494"/>
-<text font-family="Dialog" font-size="12" x="243" y="508">
-schema:Organization</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="127" x="238" y="518"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="127" x="238" y="539"/>
-<polyline fill="none" points="318,494 318,478 398,478 398,441" stroke="#000000" stroke-width="1"/>
-<polygon fill="#ffffff" points="398,441 405,453 391,453" stroke="#ffffff" stroke-width="1"/>
-<polygon fill="none" points="398,441 405,453 391,453" stroke="#000000" stroke-width="1"/>
-<rect fill="#ffffff" height="68" stroke="#ffffff" stroke-width="1" width="127" x="726" y="774"/>
-<rect fill="none" height="68" stroke="#000000" stroke-width="1" width="127" x="726" y="774"/>
-<text font-family="Dialog" font-size="12" x="731" y="788">
-won:ConnectionState</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="127" x="726" y="798"/>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="127" x="726" y="819"/>
-<polyline fill="none" points="790,680 790,774" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="783" x2="790" y1="762" y2="774"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="797" x2="790" y1="762" y2="774"/>
-<text font-family="Dialog" font-size="12" x="791" y="732">
-won:hasConnectionState</text>
-<polyline fill="none" points="776,198 678,198 678,174 776,174" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="764" x2="776" y1="181" y2="174"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="764" x2="776" y1="167" y2="174"/>
-<text font-family="Dialog" font-size="12" x="628" y="217">
-won:allowsMatchWith</text>
-<rect fill="#ffffff" height="88" stroke="#ffffff" stroke-width="1" width="239" x="110" y="94"/>
-<rect fill="none" height="88" stroke="#000000" stroke-width="1" width="239" x="110" y="94"/>
-<text font-family="Dialog" font-size="12" x="194" y="108">
-oslc:Property</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="239" x="110" y="118"/>
-<text font-family="Dialog" font-size="12" x="114" y="133">
-won:hasMinValueConstraint : xsd:decimal</text>
-<text font-family="Dialog" font-size="12" x="114" y="150">
-won:hasMaxValueConstraint : xsd:decimal</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="239" x="110" y="160"/>
-<rect fill="#99cc00" height="71" stroke="#99cc00" stroke-width="1" width="126" x="14" y="670"/>
-<rect fill="none" height="71" stroke="#000000" stroke-width="1" width="126" x="14" y="670"/>
-<text font-family="Dialog" font-size="12" x="53" y="684">
-sioc:Tag</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="126" x="14" y="694"/>
-<text font-family="Dialog" font-size="12" x="18" y="709">
-rdfs:label : rdfs:Literal</text>
-<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="126" x="14" y="719"/>
-<polyline fill="none" points="254,694 139,694" stroke="#000000" stroke-width="1"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="151" x2="139" y1="687" y2="694"/>
-<line fill="#000000" stroke="#000000" stroke-width="1" x1="151" x2="139" y1="701" y2="694"/>
-<text font-family="Dialog" font-size="12" x="152" y="679">
-won:hasTag (*..*)</text>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="154" y2="159"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="164" y2="169"/>
+<line fill="#000000" stroke="#000000" stroke-width="1" x1="838" x2="838" y1="174" y2="179"/>
+<polygon fill="#ffffff" points="838,182 831,170 845,170" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="838,182 831,170 845,170" stroke="#000000" stroke-width="1"/>
 </svg>
