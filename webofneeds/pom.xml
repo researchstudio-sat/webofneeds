@@ -98,15 +98,10 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!--dependency>
-                <groupId>org.apache.jena</groupId>
-                <artifactId>jena-jsonld</artifactId>
-                <version>${org.apache.jena.jsonld.version}</version>
-            </dependency-->
             <dependency>
                 <groupId>com.github.jsonld-java</groupId>
                 <artifactId>jsonld-java-jena</artifactId>
-                <version>0.3-SNAPSHOT</version>
+                <version>${com.github.jsonld-java.version}</version>
             </dependency>
 
             <!-- Servlet API -->
@@ -499,7 +494,7 @@
         <solr.version>3.5.0</solr.version>
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>
-        <com.github.jsonld-java.version>0.2</com.github.jsonld-java.version>
+        <com.github.jsonld-java.version>0.3-SNAPSHOT</com.github.jsonld-java.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
         <com.sun.xml.version>2.0EA3</com.sun.xml.version>
