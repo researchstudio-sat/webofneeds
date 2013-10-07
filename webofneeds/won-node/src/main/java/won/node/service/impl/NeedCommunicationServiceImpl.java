@@ -134,7 +134,7 @@ public class NeedCommunicationServiceImpl implements
     eventNode.addLiteral(WON.HAS_MATCH_SCORE, score);
     matchDataModel.setNsPrefix("",eventNode.getURI().toString());
     if (content != null) {
-      RdfUtils.replaceBaseURI(content, eventNode);
+      RdfUtils.replaceBaseResource(content, eventNode);
       matchDataModel.add(content);
     }
 
@@ -200,7 +200,6 @@ public class NeedCommunicationServiceImpl implements
     List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
     if (existingConnections.size() > 0) {
       for (Connection conn : existingConnections) {
-        //TODO: Move this to the transition() - Method in ConnectionState
         if (ConnectionState.CONNECTED == conn.getState() ||
             ConnectionState.REQUEST_SENT == conn.getState()) {
           throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);
@@ -420,7 +419,7 @@ public class NeedCommunicationServiceImpl implements
     Resource eventNode = extraDataModel.createResource(this.URIService.createEventURI(con,event).toString());
     extraDataModel.setNsPrefix("",eventNode.getURI().toString());
     if (content != null) {
-      RdfUtils.replaceBaseURI(content, eventNode);
+      RdfUtils.replaceBaseResource(content, eventNode);
       rdfStorageService.storeContent(event, extraDataModel);
     }
   }

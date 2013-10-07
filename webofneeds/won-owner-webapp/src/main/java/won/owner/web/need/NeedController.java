@@ -33,7 +33,6 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -125,11 +124,6 @@ public class NeedController
 
       Resource needResource = needModel.createResource(ownerURI.toString(), WON.NEED);
 
-      if (!needPojo.getMatchingConstraint().isEmpty()) {
-        attachRdfToModelViaBlanknode(needPojo.getMatchingConstraint(), "TTL", needResource, WON.HAS_MATCHING_CONSTRAINT, needModel);
-      }
-
-
       // need type
       needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
 
@@ -162,7 +156,6 @@ public class NeedController
       // need modalities
       Resource needModality = needModel.createResource(WON.NEED_MODALITY);
 
-      // TODO: store need modalities in separate objects to enable easier checking and multiple instances
       //price and currency
       if (needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
         Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
@@ -202,7 +195,6 @@ public class NeedController
       needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
 
       if (needPojo.getWonNode().equals("")) {
-        //TODO: this is a temporary hack, please fix. The protocol expects boolean and we have an enum for needState
         needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
       } else {
         needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, needPojo.getWonNode());
@@ -224,14 +216,8 @@ public class NeedController
 
   private void attachRdfToModelViaBlanknode(final String rdfAsString, final String rdfLanguage, final Resource resourceToLinkTo, final Property propertyToLinkThrough, final com.hp.hpl.jena.rdf.model.Model modelToModify)
   {
-    com.hp.hpl.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
-    String baseURI= "no:uri";
-    model.setNsPrefix("", baseURI);
-    model.read(new StringReader(rdfAsString), baseURI, rdfLanguage);
-    Resource linkingBlankNode = model.createResource();
-    RdfUtils.replaceBaseURI(model,linkingBlankNode);
-    resourceToLinkTo.addProperty(propertyToLinkThrough, linkingBlankNode);
-    modelToModify.add(model);
+    com.hp.hpl.jena.rdf.model.Model model = RdfUtils.readRdfSnippet(rdfAsString, rdfLanguage);
+    RdfUtils.attachModelByBaseResource(resourceToLinkTo,propertyToLinkThrough, model);
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)

@@ -9,7 +9,7 @@ import com.hp.hpl.jena.rdf.model.Model;
  * Time: 15:35
  * To change this template use File | Settings | File Templates.
  */
-interface ModelMapper<T> {
+public interface ModelMapper<T> {
     public Model toModel(T tobject);
     public T fromModel(Model model);
 }

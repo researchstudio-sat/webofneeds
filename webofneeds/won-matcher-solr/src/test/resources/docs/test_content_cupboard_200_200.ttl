@@ -1,0 +1,50 @@
+@prefix :    <http://www.example.com/resource/need/14> .
+@prefix dc:  <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:     <http://purl.org/webofneeds/model#> .
+@prefix gr:  <http://purl.org/goodrelations/v1#> .
+@prefix ldp:     <http://www.w3.org/ns/ldp#> .
+@prefix sp:  <http://spinrdf.org/sp#>.
+
+<http://www.example.com/resource/need/14>
+  a   won:Need ;
+  won:hasBasicNeedType
+      won:Supply ;
+  won:hasConnections <http://www.example.com/resource/need/14/connections/> ;
+  won:hasContent
+      [ a   won:NeedContent ;
+        dc:title "small cupboard"^^xsd:string ;
+        won:hasContentDescription
+        [ a   <http://dbpedia.org/resource/Cupboard> , gr:Individual ;
+          gr:color "natural birch";
+          gr:height
+            [ a   gr:QuantitativeValueFloat ;
+              gr:hasUnitOfMeasurement "CMT"^^xsd:string ;
+              gr:hasValue "200"^^xsd:float
+              ];
+
+            gr:depth
+              [ a   gr:QuantitativeValueFloat ;
+                gr:hasUnitOfMeasurement "CMT"^^xsd:string ;
+                gr:hasValue "200"^^xsd:float
+                ]
+        ]
+      ] ;
+  won:hasNeedModality
+      [ a   won:NeedModality
+      ] ;
+  won:isInState won:Active ;
+  won:matcherProtocolEndpoint
+      <http://www.example.com/won/protocol/matcher> ;
+  won:needCreationDate
+      "2013-09-252T10:49:54.054+0000" ;
+  won:needProtocolEndpoint
+      <http://www.example.com/won/protocol/need> ;
+  won:ownerProtocolEndpoint
+      <http://www.example.com/won/protocol/owner> .
+
+<http://www.example.com/resource/need/14/connections/>
+  a   ldp:Container .

@@ -41,7 +41,8 @@ public class WON
   public static final Property NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "needProtocolEndpoint");
   public static final Property MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "matcherProtocolEndpoint");
   public static final Property OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "ownerProtocolEndpoint");
-  public static final Property HAS_MATCHING_CONSTRAINT = m.createProperty(BASE_URI, "hasMatchingConstraint");
+  public static final Property EMBED_SPIN_ASK = m.createProperty(BASE_URI, "embedSpinAsk");
+
 
   public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
   public static final Resource NEED_STATE = m.createResource(BASE_URI + "NeedState");
@@ -133,6 +134,9 @@ public class WON
   public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
   public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
 
+  //search result model
+  public static final Property SEARCH_RESULT_URI = m.createProperty(BASE_URI,"uri");
+  public static final Property SEARCH_RESULT_PREVIEW = m.createProperty(BASE_URI, "preview");
 
 
   /**

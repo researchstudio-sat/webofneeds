@@ -191,7 +191,15 @@
 
         <field name="location" type="location" indexed="true" stored="true" required="false" multiValued="false"/>
         <dynamicField name="*_coordinate"  type="tdouble" indexed="true"  stored="false" multiValued="false"/>
+        <!-- field to be used in keyword search - all text content is copied to this field (see below) -->
+        <field name="keywordsearch" type="text_general" indexed="true" stored="false" multiValued="true"/>
     </fields>
+
+    <!-- copy content of all fields that should be searched in simple keyword search to the 'keywordsearch' field -->
+    <copyField source="ntriple" dest="keywordsearch"/>
+    <copyField source="title" dest="keywordsearch"/>
+    <copyField source="description" dest="keywordsearch"/>
+    <copyField source="tag" dest="keywordsearch"/>
 
     <!-- Field to use to determine and enforce document uniqueness.
        Unless this field is marked with required="false", it will be a required field

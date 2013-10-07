@@ -18,6 +18,7 @@ package won.node.ws;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
@@ -58,7 +59,7 @@ public class MatcherProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAut
         wireDependenciesLazily();
 
       try {
-        matcherProtocolNeedService.hint(needURI, otherNeedURI, score, originatorURI, RdfUtils.toModel(content));
+        matcherProtocolNeedService.hint(needURI, otherNeedURI, score, originatorURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (IllegalMessageForNeedStateException e) {

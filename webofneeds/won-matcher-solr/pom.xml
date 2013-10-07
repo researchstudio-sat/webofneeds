@@ -9,7 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
+    <groupId>webofneeds</groupId>
     <artifactId>won-matcher-solr</artifactId>
+    <name>Matcher</name>
     <dependencies>
         <!--
 
@@ -17,6 +19,18 @@
                   <dependencyManagement> section in the parent pom!
 
          -->
+        <!-- Web of Needs -->
+        <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-matcher</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Solr -->
         <dependency>
@@ -39,34 +53,35 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
-        <!-- Web of Needs -->
+        <!-- SPIN -->
         <dependency>
-            <groupId>webofneeds</groupId>
-            <artifactId>won-core</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.topbraid</groupId>
+            <artifactId>spin</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
 
-        <dependency>
-            <groupId>webofneeds</groupId>
-            <artifactId>won-matcher</artifactId>
-            <version>${project.version}</version>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
+
+
+
 
         <!-- START: used for testing solr -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <artifactId>solr-solrj</artifactId>
             <groupId>org.apache.solr</groupId>
-            <scope>compile</scope>
+            <scope>${dependencies.scope}</scope>
         </dependency>
+
         <!-- END: used for testing solr -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
 
     </dependencies>
 
@@ -77,8 +92,10 @@
         </filters>
         <resources>
             <resource>
-                <filtering>true</filtering>
                 <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${won.matcher.properties.dir}</directory>
             </resource>
         </resources>
 

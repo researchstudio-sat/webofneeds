@@ -59,7 +59,6 @@ public class NeedPojo
   private Integer recurTimes;
   private boolean recurInfiniteTimes;
 
-  private String matchingConstraint;
   private String contentDescription;
 
   private long needId = -1;
@@ -83,18 +82,6 @@ public class NeedPojo
     this.needURI = needUri.toString();
     Resource need = model.getResource(needUri.toString());
     creationDate = need.getProperty(WON.NEED_CREATION_DATE).getString();
-
-    if (need.getProperty(WON.HAS_MATCHING_CONSTRAINT) != null) {
-      /*Model tmpModel = ModelFactory.createDefaultModel();
-      tmpModel.add(model.listStatements(need, WON.HAS_MATCHING_CONSTRAINT, (RDFNode) null));
-      StringWriter stringWriter = new StringWriter(500);
-      tmpModel.write(stringWriter, "TTL", this.needURI);
-      matchingConstraint = stringWriter.toString();
-      */
-      matchingConstraint = " [RDF CONTENT] ";
-    }
-
-    //TODO: add owner
 
     Statement basicNeedStat = need.getProperty(WON.HAS_BASIC_NEED_TYPE);
     if (basicNeedStat != null) {
@@ -420,13 +407,4 @@ public class NeedPojo
     this.contentDescription = contentDescription;
   }
 
-  public String getMatchingConstraint()
-  {
-    return matchingConstraint;
-  }
-
-  public void setMatchingConstraint(final String matchingConstraint)
-  {
-    this.matchingConstraint = matchingConstraint;
-  }
 }

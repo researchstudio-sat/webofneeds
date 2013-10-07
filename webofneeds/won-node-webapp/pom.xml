@@ -12,7 +12,7 @@
     <artifactId>won-node-webapp</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>WON node web application</name>
+    <name>Node Webapp</name>
     <url>http://www.springframework.org/spring-ws</url>
 
     <dependencies>
@@ -40,11 +40,8 @@
             <artifactId>jaxws-tools</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-spring</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
+
+        <!-- spring stuff -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
@@ -56,17 +53,23 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
+        <!-- servlet stuff -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
         <finalName>won</finalName>
-
+        <sourceDirectory>src/main/java</sourceDirectory>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
             <resource>
-                <directory>${won.node.properties.dir}</directory>
+                <directory>src/main/resources.localhost</directory>
             </resource>
         </resources>
 

@@ -8,7 +8,7 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
     <packaging>war</packaging>
-    <name>WON owner web application</name>
+    <name>Owner Webapp</name>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>won-owner-webapp</artifactId>
 
@@ -52,24 +52,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-spring</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <scope>${dependencies.scope}</scope>
@@ -83,6 +65,12 @@
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
     </dependencies>

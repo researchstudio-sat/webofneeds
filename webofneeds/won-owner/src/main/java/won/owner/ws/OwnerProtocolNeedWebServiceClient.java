@@ -21,7 +21,6 @@ public class OwnerProtocolNeedWebServiceClient extends Service {
     private final static QName OWNERPROTOCOL_QNAME = new QName("http://www.webofneeds.org/protocol/owner/soap/1.0/", "ownerProtocol");
 
     /**
-     * TODO: We want to be able to pass the web service URI directly here... We already know the content of the wsdl file... right?
      * @param wsdlLocation
      */
     public OwnerProtocolNeedWebServiceClient(URL wsdlLocation) {

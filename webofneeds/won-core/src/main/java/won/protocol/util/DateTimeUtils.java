@@ -1,10 +1,15 @@
 package won.protocol.util;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -22,17 +27,33 @@ public class DateTimeUtils
    * @param date
    * @return
    */
-  public static String format(Date date) {
-    sdf = new SimpleDateFormat(DATE_FORMAT_XSD_DATE_TIME_STAMP);
-    return sdf.format(date);
+  //TODO: here, we're using Calendar's default time zone!! Should be the timezone used by the creator of the Date object
+  public static Literal toLiteral(Date date, Model model) {
+    if (date == null) return null;
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+    XSDDateTime dateTime = new XSDDateTime(cal);
+    return model.createTypedLiteral(dateTime, XSDDatatype.XSDdateTime);
   }
 
   /**
    * Returns the current date as xsd:dateTimeStamp (time stamp with timezone info).
    * @return
    */
-  public  static String getCurrentDateTimeStamp() {
-    return format(new Date());
+  public  static Literal getCurrentDateTimeStamp(Model model) {
+    return toLiteral(new Date(), model);
+  }
+
+  public static Date toDate(Literal literal, Model model){
+    if (XSDDatatype.XSDdateTime.equals(literal.getDatatype())) {
+      XSDDateTime dateTime = (XSDDateTime) XSDDatatype.XSDdateTime.parse(literal.getLexicalForm());
+      return dateTime.asCalendar().getTime();
+    } else if (literal.getDatatype() == null){
+      //if the literal is not typed, try to interpret it as an xsd:dateTime
+      Literal asXsdDateTime = model.createTypedLiteral(literal.getLexicalForm(), XSDDatatype.XSDdateTime);
+      return toDate(asXsdDateTime, model);
+    }
+    return null;
   }
 
   /**
@@ -40,14 +61,19 @@ public class DateTimeUtils
    * @param date
    * @return the date or null if the format is not recognized
    */
-  public static Date parse(String date) {
-    sdf = new SimpleDateFormat(DATE_FORMAT_XSD_DATE_TIME_STAMP);
-    try{
-      return sdf.parse(date);
-    } catch (ParseException e) {
-      logger.warn("caught ParseException:", e);
-    } finally {
-      return null;
-    }
+  public static Date parse(String date, Model model) {
+    return toDate(model.createTypedLiteral(date, XSDDatatype.XSDdateTime), model);
+  }
+
+  /**
+   * Converts node to Date if it is a literal, returns null otherwise.
+   * @param node
+   * @param model
+   * @return
+   */
+  public static Date toDate(RDFNode node, Model model){
+    if (!node.isLiteral()) return null;
+    Literal nodeAsLiteral = node.asLiteral();
+    return toDate(nodeAsLiteral, model);
   }
 }

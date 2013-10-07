@@ -2,10 +2,13 @@ package won.protocol.util;
 
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
+import com.hp.hpl.jena.util.FileUtils;
 import com.hp.hpl.jena.util.ResourceUtils;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: gabriel
@@ -30,14 +33,7 @@ public class RdfUtils
 
   public static Model toModel(String content)
   {
-    Model m = ModelFactory.createDefaultModel();
-
-    if (content != null) {
-      StringReader sr = new StringReader(content);
-      m.read(sr, null, "TTL");
-    }
-
-    return m;
+    return readRdfSnippet(content, FileUtils.langTurtle);
   }
 
   public static void replaceBaseURI(final Model model, final String baseURI)
@@ -66,7 +62,7 @@ public class RdfUtils
    * @param model
    * @param replacement
    */
-  public static void replaceBaseURI(final Model model, final Resource replacement)
+  public static void replaceBaseResource(final Model model, final Resource replacement)
   {
     String baseURI = model.getNsPrefixURI("");
     if (baseURI == null) return;
@@ -86,5 +82,99 @@ public class RdfUtils
       iterator.remove();
     }
     model.setNsPrefix("", replacement.getURI());
+  }
+
+  /**
+   * Adds the specified objectModel to the model of the specified subject. In the objectModel, the resource
+   * that is identified by the objectModel's base URI (the "" URI prefix) will be replaced by a newly created
+   * blank node(B, see later). All content of the objectModel is added to the model of the subject. An
+   * additional triple (subject, property, B) is added. Moreover, the Namespace prefixes are merged.
+   * @param subject
+   * @param property
+   * @param objectModel caution - will be modified
+   */
+  public static void attachModelByBaseResource(final Resource subject, final Property property, final Model objectModel)
+  {
+    attachModelByBaseResource(subject, property, objectModel, true);
+  }
+
+  /**
+   * Adds the specified objectModel to the model of the specified subject. In the objectModel, the resource
+   * that is identified by the objectModel's base URI (the "" URI prefix) will be replaced by a newly created
+   * blank node(B, see later). All content of the objectModel is added to the model of the subject. An
+   * additional triple (subject, property, B) is added. Moreover, the Namespace prefixes are merged.
+   * @param subject
+   * @param property
+   * @param objectModel caution - will be modified
+   * @param replaceBaseResourceByBlankNode
+   */
+  public static void attachModelByBaseResource(final Resource subject, final Property property, final Model objectModel, final boolean replaceBaseResourceByBlankNode){
+    Model subjectModel = subject.getModel();
+    Resource baseResource = null;
+    if (replaceBaseResourceByBlankNode){
+      baseResource = subjectModel.createResource();
+    } else {
+      String baseURI = objectModel.getNsPrefixURI("");
+      if (baseURI == null) {
+        //although not clear how this could come about:
+        //the model has no default namespace prefix, but it may have
+        //triples containing the null relative URI. we still want to attach these and try to get them by using
+        //the empty URI, and replacing that resource by a blank node
+        baseURI = "";
+        baseResource = subjectModel.createResource();
+      } else {
+        baseResource = subjectModel.getResource(baseURI); //getResource because it may exist already
+      }
+    }
+    subject.addProperty(property, baseResource);
+    RdfUtils.replaceBaseResource(objectModel, baseResource);
+    //add all of specified model to the subject's model
+    subjectModel.add(objectModel);
+    //merge the prefixes, but don't add the objectModel's default prefix in any case - we don't want it to end up as
+    //the resulting model's base prefix.
+    Map<String, String> objectModelPrefixes = objectModel.getNsPrefixMap();
+    objectModelPrefixes.remove("");
+    subjectModel.setNsPrefixes(mergeNsPrefixes(subjectModel.getNsPrefixMap(), objectModelPrefixes));
+  }
+
+  /**
+   * Creates a new Map object containing all prefixes from both specified maps. When prefix mappings clash, the mappings
+   * from prioritaryPrefixes are used.
+   * @param prioritaryPrefixes
+   * @param additionalPrefixes
+   * @return
+   */
+  public static Map<String, String> mergeNsPrefixes(final Map<String, String> prioritaryPrefixes, final Map<String, String> additionalPrefixes)
+  {
+    Map<String, String> mergedPrefixes = new HashMap<String, String>();
+    mergedPrefixes.putAll(additionalPrefixes);
+    mergedPrefixes.putAll(prioritaryPrefixes); //overwrites the additional prefixes when clashing
+    return mergedPrefixes;
+  }
+
+  /**
+   * Reads the specified string into a Model. Sets a 'fantasy URI' as base URI and handles it gracefully if
+   * the model read from the string defines its own base URI. Special care is taken that the null relative URI ('<>')
+   * is replaced by the baseURI.
+   * @param rdfAsString
+   * @param rdfLanguage
+   * @return a Model (possibly empty)
+   */
+  public static Model readRdfSnippet(final String rdfAsString, final String rdfLanguage)
+  {
+    com.hp.hpl.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
+    if (rdfAsString == null) return model;
+    String baseURI= "no:uri";
+    model.setNsPrefix("", baseURI);
+    model.read(new StringReader(rdfAsString), baseURI, rdfLanguage);
+    String baseURIAfterReading = model.getNsPrefixURI("");
+    if (baseURIAfterReading == null){
+      model.setNsPrefix("",baseURI);
+    } else if (!baseURI.equals(baseURIAfterReading)){
+      //the string representation of the model specified a base URI, but we used a different one for reading.
+      //We need to make sure that the one that is now set is the only one used
+      ResourceUtils.renameResource(model.getResource(baseURI), model.getNsPrefixURI(""));
+    }
+    return model;
   }
 }

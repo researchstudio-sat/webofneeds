@@ -41,7 +41,6 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
     this.uriService = uriService;
   }
 
-  //TODO: workaround until we can work with multiple WON nodes: protocol URI is hard-coded in spring properties
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpoint(URI wonNodeURI) throws NoSuchNeedException, MalformedURLException
   {
     if (wonNodeURI == null)
@@ -50,7 +49,6 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
     OwnerProtocolNeedWebServiceClient client = getCachedClient(wonNodeURI);
 
     if (client == null) {
-      //TODO: fetch endpoint information for the need and store in db?
       client = new OwnerProtocolNeedWebServiceClient(URI.create(wonNodeURI.toURL() + WSDL_LOCATION).toURL());
       cacheClient(wonNodeURI, client);
     }
@@ -60,7 +58,6 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
 
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpointForNeed(URI needURI) throws NoSuchNeedException, MalformedURLException
   {
-    //TODO: fetch endpoint information for the need and store in db?
     URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.OWNER_PROTOCOL_ENDPOINT);
     if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
 
@@ -78,7 +75,6 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
 
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpointForConnection(URI connectionURI) throws NoSuchConnectionException, MalformedURLException
   {
-    //TODO: fetch endpoint information for the need and store in db?
     URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.OWNER_PROTOCOL_ENDPOINT);
     if (needProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
 

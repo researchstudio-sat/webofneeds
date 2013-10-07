@@ -82,7 +82,6 @@ public class ModelReaderWriter implements MessageBodyWriter<Model>, MessageBodyR
   private String mimeTypeToJenaLanguage(MediaType mediaType, String defaultLanguage) {
     String type = mediaType.getType();
     String subtype = mediaType.getSubtype();
-    //TODO: is this correct? Check Media Type specs!
     if (type == null || subtype == null) return defaultLanguage;
     String mimeType = type + "/" + subtype;
     if ("application/rdf+xml".equalsIgnoreCase(mimeType)) return "RDF/XML";

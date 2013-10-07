@@ -33,8 +33,6 @@ import java.util.List;
  */
 public interface NeedInformationService {
 
-    //TODO: Clean up and replace with Linked Data
-
     /**
      * Retrieves a list of all needs on the needserver.
      *
@@ -98,10 +96,6 @@ public interface NeedInformationService {
 
     /**
      * Retrieves the public description of the need as an RDF graph.
-     * TODO: this is a simulation of the linked data interface, which we'll develop later
-     *
-     *
-     *
      *
      * @param needURI
      * @return

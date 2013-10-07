@@ -6,8 +6,12 @@ import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.matcher.Matcher;
+import won.matcher.processor.HintSender;
+import won.matcher.service.ScoreTransformer;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.Properties;
 
 /**
  * User: atus
@@ -17,14 +21,27 @@ import java.io.IOException;
 public class UpdateListener implements SolrEventListener
 {
   private Logger logger = LoggerFactory.getLogger(getClass());
+  private static final String PROPERTY_FILE_NAME = "matcher.properties";
 
   private DocumentStorage documentStorage;
+  private URI originatorURI;
 
   @Override
   public void init(NamedList namedList)
   {
     logger.debug("initiating matcher");
     documentStorage = DocumentStorage.getInstance();
+    Properties props = new Properties();
+    try {
+      props.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("matcher.properties"));
+    } catch (IOException e) {
+      logger.error("could not load WON matcher property file {}", PROPERTY_FILE_NAME, e);
+    }
+    try {
+      originatorURI = URI.create(props.getProperty("matcher.uri"));
+    } catch (Exception e){
+      logger.error("could not generate macher uri from property file {}", PROPERTY_FILE_NAME, e);
+    }
   }
 
   @Override
@@ -38,7 +55,8 @@ public class UpdateListener implements SolrEventListener
   {
     logger.debug("newSearcher called");
 
-    Matcher matcher = new Matcher(solrIndexSearcher);
+    Matcher matcher = new Matcher(solrIndexSearcher, new ScoreTransformer(), this.originatorURI);
+    matcher.addMatchProcessor(new HintSender());
 
     while (documentStorage.hasNext())
       try {
@@ -47,7 +65,7 @@ public class UpdateListener implements SolrEventListener
         logger.error(e.getMessage(), e);
       }
 
-    matcher.finish();
+    matcher.processMatches();
   }
 
 }

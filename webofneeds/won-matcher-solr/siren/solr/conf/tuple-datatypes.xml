@@ -151,28 +151,28 @@
     A precisionStep of 0 disables indexing at different precision levels.
   -->
   <datatype name="xsd:int" class="org.sindice.siren.solr.schema.TrieDatatype"
-                           precisionStep="8"
+                           precisionStep="4"
                            type="int"/>
                            
   <!--
     Numeric datatype that indexes an long literal.
   -->
   <datatype name="xsd:long" class="org.sindice.siren.solr.schema.TrieDatatype"
-                            precisionStep="8"
+                            precisionStep="4"
                             type="long"/>
                            
   <!--
     Numeric datatype that indexes an float literal.
   -->
   <datatype name="xsd:float" class="org.sindice.siren.solr.schema.TrieDatatype"
-                             precisionStep="8"
+                             precisionStep="4"
                              type="float"/>
                              
   <!--
     Numeric datatype that indexes an float literal.
   -->
   <datatype name="xsd:double" class="org.sindice.siren.solr.schema.TrieDatatype"
-                              precisionStep="8"
+                              precisionStep="4"
                               type="double"/>
 
 </datatypeConfig>

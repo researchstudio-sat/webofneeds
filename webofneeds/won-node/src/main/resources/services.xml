@@ -137,17 +137,17 @@
         <property name="pageSize" value="${linkeddata.pagesize}" />
     </bean>
 
-    <bean id="linkedDataRestService" class="won.node.rest.LinkedDataRestService">
+    <!--bean id="linkedDataRestService" class="won.node.rest.LinkedDataRestService">
         <property name="linkedDataService" ref="linkedDataService" />
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
         <property name="dataURIPrefix" value="${uri.prefix.data}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
         <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
         <property name="pageURIPrefix" value="${uri.prefix.page}" />
-    </bean>
+    </bean-->
 
 
-    
+
     <bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg value="30" type="int" index="0"/>
     </bean>

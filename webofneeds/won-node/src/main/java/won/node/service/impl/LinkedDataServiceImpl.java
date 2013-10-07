@@ -16,16 +16,11 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
-import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
-import com.hp.hpl.jena.vocabulary.XSD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +31,7 @@ import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
-import won.protocol.util.ConnectionModelMapper;
-import won.protocol.util.DateTimeUtils;
-import won.protocol.util.NeedModelMapper;
-import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.GR;
+import won.protocol.util.*;
 import won.protocol.vocabulary.LDP;
 import won.protocol.vocabulary.WON;
 
@@ -56,7 +46,6 @@ import java.util.List;
 public class LinkedDataServiceImpl implements LinkedDataService
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
-  public static final PrefixMapping PREFIX_MAPPING = new PrefixMappingImpl();
 
   //prefix of a need resource
   private String needResourceURIPrefix;
@@ -84,17 +73,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   private NeedInformationService needInformationService;
 
-  //TODO: move this somewhere central?
-  static {
-    PREFIX_MAPPING.setNsPrefix("won", WON.getURI());
-    PREFIX_MAPPING.setNsPrefix("rdf", RDF.getURI());
-    PREFIX_MAPPING.setNsPrefix("ldp", LDP.getURI());
-    PREFIX_MAPPING.setNsPrefix("rdfs", RDFS.getURI());
-    PREFIX_MAPPING.setNsPrefix("geo", GEO.getURI());
-    PREFIX_MAPPING.setNsPrefix("gr", GR.getURI());
-    PREFIX_MAPPING.setNsPrefix("xsd", XSD.getURI());
-    PREFIX_MAPPING.setNsPrefix("dc", DC.getURI());
-  }
 
   public Model listNeedURIs(final int page)
   {
@@ -197,12 +175,12 @@ public class LinkedDataServiceImpl implements LinkedDataService
         eventMember.addProperty(WON.HAS_ORIGINATOR, model.createResource(e.getOriginatorUri().toString()));
 
       if (e.getCreationDate() != null)
-        eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.format(e.getCreationDate()), XSDDatatype.XSDdateTime);
+        eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.toLiteral(e.getCreationDate(), model));
 
       Model additionalDataModel = rdfStorage.loadContent(e);
       if (additionalDataModel != null && additionalDataModel.size() > 0) {
         Resource additionalData = additionalDataModel.createResource();
-        RdfUtils.replaceBaseURI(additionalDataModel, additionalData);
+        RdfUtils.replaceBaseResource(additionalDataModel, additionalData);
         model.add(model.createStatement(eventMember, WON.HAS_ADDITIONAL_DATA, additionalData));
         model.add(additionalDataModel);
       }
@@ -263,7 +241,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   private void setNsPrefixes(final Model model)
   {
-    model.setNsPrefixes(PREFIX_MAPPING);
+    DefaultPrefixUtils.setDefaultPrefixes(model);
   }
 
   public void setNeedResourceURIPrefix(final String needResourceURIPrefix)

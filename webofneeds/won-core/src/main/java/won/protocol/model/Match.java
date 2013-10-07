@@ -35,12 +35,10 @@ public class Match
     private URI fromNeed;
     @Column( name = "toNeed")
     private URI toNeed;
-    //TODO: there's no need for score to be a double. short should be sufficient
     @Column( name = "score")
     private double score;
     @Column( name = "originator")
     private URI originator;
-    //TODO: set unique after this filed is filled with information
     @Column( name = "eventId")
     private long eventId;
 
@@ -56,9 +54,6 @@ public class Match
         ", eventId=" + eventId +
         '}';
   }
-
-    // TODO: we rely on the id being marshalled in the current owner implementation, but this is not neccessary
-    // it would be better to make this field @XmlTransient
 
     public long getId() {
         return id;

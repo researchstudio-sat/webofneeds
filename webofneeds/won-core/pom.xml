@@ -26,7 +26,7 @@
     </parent>
     <artifactId>won-core</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <name>won-core</name>
+    <name>Core</name>
 
     <dependencies>
         <!--
@@ -36,14 +36,6 @@
 
         -->
         <!-- REST stuff -->
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
@@ -118,6 +110,10 @@
             <artifactId>jena-arq</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.github.jsonld-java</groupId>
+            <artifactId>jsonld-java-jena</artifactId>
+        </dependency>
+        <dependency>
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
         </dependency>
@@ -157,6 +153,7 @@
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -20,7 +20,7 @@
     <artifactId>webofneeds</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Web of Needs module project</name>
+    <name>Web of Needs Main</name>
 
     <modules>
         <module>won-core</module>
@@ -30,6 +30,7 @@
         <module>won-owner-webapp</module>
         <module>won-matcher</module>
         <module>won-matcher-solr</module>
+        <module>won-matcher-webapp</module>
         <module>won-ontology-validator</module>
     </modules>
 
@@ -55,6 +56,51 @@
                 <artifactId>siren-solr</artifactId>
                 <version>${siren.version}</version>
                 <type>jar</type>
+            </dependency>
+
+            <!-- SPIN -->
+            <dependency>
+                <groupId>org.topbraid</groupId>
+                <artifactId>spin</artifactId>
+                <version>1.3.1</version>
+            </dependency>
+
+            <!-- RDF STUFF -->
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-core</artifactId>
+                <version>${org.apache.jena.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>xml-apis</artifactId>
+                        <groupId>xml-apis</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xerces</groupId>
+                        <artifactId>xercesImpl</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-arq</artifactId>
+                <version>${org.apache.jena.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>xml-apis</artifactId>
+                        <groupId>xml-apis</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xerces</groupId>
+                        <artifactId>xercesImpl</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.github.jsonld-java</groupId>
+                <artifactId>jsonld-java-jena</artifactId>
+                <version>${com.github.jsonld-java.version}</version>
             </dependency>
 
             <!-- Servlet API -->
@@ -147,6 +193,11 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-solr</artifactId>
+                <version>1.0.0.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-commons-core</artifactId>
                 <version>${org.springframework.data.commons.version}</version>
             </dependency>
@@ -175,65 +226,12 @@
                 <version>${com.sun.xml.ws.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.sun.jersey.contribs</groupId>
-                <artifactId>jersey-spring</artifactId>
-                <version>${com.sun.jersey.contribs-jersey-spring.version}</version>
-
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-web</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-beans</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-context</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-aop</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-core</artifactId>
-                <version>${com.sun.jersey.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-server</artifactId>
-                <version>${com.sun.jersey.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-client</artifactId>
                 <version>${com.sun.jersey.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-json</artifactId>
-                <version>${com.sun.jersey.version}</version>
-            </dependency>
-
-
-
 
             <!-- ORM  -->
             <dependency>
@@ -263,38 +261,10 @@
             </dependency>
 
 
-            <!-- RDF STUFF -->
             <dependency>
-                <groupId>org.apache.jena</groupId>
-                <artifactId>apache-jena-libs</artifactId>
-                <type>pom</type>
-                <version>${org.apache.jena.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>xml-apis</artifactId>
-                        <groupId>xml-apis</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xercesImpl</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.jena</groupId>
-                <artifactId>jena-arq</artifactId>
-                <version>${org.apache.jena.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>xml-apis</artifactId>
-                        <groupId>xml-apis</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xercesImpl</artifactId>
-                    </exclusion>
-                </exclusions>
+                <groupId>com.github.jsonld-java</groupId>
+                <artifactId>jsonld-java</artifactId>
+                <version>${com.github.jsonld-java.version}</version>
             </dependency>
 
             <!-- dreaded XML stuff -->
@@ -337,6 +307,13 @@
                 <version>${log4j.version}</version>
             </dependency>
 
+            <!-- UTILS -->
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons-collections.version}</version>
+            </dependency>
+
             <!-- TESTING -->
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -348,7 +325,7 @@
                 <groupId>cglib</groupId>
                 <artifactId>cglib</artifactId>
                 <version>${cglib.version}</version>
-                <scope>test</scope>
+                <!--<scope>test</scope>-->
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -486,6 +463,12 @@
 
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>org.topbraid</id>
+            <url>http://www.topquadrant.com/repository/spin/</url>
+        </repository>
+    </repositories>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -504,24 +487,27 @@
         <dependencies.scope>compile</dependencies.scope>
 
         <!-- versions for various dependencies -->
+        <commons-collections.version>3.2.1</commons-collections.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <solr.version>3.5.0</solr.version>
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>
+        <com.github.jsonld-java.version>0.3-SNAPSHOT</com.github.jsonld-java.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
         <com.sun.xml.version>2.0EA3</com.sun.xml.version>
         <com.sun.xml.ws.version>2.2.8-promoted-b146</com.sun.xml.ws.version>
         <junit.version>4.11</junit.version>
         <log4j.version>1.2.17</log4j.version>
-        <org.apache.jena.version>2.10.0</org.apache.jena.version>
+        <org.apache.jena.jsonld.version>0.0.1-SNAPSHOT</org.apache.jena.jsonld.version>
+        <org.apache.jena.version>2.11.0</org.apache.jena.version>
         <org.hibernate.version>4.1.8.Final</org.hibernate.version>
         <org.springframework.data.commons.version>1.4.0.RELEASE</org.springframework.data.commons.version>
         <org.springframework.data.jpa.version>1.2.0.RELEASE</org.springframework.data.jpa.version>
-        <org.springframework.version>3.1.2.RELEASE</org.springframework.version>
+        <org.springframework.version>3.2.4.RELEASE</org.springframework.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
-        <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <org.hsqldb.version>2.2.9</org.hsqldb.version>
+        <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
         <cargo.version>1.4.2</cargo.version>
         <jrebel.version>1.1.3</jrebel.version>
@@ -561,6 +547,8 @@
                 <won.node-test.properties.dir>src/test/resources.localhost</won.node-test.properties.dir>
                 <won.owner.properties.dir>src/main/resources.localhost</won.owner.properties.dir>
                 <won.owner-test.properties.dir>src/test/resources.localhost</won.owner-test.properties.dir>
+                <won.matcher.properties.dir>src/main/resources.localhost</won.matcher.properties.dir>
+                <won.matcher-test.properties.dir>src/test/resources.localhost</won.matcher-test.properties.dir>
             </properties>
         </profile>
 
