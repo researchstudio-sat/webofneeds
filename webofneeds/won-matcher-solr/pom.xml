@@ -147,14 +147,14 @@
                                     Copies the complete siren folder to the target dir
                                 -->
                                 <resource>
+                                    <!-- TODO: the solr war file is corrupted through filtering! exclude and copy without filtering-->
                                     <directory>${project.basedir}/siren</directory>
-                                    <filtering>true</filtering>
                                     <preservePath>true</preservePath>
                                     <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren</targetPath>
                                 </resource>
                                 <resource>
                                     <directory>${project.build.directory}</directory>
-                                    <include>${build.finalName}.jar</include>
+                                    <include>${project.build.finalName}.jar</include>
                                     <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</targetPath>
                                 </resource>
                             </resources>
@@ -194,12 +194,12 @@
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
-                            <excludeScope>provided</excludeScope>
-                            <excludeGroupIds>${project.groupId}</excludeGroupIds>
+                            <!--excludeScope>provided</excludeScope-->
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
                         </configuration>
                     </execution>
 
-                    <execution>
+                    <execution>  <!-- TODO: do we need this? -->
                         <id>copy-won-dependencies-to-solr-dir</id>
                         <phase>package</phase>
                         <goals>

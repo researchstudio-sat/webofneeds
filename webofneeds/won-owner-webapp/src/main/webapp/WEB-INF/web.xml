@@ -52,6 +52,19 @@
         <url-pattern>/need/*</url-pattern>
     </servlet-mapping>
 
+    <!-- SPRING WEB MVC config -->
+    <servlet>
+        <servlet-name>restController</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>restController</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+
+
     <servlet>
         <servlet-name>connectionController</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -70,24 +83,4 @@
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
-    <servlet>
-        <servlet-name>restController</servlet-name>
-        <servlet-class>
-            com.sun.jersey.spi.spring.container.servlet.SpringServlet
-        </servlet-class>
-        <init-param>
-            <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>won.owner.web.rest</param-value>
-        </init-param>
-        <init-param>
-            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>restController</servlet-name>
-        <url-pattern>/rest/need/*</url-pattern>
-    </servlet-mapping>
 </web-app>

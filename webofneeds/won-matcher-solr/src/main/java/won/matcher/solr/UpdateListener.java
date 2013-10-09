@@ -33,7 +33,7 @@ public class UpdateListener implements SolrEventListener
     documentStorage = DocumentStorage.getInstance();
     Properties props = new Properties();
     try {
-      props.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("matcher.properties"));
+      props.load(this.getClass().getClassLoader().getResourceAsStream("matcher.properties"));
     } catch (IOException e) {
       logger.error("could not load WON matcher property file {}", PROPERTY_FILE_NAME, e);
     }
