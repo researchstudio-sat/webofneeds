@@ -21,7 +21,9 @@
             <td>${connection.id}</td>
             <td>${connection.connectionURI}</td>
             <td>${connection.state}</td>
-            <td><a href="/owner/connection/${connection.id}" target="_parent" >connection</a></td>
+            <td><a href="/owner/connection/${connection.id}" target="_parent" >connection</a>
+                <a href="/owner/connection/${connection.id}/msg" target="_parent" >connectionForMessaging</a>
+            </td>
         </tr>
     </c:forEach>
 </table>
