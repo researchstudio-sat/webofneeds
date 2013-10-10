@@ -40,11 +40,8 @@
             <artifactId>jaxws-tools</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-spring</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
+
+        <!-- spring stuff -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
@@ -56,11 +53,17 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
+        <!-- servlet stuff -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
         <finalName>won</finalName>
-
+        <sourceDirectory>src/main/java</sourceDirectory>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

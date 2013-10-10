@@ -95,14 +95,14 @@
             <dependency>
                 <groupId>org.topbraid</groupId>
                 <artifactId>spin</artifactId>
-                <version>1.3.0</version>
+                <version>1.3.1</version>
             </dependency>
 
             <!-- RDF STUFF -->
             <dependency>
                 <groupId>org.apache.jena</groupId>
                 <artifactId>jena-core</artifactId>
-                <version>${org.apache.jena.core.version}</version>
+                <version>${org.apache.jena.version}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>xml-apis</artifactId>
@@ -118,7 +118,7 @@
             <dependency>
                 <groupId>org.apache.jena</groupId>
                 <artifactId>jena-arq</artifactId>
-                <version>${org.apache.jena.arq.version}</version>
+                <version>${org.apache.jena.version}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>xml-apis</artifactId>
@@ -131,9 +131,9 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.apache.jena</groupId>
-                <artifactId>jena-jsonld</artifactId>
-                <version>0.0.1-jena2.7.2-backport</version>
+                <groupId>com.github.jsonld-java</groupId>
+                <artifactId>jsonld-java-jena</artifactId>
+                <version>${com.github.jsonld-java.version}</version>
             </dependency>
 
             <!-- Servlet API -->
@@ -260,65 +260,12 @@
                 <version>${com.sun.xml.ws.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.sun.jersey.contribs</groupId>
-                <artifactId>jersey-spring</artifactId>
-                <version>${com.sun.jersey.contribs-jersey-spring.version}</version>
-
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-web</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-beans</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-context</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-aop</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-core</artifactId>
-                <version>${com.sun.jersey.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-server</artifactId>
-                <version>${com.sun.jersey.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-client</artifactId>
                 <version>${com.sun.jersey.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-json</artifactId>
-                <version>${com.sun.jersey.version}</version>
-            </dependency>
-
-
-
 
             <!-- ORM  -->
             <dependency>
@@ -346,8 +293,6 @@
                 <artifactId>hsqldb</artifactId>
                 <version>${org.hsqldb.version}</version>
             </dependency>
-
-
 
 
             <dependency>
@@ -394,6 +339,13 @@
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${log4j.version}</version>
+            </dependency>
+
+            <!-- UTILS -->
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons-collections.version}</version>
             </dependency>
 
             <!-- TESTING -->
@@ -569,6 +521,7 @@
         <dependencies.scope>compile</dependencies.scope>
 
         <!-- versions for various dependencies -->
+        <commons-collections.version>3.2.1</commons-collections.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <solr.version>3.5.0</solr.version>
         <camel.version>2.12.1</camel.version>
@@ -576,20 +529,19 @@
         <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed-->
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>
+        <com.github.jsonld-java.version>0.3-SNAPSHOT</com.github.jsonld-java.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
         <com.sun.xml.version>2.0EA3</com.sun.xml.version>
         <com.sun.xml.ws.version>2.2.8-promoted-b146</com.sun.xml.ws.version>
         <junit.version>4.11</junit.version>
         <log4j.version>1.2.17</log4j.version>
-        <com.github.jsonld-java.version>0.2</com.github.jsonld-java.version>
-        <org.apache.jena.version>2.9.2</org.apache.jena.version>
-        <org.apache.jena.core.version>2.7.2</org.apache.jena.core.version>
-        <org.apache.jena.arq.version>2.9.2</org.apache.jena.arq.version>
+        <org.apache.jena.jsonld.version>0.0.1-SNAPSHOT</org.apache.jena.jsonld.version>
+        <org.apache.jena.version>2.11.0</org.apache.jena.version>
         <org.hibernate.version>4.1.8.Final</org.hibernate.version>
         <org.springframework.data.commons.version>1.4.0.RELEASE</org.springframework.data.commons.version>
         <org.springframework.data.jpa.version>1.2.0.RELEASE</org.springframework.data.jpa.version>
-        <org.springframework.version>3.1.2.RELEASE</org.springframework.version>
+        <org.springframework.version>3.2.4.RELEASE</org.springframework.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
         <org.hsqldb.version>2.2.9</org.hsqldb.version>
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
@@ -637,6 +589,7 @@
             </properties>
         </profile>
 
+        <!-- copies the dependencies of each module to a subfolder inside that module -->
         <profile>
             <id>copy-module-dependencies</id>
             <build>
@@ -656,7 +609,17 @@
                                     <overWriteReleases>false</overWriteReleases>
                                     <overWriteSnapshots>false</overWriteSnapshots>
                                     <overWriteIfNewer>true</overWriteIfNewer>
-                                    <excludeGroupIds>webofneeds</excludeGroupIds>
+                                    <!--
+                                        reasons for exclusions:
+                                        webofneeds: because these are the libs we change frequently, they should not
+                                                    be put into a shared tomcat libs folder
+                                        siren: because of some mechanism we don't fully understand, having the libs in a
+                                               shared folder AND in a webapp (like [solr home]/lib) that causes problems with
+                                               ClassCastExceptions
+                                        servlet: conflicts with tomcat's version
+                                    -->
+                                    <excludeGroupIds>webofneeds,org.sindice.siren</excludeGroupIds>
+                                    <excludeArtifactIds>servlet-api</excludeArtifactIds>
                                 </configuration>
                             </execution>
                         </executions>
@@ -689,7 +652,11 @@
                                     <overWriteReleases>false</overWriteReleases>
                                     <overWriteSnapshots>false</overWriteSnapshots>
                                     <overWriteIfNewer>true</overWriteIfNewer>
-                                    <excludeGroupIds>webofneeds</excludeGroupIds>
+                                    <!--
+                                        reasons for exclusions: see config of profile 'copy-module-dependencies'
+                                    -->
+                                    <excludeGroupIds>webofneeds,org.sindice.siren</excludeGroupIds>
+                                    <excludeArtifactIds>servlet-api</excludeArtifactIds>
                                 </configuration>
                             </execution>
                         </executions>

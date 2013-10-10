@@ -38,7 +38,6 @@ public class SearchResultModelMapper implements ModelMapper<SearchResult>
   {
     Model ret = ModelFactory.createDefaultModel();
     if (searchResult == null || searchResult.getItems() == null || searchResult.getItems().size() == 0) return ret;
-    ret.setNsPrefix("", "");
     Resource mainResource = ret.createResource();
     mainResource.addProperty(WON.HAS_ORIGINATOR, ret.createResource(searchResult.getOriginator().toString()));
     for(SearchResultItem item: searchResult.getItems()){

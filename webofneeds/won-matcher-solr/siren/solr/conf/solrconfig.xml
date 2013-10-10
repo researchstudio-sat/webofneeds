@@ -36,6 +36,7 @@
        
               <lib dir="./lib" />
     -->
+    <lib dir="./lib" />
 
     <!-- Used to specify an alternate directory to hold all index data
 other than the default ./data under the Solr home.

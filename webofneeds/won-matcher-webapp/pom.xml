@@ -37,6 +37,17 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
+        <!-- SIREn-->
+        <!-- Careful! Special case:
+           Siren libs cannot be in the parent classloader of the solr webapp, so we have to include them everywhere
+           they are required.
+        -->
+        <dependency>
+            <groupId>org.sindice.siren</groupId>
+            <artifactId>siren-solr</artifactId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
         <!-- spring dependencies -->
         <dependency>
             <groupId>cglib</groupId>
@@ -100,11 +111,7 @@
             <artifactId>jena-arq</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-jsonld</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
+
 
     </dependencies>
 
@@ -117,7 +124,7 @@
                 <version>2.8</version>
                 <executions>
                     <execution>
-                        <id>copy-dependencies-to-node-webapp</id>
+                        <id>copy-dependencies-to-matcher-webapp</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
@@ -127,7 +134,10 @@
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
-                            <includeGroupIds>${project.groupId}</includeGroupIds>
+                            <!-- siren is required in the libs folder for matching functionality. As it can't be
+                              outsourced to a shared libs folder, we copy it here manually
+                             -->
+                            <includeGroupIds>${project.groupId},org.sindice.siren</includeGroupIds>
                         </configuration>
                     </execution>
                 </executions>

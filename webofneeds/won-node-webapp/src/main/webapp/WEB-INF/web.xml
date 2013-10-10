@@ -36,34 +36,6 @@
         <url-pattern>/protocol/*</url-pattern>
     </servlet-mapping>
 
-
-    <!-- JAX-RS (REST) config -->
-
-    <servlet>
-        <servlet-name>jerseySpringWebapp</servlet-name>
-        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
-        <init-param>
-            <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>won.node.rest</param-value>
-        </init-param>
-        <load-on-startup>4</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>jerseySpringWebapp</servlet-name>
-        <url-pattern>/ld/*</url-pattern>
-        <!--
-        TODO: here, we're mapping [prefix]/ld/data and [prefix]/ld/resource to this servlet (the last part is handled
-        by jax-rs - see the respective class in won.node.rest.
-        However, we would like to get rid of the /ld/. If we attempt this by using the url pattern '/', this servlet
-        is the catch-all servlet and gets everything, including requests for /index.html - which is bad. If we attempt
-        it by using two url-patterns '/data/*' and '/resource/*', the JAX-RS @Path annotations only process the path
-        starting with whatever is matched by the '*', and so it can't differentiate between the two.
-        Possible solutions:
-        a) use spring web mvc to implement the REST calls
-        b) find out how JAX-RS can be configured to use a different attribute of the HttpServletRequest
-        -->
-    </servlet-mapping>
-
     <!-- SPRING WEB MVC config -->
     <servlet>
         <servlet-name>linkedDataPageServlet</servlet-name>
@@ -73,7 +45,7 @@
 
     <servlet-mapping>
         <servlet-name>linkedDataPageServlet</servlet-name>
-        <url-pattern>/page/*</url-pattern>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
     <!-- GENERAL -->
