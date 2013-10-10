@@ -18,10 +18,7 @@ package won.protocol.owner;
 
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Match;
-import won.protocol.service.ConnectionCommunicationService;
-import won.protocol.service.NeedInformationService;
-import won.protocol.service.NeedManagementService;
-import won.protocol.service.OwnerFacingNeedCommunicationService;
+import won.protocol.service.*;
 
 import java.net.URI;
 import java.util.Collection;

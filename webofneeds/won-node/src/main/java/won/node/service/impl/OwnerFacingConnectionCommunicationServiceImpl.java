@@ -168,6 +168,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
   }
 
+
   public void setNeedFacingConnectionClient(final ConnectionCommunicationService needFacingConnectionClient)
   {
     this.needFacingConnectionClient = needFacingConnectionClient;

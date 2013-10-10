@@ -60,4 +60,5 @@ public interface ConnectionCommunicationService
    */
   public void textMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
+
 }

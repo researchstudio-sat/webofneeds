@@ -17,6 +17,8 @@
 package won.node.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+//import com.hp.hpl.jena.util.ModelQueryUtil;
+//import com.sun.xml.internal.bind.v2.TODO;
 import won.protocol.exception.*;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.service.ConnectionCommunicationService;
@@ -55,6 +57,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   {
     connectionCommunicationService.textMessage(connectionURI, message);
   }
+
 
   public void setNeedFacingNeedCommunicationService(final NeedFacingNeedCommunicationService needFacingNeedCommunicationService)
   {

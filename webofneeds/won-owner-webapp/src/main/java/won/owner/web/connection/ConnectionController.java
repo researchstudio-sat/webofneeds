@@ -14,7 +14,6 @@ import won.protocol.model.Connection;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
-
 import java.util.List;
 
 /**

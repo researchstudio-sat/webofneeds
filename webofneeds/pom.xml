@@ -50,6 +50,38 @@
                 <artifactId>solr-core</artifactId>
                 <version>${solr.version}</version>
             </dependency>
+            <!-- Camel & ActiveMQ -->
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-core</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-jms</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-spring</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-camel</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-pool</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <!-- xbean is required for ActiveMQ broker configuration in the spring xml file -->
+            <dependency>
+                <groupId>org.apache.xbean</groupId>
+                <artifactId>xbean-spring</artifactId>
+                <version>${xbean.version}</version>
+            </dependency>
 
             <!-- SIREn-->
             <dependency>
@@ -539,6 +571,9 @@
         <!-- versions for various dependencies -->
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <solr.version>3.5.0</solr.version>
+        <camel.version>2.12.1</camel.version>
+        <activemq.version>5.8.0</activemq.version>
+        <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed-->
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
