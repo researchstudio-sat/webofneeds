@@ -25,9 +25,9 @@ limitations under the License.
 
         <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
 
-        <fieldType name="timeInterval" class="at.researchstudio.sat.solrintervals.TimeIntervalType" subFieldSuffix="_interval"/>
-
         <fieldType name="tlong" class="solr.TrieLongField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
+
+        <fieldType name="timeInterval" class="at.researchstudio.sat.solrintervals.LongIntervalType" subFieldSuffix="_interval"/>
 
     </types>
 

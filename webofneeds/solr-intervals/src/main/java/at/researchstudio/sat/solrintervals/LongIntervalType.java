@@ -20,22 +20,23 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * A time interval SOLR field type that allows you to store time intervals and query them.
- * Time intervals are stored as <code>[startTime]-[stopTime]</code>. That are two longs with
+ * A long interval SOLR field type that allows you to store long intervals and query them.
+ * Long intervals are stored as <code>[start]-[stop]</code>. That are two longs with
  * a minus (dash) used as a separator.
  *
  * User: atus
  * Date: 11.10.13
  */
-public class TimeIntervalType extends AbstractSubTypeFieldType
+public class LongIntervalType extends AbstractSubTypeFieldType
 {
-  protected static final int START = 0;
-  protected static final int STOP = 1;
+  public static final int START = 0;
+  public static final int STOP = 1;
+  public static final String SEPARATOR = "-";
 
   @Override
   protected void init(final IndexSchema schema, final Map<String, String> args)
   {
-    super.init(schema, args);    //To change body of overridden methods use File | Settings | File Templates.
+    super.init(schema, args);
 
     createSuffixCache(3);
   }
@@ -69,11 +70,17 @@ public class TimeIntervalType extends AbstractSubTypeFieldType
     return f;
   }
 
+  /**
+   * Splits the external representation to two longs.
+   *
+   * @param external string to be parsed
+   * @return an array with the start and stop value <code>long[]{start,stop}</code>
+   */
   public static long[] parseExternal(String external)
   {
-    String[] parts = external.split("-");
+    String[] parts = external.split(SEPARATOR);
     if (parts.length != 2)
-      throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, "TimeIntervalField has to be of form <startTime>-<endTime>");
+      throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, "LongIntervalField has the following form: <start>-<stop>");
 
     long[] interval = new long[2];
 
@@ -81,7 +88,7 @@ public class TimeIntervalType extends AbstractSubTypeFieldType
       interval[0] = Long.parseLong(parts[0]);
       interval[1] = Long.parseLong(parts[1]);
     } catch (NumberFormatException e) {
-      throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, "TimeIntervalField: error while parsing values: " + e.getMessage());
+      throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, "LongIntervalField: error while parsing values: " + e.getMessage());
     }
 
     return interval;
@@ -119,7 +126,7 @@ public class TimeIntervalType extends AbstractSubTypeFieldType
     return result;
   }
 
-  //TODO implement this
+  //TODO I know this is crazy, but implement this maybe
   @Override
   public ValueSource getValueSource(final SchemaField field, final QParser parser)
   {
@@ -142,13 +149,13 @@ public class TimeIntervalType extends AbstractSubTypeFieldType
   @Override
   public Fieldable createField(SchemaField field, String externalVal, float boost)
   {
-    throw new UnsupportedOperationException("TimeIntervalField uses multiple fields.  field=" + field.getName());
+    throw new UnsupportedOperationException("LongIntervalField uses multiple fields.  field=" + field.getName());
   }
 
   @Override
   public SortField getSortField(final SchemaField field, final boolean top)
   {
-    throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, "Sorting not supported on TimeIntervalField " + field.getName());
+    throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, "Sorting not supported on LongIntervalField " + field.getName());
   }
 
   @Override
