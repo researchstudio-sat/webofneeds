@@ -101,24 +101,59 @@ public class TimeIntervalTest
   @Test
   public void readIndex() throws IOException
   {
-    int docs= reader.numDocs();
+    int docs = reader.numDocs();
 
-    for(int i = 0; i < docs; i++) {
+    System.out.println("Printing index:");
+
+    for (int i = 0; i < docs; i++) {
       Document doc = reader.document(i);
-      String interval = doc.get("timeInterval");
-      System.out.print(interval);
-      Assert.assertTrue(interval.length() > 0);
+      String longInterval = doc.get(Fields.longInterval);
+      String dateInterval = doc.get(Fields.dateInterval);
+
+      System.out.println(doc.get(Fields.title));
+      System.out.println(longInterval);
+      System.out.println(dateInterval);
+      System.out.println("======================");
+
+      Assert.assertFalse(longInterval == null);
+      Assert.assertFalse(longInterval == null);
     }
   }
 
   @Test
-  public void intervalQuery() throws IOException
+  public void longIntervalQuery() throws IOException
   {
-    SchemaField schemaField = searcher.getSchema().getField("timeInterval");
+    SchemaField schemaField = searcher.getSchema().getField(Fields.longInterval);
 
-    Query q = schemaField.getType().getRangeQuery(null, schemaField, "50","150",true,true);
-    TopDocs results = searcher.search(q, 5);
-    System.out.print(reader.document(results.scoreDocs[0].doc).toString());
+    Query q1 = schemaField.getType().getRangeQuery(null, schemaField, "10", "15", true, true);
+    TopDocs results1 = searcher.search(q1, 5);
+    Assert.assertTrue(results1.totalHits == 0);
+
+    Query q2 = schemaField.getType().getRangeQuery(null, schemaField, "60", "110", true, true);
+    TopDocs results2 = searcher.search(q2, 5);
+    Assert.assertTrue(results2.totalHits == 2);
+
+    Query q3 = schemaField.getType().getRangeQuery(null, schemaField, "140", "145", true, true);
+    TopDocs results3 = searcher.search(q3, 5);
+    Assert.assertTrue(results3.totalHits == 1);
+  }
+
+  @Test
+  public void dateIntervalQuery() throws IOException
+  {
+    SchemaField schemaField = searcher.getSchema().getField(Fields.dateInterval);
+
+    Query q1 = schemaField.getType().getRangeQuery(null, schemaField, "2013-08-15T00:01Z", "2013-09-10T23:00Z", true, true);
+    TopDocs results1 = searcher.search(q1, 5);
+    Assert.assertTrue(results1.totalHits == 2);
+
+    Query q2 = schemaField.getType().getRangeQuery(null, schemaField, "2016-09-15T00:01Z", "2017-09-05T23:00Z", true, true);
+    TopDocs results2 = searcher.search(q2, 5);
+    Assert.assertTrue(results2.totalHits == 0);
+
+    Query q3 = schemaField.getType().getRangeQuery(null, schemaField, "2013-07-15T00:01Z", "2013-08-05T23:00Z", true, true);
+    TopDocs results3 = searcher.search(q3, 5);
+    Assert.assertTrue(results3.totalHits == 1);
   }
 
   private static List<SolrInputDocument> getTestData()
@@ -126,17 +161,28 @@ public class TimeIntervalTest
     List<SolrInputDocument> docs = new ArrayList<>();
 
     SolrInputDocument doc1 = new SolrInputDocument();
-    doc1.addField("id", 1);
-    doc1.addField("title", "Example 1");
-    long start = System.currentTimeMillis();
-    long end = System.currentTimeMillis() + (90 * 60 * 1000);
-    String s = Long.toString(start) + "-" + Long.toString(end);
-    doc1.addField("timeInterval","100-200");
-    //"2013-08-01T00:01:00.000Z"
-    //"2013-08-30T23:00:00.000Z"
-
+    doc1.addField(Fields.id, 1);
+    doc1.addField(Fields.title, "Example 1");
+    doc1.addField(Fields.dateInterval, "2013-08-01T00:01Z/2013-08-30T23:00Z");
+    doc1.addField(Fields.longInterval, "100-200");
     docs.add(doc1);
+
+    SolrInputDocument doc2 = new SolrInputDocument();
+    doc2.addField(Fields.id, 2);
+    doc2.addField(Fields.title, "Example 2");
+    doc2.addField(Fields.dateInterval, "2013-09-05T00:01Z/2013-09-30T23:00Z");
+    doc2.addField(Fields.longInterval, "50-75");
+    docs.add(doc2);
 
     return docs;
   }
+
+  public class Fields
+  {
+    public static final String id = "id";
+    public static final String title = "title";
+    public static final String longInterval = "longInterval";
+    public static final String dateInterval = "dateInterval";
+  }
+
 }

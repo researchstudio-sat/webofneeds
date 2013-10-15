@@ -23,11 +23,14 @@ limitations under the License.
     <types>
         <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
 
-        <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
-
+        <fieldType name="tint" class="solr.TrieIntField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
         <fieldType name="tlong" class="solr.TrieLongField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
 
-        <fieldType name="timeInterval" class="at.researchstudio.sat.solrintervals.LongIntervalType" subFieldSuffix="_interval"/>
+        <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
+
+        <fieldType name="longIntervalType" class="at.researchstudio.sat.solrintervals.LongIntervalType" subFieldSuffix="_longInterval"/>
+
+        <fieldType name="dateIntervalType" class="at.researchstudio.sat.solrintervals.DateIntervalType" subFieldSuffix="_dateInterval"/>
 
     </types>
 
@@ -36,8 +39,11 @@ limitations under the License.
 
         <field name="title" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
 
-        <field name="timeInterval" type="timeInterval" indexed="true" stored="true" required="false" multiValued="false"/>
-        <dynamicField name="*_interval"  type="tlong" indexed="true"  stored="false" multiValued="false"/>
+        <field name="longInterval" type="longIntervalType" indexed="true" stored="true" required="false" multiValued="false"/>
+        <dynamicField name="*_longInterval"  type="tlong" indexed="true"  stored="false" multiValued="false"/>
+
+        <field name="dateInterval" type="dateIntervalType" indexed="true" stored="true" required="false" multiValued="false"/>
+        <dynamicField name="*_dateInterval"  type="tlong" indexed="true"  stored="false" multiValued="false"/>
 
     </fields>
 
