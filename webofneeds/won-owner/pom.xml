@@ -23,7 +23,11 @@
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <!-- messaging stuff -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-amqp</artifactId>
+        </dependency>
         <!-- HSQL STUFF -->
         <dependency>
             <groupId>org.hsqldb</groupId>

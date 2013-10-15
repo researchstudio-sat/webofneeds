@@ -19,7 +19,21 @@
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
     </bean>
-
+    <!-- messaging beans -->
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+    </bean>
+    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
+        <property name="sessionCacheSize" value="10"></property>
+    </bean>
+    <bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="WON.MSG"></constructor-arg>
+    </bean>
+    <bean id="producerTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="cachedConnectionFactory"></property>
+        <property name="defaultDestination" ref="destination"></property>
+    </bean>
 
     <!-- Activate Annotation based configuration -->
     <context:annotation-config />

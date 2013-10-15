@@ -19,8 +19,10 @@ import won.protocol.vocabulary.WON;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 import won.protocol.ws.fault.*;
 
+import javax.jms.JMSException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -69,6 +71,9 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
 
   @Autowired
   private ConnectionModelMapper connectionModelMapper;
+
+  @Autowired
+  private MessageProducer messageProducer;
 
   @Override
   public void activate(URI needURI) throws NoSuchNeedException
@@ -164,7 +169,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     }
   }
-
+       /*
   @Override
   public void textMessage(final URI connectionURI, final String message)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException
@@ -196,8 +201,52 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
     } catch (NoSuchConnectionFault noSuchConnectionFault) {
       throw NoSuchConnectionFault.toException(noSuchConnectionFault);
     }
-  }
+  }         */
 
+    //for -MESSAGING
+    @Override
+    public void textMessage(final URI connectionURI, final String message)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
+        logger.debug("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
+        try {
+            URI brokerURI = new URI("vm://localhost");
+            messageProducer.textMessage(brokerURI, message);
+
+        } catch (URISyntaxException e) {
+            logger.warn("Wrong URI syntax", e);  //To change body of catch statement use File | Settings | File Templates.
+        } catch (JMSException e) {
+            logger.warn("JMS Exception", e);  //To change body of catch statement use File | Settings | File Templates.
+        }
+        /*
+
+        try {
+            OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
+            List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
+            if (cons.isEmpty())
+                throw new NoSuchConnectionException(connectionURI);
+            Connection con = cons.get(0);
+
+            //send text message
+            proxy.textMessage(connectionURI, message);
+
+            ChatMessage chatMessage = new ChatMessage();
+            chatMessage.setCreationDate(new Date());
+            chatMessage.setLocalConnectionURI(connectionURI);
+            chatMessage.setMessage(message);
+            chatMessage.setOriginatorURI(con.getNeedURI());
+
+            //save in the db
+            chatMessageRepository.saveAndFlush(chatMessage);
+
+        } catch (MalformedURLException e) {
+            logger.warn("couldn't create URL for needProtocolEndpoint", e);
+        } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+            throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+        } catch (NoSuchConnectionFault noSuchConnectionFault) {
+            throw NoSuchConnectionFault.toException(noSuchConnectionFault);
+        }   */
+    }
   @Override
   public URI createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException
   {

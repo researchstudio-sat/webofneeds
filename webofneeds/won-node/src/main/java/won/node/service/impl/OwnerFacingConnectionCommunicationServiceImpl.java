@@ -29,10 +29,14 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
+import won.node.protocol.impl.MessageProducer;
 
+import javax.jms.JMSException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
+
 
 /**
  * User: fkleedorfer
@@ -46,6 +50,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
   private ExecutorService executorService;
 
+
   @Autowired
   private ConnectionRepository connectionRepository;
   @Autowired
@@ -54,6 +59,8 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   private EventRepository eventRepository;
   @Autowired
   private RDFStorageService rdfStorageService;
+  @Autowired
+  private MessageProducer messageProducer;
 
   @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
@@ -132,7 +139,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       });
     }
   }
-
+  /*
   @Override
   public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
@@ -166,7 +173,55 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       }
     });
 
-  }
+  }  */
+
+    //for Messaging
+    @Override
+    public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
+        logger.debug("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
+        try {
+            URI brokerURI = new URI("vm://localhost");
+
+            messageProducer.textMessage(brokerURI, message);
+
+        } catch (URISyntaxException e) {
+            logger.warn("Wrong URI syntax", e);  //To change body of catch statement use File | Settings | File Templates.
+        } catch (JMSException e) {
+            logger.warn("JMS Exception", e);  //To change body of catch statement use File | Settings | File Templates.
+        }
+        /*
+        logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
+        if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+        if (message == null) throw new IllegalArgumentException("message is not set");
+        //load connection, checking if it exists
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        //perform state transit (should not result in state change)
+        //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
+        //construct chatMessage object to store in the db
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setCreationDate(new Date());
+        chatMessage.setLocalConnectionURI(con.getConnectionURI());
+        chatMessage.setMessage(message);
+        chatMessage.setOriginatorURI(con.getNeedURI());
+        //save in the db
+        chatMessageRepository.saveAndFlush(chatMessage);
+        final URI remoteConnectionURI = con.getRemoteConnectionURI();
+        //inform the other side
+        executorService.execute(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try {
+                    needFacingConnectionClient.textMessage(remoteConnectionURI, message);
+                } catch (WonProtocolException e) {
+                    logger.warn("caught WonProtocolException:", e);
+                }
+            }
+        });     */
+
+    }
 
 
   public void setNeedFacingConnectionClient(final ConnectionCommunicationService needFacingConnectionClient)

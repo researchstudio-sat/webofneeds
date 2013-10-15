@@ -88,13 +88,12 @@ public class ConnectionController {
         try {
             ownerService.textMessage(con.getConnectionURI(), text.getText());
         } catch (Exception e) {
-          logger.warn("error sending text message");
-          return "error sending text message: " + e.getMessage();
+            logger.warn("error sending text message");
+            return "error sending text message: " + e.getMessage();
         }
 
         return  "redirect:/connection/" + con.getId().toString();//"viewConnection";
     }
-
 
     @RequestMapping(value = "/{conId}/accept", method = RequestMethod.POST)
     public String accept(@PathVariable String conId, Model model) {

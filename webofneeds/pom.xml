@@ -50,7 +50,7 @@
                 <artifactId>solr-core</artifactId>
                 <version>${solr.version}</version>
             </dependency>
-            <!-- Camel & ActiveMQ -->
+            <!-- Camel, AMQP & ActiveMQ -->
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-core</artifactId>
@@ -76,11 +76,31 @@
                 <artifactId>activemq-pool</artifactId>
                 <version>${activemq.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-amqp</artifactId>
+                <version>${camel.version}</version> <!-- use the same version as your Camel core version -->
+            </dependency>
             <!-- xbean is required for ActiveMQ broker configuration in the spring xml file -->
             <dependency>
                 <groupId>org.apache.xbean</groupId>
                 <artifactId>xbean-spring</artifactId>
                 <version>${xbean.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-kahadb-store</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-amqp</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.jms</groupId>
+                <artifactId>jms</artifactId>
+                <version>${jms.version}</version>
             </dependency>
 
             <!-- SIREn-->
@@ -243,6 +263,11 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jms</artifactId>
                 <version>${org.springframework.version}</version>
             </dependency>
 
@@ -526,6 +551,8 @@
         <solr.version>3.5.0</solr.version>
         <camel.version>2.12.1</camel.version>
         <activemq.version>5.8.0</activemq.version>
+        <activemq.conf>classpath:</activemq.conf>
+        <jms.version>1.1</jms.version>
         <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed-->
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>

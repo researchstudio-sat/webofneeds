@@ -2,6 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:activemq="http://activemq.apache.org/schema/core"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
@@ -10,7 +11,8 @@
                 http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
                 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
-                http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+                http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+                http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
     <bean id="propertyConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -22,7 +24,7 @@
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
     </bean>
-
+    <context:property-placeholder location="classpath:activemq.properties" />
 
     <!-- Activate Annotation based configuration -->
     <context:annotation-config />
@@ -30,22 +32,63 @@
     <!-- Defines where to search for annotated components -->
     <context:component-scan base-package="won.protocol" />
 
+    <bean id="messageProducer" class="won.node.protocol.impl.MessageProducer"></bean>
+
     <!-- Camel configuration -->
-    <camel:camelContext>
+    <!--camel:camelContext>
         <camel:packageScan>
             <camel:package>won.node.routes</camel:package>
         </camel:packageScan>
-    </camel:camelContext>
+    </camel:camelContext-->
 
     <!-- Configure Message Broker -->
-    <bean id ="jms" class="org.apache.camel.component.jms.JmsComponent">
-       <property name="connectionFactory">
-           <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-               <property name="brokerURL" value="vm://localhost"></property>
-           </bean>
-       </property>
+    <!-- bean id="jmsConnectionFactory"
+          class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="vm://localhost:61616" />
     </bean>
 
+    <bean id="pooledConnectionFactory"
+          class="org.apache.activemq.pool.PooledConnectionFactory" init-method="start" destroy-method="stop">
+        <property name="maxConnections" value="8" />
+        <property name="connectionFactory" ref="jmsConnectionFactory" />
+    </bean>
+
+    <bean id="jmsConfig"
+          class="org.apache.camel.component.jms.JmsConfiguration">
+        <property name="connectionFactory" ref="pooledConnectionFactory"/>
+        <property name="concurrentConsumers" value="10"/>
+    </bean-->
+
+    <!--bean id="activemq"
+          class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="configuration" ref="jmsConfig"/-->
+
+        <!-- if we are using transacted then enable CACHE_CONSUMER (if not using XA) to run faster
+             see more details at: http://camel.apache.org/jms
+        <property name="transacted" value="true"/>
+        <property name="cacheLevelName" value="CACHE_CONSUMER" />
+        -->
+    <!--/bean-->
+
+    <bean id="broker" class="org.apache.activemq.xbean.PooledBrokerFactoryBean">
+        <property name="config" value="classpath:activemq.xml"/>
+        <property name="start" value="true"/>
+
+    </bean>
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="broker">
+        <property name="brokerURL" value="vm://localhost"/>
+    </bean>
+    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
+        <property name="sessionCacheSize" value="10"></property>
+    </bean>
+    <bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="WON.MSG"></constructor-arg>
+    </bean>
+    <bean id="producerTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="cachedConnectionFactory"></property>
+        <property name="defaultDestination" ref="destination"></property>
+    </bean>
     <!-- Database connection -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="driverClass" value="${db.sql.jdbcDriverClass}" />

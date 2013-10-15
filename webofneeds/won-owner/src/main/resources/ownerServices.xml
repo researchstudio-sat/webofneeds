@@ -57,4 +57,6 @@
     <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
 
+
+    <bean id="messageProducer" class="won.owner.protocol.impl.MessageProducer"></bean>
 </beans>
