@@ -19,14 +19,6 @@
     </mvc:annotation-driven>
     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />
 
-
-    <!-- solr server via spring-data-solr. Below are the two options for embedded and http variants -->
-    <!-- http variant
-    <solr:solr-server id="solrServer" url="http://locahost:8983/solr" />
-    -->
-    <!-- embedded variant -->
-    <solr:embedded-solr-server id="solrServer" solrHome="${matcher.solr.home}" />
-
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>
         <property name="suffix" value=".jsp"/>
