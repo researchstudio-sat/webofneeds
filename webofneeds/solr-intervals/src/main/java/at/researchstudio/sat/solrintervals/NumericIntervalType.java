@@ -3,10 +3,7 @@ package at.researchstudio.sat.solrintervals;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.*;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.response.TextResponseWriter;
 import org.apache.solr.response.XMLWriter;
@@ -19,24 +16,32 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * An abstract numeric interval SOLR field type that allows you to store numeric intervals and query them.
- * Numeric intervals are stored as <code>[start]-[stop]</code>. That is two numbers with
- * a minus (dash) used as a separator.
+ * A numeric interval SOLR field type that allows you to store numeric intervals and query them.
+ * Numeric intervals are stored as <code>[start][SEPARATOR][stop]</code>. That is two numbers with
+ * a separator in between.
+ * The separator can be set using SOLR arguments in the schema file.
  *
  * User: atus
  * Date: 15.10.13
  */
-public abstract class NumericIntervalType<T extends Number> extends AbstractSubTypeFieldType
+public class NumericIntervalType extends AbstractSubTypeFieldType
 {
-  public static final int START = 0;
-  public static final int STOP = 1;
-  public static final String SEPARATOR = "-";
+  protected final int START = 0;
+  protected final int STOP = 1;
+
+  public static final String SEPARATOR_ARG = "separator";
+  protected String separator;
 
   @Override
   protected void init(final IndexSchema schema, final Map<String, String> args)
   {
     super.init(schema, args);
     createSuffixCache(3);
+
+    if(args.containsKey(SEPARATOR_ARG))
+      separator = args.get(SEPARATOR_ARG);
+    else
+      separator = getDefaultSeparator();
   }
 
   @Override
@@ -45,7 +50,7 @@ public abstract class NumericIntervalType<T extends Number> extends AbstractSubT
     Fieldable[] f = new Fieldable[(field.indexed() ? 2 : 0) + (field.stored() ? 1 : 0)];
 
     if (field.indexed()) {
-      String[] startStop = splitExternal(toInternal(externalVal));
+      String[] startStop = splitExternal(externalVal);
 
       int i = 0;
       SchemaField sf = subField(field, i);
@@ -56,8 +61,8 @@ public abstract class NumericIntervalType<T extends Number> extends AbstractSubT
 
     if (field.stored()) {
       f[f.length - 1] = createField(field.getName(),
-          toInternal(externalVal),
-          getFieldStore(field, toInternal(externalVal)),
+          externalVal,
+          getFieldStore(field, externalVal),
           Field.Index.NO,
           Field.TermVector.NO,
           false,
@@ -72,7 +77,7 @@ public abstract class NumericIntervalType<T extends Number> extends AbstractSubT
   @Override
   public Fieldable createField(SchemaField field, String externalVal, float boost)
   {
-    throw new UnsupportedOperationException("NumericIntervalType uses multiple fields.  field=" + field.getName());
+    throw new UnsupportedOperationException("NumericIntervalType uses multiple fields. field=" + field.getName());
   }
 
   @Override
@@ -82,42 +87,43 @@ public abstract class NumericIntervalType<T extends Number> extends AbstractSubT
 
     String[] startStop = splitExternal(externalVal);
 
-    BooleanQuery bq = new BooleanQuery(true);
+    BooleanQuery query = new BooleanQuery(true);
     for (int i = 0; i < dimension; i++) {
       SchemaField sf = subField(field, i);
       Query tq = sf.getType().getFieldQuery(parser, sf, startStop[i]);
-      bq.add(tq, BooleanClause.Occur.MUST);
-    }
-
-    return bq;
-  }
-
-  @Override
-  public Query getRangeQuery(QParser parser, SchemaField field, String part1, String part2, boolean minInclusive, boolean maxInclusive)
-  {
-    int dimension = 2;
-
-    //TODO research this true in the constructor
-    BooleanQuery query = new BooleanQuery(true);
-    for (int i = 0; i < dimension; i++) {
-      SchemaField subSF = subField(field, i);
-      // points must be ordered
-      query.add(subSF.getType().getRangeQuery(parser, subSF, subFieldToInternal(part1), subFieldToInternal(part2), minInclusive, maxInclusive),
-          BooleanClause.Occur.SHOULD);
+      query.add(tq, BooleanClause.Occur.MUST);
     }
 
     return query;
   }
 
-  /**
-   * Override this function if you have to convert the subfields to a correct representation.
-   *
-   * @param external external representation
-   * @return internal representation
-   */
-  protected String subFieldToInternal(String external)
+  @Override
+  public Query getRangeQuery(QParser parser, SchemaField field, String part1, String part2, boolean minInclusive, boolean maxInclusive)
   {
-    return external;
+    //TODO research this true in the constructor
+
+    SchemaField subField1 = subField(field, 0);
+    SchemaField subField2 = subField(field, 1);
+
+    // points must be ordered
+    BooleanQuery mainQuery = new BooleanQuery(true);
+    mainQuery.add(
+            subField1.getType().getRangeQuery(parser, subField1, part1, part2, minInclusive, maxInclusive),
+            BooleanClause.Occur.SHOULD);
+    mainQuery.add(
+            subField2.getType().getRangeQuery(parser, subField2, part1, part2, minInclusive, maxInclusive),
+            BooleanClause.Occur.SHOULD);
+
+    BooleanQuery invertedRangeQuery = new BooleanQuery(true);
+    invertedRangeQuery.add(
+            subField1.getType().getRangeQuery(parser, subField1, null, part1, minInclusive, maxInclusive),
+            BooleanClause.Occur.MUST);
+    invertedRangeQuery.add(
+            subField2.getType().getRangeQuery(parser, subField2, part2, null, minInclusive, maxInclusive),
+            BooleanClause.Occur.MUST);
+    mainQuery.add(invertedRangeQuery, BooleanClause.Occur.SHOULD);
+
+    return mainQuery;
   }
 
   /**
@@ -129,22 +135,12 @@ public abstract class NumericIntervalType<T extends Number> extends AbstractSubT
    */
   protected String[] splitExternal(String external)
   {
-    String[] parts = external.split(SEPARATOR);
+    String[] parts = external.split(separator);
     if (parts.length != 2)
-      throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, "NumericIntervalType has the following form: <start>-<stop>");
-
-    validateExternal(parts);
+      throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, "NumericIntervalType has the following form: <start>" + separator + "<stop>");
 
     return parts;
   }
-
-  /**
-   * Validates that the given strings can be parsed to the right number type.
-   *
-   * @param parts start and stop string representations
-   * @return true if both parts are parseable, false otherwise
-   */
-  public abstract boolean validateExternal(String[] parts);
 
   @Override
   public void write(final XMLWriter xmlWriter, final String name, final Fieldable f) throws IOException
@@ -170,5 +166,7 @@ public abstract class NumericIntervalType<T extends Number> extends AbstractSubT
     return true;
   }
 
-
+  public String getDefaultSeparator() {
+    return "-";
+  }
 }

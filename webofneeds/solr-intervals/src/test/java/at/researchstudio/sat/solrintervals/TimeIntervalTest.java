@@ -116,7 +116,7 @@ public class TimeIntervalTest
       System.out.println("======================");
 
       Assert.assertFalse(longInterval == null);
-      Assert.assertFalse(longInterval == null);
+      Assert.assertFalse(dateInterval == null);
     }
   }
 
@@ -143,17 +143,21 @@ public class TimeIntervalTest
   {
     SchemaField schemaField = searcher.getSchema().getField(Fields.dateInterval);
 
-    Query q1 = schemaField.getType().getRangeQuery(null, schemaField, "2013-08-15T00:01Z", "2013-09-10T23:00Z", true, true);
+    Query q1 = schemaField.getType().getRangeQuery(null, schemaField, "2013-08-15T00:01:00Z", "2013-09-10T00:01:00Z", true, true);
     TopDocs results1 = searcher.search(q1, 5);
     Assert.assertTrue(results1.totalHits == 2);
 
-    Query q2 = schemaField.getType().getRangeQuery(null, schemaField, "2016-09-15T00:01Z", "2017-09-05T23:00Z", true, true);
+    Query q2 = schemaField.getType().getRangeQuery(null, schemaField, "2016-09-15T00:01:00Z", "2017-09-05T00:01:00Z", true, true);
     TopDocs results2 = searcher.search(q2, 5);
     Assert.assertTrue(results2.totalHits == 0);
 
-    Query q3 = schemaField.getType().getRangeQuery(null, schemaField, "2013-07-15T00:01Z", "2013-08-05T23:00Z", true, true);
+    Query q3 = schemaField.getType().getRangeQuery(null, schemaField, "2013-07-15T00:01:00Z", "2013-08-05T00:01:00Z", true, true);
     TopDocs results3 = searcher.search(q3, 5);
     Assert.assertTrue(results3.totalHits == 1);
+
+    Query q4 = schemaField.getType().getRangeQuery(null, schemaField, "2013-08-15T00:01:00Z", "2013-08-20T00:01:00Z", true, true);
+    TopDocs results4 = searcher.search(q4, 5);
+    Assert.assertTrue(results4.totalHits == 1);
   }
 
   private static List<SolrInputDocument> getTestData()
@@ -163,14 +167,14 @@ public class TimeIntervalTest
     SolrInputDocument doc1 = new SolrInputDocument();
     doc1.addField(Fields.id, 1);
     doc1.addField(Fields.title, "Example 1");
-    doc1.addField(Fields.dateInterval, "2013-08-01T00:01Z/2013-08-30T23:00Z");
+    doc1.addField(Fields.dateInterval, "2013-08-01T00:01:00Z/2013-08-30T00:01:00Z");
     doc1.addField(Fields.longInterval, "100-200");
     docs.add(doc1);
 
     SolrInputDocument doc2 = new SolrInputDocument();
     doc2.addField(Fields.id, 2);
     doc2.addField(Fields.title, "Example 2");
-    doc2.addField(Fields.dateInterval, "2013-09-05T00:01Z/2013-09-30T23:00Z");
+    doc2.addField(Fields.dateInterval, "2013-09-05T00:01:00Z/2013-09-30T00:01:00Z");
     doc2.addField(Fields.longInterval, "50-75");
     docs.add(doc2);
 
