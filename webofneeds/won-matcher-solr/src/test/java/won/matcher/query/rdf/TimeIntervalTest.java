@@ -18,7 +18,6 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +41,7 @@ public class TimeIntervalTest
   {
     System.setProperty("solr.solr.home", "src/test/resources/solr-intervals");
 
-    deleteIndexDir();
-
-    //now start solr
+    //start solr
     CoreContainer.Initializer initializer = new CoreContainer.Initializer();
     CoreContainer coreContainer = initializer.initialize();
 
@@ -60,26 +57,6 @@ public class TimeIntervalTest
     SolrCore core = coreContainer.getCore(SOLR_CORE_NAME);
     searcher = core.newSearcher("test");
     reader = searcher.getReader();
-  }
-
-  private static void deleteIndexDir()
-  {
-    //first, delete the index dir if it's there
-    File indexDir = new File(System.getProperty("solr.solr.home"), "data/index");
-    if (indexDir.exists()) {
-      System.out.println("deleting index dir: " + indexDir);
-      File[] indexDirContents = indexDir.listFiles();
-      boolean deleteSuccessful = true;
-      for (int i = 0; i < indexDirContents.length && deleteSuccessful; i++) {
-        deleteSuccessful = indexDirContents[i].delete();
-      }
-      deleteSuccessful = indexDir.delete();
-      if (deleteSuccessful) {
-        System.out.println("index dir deleted");
-      } else {
-        System.out.println("failed to delete index dir");
-      }
-    }
   }
 
   @AfterClass

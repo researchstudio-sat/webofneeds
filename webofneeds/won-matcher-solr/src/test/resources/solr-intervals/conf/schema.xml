@@ -14,9 +14,9 @@
 
         <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
 
-        <fieldType name="numericIntervalType" class="at.researchstudio.sat.solrintervals.NumericIntervalType" subFieldSuffix="_numericInterval" separator="-"/>
+        <fieldType name="numericIntervalType" class="won.matcher.solr.intervals.NumericIntervalType" subFieldSuffix="_numericInterval" separator="-"/>
 
-        <fieldType name="dateIntervalType" class="at.researchstudio.sat.solrintervals.DateIntervalType" subFieldSuffix="_dateInterval"/>
+        <fieldType name="dateIntervalType" class="won.matcher.solr.intervals.DateIntervalType" subFieldSuffix="_dateInterval"/>
 
     </types>
 
