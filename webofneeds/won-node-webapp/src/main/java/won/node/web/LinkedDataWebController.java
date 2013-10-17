@@ -104,6 +104,11 @@ public class LinkedDataWebController
   @Autowired
   private URIService uriService;
 
+  @RequestMapping(value="/", method = RequestMethod.GET)
+  public String showIndexPage(){
+    return "index";
+  }
+
   //webmvc controller method
   @RequestMapping("${uri.path.page.need}/{identifier}")
   public String showNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response) {

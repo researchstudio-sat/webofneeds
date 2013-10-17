@@ -554,6 +554,7 @@
             </properties>
         </profile>
 
+        <!-- copies the dependencies of each module to a subfolder inside that module -->
         <profile>
             <id>copy-module-dependencies</id>
             <build>
@@ -573,7 +574,17 @@
                                     <overWriteReleases>false</overWriteReleases>
                                     <overWriteSnapshots>false</overWriteSnapshots>
                                     <overWriteIfNewer>true</overWriteIfNewer>
-                                    <excludeGroupIds>webofneeds</excludeGroupIds>
+                                    <!--
+                                        reasons for exclusions:
+                                        webofneeds: because these are the libs we change frequently, they should not
+                                                    be put into a shared tomcat libs folder
+                                        siren: because of some mechanism we don't fully understand, having the libs in a
+                                               shared folder AND in a webapp (like [solr home]/lib) that causes problems with
+                                               ClassCastExceptions
+                                        servlet: conflicts with tomcat's version
+                                    -->
+                                    <excludeGroupIds>webofneeds,org.sindice.siren</excludeGroupIds>
+                                    <excludeArtifactIds>servlet-api</excludeArtifactIds>
                                 </configuration>
                             </execution>
                         </executions>
@@ -606,7 +617,11 @@
                                     <overWriteReleases>false</overWriteReleases>
                                     <overWriteSnapshots>false</overWriteSnapshots>
                                     <overWriteIfNewer>true</overWriteIfNewer>
-                                    <excludeGroupIds>webofneeds</excludeGroupIds>
+                                    <!--
+                                        reasons for exclusions: see config of profile 'copy-module-dependencies'
+                                    -->
+                                    <excludeGroupIds>webofneeds,org.sindice.siren</excludeGroupIds>
+                                    <excludeArtifactIds>servlet-api</excludeArtifactIds>
                                 </configuration>
                             </execution>
                         </executions>
