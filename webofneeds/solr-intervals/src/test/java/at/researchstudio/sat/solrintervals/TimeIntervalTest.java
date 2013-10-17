@@ -40,7 +40,7 @@ public class TimeIntervalTest
   @BeforeClass
   public static void setup() throws IOException, SAXException, ParserConfigurationException, SolrServerException, InterruptedException
   {
-    System.setProperty("solr.solr.home", "src/test/resources/solr");
+    System.setProperty("solr.solr.home", "src/test/resources/solr-intervals");
 
     deleteIndexDir();
 
@@ -158,6 +158,57 @@ public class TimeIntervalTest
     Query q4 = schemaField.getType().getRangeQuery(null, schemaField, "2013-08-15T00:01:00Z", "2013-08-20T00:01:00Z", true, true);
     TopDocs results4 = searcher.search(q4, 5);
     Assert.assertTrue(results4.totalHits == 1);
+  }
+
+  //not used because we don't have a custom query to manage this with
+  public void inclusionsTest() throws IOException
+  {
+    SchemaField sf = searcher.getSchema().getField(Fields.longInterval);
+
+    //search exact, both included
+    Query q01 = sf.getType().getRangeQuery(null, sf, "50", "75", true, true);
+    Assert.assertTrue(searcher.search(q01,5).totalHits == 1);
+
+    //search exact, both excluded
+    Query q02 = sf.getType().getRangeQuery(null, sf, "50", "75", false, false);
+    Assert.assertTrue(searcher.search(q02,5).totalHits == 1);
+
+    //search over left, left included
+    Query q11 = sf.getType().getRangeQuery(null, sf, "45", "55", true, true);
+    Assert.assertTrue(searcher.search(q11,5).totalHits == 1);
+
+    //search over left, left excluded
+    Query q12 = sf.getType().getRangeQuery(null, sf, "45", "55", false, true);
+    Assert.assertTrue(searcher.search(q12,5).totalHits == 0);
+
+    //search internal, both included
+    Query q21 = sf.getType().getRangeQuery(null, sf, "55", "57", true, true);
+    Assert.assertTrue(searcher.search(q21,5).totalHits == 1);
+
+    //search internal both excluded
+    Query q22 = sf.getType().getRangeQuery(null, sf, "55", "57", false, false);
+    Assert.assertTrue(searcher.search(q22,5).totalHits == 1);
+
+    //search over right, right included
+    Query q31 = sf.getType().getRangeQuery(null, sf, "70", "80", true, true);
+    Assert.assertTrue(searcher.search(q31,5).totalHits == 1);
+
+    //search over right, right excluded
+    Query q32 = sf.getType().getRangeQuery(null, sf, "70", "80", true, false);
+    Assert.assertTrue(searcher.search(q32,5).totalHits == 0);
+
+    //search over both, both included
+    Query q41 = sf.getType().getRangeQuery(null, sf, "40", "80", true, true);
+    Assert.assertTrue(searcher.search(q41,5).totalHits == 1);
+
+    //search over right, right excluded
+    Query q42 = sf.getType().getRangeQuery(null, sf, "40", "80", false, false);
+    Assert.assertTrue(searcher.search(q42,5).totalHits == 0);
+
+    //search over right, right excluded
+    Query q51 = sf.getType().getRangeQuery(null, sf, "90", "100", true, true);
+    Assert.assertTrue(searcher.search(q51,5).totalHits == 0);
+
   }
 
   private static List<SolrInputDocument> getTestData()

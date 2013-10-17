@@ -3,7 +3,10 @@ package at.researchstudio.sat.solrintervals;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.SortField;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.response.TextResponseWriter;
 import org.apache.solr.response.XMLWriter;
@@ -11,8 +14,12 @@ import org.apache.solr.schema.AbstractSubTypeFieldType;
 import org.apache.solr.schema.IndexSchema;
 import org.apache.solr.schema.SchemaField;
 import org.apache.solr.search.QParser;
+import org.apache.solr.search.function.ValueSource;
+import org.apache.solr.search.function.VectorValueSource;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,7 +27,7 @@ import java.util.Map;
  * Numeric intervals are stored as <code>[start][SEPARATOR][stop]</code>. That is two numbers with
  * a separator in between.
  * The separator can be set using SOLR arguments in the schema file.
- *
+ * <p/>
  * User: atus
  * Date: 15.10.13
  */
@@ -38,7 +45,7 @@ public class NumericIntervalType extends AbstractSubTypeFieldType
     super.init(schema, args);
     createSuffixCache(3);
 
-    if(args.containsKey(SEPARATOR_ARG))
+    if (args.containsKey(SEPARATOR_ARG))
       separator = args.get(SEPARATOR_ARG);
     else
       separator = getDefaultSeparator();
@@ -98,7 +105,7 @@ public class NumericIntervalType extends AbstractSubTypeFieldType
   }
 
   @Override
-  public Query getRangeQuery(QParser parser, SchemaField field, String part1, String part2, boolean minInclusive, boolean maxInclusive)
+  public Query getRangeQuery(QParser parser, SchemaField field, String part1, String part2, boolean leftInclusive, boolean rightInclusive)
   {
     //TODO research this true in the constructor
 
@@ -107,21 +114,23 @@ public class NumericIntervalType extends AbstractSubTypeFieldType
 
     // points must be ordered
     BooleanQuery mainQuery = new BooleanQuery(true);
-    mainQuery.add(
-            subField1.getType().getRangeQuery(parser, subField1, part1, part2, minInclusive, maxInclusive),
-            BooleanClause.Occur.SHOULD);
-    mainQuery.add(
-            subField2.getType().getRangeQuery(parser, subField2, part1, part2, minInclusive, maxInclusive),
-            BooleanClause.Occur.SHOULD);
 
-    BooleanQuery invertedRangeQuery = new BooleanQuery(true);
-    invertedRangeQuery.add(
-            subField1.getType().getRangeQuery(parser, subField1, null, part1, minInclusive, maxInclusive),
-            BooleanClause.Occur.MUST);
-    invertedRangeQuery.add(
-            subField2.getType().getRangeQuery(parser, subField2, part2, null, minInclusive, maxInclusive),
-            BooleanClause.Occur.MUST);
-    mainQuery.add(invertedRangeQuery, BooleanClause.Occur.SHOULD);
+    BooleanQuery internalRangeQuery = new BooleanQuery(true);
+    internalRangeQuery.add(
+        subField1.getType().getRangeQuery(parser, subField1, null, part1, leftInclusive, rightInclusive),
+        BooleanClause.Occur.MUST);
+    internalRangeQuery.add(
+        subField2.getType().getRangeQuery(parser, subField2, part2, null, leftInclusive, rightInclusive),
+        BooleanClause.Occur.MUST);
+    mainQuery.add(internalRangeQuery, BooleanClause.Occur.SHOULD);
+
+    mainQuery.add(
+        subField1.getType().getRangeQuery(parser, subField1, part1, part2, leftInclusive, rightInclusive),
+        BooleanClause.Occur.SHOULD);
+
+    mainQuery.add(
+        subField2.getType().getRangeQuery(parser, subField2, part1, part2, leftInclusive, rightInclusive),
+        BooleanClause.Occur.SHOULD);
 
     return mainQuery;
   }
@@ -161,12 +170,49 @@ public class NumericIntervalType extends AbstractSubTypeFieldType
   }
 
   @Override
+  public ValueSource getValueSource(SchemaField field, QParser parser)
+  {
+    List<ValueSource> vs = new ArrayList<>(2);
+    for (int i = 0; i < 2; i++) {
+      SchemaField sub = subField(field, i);
+      vs.add(sub.getType().getValueSource(sub, parser));
+    }
+    return new NumericIntervalValueSource(field, vs);
+  }
+
+  @Override
   public boolean isPolyField()
   {
     return true;
   }
 
-  public String getDefaultSeparator() {
+  public String getDefaultSeparator()
+  {
     return "-";
   }
+
+  class NumericIntervalValueSource extends VectorValueSource
+  {
+    private final SchemaField sf;
+
+    public NumericIntervalValueSource(SchemaField sf, List<ValueSource> sources)
+    {
+      super(sources);
+      this.sf = sf;
+    }
+
+    @Override
+    public String name()
+    {
+      return "numericInterval";
+    }
+
+    @Override
+    public String description()
+    {
+      return name() + "(" + sf.getName() + ")";
+    }
+  }
+
+
 }
