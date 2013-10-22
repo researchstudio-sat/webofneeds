@@ -11,6 +11,7 @@
 *.iws
 /*/.idea
 */.idea
+atlassian-ide-plugin.xml
 
 # NetBeans
 nbproject
