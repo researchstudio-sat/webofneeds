@@ -46,6 +46,7 @@ import java.util.List;
  */
 
 @Controller
+@RequestMapping("/need")
 public class NeedController
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
@@ -215,7 +216,7 @@ public class NeedController
     RdfUtils.attachModelByBaseResource(resourceToLinkTo,propertyToLinkThrough, model);
   }
 
-  @RequestMapping(value = "", method = RequestMethod.GET)
+  @RequestMapping(value = "/", method = RequestMethod.GET)
   public String listNeeds(Model model)
   {
 
