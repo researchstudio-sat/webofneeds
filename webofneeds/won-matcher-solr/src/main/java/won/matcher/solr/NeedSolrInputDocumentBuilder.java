@@ -45,8 +45,7 @@ public class NeedSolrInputDocumentBuilder extends NeedBuilderBase<SolrInputDocum
     addFieldIfPresent(doc, SolrFields.BASIC_NEED_TYPE, getBasicNeedTypeURI());
     addFieldIfPresent(doc, SolrFields.DESCRIPTION, getDescription());
     addFieldIfPresent(doc, SolrFields.LOCATION, location);
-    addFieldIfPresent(doc, SolrFields.LOWER_PRICE_LIMIT, getLowerPriceLimit());
-    addFieldIfPresent(doc, SolrFields.UPPER_PRICE_LIMIT, getUpperPriceLimit());
+    addFieldIfPresent(doc, SolrFields.PRICE, getPriceLimitString());
     addContentDescriptionIfPresent(doc, SolrFields.NTRIPLE, getContentDescription());
     if (getTags() != null) {
       for(String tag: getTags()){
@@ -75,8 +74,7 @@ public class NeedSolrInputDocumentBuilder extends NeedBuilderBase<SolrInputDocum
         setAvailableAtLocation(latLong[0], latLong[1]);
       }
     }
-    setLowerPriceLimit(getStringValueIfPresent(document, SolrFields.LOWER_PRICE_LIMIT));
-    setUpperPriceLimit(getStringValueIfPresent(document, SolrFields.UPPER_PRICE_LIMIT));
+    setPriceLimit(getStringValueIfPresent(document, SolrFields.PRICE));
     setBasicNeedType(getStringValueIfPresent(document, SolrFields.BASIC_NEED_TYPE));
     setDescription(getStringValueIfPresent(document, SolrFields.DESCRIPTION));
     Collection<Object> tags = document.getFieldValues(SolrFields.TAG);
@@ -86,10 +84,9 @@ public class NeedSolrInputDocumentBuilder extends NeedBuilderBase<SolrInputDocum
       }
     }
     setTitle(getStringValueIfPresent(document, SolrFields.TITLE));
-    Long timeStart = (Long) document.getFieldValue(SolrFields.TIME_START);
-    Long timeEnd = (Long) document.getFieldValue(SolrFields.TIME_END);
-    if (timeEnd != null || timeStart != null){
-      addInterval(timeStart, timeEnd);
+    String duration = (String) document.getFieldValue(SolrFields.DURATION);
+    if (duration != null){
+      addInterval(duration);
     }
     String ntriples = getStringValueIfPresent(document, SolrFields.NTRIPLE);
     if (ntriples != null) {

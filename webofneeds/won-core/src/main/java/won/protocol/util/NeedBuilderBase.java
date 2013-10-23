@@ -19,12 +19,15 @@ package won.protocol.util;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileUtils;
+import org.apache.commons.lang3.Range;
 import won.protocol.model.BasicNeedType;
 import won.protocol.model.NeedState;
 import won.protocol.vocabulary.WON;
 
 import java.io.StringReader;
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,10 +50,8 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   private String title;
   private List<String> tags = new ArrayList<String>();
   private String description;
-  private Float upperPriceLimit;
-  private Float lowerPriceLimit;
-  private String upperPriceLimitString;
-  private String lowerPriceLimitString;
+  private Range<Double> priceLimit;
+  private String priceLimitString;
   private String currency;
   private List<Interval> intervals = new ArrayList<Interval>();
   private Date creationDate;
@@ -70,6 +71,8 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   //pattern for finding hashtags in title and description
   private static final Pattern PATTERN_HASHTAG = Pattern.compile("#\\w+");
 
+  private static final String PRICE_SEPARATOR = "-";
+  private static final String DATE_SEPARATOR = "/";
 
   protected class Interval{
     final Date from;
@@ -101,8 +104,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
       otherNeedBuilder.addInterval(interval.from, interval.to);
     }
     otherNeedBuilder.setDescription(getDescription())
-      .setLowerPriceLimit(getLowerPriceLimit())
-      .setUpperPriceLimit(getUpperPriceLimit());
+      .setPriceLimit(getPriceLimit());
     for (String tag: this.tags){
       otherNeedBuilder.addTag(tag);
     }
@@ -126,7 +128,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   private URI getURIforURI(String stringUri, URI uri) {
     if (uri != null) return uri;
     if (stringUri == null) return null;
-    return URI.create(stringUri);    
+    return URI.create(stringUri);
   }
 
   private String getStringForURI(String stringUri, URI uri) {
@@ -161,7 +163,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   protected URI getOwnerProtocolEndpointURI(){
     return getURIforURI(this.ownerProtocolEndpointString, this.ownerProtocolEndpointURI);
   }
-  
+
   protected String getOwnerProtocolEndpointString() {
     return getStringForURI(this.ownerProtocolEndpointString, this.ownerProtocolEndpointURI);
   }
@@ -179,13 +181,13 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   }
 
   protected String getNeedProtocolEndpointString() {
-    return getStringForURI(this.needProtocolEndpointString, this.needProtocolEndpointURI);  
+    return getStringForURI(this.needProtocolEndpointString, this.needProtocolEndpointURI);
   }
-  
+
   protected String getNeedURIString(){
-    return getStringForURI(this.uriString, this.uriURI); 
+    return getStringForURI(this.uriString, this.uriURI);
   }
-  
+
   protected URI getBasicNeedTypeURI(){
     if (this.basicNeedTypeURI != null) return this.basicNeedTypeURI;
     if (this.basicNeedTypeBNT != null) return URI.create(WON.toResource(this.basicNeedTypeBNT).getURI());
@@ -215,18 +217,26 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
     return description;
   }
 
-  protected Float getUpperPriceLimit()
+  protected Range<Double> getPriceLimit()
   {
-    if (upperPriceLimit != null) return upperPriceLimit;
-    if (upperPriceLimitString != null) return Float.parseFloat(upperPriceLimitString);
+    if (priceLimit != null) return priceLimit;
+    if (priceLimitString != null) return parseDoubleInterval(priceLimitString, PRICE_SEPARATOR);
     return null;
   }
 
-  protected Float getLowerPriceLimit()
+  public String getPriceLimitString()
   {
-    if (lowerPriceLimit != null) return lowerPriceLimit;
-    if (lowerPriceLimitString != null) return Float.parseFloat(lowerPriceLimitString);
+    if(priceLimitString != null) return priceLimitString;
+    if(priceLimit != null) return priceLimit.getMinimum() + PRICE_SEPARATOR + priceLimit.getMaximum();
     return null;
+  }
+
+  protected Range<Double> parseDoubleInterval(String interval, String separator) {
+    String[] parts = interval.split(separator);
+    if(parts.length != 2)
+      throw new IllegalArgumentException("There should be exactly two parts. Found " + parts.length);
+
+    return Range.between(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
   }
 
   protected String getCurrency()
@@ -342,31 +352,23 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   }
 
   @Override
-  public NeedBuilder<T> setUpperPriceLimit(final Float price)
+  public NeedBuilder<T> setPriceLimit(final Double from, final Double to)
   {
-    this.upperPriceLimit = price;
-    return this;
-  }
-
-
-  @Override
-  public NeedBuilder<T> setLowerPriceLimit(final Float price)
-  {
-    this.lowerPriceLimit = price;
+    priceLimit = Range.between(from,to);
     return this;
   }
 
   @Override
-  public NeedBuilder<T> setUpperPriceLimit(final String price)
+  public NeedBuilder<T> setPriceLimit(final Range<Double> priceLimit)
   {
-    this.upperPriceLimitString = price;
+    this.priceLimit = priceLimit;
     return this;
   }
 
   @Override
-  public NeedBuilder<T> setLowerPriceLimit(final String price)
+  public NeedBuilder<T> setPriceLimit(final String price)
   {
-    this.lowerPriceLimitString = price;
+    this.priceLimitString = price;
     return this;
   }
 
@@ -375,6 +377,28 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   {
     this.currency = currency;
     return this;
+  }
+
+  @Override
+  public NeedBuilder<T> addInterval(final String interval)
+  {
+    return addInterval(parseDateInterval(interval, DATE_SEPARATOR));
+  }
+
+  protected Interval parseDateInterval(String interval, String separator) {
+    String[] parts = interval.split(separator);
+    if(parts.length != 2)
+      throw new IllegalArgumentException("There should be exactly two parts. Found " + parts.length);
+
+    Date from, to;
+    try {
+      from = SimpleDateFormat.getInstance().parse(parts[0]);
+      to = SimpleDateFormat.getInstance().parse(parts[0]);
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("The dates could not be parsed", e);
+    }
+
+    return new Interval(from, to);
   }
 
   @Override

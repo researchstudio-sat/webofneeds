@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<!--
+<!--  
   ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,11 +49,20 @@
 
     <types>
 
-        <!-- The StrField type is not analyzed, but indexed/stored verbatim. -->
         <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
 
-        <!-- A Trie based date field for faster date range queries and date faceting. -->
+        <fieldType name="tdouble" class="solr.TrieDoubleField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
+
+        <fieldType name="tfloat" class="solr.TrieFloatField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
+
+        <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
+
         <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
+
+        <fieldType name="numericInterval" class="won.matcher.solr.intervals.NumericIntervalType" subFieldSuffix="_numericInterval"/>
+
+        <fieldType name="dateInterval" class="won.matcher.solr.intervals.DateIntervalType" subFieldSuffix="_dateInterval"/>
+
 
         <!-- A uri field that uses WhitespaceTokenizer and WordDelimiterFilter to
              split URIs into multiple components.  Stopwords is customized by
@@ -137,15 +146,7 @@
                    analyzerConfig="tuple-analyzers.xml"
                    datatypeConfig="tuple-datatypes.xml"/>
 
-        <!--<fieldType name="tabular" class="org.sindice.siren.solr.schema.SirenField"
-                   omitNorms="true"
-                   omitTermFreqAndPositions="false"
-                   analyzerConfig="tuple-analyzers.xml"
-                   datatypeConfig="tuple-datatypes.xml"/>-->
-
-        <fieldType name="text_general"
-                   class="solr.TextField"
-                   positionIncrementGap="100">
+        <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
             <!-- Configures the analysis done at the index phase -->
             <analyzer type="index">
                 <!-- Uses word break rules of the Unicode Text Segmentation algorith when splitting text into words. -->
@@ -168,19 +169,9 @@
             </analyzer>
         </fieldType>
 
-        <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
-
-        <fieldType name="tdouble" class="solr.TrieDoubleField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
-
-        <fieldType name="tfloat" class="solr.TrieFloatField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
-
     </types>
 
     <fields>
-
-        <!-- The ID (URL) of the document
-             Use the 'string' field type (no tokenisation)
-        <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false"/>-->
 
         <!-- The URL of the document
              Use the 'text' field type in order to be tokenised -->
@@ -189,9 +180,6 @@
         <!-- n-triple indexing scheme -->
         <field name="ntriple" type="ntriple" indexed="true" stored="true" multiValued="false"/>
 
-        <!-- tabular indexing scheme -->
-        <!--<field name="tabular" type="tabular" indexed="true" stored="false" multiValued="false"/>-->
-
         <field name="title" type="text_general" indexed="true" stored="true" required="false" multiValued="false"/>
         <field name="description" type="text_general" indexed="true" stored="false" required="false" termVectors="true" multiValued="false"/>
 
@@ -199,11 +187,11 @@
 
         <field name="tag" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
 
-        <field name="startTime" type="tdate" indexed="true" stored="true" required="false" multiValued="false"/>
-        <field name="endTime" type="tdate" indexed="true" stored="true" required="false" multiValued="false"/>
+        <field name="duration" type="dateInterval" indexed="true" stored="true" required="false" multiValued="false"/>
+        <dynamicField name="*_dateInterval"  type="tdate" indexed="true"  stored="false" multiValued="false"/>
 
-        <field name="lowerPriceLimit" type="tdouble" indexed="true" stored="true" required="false" multiValued="false"/>
-        <field name="upperPriceLimit" type="tdouble" indexed="true" stored="true" required="false" multiValued="false"/>
+        <field name="price" type="numericInterval" indexed="true" stored="true" required="false" multiValued="false"/>
+        <dynamicField name="*_numericInterval"  type="tdouble" indexed="true"  stored="false" multiValued="false"/>
 
         <field name="location" type="location" indexed="true" stored="true" required="false" multiValued="false"/>
         <dynamicField name="*_coordinate"  type="tdouble" indexed="true"  stored="false" multiValued="false"/>
@@ -217,7 +205,6 @@
     <copyField source="title" dest="keywordsearch"/>
     <copyField source="description" dest="keywordsearch"/>
     <copyField source="tag" dest="keywordsearch"/>
-
 
     <!-- Field to use to determine and enforce document uniqueness.
        Unless this field is marked with required="false", it will be a required field

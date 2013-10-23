@@ -13,12 +13,14 @@ import org.apache.solr.response.XMLWriter;
 import org.apache.solr.schema.AbstractSubTypeFieldType;
 import org.apache.solr.schema.IndexSchema;
 import org.apache.solr.schema.SchemaField;
+import org.apache.solr.schema.TrieField;
 import org.apache.solr.search.QParser;
 import org.apache.solr.search.function.ValueSource;
 import org.apache.solr.search.function.VectorValueSource;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -61,8 +63,16 @@ public class NumericIntervalType extends AbstractSubTypeFieldType
 
       int i = 0;
       SchemaField sf = subField(field, i);
+      if (startStop[START].equals("*")) {
+        TrieField tf = (TrieField) sf.getType();
+        startStop[START] = getMaxMinValue(tf.getType(), false);
+      }
       f[i] = sf.createField(startStop[START], boost);
       i++;
+      if (startStop[STOP].equals("*")) {
+        TrieField tf = (TrieField) sf.getType();
+        startStop[STOP] = getMaxMinValue(tf.getType(), true);
+      }
       f[i] = subField(field, i).createField(startStop[STOP], boost);
     }
 
@@ -78,6 +88,29 @@ public class NumericIntervalType extends AbstractSubTypeFieldType
     }
 
     return f;
+  }
+
+  protected String getMaxMinValue(TrieField.TrieTypes type, boolean max)
+  {
+    switch (type) {
+      case INTEGER:
+        if (max) return String.valueOf(Integer.MAX_VALUE);
+        else return String.valueOf(Integer.MIN_VALUE);
+      case FLOAT:
+        if (max) return String.valueOf(Float.MAX_VALUE);
+        else return String.valueOf(Float.MIN_VALUE);
+      case LONG:
+        if (max) return String.valueOf(Long.MAX_VALUE);
+        else return String.valueOf(Long.MIN_VALUE);
+      case DOUBLE:
+        if (max) return String.valueOf(Double.MAX_VALUE);
+        else return String.valueOf(Double.MIN_VALUE);
+      case DATE:
+        if (max) return String.valueOf(new Date(Long.MAX_VALUE));
+        else return String.valueOf(new Date(Long.MIN_VALUE));
+      default:
+        throw new SolrException(SolrException.ErrorCode.SERVER_ERROR, "Unknown type for trie field");
+    }
   }
 
   //One does not simply create a single field
@@ -107,8 +140,6 @@ public class NumericIntervalType extends AbstractSubTypeFieldType
   @Override
   public Query getRangeQuery(QParser parser, SchemaField field, String part1, String part2, boolean leftInclusive, boolean rightInclusive)
   {
-    //TODO research this true in the constructor
-
     SchemaField subField1 = subField(field, 0);
     SchemaField subField2 = subField(field, 1);
 
@@ -140,13 +171,17 @@ public class NumericIntervalType extends AbstractSubTypeFieldType
    *
    * @param external string to be split
    * @return an array with the start and stop value <code>long[]{start,stop}</code>
-   * @throws org.apache.solr.common.SolrException if the external value has the wrong formatting
+   * @throws org.apache.solr.common.SolrException
+   *          if the external value has the wrong formatting
    */
   protected String[] splitExternal(String external)
   {
     String[] parts = external.split(separator);
     if (parts.length != 2)
       throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, "NumericIntervalType has the following form: <start>" + separator + "<stop>");
+
+    parts[0].trim();
+    parts[1].trim();
 
     return parts;
   }

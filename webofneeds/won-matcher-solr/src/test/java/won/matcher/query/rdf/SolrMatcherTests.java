@@ -431,11 +431,9 @@ public class SolrMatcherTests
     doc1.addField(SolrFields.TAG, "red");
     doc1.addField(SolrFields.TAG, "leather");
     doc1.addField(SolrFields.TAG, "used");
-    doc1.addField(SolrFields.LOWER_PRICE_LIMIT, 10.0);
-    doc1.addField(SolrFields.UPPER_PRICE_LIMIT, 100.0);
+    doc1.addField(SolrFields.PRICE, "10.0-100.0");
     doc1.addField(SolrFields.LOCATION, "48.2088,16.3726");
-    doc1.addField(SolrFields.TIME_START, "2013-08-01T00:01:00.000Z");
-    doc1.addField(SolrFields.TIME_END, "2013-08-30T23:00:00.000Z");
+    doc1.addField(SolrFields.DURATION, "2013-08-01T00:01:00.000Z/2013-08-30T23:00:00.000Z");
 
     docs.put(url, doc1);
 
@@ -449,10 +447,9 @@ public class SolrMatcherTests
     doc2.addField(SolrFields.TAG, "blue");
     doc2.addField(SolrFields.TAG, "dirty");
     doc2.addField(SolrFields.TAG, "couch");
-    doc2.addField(SolrFields.LOWER_PRICE_LIMIT, 50.0);
+    doc2.addField(SolrFields.PRICE, "50.0-*");
     doc2.addField(SolrFields.LOCATION, "48.3089,16.3726");
-    doc2.addField(SolrFields.TIME_START, "2013-07-01T00:01:00.000Z");
-    doc2.addField(SolrFields.TIME_END, "2013-08-30T23:00:00.000Z");
+    doc2.addField(SolrFields.DURATION, "2013-07-01T00:01:00.000Z/2013-08-30T23:00:00.000Z");
 
     docs.put(url, doc2);
 
@@ -466,8 +463,7 @@ public class SolrMatcherTests
     doc3.addField(SolrFields.TAG, "family");
     doc3.addField(SolrFields.TAG, "suburbs");
     doc3.addField(SolrFields.TAG, "kids");
-    doc3.addField(SolrFields.LOWER_PRICE_LIMIT, 100000.0);
-    doc3.addField(SolrFields.UPPER_PRICE_LIMIT, 500000.0);
+    doc3.addField(SolrFields.PRICE, "100000.0-500000.0");
     doc3.addField(SolrFields.LOCATION, "48.2088,16.3726");
 
     docs.put(url, doc3);
@@ -481,10 +477,9 @@ public class SolrMatcherTests
     doc4.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
     doc4.addField(SolrFields.TAG, "sofa");
     doc4.addField(SolrFields.TAG, "furniture");
-    doc4.addField(SolrFields.UPPER_PRICE_LIMIT, 150.0);
+    doc4.addField(SolrFields.PRICE, "*-150.0");
     doc4.addField(SolrFields.LOCATION, "48.2088,16.3726");
-    doc4.addField(SolrFields.TIME_START, "2013-06-01T00:01:00.000Z");
-    doc4.addField(SolrFields.TIME_END, "2013-07-30T23:00:00.000Z");
+    doc4.addField(SolrFields.DURATION, "2013-06-01T00:01:00.000Z/2013-07-30T23:00:00.000Z");
 
 
     docs.put(url, doc4);
@@ -500,10 +495,9 @@ public class SolrMatcherTests
     doc5.addField(SolrFields.TAG, "red");
     doc5.addField(SolrFields.TAG, "couch");
     doc5.addField(SolrFields.TAG, "leather");
-    doc5.addField(SolrFields.UPPER_PRICE_LIMIT, 50.0);
+    doc5.addField(SolrFields.PRICE, "*-50.0");
     doc5.addField(SolrFields.LOCATION, "48.2088,16.3726");
-    doc5.addField(SolrFields.TIME_START, "2013-07-01T00:01:00.000Z");
-    doc5.addField(SolrFields.TIME_END, "2013-09-30T23:00:00.000Z");
+    doc5.addField(SolrFields.DURATION, "2013-07-01T00:01:00.000Z/2013-09-30T23:00:00.000Z");
 
     docs.put(url, doc5);
 
@@ -516,7 +510,7 @@ public class SolrMatcherTests
     doc6.addField(SolrFields.TAG, "house");
     doc6.addField(SolrFields.TAG, "apartment");
     doc6.addField(SolrFields.TAG, "family");
-    doc6.addField(SolrFields.UPPER_PRICE_LIMIT, 250000.0);
+    doc6.addField(SolrFields.PRICE, "*-250000.0");
     doc6.addField(SolrFields.LOCATION, "48.2088,16.3726");
 
     docs.put(url, doc6);

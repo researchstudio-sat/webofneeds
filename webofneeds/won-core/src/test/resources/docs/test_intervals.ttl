@@ -1,0 +1,36 @@
+@prefix :      <http://localhost:8080/won/resource/need/1> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix gr:    <http://purl.org/goodrelations/v1#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+
+:       a                            won:Need ;
+        won:hasBasicNeedType         won:Demand ;
+        won:hasConnections           <http://localhost:8080/won/resource/need/1/connections/> ;
+        won:hasContent               [ a                       won:NeedContent ;
+                                       dc:title                "Test ranges"^^xsd:string ;
+                                       won:hasTextDescription  "I'm just testing ranges here."^^xsd:string
+                                     ] ;
+        won:hasNeedModality          [ a                          won:NeedModality ;
+                                       won:hasPriceSpecification  [ a                       won:PriceSpecification ;
+                                                                    won:hasLowerPriceLimit  "50.0"^^xsd:double ;
+                                                                    won:hasUpperPriceLimit  "150.0"^^xsd:double
+                                                                  ] ;
+                                       won:hasTimeSpecification   [ a                          won:TimeSpecification ;
+                                                                    won:hasEndTime             "2013-12-15T00:01:00Z"^^xsd:dateTime ;
+                                                                    won:hasRecurInfiniteTimes  false ;
+                                                                    won:hasStartTime           "2013-08-15T00:01:00Z"^^xsd:dateTime
+                                                                  ]
+                                     ] ;
+        won:isInState                won:Active ;
+        won:matcherProtocolEndpoint  <http://localhost:8080/won/protocol/matcher> ;
+        won:needCreationDate         "2013-10-23T16:01:59.886Z"^^xsd:dateTime ;
+        won:needProtocolEndpoint     <http://localhost:8080/won/protocol/need> ;
+        won:ownerProtocolEndpoint    <http://localhost:8080/won/protocol/owner> .
+
+<http://localhost:8080/won/resource/need/1/connections/>
+        a       ldp:Container .

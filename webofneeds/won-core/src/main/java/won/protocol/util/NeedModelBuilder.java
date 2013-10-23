@@ -97,8 +97,9 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     }
     Resource priceSpec = needModality.getPropertyResourceValue(WON.HAS_PRICE_SPECIFICATION);
     if (priceSpec != null) {
-      setUpperPriceLimit(extractFloatFromObject(priceSpec.getProperty(WON.HAS_UPPER_PRICE_LIMIT)));
-      setLowerPriceLimit(extractFloatFromObject(priceSpec.getProperty(WON.HAS_LOWER_PRICE_LIMIT)));
+      Double from = extractDoubleFromObject(priceSpec.getProperty(WON.HAS_UPPER_PRICE_LIMIT));
+      Double to = extractDoubleFromObject(priceSpec.getProperty(WON.HAS_LOWER_PRICE_LIMIT));
+      setPriceLimit(from, to);
       setCurrency(extractStringFromObject(priceSpec.getProperty(WON.HAS_CURRENCY)));
     }
   }
@@ -132,6 +133,14 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     RDFNode obj = stmt.getObject();
     if (!obj.isLiteral()) return null;
     return stmt.getFloat();
+  }
+
+  private Double extractDoubleFromObject(final Statement stmt)
+  {
+    if (stmt == null) return null;
+    RDFNode obj = stmt.getObject();
+    if (!obj.isLiteral()) return null;
+    return stmt.getDouble();
   }
 
   private String extractStringFromObject(final Statement stmt)
@@ -246,10 +255,10 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     Resource needModality = needModel.createResource(WON.NEED_MODALITY);
 
     //price and currency
-    if (getUpperPriceLimit() != null || getLowerPriceLimit() != null) {
+    if (getPriceLimit() != null) {
       Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
-      addLiteralValueIfPresent(needModel, priceSpecification, WON.HAS_LOWER_PRICE_LIMIT, getLowerPriceLimit(), XSDDatatype.XSDfloat);
-      addLiteralValueIfPresent(needModel, priceSpecification, WON.HAS_UPPER_PRICE_LIMIT, getUpperPriceLimit(), XSDDatatype.XSDfloat);
+      addLiteralValueIfPresent(needModel, priceSpecification, WON.HAS_LOWER_PRICE_LIMIT, getPriceLimit().getMinimum(), XSDDatatype.XSDfloat);
+      addLiteralValueIfPresent(needModel, priceSpecification, WON.HAS_UPPER_PRICE_LIMIT, getPriceLimit().getMaximum(), XSDDatatype.XSDfloat);
       addLiteralValueIfPresent(needModel, priceSpecification, WON.HAS_CURRENCY, getCurrency(), XSDDatatype.XSDstring);
       needModel.add(needModel.createStatement(needModality, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
     }
