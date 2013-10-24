@@ -74,64 +74,44 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   private static final String PRICE_SEPARATOR = "-";
   private static final String DATE_SEPARATOR = "/";
 
-  protected class Interval{
-    final Date from;
-    final Date to;
-
-    public Interval(final Date from, final Date to)
-    {
-      if (from == null) {
-        if (to == null) throw new IllegalArgumentException("At least one date must be specified!");
-        this.from = new Date(0);
-        this.to = to;
-      } else if (to == null) {
-        this.from = from;
-        this.to = new Date(Long.MAX_VALUE);
-      } else if (from.after(to)){
-        this.from = from;
-        this.to = to;
-      } else {
-        this.to = from;
-        this.from = to;
-      }
-    }
-  }
-
   @Override
   public <O> void copyValuesToBuilder(final NeedBuilder<O> otherNeedBuilder)
   {
-    for (Interval interval: this.intervals){
+    for (Interval interval : this.intervals) {
       otherNeedBuilder.addInterval(interval.from, interval.to);
     }
     otherNeedBuilder.setDescription(getDescription())
-      .setPriceLimit(getPriceLimit());
-    for (String tag: this.tags){
+        .setPriceLimit(getPriceLimit());
+    for (String tag : this.tags) {
       otherNeedBuilder.addTag(tag);
     }
-    if (getAvailableAtLocationRegion() != null){
+    if (getAvailableAtLocationRegion() != null) {
       otherNeedBuilder.setAvailableAtLocation(getAvailableAtLocationRegion());
     } else {
       otherNeedBuilder.setAvailableAtLocation(getAvailableAtLocationLatitude(), getAvailableAtLocationLongitude());
     }
     otherNeedBuilder.setBasicNeedType(getBasicNeedTypeURI())
-      .setContentDescription(getContentDescription())
-      .setCreationDate(getCreationDate())
-      .setCurrency(getCurrency())
-      .setMatcherProtocolEndpoint(getMatcherProtocolEndpointURI())
-      .setNeedProtocolEndpoint(getNeedProtocolEndpointURI())
-      .setOwnerProtocolEndpoint(getOwnerProtocolEndpointURI())
-      .setState(getStateURI())
-      .setTitle(getTitle())
-      .setUri(getURI());
+        .setContentDescription(getContentDescription())
+        .setCreationDate(getCreationDate())
+        .setPriceLimit(getPriceLimit())
+        .setCurrency(getCurrency())
+        .setMatcherProtocolEndpoint(getMatcherProtocolEndpointURI())
+        .setNeedProtocolEndpoint(getNeedProtocolEndpointURI())
+        .setOwnerProtocolEndpoint(getOwnerProtocolEndpointURI())
+        .setState(getStateURI())
+        .setTitle(getTitle())
+        .setUri(getURI());
   }
 
-  private URI getURIforURI(String stringUri, URI uri) {
+  private URI getURIforURI(String stringUri, URI uri)
+  {
     if (uri != null) return uri;
     if (stringUri == null) return null;
     return URI.create(stringUri);
   }
 
-  private String getStringForURI(String stringUri, URI uri) {
+  private String getStringForURI(String stringUri, URI uri)
+  {
     if (stringUri != null) return stringUri;
     if (uri == null) return null;
     return uri.toString();
@@ -140,14 +120,16 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   /**
    * Finds all #hashtags in the specified string. If none are found or the specified string is null,
    * an empty list is returned.
+   *
    * @param content
    * @return
    */
-  protected List<String> getHashtags(String content) {
+  protected List<String> getHashtags(String content)
+  {
     List<String> ret = new ArrayList<String>();
     if (content == null) return ret;
     Matcher m = PATTERN_HASHTAG.matcher(content);
-    while(m.find()){
+    while (m.find()) {
       ret.add(m.group(0));
     }
     return ret;
@@ -160,42 +142,51 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
     return null;
   }
 
-  protected URI getOwnerProtocolEndpointURI(){
+  protected URI getOwnerProtocolEndpointURI()
+  {
     return getURIforURI(this.ownerProtocolEndpointString, this.ownerProtocolEndpointURI);
   }
 
-  protected String getOwnerProtocolEndpointString() {
+  protected String getOwnerProtocolEndpointString()
+  {
     return getStringForURI(this.ownerProtocolEndpointString, this.ownerProtocolEndpointURI);
   }
 
-  protected URI getMatcherProtocolEndpointURI(){
+  protected URI getMatcherProtocolEndpointURI()
+  {
     return getURIforURI(this.matcherProtocolEndpointString, this.matcherProtocolEndpointURI);
   }
 
-  protected String getMatcherProtocolEndpointString() {
+  protected String getMatcherProtocolEndpointString()
+  {
     return getStringForURI(this.matcherProtocolEndpointString, this.matcherProtocolEndpointURI);
   }
 
-  protected URI getNeedProtocolEndpointURI(){
+  protected URI getNeedProtocolEndpointURI()
+  {
     return getURIforURI(this.needProtocolEndpointString, this.needProtocolEndpointURI);
   }
 
-  protected String getNeedProtocolEndpointString() {
+  protected String getNeedProtocolEndpointString()
+  {
     return getStringForURI(this.needProtocolEndpointString, this.needProtocolEndpointURI);
   }
 
-  protected String getNeedURIString(){
+  protected String getNeedURIString()
+  {
     return getStringForURI(this.uriString, this.uriURI);
   }
 
-  protected URI getBasicNeedTypeURI(){
+  protected URI getBasicNeedTypeURI()
+  {
     if (this.basicNeedTypeURI != null) return this.basicNeedTypeURI;
     if (this.basicNeedTypeBNT != null) return URI.create(WON.toResource(this.basicNeedTypeBNT).getURI());
-    if (this.basicNeedTypeURIString != null) return  URI.create(this.basicNeedTypeURIString);
+    if (this.basicNeedTypeURIString != null) return URI.create(this.basicNeedTypeURIString);
     return null;
   }
 
-  protected URI getStateURI(){
+  protected URI getStateURI()
+  {
     if (this.stateURI != null) return this.stateURI;
     if (this.stateNS != null) return URI.create(WON.toResource(this.stateNS).getURI());
     if (this.stateURIString != null) return URI.create(this.stateURIString);
@@ -226,14 +217,15 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
 
   public String getPriceLimitString()
   {
-    if(priceLimitString != null) return priceLimitString;
-    if(priceLimit != null) return priceLimit.getMinimum() + PRICE_SEPARATOR + priceLimit.getMaximum();
+    if (priceLimitString != null) return priceLimitString;
+    if (priceLimit != null) return priceLimit.getMinimum() + PRICE_SEPARATOR + priceLimit.getMaximum();
     return null;
   }
 
-  protected Range<Double> parseDoubleInterval(String interval, String separator) {
+  protected Range<Double> parseDoubleInterval(String interval, String separator)
+  {
     String[] parts = interval.split(separator);
-    if(parts.length != 2)
+    if (parts.length != 2)
       throw new IllegalArgumentException("There should be exactly two parts. Found " + parts.length);
 
     return Range.between(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
@@ -354,7 +346,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   @Override
   public NeedBuilder<T> setPriceLimit(final Double from, final Double to)
   {
-    priceLimit = Range.between(from,to);
+    priceLimit = Range.between(from, to);
     return this;
   }
 
@@ -385,9 +377,10 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
     return addInterval(parseDateInterval(interval, DATE_SEPARATOR));
   }
 
-  protected Interval parseDateInterval(String interval, String separator) {
+  protected Interval parseDateInterval(String interval, String separator)
+  {
     String[] parts = interval.split(separator);
-    if(parts.length != 2)
+    if (parts.length != 2)
       throw new IllegalArgumentException("There should be exactly two parts. Found " + parts.length);
 
     Date from, to;
@@ -404,7 +397,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   @Override
   public NeedBuilder<T> addInterval(final Date from, final Date to)
   {
-    this.intervals.add(new Interval(from,to));
+    this.intervals.add(new Interval(from, to));
     return this;
   }
 
@@ -412,9 +405,9 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   public NeedBuilder<T> addInterval(final Long from, final Long to)
   {
     if (from == null && to == null) return this;
-    Date fromDate = from != null ? new Date(from): null;
-    Date toDate = to != null ? new Date(to): null;
-    this.intervals.add(new Interval(fromDate,toDate));
+    Date fromDate = from != null ? new Date(from) : null;
+    Date toDate = to != null ? new Date(to) : null;
+    this.intervals.add(new Interval(fromDate, toDate));
     return this;
   }
 
@@ -530,7 +523,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   public NeedBuilder<T> setContentDescription(final String content)
   {
     Model model = ModelFactory.createDefaultModel();
-    String baseURI= "no:setUri";
+    String baseURI = "no:setUri";
     model.setNsPrefix("", baseURI);
     StringReader reader = new StringReader(content);
     model.read(reader, baseURI, FileUtils.langTurtle);
@@ -550,7 +543,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   @Override
   public NeedBuilder<T> setState(final NeedState state)
   {
-    this.stateURI= null;
+    this.stateURI = null;
     this.stateNS = state;
     this.stateURIString = null;
     return this;
@@ -559,7 +552,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   @Override
   public NeedBuilder<T> setState(final String stateURI)
   {
-    this.stateURI= null;
+    this.stateURI = null;
     this.stateNS = null;
     this.stateURIString = stateURI;
     return this;

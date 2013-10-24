@@ -10,19 +10,17 @@
 
 :       a                            won:Need ;
         won:hasBasicNeedType         won:Demand ;
-        won:hasConnections           <http://localhost:8080/won/resource/need/1/connections/> ;
         won:hasContent               [ a                       won:NeedContent ;
                                        dc:title                "Test ranges"^^xsd:string ;
                                        won:hasTextDescription  "I'm just testing ranges here."^^xsd:string
                                      ] ;
         won:hasNeedModality          [ a                          won:NeedModality ;
                                        won:hasPriceSpecification  [ a                       won:PriceSpecification ;
-                                                                    won:hasLowerPriceLimit  "50.0"^^xsd:double ;
-                                                                    won:hasUpperPriceLimit  "150.0"^^xsd:double
+                                                                    won:hasLowerPriceLimit  "50.0"^^xsd:float ;
+                                                                    won:hasUpperPriceLimit  "150.0"^^xsd:float
                                                                   ] ;
                                        won:hasTimeSpecification   [ a                          won:TimeSpecification ;
                                                                     won:hasEndTime             "2013-12-15T00:01:00Z"^^xsd:dateTime ;
-                                                                    won:hasRecurInfiniteTimes  false ;
                                                                     won:hasStartTime           "2013-08-15T00:01:00Z"^^xsd:dateTime
                                                                   ]
                                      ] ;
@@ -31,6 +29,3 @@
         won:needCreationDate         "2013-10-23T16:01:59.886Z"^^xsd:dateTime ;
         won:needProtocolEndpoint     <http://localhost:8080/won/protocol/need> ;
         won:ownerProtocolEndpoint    <http://localhost:8080/won/protocol/owner> .
-
-<http://localhost:8080/won/resource/need/1/connections/>
-        a       ldp:Container .
