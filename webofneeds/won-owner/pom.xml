@@ -25,8 +25,24 @@
         </dependency>
         <!-- messaging stuff -->
         <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-spring</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-amqp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-camel</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
         </dependency>
         <!-- HSQL STUFF -->
         <dependency>

@@ -181,7 +181,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     {
         logger.debug("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         try {
-            URI brokerURI = new URI("vm://localhost");
+            URI brokerURI = new URI("vm://localhost:61617");
 
             messageProducer.textMessage(brokerURI, message);
 

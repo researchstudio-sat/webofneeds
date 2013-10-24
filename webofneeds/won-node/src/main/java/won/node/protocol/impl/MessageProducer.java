@@ -33,8 +33,8 @@ import java.util.logging.Logger;
 public class MessageProducer {
     private static final Logger LOG = Logger.getLogger(MessageProducer.class.toString());
 
-    @Autowired
-    protected JmsTemplate jmsTemplate;
+    //@Autowired
+    //protected JmsTemplate jmsTemplate;
 
     protected  int numberOfMessages = 100;
 
@@ -43,12 +43,12 @@ public class MessageProducer {
         payload.append(message);
 
 
-        jmsTemplate.send(new MessageCreator(){
+       /* jmsTemplate.send(new MessageCreator(){
            @Override
            public Message createMessage(Session session) throws JMSException {
                return session.createTextMessage(message);  //To change body of implemented methods use File | Settings | File Templates.
            }
-        });
+        });      */
 
     }
 }

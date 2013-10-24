@@ -3,6 +3,7 @@ package won.owner.web.connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.TextMessagePojo;
+import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
+import won.owner.protocol.impl.OwnerProtocolNeedServiceClientSide;
 import won.protocol.model.Connection;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ChatMessageRepository;
@@ -28,7 +31,8 @@ public class ConnectionController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private OwnerProtocolNeedService ownerService;
+    @Qualifier("ownerProtocolNeedServiceClientJMSBased")
+    private OwnerProtocolNeedServiceClientSide ownerService;
 
     @Autowired
     private ConnectionRepository connectionRepository;

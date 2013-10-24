@@ -4,9 +4,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.owner.protocol.impl.OwnerProtocolNeedServiceClientJMSBased;
+import won.protocol.jms.WonMessageListener;
 import won.protocol.exception.*;
 import won.protocol.model.*;
-import won.protocol.owner.OwnerProtocolNeedService;
+
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
@@ -14,6 +16,7 @@ import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.DataAccessUtils;
 
+import javax.jms.Message;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -24,9 +27,43 @@ import java.util.List;
  * Date: 03.12.12
  * Time: 14:12
  */
-public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService {
+//TODO copied from OwnerProtocolOwnerService... refactoring needed
+public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService, WonMessageListener{
 
     final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Override
+    public void onMessage(Message message) {
+       /* try{
+            TextMessage msg = (TextMessage) message;
+            message.
+            logger.info("reading message " + msg.getText());
+            message
+            if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+            if (message == null) throw new IllegalArgumentException("message is not set");
+            //load connection, checking if it exists
+            Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+
+            //perform state transit (should not result in state change)
+            //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
+            //construct chatMessage object to store in the db
+            ChatMessage chatMessage = new ChatMessage();
+            chatMessage.setCreationDate(new Date());
+            chatMessage.setLocalConnectionURI(con.getConnectionURI());
+            chatMessage.setMessage(msg.getText());
+            chatMessage.setOriginatorURI(con.getRemoteNeedURI());
+            //save in the db
+            chatMessageRepository.saveAndFlush(chatMessage);
+        }catch (JMSException e){
+            e.printStackTrace();
+        }
+          */
+    }
+
+    @Override
+    public void consume(URI connectionURI, Message msg) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 
     @Autowired
     private NeedRepository needRepository;
@@ -41,7 +78,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
     private ChatMessageRepository chatMessageRepository;
 
     @Autowired
-    private OwnerProtocolNeedService ownerService;
+    private OwnerProtocolNeedServiceClientJMSBased ownerService;
 
     @Override
     public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
@@ -142,9 +179,11 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         connectionRepository.saveAndFlush(con);
     }
 
+
     @Override
     public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
+
         logger.info("node-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         if (message == null) throw new IllegalArgumentException("message is not set");
@@ -163,7 +202,10 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         chatMessageRepository.saveAndFlush(chatMessage);
     }
 
-    public void setOwnerService(OwnerProtocolNeedService ownerService) {
+    public void setOwnerService(OwnerProtocolNeedServiceClientJMSBased ownerService) {
         this.ownerService = ownerService;
     }
+
+
+
 }

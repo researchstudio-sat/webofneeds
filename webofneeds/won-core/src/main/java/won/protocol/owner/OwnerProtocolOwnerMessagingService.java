@@ -1,37 +1,33 @@
 /*
  * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package won.protocol.owner;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.*;
 import won.protocol.service.ConnectionCommunicationService;
-import javax.jms.Message;
 
+import javax.jms.Message;
 import java.net.URI;
 
 /**
  * User: fkleedorfer
  * Date: 31.10.12
  */
-public interface OwnerProtocolOwnerService extends ConnectionCommunicationService
+public interface OwnerProtocolOwnerMessagingService extends ConnectionCommunicationService
 {
   /**
    * Informs the owner of a hint that has been received for the need.
@@ -39,7 +35,7 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    * @param otherNeedURI
    * @param score
    * @param originatorURI
-   * @throws NoSuchNeedException if ownNeedURI is not a known need URI
+   * @throws won.protocol.exception.NoSuchNeedException if ownNeedURI is not a known need URI
    */
   public void hint(URI ownNeedURI, URI otherNeedURI, double score, URI originatorURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
@@ -54,13 +50,14 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    * @param otherNeedURI
    * @param ownConnectionURI
    * @param content
-   * @throws NoSuchNeedException if ownNeedURI or otherNeedURI does not denote a need
-   * @throws IllegalMessageForNeedStateException
+   * @throws won.protocol.exception.NoSuchNeedException if ownNeedURI or otherNeedURI does not denote a need
+   * @throws won.protocol.exception.IllegalMessageForNeedStateException
    *                             if one of the needs is inactive
-   * @throws ConnectionAlreadyExistsException
+   * @throws won.protocol.exception.ConnectionAlreadyExistsException
    *                             if the two needs are already connected
    */
   public void connect(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI, Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
   //TODO move to another interface maybe?
+  public void textMessageConsume(final URI connectionURI, Message message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 }

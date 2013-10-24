@@ -38,10 +38,19 @@
 
     <!-- protocol-level services -->
 
+    <bean id="ownerProtocolNeedServiceClientWSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientWSBased">
+        <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
+    </bean>
+
+    <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientJMSBased">
+        <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
+        <property name="producerTemplate" ref="producerTemplate"/>
+    </bean>
+
     <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
+        <property name="delegate" ref="ownerProtocolNeedServiceClientJMSBased" />
         <property name="linkedDataRestClient" ref="linkedDataRestClient" />
         <property name="uriService" ref="uriService" />
-        <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
     </bean>
 
     <bean id="uriService" class="won.owner.service.impl.URIService">
@@ -58,5 +67,6 @@
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
 
 
-    <bean id="messageProducer" class="won.owner.protocol.impl.MessageProducer"></bean>
+    <!--bean id="messageProducer" class="won.owner.protocol.impl.MessageProducer"></bean-->
+
 </beans>

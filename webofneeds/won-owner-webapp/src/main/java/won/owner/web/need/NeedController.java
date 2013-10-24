@@ -8,6 +8,7 @@ import com.hp.hpl.jena.vocabulary.DC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
+import won.owner.protocol.impl.OwnerProtocolNeedServiceClientSide;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
 import won.protocol.exception.ConnectionAlreadyExistsException;
@@ -51,7 +53,8 @@ public class NeedController
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private OwnerProtocolNeedService ownerService;
+  @Qualifier("ownerProtocolNeedServiceClientJMSBased")
+  private OwnerProtocolNeedServiceClientSide ownerService;
 
   @Autowired
   private NeedRepository needRepository;
@@ -84,7 +87,7 @@ public class NeedController
     this.uriService = uriService;
   }
 
-  public void setOwnerService(OwnerProtocolNeedService ownerService)
+  public void setOwnerService(OwnerProtocolNeedServiceClientSide ownerService)
   {
     this.ownerService = ownerService;
   }
@@ -192,7 +195,7 @@ public class NeedController
       if (needPojo.getWonNode().equals("")) {
         needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
       } else {
-        needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, needPojo.getWonNode());
+        needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, URI.create(needPojo.getWonNode()));
       }
 
       List<Need> needs = needRepository.findByNeedURI(needURI);
