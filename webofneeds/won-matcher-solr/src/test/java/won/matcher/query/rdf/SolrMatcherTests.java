@@ -66,27 +66,10 @@ public class SolrMatcherTests
   @BeforeClass
   public static void setup() throws IOException, SAXException, ParserConfigurationException, SolrServerException, InterruptedException
   {
-
-
     // Note that the following property could be set through JVM level arguments too
     System.setProperty("solr.solr.home", "won-matcher-solr/src/test/resources/solr");
 
-    //first, delete the index dir if it's there
-    File indexDir = new File(System.getProperty("solr.solr.home"), "data/index");
-    System.out.println("deleting index dir: " + indexDir);
-    File[] indexDirContents = indexDir.listFiles();
-    boolean deleteSuccessful = true;
-    for (int i = 0; i < indexDirContents.length && deleteSuccessful; i++) {
-      deleteSuccessful = indexDirContents[i].delete();
-    }
-    deleteSuccessful = indexDir.delete();
-    if (deleteSuccessful) {
-      System.out.println("index dir deleted");
-    } else {
-      System.out.println("failed to delete index dir");
-    }
-
-    //now start solr
+    //start solr
     CoreContainer.Initializer initializer = new CoreContainer.Initializer();
     CoreContainer coreContainer = initializer.initialize();
     EmbeddedSolrServer server = new EmbeddedSolrServer(coreContainer, SOLR_CORE_NAME);
@@ -114,14 +97,10 @@ public class SolrMatcherTests
     if (coreContainer != null) {
       coreContainer.shutdown();
     }
-
-
   }
 
 
-
   /*********************** UTILS ************************************/
-
 
   /**
    * Test supposed to find some documents by a one-term query
@@ -130,11 +109,11 @@ public class SolrMatcherTests
   public void testSirenTermQuery() throws IOException
   {
     SirenTermQuery query = new SirenTermQuery(new Term(SolrFields.NTRIPLE, "hasvalue"));
-    assertHitCount(query,5,5,"term query");
+    assertHitCount(query, 5, 5, "term query");
 
     SirenCellQuery cellQuery = new SirenCellQuery(query);
     cellQuery.setConstraint(1);
-    assertHitCount(cellQuery,5,5,"cell query (constraint 1)");
+    assertHitCount(cellQuery, 5, 5, "cell query (constraint 1)");
   }
 
   /**
@@ -146,9 +125,9 @@ public class SolrMatcherTests
     SirenTermQuery query = new SirenTermQuery(new Term(SolrFields.NTRIPLE, "hasvalue"));
     SirenCellQuery cellQuery = new SirenCellQuery(query);
     cellQuery.setConstraint(1);
-    assertHitCount(cellQuery,5,5,"cell query (constraint 1)");
+    assertHitCount(cellQuery, 5, 5, "cell query (constraint 1)");
     cellQuery.setConstraint(0);
-    assertHitCount(cellQuery,0,5,"cell query (constraint 0)");
+    assertHitCount(cellQuery, 0, 5, "cell query (constraint 0)");
   }
 
   /**
@@ -166,7 +145,7 @@ public class SolrMatcherTests
     SirenTupleQuery tupleQuery = new SirenTupleQuery();
     tupleQuery.add(predCellQuery, SirenTupleClause.Occur.MUST);
     tupleQuery.add(objCellQuery, SirenTupleClause.Occur.SHOULD);
-    assertHitCount(tupleQuery,5,10,"tuple query");
+    assertHitCount(tupleQuery, 5, 10, "tuple query");
   }
 
 
@@ -179,7 +158,7 @@ public class SolrMatcherTests
     SirenNumericRangeQuery numQuery = SirenNumericRangeQuery.newFloatRange(SolrFields.NTRIPLE, SIREN_NUMERIC_FIELD_PRECISION_STEP, 0f, 50f, true, true);
     SirenCellQuery cellQuery = new SirenCellQuery(numQuery);
     cellQuery.setConstraint(2);
-    assertHitCount(cellQuery,5,5,"range cell");
+    assertHitCount(cellQuery, 5, 5, "range cell");
   }
 
   /**
@@ -189,26 +168,28 @@ public class SolrMatcherTests
   public void testNumericRangeQuery() throws IOException
   {
     SirenNumericRangeQuery numQuery = SirenNumericRangeQuery.newIntRange(SolrFields.NTRIPLE, SIREN_NUMERIC_FIELD_PRECISION_STEP, -1000, 1000, true, true);
-    assertHitCount(numQuery,0,5,"int range");
+    assertHitCount(numQuery, 0, 5, "int range");
     numQuery = SirenNumericRangeQuery.newLongRange(SolrFields.NTRIPLE, SIREN_NUMERIC_FIELD_PRECISION_STEP, -1000L, 1000L, true, true);
-    assertHitCount(numQuery,0,5,"long range");
+    assertHitCount(numQuery, 0, 5, "long range");
     numQuery = SirenNumericRangeQuery.newDoubleRange(SolrFields.NTRIPLE, SIREN_NUMERIC_FIELD_PRECISION_STEP, -1000d, 1000d, true, true);
-    assertHitCount(numQuery,0,5,"double range");
+    assertHitCount(numQuery, 0, 5, "double range");
     numQuery = SirenNumericRangeQuery.newFloatRange(SolrFields.NTRIPLE, SIREN_NUMERIC_FIELD_PRECISION_STEP, 0f, 50f, true, true);
-    assertHitCount(numQuery,9,10,"float range");
+    assertHitCount(numQuery, 9, 10, "float range");
   }
 
   /**
-   *  Test used to find out how to get the equivalent of this query:
-   *  ASK where {
-   *   ?this gr:color ?color.
-   *   FILTER (?color not in ("natural","black"))
+   * Test used to find out how to get the equivalent of this query:
+   * ASK where {
+   * ?this gr:color ?color.
+   * FILTER (?color not in ("natural","black"))
    * }
+   *
    * @throws Exception
    */
   @Test
   @Ignore
-  public void testNegativeMatch() throws Exception {
+  public void testNegativeMatch() throws Exception
+  {
     SirenBooleanQuery booleanQuery = new SirenBooleanQuery();
     booleanQuery.add(new SirenTermQuery(new Term(SolrFields.NTRIPLE, "natural")), SirenBooleanClause.Occur.MUST_NOT);
     booleanQuery.add(new SirenTermQuery(new Term(SolrFields.NTRIPLE, "black")), SirenBooleanClause.Occur.MUST_NOT);
@@ -217,7 +198,7 @@ public class SolrMatcherTests
     booleanQuery.add(new SirenWildcardQuery(new Term(SolrFields.NTRIPLE, "*")), SirenBooleanClause.Occur.MUST);
     BooleanQuery outerQuery = new BooleanQuery();
 
-    outerQuery.add(new SirenTermQuery(new Term(SolrFields.NTRIPLE,"http://purl.org/goodrelations/v1#color")), BooleanClause.Occur.SHOULD);
+    outerQuery.add(new SirenTermQuery(new Term(SolrFields.NTRIPLE, "http://purl.org/goodrelations/v1#color")), BooleanClause.Occur.SHOULD);
     outerQuery.add(booleanQuery, BooleanClause.Occur.MUST);
     //outerQuery.add(booleanQuery, SirenBooleanClause.Occur.SHOULD);
     assertHitCount(outerQuery, 17, 20, "negative match");
@@ -279,14 +260,14 @@ public class SolrMatcherTests
   }
 
 
-
-  /*********************** UTILS ************************************/
-
+  /**
+   * ******************** UTILS ***********************************
+   */
 
 
   private void assertTopHit(String docId, String topHitDocNum) throws IOException
   {
-    Matcher m = new Matcher(searcher,new ScoreTransformer(), URI.create("http://www.example.com/matcher"));
+    Matcher m = new Matcher(searcher, new ScoreTransformer(), URI.create("http://www.example.com/matcher"));
     HintCountingMatchProcessor proc = new HintCountingMatchProcessor();
     m.addMatchProcessor(proc);
     m.processDocument(testDocuments.get(makeNeedUriString(docId)));
@@ -304,10 +285,10 @@ public class SolrMatcherTests
   private void assertHitCount(final Query query, int expectedCount, int maxCount, String msg) throws IOException
   {
     TopDocs result = searcher.search(query, maxCount);
-    System.out.println(msg +": " + result.totalHits + " docs found");
+    System.out.println(msg + ": " + result.totalHits + " docs found");
     DecimalFormat fmt = new DecimalFormat("##.###");
     for (int i = 0; i < result.scoreDocs.length; i++) {
-      System.out.println(msg +"[" + i + "]: "+ fmt.format(result.scoreDocs[i].score) +", " + reader.document(result.scoreDocs[i].doc).getValues(SolrFields.URL)[0]);
+      System.out.println(msg + "[" + i + "]: " + fmt.format(result.scoreDocs[i].score) + ", " + reader.document(result.scoreDocs[i].doc).getValues(SolrFields.URL)[0]);
     }
     Assert.assertEquals(expectedCount, result.scoreDocs.length);
   }
@@ -324,9 +305,6 @@ public class SolrMatcherTests
   }
 
 
-
-
-
   private static void convertTextualSparqlToSpinRDF(final Model model)
   {
     // SPAQRL queries embedded in the RDF can't use the ns prefixes of the surrounding
@@ -337,6 +315,7 @@ public class SolrMatcherTests
     // replaced by their representation in SPIN RDF.
     SPINUtils.replaceSpinTextWithSpinRdf(model);
   }
+
   private static String getNTriples(String filename, String baseURI) throws FileNotFoundException
   {
     File file = new File(filename);
@@ -347,6 +326,7 @@ public class SolrMatcherTests
     convertTextualSparqlToSpinRDF(model);
     return toNTriples(model, baseURI);
   }
+
   private static Model readTTL(String filename, String baseURI) throws FileNotFoundException
   {
     System.out.println("loading ntriples data for " + baseURI + " from " + filename);
@@ -433,8 +413,9 @@ public class SolrMatcherTests
   }
 
 
-
-  /*********************** TEST DATA ************************************/
+  /**
+   * ******************** TEST DATA ***********************************
+   */
 
   private static Map<String, SolrInputDocument> getTestData() throws FileNotFoundException
   {
@@ -450,11 +431,9 @@ public class SolrMatcherTests
     doc1.addField(SolrFields.TAG, "red");
     doc1.addField(SolrFields.TAG, "leather");
     doc1.addField(SolrFields.TAG, "used");
-    doc1.addField(SolrFields.LOWER_PRICE_LIMIT, 10.0);
-    doc1.addField(SolrFields.UPPER_PRICE_LIMIT, 100.0);
+    doc1.addField(SolrFields.PRICE, "10.0-100.0");
     doc1.addField(SolrFields.LOCATION, "48.2088,16.3726");
-    doc1.addField(SolrFields.TIME_START, "2013-08-01T00:01:00.000Z");
-    doc1.addField(SolrFields.TIME_END, "2013-08-30T23:00:00.000Z");
+    doc1.addField(SolrFields.DURATION, "2013-08-01T00:01:00.000Z/2013-08-30T23:00:00.000Z");
 
     docs.put(url, doc1);
 
@@ -468,10 +447,9 @@ public class SolrMatcherTests
     doc2.addField(SolrFields.TAG, "blue");
     doc2.addField(SolrFields.TAG, "dirty");
     doc2.addField(SolrFields.TAG, "couch");
-    doc2.addField(SolrFields.LOWER_PRICE_LIMIT, 50.0);
+    doc2.addField(SolrFields.PRICE, "50.0-*");
     doc2.addField(SolrFields.LOCATION, "48.3089,16.3726");
-    doc2.addField(SolrFields.TIME_START, "2013-07-01T00:01:00.000Z");
-    doc2.addField(SolrFields.TIME_END, "2013-08-30T23:00:00.000Z");
+    doc2.addField(SolrFields.DURATION, "2013-07-01T00:01:00.000Z/2013-08-30T23:00:00.000Z");
 
     docs.put(url, doc2);
 
@@ -485,8 +463,7 @@ public class SolrMatcherTests
     doc3.addField(SolrFields.TAG, "family");
     doc3.addField(SolrFields.TAG, "suburbs");
     doc3.addField(SolrFields.TAG, "kids");
-    doc3.addField(SolrFields.LOWER_PRICE_LIMIT, 100000.0);
-    doc3.addField(SolrFields.UPPER_PRICE_LIMIT, 500000.0);
+    doc3.addField(SolrFields.PRICE, "100000.0-500000.0");
     doc3.addField(SolrFields.LOCATION, "48.2088,16.3726");
 
     docs.put(url, doc3);
@@ -500,10 +477,9 @@ public class SolrMatcherTests
     doc4.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
     doc4.addField(SolrFields.TAG, "sofa");
     doc4.addField(SolrFields.TAG, "furniture");
-    doc4.addField(SolrFields.UPPER_PRICE_LIMIT, 150.0);
+    doc4.addField(SolrFields.PRICE, "*-150.0");
     doc4.addField(SolrFields.LOCATION, "48.2088,16.3726");
-    doc4.addField(SolrFields.TIME_START, "2013-06-01T00:01:00.000Z");
-    doc4.addField(SolrFields.TIME_END, "2013-07-30T23:00:00.000Z");
+    doc4.addField(SolrFields.DURATION, "2013-06-01T00:01:00.000Z/2013-07-30T23:00:00.000Z");
 
 
     docs.put(url, doc4);
@@ -519,10 +495,9 @@ public class SolrMatcherTests
     doc5.addField(SolrFields.TAG, "red");
     doc5.addField(SolrFields.TAG, "couch");
     doc5.addField(SolrFields.TAG, "leather");
-    doc5.addField(SolrFields.UPPER_PRICE_LIMIT, 50.0);
+    doc5.addField(SolrFields.PRICE, "*-50.0");
     doc5.addField(SolrFields.LOCATION, "48.2088,16.3726");
-    doc5.addField(SolrFields.TIME_START, "2013-07-01T00:01:00.000Z");
-    doc5.addField(SolrFields.TIME_END, "2013-09-30T23:00:00.000Z");
+    doc5.addField(SolrFields.DURATION, "2013-07-01T00:01:00.000Z/2013-09-30T23:00:00.000Z");
 
     docs.put(url, doc5);
 
@@ -535,7 +510,7 @@ public class SolrMatcherTests
     doc6.addField(SolrFields.TAG, "house");
     doc6.addField(SolrFields.TAG, "apartment");
     doc6.addField(SolrFields.TAG, "family");
-    doc6.addField(SolrFields.UPPER_PRICE_LIMIT, 250000.0);
+    doc6.addField(SolrFields.PRICE, "*-250000.0");
     doc6.addField(SolrFields.LOCATION, "48.2088,16.3726");
 
     docs.put(url, doc6);
