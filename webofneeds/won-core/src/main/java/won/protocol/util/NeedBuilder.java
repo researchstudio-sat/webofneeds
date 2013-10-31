@@ -25,8 +25,8 @@ import java.net.URI;
 import java.util.Date;
 
 /**
- * User: fkleedorfer
- * Date: 18.09.13
+ * Builder interface for building Need objects.
+ * TODO [REFACTORING]: move all the builder stuff to its own package.
  */
 public interface NeedBuilder<T>
 {

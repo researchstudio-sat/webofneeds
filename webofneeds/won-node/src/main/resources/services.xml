@@ -44,7 +44,6 @@
     </bean>
 
     <bean id="matcherProtocolNeedService" class="won.node.protocol.impl.MatcherProtocolNeedServiceImpl">
-        <property name="needInformationService" ref="needInformationService" />
         <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
     </bean>
 

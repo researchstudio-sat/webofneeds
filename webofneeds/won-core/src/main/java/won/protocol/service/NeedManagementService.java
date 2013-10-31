@@ -16,18 +16,15 @@
 
 package won.protocol.service;
 
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.model.Match;
 
 import java.net.URI;
-import java.util.Collection;
 
 /**
- * User: fkleedorfer
- * Date: 05.11.12
+ * Service for creating and manipulating needs.
+ * TODO [REFACTORING]: delete and move methods to owner and node interfaces.
  */
 public interface NeedManagementService
 {

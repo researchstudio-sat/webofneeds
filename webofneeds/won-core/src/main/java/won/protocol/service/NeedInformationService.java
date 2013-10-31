@@ -28,8 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * User: fkleedorfer
- * Date: 05.11.12
+ * Service for obtaining information about needs and connections in the system in RDF.
  */
 public interface NeedInformationService {
 

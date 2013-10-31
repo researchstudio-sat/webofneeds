@@ -1,8 +1,8 @@
 package won.protocol.solr;
 
 /**
- * User: atus
- * Date: 03.07.13
+ * Constants required for use with our solr schema.
+ * TODO [REFACTORING]: move to a solr-specific module containing the client code required to write to the solr index
  */
 public class SolrFields
 {

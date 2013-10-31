@@ -23,8 +23,8 @@ import won.protocol.exception.NoSuchNeedException;
 import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 26.11.12
+ * Linked data interface for the WON node.
+ * TODO [REFACTORING]: move this interface to won-node module
  */
 public interface LinkedDataService
 {
