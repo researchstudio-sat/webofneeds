@@ -21,7 +21,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Match;
-
+import org.apache.camel.Exchange;
 import java.net.URI;
 import java.util.Collection;
 

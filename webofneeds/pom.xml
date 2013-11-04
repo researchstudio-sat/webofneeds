@@ -102,7 +102,11 @@
                 <artifactId>jms</artifactId>
                 <version>${jms.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
             <!-- SIREn-->
             <dependency>
                 <groupId>org.sindice.siren</groupId>
@@ -553,6 +557,7 @@
         <activemq.version>5.8.0</activemq.version>
         <activemq.conf>classpath:</activemq.conf>
         <jms.version>1.1</jms.version>
+        <guava.version>15.0</guava.version>
         <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed-->
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>

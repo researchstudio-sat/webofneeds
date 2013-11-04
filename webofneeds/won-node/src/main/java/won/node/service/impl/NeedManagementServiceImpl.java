@@ -17,6 +17,7 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -49,8 +49,11 @@
 
     <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
         <property name="delegate" ref="ownerProtocolNeedServiceClientJMSBased" />
-        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
-        <property name="uriService" ref="uriService" />
+        <!--property name="linkedDataRestClient" ref="linkedDataRestClient" />
+        <property name="uriService" ref="uriService" /-->
+    </bean>
+
+    <bean id="ownerProtocolNeedReadService" class="won.owner.protocol.impl.OwnerProtocolNeedReadServiceImpl">
     </bean>
 
     <bean id="uriService" class="won.owner.service.impl.URIService">
@@ -59,7 +62,7 @@
     </bean>
 
     <bean id="dataReloadService" class="won.owner.service.impl.DataReloadService">
-        <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
+        <property name="ownerService" ref="ownerProtocolNeedReadService" />
     </bean>
 
     <!-- Model Mapper for RDF -->

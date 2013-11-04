@@ -41,10 +41,11 @@
         <camel:packageScan>
             <camel:package>won.node.routes</camel:package>
         </camel:packageScan>
-        <camel:template id="producerTemplate"/>
+        <camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
     </camel:camelContext>
-    <bean id="activemqComponent" class="org.apache.activemq.camel.component.ActiveMQComponent">
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
          <property name="brokerURL" value="vm://localhost:61616"/>
+
     </bean>
 
     <!-- Configure Message Broker -->
@@ -91,19 +92,17 @@
         <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
         <property name="sessionCacheSize" value="10"></property>
     </bean>
-    <bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
+    <!--bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
         <constructor-arg value="WON.MSG"></constructor-arg>
-    </bean>
+    </bean-->
     <!-- bean id="producerTemplate" class="org.apache.camel.impl.DefaultProducerTemplate">
         <property name="connectionFactory" ref="cachedConnectionFactory"></property>
         <property name="defaultDestination" ref="destination"></property>
     </bean -->
-    <bean id="ownerProtocolNeedServiceJmsBased" class="won.node.jms.OwnerProtocolNeedServiceImplJMSBased" >
-        <property name="delegate" ref="ownerProtocolNeedService" />
-    </bean>
-    <jms:listener-container container-type="default" connection-factory="cachedConnectionFactory" acknowledge="auto">
+
+    <!--jms:listener-container container-type="default" connection-factory="cachedConnectionFactory" acknowledge="auto">
         <jms:listener destination="WON.MSG" ref="ownerProtocolNeedServiceJmsBased" method="onMessage"></jms:listener>
-    </jms:listener-container>
+    </jms:listener-container-->
 
     <!-- Database connection -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">

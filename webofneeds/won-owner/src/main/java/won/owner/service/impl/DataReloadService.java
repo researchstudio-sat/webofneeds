@@ -3,6 +3,7 @@ package won.owner.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.owner.protocol.impl.OwnerProtocolNeedReadService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
@@ -23,7 +24,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class DataReloadService {
-    private OwnerProtocolNeedService ownerService;
+    private OwnerProtocolNeedReadService ownerService;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -36,7 +37,7 @@ public class DataReloadService {
     @Autowired
     private ConnectionRepository connectionRepository;
 
-    public void setOwnerService(OwnerProtocolNeedService ownerService) {
+    public void setOwnerService(OwnerProtocolNeedReadService ownerService) {
         this.ownerService = ownerService;
     }
 

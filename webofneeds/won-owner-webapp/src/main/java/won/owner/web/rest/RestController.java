@@ -1,6 +1,7 @@
 package won.owner.web.rest;
 
 
+import com.google.common.util.concurrent.SettableFuture;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
+import won.owner.protocol.impl.OwnerProtocolNeedServiceClientSide;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
 import won.protocol.exception.IllegalNeedContentException;
@@ -38,6 +40,8 @@ import javax.ws.rs.core.MediaType;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @Controller
 @RequestMapping("/")
@@ -48,7 +52,7 @@ public class RestController
 
   @Autowired
   @Qualifier("ownerProtocolNeedServiceClientJMSBased")
-  private OwnerProtocolNeedService ownerService;
+  private OwnerProtocolNeedServiceClientSide ownerService;
 
   @Autowired
   private NeedRepository needRepository;
@@ -84,7 +88,7 @@ public class RestController
     this.uriService = uriService;
   }
 
-  public void setOwnerService(OwnerProtocolNeedService ownerService)
+  public void setOwnerService(OwnerProtocolNeedServiceClientSide ownerService)
   {
     this.ownerService = ownerService;
   }
@@ -175,8 +179,7 @@ public class RestController
       produces = MediaType.APPLICATION_JSON,
       method = RequestMethod.POST
       )
-  public NeedPojo createNeed(NeedPojo needPojo)
-  {
+  public NeedPojo createNeed(NeedPojo needPojo) throws ExecutionException, InterruptedException {
 
     logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getCreationDate() + "/" +
         needPojo.getLongitude() + "/" + needPojo.getLatitude() + "/" + (needPojo.getState() == NeedState.ACTIVE));
@@ -207,8 +210,7 @@ public class RestController
     return returnList;
   }
 
-  private NeedPojo resolve(NeedPojo needPojo)
-  {
+  private NeedPojo resolve(NeedPojo needPojo) throws ExecutionException, InterruptedException {
 
 
     if (needPojo.getNeedId() >= 0) {
@@ -290,9 +292,11 @@ public class RestController
       needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
 
       if (needPojo.getWonNode().equals("")) {
-        needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+        Future<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+        needURI = futureResult.get();
       } else {
-        needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, URI.create(needPojo.getWonNode()));
+        Future<URI> futureResult = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, URI.create(needPojo.getWonNode()));
+        needURI = futureResult.get();
       }
 
       List<Need> needs = needRepository.findByNeedURI(needURI);

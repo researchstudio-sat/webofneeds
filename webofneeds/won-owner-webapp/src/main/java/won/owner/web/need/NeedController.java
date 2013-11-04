@@ -39,6 +39,8 @@ import won.protocol.vocabulary.WON;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Created with IntelliJ IDEA.
@@ -53,7 +55,7 @@ public class NeedController
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  @Qualifier("ownerProtocolNeedServiceClientJMSBased")
+  @Qualifier("ownerProtocolNeedServiceClient")
   private OwnerProtocolNeedServiceClientSide ownerService;
 
   @Autowired
@@ -115,8 +117,7 @@ public class NeedController
   }
 
   @RequestMapping(value = "/create", method = RequestMethod.POST)
-  public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model)
-  {
+  public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) throws ExecutionException, InterruptedException {
     URI needURI;
 
     try {
@@ -193,13 +194,15 @@ public class NeedController
       needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
 
       if (needPojo.getWonNode().equals("")) {
-        needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+          Future<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+          needURI = futureResult.get();
       } else {
-        needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, URI.create(needPojo.getWonNode()));
+          Future<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE,URI.create(needPojo.getWonNode()));
+          needURI = futureResult.get();
       }
 
       List<Need> needs = needRepository.findByNeedURI(needURI);
-
+      //TODO: race condition between need saving logic and redirect. adapt interface.
       if (needs.size() == 1)
         return "redirect:/need/" + needs.get(0).getId().toString();
       // return viewNeed(need.getId().toString(), model);
@@ -307,9 +310,13 @@ public class NeedController
       logger.warn("caught IllegalMessageForNeedStateException:", e);
     } catch (NoSuchNeedException e) {
       logger.warn("caught NoSuchNeedException:", e);
+    }  catch (InterruptedException e) {
+       logger.warn("caught InterruptedException", e);
+    } catch (ExecutionException e) {
+        logger.warn("caught ExcutionException", e);
     }
 
-    return "noNeedFound";
+      return "noNeedFound";
   }
 
   @RequestMapping(value = "/{needId}/toggle", method = RequestMethod.POST)
@@ -352,8 +359,12 @@ public class NeedController
       logger.warn("caught IllegalMessageForNeedStateException:", e);
     } catch (NoSuchNeedException e) {
       logger.warn("caught NoSuchNeedException:", e);
+    } catch (InterruptedException e) {
+      logger.warn("caught InterruptedEception",e);
+    } catch (ExecutionException e) {
+      logger.warn("caught ExecutionException",e);
     }
 
-    return ret;
+      return ret;
   }
 }

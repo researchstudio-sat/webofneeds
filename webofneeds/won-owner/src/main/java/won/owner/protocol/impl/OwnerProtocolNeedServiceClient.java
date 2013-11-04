@@ -6,28 +6,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.service.impl.URIService;
-import won.owner.ws.OwnerProtocolNeedClientFactory;
 import won.protocol.exception.*;
 import won.protocol.model.*;
-import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.*;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.NeedModelMapper;
-import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
-import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
-import won.protocol.ws.fault.*;
 
-import javax.jms.JMSException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Implementation of the OwnerProtocolNeedService to be used on the owner side. It contains the
@@ -52,9 +46,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private LinkedDataRestClient linkedDataRestClient;
 
-    private URIService uriService;
+
 
 
     @Autowired
@@ -66,17 +59,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     @Autowired
     private NeedRepository needRepository;
 
-    @Autowired
-    private EventRepository eventRepository;
-
-    @Autowired
-    private MatchRepository matchRepository;
-
-    @Autowired
-    private NeedModelMapper needModelMapper;
-
-    @Autowired
-    private ConnectionModelMapper connectionModelMapper;
 
     //ref=ownerProtocolNeedServiceClientJMSBased
     private OwnerProtocolNeedServiceClientSide delegate;
@@ -161,33 +143,51 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
 
     @Override
-    public URI createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException, ExecutionException, InterruptedException {
         return createNeed(ownerURI, content, activate, null);
     }
 
     @Override
-    public URI createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException {
+    public Future<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeURI) throws IllegalNeedContentException, ExecutionException, InterruptedException {
         logger.info("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
                 new Object[]{ownerURI, content, activate});
 
-        URI uri = delegate.createNeed(ownerURI, content, activate, wonNodeURI);
-        Need need = new Need();
-        need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
-        need.setOwnerURI(ownerURI);
-        need.setNeedURI(uri);
-        needRepository.saveAndFlush(need);
+        final Future<URI> uri = delegate.createNeed(ownerURI, content, activate, wonNodeURI);
+
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        Need need = new Need();
+                        try {
+                            need.setNeedURI(uri.get());
+                           // logger.info(need.getNeedURI().toString());
+                            need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
+                            need.setOwnerURI(ownerURI);
+                            needRepository.saveAndFlush(need);
+                            logger.info("saving URI", need.getNeedURI().toString());
+                        } catch (InterruptedException e) {
+                            logger.warn("interrupted",e);
+                        } catch (ExecutionException e) {
+                            logger.warn("ExecutionException caught",e);
+                        }
+
+
+                    }
+                }
+        ).start();
 
         return uri;
 
     }
 
     @Override
-    public URI connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+    public Future<URI> connect(final URI needURI, final  URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException {
         logger.info("need-facing: CONNECT called for other need {}, own need {} and content {}", new Object[]{needURI, otherNeedURI, content});
-        try {
-            URI uri = delegate.connect(needURI, otherNeedURI, content);
 
-            List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri);
+            final Future<URI> uri = delegate.connect(needURI, otherNeedURI, content);
+
+            List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri.get());
             if (existingConnections.size() > 0) {
                 for (Connection conn : existingConnections) {
                     if (ConnectionState.CONNECTED == conn.getState() ||
@@ -199,136 +199,38 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                     }
                 }
             } else {
-                //Create new connection object
-                Connection con = new Connection();
-                con.setNeedURI(needURI);
-                con.setState(ConnectionState.REQUEST_SENT);
-                con.setRemoteNeedURI(otherNeedURI);
-                //set new uri
-                con.setConnectionURI(uri);
-                connectionRepository.saveAndFlush(con);
+                new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+
+                                //set new uri
+                                try {
+                                    //Create new connection object
+                                    Connection con = new Connection();
+                                    con.setNeedURI(needURI);
+                                    con.setState(ConnectionState.REQUEST_SENT);
+                                    con.setRemoteNeedURI(otherNeedURI);
+                                    con.setConnectionURI(uri.get());
+                                    connectionRepository.saveAndFlush(con);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                } catch (ExecutionException e) {
+                                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                }
+
+                            }
+                        }
+                ).start();
+
             }
-            return uri;
-        } catch (NoSuchNeedException e) {
-            logger.warn("caught NoSuchNeedException", e);
-        }
-        return null;
+
+
+        return uri;
     }
 
-    @Override
-    public Collection<URI> listNeedURIs() {
-        logger.debug("need-facing: LIST_NEED_URIS called");
-        return getHardcodedCollectionResource(NEED_URI_PATH_PREFIX);
-    }
 
-    @Override
-    public Collection<URI> listNeedURIs(int page) {
-        logger.debug("need-facing: LIST_NEED_URIS called for page {}", page);
-        return getHardcodedCollectionResource(NEED_URI_PATH_PREFIX + "?page=" + page);
-    }
 
-    @Override
-    public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException {
-        logger.debug("need-facing: LIST_CONNECTION_URIS called for need {}", needURI);
-        return getHardcodedCollectionResource(needURI, NEED_CONNECTION_URI_PATH_SUFFIX);
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs() {
-        logger.debug("need-facing: LIST_CONNECTION_URIS called");
-        return getHardcodedCollectionResource(CONNECTION_URI_PATH_PREFIX);
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs(int page) {
-        logger.debug("need-facing: LIST_CONNECTION_URIS called for page {}", page);
-        return getHardcodedCollectionResource(CONNECTION_URI_PATH_PREFIX + "?page=" + page);
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException {
-        logger.debug("need-facing: LIST_CONNECTION_URIS called for need {} and page {}", needURI, page);
-        return getHardcodedCollectionResource(needURI, NEED_CONNECTION_URI_PATH_SUFFIX + "?page=" + page);
-    }
-
-    @Override
-    public Need readNeed(URI needURI) throws NoSuchNeedException {
-        logger.debug("need-facing: READ_NEED called for need {}", needURI);
-
-        Need n = needModelMapper.fromModel(readNeedContent(needURI));
-        n.setOwnerURI(uriService.getOwnerProtocolOwnerServiceEndpointURI());
-        return n;
-    }
-
-    @Override
-    public Model readNeedContent(URI needURI) throws NoSuchNeedException {
-        logger.debug("need-facing: READ_NEED_CONTENT called for need {}", needURI);
-
-        return getHardcodedNeedResource(needURI, "");
-    }
-
-    @Override
-    public Connection readConnection(URI connectionURI) throws NoSuchConnectionException {
-        logger.debug("need-facing: READ_CONNECTION called for connection {}", connectionURI);
-
-        return connectionModelMapper.fromModel(readConnectionContent(connectionURI));
-    }
-
-    @Override
-    public List<ConnectionEvent> readEvents(final URI connectionURI) throws NoSuchConnectionException {
-        return eventRepository.findByConnectionURI(connectionURI);
-    }
-
-    @Override
-    public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException {
-        logger.debug("need-facing: READ_CONNECTION_CONTENT called for connection {}", connectionURI);
-        URI connectionProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.OWNER_PROTOCOL_ENDPOINT);
-        if (connectionProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
-
-        return linkedDataRestClient.readResourceData(URI.create(connectionProtocolEndpoint.toString()));
-    }
-
-    private Collection<URI> getHardcodedCollectionResource(URI needURI, String res) throws NoSuchNeedException {
-        Model mUris = getHardcodedNeedResource(needURI, res);
-
-        Stack<URI> uris = new Stack<URI>();
-        for (Statement stmt : mUris.listStatements().toList()) {
-            uris.push(URI.create(stmt.getObject().toString()));
-        }
-
-        return uris;
-    }
-
-    private Collection<URI> getHardcodedCollectionResource(String res) {
-        Model mUris = getHardcodedResource(res);
-
-        Stack<URI> uris = new Stack<URI>();
-        for (Statement stmt : mUris.listStatements().toList()) {
-            uris.push(URI.create(stmt.getObject().toString()));
-        }
-
-        return uris;
-    }
-
-    private Model getHardcodedNeedResource(URI needURI, String res) throws NoSuchNeedException {
-        if (res.equals(""))
-            return linkedDataRestClient.readResourceData(needURI);
-        else
-            return linkedDataRestClient.readResourceData(URI.create(needURI.toString() + res));
-    }
-
-    private Model getHardcodedResource(String res) {
-        return linkedDataRestClient.readResourceData(
-                URI.create(this.uriService.getDefaultOwnerProtocolNeedServiceEndpointURI().toString() + res));
-    }
-
-    public void setLinkedDataRestClient(LinkedDataRestClient linkedDataRestClient) {
-        this.linkedDataRestClient = linkedDataRestClient;
-    }
-
-    public void setUriService(final URIService uriService) {
-        this.uriService = uriService;
-    }
 
     public void setDelegate(OwnerProtocolNeedServiceClientSide delegate) {
         this.delegate = delegate;

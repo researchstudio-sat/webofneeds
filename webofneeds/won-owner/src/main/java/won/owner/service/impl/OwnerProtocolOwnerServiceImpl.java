@@ -202,6 +202,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService,
         chatMessageRepository.saveAndFlush(chatMessage);
     }
 
+
     public void setOwnerService(OwnerProtocolNeedServiceClientJMSBased ownerService) {
         this.ownerService = ownerService;
     }

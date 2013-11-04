@@ -27,10 +27,12 @@
     <camel:camelContext>
 
         <camel:packageScan>
-            <camel:package>won.node.routes</camel:package>
+            <camel:package>won.owner.routes</camel:package>
         </camel:packageScan>
-        <camel:template id="producerTemplate" defaultEndpoint="activemq:WON.MSG"/>
-        <camel:endpoint id="needMessageQueue" uri="activemq:WON.MSG"></camel:endpoint>
+        <camel:template id="producerTemplate" defaultEndpoint="direct:OUTMSG1"/>
+        <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG" />
+        <camel:endpoint id="needMessageQueue" uri="activemq:WON.MSG" pattern="InOut"></camel:endpoint>
+
     </camel:camelContext>
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
           <property name="configuration" ref="jmsConfig"></property>
@@ -56,9 +58,9 @@
 
     <!-- bean for consuming messages -->
 
-    <jms:listener-container container-type="default" connection-factory="cachedConnectionFactory" acknowledge="auto">
-        <jms:listener destination="WON.MSG" ref="ownerProtocolOwnerServiceImpl" method="onMessage"></jms:listener>
-    </jms:listener-container>
+    <!--jms:listener-container container-type="default" connection-factory="cachedConnectionFactory" acknowledge="auto">
+        <jms:listener destination="WON.CREATENEED" ref="ownerProtocolOwnerServiceImpl" method="onMessage"></jms:listener>
+    </jms:listener-container-->
     <!--bean id="needMessageCreator" class="won.owner.protocol.impl.NeedMessageCreatorImpl"></bean-->
     <!-- Activate Annotation based configuration -->
     <context:annotation-config />

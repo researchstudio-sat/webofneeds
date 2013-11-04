@@ -16,24 +16,27 @@
 
 package won.owner.protocol.impl;
 import javax.jms.Destination;
+
+import com.google.common.util.concurrent.SettableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.*;
 import org.apache.camel.impl.DefaultExchange;
+import org.apache.camel.spi.Synchronization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.owner.ws.OwnerProtocolNeedClientFactory;
 import won.protocol.exception.*;
-import won.protocol.model.ConnectionEvent;
-import won.protocol.model.Need;
 import won.protocol.util.RdfUtils;
+import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
+import won.protocol.ws.fault.NoSuchNeedFault;
 
 import javax.jms.JMSException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * User: LEIH-NB
@@ -50,22 +53,67 @@ public class OwnerProtocolNeedServiceClientJMSBased implements OwnerProtocolNeed
 
 
     @Override
-    public URI connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-       throw new UnsupportedOperationException("not yet implemented");
+    public Future<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+        Exchange exchange = new DefaultExchange(getCamelContext());
+
+        Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
+
+        exchange.setProperty("methodName", "connect");
+        exchange.getIn().setHeader("needURI", needURI.toString());
+        exchange.getIn().setHeader("otherNeedURI", otherNeedURI.toString());
+        exchange.getIn().setHeader("content",RdfUtils.toString(content));
+
+        exchange.setPattern(ExchangePattern.InOut);
+        final SettableFuture result = SettableFuture.create();
+
+        Future<Exchange> resultAsync = producerTemplate.asyncCallback(ep,exchange, new Synchronization() {
+            @Override
+            public void onComplete(Exchange exchange) {
+                URI resultObject = (URI)exchange.getOut().getBody();
+                result.set(resultObject);
+            }
+
+            @Override
+            public void onFailure(Exchange exchange) {
+                result.cancel(true);
+            }
+        });
+
+        logger.info("sending create message:owner-uri");
+
+
+        return result;
     }
 
     @Override
     public void deactivate(URI needURI) throws NoSuchNeedException {
-        throw new UnsupportedOperationException("not yet implemented");
+        Exchange exchange = new DefaultExchange(getCamelContext());
+        Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
+
+        exchange.setProperty("methodName", "deactivate");
+        exchange.getIn().setHeader("needURI", needURI.toString());
+
+        producerTemplate.send(ep,exchange);
+        logger.info("sending deactivate message:need-uri");
     }
 
     @Override
     public void activate(URI needURI) throws NoSuchNeedException {
-        throw new UnsupportedOperationException("not yet implemented");
+
+
+        Exchange exchange = new DefaultExchange(getCamelContext());
+        Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
+
+        exchange.setProperty("methodName", "activate");
+        exchange.getIn().setHeader("needURI", needURI.toString());
+
+        producerTemplate.send(ep,exchange);
+        logger.info("sending activate message: "+ needURI.toString());
+
     }
 
     @Override
-    public URI createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
         return createNeed(ownerURI, content, activate,null);
 
     }
@@ -94,7 +142,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements OwnerProtocolNeed
     }
 
     @Override
-    public URI createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException {
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException {
         //throw new UnsupportedOperationException("not yet implemented");
 
                 Exchange exchange = new DefaultExchange(getCamelContext());
@@ -102,16 +150,44 @@ public class OwnerProtocolNeedServiceClientJMSBased implements OwnerProtocolNeed
               //  NeedMessageCreator nmc = new NeedMessageCreatorImpl(ownerURI, content, activate);
               //  Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
                // Message message = needMessageCreator.createMessage(session, ownerURI, content, activate);
-                Endpoint ep = getCamelContext().getEndpoint("needMessageQueue");
+                Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
                 Map mapMessage = new HashMap();
-                mapMessage.put("ownerURI", ownerURI.toString());
-                mapMessage.put("model", RdfUtils.toString(content));
-                mapMessage.put("activate", activate);
-                exchange.getIn().setBody(mapMessage);
+
+                exchange.setProperty("ownerURI", ownerURI.toString());
+                exchange.setProperty("model", RdfUtils.toString(content));
+                exchange.setProperty("activate", activate);
+                //exchange.getIn().setBody(mapMessage);
                 //camelContext.
-                producerTemplate.send(ep,exchange);
+                //exchange.getIn().setHeaders(mapMessage);
+
+                exchange.getIn().setHeader("ownerURI", ownerURI.toString());
+                exchange.getIn().setHeader("model", RdfUtils.toString(content));
+                exchange.getIn().setHeader("activate", activate);
+                exchange.setPattern(ExchangePattern.InOut);
+                final SettableFuture<URI> result = SettableFuture.create();
+
+                Future<Exchange> resultAsync = producerTemplate.asyncCallback(ep, exchange, new Synchronization() {
+                    @Override
+                    public void onComplete(Exchange exchange) {
+
+                        URI resultObject = (URI) exchange.getOut().getBody();
+                        result.set(resultObject);
+                        logger.info("onComplete");
+                    }
+
+                    @Override
+                    public void onFailure(Exchange exchange) {
+                        result.cancel(true);
+                        logger.info("onFailure");
+                    }
+                });
                 logger.info("sending create message:owner-uri");
-                return null;
+                logger.info("Result: "+result.toString());
+                return result;
+               // exchange.getIn().setBody("Syncronous");
+               // Object result = producerTemplate.requestBodyAndHeaders("direct:OUTMSG",exchange.getIn().getBody(), exchange.getIn().getHeaders());
+        //producerTemplate.send(ep,exchange);
+
               //  Endpoint endpoint = c
                 // Exchange exchange =
 
@@ -128,60 +204,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements OwnerProtocolNeed
 
     }
 
-    @Override
-    public Collection<URI> listNeedURIs() {
-        throw new UnsupportedOperationException("not implemented");
-    }
 
-    @Override
-    public Collection<URI> listNeedURIs(int page) {
-        throw new UnsupportedOperationException("not implemented");
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException {
-        throw new UnsupportedOperationException("not implemented");
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs() {
-        throw new UnsupportedOperationException("not implemented");
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs(int page) {
-        throw new UnsupportedOperationException("not implemented");
-    }
-
-    @Override
-    public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException {
-        throw new UnsupportedOperationException("not implemented");
-    }
-
-    @Override
-    public Need readNeed(URI needURI) throws NoSuchNeedException {
-        throw new UnsupportedOperationException("not implemented");
-    }
-
-    @Override
-    public Model readNeedContent(URI needURI) throws NoSuchNeedException {
-        throw new UnsupportedOperationException("not implemented");
-    }
-
-    @Override
-    public won.protocol.model.Connection readConnection(URI connectionURI) throws NoSuchConnectionException {
-        throw new UnsupportedOperationException("not implemented");
-    }
-
-    @Override
-    public List<ConnectionEvent> readEvents(URI connectionURI) throws NoSuchConnectionException {
-        throw new UnsupportedOperationException("not implemented");
-    }
-
-    @Override
-    public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException {
-        throw new UnsupportedOperationException("not implemented");
-    }
     public void setClientFactory(OwnerProtocolNeedClientFactory clientFactory) {
         this.clientFactory = clientFactory;
     }

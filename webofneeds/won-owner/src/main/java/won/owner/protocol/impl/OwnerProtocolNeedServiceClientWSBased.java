@@ -16,6 +16,7 @@
 
 package won.owner.protocol.impl;
 
+import com.google.common.util.concurrent.SettableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,6 @@ import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
-import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 import won.protocol.ws.fault.*;
@@ -33,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * User: LEIH-NB
@@ -43,7 +44,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     private OwnerProtocolNeedClientFactory clientFactory;
 
 
-    @Override
+    //@Override
     public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
         try {
@@ -57,8 +58,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
             throw NoSuchConnectionFault.toException(noSuchConnectionFault);
         }
     }
-
-    @Override
+    //@Override
     public void close(URI connectionURI, Model content) throws
             NoSuchConnectionException, IllegalMessageForConnectionStateException {
         try {
@@ -73,7 +73,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
         }
     }
 
-    @Override
+    //@Override
     public void textMessage(URI connectionURI, String message) throws
             NoSuchConnectionException, IllegalMessageForConnectionStateException {
         try {
@@ -89,18 +89,21 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
 
-    @Override
-    public URI createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
+    //@Override
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
         return createNeed(ownerURI, content, activate,null);
     }
 
-    @Override
-    public URI createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException {
+    //@Override
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(wonNodeURI);
             content.setNsPrefix("",ownerURI.toString());
             String modelAsString = RdfUtils.toString(content);
-            return proxy.createNeed(ownerURI, modelAsString , activate);
+            URI result = proxy.createNeed(ownerURI, modelAsString , activate);
+            SettableFuture<URI> futureResult = SettableFuture.create();
+            futureResult.set(result);
+            return  futureResult;
         } catch (MalformedURLException e) {
             logger.warn("couldn't create URL for needProtocolEndpoint", e);
         } catch (NoSuchNeedException e) {
@@ -111,7 +114,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
         return null;
     }
 
-    @Override
+    //@Override
     public void activate(URI needURI) throws NoSuchNeedException {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
@@ -122,8 +125,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
             throw NoSuchNeedFault.toException(noSuchNeedFault);
         }
     }
-
-    @Override
+    //@Override
     public void deactivate(URI needURI) throws NoSuchNeedException {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
@@ -135,12 +137,14 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
         }
     }
 
-    @Override
-    public URI connect(URI needURI, URI otherNeedURI, Model content) throws
+    //@Override
+    public Future<URI> connect(URI needURI, URI otherNeedURI, Model content) throws
             NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
-            return proxy.connect(needURI, otherNeedURI, RdfUtils.toString(content));
+            SettableFuture futureResult = SettableFuture.create();
+            futureResult.set(proxy.connect(needURI, otherNeedURI, RdfUtils.toString(content)));
+            return futureResult;
         } catch (MalformedURLException e) {
             logger.warn("couldn't create URL for needProtocolEndpoint", e);
         } catch (NoSuchNeedFault noSuchNeedFault) {
@@ -152,58 +156,56 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
         }
         return null;
     }
-
-    @Override
+    //@Override
     public Collection<URI> listNeedURIs() {
         throw new UnsupportedOperationException("not implemented");
     }
 
-    @Override
+    //@Override
     public Collection<URI> listNeedURIs(int page) {
         throw new UnsupportedOperationException("not implemented");
     }
 
-    @Override
+    //@Override
     public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException {
         throw new UnsupportedOperationException("not implemented");
     }
 
-    @Override
+    //@Override
     public Collection<URI> listConnectionURIs() {
         throw new UnsupportedOperationException("not implemented");
     }
 
-    @Override
+    //@Override
     public Collection<URI> listConnectionURIs(int page) {
         throw new UnsupportedOperationException("not implemented");
     }
 
-    @Override
+    //@Override
     public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException {
         throw new UnsupportedOperationException("not implemented");
     }
 
-    @Override
+    //@Override
     public Need readNeed(URI needURI) throws NoSuchNeedException {
         throw new UnsupportedOperationException("not implemented");
     }
 
-    @Override
+    //@Override
     public Model readNeedContent(URI needURI) throws NoSuchNeedException {
         throw new UnsupportedOperationException("not implemented");
     }
 
-    @Override
+    //@Override
     public Connection readConnection(URI connectionURI) throws NoSuchConnectionException {
         throw new UnsupportedOperationException("not implemented");
     }
 
-    @Override
+    //@Override
     public List<ConnectionEvent> readEvents(URI connectionURI) throws NoSuchConnectionException {
         throw new UnsupportedOperationException("not implemented");
     }
-
-    @Override
+    //@Override
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException {
         throw new UnsupportedOperationException("not implemented");
     }

@@ -40,6 +40,10 @@
             <groupId>javax.jms</groupId>
             <artifactId>jms</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+        </dependency>
         <!-- REST stuff -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
