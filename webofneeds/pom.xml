@@ -67,6 +67,11 @@
                 <version>${camel.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-amqp</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-camel</artifactId>
                 <version>${activemq.version}</version>
@@ -80,6 +85,11 @@
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-amqp</artifactId>
                 <version>${camel.version}</version> <!-- use the same version as your Camel core version -->
+            </dependency>
+            <dependency>
+                <groupId>org.apache.qpid</groupId>
+                <artifactId>qpid-client</artifactId>
+                <version>${qpid.version}</version>
             </dependency>
             <!-- xbean is required for ActiveMQ broker configuration in the spring xml file -->
             <dependency>
@@ -554,6 +564,7 @@
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <solr.version>3.5.0</solr.version>
         <camel.version>2.12.1</camel.version>
+        <qpid.version>0.24</qpid.version>
         <activemq.version>5.8.0</activemq.version>
         <activemq.conf>classpath:</activemq.conf>
         <jms.version>1.1</jms.version>

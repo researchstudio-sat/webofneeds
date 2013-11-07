@@ -1,35 +1,22 @@
 package won.node.jms;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import org.apache.activemq.camel.component.ActiveMQComponent;
-import org.apache.activemq.command.ActiveMQTempQueue;
 import org.apache.camel.*;
-import org.apache.camel.component.jms.JmsConstants;
-import org.apache.camel.component.jms.JmsEndpoint;
-import org.apache.camel.impl.DefaultExchange;
-import org.apache.qpid.client.message.JMSMapMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.node.service.impl.NeedManagementServiceImpl;
 import won.protocol.exception.*;
-import won.protocol.jms.WonMessageListener;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 import won.protocol.util.RdfUtils;
-
-
-import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.Message;
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * User: LEIH-NB
@@ -38,13 +25,11 @@ import java.util.Map;
 public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNeedService /*, WonMessageListener*/ {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private OwnerProtocolNeedService delegate;
-
+    private ConnectionCommunicationService connectionCommunicationService;
    // private ActiveMQComponent activeMQComponent;
     private NeedManagementService needManagementService;
 
-    public void setNeedCommunicationService(OwnerFacingNeedCommunicationService needCommunicationService) {
-        this.needCommunicationService = needCommunicationService;
-    }
+
 
     private OwnerFacingNeedCommunicationService needCommunicationService;
     private ProducerTemplate producerTemplate;
@@ -90,7 +75,7 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
     public void deactivate(@Header("needURI") String needURI) throws NoSuchNeedException{
 
         URI needURIconvert = URI.create(needURI);
-        logger.info("activateNeed: message received: {}", needURI);
+        logger.info("deactivateNeed: message received: {}", needURI);
         needManagementService.deactivate(needURIconvert);
     }
 
@@ -149,22 +134,28 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         return delegate.readConnectionContent(connectionURI);
     }
 
-    //@Override
-    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        delegate.open(connectionURI, content);
+    @Consume(uri="bean:activemq:queue:WON.OPEN")
+    public void open(@Header("connectionURI")String connectionURI, @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        URI connectionURIConvert = URI.create(connectionURI);
+        Model contentConvert = RdfUtils.toModel(content);
+        connectionCommunicationService.open(connectionURIConvert, contentConvert);
     }
 
-    //@Override
-    public void close(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        delegate.close(connectionURI, content);
+    @Consume(uri="bean:activemq:queue:WON.CLOSE")
+    public void close(@Header("connectionURI")String connectionURI, @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        URI connectionURIConvert = URI.create(connectionURI);
+        Model contentConvert = RdfUtils.toModel(content);
+        connectionCommunicationService.open(connectionURIConvert, contentConvert);
     }
 
-    //@Override
-    public void textMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        delegate.textMessage(connectionURI, message);
+    @Consume(uri="bean:activemq:queue:WON.TEXTMESSAGE")
+    public void textMessage(@Header("connectionURI") String connectionURI, @Header("message")String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        URI connectionURIconvert = URI.create(connectionURI);
+
+        connectionCommunicationService.textMessage(connectionURIconvert, message);
     }
 
-    //@Override
+
     @Consume(uri="bean:activemq:queue:WON.CONNECTNEED")
     public URI connect(@Header("needURI") String needURI, @Header("otherNeedURI") String otherNeedURI, @Header("content") String content, Exchange exchange) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
         URI result = null;
@@ -199,5 +190,12 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
 
     public void setProducerTemplate(ProducerTemplate producerTemplate) {
         this.producerTemplate = producerTemplate;
+    }
+
+    public void setConnectionCommunicationService(ConnectionCommunicationService connectionCommunicationService) {
+        this.connectionCommunicationService = connectionCommunicationService;
+    }
+    public void setNeedCommunicationService(OwnerFacingNeedCommunicationService needCommunicationService) {
+        this.needCommunicationService = needCommunicationService;
     }
 }

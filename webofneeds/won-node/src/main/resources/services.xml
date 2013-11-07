@@ -33,6 +33,7 @@
         <property name="needFacingNeedCommunicationService" ref="needCommunicationService" />
         <!-- the connection communication service injected here is need facing, not owner facing -->
         <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService" />
+        <qualifier value="needProtocolNeedService"/>
     </bean>
 
     <bean id="ownerProtocolNeedService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
@@ -54,6 +55,7 @@
         <property name="producerTemplate" ref="producerTemplate"/>
         <property name="needManagementService" ref="needManagementServiceJMSBased"/>
         <property name="needCommunicationService" ref="needCommunicationService"/>
+        <property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
     </bean>
     <bean id="matcherProtocolNeedService" class="won.node.protocol.impl.MatcherProtocolNeedServiceImpl">
         <property name="needInformationService" ref="needInformationService" />
@@ -63,7 +65,7 @@
     <!-- service-level services -->
 
     <bean id="needCommunicationService" class="won.node.service.impl.NeedCommunicationServiceImpl">
-        <property name="needProtocolNeedService" ref="needProtocolNeedClient" />
+        <property name="needProtocolNeedService" ref="needProtocolNeedClientJMSBased" />
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
         <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
         <property name="needFacingConnectionCommunicationService" ref="needFacingConnectionCommunicationService" />
@@ -93,7 +95,7 @@
     </bean>
 
     <bean id="ownerFacingConnectionCommunicationService" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl">
-        <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
+        <property name="needFacingConnectionClient" ref="needProtocolNeedClientJMSBased" />
         <property name="executorService" ref="threadPoolExecutor" />
         <property name="rdfStorageService" ref="rdfStorageRef" />
     </bean>
@@ -173,6 +175,14 @@
 
     <bean name="needProtocolNeedClient" class="won.node.protocol.impl.NeedProtocolNeedClientImpl">
         <property name="clientFactory" ref="needProtocolNeedWebServiceClientFactory" />
+    </bean>
+    <bean name="needProtocolNeedClientJMSBased" class="won.node.protocol.impl.NeedProtocolNeedClientImplJMSBased">
+        <property name="clientFactory" ref="needProtocolNeedWebServiceClientFactory" />
+        <property name="messagingService" ref="messagingService"/>
+
+    </bean>
+    <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
+        <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
 
     <!-- Model Mapper for RDF -->

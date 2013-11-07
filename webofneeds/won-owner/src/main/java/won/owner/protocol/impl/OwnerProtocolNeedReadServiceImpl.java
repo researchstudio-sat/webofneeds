@@ -5,7 +5,6 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.owner.protocol.impl.OwnerProtocolNeedReadService;
 import won.owner.service.impl.URIService;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
@@ -19,13 +18,10 @@ import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.NeedModelMapper;
 import won.protocol.vocabulary.WON;
-
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * Created with IntelliJ IDEA.
@@ -178,43 +174,4 @@ public class OwnerProtocolNeedReadServiceImpl implements OwnerProtocolNeedReadSe
         this.uriService = uriService;
     }
 
-    @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException, ExecutionException, InterruptedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void activate(URI needURI) throws NoSuchNeedException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void deactivate(URI needURI) throws NoSuchNeedException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException, ExecutionException, InterruptedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void close(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void textMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Future<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
 }

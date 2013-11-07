@@ -23,31 +23,54 @@
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
     </bean>
+
     <!-- messaging beans -->
     <camel:camelContext>
-
         <camel:packageScan>
             <camel:package>won.owner.routes</camel:package>
         </camel:packageScan>
         <camel:template id="producerTemplate" defaultEndpoint="direct:OUTMSG1"/>
         <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG" />
         <camel:endpoint id="needMessageQueue" uri="activemq:WON.MSG" pattern="InOut"></camel:endpoint>
-
     </camel:camelContext>
+
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
           <property name="configuration" ref="jmsConfig"></property>
+
     </bean>
+
     <bean id = "jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
         <property name="concurrentConsumers" value="10"/>
     </bean>
-    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" >
         <property name="brokerURL" value="tcp://localhost:61616"/>
+
+        <!--property name="brokerURL" value="amqp://localhost:5672"/-->
     </bean>
-    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+    <!--bean id="pooledConnectionFactory"
+          class="org.apache.activemq.pool.PooledConnectionFactory" init-method="start" destroy-method="stop">
+       <property name="createConnectionOnStartup" value="true" />
+        <property name="connectionFactory" ref="activemqConnectionFactory" />
+    </bean-->
+
+    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory" >
         <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
+
         <property name="sessionCacheSize" value="10"></property>
+
     </bean>
+
+    <!-- Camels AMQP component doesn't seem to support AMQP 1.0 yet -->
+    <!--bean id ="amqpComponent" class="org.apache.camel.component.amqp.AMQPComponent">
+        <property name="configuration" ref="jmsConfig"></property>
+    </bean-->
+    <!--bean id="amqpConnectionFactory" class="org.apache.qpid.client.AMQConnectionFactory">
+    <property name="brokerURL" value="tcp://localhost:61616"/>
+    <constructor-arg index="0" type="java.lang.String" value="amqp://localhost:5672"/>
+    </bean-->
+
     <!--bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
         <constructor-arg value="WON.MSG"></constructor-arg>
     </bean>

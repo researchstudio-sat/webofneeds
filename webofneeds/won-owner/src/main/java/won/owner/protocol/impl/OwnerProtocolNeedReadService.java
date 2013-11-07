@@ -6,8 +6,6 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
-import won.protocol.vocabulary.WON;
-
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +14,7 @@ import java.util.List;
  * User: LEIH-NB
  * Date: 31.10.13
  */
-public interface OwnerProtocolNeedReadService extends OwnerProtocolNeedServiceClientSide{
+public interface OwnerProtocolNeedReadService {//extends OwnerProtocolNeedServiceClientSide{
 
     public Collection<URI> listNeedURIs();
 

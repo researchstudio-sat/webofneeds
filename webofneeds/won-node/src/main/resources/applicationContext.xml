@@ -42,11 +42,13 @@
             <camel:package>won.node.routes</camel:package>
         </camel:packageScan>
         <camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
+        <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG" />
     </camel:camelContext>
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
          <property name="brokerURL" value="vm://localhost:61616"/>
 
     </bean>
+
 
     <!-- Configure Message Broker -->
     <!-- bean id="jmsConnectionFactory"
@@ -86,12 +88,13 @@
     </bean>
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker1">
         
-        <property name="brokerURL" value="vm://localhost"/>
+        <property name="brokerURL" value="vm://localhost:5672"/>
     </bean>
     <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
         <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
         <property name="sessionCacheSize" value="10"></property>
     </bean>
+
     <!--bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
         <constructor-arg value="WON.MSG"></constructor-arg>
     </bean-->

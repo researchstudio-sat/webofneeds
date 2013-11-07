@@ -26,7 +26,6 @@ import java.util.List;
  * Time: 15:19
  */
 @Controller
-//@RequestMapping("/connection")
 public class ConnectionController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -106,7 +105,7 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
-            ownerService.connect(con.getNeedURI(), con.getRemoteNeedURI(), null);
+            ownerService.open(con.getConnectionURI(), null);
         } catch (Exception e) {
           logger.warn("error during accept", e);
           return "error during accept: " + e.getMessage();

@@ -41,10 +41,13 @@
     <bean id="ownerProtocolNeedServiceClientWSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientWSBased">
         <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
     </bean>
-
+    <bean id="messagingServiceImpl" class="won.protocol.jms.MessagingServiceImpl">
+        <property name="producerTemplate" ref="producerTemplate"/>
+    </bean>
     <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientJMSBased">
         <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
         <property name="producerTemplate" ref="producerTemplate"/>
+        <property name="messagingService" ref="messagingServiceImpl"/>
     </bean>
 
     <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">

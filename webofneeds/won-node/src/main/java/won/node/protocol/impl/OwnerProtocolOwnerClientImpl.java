@@ -55,7 +55,7 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
       logger.warn("couldn't send hint", illegalMessageForNeedStateFault);
     }
   }
-
+  /*
   @Override
   public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
   {
@@ -74,12 +74,31 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
       logger.warn("couldn't send hint", illegalMessageForNeedStateFault);
     }
-  }
+  }   */
+    @Override
+    public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
+    {
+        logger.info(MessageFormat.format("owner-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, own connection {2} and message ''{3}''", ownNeedURI, otherNeedURI, ownConnectionURI, content));
+        try {
+            OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(ownNeedURI);
+            StringWriter sw = new StringWriter();
+            content.write(sw, "TTL");
+            proxy.connect(ownNeedURI, otherNeedURI, ownConnectionURI, sw.toString());
+        } catch (MalformedURLException e) {
+            logger.warn("couldn't create URL for needProtocolEndpoint", e);
+        } catch (NoSuchNeedFault noSuchNeedFault) {
+            NoSuchNeedFault.toException(noSuchNeedFault);
+        } catch (ConnectionAlreadyExistsFault connectionAlreadyExistsFault) {
+            throw ConnectionAlreadyExistsFault.toException(connectionAlreadyExistsFault);
+        } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
+            logger.warn("couldn't send hint", illegalMessageForNeedStateFault);
+        }
+    }
 
-  @Override
+    @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}", connectionURI));
+    logger.info(MessageFormat.format("owner-facing: Open called for connection {0}", connectionURI));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
       proxy.open(connectionURI, RdfUtils.toString(content));

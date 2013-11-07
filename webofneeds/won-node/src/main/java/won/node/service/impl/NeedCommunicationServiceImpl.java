@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.node.protocol.impl.NeedProtocolNeedClientSide;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.need.NeedProtocolNeedService;
@@ -40,7 +41,9 @@ import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 
 /**
@@ -62,7 +65,7 @@ public class NeedCommunicationServiceImpl implements
   /**
    * Client talking another need via the need protocol
    */
-  private NeedProtocolNeedService needProtocolNeedService;
+  private NeedProtocolNeedClientSide needProtocolNeedService;
 
   /**
    * Client talking to this need service from the need side
@@ -226,30 +229,34 @@ public class NeedCommunicationServiceImpl implements
 
       final Connection connectionForRunnable = con;
       //send to need
-      executorService.execute(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          try {
-            URI remoteConnectionURI = needProtocolNeedService.connect(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), content);
-            connectionForRunnable.setRemoteConnectionURI(remoteConnectionURI);
-            connectionRepository.saveAndFlush(connectionForRunnable);
-          } catch (WonProtocolException e) {
-            // we can't connect the connection. we send a close back to the owner
-            // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
-            // For now, we call the close method as if it had been called from the remote side
-            // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
-            try {
-              NeedCommunicationServiceImpl.this.needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI(), content);
-            } catch (NoSuchConnectionException e1) {
-              logger.warn("caught NoSuchConnectionException:", e1);
-            } catch (IllegalMessageForConnectionStateException e1) {
-              logger.warn("caught IllegalMessageForConnectionStateException:", e1);
-            }
-          }
-        }
-      });
+
+
+
+
+
+    final Future<URI> remoteConnectionURI = needProtocolNeedService.connect(otherNeedURI, needURI, connectionForRunnable.getConnectionURI(), content);
+      new Thread(
+              new Runnable() {
+                  @Override
+                  public void run() {
+                      Need need = new Need();
+                      try {
+                          connectionForRunnable.setRemoteConnectionURI(remoteConnectionURI.get());
+                          connectionRepository.saveAndFlush(connectionForRunnable);
+
+                      } catch (InterruptedException e) {
+                          logger.warn("interrupted",e);
+                      } catch (ExecutionException e) {
+                          logger.warn("ExecutionException caught",e);
+                      }
+
+
+                  }
+              }
+      ).start();
+
+
+
 
       return con.getConnectionURI();
     }
@@ -260,7 +267,7 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-    logger.info("CONNECT received for need {} referring to need {} (connection {}) with content '{}'", new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
+    logger.info("NODE2: ConnectionCommunicationSErvice CONNECT received for need {} referring to need {} (connection {}) with content '{}'", new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (otherConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
@@ -393,7 +400,7 @@ public class NeedCommunicationServiceImpl implements
     this.connectionRepository = connectionRepository;
   }
 
-  public void setNeedProtocolNeedService(final NeedProtocolNeedService needProtocolNeedService)
+  public void setNeedProtocolNeedService(final NeedProtocolNeedClientSide needProtocolNeedService)
   {
     this.needProtocolNeedService = needProtocolNeedService;
   }

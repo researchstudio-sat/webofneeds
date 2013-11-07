@@ -20,6 +20,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.node.protocol.impl.NeedProtocolNeedClientSide;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
@@ -30,10 +31,7 @@ import won.protocol.repository.EventRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
 import won.node.protocol.impl.MessageProducer;
-
-import javax.jms.JMSException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 
@@ -46,7 +44,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private ConnectionCommunicationService needFacingConnectionClient;
+  private NeedProtocolNeedClientSide needFacingConnectionClient;
 
   private ExecutorService executorService;
 
@@ -179,18 +177,6 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     @Override
     public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.debug("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
-        try {
-            URI brokerURI = new URI("vm://localhost:61617");
-
-            messageProducer.textMessage(brokerURI, message);
-
-        } catch (URISyntaxException e) {
-            logger.warn("Wrong URI syntax", e);  //To change body of catch statement use File | Settings | File Templates.
-        } catch (JMSException e) {
-            logger.warn("JMS Exception", e);  //To change body of catch statement use File | Settings | File Templates.
-        }
-        /*
         logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         if (message == null) throw new IllegalArgumentException("message is not set");
@@ -219,12 +205,12 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
                     logger.warn("caught WonProtocolException:", e);
                 }
             }
-        });     */
+        });
 
     }
 
 
-  public void setNeedFacingConnectionClient(final ConnectionCommunicationService needFacingConnectionClient)
+  public void setNeedFacingConnectionClient(final NeedProtocolNeedClientSide needFacingConnectionClient)
   {
     this.needFacingConnectionClient = needFacingConnectionClient;
   }
