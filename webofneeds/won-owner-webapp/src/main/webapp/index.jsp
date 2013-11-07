@@ -11,7 +11,7 @@
 --%>
 		<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>
 
-		<script src="jquery/jquery..10.2.js"></script>
+		<script src="scripts/jquery.10.2.js"></script>
 
 		<script src="bower_components/angular/angular.js"></script>
 		<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
