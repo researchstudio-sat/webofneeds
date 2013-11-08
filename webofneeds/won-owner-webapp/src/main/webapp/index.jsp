@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE HTML>
 <html>
@@ -57,6 +58,16 @@
 			}
 		</style>
 		<script type="text/javascript">
+			var user = {
+				<sec:authorize access="isAuthenticated()">
+				username : '<sec:authentication property="principal.username" />',
+				isAuth : true
+				</sec:authorize>
+				<sec:authorize access="!isAuthenticated()">
+				isAuth : false
+				</sec:authorize>
+			};
+
 			function onGoogleReady() {
 				angular.bootstrap(document.getElementsByTagName("html")[0], ['owner']);
 			}

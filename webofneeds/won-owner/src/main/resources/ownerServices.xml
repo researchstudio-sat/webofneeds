@@ -57,4 +57,8 @@
     <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
 
+	<bean id="wonUserDetailService" class="won.owner.service.impl.WONUserDetailService">
+		<constructor-arg value="won.owner.repository.UserRepository"/>
+	</bean>
+
 </beans>

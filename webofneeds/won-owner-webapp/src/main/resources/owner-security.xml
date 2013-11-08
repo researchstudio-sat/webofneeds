@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+	<http pattern="/favicon.ico" security="none"/>
+	<http pattern="/app" security="none"/>
+	<http pattern="/bower_components" security="none"/>
+	<http pattern="/fonts" security="none"/>
+	<http pattern="/images" security="none"/>
+	<http pattern="/old" security="none"/>
+	<http pattern="/scripts" security="none"/>
+	<http pattern="/style" security="none"/>
+	<http auto-config="true" use-expressions="true" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint">
+		<intercept-url pattern="/rest/**" access="hasRole('WON_USER')"/>
+		<intercept-url pattern="/" access="hasRole('WON_USER')"/>
+		<intercept-url pattern="/public" access="isAnonymous() || isAuthenticated()"/>
+		<form-login login-page="/public/login" login-processing-url="/rest/check" username-parameter="username" password-parameter="password"/>
+		<logout logout-url="/logout"/>
+	</http>
+
+	<beans:import resource="classpath:ownerServices.xml" />
+
+	<beans:bean name="authenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+		<beans:property name="userDetailsService" ref="wonUserDetailService"/>
+	</beans:bean>
+
+	<beans:bean name="ajaxLoginUrlAuthenticationEntryPoint" class="won.owner.security.AjaxLoginUrlAuthenticationEntryPoint">
+		<beans:constructor-arg value="/"/>
+	</beans:bean>
+
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider ref="authenticationProvider"/>
+	</authentication-manager>
+</beans:beans>

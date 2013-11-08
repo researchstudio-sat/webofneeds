@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>won-owner-webapp</artifactId>
 
-    <dependencies>
+	<dependencies>
         <!--
 
                  Warning! Only to be used in connection with the
@@ -33,6 +33,10 @@
         </dependency>
 
         <!-- JSTL/Servlet-->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+		</dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
@@ -61,6 +65,22 @@
             <artifactId>spring-webmvc</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
+
+	    <dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-web</artifactId>
+		    <version>${org.springframework.security.version}</version>
+	    </dependency>
+	    <dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-config</artifactId>
+		    <version>${org.springframework.security.version}</version>
+	    </dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+			<version>${org.springframework.security.version}</version>
+		</dependency>
 
         <dependency>
             <groupId>commons-httpclient</groupId>

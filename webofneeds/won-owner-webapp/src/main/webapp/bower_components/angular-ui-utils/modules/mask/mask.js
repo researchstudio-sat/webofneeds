@@ -16,7 +16,7 @@ angular.module('ui.mask',[])
       restrict: 'A',
       compile: function uiMaskCompilingFunction(){
         var options = maskConfig;
-        
+
         return function uiMaskLinkingFunction(scope, iElement, iAttrs, controller){
           var maskProcessed = false, eventsBound = false,
             maskCaretMap, maskPatterns, maskPlaceholder, maskComponents,
@@ -71,10 +71,10 @@ angular.module('ui.mask',[])
           }
 
           var linkOptions = {};
-          
+
           if (iAttrs.uiOptions) {
             linkOptions = scope.$eval('[' + iAttrs.uiOptions + ']');
-            if (angular.isObject(linkOptions[0])) { 
+            if (angular.isObject(linkOptions[0])) {
               // we can't use angular.copy nor angular.extend, they lack the power to do a deep merge
               linkOptions = (function(original, current){
                 for(var i in original) {
@@ -181,7 +181,7 @@ angular.module('ui.mask',[])
           function maskValue(unmaskedValue){
             var valueMasked = '',
               maskCaretMapCopy = maskCaretMap.slice();
-            
+
             angular.forEach(maskPlaceholder.split(''), function (chr, i){
               if (unmaskedValue.length && i === maskCaretMapCopy[0]) {
                 valueMasked += unmaskedValue.charAt(0) || '_';
