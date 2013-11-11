@@ -20,6 +20,7 @@
 		<script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
 		<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
 
+		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
@@ -58,7 +59,7 @@
 			}
 		</style>
 		<script type="text/javascript">
-			var user = {
+			window.user = {
 				<sec:authorize access="isAuthenticated()">
 				username : '<sec:authentication property="principal.username" />',
 				isAuth : true
@@ -74,20 +75,25 @@
 		</script>
 	</head>
 	<body>
+		<span ng-init=""></span>
 		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>
 		<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
-			<div class="container">
-				<div class="collapse navbar-collapse navbar-ex1-collapse">
+			<div class="container" style="padding:0">
+				<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
 					<ul class="nav navbar-nav">
 						<li ng-class="isActive()"><a href="#/">
 							<span class="glyphicon glyphicon-transfer"></span>&nbsp;Web Of Needs</a>
 						</li>
-						<li	ng-class="isActive('create-need')"><a href="#/create-need/">
+						<li ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak><a href="#/create-need/">
 							<span class="glyphicon glyphicon-plus"></span>&nbsp;New	Need</a>
 						</li>
-						<li ng-class="isActive('need-list')"><a href="#/need-list/">
+						<li ng-show="!showPublic()" ng-class="isActive('need-list')" ng-cloak><a href="#/need-list/">
 							<span class="glyphicon glyphicon-globe"></span>&nbsp;All Needs</a>
 						</li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right" ng-show="showPublic()" ng-cloak>
+						<li><a href="#/register">Create account</a></li>
+						<li><a href="#/login">Sign in</a></li>
 					</ul>
 				</div>
 			</div>

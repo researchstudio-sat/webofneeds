@@ -2,7 +2,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE HTML>
-<html>
+<html ng-app>
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Web Of Needs</title>
@@ -14,7 +14,7 @@
 	<script src="bower_components/angular/angular.js"></script>
 	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
-	<script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
+	<!--script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
 	<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
 
 	<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
@@ -24,7 +24,7 @@
 	<script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
 	<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
 	<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
+	<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script-->
 
 
 	<style type="text/css">
@@ -65,26 +65,15 @@
 			isAuth:false
 			</sec:authorize>
 		};
-
-		function onGoogleReady() {
-			angular.bootstrap(document.getElementsByTagName("html")[0], ['owner']);
-		}
 	</script>
 </head>
 <body>
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>
 <nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
 	<div class="container">
 		<div class="collapse navbar-collapse navbar-ex1-collapse">
 			<ul class="nav navbar-nav">
-				<li ng-class="isActive()"><a href="#/">
+				<li class="active"><a href="#/">
 					<span class="glyphicon glyphicon-transfer"></span>&nbsp;Web Of Needs</a>
-				</li>
-				<li ng-class="isActive('create-need')"><a href="#/create-need/">
-					<span class="glyphicon glyphicon-plus"></span>&nbsp;New Need</a>
-				</li>
-				<li ng-class="isActive('need-list')"><a href="#/need-list/">
-					<span class="glyphicon glyphicon-globe"></span>&nbsp;All Needs</a>
 				</li>
 			</ul>
 		</div>

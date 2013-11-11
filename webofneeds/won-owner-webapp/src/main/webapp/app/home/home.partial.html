@@ -1,0 +1,137 @@
+<div style="padding-top: 40px;padding-bottom: 8em;">
+	<h1 style="text-align: center;font-size: 4em;padding-bottom: 0.3em;">The Web Of Needs</h1>
+
+	<div class="row">
+		<div class="col-md-5" style="margin-left: 12%">
+			<iframe style="border: 2px solid #54B4EB;" width="420" height="315"
+			        src="//www.youtube.com/embed/pe9qU3H3LJk?controls=0&showinfo=0&showsearch=0" frameborder="0"
+			        allowfullscreen></iframe>
+		</div>
+		<div class="col-md-4" style="font-size: 1.4em;">
+			<strong>Welcome on WON website!</strong><br />Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
+			                                             laudantium,
+			totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam
+			voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+		</div>
+	</div>
+	<div class="container text-center" style="margin-top: 4em;">
+		<button type="button" ng-click="goToAllNeeds()" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-globe"></span>&nbsp;Explore
+			The	Web	Of
+			Needs</button>
+	</div>
+	<div class="container text-center"><h3>OR</h3></div>
+	<div class="container text-center">
+		<button type="button" ng-click="goToNewNeed()" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-plus"></span>&nbsp;Post a
+			need on your own</button>
+	</div>
+</div>
+<div style="position: absolute;width:100%;height: 100%;top:0;left:0;opacity: 0.9;background: white;">
+</div>
+<div style="position: absolute;width:100%;height: 100%;top:0;left:0;"> <div class="container" style="padding-top:11%;">
+		<form class="form-horizontal">
+			<div class="col-md-5 col-md-offset-4">
+				<div class="well">
+					<fieldset>
+						<legend>Please sign in to Web Of Needs</legend>
+						<div class="form-group">
+							<label for="username" class="col-md-offset-1 col-md-3 control-label">Username</label>
+
+							<div class="col-md-7">
+								<input type="text" class="form-control" id="username" ng-model="user.username" placeholder="Username">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="password" class="col-md-offset-1 col-md-3 control-label">Password</label>
+
+							<div class="col-md-7">
+								<input type="password" class="form-control" id="password" ng-model="user.password" placeholder="Password">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-md-4"></div>
+							<div class="col-md-7">
+								<button type="button" class="btn btn-primary" ng-click="save()">Sign in</button>
+							</div>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div style="position: absolute;width:100%;height: 100%;top:0;left:0;">
+	<div class="container" style="padding-top:11%;display: none;">
+		<form class="form-horizontal">
+			<div class="col-md-5 col-md-offset-4">
+				<div class="well">
+					<fieldset>
+						<legend>Please sign in to Web Of Needs</legend>
+						<div class="form-group">
+							<label for="username" class="col-md-offset-1 col-md-3 control-label">Username</label>
+
+							<div class="col-md-7">
+								<input type="text" class="form-control" id="username" ng-model="user.username" placeholder="Username">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="password" class="col-md-offset-1 col-md-3 control-label">Password</label>
+
+							<div class="col-md-7">
+								<input type="password" class="form-control" id="password" ng-model="user.password" placeholder="Password">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-md-4"></div>
+							<div class="col-md-7">
+								<button type="button" class="btn btn-primary" ng-click="save()">Sign in</button>
+							</div>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="container" style="padding-top:11%;">
+		<form class="form-horizontal">
+			<div class="col-md-5 col-md-offset-4">
+				<div class="well">
+					<fieldset>
+						<legend>Create account</legend>
+						<div class="form-group">
+							<label for="username" class="col-md-offset-1 col-md-3 control-label">Username</label>
+
+							<div class="col-md-7">
+								<input type="text" class="form-control" id="username" ng-model="user.username" placeholder="Username">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="password" class="col-md-offset-1 col-md-3 control-label">Password</label>
+
+							<div class="col-md-7">
+								<input type="password" class="form-control" id="password" ng-model="user.password" placeholder="Password">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="password" class="col-md-offset-1 col-md-3 control-label">Confirm password</label>
+
+							<div class="col-md-7">
+								<input type="password" class="form-control" id="password" ng-model="user.password" placeholder="Password">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-md-4"></div>
+							<div class="col-md-7">
+								<button type="button" class="btn btn-primary" ng-click="save()">Create account</button>
+							</div>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+		</form>
+	</div>
+
+</div>
+
+
+
+

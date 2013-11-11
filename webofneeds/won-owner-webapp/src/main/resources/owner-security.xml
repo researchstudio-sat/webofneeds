@@ -14,7 +14,7 @@
 	<http pattern="/scripts" security="none"/>
 	<http pattern="/style" security="none"/>
 	<http auto-config="true" use-expressions="true" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint">
-		<intercept-url pattern="/rest/**" access="hasRole('WON_USER')"/>
+		<intercept-url pattern="/rest/**" access="hasRole('WON_USER')" />
 		<intercept-url pattern="/" access="hasRole('WON_USER')"/>
 		<intercept-url pattern="/public" access="isAnonymous() || isAuthenticated()"/>
 		<form-login login-page="/public/login" login-processing-url="/rest/check" username-parameter="username" password-parameter="password"/>
