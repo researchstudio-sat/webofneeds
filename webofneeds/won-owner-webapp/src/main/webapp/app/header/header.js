@@ -14,4 +14,16 @@ headerModule.controller("HeaderCtrl", function($scope, $location, userService) {
 		return !userService.isAuth();
 	}
 
+
+	onResponseSignOut = function (result) {
+		if (result.status == 'OK') {
+			userService.resetAuth();
+			$location.path("/");
+		}
+	}
+
+	$scope.onClickSignOut = function() {
+		userService.logOut().then(onResponseSignOut);
+	}
+
 });

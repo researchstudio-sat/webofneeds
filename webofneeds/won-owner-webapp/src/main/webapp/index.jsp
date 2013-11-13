@@ -7,10 +7,8 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<title>Web Of Needs</title>
 		<link rel="stylesheet" href="style/bootstrap.min.css" />
-<%--
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css" />
---%>
 		<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>
+		<link rel="stylesheet" href="style/main.css"/>
 
 		<script src="scripts/jquery.10.2.js"></script>
 
@@ -30,34 +28,6 @@
 		<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
 
-
-		<style type="text/css">
-			.navbar {
-				border-radius: 0;
-				margin-bottom: 0;
-			}
-			#content {
-				background-color: #F5F5F5;
-			}
-
-			.map-canvas {
-				width: 405px;
-				height: 235px;
-			}
-
-			.btnTag:hover {
-				background-color: black;
-			}
-
-			.need-panel-body:hover {
-				cursor: pointer;
-				background-color: #F1F1F1;
-			}
-
-			.value-panel {
-				padding-top:9px;
-			}
-		</style>
 		<script type="text/javascript">
 			window.user = {
 				<sec:authorize access="isAuthenticated()">
@@ -91,9 +61,10 @@
 							<span class="glyphicon glyphicon-globe"></span>&nbsp;All Needs</a>
 						</li>
 					</ul>
-					<ul class="nav navbar-nav navbar-right" ng-show="showPublic()" ng-cloak>
-						<li><a href="#/register">Create account</a></li>
-						<li><a href="#/login">Sign in</a></li>
+					<ul class="nav navbar-nav navbar-right" ng-cloak>
+						<li ng-show="showPublic()" ng-class="isActive('register')"><a href="#/register">Create account</a></li>
+						<li ng-show="showPublic()" ng-class="isActive('signin')"><a href="#/signin">Sign in</a></li>
+						<li ng-show="!showPublic()"><a href="" ng-click="onClickSignOut()">Sign out</a></li>
 					</ul>
 				</div>
 			</div>

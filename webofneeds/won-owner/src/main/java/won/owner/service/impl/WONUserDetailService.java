@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import won.owner.model.User;
 import won.owner.repository.UserRepository;
 
 /**
@@ -25,6 +26,16 @@ public class WONUserDetailService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-		return userRepository.findByUsername(username);
+		User user = userRepository.findByUsername(username);
+		if(user == null) {
+			throw new UsernameNotFoundException("User " + username + " not found!");
+		} else {
+			return user;
+		}
 	}
+
+	public User save(User user) {
+		return userRepository.save(user);
+	}
+
 }

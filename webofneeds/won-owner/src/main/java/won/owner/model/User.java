@@ -4,6 +4,7 @@
 
 package won.owner.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,7 @@ import java.util.List;
 		name = "wonuser",
 		uniqueConstraints = @UniqueConstraint(columnNames = {"username"})
 )
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User implements UserDetails{
 
 	@Id
@@ -38,6 +40,14 @@ public class User implements UserDetails{
 
 	@Transient
 	private Collection<SimpleGrantedAuthority> authorities;
+
+	public User() {
+	}
+
+	public User(final String username, final String password) {
+		this.username = username;
+		this.password = password;
+	}
 
 	@Override
 	public String toString() {

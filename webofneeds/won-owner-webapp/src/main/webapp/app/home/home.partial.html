@@ -1,5 +1,5 @@
 <div style="padding-top: 40px;padding-bottom: 8em;">
-	<h1 style="text-align: center;font-size: 4em;padding-bottom: 0.3em;">The Web Of Needs</h1>
+	<h1 id="main-heading">The Web Of Needs</h1>
 
 	<div class="row">
 		<div class="col-md-5" style="margin-left: 12%">
@@ -25,111 +25,93 @@
 			need on your own</button>
 	</div>
 </div>
-<div style="position: absolute;width:100%;height: 100%;top:0;left:0;opacity: 0.9;background: white;">
+<div id="panel-opacity" ng-show="forms.signin || forms.register">
 </div>
-<div style="position: absolute;width:100%;height: 100%;top:0;left:0;"> <div class="container" style="padding-top:11%;">
-		<form class="form-horizontal">
-			<div class="col-md-5 col-md-offset-4">
-				<div class="well">
-					<fieldset>
-						<legend>Please sign in to Web Of Needs</legend>
-						<div class="form-group">
-							<label for="username" class="col-md-offset-1 col-md-3 control-label">Username</label>
+<div id="panel-sign-in"  ng-controller="SignInCtrl" ng-show="forms.signin">
+	<form class="form-horizontal container" novalidate name="signInForm" ng-submit="onClickSignIn()">
+		<div class="col-md-5 col-md-offset-4">
+			<div class="well">
+				<fieldset>
+					<legend>Please sign in to Web Of Needs</legend>
+					<div class="alert alert-danger" ng-show="error.length > 0">
+						{{ error }}
+					</div>
+					<div class="form-group">
+						<label for="signUsername" class="col-md-offset-1 col-md-3 control-label">Username</label>
 
-							<div class="col-md-7">
-								<input type="text" class="form-control" id="username" ng-model="user.username" placeholder="Username">
-							</div>
+						<div class="col-md-7">
+							<input type="text" class="form-control" name="signUsername" id="signUsername" ng-model="user.username"
+							       placeholder="Username" required>
 						</div>
-						<div class="form-group">
-							<label for="password" class="col-md-offset-1 col-md-3 control-label">Password</label>
+					</div>
+					<div class="form-group">
+						<label for="signPassword" class="col-md-offset-1 col-md-3 control-label">Password</label>
 
-							<div class="col-md-7">
-								<input type="password" class="form-control" id="password" ng-model="user.password" placeholder="Password">
-							</div>
+						<div class="col-md-7">
+							<input type="password" class="form-control" name="signPassword" id="signPassword" ng-model="user.password"
+							       placeholder="Password" required>
 						</div>
-						<div class="form-group">
-							<div class="col-md-4"></div>
-							<div class="col-md-7">
-								<button type="button" class="btn btn-primary" ng-click="save()">Sign in</button>
-							</div>
+					</div>
+					<div class="form-group">
+						<div class="col-md-4"></div>
+						<div class="col-md-7">
+							<button ng-disabled="signInForm.$invalid" type="submit" class="btn btn-primary">Sign in</button>
 						</div>
-					</fieldset>
-				</div>
+					</div>
+				</fieldset>
 			</div>
-		</form>
-	</div>
+		</div>
+	</form>
 </div>
-<div style="position: absolute;width:100%;height: 100%;top:0;left:0;">
-	<div class="container" style="padding-top:11%;display: none;">
-		<form class="form-horizontal">
-			<div class="col-md-5 col-md-offset-4">
-				<div class="well">
-					<fieldset>
-						<legend>Please sign in to Web Of Needs</legend>
-						<div class="form-group">
-							<label for="username" class="col-md-offset-1 col-md-3 control-label">Username</label>
+<div id="panel-register" ng-controller="RegisterCtrl" ng-show="forms.register">
+	<form class="form-horizontal container" novalidate name="registerForm" ng-submit="onClickRegister()">
+		<div class="col-md-5 col-md-offset-4">
+			<div class="well">
+				<fieldset>
+					<legend>Create account</legend>
+					<div class="alert alert-danger" ng-show="error.length > 0">
+						{{ error }}
+					</div>
+					<div class="alert alert-success" ng-show="success.length > 0">
+						{{ success }}
+					</div>
+					<div class="form-group">
+						<label for="registerUsername" class="col-md-offset-1 col-md-3 control-label">Username</label>
 
-							<div class="col-md-7">
-								<input type="text" class="form-control" id="username" ng-model="user.username" placeholder="Username">
-							</div>
+						<div class="col-md-7">
+							<input type="text" class="form-control" name="registerUsername" id="registerUsername" ng-model="registerUser.username"
+							       placeholder="Username"
+							       required>
 						</div>
-						<div class="form-group">
-							<label for="password" class="col-md-offset-1 col-md-3 control-label">Password</label>
+					</div>
+					<div class="form-group">
+						<label for="registerPassword" class="col-md-offset-1 col-md-3 control-label">Password</label>
 
-							<div class="col-md-7">
-								<input type="password" class="form-control" id="password" ng-model="user.password" placeholder="Password">
-							</div>
+						<div class="col-md-7">
+							<input type="password" class="form-control" name="registerPassword" id="registerPassword"
+							       ng-model="registerUser.password"
+							       placeholder="Password" required>
 						</div>
-						<div class="form-group">
-							<div class="col-md-4"></div>
-							<div class="col-md-7">
-								<button type="button" class="btn btn-primary" ng-click="save()">Sign in</button>
-							</div>
+					</div>
+					<div class="form-group">
+						<label for="registerPasswordAgain" class="col-md-offset-1 col-md-3 control-label">Confirm password</label>
+
+						<div class="col-md-7">
+							<input type="password" class="form-control" name="registerPasswordAgain" id="registerPasswordAgain"
+							       ng-model="registerUser.passwordAgain"
+							       placeholder="Password" required>
 						</div>
-					</fieldset>
-				</div>
+					</div>
+					<div class="form-group">
+						<div class="col-md-4"></div>
+						<div class="col-md-7">
+							<button ng-disabled="registerForm.$invalid" type="submit" class="btn btn-primary">Create account</button>
+						</div>
+					</div>
+				</fieldset>
 			</div>
-		</form>
-	</div>
-	<div class="container" style="padding-top:11%;">
-		<form class="form-horizontal">
-			<div class="col-md-5 col-md-offset-4">
-				<div class="well">
-					<fieldset>
-						<legend>Create account</legend>
-						<div class="form-group">
-							<label for="username" class="col-md-offset-1 col-md-3 control-label">Username</label>
-
-							<div class="col-md-7">
-								<input type="text" class="form-control" id="username" ng-model="user.username" placeholder="Username">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="password" class="col-md-offset-1 col-md-3 control-label">Password</label>
-
-							<div class="col-md-7">
-								<input type="password" class="form-control" id="password" ng-model="user.password" placeholder="Password">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="password" class="col-md-offset-1 col-md-3 control-label">Confirm password</label>
-
-							<div class="col-md-7">
-								<input type="password" class="form-control" id="password" ng-model="user.password" placeholder="Password">
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-md-4"></div>
-							<div class="col-md-7">
-								<button type="button" class="btn btn-primary" ng-click="save()">Create account</button>
-							</div>
-						</div>
-					</fieldset>
-				</div>
-			</div>
-		</form>
-	</div>
-
+		</div>
+	</form>
 </div>
 
 
