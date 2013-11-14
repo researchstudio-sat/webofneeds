@@ -1,7 +1,6 @@
+<!DOCTYPE HTML>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-
-<!DOCTYPE HTML>
 <html>
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,6 +16,7 @@
 
 		<script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
 		<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
+		<script type="text/javascript" src="<c:url value="/bower_components/js-md5/js/md5.js"/>"></script>
 
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>

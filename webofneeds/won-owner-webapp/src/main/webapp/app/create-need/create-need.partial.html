@@ -5,15 +5,48 @@
 		<button type="button" class="btn btn-success" ng-click="save()">Save</button>
 	</div>
 	<form class="form-horizontal">
+		<div class="col-lg-5">
+			<div
+					style="height:270px;width:100%;background-color:#CACACA;border:1px solid #CACACA;border-radius: 3px;text-align: center;padding-top: 80px;margin-bottom: 20px;">
+					<span class="glyphicon glyphicon-picture" style="font-size:58px;color:white"></span><br/>
+					<h4 style="color:white">Click here and upload new image</h4>
+			</div>
+			<div class="row">
+				
+			</div>
+			<div class="well">
+				<fieldset>
+					<legend>Tags</legend>
+					<div class="form-group">
+						<div class="col-lg-12">
+							<span style="margin-right:5px;cursor:pointer;" class="label label-primary btnTag"
+							      ng-click="removeTag('{{tagName}}')"
+							      ng-repeat="tagName in need.tags">{{tagName}}&nbsp;&nbsp;|&nbsp;x
+							</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-lg-5">
+							<input type="text" class="form-control" id="inputTagName" placeholder="tag name">
+						</div>
+						<div class="col-lg-3">
+							<button type="button" class="btn btn-primary" id="bttAddTag" ng-click="addTag()">Add tag</button>
+						</div>
+
+					</div>
+
+				</fieldset>
+			</div>
+
+		</div>
 		<div class="col-lg-7">
 			<div class="well">
 				<fieldset>
-					<legend>Basic informations</legend>
 					<div class="form-group">
-						<label for="inputName" class="col-lg-2 control-label">Name</label>
+						<label for="inputName" class="col-lg-2 control-label">Title</label>
 
 						<div class="col-lg-10">
-							<input type="text" class="form-control" id="inputName" ng-model="need.title" placeholder="Title">
+							<input type="text" class="form-control" id="inputName" ng-model="need.title" placeholder="Title" />
 						</div>
 					</div>
 					<div class="form-group">
@@ -21,10 +54,10 @@
 
 						<div class="col-lg-10">
 							<textarea class="form-control" rows="3" id="textarea-description" ng-model="need.textDescription"></textarea>
-							<!--span class="help-block">A longer block of help text that breaks onto a new line and may extend beyond one line.</span-->
 						</div>
+						<!--span class="help-block">A longer block of help text that breaks onto a new line and may extend beyond one line.</span-->
 					</div>
-					<div class="form-group">
+					<!--div class="form-group">
 						<label class="col-lg-2 control-label">Active</label>
 
 						<div class="col-lg-10">
@@ -35,7 +68,7 @@
 								</button>
 							</div>
 						</div>
-					</div>
+					</div-->
 					<div class="form-group">
 						<label class="col-lg-2 control-label">Type</label>
 
@@ -52,7 +85,64 @@
 							</div>
 						</div>
 					</div>
-					<legend>Price</legend>
+				</fieldset>
+			</div>
+			<div class="well">
+				<fieldset>
+
+					<div class="form-group">
+						<label class="col-lg-2 control-label">From</label>
+
+						<div class="col-lg-4">
+							<input type="text" class="form-control" id="inputFromDate" ng-model="need.startTime" placeholder="from">
+							<div class="row" style="padding-top: 1em">
+								<div class="col-xs-4" style="padding-right:0">
+									<input type="text" class="form-control"/>
+								</div>
+								<div class="col-xs-2">
+									<p class="form-control-static">:</p>
+								</div>
+								<div class="col-xs-4" style="padding-left:0">
+									<input type="text" class="form-control"/>
+								</div>
+
+							</div>
+						</div>
+						<div class="col-lg-1"><label class="control-label">to</label></div>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" id="inputToDate" ng-model="need.endTime" placeholder="to">
+							<div class="row" style="padding-top: 1em">
+								<div class="col-xs-4" style="padding-right:0">
+									<input type="text" class="form-control" maxlength="2"/>
+								</div>
+								<div class="col-xs-2">
+									<p class="form-control-static">:</p>
+								</div>
+								<div class="col-xs-4" style="padding-left:0">
+									<input type="text" class="form-control"/>
+								</div>
+
+							</div>
+						</div>
+
+						<label class="col-lg-2 control-label">All day</label>
+
+						<div class="col-lg-4 checkbox">
+							<input type="checkbox" style="margin-left:0"/>
+						</div>
+					</div>
+
+					<!--legend>Content description</legend>
+					<div class="form-group">
+						<div class="col-lg-12">
+							<textarea class="form-control" rows="6" ng-model="need.contentDescription" id="textArea"></textarea>
+						</div>
+					</div-->
+				</fieldset>
+			</div>
+
+			<div class="well">
+				<fieldset>
 					<div class="form-group">
 						<label class="col-lg-2 control-label">Price</label>
 
@@ -73,69 +163,20 @@
 						</div>
 					</div>
 
-					<legend>Time</legend>
-					<div class="form-group">
-						<label class="col-lg-2 control-label">Valid</label>
-
-						<div class="col-lg-4">
-							<input type="text" class="form-control" id="inputFromDate" ng-model="need.startTime" placeholder="from">
-						</div>
-						<div class="col-lg-1"><label class="control-label">to</label></div>
-						<div class="col-lg-4">
-							<input type="text" class="form-control" id="inputToDate" ng-model="need.endTime" placeholder="to">
-						</div>
-
-						<label class="col-lg-2 control-label">Repeatable</label>
-
-						<div class="col-lg-4 checkbox">
-							<input type="checkbox" style="margin-left:0"/>
-						</div>
-					</div>
-					<legend>Content description</legend>
-					<div class="form-group">
-						<div class="col-lg-12">
-							<textarea class="form-control" rows="6" ng-model="need.contentDescription" id="textArea"></textarea>
-						</div>
-					</div>
 				</fieldset>
 			</div>
-		</div>
-		<div class="col-lg-5">
+
 			<div class="well">
 				<fieldset>
 					<legend>Where new need takes place</legend>
 					<section id="map">
-					<div ui-map="myMap" ui-options="mapOptions" class="map-canvas"
-					     ui-event="{'map-click' : 'onClickMap($event,$params, $myMap)'}"></div>
+						<div ui-map="myMap" ui-options="mapOptions" class="map-canvas"
+						     ui-event="{'map-click' : 'onClickMap($event,$params, $myMap)'}"></div>
 					</section>
 					<span class="help-block">Please click on the map above and determine where need takes place</span>
 				</fieldset>
 			</div>
-		</div>
-		<div class="col-lg-5">
-			<div class="well">
-				<fieldset>
-					<legend>Tags</legend>
-					<div class="form-group">
-						<div class="col-lg-12">
-							<span style="margin-right:5px;cursor:pointer;"class="label label-primary btnTag"
-							      ng-click="removeTag('{{tagName}}')"
-							      ng-repeat="tagName in need.tags">{{tagName}}&nbsp;&nbsp;|&nbsp;x
-							</span>
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-lg-5">
-							<input type="text" class="form-control" id="inputTagName" placeholder="tag name">
-						</div>
-						<div class="col-lg-3">
-							<button type="button" class="btn btn-primary" id="bttAddTag" ng-click="addTag()">Add tag</button>
-						</div>
 
-					</div>
-
-				</fieldset>
-			</div>
 		</div>
 	</form>
 </div>

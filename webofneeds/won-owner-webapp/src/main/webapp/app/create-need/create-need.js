@@ -1,7 +1,7 @@
 //owner.home.controller
 createNeedModule = angular.module('owner.createneed', ['ui.map', 'ui.bootstrap.buttons', 'owner.service.need']);
 
-createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http, needService) {
+createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http, needService, userService) {
 	$scope.mapOptions = {
 		center : new google.maps.LatLng(35.784, -78.670),
 		zoom : 15,
@@ -19,7 +19,8 @@ createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http
 		tags : [],
 		startTime : '',
 		endTime : '',
-		wonNode : ''
+		wonNode : '',
+		uniqueKey : md5(userService.getUserName() + new Date().getTime())
 	};
 
 	$scope.onClickMap = function($event, $params) {
