@@ -20,7 +20,9 @@ import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.*;
 import won.protocol.owner.OwnerProtocolNeedService;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -29,6 +31,12 @@ import java.util.concurrent.Future;
  * Date: 17.10.13
  */
 public interface OwnerProtocolNeedServiceClientSide  {
+
+    /**
+     * registers the owner application on WON Node and receive client ID
+     **/
+    public Future<String> register();
+
     /**
      * Creates a new need with the specified content, ownerURI and active state.
      *
@@ -37,7 +45,7 @@ public interface OwnerProtocolNeedServiceClientSide  {
      * @param activate
      * @return the URI of the newly created need
      */
-    public Future<URI> createNeed(final URI ownerURI, Model content, final boolean activate) throws IllegalNeedContentException, ExecutionException, InterruptedException;
+    public Future<URI> createNeed(final URI ownerURI, Model content, final boolean activate) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException;
 
     /**
      * Activates the need object.
@@ -55,7 +63,7 @@ public interface OwnerProtocolNeedServiceClientSide  {
      */
     public void deactivate(URI needURI) throws NoSuchNeedException;
 
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException, ExecutionException, InterruptedException;
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException;
     /**
      * Opens a connection identified by connectionURI. A rdf graph can be sent along with the request.
      *

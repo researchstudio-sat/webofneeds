@@ -60,4 +60,9 @@ public class OwnerProtocolOwnerClientFactory extends AbstractClientFactory<Owner
     return getOwnerProtocolEndpointForNeed(needUri);
   }
 
+  public URI getOwnerProtocolOwnerURI(URI needURI){
+      Need owner = needRepository.findByNeedURI(needURI).get(0);
+      return  URI.create(owner.getOwnerURI().toString());
+
+  }
 }

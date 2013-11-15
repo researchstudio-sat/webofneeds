@@ -34,7 +34,9 @@
 
     <bean id="ownerProtocolNeedClientFactory" class="won.owner.ws.OwnerProtocolNeedClientFactory" />
 
-    <bean id="ownerProtocolOwnerServiceImpl" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
+    <bean id="ownerProtocolOwnerServiceImpl" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" >
+
+    </bean>
 
     <!-- protocol-level services -->
 
@@ -44,11 +46,18 @@
     <bean id="messagingServiceImpl" class="won.protocol.jms.MessagingServiceImpl">
         <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
+    <bean id="ownerApplicationListenerRouteBuilder" class="won.owner.routes.OwnerApplicationListenerRouteBuilder">
+
+    </bean>
     <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientJMSBased">
         <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
         <property name="producerTemplate" ref="producerTemplate"/>
         <property name="messagingService" ref="messagingServiceImpl"/>
+        <property name="propertiesUtil" ref="propertiesUtil" />
+        <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
+        <property name="ownerApplicationListenerRouteBuilder" ref="ownerApplicationListenerRouteBuilder"/>
     </bean>
+    <bean id="propertiesUtil" class="won.protocol.util.PropertiesUtil"></bean>
 
     <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
         <property name="delegate" ref="ownerProtocolNeedServiceClientJMSBased" />
@@ -62,6 +71,7 @@
     <bean id="uriService" class="won.owner.service.impl.URIService">
         <property name="ownerProtocolOwnerServiceEndpointURI" value="${uri.owner.protocol.endpoint}" />
         <property name="defaultOwnerProtocolNeedServiceEndpointURI" value="${uri.need.protocol.endpoint.default}" />
+        <property name="ownerProtocolOwnerURI" value="${uri.prefix.owner}"/>
     </bean>
 
     <bean id="dataReloadService" class="won.owner.service.impl.DataReloadService">

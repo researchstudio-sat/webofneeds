@@ -36,6 +36,7 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -117,7 +118,7 @@ public class NeedController
   }
 
   @RequestMapping(value = "/create", method = RequestMethod.POST)
-  public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) throws ExecutionException, InterruptedException {
+  public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) throws ExecutionException, InterruptedException, IOException, URISyntaxException {
     URI needURI;
 
     try {

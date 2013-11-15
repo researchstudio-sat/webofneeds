@@ -6,9 +6,10 @@ import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.spi.Synchronization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.jms.MessagingService;
+import won.protocol.model.OwnerApplication;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
@@ -16,16 +17,77 @@ import java.util.concurrent.Future;
  * User: LEIH-NB
  * Date: 04.11.13
  */
-public class MessagingServiceImpl implements MessagingService,CamelContextAware {
+public class MessagingServiceImpl<T> implements MessagingService,CamelContextAware {
     private CamelContext camelContext;
     private ProducerTemplate producerTemplate;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public Future<URI> sendInOutMessage(String methodName, Map headers, Object body, String endpoint){
+    public Future<String> sendInOutMessageForString(String methodName, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
 
         Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
         exchange.setProperty("methodName", methodName);
+        exchange.getIn().setHeaders(headers);
+        exchange.getIn().setBody(body);
+        exchange.setPattern(ExchangePattern.InOut);
+        final SettableFuture<String> result = SettableFuture.create();
+
+        producerTemplate.asyncCallback(ep,exchange, new Synchronization() {
+            @Override
+            public void onComplete(Exchange exchange) {
+                String resultObject = exchange.getOut().getBody().toString();
+                result.set(resultObject);
+            }
+
+            @Override
+            public void onFailure(Exchange exchange) {
+                result.cancel(true);
+            }
+        });
+
+        logger.info("sending InOut Message: "+ methodName);
+
+
+        return result;
+    }
+    public Future<T> sendInOutMessageGeneric(Map properties, Map headers, Object body, String endpoint){
+        Exchange exchange = new DefaultExchange(getCamelContext());
+
+        Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
+        exchange.setProperty("methodName", properties);
+        exchange.getIn().setHeaders(headers);
+        exchange.getIn().setBody(body);
+        exchange.setPattern(ExchangePattern.InOut);
+        final SettableFuture<T> result = SettableFuture.create();
+
+        producerTemplate.asyncCallback(ep,exchange, new Synchronization() {
+            @Override
+            public void onComplete(Exchange exchange) {
+                T resultObject = (T)exchange.getOut().getBody();
+                result.set(resultObject);
+            }
+
+            @Override
+            public void onFailure(Exchange exchange) {
+                result.cancel(true);
+            }
+        });
+
+        logger.info("sending InOut Message: "+ properties);
+
+
+        return result;
+    }
+
+    public Future<URI> sendInOutMessage(Map properties, Map headers, Object body, String endpoint){
+        Exchange exchange = new DefaultExchange(getCamelContext());
+
+        Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
+        if(properties.containsKey("methodName"))
+            exchange.setProperty("methodName", properties.get("methodName"));
+        if (properties.containsKey("protocol"))
+            exchange.setProperty("protocol",properties.get("protocol"));
+
         exchange.getIn().setHeaders(headers);
         exchange.getIn().setBody(body);
         exchange.setPattern(ExchangePattern.InOut);
@@ -44,16 +106,21 @@ public class MessagingServiceImpl implements MessagingService,CamelContextAware 
             }
         });
 
-        logger.info("sending InOut Message: "+ methodName);
+        logger.info("sending InOut Message: "+ properties.containsKey("methodName"));
 
 
         return result;
     }
-    public void sendInOnlyMessage(String methodName, Map headers, Object body, String endpoint){
+    public void sendInOnlyMessage(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
-        exchange.setProperty("methodName", methodName);
+        if(properties.containsKey("methodName"))
+            exchange.setProperty("methodName", properties.get("methodName"));
+        if (properties.containsKey("protocol"))
+            exchange.setProperty("protocol",properties.get("protocol"));
         exchange.getIn().setHeaders(headers);
+        List<OwnerApplication> ownerApplications= (List<OwnerApplication>) exchange.getIn().getHeader("ownerApplications");
+        logger.info(String.valueOf(ownerApplications.size()));
         exchange.getIn().setBody(body);
         producerTemplate.send(ep, exchange);
     }

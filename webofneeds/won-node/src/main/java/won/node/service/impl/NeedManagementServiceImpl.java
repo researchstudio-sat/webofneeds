@@ -17,7 +17,6 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,10 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
+import won.protocol.model.OwnerApplication;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.NeedRepository;
+import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
@@ -37,6 +38,7 @@ import won.protocol.util.RdfUtils;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -56,16 +58,23 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Autowired
   private NeedRepository needRepository;
 
+  @Autowired
+  private OwnerApplicationRepository ownerApplicationRepository;
+
   @Override
-  public URI createNeed(final URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException
+  public URI createNeed(final URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException
   {
     if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
     Need need = new Need();
+    List<OwnerApplication> ownerApplicationList = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
+    OwnerApplication ownerApplication = ownerApplicationList.get(0);
     need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
     need.setOwnerURI(ownerURI);
     need = needRepository.save(need);
     //now, create the need URI and save again
     need.setNeedURI(URIService.createNeedURI(need));
+
+    need.getAuthorizedApplications().add(ownerApplication);
     need = needRepository.saveAndFlush(need);
     String baseURI = need.getNeedURI().toString();
     RdfUtils.replaceBaseURI(content, baseURI);
@@ -138,4 +147,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
   {
     this.rdfStorage = rdfStorage;
   }
+
+    public void setOwnerApplicationRepository(OwnerApplicationRepository ownerApplicationRepository) {
+        this.ownerApplicationRepository = ownerApplicationRepository;
+    }
 }

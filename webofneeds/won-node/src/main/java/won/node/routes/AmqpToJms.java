@@ -18,12 +18,15 @@
 package won.node.routes;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.RouteBuilder;
+import won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor;
 
 /**
  * User: LEIH-NB
  * Date: 10.10.13
  */
 public class AmqpToJms extends RouteBuilder{
+
+
     @Override
     public void configure(){
         from("activemq:queue:WON.CREATENEED")
@@ -45,39 +48,55 @@ public class AmqpToJms extends RouteBuilder{
         from("activemq:queue:WON.CLOSE")
                 .to("log:CLOSE IN")
                 .to("bean:ownerProtocolNeedJMSService?method=close");
+        from("activemq:queue:WON.REGISTER")
+                .to("bean:ownerProtocolNeedJMSService?method=registerOwnerApplication");
         from("activemq:queue:WON.TEXTMESSAGE")
                 .to("log:TEXTMESSAGE IN")
                 .to("bean:ownerProtocolNeedJMSService?method=textMessage");
+        from("activemq:queue:WON.GETENDPOINTS")
+                .to("log:Get Endpoints IN")
+                .to("bean:ownerProtocolNeedJMSService?method=getEndpointsForOwnerApplication");
         from("activemq:queue:WON.INMSG")
             .choice()
-                    .when(property("methodName").isEqualTo("connect"))
-                    .to("activemq:queue:WON.CONNECTNEED")
-                    .when(property("methodName").isEqualTo("activate"))
-                    .to("log:ACTIVATEMSG")
-                    .to("activemq:queue:WON.ACTIVATENEED")
-                    .when(property("methodName").isEqualTo("deactivate"))
-                    .to("activemq:queue:WON.DEACTIVATENEED")
-                    .when(property("methodName").isEqualTo("textMessage"))
-                    .to("activemq:queue:WON.TEXTMESSAGE")
-                    .when(property("methodName").isEqualTo("createNeed"))
-                    .to("activemq:queue:WON.CREATENEED")
-                    .when(property("methodName").isEqualTo("open"))
-                    .to("activemq:queue:WON.OPEN")
-                    .when(property("methodName").isEqualTo("close"))
-                    .to("activemq:queue:WON.CLOSE")
-                    .otherwise()
-                    .to("log:UNSUPPORTED METHOD") ;
+                .when(property("methodName").isEqualTo("connect"))
+                .to("activemq:queue:WON.CONNECTNEED")
+                .when(property("methodName").isEqualTo("activate"))
+                .to("log:ACTIVATEMSG")
+                .to("activemq:queue:WON.ACTIVATENEED")
+                .when(property("methodName").isEqualTo("deactivate"))
+                .to("activemq:queue:WON.DEACTIVATENEED")
+                .when(property("methodName").isEqualTo("textMessage"))
+                .to("activemq:queue:WON.TEXTMESSAGE")
+                .when(property("methodName").isEqualTo("createNeed"))
+                .to("activemq:queue:WON.CREATENEED")
+                .when(property("methodName").isEqualTo("open"))
+                .to("activemq:queue:WON.OPEN")
+                .when(property("methodName").isEqualTo("close"))
+                .to("activemq:queue:WON.CLOSE")
+                .otherwise()
+                .to("log:UNSUPPORTED METHOD") ;
         from("seda:OUTMSG")
                 .to("log:OUTMSG FROM NODE")
                 .choice()
-                    .when(property("methodName").isEqualTo("connect"))
-                    .to("activemq:queue:WON.NeedProtocol.Connect.In")
-                    .when(property("methodName").isEqualTo("open"))
-                    .to("activemq:queue:WON.NeedProtocol.Open.In")
-                    .when(property("methodName").isEqualTo("close"))
-                    .to("activemq:queue:WON.NeedProtocol.Close.In")
-                    .when(property("methodName").isEqualTo("textMessage"))
-                    .to("activemq:queue:WON.NeedProtocol.TextMessage.In");
+                    .when(property("protocol").isEqualTo("NeedProtocol"))
+                    .to("seda:NeedProtocolOut")
+                    .when(property("protocol").isEqualTo("OwnerProtocol"))
+                    .to("seda:OwnerProtocolOut")
+                    .otherwise()
+                    .to("log:No protocol defined in header");
+        from("seda:NeedProtocolOut")
+            .choice()
+                .when(property("methodName").isEqualTo("connect"))
+                .to("activemq:queue:WON.NeedProtocol.Connect.In")
+                .when(property("methodName").isEqualTo("open"))
+                .to("activemq:queue:WON.NeedProtocol.Open.In")
+                .when(property("methodName").isEqualTo("close"))
+                .to("activemq:queue:WON.NeedProtocol.Close.In")
+                .when(property("methodName").isEqualTo("textMessage"))
+                .to("activemq:queue:WON.NeedProtocol.TextMessage.In");
+        from("seda:OwnerProtocolOut")
+                .to("bean:ownerProtocolOutgoingMessagesProcessor")
+                .recipientList(header("ownerApplicationIDs"));
         from("activemq:queue:WON.NeedProtocol.Connect.In")
                 .to("log:Routing message from queue WON.NeedProtocol.Connect.In")
                 .to("bean:needProtocolNeedService?method=connect");
@@ -90,5 +109,8 @@ public class AmqpToJms extends RouteBuilder{
         from("activemq:queue:WON.NeedProtocol.TextMessage.In")
                 .to("log:Routing message from queue WON.NeedProtocol.TextMessage.In")
                 .to("bean:needProtocolNeedService?method=textMessage");
+
     }
+
+
 }

@@ -14,7 +14,9 @@ import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.NeedModelMapper;
 import won.protocol.vocabulary.WON;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -143,12 +145,17 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
 
     @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException, ExecutionException, InterruptedException {
+    public Future<String> register() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException {
         return createNeed(ownerURI, content, activate, null);
     }
 
     @Override
-    public Future<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeURI) throws IllegalNeedContentException, ExecutionException, InterruptedException {
+    public Future<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeURI) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException {
         logger.info("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
                 new Object[]{ownerURI, content, activate});
 

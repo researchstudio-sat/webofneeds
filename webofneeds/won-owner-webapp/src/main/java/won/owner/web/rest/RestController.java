@@ -37,7 +37,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -179,7 +181,7 @@ public class RestController
       produces = MediaType.APPLICATION_JSON,
       method = RequestMethod.POST
       )
-  public NeedPojo createNeed(NeedPojo needPojo) throws ExecutionException, InterruptedException {
+  public NeedPojo createNeed(NeedPojo needPojo) throws ExecutionException, InterruptedException, IOException, URISyntaxException {
 
     logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getCreationDate() + "/" +
         needPojo.getLongitude() + "/" + needPojo.getLatitude() + "/" + (needPojo.getState() == NeedState.ACTIVE));
@@ -210,7 +212,7 @@ public class RestController
     return returnList;
   }
 
-  private NeedPojo resolve(NeedPojo needPojo) throws ExecutionException, InterruptedException {
+  private NeedPojo resolve(NeedPojo needPojo) throws ExecutionException, InterruptedException, IOException, URISyntaxException {
 
 
     if (needPojo.getNeedId() >= 0) {

@@ -26,6 +26,7 @@ import won.protocol.service.ConnectionCommunicationService;
 import javax.jms.Message;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  * User: fkleedorfer

@@ -34,12 +34,14 @@ public interface NeedManagementService
   /**
    * Creates a new need with the specified content, ownerURI and active state.
    *
+   *
    * @param ownerURI
    * @param content
    * @param activate
+   * @param ownerApplicationID
    * @return the URI of the newly created need
    */
-  public URI createNeed(final URI ownerURI, Model content, final boolean activate) throws IllegalNeedContentException;
+  public URI createNeed(final URI ownerURI, Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException;
 
   /**
    * Activates the need object.

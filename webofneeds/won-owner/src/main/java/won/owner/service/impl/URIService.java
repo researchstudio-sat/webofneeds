@@ -26,6 +26,7 @@ public class URIService
 {
   private URI ownerProtocolOwnerServiceEndpointURI;
   private URI defaultOwnerProtocolNeedServiceEndpointURI;
+  private URI ownerProtocolOwnerURI;
 
   public URI getOwnerProtocolOwnerServiceEndpointURI()
   {
@@ -46,4 +47,12 @@ public class URIService
   {
     this.defaultOwnerProtocolNeedServiceEndpointURI = defaultOwnerProtocolNeedServiceEndpointURI;
   }
+
+    public URI getOwnerProtocolOwnerURI() {
+        return ownerProtocolOwnerURI;
+    }
+
+    public void setOwnerProtocolOwnerURI(URI ownerProtocolOwnerURI) {
+        this.ownerProtocolOwnerURI = ownerProtocolOwnerURI;
+    }
 }

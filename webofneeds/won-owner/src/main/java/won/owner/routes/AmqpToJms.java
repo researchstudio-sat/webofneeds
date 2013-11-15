@@ -32,6 +32,8 @@ public class AmqpToJms extends RouteBuilder{
         from("seda:OUTMSG")
                 .to("log:OUTMSG")
                 .choice()
+                    .when(property("methodName").isEqualTo("register"))
+                    .to("activemq:queue:WON.REGISTER")
                     .when(property("methodName").isEqualTo("connect"))
                     .to("activemq:queue:WON.CONNECTNEED")
                     .when(property("methodName").isEqualTo("activate"))
@@ -49,6 +51,7 @@ public class AmqpToJms extends RouteBuilder{
                     .to("activemq:queue:WON.CLOSE")
                     .otherwise()
                     .to("log:UNSUPPORTED METHOD") ;
+
         from("seda:OUTMSG1")
                    .to("activemq:queue:WON.INMSG");
 

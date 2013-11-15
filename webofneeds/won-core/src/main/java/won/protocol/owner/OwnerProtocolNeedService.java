@@ -16,12 +16,7 @@
 
 package won.protocol.owner;
 
-import won.protocol.exception.NoSuchNeedException;
-import won.protocol.model.Match;
 import won.protocol.service.*;
-
-import java.net.URI;
-import java.util.Collection;
 
 /**
  * User: fkleedorfer

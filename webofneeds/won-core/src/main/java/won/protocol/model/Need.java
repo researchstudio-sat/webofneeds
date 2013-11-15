@@ -17,12 +17,14 @@
 package won.protocol.model;
 
 import org.hibernate.cfg.Configuration;
+import org.hibernate.mapping.Set;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -50,6 +52,13 @@ public class Need
   @Temporal(TemporalType.TIMESTAMP)
   @Column( name = "creationDate", nullable = false)
   private Date creationDate;
+
+
+   @ManyToMany(targetEntity = OwnerApplication.class,fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+   @JoinTable(name="NEED_OWNERAPP",
+           joinColumns = @JoinColumn(name="need_id"),
+           inverseJoinColumns = @JoinColumn(name = "owner_application_id"))
+   private List<OwnerApplication> authorizedApplications;
 
   @PrePersist
   protected void onCreate() {
@@ -147,4 +156,15 @@ public class Need
        config.configure();
        new SchemaExport(config).create(true, true);
    }
+
+
+    public List<OwnerApplication> getAuthorizedApplications() {
+        return authorizedApplications;
+    }
+
+    public void setAuthorizedApplications(List<OwnerApplication> authorizedApplications) {
+        this.authorizedApplications = authorizedApplications;
+    }
+
+
 }

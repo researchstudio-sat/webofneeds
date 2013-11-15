@@ -89,6 +89,11 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
 
+    @Override
+    public Future<String> register() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     //@Override
     public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
         return createNeed(ownerURI, content, activate,null);

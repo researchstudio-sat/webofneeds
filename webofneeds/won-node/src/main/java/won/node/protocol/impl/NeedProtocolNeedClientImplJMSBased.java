@@ -58,12 +58,15 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
   public Future<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
       Map headerMap = new HashMap<String, String>();
+      headerMap.put("protocol","NeedProtocol");
       headerMap.put("needURI", needURI.toString()) ;
       headerMap.put("otherNeedURI", otherNeedURI.toString());
       headerMap.put("otherConnectionURI", otherConnectionURI.toString()) ;
       headerMap.put("content",RdfUtils.toString(content));
-
-      return messagingService.sendInOutMessage("connect",headerMap,null, "outgoingMessages" );
+      Map properties = new HashMap();
+      properties.put("methodName","connect");
+      properties.put("protocol","NeedProtocol");
+      return messagingService.sendInOutMessage(properties,headerMap,null, "outgoingMessages" );
   }
    /*
     @Override
@@ -85,9 +88,12 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
     public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connectionURI));
         Map headerMap = new HashMap<String, String>();
+        headerMap.put("protocol","NeedProtocol");
         headerMap.put("connectionURI", connectionURI.toString()) ;
         headerMap.put("content", RdfUtils.toString(content));
-        messagingService.sendInOnlyMessage("open",headerMap,null, "outgoingMessages" );
+        Map properties = new HashMap();
+        properties.put("methodName","open");
+        messagingService.sendInOnlyMessage(properties,headerMap,null, "outgoingMessages" );
     }
 
     @Override
@@ -95,9 +101,12 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
   {
       logger.info("need-facing: CLOSE called for connection {}", connectionURI);
       Map headerMap = new HashMap<String, String>();
+      headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connectionURI.toString()) ;
       headerMap.put("content", RdfUtils.toString(content));
-      messagingService.sendInOnlyMessage("close",headerMap,null, "outgoingMessages" );
+      Map properties = new HashMap();
+      properties.put("methodName","close");
+      messagingService.sendInOnlyMessage(properties,headerMap,null, "outgoingMessages" );
 
   }
 
@@ -106,9 +115,12 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
   {
       logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
       Map headerMap = new HashMap<String, String>();
+      headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connectionURI.toString()) ;
       headerMap.put("content", message);
-      messagingService.sendInOnlyMessage("textMessage",headerMap,null, "outgoingMessages" );
+      Map properties = new HashMap();
+      properties.put("methodName","textMessage");
+      messagingService.sendInOnlyMessage(properties,headerMap,null, "outgoingMessages" );
 
   }
 

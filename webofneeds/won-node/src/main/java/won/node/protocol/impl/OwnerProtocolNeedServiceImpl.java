@@ -42,8 +42,8 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     private NeedInformationService needInformationService;
 
     @Override
-    public URI createNeed(URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException {
-        return this.needManagementService.createNeed(ownerURI, content, activate);
+    public URI createNeed(URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException {
+        return this.needManagementService.createNeed(ownerURI, content, activate, ownerApplicationID);
     }
 
     @Override

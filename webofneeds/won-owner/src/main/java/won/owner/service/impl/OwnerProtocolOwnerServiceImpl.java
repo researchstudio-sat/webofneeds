@@ -3,23 +3,27 @@ package won.owner.service.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClientJMSBased;
+import won.owner.routes.OwnerApplicationListenerRouteBuilder;
+import won.protocol.jms.MessagingService;
 import won.protocol.jms.WonMessageListener;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 
 import won.protocol.owner.OwnerProtocolOwnerService;
-import won.protocol.repository.ChatMessageRepository;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.MatchRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.*;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.util.RdfUtils;
 
 import javax.jms.Message;
 import java.net.URI;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,6 +35,13 @@ import java.util.List;
 public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService, WonMessageListener{
 
     final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    private WonNodeRepository wonNodeRepository;
+
+
+
+
 
     @Override
     public void onMessage(Message message) {

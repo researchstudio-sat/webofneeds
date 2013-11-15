@@ -17,7 +17,6 @@
 package won.node.ws;
 
 import com.hp.hpl.jena.util.FileUtils;
-import org.hsqldb.lib.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.owner.OwnerProtocolNeedService;
@@ -89,7 +88,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     {
         wireDependenciesLazily();
       try {
-        return ownerProtocolNeedService.createNeed(ownerURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), activate);
+        return ownerProtocolNeedService.createNeed(ownerURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), activate, null);
       } catch (IllegalNeedContentException e) {
         throw IllegalNeedContentFault.fromException(e);
       }

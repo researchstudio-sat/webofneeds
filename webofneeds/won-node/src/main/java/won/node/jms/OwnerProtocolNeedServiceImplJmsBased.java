@@ -9,9 +9,7 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
-import won.protocol.service.ConnectionCommunicationService;
-import won.protocol.service.NeedManagementService;
-import won.protocol.service.OwnerFacingNeedCommunicationService;
+import won.protocol.service.*;
 import won.protocol.util.RdfUtils;
 import javax.jms.JMSException;
 import java.net.URI;
@@ -28,8 +26,8 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
     private ConnectionCommunicationService connectionCommunicationService;
    // private ActiveMQComponent activeMQComponent;
     private NeedManagementService needManagementService;
-
-
+    private OwnerManagementService ownerManagementService;
+    private QueueManagementService queueManagementService;
 
     private OwnerFacingNeedCommunicationService needCommunicationService;
     private ProducerTemplate producerTemplate;
@@ -44,12 +42,27 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         //To change body of implemented methods use File | Settings | File Templates.
     } */
 
+   // @Consume(uri="bean:activemq:queue:WON.REGISTER")
+
+    public List<String> getEndpointsForOwnerApplication(
+            @Header("ownerApplicationID") String ownerApplicationID, Exchange exchange){
+        logger.info("get endpoints: message received");
+        List<String> endpoints = queueManagementService.getEndpointsForOwnerApplication(ownerApplicationID);
+        return endpoints;
+    }
+    public String registerOwnerApplication(
+            Exchange exchange) throws IllegalNeedContentException, JMSException {
+        logger.info("register: message received");
+        String ownerApplicationId = ownerManagementService.registerOwnerApplication();
+        return ownerApplicationId;
+    }
 
     @Consume(uri="bean:activemq:queue:WON.CREATENEED")
     public URI createNeed(
             @Header("ownerURI") String ownerURI,
             @Header("model") String content,
             @Header("activate") boolean activate,
+            @Header("ownerApplicationID") String ownerApplicationID,
             Exchange exchange) throws IllegalNeedContentException, JMSException {
         URI connectionURI = null;
         URI ownerURIconvert = URI.create(ownerURI);
@@ -58,9 +71,9 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         logger.info(ownerURI);
         logger.info("pattern: ", exchange.getPattern());
         logger.info(exchange.getProperties().toString());
-        logger.info("createNeed: message received: {}", content);
+        logger.info("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
 
-        connectionURI = needManagementService.createNeed(ownerURIconvert, contentconvert, activate);
+        connectionURI = needManagementService.createNeed(ownerURIconvert, contentconvert, activate, ownerApplicationID);
         exchange.getOut().setBody(connectionURI);
        return connectionURI;
     }
@@ -197,5 +210,9 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
     }
     public void setNeedCommunicationService(OwnerFacingNeedCommunicationService needCommunicationService) {
         this.needCommunicationService = needCommunicationService;
+    }
+
+    public void setOwnerManagementService(OwnerManagementService ownerManagementService) {
+        this.ownerManagementService = ownerManagementService;
     }
 }

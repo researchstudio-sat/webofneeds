@@ -35,7 +35,9 @@
         <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService" />
         <qualifier value="needProtocolNeedService"/>
     </bean>
-
+    <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor">
+        <property name="queueManagementService" ref="queueManagementService"/>
+    </bean>
     <bean id="ownerProtocolNeedService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
         <!-- the connection communication service injected here is owner facing -->
         <property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
@@ -55,6 +57,7 @@
         <property name="producerTemplate" ref="producerTemplate"/>
         <property name="needManagementService" ref="needManagementServiceJMSBased"/>
         <property name="needCommunicationService" ref="needCommunicationService"/>
+        <property name="ownerManagementService" ref="ownerManagementService"/>
         <property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
     </bean>
     <bean id="matcherProtocolNeedService" class="won.node.protocol.impl.MatcherProtocolNeedServiceImpl">
@@ -73,7 +76,7 @@
         <property name="executorService" ref="threadPoolExecutor" />
         <property name="rdfStorageService" ref="rdfStorageRef" />
     </bean>
-
+    <bean id="queueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/>
     <bean id="needInformationService" class="won.node.service.impl.NeedInformationServiceImpl">
         <property name="pageSize" value="${linkeddata.pagesize}" />
         <property name="rdfStorage" ref="rdfStorageRef" />
@@ -85,6 +88,8 @@
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
         <property name="URIService" ref="uriService" />
         <property name="rdfStorage" ref="rdfStorageRef" />
+    </bean>
+    <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl">
     </bean>
 
     <bean id="needFacingConnectionCommunicationService"
@@ -168,6 +173,7 @@
 
     <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClientImpl">
         <property name="clientFactory" ref="ownerProtocolOwnerWebServiceClientFactory" />
+        <property name="messagingService" ref="messagingService"/>
     </bean>
 
 
@@ -185,6 +191,8 @@
         <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
 
+    <bean id="ownerProtocolQueueService" class="won.node.service.impl.QueueManagementServiceImpl">
+    </bean>
     <!-- Model Mapper for RDF -->
     <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>

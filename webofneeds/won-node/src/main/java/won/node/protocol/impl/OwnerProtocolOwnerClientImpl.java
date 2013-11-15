@@ -17,11 +17,16 @@
 package won.node.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.hibernate.mapping.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
+import won.protocol.jms.MessagingService;
+import won.protocol.model.Need;
+import won.protocol.model.OwnerApplication;
 import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.repository.NeedRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
 import won.protocol.ws.fault.*;
@@ -30,15 +35,24 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
 
+
   @Autowired
   private OwnerProtocolOwnerClientFactory clientFactory;
 
-  @Override
+  private MessagingService messagingService;
+
+  @Autowired
+  private NeedRepository needRepository;
+
+    @Override
   public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
     logger.info(MessageFormat.format("owner-facing: HINT_RECEIVED called for own need {0}, other need {1}, with score {2} from originator {3} and content {4}", ownNeedURI, otherNeedURI, score, originatorURI, content));
@@ -55,44 +69,35 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
       logger.warn("couldn't send hint", illegalMessageForNeedStateFault);
     }
   }
-  /*
-  @Override
-  public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
-  {
-    logger.info(MessageFormat.format("owner-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, own connection {2} and message ''{3}''", ownNeedURI, otherNeedURI, ownConnectionURI, content));
-    try {
-      OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(ownNeedURI);
-      StringWriter sw = new StringWriter();
-      content.write(sw, "TTL");
-      proxy.connect(ownNeedURI, otherNeedURI, ownConnectionURI, sw.toString());
-    } catch (MalformedURLException e) {
-      logger.warn("couldn't create URL for needProtocolEndpoint", e);
-    } catch (NoSuchNeedFault noSuchNeedFault) {
-      NoSuchNeedFault.toException(noSuchNeedFault);
-    } catch (ConnectionAlreadyExistsFault connectionAlreadyExistsFault) {
-      throw ConnectionAlreadyExistsFault.toException(connectionAlreadyExistsFault);
-    } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
-      logger.warn("couldn't send hint", illegalMessageForNeedStateFault);
-    }
-  }   */
+
     @Override
     public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
         logger.info(MessageFormat.format("owner-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, own connection {2} and message ''{3}''", ownNeedURI, otherNeedURI, ownConnectionURI, content));
-        try {
-            OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(ownNeedURI);
-            StringWriter sw = new StringWriter();
-            content.write(sw, "TTL");
-            proxy.connect(ownNeedURI, otherNeedURI, ownConnectionURI, sw.toString());
-        } catch (MalformedURLException e) {
-            logger.warn("couldn't create URL for needProtocolEndpoint", e);
-        } catch (NoSuchNeedFault noSuchNeedFault) {
-            NoSuchNeedFault.toException(noSuchNeedFault);
-        } catch (ConnectionAlreadyExistsFault connectionAlreadyExistsFault) {
-            throw ConnectionAlreadyExistsFault.toException(connectionAlreadyExistsFault);
-        } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
-            logger.warn("couldn't send hint", illegalMessageForNeedStateFault);
-        }
+        StringWriter sw = new StringWriter();
+        content.write(sw, "TTL");
+        URI ownerURI = clientFactory.getOwnerProtocolOwnerURI(ownNeedURI);
+        Map headerMap = new HashMap<String, String>();
+        List<Need> needs = needRepository.findByNeedURI(ownNeedURI);
+        List<Need> needs2 = needRepository.findByNeedURI(otherNeedURI);
+        Need need = needs.get(0);
+        Need otherNeed = needs2.get(0);
+        List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
+
+        logger.info(ownerApplications.get(0).getOwnerApplicationId());
+        headerMap.put("ownNeedURI", ownNeedURI.toString()) ;
+        headerMap.put("otherNeedURI", otherNeedURI.toString());
+        headerMap.put("ownConnectionURI", ownConnectionURI.toString()) ;
+        headerMap.put("content",RdfUtils.toString(content));
+        headerMap.put("ownerURI", ownerURI.toString());
+        headerMap.put("ownerApplications", ownerApplications);
+
+        Map properties = new HashMap();
+        properties.put("protocol","OwnerProtocol");
+        properties.put("methodName", "connect");
+        messagingService.sendInOnlyMessage(properties,headerMap,null,"outgoingMessages");
+
+
     }
 
     @Override
@@ -154,4 +159,11 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     this.clientFactory = clientFactory;
   }
 
+    public void setNeedRepository(NeedRepository needRepository) {
+        this.needRepository = needRepository;
+    }
+
+    public void setMessagingService(MessagingService messagingService) {
+        this.messagingService = messagingService;
+    }
 }
