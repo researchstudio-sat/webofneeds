@@ -13,19 +13,26 @@ createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http
 		acceptFileTypes:/(\.|\/)(gif|jpe?g|png)$/i
 	};
 
+	$scope.succesShow = false;
+
 	$scope.marker = null;
 
-	$scope.need = {
-		title : '',
-		textDescription : '',
-		contentDescription : '',
-		state : 'ACTIVE',
-		basicNeedType : 'DEMAND',
-		tags : [],
-		startTime : '',
-		endTime : '',
-		wonNode : ''
-	};
+	$scope.getCleanNeed = function() {
+		return {
+			title:'',
+			textDescription:'',
+			contentDescription:'',
+			state:'ACTIVE',
+			basicNeedType:'DEMAND',
+			tags:[],
+			startTime:'',
+			endTime:'',
+			wonNode:'',
+			binaryFolder:md5((new Date().getTime() + Math.random(1)).toString())
+		};
+	}
+
+	$scope.need = $scope.getCleanNeed();
 
 	$scope.onClickMap = function($event, $params) {
 		if (this.marker == null) {
@@ -55,8 +62,10 @@ createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http
 
 
 	$scope.save = function () {
-		needService.save($scope.need);
-		$location.path("/create-need");
+		needService.save($scope.need).then(function() {
+			$scope.need = $scope.getCleanNeed();
+			$scope.succesShow = true;
+		});
 	}
 
 	$scope.cancel = function () {
@@ -70,22 +79,25 @@ createNeedModule.directive('wonGallery', function factory() {
 	return {
 		restrict : 'A',
 		templateUrl : "app/create-need/won-gallery.html",
+		scope : {
+			need : '=need'
+		},
 		link : function (scope, element, attrs) {
 
 			$('#photo').change(function () {
 				angular.element("#photo-form").scope().submit();
 			});
-
 		},
 		controller : function($scope) {
-			$scope.unique = md5((new Date().getTime() + Math.random(1)).toString());
 			$scope.selectedPhoto = 0;
-			/*$scope.bigUrl = '';*/
-			$scope.photos = [
-				{url:''},
-				{url:''},
-				{url:''}
-			];
+			$scope.getCleanPhotos = function() {
+				return [
+					{url:''},
+					{url:''},
+					{url:''}
+				];
+			}
+			$scope.photos = $scope.getCleanPhotos();
 
 			$scope.onClickPhoto = function(num) {
 				$scope.selectedPhoto = num;
@@ -96,8 +108,14 @@ createNeedModule.directive('wonGallery', function factory() {
 				$scope.lastExtension =  extension = filename.substr(filename.lastIndexOf(".") , filename.lenght);
 			});
 
+			$scope.$watch('need', function (newVal, oldVal) {
+				if(newVal.binaryFolder != oldVal.binaryFolder) {
+					$scope.photos = $scope.getCleanPhotos();
+				}
+			});
+
 			$scope.$on('fileuploadstop', function (e, data) {
-				$scope.photos[$scope.selectedPhoto].url = 'http://localhost:8080/owner/rest/needphoto/' + $scope.unique + "/" + $scope.selectedPhoto + $scope.lastExtension + '/';
+				$scope.photos[$scope.selectedPhoto].url = 'http://localhost:8080/owner/rest/needphoto/' + $scope.need.binaryFolder + "/" + $scope.selectedPhoto + $scope.lastExtension + '/';
 			});
 		}
 	};

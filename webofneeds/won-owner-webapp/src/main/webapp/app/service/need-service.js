@@ -63,6 +63,7 @@ needServiceModule.factory('needService', function ($http, $q, connectionService)
 		}
 		delete needToSave.endTimeHour;
 		delete needToSave.endTimeMinute;
+		delete needToSave.binaryFolder;
 		return $http({
 			method:'POST',
 			url:'/owner/rest/create',
@@ -70,7 +71,15 @@ needServiceModule.factory('needService', function ($http, $q, connectionService)
 			success:function (content) {
 				console.log(content);
 			}
-		});
+		}).then(
+				function () {
+					// success
+					return {status:"OK"};
+				},
+				function (response) {
+					console.log("FATAL ERROR");
+				}
+		);;
 	};
 
 	return needService;

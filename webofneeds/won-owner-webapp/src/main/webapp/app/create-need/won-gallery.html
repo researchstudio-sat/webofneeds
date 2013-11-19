@@ -5,7 +5,7 @@
 				<input type="file" name="photo" id="photo"
 				       style="position:absolute;top:0;right:0;font-size:190px;margin:0;opacity:0;direction:ltr;cursor: pointer;"
 						/>
-				<input type="hidden" name="unique" value="{{ unique }}"/>
+				<input type="hidden" name="unique" value="{{ need.binaryFolder }}"/>
 				<input type="hidden" name="selected" value="{{ selectedPhoto }}"/>
 				<span ng-show="!photos[selectedPhoto].url" class="glyphicon glyphicon-picture"></span>
 				<br ng-show="!photos[selectedPhoto].url" />
