@@ -161,6 +161,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Resource connectionMember = model.getResource(connection.getConnectionURI().toString());
 
     addProtocolEndpoints(model, connectionMember);
+    connectionMember.addProperty(WON.HAS_REMOTE_NEED,model.createResource(connection.getRemoteNeedURI().toString()));
 
     if (includeEventData) {
         List<ConnectionEvent> events = needInformationService.readEvents(connectionUri);
@@ -168,7 +169,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
         //create event container and attach it to the member
         Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
         connectionMember.addProperty(WON.HAS_EVENT_CONTAINER,eventContainer);
-        eventContainer.addProperty(WON.HAS_REMOTE_NEED,model.createResource(connection.getRemoteNeedURI().toString()));
 
         //add event members and attach them
         for (ConnectionEvent e : events) {
