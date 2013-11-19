@@ -55,11 +55,13 @@ public interface LinkedDataService
 
   /**
    * Returns a model describing the connection with the specified URI.
+   *
    * @param connectionUri
+   * @param includeEventData If true, RDF describing connection events is included. Default: true.
    * @return
    * @throws NoSuchConnectionException
    */
-  public Model getConnectionModel(final URI connectionUri) throws NoSuchConnectionException;
+  public Model getConnectionModel(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException;
 
 
   /**

@@ -149,10 +149,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
         .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint));
   }
 
-  public Model getConnectionModel(final URI connectionUri) throws NoSuchConnectionException
+  public Model getConnectionModel(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException
   {
     Connection connection = needInformationService.readConnection(connectionUri);
-    List<ConnectionEvent> events = needInformationService.readEvents(connectionUri);
 
     Model model = connectionModelMapper.toModel(connection);
     setNsPrefixes(model);
@@ -163,30 +162,33 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     addProtocolEndpoints(model, connectionMember);
 
-    //create event container and attach it to the member
-    Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
-    connectionMember.addProperty(WON.HAS_EVENT_CONTAINER,eventContainer);
-    eventContainer.addProperty(WON.HAS_REMOTE_NEED,model.createResource(connection.getRemoteNeedURI().toString()));
+    if (includeEventData) {
+        List<ConnectionEvent> events = needInformationService.readEvents(connectionUri);
 
-    //add event members and attach them
-    for (ConnectionEvent e : events) {
-      Resource eventMember = model.createResource(WON.toResource(e.getType()));
-      if (e.getOriginatorUri() != null)
-        eventMember.addProperty(WON.HAS_ORIGINATOR, model.createResource(e.getOriginatorUri().toString()));
+        //create event container and attach it to the member
+        Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
+        connectionMember.addProperty(WON.HAS_EVENT_CONTAINER,eventContainer);
+        eventContainer.addProperty(WON.HAS_REMOTE_NEED,model.createResource(connection.getRemoteNeedURI().toString()));
 
-      if (e.getCreationDate() != null)
-        eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.toLiteral(e.getCreationDate(), model));
+        //add event members and attach them
+        for (ConnectionEvent e : events) {
+          Resource eventMember = model.createResource(WON.toResource(e.getType()));
+          if (e.getOriginatorUri() != null)
+            eventMember.addProperty(WON.HAS_ORIGINATOR, model.createResource(e.getOriginatorUri().toString()));
 
-      Model additionalDataModel = rdfStorage.loadContent(e);
-      if (additionalDataModel != null && additionalDataModel.size() > 0) {
-        Resource additionalData = additionalDataModel.createResource();
-        RdfUtils.replaceBaseResource(additionalDataModel, additionalData);
-        model.add(model.createStatement(eventMember, WON.HAS_ADDITIONAL_DATA, additionalData));
-        model.add(additionalDataModel);
-      }
-      model.add(model.createStatement(eventContainer, RDFS.member, eventMember));
+          if (e.getCreationDate() != null)
+            eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.toLiteral(e.getCreationDate(), model));
+
+          Model additionalDataModel = rdfStorage.loadContent(e);
+          if (additionalDataModel != null && additionalDataModel.size() > 0) {
+            Resource additionalData = additionalDataModel.createResource();
+            RdfUtils.replaceBaseResource(additionalDataModel, additionalData);
+            model.add(model.createStatement(eventMember, WON.HAS_ADDITIONAL_DATA, additionalData));
+            model.add(additionalDataModel);
+          }
+          model.add(model.createStatement(eventContainer, RDFS.member, eventMember));
+        }
     }
-
     return model;
   }
 
