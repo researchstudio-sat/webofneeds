@@ -92,9 +92,9 @@ createNeedModule.directive('wonGallery', function factory() {
 			$scope.selectedPhoto = 0;
 			$scope.getCleanPhotos = function() {
 				return [
-					{url:''},
-					{url:''},
-					{url:''}
+					{uri:''},
+					{uri:''},
+					{uri:''}
 				];
 			}
 			$scope.photos = $scope.getCleanPhotos();
@@ -115,7 +115,13 @@ createNeedModule.directive('wonGallery', function factory() {
 			});
 
 			$scope.$on('fileuploadstop', function (e, data) {
-				$scope.photos[$scope.selectedPhoto].url = 'http://localhost:8080/owner/rest/needphoto/' + $scope.need.binaryFolder + "/" + $scope.selectedPhoto + $scope.lastExtension + '/';
+				$scope.photos[$scope.selectedPhoto].uri = 'http://localhost:8080/owner/rest/needphoto/' + $scope.need.binaryFolder + "/" + $scope.selectedPhoto + $scope.lastExtension + '/';
+				$scope.need.images = [];
+				angular.forEach($scope.photos, function(photo) {
+					if(photo.uri) {
+						$scope.need.images.push(angular.copy(photo));
+					}
+				}, $scope);
 			});
 		}
 	};

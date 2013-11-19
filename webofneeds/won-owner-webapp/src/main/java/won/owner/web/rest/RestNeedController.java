@@ -274,13 +274,13 @@ public class RestNeedController {
 			}
       if (!needPojo.getImages().isEmpty()){
         Seq mediaSeq = needModel.createSeq();
-        int imageIndex = 0;
+        int imageIndex = 1;
         for (ImagePojo imagePojo: needPojo.getImages()) {
-          URI imageUri = imagePojo.getUri();
+          String imageUri = imagePojo.getUri();
 
           if (imageUri != null){
             Resource blankNodeForImage = needModel.createResource();
-            blankNodeForImage.addProperty(MAONT.LOCATOR, needModel.createResource(imageUri.toString()));
+            blankNodeForImage.addProperty(MAONT.LOCATOR, needModel.createResource(imageUri));
             blankNodeForImage.addProperty(RDF.type, MAONT.IMAGE);
             mediaSeq.add(imageIndex++,blankNodeForImage);
           }

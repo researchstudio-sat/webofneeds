@@ -1,6 +1,8 @@
-package won.owner.pojo;
+/*
+ * This file is subject to the terms and conditions defined in file 'LICENSE.txt', which is part of this source code package.
+ */
 
-import java.net.URI;
+package won.owner.pojo;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,13 +12,13 @@ import java.net.URI;
  * To change this template use File | Settings | File Templates.
  */
 public class ImagePojo {
-    private URI uri;
+    private String uri;
 
-    public URI getUri() {
+    public String getUri() {
         return uri;
     }
 
-    public void setUri(URI uri) {
+    public void setUri(String uri) {
         this.uri = uri;
     }
 }

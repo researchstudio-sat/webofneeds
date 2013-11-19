@@ -42,12 +42,26 @@ needServiceModule.factory('needService', function ($http, $q, connectionService)
 		});
 	};
 
-	needService.getNeedConnections = function (needId) {
-		return $http.get('/owner/rest/' + needId + '/listConnections');
+	needService.getNeedConnections = function (needUri) {
+		return $http({
+			url : needUri + '/connections/?deep=true',
+			headers : {
+				'Accept' : 'application/ld+json'
+			}
+		});
 	};
 
+	needService.getNeedByUri = function(needUri) {
+		return $http({
+			url : needUri,
+			headers : {
+				'Accept':'application/ld+json'
+			}
+		});
+	}
+
 	needService.getAllNeeds = function() {
-		return $http.get('/owner/rest/');
+		return $http.get('/owner/rest/need/');
 	}
 
 	needService.save = function(need) {
@@ -66,7 +80,7 @@ needServiceModule.factory('needService', function ($http, $q, connectionService)
 		delete needToSave.binaryFolder;
 		return $http({
 			method:'POST',
-			url:'/owner/rest/create',
+			url:'/owner/rest/need/create',
 			data:needToSave,
 			success:function (content) {
 				console.log(content);

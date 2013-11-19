@@ -100,7 +100,7 @@ public class NeedPojo
           ImagePojo imagePojo = new ImagePojo();
           Statement locatorStmt = nodeRes.getProperty(MAONT.LOCATOR);
           if (locatorStmt == null) continue;
-          imagePojo.setUri(URI.create(locatorStmt.getObject().toString()));
+          imagePojo.setUri(locatorStmt.getObject().toString());
         }
       }
       this.images = images;
