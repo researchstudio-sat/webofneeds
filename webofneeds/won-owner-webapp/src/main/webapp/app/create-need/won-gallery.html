@@ -7,9 +7,10 @@
 						/>
 				<input type="hidden" name="unique" value="{{ unique }}"/>
 				<input type="hidden" name="selected" value="{{ selectedPhoto }}"/>
-				<span ng-show="!bigUrl" class="glyphicon glyphicon-picture"></span><br/>
-				<h4 ng-show="!bigUrl">Click here and upload new image</h4>
-				<img style="width:100%" src="{{ bigUrl }}" ng-show="bigUrl"/>
+				<span ng-show="!photos[selectedPhoto].url" class="glyphicon glyphicon-picture"></span>
+				<br ng-show="!photos[selectedPhoto].url" />
+				<h4 ng-show="!photos[selectedPhoto].url">Click here and upload new image</h4>
+				<img style="width:100%" src="{{ photos[selectedPhoto].url }}" ng-show="photos[selectedPhoto].url"/>
 			</div>
 		</form>
 	</div>
@@ -17,17 +18,20 @@
 <div class="row" style="margin-bottom: 20px;">
 	<div class="col-lg-4">
 		<div class="img-upload-box img-upload-box-small" ng-class="{selected : selectedPhoto==0}" ng-click="onClickPhoto(0)">
-			<span class="glyphicon glyphicon-picture"></span>
+			<span class="glyphicon glyphicon-picture" ng-show="!photos[0].url"></span>
+			<img style="width:100%" src="{{ photos[0].url }}" ng-show="photos[0].url"/>
 		</div>
 	</div>
 	<div class="col-lg-4">
 		<div class="img-upload-box img-upload-box-small" ng-class="{selected : selectedPhoto==1}" ng-click="onClickPhoto(1)">
-			<span class="glyphicon glyphicon-picture"></span>
+			<span class="glyphicon glyphicon-picture" ng-show="!photos[1].url"></span>
+			<img style="width:100%" src="{{ photos[1].url }}" ng-show="photos[1].url"/>
 		</div>
 	</div>
 	<div class="col-lg-4">
 		<div class="img-upload-box img-upload-box-small" ng-class="{selected : selectedPhoto==2}" ng-click="onClickPhoto(2)">
-			<span class="glyphicon glyphicon-picture"></span>
+			<span class="glyphicon glyphicon-picture" ng-show="!photos[2].url"></span>
+			<img style="width:100%" src="{{ photos[2].url }}" ng-show="photos[2].url"/>
 		</div>
 	</div>
 </div>

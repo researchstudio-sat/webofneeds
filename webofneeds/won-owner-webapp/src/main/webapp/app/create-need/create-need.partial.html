@@ -93,13 +93,13 @@
 							<input type="text" class="form-control" id="inputFromDate" ng-model="need.startTime" placeholder="from">
 							<div class="row" style="padding-top: 1em">
 								<div class="col-xs-4" style="padding-right:0">
-									<input type="text" class="form-control"/>
+									<input ng-model="need.startTimeHour" type="text" class="form-control"/>
 								</div>
 								<div class="col-xs-2">
 									<p class="form-control-static">:</p>
 								</div>
 								<div class="col-xs-4" style="padding-left:0">
-									<input type="text" class="form-control"/>
+									<input ng-model="need.startTimeMinute" type="text" class="form-control"/>
 								</div>
 
 							</div>
@@ -109,13 +109,13 @@
 							<input type="text" class="form-control" id="inputToDate" ng-model="need.endTime" placeholder="to">
 							<div class="row" style="padding-top: 1em">
 								<div class="col-xs-4" style="padding-right:0">
-									<input type="text" class="form-control" maxlength="2"/>
+									<input ng-model="need.endTimeHour" type="text" class="form-control" maxlength="2"/>
 								</div>
 								<div class="col-xs-2">
 									<p class="form-control-static">:</p>
 								</div>
 								<div class="col-xs-4" style="padding-left:0">
-									<input type="text" class="form-control"/>
+									<input ng-model="need.endTimeMinute" type="text" class="form-control"/>
 								</div>
 
 							</div>

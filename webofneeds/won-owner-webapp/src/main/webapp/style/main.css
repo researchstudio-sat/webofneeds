@@ -99,8 +99,12 @@ h1#main-heading {
 	height: 81px;
 	color: white;
 	font-size: 23px;
-	padding-top: 24px;
 	cursor: pointer;
+	overflow: hidden;
+}
+
+.img-upload-box-small .glyphicon-picture{
+	padding-top: 24px;
 }
 
 .img-upload-box-small.selected {

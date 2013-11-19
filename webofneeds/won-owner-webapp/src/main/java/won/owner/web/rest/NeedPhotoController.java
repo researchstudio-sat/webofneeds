@@ -46,11 +46,11 @@ public class NeedPhotoController {
 
 	@ResponseBody
 	@RequestMapping(
-			value = "/{unique}/{photoNum}",
+			value = "/{unique}/{photoNum}/",
 			method = RequestMethod.GET,
 			produces = {MediaType.IMAGE_JPEG_VALUE})
 	public byte[] getImage(@PathVariable("unique") String unique, @PathVariable("photoNum") String photoNum) {
-		File photoFile = new File(unique + File.separator + photoNum + ".jpg");
+		File photoFile = new File(unique + File.separator + photoNum);
 		if(photoFile.exists()) {
 			try {
 				return IOUtils.toByteArray(new FileInputStream(photoFile));

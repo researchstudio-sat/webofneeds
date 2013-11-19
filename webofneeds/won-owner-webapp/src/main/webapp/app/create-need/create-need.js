@@ -36,8 +36,8 @@ createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http
 		} else {
 			this.marker.setPosition($params[0].latLng);
 		}
-		$scope.need.latitude = $params[0].latLng.lb;
-		$scope.need.longitude = $params[0].latLng.mb;
+		$scope.need.latitude = $params[0].latLng.lat();
+		$scope.need.longitude = $params[0].latLng.lng();
 	}
 
 	$scope.addTag = function() {
@@ -76,27 +76,28 @@ createNeedModule.directive('wonGallery', function factory() {
 				angular.element("#photo-form").scope().submit();
 			});
 
-
-
-		/*scope.$watch(attrs.ngModel, function (graphSpec) {
-			   var plot = $.plot(element, graphSpec.data, graphSpec.options);
-			   element.show();
-
-		   });*/
 		},
 		controller : function($scope) {
 			$scope.unique = md5((new Date().getTime() + Math.random(1)).toString());
 			$scope.selectedPhoto = 0;
-			$scope.bigUrl = '';
-			$scope.photos = new Array(3);
+			/*$scope.bigUrl = '';*/
+			$scope.photos = [
+				{url:''},
+				{url:''},
+				{url:''}
+			];
 
 			$scope.onClickPhoto = function(num) {
 				$scope.selectedPhoto = num;
 				console.log($scope.selectedPhoto);
 			}
+			$scope.$on('fileuploadsubmit', function (e, data) {
+				var filename = data.files[0].name;
+				$scope.lastExtension =  extension = filename.substr(filename.lastIndexOf(".") , filename.lenght);
+			});
 
-			$scope.$on('fileuploadstop', function (data) {
-				$scope.bigUrl = '/owner/rest/needphoto/' + $scope.unique + "/" + $scope.selectedPhoto;
+			$scope.$on('fileuploadstop', function (e, data) {
+				$scope.photos[$scope.selectedPhoto].url = 'http://localhost:8080/owner/rest/needphoto/' + $scope.unique + "/" + $scope.selectedPhoto + $scope.lastExtension + '/';
 			});
 		}
 	};

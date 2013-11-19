@@ -53,6 +53,16 @@ needServiceModule.factory('needService', function ($http, $q, connectionService)
 	needService.save = function(need) {
 		var needToSave = angular.copy(need);
 		needToSave.tags = need.tags.join(",");
+		if(needToSave.startTimeHour && needToSave.startTimeMinute) {
+			needToSave.startTime = needToSave.startTime + " " + needToSave.startTimeHour + ":" + needToSave.startTimeMinute + ": 00";
+		}
+		delete needToSave.startTimeHour;
+		delete needToSave.startTimeMinute;
+		if (needToSave.endTimeHour && needToSave.endTimeMinute) {
+			needToSave.endTime = needToSave.endTime + " " + needToSave.endTimeHour + ":" + needToSave.endTimeMinute + ": 00";
+		}
+		delete needToSave.endTimeHour;
+		delete needToSave.endTimeMinute;
 		return $http({
 			method:'POST',
 			url:'/owner/rest/create',
