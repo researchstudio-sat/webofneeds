@@ -348,11 +348,11 @@ public class NeedPojo
     this.contentDescription = contentDescription;
   }
 
-    public String getBinaryFolder() {
-        return binaryFolder;
-    }
+  public String getBinaryFolder() {
+    return binaryFolder;
+  }
 
-    public void setBinaryFolder(String binaryFolder) {
-        this.binaryFolder = binaryFolder;
-    }
+  public void setBinaryFolder(String binaryFolder) {
+    this.binaryFolder = binaryFolder;
+  }
 }
