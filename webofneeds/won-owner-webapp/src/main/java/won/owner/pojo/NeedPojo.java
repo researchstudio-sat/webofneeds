@@ -53,6 +53,8 @@ public class NeedPojo
 
   private long needId = -1;
 
+  private String binaryFolder;
+
   public NeedPojo()
   {
 
@@ -346,4 +348,11 @@ public class NeedPojo
     this.contentDescription = contentDescription;
   }
 
+    public String getBinaryFolder() {
+        return binaryFolder;
+    }
+
+    public void setBinaryFolder(String binaryFolder) {
+        this.binaryFolder = binaryFolder;
+    }
 }
