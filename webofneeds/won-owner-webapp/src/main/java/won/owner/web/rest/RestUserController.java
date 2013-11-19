@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Controller
 @RequestMapping("/rest/user")
-public class UserController {
+public class RestUserController {
 
 	private WONUserDetailService wonUserDetailService;
 
@@ -48,8 +48,8 @@ public class UserController {
 	private UserRegisterValidator userRegisterValidator;
 
 	@Autowired
-	public UserController(final WONUserDetailService wonUserDetailService, final AuthenticationManager authenticationManager,
-	                      final SecurityContextRepository securityContextRepository, final UserRegisterValidator userRegisterValidator) {
+	public RestUserController(final WONUserDetailService wonUserDetailService, final AuthenticationManager authenticationManager,
+	                          final SecurityContextRepository securityContextRepository, final UserRegisterValidator userRegisterValidator) {
 		this.wonUserDetailService = wonUserDetailService;
 		this.authenticationManager = authenticationManager;
 		this.securityContextRepository = securityContextRepository;

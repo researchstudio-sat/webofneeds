@@ -9,83 +9,125 @@
 		}
 	</style>
 
-	<div class="col-lg-2">
-		<div class="btn-group">
-			<button type="button" class="btn btn-default">All need types</button>
-			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-			<ul class="dropdown-menu">
-				<li><a href="#">Demand</a></li>
-				<li><a href="#">Supply</a></li>
-				<li><a href="#">Do together</a></li>
-				<li><a href="#">Critique</a></li>
-			</ul>
+	<div class="row">
+		<div class="col-lg-2">
+			<div class="btn-group">
+				<button type="button" class="btn btn-default">All need types</button>
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+				<ul class="dropdown-menu">
+					<li><a href="#">Demand</a></li>
+					<li><a href="#">Supply</a></li>
+					<li><a href="#">Do together</a></li>
+					<li><a href="#">Critique</a></li>
+				</ul>
+			</div>
 		</div>
-	</div>
-
-	<div class="col-lg-7" id="need-list">
-		<div class="row panel-need" ng-repeat="need in needs" ng-show="!need.hidden">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<div class="col-md-8">{{ need.title }}</div>
-					<div class="col-md-4 text-right">
-						<div ng-show="!need.selected">
-							<a href="#" ng-click="showMatches($event)">Show matches</a>&nbsp;
-							&nbsp;<span class="badge">14</span>
-						</div>
-						<div ng-show="need.selected">
-							<a href="#" ng-click="hideMatches($event)">Hide matches</a>&nbsp;
-						</div>
-					</div>
-					<div class="clearfix"></div>
+		<div class="col-lg-7">
+			<div class="row">
+				<div class="col-lg-4">
+					<button type="button" class="btn btn-default" ng-model="singleModel" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">
+						Suggestions
+					</button>
 				</div>
-				<div class="panel-body need-panel-body" ng-click="$parent.goToDetail(need.needId)">
-					<img src="/owner/images/need.jpg" style="float:left;height:100px;" />
-					{{ need.textDescription }}
+				<div class="col-lg-4">
+					<div class="btn-group">
+						<button type="button" class="btn btn-default">Requests</button>
+						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+						<ul class="dropdown-menu">
+							<li><a href="#">Incoming requests</a></li>
+							<li><a href="#">Outgoing requests</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<button type="button" class="btn btn-default" ng-model="singleModel" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">
+						Conversations
+					</button>
 				</div>
 			</div>
 		</div>
 	</div>
+	<div class="row">
+		<div class="col-lg-2">
+			<div class="row">
+				<button type="button" class="btn btn-default" ng-model="singleModel" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">
+					All Owned needs
+				</button>
+			</div>
+			<div class="row">
+				<button class="btn" ng-click="isCollapsed = !isCollapsed">Toggle collapse</button>
+				<hr>
+				<div collapse="isCollapsed">
+					<div class="well well-large">Some content</div>
+				</div>
+			</div>
+		</div>
 
-	<div id="panel-matches" class="col-md-offset-2 col-lg-7" ng-show="inMatchesMode">
-		<h3>Matched needs</h3>
-		<div id="panel-matches-list">
-			<div ng-repeat="match in matches" style="position: relative">
+		<div class="col-lg-7" id="need-list">
+			<div class="row panel-need" ng-repeat="need in needs" ng-show="!need.hidden">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<div class="col-md-8">{{ match.title }}</div>
+						<div class="col-md-8">{{ need.title }}</div>
 						<div class="col-md-4 text-right">
-							<button type="button" class="btn btn-primary btn-xs" ng-show="!match.hasConnection" ng-click="connect()">Connect</button>
-							<button type="button" class="btn btn-primary btn-xs"
-							        ng-show="match.connectionState && match.connectionState.state == 'listMessages'" ng-click="showChat()">Chat
-							</button>
-							<button type="button" class="btn btn-danger btn-xs"
-							        ng-show="match.connectionState && match.connectionState.state == 'manageConnection'"
-							        ng-click="approve()">Reject
-							</button>
-							<button type="button" class="btn btn-success btn-xs"
-							        ng-show="match.connectionState && match.connectionState.state == 'manageConnection'" ng-click="approve()">Approve
-							</button>
-							<strong ng-show="match.connectionState.message">{{ match.connectionState.message }}</strong>
+							<div ng-show="!need.selected">
+								<a href="#" ng-click="showMatches($event)">Show matches</a>&nbsp;
+								&nbsp;<span class="badge">14</span>
+							</div>
+							<div ng-show="need.selected">
+								<a href="#" ng-click="hideMatches($event)">Hide matches</a>&nbsp;
+							</div>
 						</div>
 						<div class="clearfix"></div>
 					</div>
 					<div class="panel-body need-panel-body" ng-click="$parent.goToDetail(need.needId)">
-						<img src="/ownergui/images/need.jpg" style="float:left;height:100px;"/>
-						{{ match.textDescription }}
-					</div>
-				</div>
-				<div class="conversation-panel" ng-show="match.areMessages">
-					<div class="panel panel-primary">
-						<div class="panel-heading">
-							<h3 class="panel-title">Conversation</h3>
-						</div>
-						<div class="panel-body">
-							{{ match.messages }}
-						</div>
+						<img src="/owner/images/need.jpg" style="float:left;height:100px;" />
+						{{ need.textDescription }}
 					</div>
 				</div>
 			</div>
 		</div>
-		<strong ng-show="noMatches">There are no matches</strong>
+
+		<div id="panel-matches" class="col-md-offset-2 col-lg-7" ng-show="inMatchesMode">
+			<h3>Matched needs</h3>
+			<div id="panel-matches-list">
+				<div ng-repeat="match in matches" style="position: relative">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<div class="col-md-8">{{ match.title }}</div>
+							<div class="col-md-4 text-right">
+								<button type="button" class="btn btn-primary btn-xs" ng-show="!match.hasConnection" ng-click="connect()">Connect</button>
+								<button type="button" class="btn btn-primary btn-xs"
+								        ng-show="match.connectionState && match.connectionState.state == 'listMessages'" ng-click="showChat()">Chat
+								</button>
+								<button type="button" class="btn btn-danger btn-xs"
+								        ng-show="match.connectionState && match.connectionState.state == 'manageConnection'"
+								        ng-click="approve()">Reject
+								</button>
+								<button type="button" class="btn btn-success btn-xs"
+								        ng-show="match.connectionState && match.connectionState.state == 'manageConnection'" ng-click="approve()">Approve
+								</button>
+								<strong ng-show="match.connectionState.message">{{ match.connectionState.message }}</strong>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+						<div class="panel-body need-panel-body" ng-click="$parent.goToDetail(need.needId)">
+							<img src="/ownergui/images/need.jpg" style="float:left;height:100px;"/>
+							{{ match.textDescription }}
+						</div>
+					</div>
+					<div class="conversation-panel" ng-show="match.areMessages">
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								<h3 class="panel-title">Conversation</h3>
+							</div>
+							<div class="panel-body">
+								{{ match.messages }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<strong ng-show="noMatches">There are no matches</strong>
+		</div>
 	</div>
 </div>

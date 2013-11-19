@@ -9,7 +9,7 @@ app = angular.module('owner', ['owner.home', 'owner.header', 'owner.createneed',
 			when('/need-detail/:needId', {controller:'NeedDetailCtrl', templateUrl:'app/need-detail/need-detail.partial.html'}).
 			otherwise({redirectTo : '/'});
 
-	var interceptor = function ($rootScope, $q, $location) {
+	var interceptor = function ($rootScope, $q, $location, $window) {
 
 		function success(response) {
 			return response;
@@ -23,7 +23,11 @@ app = angular.module('owner', ['owner.home', 'owner.header', 'owner.createneed',
 			var url = config.url;
 
 			if (status == 401) {
-				$location.path("/");
+				$window.user = {
+					isAuth:false
+				}
+
+				$location.path("/signin");
 			} else {
 				$rootScope.error = method + " on " + url + " failed with status " + status;
 			}

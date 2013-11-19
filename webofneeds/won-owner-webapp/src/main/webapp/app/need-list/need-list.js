@@ -3,6 +3,8 @@ needListModule = angular.module('owner.needlist', ['ui.map', 'ui.bootstrap', 'ow
 
 needListModule.controller('NeedListCtrl', function ($scope, $location, $http, needService, connectionService) {
 
+	$scope.isCollapse =  true;
+
 	$scope.needs = [];
 
 	$scope.inMatchesMode = false;

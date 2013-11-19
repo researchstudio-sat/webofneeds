@@ -64,7 +64,7 @@
 							<span class="glyphicon glyphicon-plus"></span>&nbsp;New	Need</a>
 						</li>
 						<li ng-show="!showPublic()" ng-class="isActive('need-list')" ng-cloak><a href="#/need-list/">
-							<span class="glyphicon glyphicon-globe"></span>&nbsp;All Needs</a>
+							<span class="glyphicon glyphicon-globe"></span>&nbsp;My Needs</a>
 						</li>
 					</ul>
 					<ul class="nav navbar-nav navbar-right" ng-cloak>

@@ -18,11 +18,11 @@ import java.io.IOException;
 
 @Controller
 @RequestMapping("/rest/needphoto")
-public class NeedPhotoController {
+public class RestNeedPhotoController {
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
 
-	public NeedPhotoController() {
+	public RestNeedPhotoController() {
 	}
 
 	@ResponseBody
