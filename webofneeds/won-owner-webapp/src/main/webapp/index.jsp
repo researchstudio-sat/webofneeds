@@ -18,6 +18,12 @@
 		<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
 		<script type="text/javascript" src="<c:url value="/bower_components/js-md5/js/md5.js"/>"></script>
 
+		<script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
+		<script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
+		<script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
+		<script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
+		<script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
+
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>

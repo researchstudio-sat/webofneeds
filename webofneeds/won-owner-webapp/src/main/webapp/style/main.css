@@ -68,3 +68,41 @@ h1#main-heading {
 	left: 0;
 	padding-top: 11%;
 }
+
+/** Create need **/
+.img-upload-box {
+	background-color: #CACACA;
+	border: 1px solid #CACACA;
+	border-radius: 3px;
+	text-align: center;
+}
+
+.img-upload-box-big {
+	width: 100%;
+	height: 270px;
+	margin-bottom: 20px;
+	position: relative;
+	overflow: hidden;
+}
+
+.img-upload-box-big h4 {
+	color: white;
+}
+
+.img-upload-box-big .glyphicon-picture {
+	margin-top: 80px;
+	font-size: 58px;
+	color: white
+}
+
+.img-upload-box-small {
+	height: 81px;
+	color: white;
+	font-size: 23px;
+	padding-top: 24px;
+	cursor: pointer;
+}
+
+.img-upload-box-small.selected {
+	border: 1px solid #000;
+}

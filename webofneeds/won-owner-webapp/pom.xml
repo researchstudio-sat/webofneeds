@@ -12,6 +12,11 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>won-owner-webapp</artifactId>
 
+	<properties>
+		<commons.fileupload.version>1.2.2</commons.fileupload.version>
+		<commons.io.version>2.1</commons.io.version>
+	</properties>
+
 	<dependencies>
         <!--
 
@@ -100,6 +105,18 @@
             <artifactId>commons-httpclient</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
+
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>${commons.fileupload.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons.io.version}</version>
+		</dependency>
 
         <dependency>
             <groupId>commons-collections</groupId>

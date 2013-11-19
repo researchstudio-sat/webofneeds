@@ -1,11 +1,16 @@
 //owner.home.controller
-createNeedModule = angular.module('owner.createneed', ['ui.map', 'ui.bootstrap.buttons', 'owner.service.need']);
+createNeedModule = angular.module('owner.createneed', ['ui.map', 'ui.bootstrap.buttons', 'owner.service.need', 'blueimp.fileupload']);
 
 createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http, needService, userService) {
 	$scope.mapOptions = {
 		center : new google.maps.LatLng(35.784, -78.670),
 		zoom : 15,
 		mapTypeId:google.maps.MapTypeId.ROADMAP
+	};
+
+	$scope.uploadOptions = {
+		maxFileSize:5000000,
+		acceptFileTypes:/(\.|\/)(gif|jpe?g|png)$/i
 	};
 
 	$scope.marker = null;
@@ -19,8 +24,7 @@ createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http
 		tags : [],
 		startTime : '',
 		endTime : '',
-		wonNode : '',
-		uniqueKey : md5(userService.getUserName() + new Date().getTime())
+		wonNode : ''
 	};
 
 	$scope.onClickMap = function($event, $params) {
@@ -62,3 +66,38 @@ createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http
 
 });
 
+createNeedModule.directive('wonGallery', function factory() {
+	return {
+		restrict : 'A',
+		templateUrl : "app/create-need/won-gallery.html",
+		link : function (scope, element, attrs) {
+
+			$('#photo').change(function () {
+				angular.element("#photo-form").scope().submit();
+			});
+
+
+
+		/*scope.$watch(attrs.ngModel, function (graphSpec) {
+			   var plot = $.plot(element, graphSpec.data, graphSpec.options);
+			   element.show();
+
+		   });*/
+		},
+		controller : function($scope) {
+			$scope.unique = md5((new Date().getTime() + Math.random(1)).toString());
+			$scope.selectedPhoto = 0;
+			$scope.bigUrl = '';
+			$scope.photos = new Array(3);
+
+			$scope.onClickPhoto = function(num) {
+				$scope.selectedPhoto = num;
+				console.log($scope.selectedPhoto);
+			}
+
+			$scope.$on('fileuploadstop', function (data) {
+				$scope.bigUrl = '/owner/rest/needphoto/' + $scope.unique + "/" + $scope.selectedPhoto;
+			});
+		}
+	};
+});
