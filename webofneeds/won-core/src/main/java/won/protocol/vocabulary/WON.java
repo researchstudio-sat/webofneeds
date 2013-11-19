@@ -55,6 +55,7 @@ public class WON
   public static final Property HAS_TEXT_DESCRIPTION = m.createProperty(BASE_URI, "hasTextDescription");
   public static final Property HAS_CONTENT_DESCRIPTION = m.createProperty(BASE_URI, "hasContentDescription");
   public static final Property HAS_TAG = m.createProperty(BASE_URI, "hasTag");
+  public static final Property HAS_ATTACHED_MEDIA = m.createProperty(BASE_URI, "hasAttachedMedia");
   public static final Property HAS_HEIGHT = m.createProperty(BASE_URI, "hasHeight");
   public static final Property HAS_DEPTH = m.createProperty(BASE_URI, "hasDepth");
   public static final Property HAS_WIDTH = m.createProperty(BASE_URI, "hasWidth");
@@ -131,6 +132,7 @@ public class WON
   //search result model
   public static final Property SEARCH_RESULT_URI = m.createProperty(BASE_URI,"uri");
   public static final Property SEARCH_RESULT_PREVIEW = m.createProperty(BASE_URI, "preview");
+
 
 
   /**

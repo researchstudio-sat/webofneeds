@@ -1,18 +1,19 @@
 package won.owner.pojo;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.model.BasicNeedType;
 import won.protocol.model.NeedState;
 import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.MAONT;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: Gabriel
@@ -53,7 +54,7 @@ public class NeedPojo
 
   private long needId = -1;
 
-  private String binaryFolder;
+  private List<ImagePojo> images;
 
   public NeedPojo()
   {
@@ -83,6 +84,26 @@ public class NeedPojo
 
       Statement contentDescriptionStat = needContent.getProperty(WON.HAS_CONTENT_DESCRIPTION);
       if (contentDescriptionStat != null) contentDescription = " [ RDF CONTENT ] ";
+
+      Statement attachedMedia = needContent.getProperty(WON.HAS_ATTACHED_MEDIA);
+      List<ImagePojo> images = new ArrayList<ImagePojo>();
+      if (attachedMedia != null){
+        Seq imageSeq = attachedMedia.getSeq();
+        NodeIterator it = imageSeq.iterator();
+        while (it.hasNext()) {
+          //check if the node is a MA:IMAGGE
+          RDFNode node = it.next();
+          if (! node.isResource()) continue;
+          Resource nodeRes = node.asResource();
+          if (!nodeRes.hasProperty(RDF.type, MAONT.IMAGE)) continue;
+          //it's an image. get the URI (ma:locator)
+          ImagePojo imagePojo = new ImagePojo();
+          Statement locatorStmt = nodeRes.getProperty(MAONT.LOCATOR);
+          if (locatorStmt == null) continue;
+          imagePojo.setUri(URI.create(locatorStmt.getObject().toString()));
+        }
+      }
+      this.images = images;
 
       StmtIterator tagProps = needContent.listProperties(WON.HAS_TAG);
       StringBuilder tags = new StringBuilder();
@@ -348,11 +369,12 @@ public class NeedPojo
     this.contentDescription = contentDescription;
   }
 
-  public String getBinaryFolder() {
-    return binaryFolder;
+  public List<ImagePojo> getImages() {
+    return images;
   }
 
-  public void setBinaryFolder(String binaryFolder) {
-    this.binaryFolder = binaryFolder;
+  public void setImages(List<ImagePojo> images) {
+    this.images = images;
   }
+
 }

@@ -2,10 +2,9 @@ package won.owner.web.rest;
 
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.commons.collections.map.LRUMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import won.owner.model.User;
+import won.owner.pojo.ImagePojo;
 import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
 import won.owner.service.impl.DataReloadService;
@@ -35,6 +35,7 @@ import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.MAONT;
 import won.protocol.vocabulary.WON;
 
 import javax.ws.rs.GET;
@@ -232,7 +233,6 @@ public class RestNeedController {
 		return needPojo;
 	}
 
-
 	private NeedPojo resolve(NeedPojo needPojo) {
 		if (needPojo.getNeedId() >= 0) {
 
@@ -272,6 +272,21 @@ public class RestNeedController {
 					needModel.add(needModel.createStatement(needContent, WON.HAS_TAG, tag.trim()));
 				}
 			}
+      if (!needPojo.getImages().isEmpty()){
+        Seq mediaSeq = needModel.createSeq();
+        int imageIndex = 0;
+        for (ImagePojo imagePojo: needPojo.getImages()) {
+          URI imageUri = imagePojo.getUri();
+
+          if (imageUri != null){
+            Resource blankNodeForImage = needModel.createResource();
+            blankNodeForImage.addProperty(MAONT.LOCATOR, needModel.createResource(imageUri.toString()));
+            blankNodeForImage.addProperty(RDF.type, MAONT.IMAGE);
+            mediaSeq.add(imageIndex++,blankNodeForImage);
+          }
+        }
+        needContent.addProperty(WON.HAS_ATTACHED_MEDIA,mediaSeq);
+      }
 
 			needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
 
