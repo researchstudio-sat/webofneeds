@@ -1,13 +1,57 @@
 //owner.home.controller
 needListModule = angular.module('owner.needlist', ['ui.map', 'ui.bootstrap', 'owner.service.need', 'owner.service.connection']);
 
-needListModule.controller('NeedListCtrl', function ($scope, $location, $http, needService, connectionService) {
+needListModule.controller('NeedListCtrl', function ($scope, $location, $http, $q, needService, connectionService) {
 
-	$scope.needType = 'Demand';
+	NeedListPage = function() {
+		this.btnConversations = 0;
+		this.btnRequests = 0;
+		this.btnSuggestions = 0;
+		this.btnOneTimeNeeds = 0;
+		this.selectedNeed = null;
+		this.selectedNeedType = null;
+		this.myNeeds = [];
+		this.requestType = 'All Requests';
+		this.categorizedNeeds = new CategorizedNeeds();
 
-	$scope.isCollapsed =  false;
+		this.resetTopPanel = function() {
+		}
 
-	$scope.needs = [];
+		this.startup = function() {
+			if(this.categorizedNeeds.conversations.length > 0) {
+				this.btnConversations = 1;
+			} else if(this.categorizedNeeds.requests.received.length > 0) {
+				this.btnRequests = 1;
+			} else if (this.categorizedNeeds.requests.sent.length > 0) {
+				this.btnRequests = 1;
+			} else if (this.categorizedNeeds.suggestions.length > 0) {
+				this.btnSuggestions = 1;
+			}
+		}
+	}
+
+	$scope.model = new NeedListPage();
+
+	$scope.$watch('model.btnConversations', function(newVal, oldVal) {
+		if(newVal == 1) {
+			$scope.model.btnRequests = 0;
+			$scope.model.btnSuggestions = 0;
+		}
+	});
+
+	$scope.$watch('model.btnRequests', function (newVal, oldVal) {
+		if (newVal == 1) {
+			$scope.model.btnConversations = 0;
+			$scope.model.btnSuggestions = 0;
+		}
+	});
+
+	$scope.$watch('model.btnSuggestions', function (newVal, oldVal) {
+		if (newVal == 1) {
+			$scope.model.btnConversations = 0;
+			$scope.model.btnRequests = 0;
+		}
+	});
 
 	$scope.inMatchesMode = false;
 
@@ -15,8 +59,29 @@ needListModule.controller('NeedListCtrl', function ($scope, $location, $http, ne
 
 	$scope.matches = [];
 
-	needService.getAllNeeds().then(function(response) {
-		$scope.needs = response.data;
+	var categorizeNeeds = function(catNeeds) {
+		var categorizedNeeds = new CategorizedNeeds();
+		angular.forEach(catNeeds, function (catNeed) {
+			if (catNeed) {
+				categorizedNeeds.merge(catNeed);
+			}
+		});
+		console.log(categorizedNeeds);
+		$scope.model.categorizedNeeds = categorizedNeeds;
+		$scope.model.startup();
+	}
+
+	needService.getAllNeeds().then(function(needs) {
+		$scope.model.myNeeds = needs;
+		var allConnsRequests = [];
+		angular.forEach(needs, function (need) {
+			allConnsRequests.push(needService.getNeedConnections(need.needURI));
+		});
+		$q.allSettled(allConnsRequests).then(function(responses) {
+			categorizeNeeds(responses);
+		}, function(responses) {
+			categorizeNeeds(responses);
+		});
 	});
 
 	$scope.goToDetail = function($id) {

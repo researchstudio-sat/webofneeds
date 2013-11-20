@@ -1,5 +1,80 @@
 needServiceModule = angular.module('owner.service.need', []);
 
+NeeLD = function (needURI, needLD) {
+	this.needURI = needURI.replace('data', 'resource');
+	this.title = '';
+	this.textDescription = '';
+	this.tags = []
+	this.type = '';
+
+	if (needLD['@graph']) {
+		var contentId;
+		angular.forEach(needLD['@graph'], function (node) {
+			if (node['@id'] == this.needURI) {
+				if (node['hasBasicNeedType']) {
+					this.type = node.hasBasicNeedType;
+				}
+				if (node['hasContent']) {
+					contentId = node.hasContent;
+				}
+			}
+		}, this);
+		if (contentId) {
+			angular.forEach(needLD['@graph'], function (node) {
+				if (node['@id'] == contentId) {
+					this.title = node['dc:title']
+					if (node['won:hasTag']) {
+						this.tags = node['won:hasTag'].split(',');
+					}
+					if (node['won:hasTextDescription']) {
+						this.textDescription = node['won:hasTextDescription'];
+					}
+				}
+			}, this);
+		}
+	}
+}
+
+CategorizedNeeds = function() {
+	this.suggestions = [];
+	this.requests = {
+		received : [],
+		sent : []
+	}
+	this.conversations = [];
+	this.closed = [];
+
+	this.addNeed = function(ldConnectionType, need) {
+		switch(ldConnectionType) {
+			case 'won:Suggested':
+				this.suggestions.push(need);
+			break;
+			case 'won:RequestSent':
+				this.requests.sent.push(need);
+			break;
+			case 'won:RequestReceived':
+				this.requests.received.push(need);
+			break;
+			case 'won:Connected':
+				this.conversations.push(need);
+			break;
+			case 'won:Closed':
+				this.closed.push(need);
+			break;
+			default:
+				throw Exception("FATAL ERROR: unrecognized state");
+		}
+	}
+
+	this.merge = function(needsCategorized) {
+		this.suggestions = this.suggestions.concat(needsCategorized.suggestions);
+		this.conversations = this.conversations.concat(needsCategorized.conversations);
+		this.requests.received = this.requests.received.concat(needsCategorized.requests.received);
+		this.requests.sent = this.requests.sent.concat(needsCategorized.requests.sent);
+		this.closed = this.closed.concat(needsCategorized.closed);
+	}
+}
+
 needServiceModule.factory('needService', function ($http, $q, connectionService) {
 
 	var needService = {};
@@ -42,18 +117,66 @@ needServiceModule.factory('needService', function ($http, $q, connectionService)
 		});
 	};
 
+	var findNeedsToConnections = function (response) {
+		var graph = response.data['@graph'];
+		if(graph) {
+			var remoteNeedsList = [];
+			angular.forEach(graph, function (connection) {
+				if (connection.hasRemoteNeed) {
+					remoteNeedsList.push(needService.getNeedByUri(connection.hasRemoteNeed));
+				}
+				//connection.hasConnectionState
+			});
+			var needThrough = function(responses) {
+				var needs = {};
+				angular.forEach(responses, function (response) {
+					if(response.status == 200) {
+						var need = new NeeLD(response.config.url, response.data);
+						needs[need.needURI] = need;
+					}
+				});
+				return needs;
+			}
+			return $q.allSettled(remoteNeedsList).then(function(response) {
+				return needThrough(response);
+			},function(response) {
+				return needThrough(response);
+			}).then(function(needs) {
+				var result = new CategorizedNeeds();
+				angular.forEach(graph, function (connection) {
+					if (connection.hasRemoteNeed && needs[connection.hasRemoteNeed]) {
+						result.addNeed(connection.hasConnectionState, needs[connection.hasRemoteNeed]);
+					}
+				});
+				return result;
+			});
+		}
+	}
+
 	needService.getNeedConnections = function (needUri) {
+		var dataNeedUri = needUri.replace('resource', 'data');
 		return $http({
-			url : needUri + '/connections/?deep=true',
+			method : 'GET',
+			url : dataNeedUri + '/connections/',
+			params : {
+				'deep' : 'true'
+			},
 			headers : {
 				'Accept' : 'application/ld+json'
 			}
-		});
+		}).then(
+			findNeedsToConnections,
+			function() {
+				console.log("FATAL ERROR")
+			}
+		);
 	};
 
 	needService.getNeedByUri = function(needUri) {
+		var dataNeedUri = needUri.replace('resource', 'data');
 		return $http({
-			url : needUri,
+			method : 'GET',
+			url : dataNeedUri,
 			headers : {
 				'Accept':'application/ld+json'
 			}
@@ -61,7 +184,14 @@ needServiceModule.factory('needService', function ($http, $q, connectionService)
 	}
 
 	needService.getAllNeeds = function() {
-		return $http.get('/owner/rest/need/');
+		return $http.get('/owner/rest/need/').then(
+			function(response) {
+				return response.data;
+			},
+			function() {
+				return [];
+			}
+		);
 	}
 
 	needService.save = function(need) {
