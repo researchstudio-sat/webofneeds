@@ -28,6 +28,7 @@ import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.model.OwnerApplication;
 import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.owner.OwnerProtocolOwnerServiceClient;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.ConnectionCommunicationService;
@@ -48,7 +49,7 @@ import java.util.List;
 public class NeedManagementServiceImpl implements NeedManagementService
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
-  private OwnerProtocolOwnerService ownerProtocolOwnerService;
+  private OwnerProtocolOwnerServiceClient ownerProtocolOwnerService;
   //used to close connections when a need is deactivated
   private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
   private NeedInformationService needInformationService;
@@ -118,7 +119,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   }
 
 
-  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerService ownerProtocolOwnerService)
+  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerServiceClient ownerProtocolOwnerService)
   {
     this.ownerProtocolOwnerService = ownerProtocolOwnerService;
   }

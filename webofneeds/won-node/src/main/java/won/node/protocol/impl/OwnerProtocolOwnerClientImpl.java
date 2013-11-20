@@ -17,16 +17,19 @@
 package won.node.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import org.hibernate.mapping.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
+import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.OwnerApplication;
 import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.owner.OwnerProtocolOwnerServiceClient;
+import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
 import won.protocol.ws.fault.*;
@@ -39,7 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
+public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerServiceClient
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -51,6 +54,9 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
 
   @Autowired
   private NeedRepository needRepository;
+
+    @Autowired
+    private ConnectionRepository connectionRepository;
 
     @Override
   public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
@@ -76,6 +82,7 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
         logger.info(MessageFormat.format("owner-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, own connection {2} and message ''{3}''", ownNeedURI, otherNeedURI, ownConnectionURI, content));
         StringWriter sw = new StringWriter();
         content.write(sw, "TTL");
+
         URI ownerURI = clientFactory.getOwnerProtocolOwnerURI(ownNeedURI);
         Map headerMap = new HashMap<String, String>();
         List<Need> needs = needRepository.findByNeedURI(ownNeedURI);
@@ -92,14 +99,14 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
         headerMap.put("ownerURI", ownerURI.toString());
         headerMap.put("ownerApplications", ownerApplications);
 
-        Map properties = new HashMap();
-        properties.put("protocol","OwnerProtocol");
-        properties.put("methodName", "connect");
-        messagingService.sendInOnlyMessage(properties,headerMap,null,"outgoingMessages");
+
+        headerMap.put("protocol","OwnerProtocol");
+        headerMap.put("methodName", "connect");
+        messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
 
 
     }
-
+   /*
     @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
@@ -116,8 +123,25 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     } catch (NoSuchConnectionFault noSuchConnectionFault) {
       throw NoSuchConnectionFault.toException(noSuchConnectionFault);
     }
-  }
-
+  }      */
+    @Override
+    public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
+        logger.info(MessageFormat.format("owner-facing: OPEN called for connection {0}", connectionURI));
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        URI needURI = con.getNeedURI();
+        Need need = needRepository.findByNeedURI(needURI).get(0);
+        List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
+        Map headerMap = new HashMap<String, String>();
+        logger.info(ownerApplicationList.get(0).getOwnerApplicationId());
+        headerMap.put("connectionURI", connectionURI.toString()) ;
+        headerMap.put("content",RdfUtils.toString(content));
+        headerMap.put("ownerApplications", ownerApplicationList);
+        headerMap.put("protocol","OwnerProtocol");
+        headerMap.put("methodName", "open");
+        messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
+    }
+    /*
   @Override
   public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
@@ -134,8 +158,25 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     } catch (NoSuchConnectionFault noSuchConnectionFault) {
       noSuchConnectionFault.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
-  }
-
+  }      */
+    @Override
+    public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
+        logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}", connectionURI));
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        URI needURI = con.getNeedURI();
+        Need need = needRepository.findByNeedURI(needURI).get(0);
+        List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
+        Map headerMap = new HashMap<String, String>();
+        logger.info(ownerApplicationList.get(0).getOwnerApplicationId());
+        headerMap.put("connectionURI", connectionURI.toString()) ;
+        headerMap.put("content",RdfUtils.toString(content));
+        headerMap.put("ownerApplications", ownerApplicationList);
+        headerMap.put("protocol","OwnerProtocol");
+        headerMap.put("methodName", "close");
+        messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
+    }
+   /*
   @Override
   public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
@@ -152,8 +193,26 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
     } catch (NoSuchConnectionFault noSuchConnectionFault) {
       throw NoSuchConnectionFault.toException(noSuchConnectionFault);
     }
-  }
+  }   */
+    @Override
+    public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
+        logger.info(MessageFormat.format("owner-facing: TEXTMESSAGE_REQUESTED called for connectionURI {0}, message {1}", connectionURI,message));
 
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        URI needURI = con.getNeedURI();
+        Need need = needRepository.findByNeedURI(needURI).get(0);
+        List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
+        Map headerMap = new HashMap<String, String>();
+        logger.info(ownerApplicationList.get(0).getOwnerApplicationId());
+        headerMap.put("connectionURI", connectionURI.toString()) ;
+        headerMap.put("message",message);
+        headerMap.put("ownerApplications", ownerApplicationList);
+        headerMap.put("protocol","OwnerProtocol");
+        headerMap.put("methodName", "textMessage");
+        messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
+
+    }
   public void setClientFactory(final OwnerProtocolOwnerClientFactory clientFactory)
   {
     this.clientFactory = clientFactory;

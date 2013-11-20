@@ -9,4 +9,5 @@ import java.util.concurrent.Future;
  */
 public interface OwnerManagementService {
     public String registerOwnerApplication();
+
 }

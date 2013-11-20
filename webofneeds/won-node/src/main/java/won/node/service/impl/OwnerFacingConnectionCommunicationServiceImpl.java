@@ -194,6 +194,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
         chatMessageRepository.saveAndFlush(chatMessage);
         final URI remoteConnectionURI = con.getRemoteConnectionURI();
         //inform the other side
+
         executorService.execute(new Runnable()
         {
             @Override

@@ -4,6 +4,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
@@ -27,9 +28,11 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
    // private ActiveMQComponent activeMQComponent;
     private NeedManagementService needManagementService;
     private OwnerManagementService ownerManagementService;
+    @Autowired
     private QueueManagementService queueManagementService;
 
     private OwnerFacingNeedCommunicationService needCommunicationService;
+
     private ProducerTemplate producerTemplate;
     /*
     @Override

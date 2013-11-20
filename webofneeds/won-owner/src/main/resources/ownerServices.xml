@@ -34,7 +34,7 @@
 
     <bean id="ownerProtocolNeedClientFactory" class="won.owner.ws.OwnerProtocolNeedClientFactory" />
 
-    <bean id="ownerProtocolOwnerServiceImpl" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" >
+    <bean id="ownerProtocolOwnerService" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" >
 
     </bean>
 
@@ -43,19 +43,17 @@
     <bean id="ownerProtocolNeedServiceClientWSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientWSBased">
         <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
     </bean>
-    <bean id="messagingServiceImpl" class="won.protocol.jms.MessagingServiceImpl">
+    <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
         <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
-    <bean id="ownerApplicationListenerRouteBuilder" class="won.owner.routes.OwnerApplicationListenerRouteBuilder">
 
-    </bean>
     <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientJMSBased">
         <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
         <property name="producerTemplate" ref="producerTemplate"/>
-        <property name="messagingService" ref="messagingServiceImpl"/>
+        <property name="messagingService" ref="messagingService"/>
         <property name="propertiesUtil" ref="propertiesUtil" />
         <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
-        <property name="ownerApplicationListenerRouteBuilder" ref="ownerApplicationListenerRouteBuilder"/>
+
     </bean>
     <bean id="propertiesUtil" class="won.protocol.util.PropertiesUtil"></bean>
 

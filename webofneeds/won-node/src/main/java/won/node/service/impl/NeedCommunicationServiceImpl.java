@@ -28,6 +28,7 @@ import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.owner.OwnerProtocolOwnerServiceClient;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
 import won.protocol.repository.NeedRepository;
@@ -39,6 +40,7 @@ import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -61,7 +63,7 @@ public class NeedCommunicationServiceImpl implements
   /**
    * Client talking to the owner side via the owner protocol
    */
-  private OwnerProtocolOwnerService ownerProtocolOwnerService;
+  private OwnerProtocolOwnerServiceClient ownerProtocolOwnerService;
   /**
    * Client talking another need via the need protocol
    */
@@ -339,6 +341,7 @@ public class NeedCommunicationServiceImpl implements
         public void run()
         {
           try {
+
             ownerProtocolOwnerService.connect(needURI, otherNeedURI, connectionForRunnable.getConnectionURI(), content);
           } catch (WonProtocolException e) {
             // we can't connect the connection. we send a deny back to the owner
@@ -385,7 +388,7 @@ public class NeedCommunicationServiceImpl implements
   }
 
 
-  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerService ownerProtocolOwnerService)
+  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerServiceClient ownerProtocolOwnerService)
   {
     this.ownerProtocolOwnerService = ownerProtocolOwnerService;
   }

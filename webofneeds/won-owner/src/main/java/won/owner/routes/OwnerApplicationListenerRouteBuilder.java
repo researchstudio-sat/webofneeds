@@ -16,39 +16,49 @@
 
 package won.owner.routes;
 
+import org.apache.camel.CamelContext;
+import org.apache.camel.CamelContextAware;
 import org.apache.camel.builder.RouteBuilder;
 
 import java.util.List;
 
+//TODO: This route builder should not be loaded on startup, but it's being loaded..
 /**
  * User: sbyim
  * Date: 14.11.13
  */
-public class OwnerApplicationListenerRouteBuilder extends RouteBuilder {
+public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
 
 
     private List<String> endpoints;
+
+    public OwnerApplicationListenerRouteBuilder(CamelContext camelContext, List<String> endpoints) {
+        super(camelContext);
+        this.endpoints = endpoints;
+    }
+
 
     @Override
     public void configure() throws Exception {
        for (int i = 0; i<endpoints.size();i++){
            from(endpoints.get(i))
+           .wireTap("bean:messagingService?method=inspectMessage")
            .choice()
                 .when(header("methodName").isEqualTo("connect"))
+                .to("log:OWNER CONNECT RECEIVED")
                 .to("bean:ownerProtocolOwnerService?method=connect")
                 .when(header("methodName").isEqualTo("hint"))
                 .to("bean:ownerProtocolOwnerService?method=hint")
+                .when(header("methodName").isEqualTo("textMessage"))
+                .to("bean:ownerProtocolOwnerService?method=textMessage")
+                .when(header("methodName").isEqualTo("open"))
+                .to("bean:ownerProtocolOwnerService?method=open")
+                .when(header("methodName").isEqualTo("close"))
+                .to("bean:ownerProtocolOwnerService?method=close")
                 .otherwise()
-                .to("LOG: Message Type Not Supported");
+                .to("log:Message Type Not Supported");
        }
     }
 
-    public List<String> getEndpoints() {
-        return endpoints;
-    }
-
-    public void setEndpoints(List<String> endpoints) {
-        this.endpoints = endpoints;
-    }
 
 }

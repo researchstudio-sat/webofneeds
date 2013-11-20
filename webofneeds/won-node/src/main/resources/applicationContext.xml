@@ -39,7 +39,7 @@
     <!-- Camel configuration -->
     <camel:camelContext>
         <camel:packageScan>
-            <camel:package>won.node.routes</camel:package>
+            <camel:package>won.node.routes.fixed</camel:package>
         </camel:packageScan>
         <camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
         <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG" />

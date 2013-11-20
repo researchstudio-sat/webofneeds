@@ -1,5 +1,8 @@
 package won.protocol.model;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.List;
@@ -22,7 +25,8 @@ public class OwnerApplication {
     @ManyToMany(mappedBy = "authorizedApplications", targetEntity = Need.class,fetch = FetchType.EAGER, cascade = CascadeType.ALL)
      private List<Need> needs;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     @CollectionTable(name="QueueNames", joinColumns = @JoinColumn(name="owner_application_id"))
     @Column(name="queueName")
     private List<String> queueNames;

@@ -38,6 +38,7 @@ public class OwnerManagementServiceImpl implements OwnerManagementService {
 
     }
 
+
     public void setQueueManagementService(QueueManagementServiceImpl queueManagementService) {
         this.queueManagementService = queueManagementService;
     }

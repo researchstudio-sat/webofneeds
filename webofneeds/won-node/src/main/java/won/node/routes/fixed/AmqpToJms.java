@@ -15,7 +15,7 @@
  */
 
 
-package won.node.routes;
+package won.node.routes.fixed;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.RouteBuilder;
 import won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor;
@@ -56,7 +56,7 @@ public class AmqpToJms extends RouteBuilder{
         from("activemq:queue:WON.GETENDPOINTS")
                 .to("log:Get Endpoints IN")
                 .to("bean:ownerProtocolNeedJMSService?method=getEndpointsForOwnerApplication");
-        from("activemq:queue:WON.INMSG")
+       /* from("activemq:queue:WON.INMSG")
             .choice()
                 .when(property("methodName").isEqualTo("connect"))
                 .to("activemq:queue:WON.CONNECTNEED")
@@ -74,29 +74,18 @@ public class AmqpToJms extends RouteBuilder{
                 .when(property("methodName").isEqualTo("close"))
                 .to("activemq:queue:WON.CLOSE")
                 .otherwise()
-                .to("log:UNSUPPORTED METHOD") ;
-        from("seda:OUTMSG")
-                .to("log:OUTMSG FROM NODE")
-                .choice()
-                    .when(property("protocol").isEqualTo("NeedProtocol"))
-                    .to("seda:NeedProtocolOut")
-                    .when(property("protocol").isEqualTo("OwnerProtocol"))
-                    .to("seda:OwnerProtocolOut")
-                    .otherwise()
-                    .to("log:No protocol defined in header");
+                .to("log:UNSUPPORTED METHOD") ;   */
+
         from("seda:NeedProtocolOut")
             .choice()
-                .when(property("methodName").isEqualTo("connect"))
+                .when(header("methodName").isEqualTo("connect"))
                 .to("activemq:queue:WON.NeedProtocol.Connect.In")
-                .when(property("methodName").isEqualTo("open"))
+                .when(header("methodName").isEqualTo("open"))
                 .to("activemq:queue:WON.NeedProtocol.Open.In")
-                .when(property("methodName").isEqualTo("close"))
+                .when(header("methodName").isEqualTo("close"))
                 .to("activemq:queue:WON.NeedProtocol.Close.In")
-                .when(property("methodName").isEqualTo("textMessage"))
+                .when(header("methodName").isEqualTo("textMessage"))
                 .to("activemq:queue:WON.NeedProtocol.TextMessage.In");
-        from("seda:OwnerProtocolOut")
-                .to("bean:ownerProtocolOutgoingMessagesProcessor")
-                .recipientList(header("ownerApplicationIDs"));
         from("activemq:queue:WON.NeedProtocol.Connect.In")
                 .to("log:Routing message from queue WON.NeedProtocol.Connect.In")
                 .to("bean:needProtocolNeedService?method=connect");

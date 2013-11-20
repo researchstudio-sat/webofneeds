@@ -21,8 +21,9 @@ import org.apache.camel.Processor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.model.OwnerApplication;
+import won.protocol.repository.OwnerApplicationRepository;
+import won.protocol.service.OwnerManagementService;
 import won.protocol.service.QueueManagementService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,8 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
     private QueueManagementService queueManagementService;
+    @Autowired
+    private OwnerApplicationRepository ownerApplicationRepository;
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -42,21 +45,26 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
         Map headers = exchange.getIn().getHeaders();
         Map properties = exchange.getProperties();
         List<OwnerApplication> ownerApplications = (List<OwnerApplication>)headers.get("ownerApplications");
-        String methodName = properties.get("methodName").toString();
+        String methodName =headers.get("methodName").toString();
         logger.info(ownerApplications.get(0).getOwnerApplicationId());
         List<String> queueNames = convertToQueueName(ownerApplications,methodName);
-        exchange.setProperty("ownerApplicationIDs",queueNames);
+        exchange.getIn().setHeader("ownerApplicationIDs",queueNames);
+
 
 
     }
     private List<String> convertToQueueName(List<OwnerApplication> ownerApplications,String methodName){
-        List<String> ownerApplicationQueueNames = new ArrayList<String>();
+        List<String> ownerApplicationQueueNames = new ArrayList<>();
+
         for (int i =0;i<ownerApplications.size();i++){
              logger.info("i: "+i);
              logger.info("methodName: "+methodName);
-             logger.info(queueManagementService.getEndpointsForOwnerApplication(ownerApplications.get(i).getOwnerApplicationId()).get(0));
+
+             OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplications.get(i).getOwnerApplicationId()).get(i);
+
+            logger.info(queueManagementService.getEndpointsForOwnerApplication(ownerApplication.getOwnerApplicationId()).get(0));
              logger.info("ownerApplicationID: "+ownerApplications.get(i).getOwnerApplicationId());
-             ownerApplicationQueueNames.add(i, queueManagementService.getEndpointForMessage(methodName,ownerApplications.get(i).getOwnerApplicationId()));
+             ownerApplicationQueueNames.add(i, queueManagementService.getEndpointForMessage(methodName,ownerApplication.getOwnerApplicationId()));
 
         }
         return ownerApplicationQueueNames;
@@ -64,5 +72,9 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
 
     public void setQueueManagementService(QueueManagementService queueManagementService) {
         this.queueManagementService = queueManagementService;
+    }
+
+    public void setOwnerApplicationRepository(OwnerApplicationRepository ownerApplicationRepository) {
+        this.ownerApplicationRepository = ownerApplicationRepository;
     }
 }

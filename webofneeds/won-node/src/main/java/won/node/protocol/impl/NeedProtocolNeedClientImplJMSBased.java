@@ -63,10 +63,10 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       headerMap.put("otherNeedURI", otherNeedURI.toString());
       headerMap.put("otherConnectionURI", otherConnectionURI.toString()) ;
       headerMap.put("content",RdfUtils.toString(content));
-      Map properties = new HashMap();
-      properties.put("methodName","connect");
-      properties.put("protocol","NeedProtocol");
-      return messagingService.sendInOutMessage(properties,headerMap,null, "outgoingMessages" );
+
+      headerMap.put("methodName","connect");
+
+      return messagingService.sendInOutMessage(null,headerMap,null, "outgoingMessages" );
   }
    /*
     @Override
@@ -91,9 +91,9 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
         headerMap.put("protocol","NeedProtocol");
         headerMap.put("connectionURI", connectionURI.toString()) ;
         headerMap.put("content", RdfUtils.toString(content));
-        Map properties = new HashMap();
-        properties.put("methodName","open");
-        messagingService.sendInOnlyMessage(properties,headerMap,null, "outgoingMessages" );
+
+        headerMap.put("methodName","open");
+        messagingService.sendInOnlyMessage(null,headerMap,null, "outgoingMessages" );
     }
 
     @Override
@@ -104,9 +104,9 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connectionURI.toString()) ;
       headerMap.put("content", RdfUtils.toString(content));
-      Map properties = new HashMap();
-      properties.put("methodName","close");
-      messagingService.sendInOnlyMessage(properties,headerMap,null, "outgoingMessages" );
+
+      headerMap.put("methodName","close");
+      messagingService.sendInOnlyMessage(null,headerMap,null, "outgoingMessages" );
 
   }
 
@@ -118,9 +118,9 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connectionURI.toString()) ;
       headerMap.put("content", message);
-      Map properties = new HashMap();
-      properties.put("methodName","textMessage");
-      messagingService.sendInOnlyMessage(properties,headerMap,null, "outgoingMessages" );
+
+      headerMap.put("methodName","textMessage");
+      messagingService.sendInOnlyMessage(null,headerMap,null, "outgoingMessages" );
 
   }
 

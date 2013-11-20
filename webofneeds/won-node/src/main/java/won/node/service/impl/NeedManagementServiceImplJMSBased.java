@@ -17,6 +17,7 @@ import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.model.OwnerApplication;
 import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.owner.OwnerProtocolOwnerServiceClient;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.ConnectionCommunicationService;
@@ -38,7 +39,7 @@ import java.util.List;
 public class NeedManagementServiceImplJMSBased implements NeedManagementService
 {
     final Logger logger = LoggerFactory.getLogger(getClass());
-    private OwnerProtocolOwnerService ownerProtocolOwnerService;
+    private OwnerProtocolOwnerServiceClient ownerProtocolOwnerService;
     //used to close connections when a need is deactivated
     private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
     private NeedInformationService needInformationService;
@@ -61,9 +62,12 @@ public class NeedManagementServiceImplJMSBased implements NeedManagementService
         need = needRepository.save(need);
         //now, create the need URI and save again
         need.setNeedURI(URIService.createNeedURI(need));
-        if(need.getAuthorizedApplications()!=null)  {
+        List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
+        if(ownerApplications.size()>0)  {
             OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID).get(0);
-            need.getAuthorizedApplications().add(ownerApplication);
+            List<OwnerApplication> authorizedApplications = new ArrayList<>();
+            authorizedApplications.add(ownerApplication);
+            need.setAuthorizedApplications(authorizedApplications);
         }
 
         else{
@@ -75,13 +79,13 @@ public class NeedManagementServiceImplJMSBased implements NeedManagementService
             logger.info("setting OwnerApp ID: "+ownerApplicationList.get(0));
         }
         logger.info("CREATED NEED-NEED URI: "+need.getNeedURI());
-        logger.info("OwnerApp ID param: "+need.getAuthorizedApplications().get(0));
-        logger.info("CREATED NEED-OwnerApp ID: "+need.getAuthorizedApplications().get(0));
+        logger.info("OwnerApp ID param: "+need.getAuthorizedApplications().get(0).getOwnerApplicationId());
+        logger.info("CREATED NEED-OwnerApp ID: "+need.getAuthorizedApplications().get(0).getOwnerApplicationId());
         need = needRepository.saveAndFlush(need);
         List<Need>needs = needRepository.findByNeedURI(need.getNeedURI());
         need = needs.get(0);
         logger.info("SAVED NEED-NEED URI: "+need.getNeedURI());
-        logger.info("SAVED NEED-OwnerApp ID: "+need.getAuthorizedApplications().get(0));
+        logger.info("SAVED NEED-OwnerApp ID: "+need.getAuthorizedApplications().get(0).getOwnerApplicationId());
         String baseURI = need.getNeedURI().toString();
         RdfUtils.replaceBaseURI(content, baseURI);
 
@@ -125,7 +129,7 @@ public class NeedManagementServiceImplJMSBased implements NeedManagementService
     }
 
 
-    public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerService ownerProtocolOwnerService)
+    public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerServiceClient ownerProtocolOwnerService)
     {
         this.ownerProtocolOwnerService = ownerProtocolOwnerService;
     }

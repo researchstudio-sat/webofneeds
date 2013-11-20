@@ -13,10 +13,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.TextMessagePojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClientSide;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.util.DataAccessUtils;
+
 import java.util.List;
 
 /**
@@ -53,12 +56,14 @@ public class ConnectionController {
 
 
     @RequestMapping(value = "/{conId}/body", method = RequestMethod.GET)
-    public String listMessages(@PathVariable String conId, Model model) {
-        List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
+    public String listMessages(@PathVariable String conId, Model model) throws NoSuchConnectionException {
+        Connection con = DataAccessUtils.loadConnection(connectionRepository,Long.valueOf(conId));
+     //   List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
 
-        if(cons.isEmpty())
+       if(con==null)
             return "noNeedFound";
-        Connection con = cons.get(0);
+        //Connection con = cons.get(0);
+        logger.info("CONNECTION CONTROLLER-Connection State: "+con.getState().toString());
         try {
             switch (con.getState()) {
                 case REQUEST_RECEIVED:

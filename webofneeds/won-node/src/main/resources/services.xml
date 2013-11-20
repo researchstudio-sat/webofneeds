@@ -37,7 +37,9 @@
     </bean>
     <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor">
         <property name="queueManagementService" ref="queueManagementService"/>
+
     </bean>
+
     <bean id="ownerProtocolNeedService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
         <!-- the connection communication service injected here is owner facing -->
         <property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />

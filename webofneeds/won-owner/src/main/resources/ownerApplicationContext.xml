@@ -27,7 +27,7 @@
     <!-- messaging beans -->
     <camel:camelContext>
         <camel:packageScan>
-            <camel:package>won.owner.routes</camel:package>
+            <camel:package>won.owner.routes.fixed</camel:package>
         </camel:packageScan>
         <camel:template id="producerTemplate" defaultEndpoint="direct:OUTMSG1"/>
         <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG" />

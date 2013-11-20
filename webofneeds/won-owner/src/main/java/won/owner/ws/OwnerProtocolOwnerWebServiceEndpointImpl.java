@@ -48,7 +48,7 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     public void connect(@WebParam(name = "ownNeedURI") URI ownNeedURI, @WebParam(name = "otherNeedURI") URI otherNeedURI, @WebParam(name = "ownConnectionURI") URI ownConnectionURI, @WebParam(name = "content") String content) throws NoSuchNeedFault, ConnectionAlreadyExistsFault, IllegalMessageForNeedStateFault {
         wireDependenciesLazily();
       try {
-        ownerProtocolOwnerService.connect(ownNeedURI, otherNeedURI, ownConnectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
+        ownerProtocolOwnerService.connect(ownNeedURI.toString(), otherNeedURI.toString(), ownConnectionURI.toString(), RdfUtils.readRdfSnippet(content, FileUtils.langTurtle).toString());
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (ConnectionAlreadyExistsException e) {

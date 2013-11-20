@@ -9,8 +9,7 @@ import org.slf4j.LoggerFactory;
 import won.protocol.model.OwnerApplication;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 
 /**
@@ -54,8 +53,12 @@ public class MessagingServiceImpl<T> implements MessagingService,CamelContextAwa
         Exchange exchange = new DefaultExchange(getCamelContext());
 
         Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
-        exchange.setProperty("methodName", properties);
-        exchange.getIn().setHeaders(headers);
+        if (properties!=null){
+            if(properties.containsKey("methodName"))
+                exchange.setProperty("methodName", properties.get("methodName"));
+        }
+        if (headers!=null)
+            exchange.getIn().setHeaders(headers);
         exchange.getIn().setBody(body);
         exchange.setPattern(ExchangePattern.InOut);
         final SettableFuture<T> result = SettableFuture.create();
@@ -73,22 +76,56 @@ public class MessagingServiceImpl<T> implements MessagingService,CamelContextAwa
             }
         });
 
-        logger.info("sending InOut Message: "+ properties);
+
 
 
         return result;
     }
 
+    @Override
+    public void inspectMessage(Exchange exchange) {
+        inspectProperties(exchange);
+        inspectHeaders(exchange);
+        if(exchange.getIn().getBody()!=null)
+        logger.info(exchange.getIn().getBody().toString());
+    }
+    public void inspectProperties(Exchange exchange){
+        Map properties = (Map) exchange.getProperties();
+        Iterator iter =  properties.entrySet().iterator();
+        logger.info("WIRETAP: properties size: "+properties.size());
+        while(iter.hasNext()){
+            Map.Entry pairs = (Map.Entry)iter.next();
+            logger.info("key: "+pairs.getKey()+" value: "+pairs.getValue());
+        }
+
+    }
+
+
+    public void inspectHeaders(Exchange exchange){
+        Map headers = (Map) exchange.getIn().getHeaders();
+        Iterator iter =  headers.entrySet().iterator();
+        logger.info("WIRETAP: headers size: "+headers.size());
+        while(iter.hasNext()){
+            Map.Entry pairs = (Map.Entry)iter.next();
+            if(pairs.getValue()!=null)
+                logger.info("key: "+pairs.getKey()+" value: "+pairs.getValue());
+        }
+
+    }
+    //todo: deprecated method.. use sendInOutMessageGeneric instead
     public Future<URI> sendInOutMessage(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
 
         Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
-        if(properties.containsKey("methodName"))
-            exchange.setProperty("methodName", properties.get("methodName"));
-        if (properties.containsKey("protocol"))
-            exchange.setProperty("protocol",properties.get("protocol"));
+        if(properties != null)        {
+            if(properties.containsKey("methodName"))
+                exchange.setProperty("methodName", properties.get("methodName"));
+            if (properties.containsKey("protocol"))
+                exchange.setProperty("protocol",properties.get("protocol"));
+        }
+        if(headers != null)
+            exchange.getIn().setHeaders(headers);
 
-        exchange.getIn().setHeaders(headers);
         exchange.getIn().setBody(body);
         exchange.setPattern(ExchangePattern.InOut);
         final SettableFuture<URI> result = SettableFuture.create();
@@ -106,7 +143,7 @@ public class MessagingServiceImpl<T> implements MessagingService,CamelContextAwa
             }
         });
 
-        logger.info("sending InOut Message: "+ properties.containsKey("methodName"));
+
 
 
         return result;
@@ -114,13 +151,16 @@ public class MessagingServiceImpl<T> implements MessagingService,CamelContextAwa
     public void sendInOnlyMessage(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
-        if(properties.containsKey("methodName"))
-            exchange.setProperty("methodName", properties.get("methodName"));
-        if (properties.containsKey("protocol"))
-            exchange.setProperty("protocol",properties.get("protocol"));
-        exchange.getIn().setHeaders(headers);
-        List<OwnerApplication> ownerApplications= (List<OwnerApplication>) exchange.getIn().getHeader("ownerApplications");
-        logger.info(String.valueOf(ownerApplications.size()));
+        if (properties!=null){
+            if(properties.containsKey("methodName"))
+                exchange.setProperty("methodName", properties.get("methodName"));
+            if (properties.containsKey("protocol"))
+                exchange.setProperty("protocol",properties.get("protocol"));
+        }
+        if (headers!=null)
+             exchange.getIn().setHeaders(headers);
+       // List<OwnerApplication> ownerApplications= (List<OwnerApplication>) exchange.getIn().getHeader("ownerApplications");
+      //  logger.info(String.valueOf(ownerApplications.size()));
         exchange.getIn().setBody(body);
         producerTemplate.send(ep, exchange);
     }

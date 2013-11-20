@@ -73,5 +73,13 @@ public class DataAccessUtils
     return ownerApplications.get(0).getOwnerApplicationId();
 
   }
+    public static Connection loadConnection(ConnectionRepository connectionRepository, final Long id) throws NoSuchConnectionException
+    {
+        List<Connection> connections = connectionRepository.findById(id);
+        if (connections.size() == 0) throw new NoSuchConnectionException(id);
+        if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple connections found with URI {0}", id));
+        return connections.get(0);
+    }
+
 
 }

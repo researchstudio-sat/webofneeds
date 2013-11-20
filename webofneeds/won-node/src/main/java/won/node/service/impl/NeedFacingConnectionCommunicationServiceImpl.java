@@ -25,14 +25,13 @@ import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.model.*;
-import won.protocol.repository.ChatMessageRepository;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.EventRepository;
+import won.protocol.repository.*;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -55,6 +54,10 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   private EventRepository eventRepository;
   @Autowired
   private RDFStorageService rdfStorageService;
+  @Autowired
+  private OwnerApplicationRepository ownerApplicationRepository;
+  @Autowired
+  private NeedRepository needRepository;
 
   @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
@@ -136,6 +139,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     if (message == null) throw new IllegalArgumentException("message is not set");
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+
     //perform state transit (should not result in state change)
     //ConnectionState nextState = performStateTransit(con, ConnectionEventType.PARTNER_MESSAGE);
     //construct chatMessage object to store in the db

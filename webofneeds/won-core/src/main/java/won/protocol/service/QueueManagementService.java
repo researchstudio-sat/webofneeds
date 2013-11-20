@@ -16,6 +16,7 @@
 
 package won.protocol.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import won.protocol.model.OwnerApplication;
 
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.List;
  * Date: 13.11.13
  */
 public interface QueueManagementService {
+
     public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication);
     public String getEndpointForMessage(String methodName, String ownerApplicationID);
     public List<String> getEndpointsForOwnerApplication(String ownerApplication);

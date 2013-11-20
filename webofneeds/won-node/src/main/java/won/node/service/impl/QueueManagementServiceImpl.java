@@ -16,6 +16,7 @@
 
 package won.node.service.impl;
 
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +43,15 @@ public class QueueManagementServiceImpl implements QueueManagementService {
 
         logger.info(ownerApplication.getOwnerApplicationId());
         List<String> queueNames = new ArrayList<>();
-        queueNames.add("activemq:queue:OwnerProtocol." + "connect" + ".Out." + ownerApplication);
-        queueNames.add("activemq:queue:OwnerProtocol."+"hint"+".Out."+ownerApplication);
+        queueNames.add("activemq:queue:OwnerProtocol." + "connect" + ".Out." + ownerApplication.getOwnerApplicationId());
+        queueNames.add("activemq:queue:OwnerProtocol."+"hint"+".Out."+ownerApplication.getOwnerApplicationId());
+        queueNames.add("activemq:queue:OwnerProtocol."+"textMessage"+".Out."+ownerApplication.getOwnerApplicationId());
+        queueNames.add("activemq:queue:OwnerProtocol."+"open"+".Out."+ownerApplication.getOwnerApplicationId());
+        queueNames.add("activemq:queue:OwnerProtocol."+"close"+".Out."+ownerApplication.getOwnerApplicationId());
         ownerApplication.setQueueNames(queueNames);
+        logger.info(ownerApplication.getQueueNames().get(0));
+        logger.info(ownerApplication.getQueueNames().get(1));
+
         return ownerApplication.getQueueNames();
     }
 
@@ -67,8 +74,10 @@ public class QueueManagementServiceImpl implements QueueManagementService {
 
     @Override
     public List<String> getEndpointsForOwnerApplication(String ownerApplicationID) {
+        //TODO: must implement special handling of the case where the id is unknown
         List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
-        List<String> endpoints = ownerApplications.get(0).getQueueNames();
+        List<String> endpoints = new ArrayList<>();
+        endpoints.addAll(ownerApplications.get(0).getQueueNames());
         return endpoints;
     }
 
