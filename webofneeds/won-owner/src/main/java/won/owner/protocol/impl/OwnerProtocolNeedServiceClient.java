@@ -1,27 +1,20 @@
 package won.owner.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.owner.service.impl.URIService;
 import won.protocol.exception.*;
 import won.protocol.model.*;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.*;
-import won.protocol.rest.LinkedDataRestClient;
-import won.protocol.util.ConnectionModelMapper;
-import won.protocol.util.NeedModelMapper;
-import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 

@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.TextMessagePojo;
-import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
-import won.owner.protocol.impl.OwnerProtocolNeedServiceClientSide;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
-import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.DataAccessUtils;
@@ -33,7 +31,7 @@ public class ConnectionController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    @Qualifier("ownerProtocolNeedServiceClientJMSBased")
+    @Qualifier("ownerProtocolNeedServiceClient")
     private OwnerProtocolNeedServiceClientSide ownerService;
 
     @Autowired

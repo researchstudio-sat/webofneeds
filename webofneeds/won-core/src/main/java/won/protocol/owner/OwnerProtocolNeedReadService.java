@@ -1,4 +1,4 @@
-package won.owner.protocol.impl;
+package won.protocol.owner;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.NoSuchConnectionException;

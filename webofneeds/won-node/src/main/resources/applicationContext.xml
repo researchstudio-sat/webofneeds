@@ -26,6 +26,7 @@
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
     </bean>
+
     <context:property-placeholder location="classpath:activemq.properties" />
 
     <!-- Activate Annotation based configuration -->
@@ -44,68 +45,25 @@
         <camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
         <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG" />
     </camel:camelContext>
+
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
          <property name="brokerURL" value="vm://localhost:61616"/>
-
     </bean>
 
-
-    <!-- Configure Message Broker -->
-    <!-- bean id="jmsConnectionFactory"
-          class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="vm://localhost:61616" />
-    </bean>
-
-    <bean id="pooledConnectionFactory"
-          class="org.apache.activemq.pool.PooledConnectionFactory" init-method="start" destroy-method="stop">
-        <property name="maxConnections" value="8" />
-        <property name="connectionFactory" ref="jmsConnectionFactory" />
-    </bean-->
-
-
-
-    <!--bean id="activemq"
-          class="org.apache.activemq.camel.component.ActiveMQComponent">
-        <property name="configuration" ref="jmsConfig"/-->
-
-        <!-- if we are using transacted then enable CACHE_CONSUMER (if not using XA) to run faster
-             see more details at: http://camel.apache.org/jms
-        <property name="transacted" value="true"/>
-        <property name="cacheLevelName" value="CACHE_CONSUMER" />
-        -->
-    <!--/bean-->
-
-
-    <!-- bean id="embeddedBroker2" class="org.apache.activemq.xbean.PooledBrokerFactoryBean">
-        <property name="config" value="classpath:activemq2.xml"/>
-        <property name="start" value="true"/>
-
-    </bean-->
+    <!-- Configuring Broker -->
     <bean id="embeddedBroker1" class="org.apache.activemq.xbean.PooledBrokerFactoryBean">
         <property name="config" value="classpath:activemq.xml"/>
         <property name="start" value="true"/>
-
     </bean>
+
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker1">
-        
         <property name="brokerURL" value="vm://localhost:5672"/>
     </bean>
+
     <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
         <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
         <property name="sessionCacheSize" value="10"></property>
     </bean>
-
-    <!--bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
-        <constructor-arg value="WON.MSG"></constructor-arg>
-    </bean-->
-    <!-- bean id="producerTemplate" class="org.apache.camel.impl.DefaultProducerTemplate">
-        <property name="connectionFactory" ref="cachedConnectionFactory"></property>
-        <property name="defaultDestination" ref="destination"></property>
-    </bean -->
-
-    <!--jms:listener-container container-type="default" connection-factory="cachedConnectionFactory" acknowledge="auto">
-        <jms:listener destination="WON.MSG" ref="ownerProtocolNeedServiceJmsBased" method="onMessage"></jms:listener>
-    </jms:listener-container-->
 
     <!-- Database connection -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">

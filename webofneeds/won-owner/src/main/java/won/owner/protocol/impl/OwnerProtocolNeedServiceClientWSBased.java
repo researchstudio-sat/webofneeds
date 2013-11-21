@@ -25,6 +25,7 @@ import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 import won.protocol.ws.fault.*;

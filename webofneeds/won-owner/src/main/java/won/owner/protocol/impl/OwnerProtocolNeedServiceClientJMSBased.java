@@ -21,7 +21,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -30,6 +29,7 @@ import won.owner.ws.OwnerProtocolNeedClientFactory;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
 import won.protocol.model.WonNode;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.PropertiesUtil;
 import won.protocol.util.RdfUtils;
@@ -207,7 +207,9 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationListen
     @Override
     public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException, IOException, ExecutionException, InterruptedException, URISyntaxException {
         Map headerMap = new HashMap();
-
+        if (content != null) {
+            content.setNsPrefix("",ownerURI.toString());
+        }
         if(wonNodeURI == null)
             wonNodeURI=defaultNodeURI;
         List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeURI);

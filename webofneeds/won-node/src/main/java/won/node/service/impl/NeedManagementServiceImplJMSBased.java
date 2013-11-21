@@ -35,6 +35,8 @@ import java.util.List;
  * User: fkleedorfer
  * Date: 02.11.12
  */
+/* TODO: The logic of the methods of this class has nothing to do with JMS. should be merged with NeedManagementServiceImpl class. The only change was made in createNeed method, where the concept of authorizedApplications for each need was introduced.
+ */
 @Component
 public class NeedManagementServiceImplJMSBased implements NeedManagementService
 {

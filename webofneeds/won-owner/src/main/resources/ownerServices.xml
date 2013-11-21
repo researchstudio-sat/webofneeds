@@ -34,37 +34,13 @@
 
     <bean id="ownerProtocolNeedClientFactory" class="won.owner.ws.OwnerProtocolNeedClientFactory" />
 
-    <bean id="ownerProtocolOwnerService" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" >
+    <bean id="ownerProtocolOwnerService" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
 
-    </bean>
-
-    <!-- protocol-level services -->
-
-    <bean id="ownerProtocolNeedServiceClientWSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientWSBased">
-        <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
-    </bean>
     <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
         <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
 
-    <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientJMSBased">
-        <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
-        <property name="producerTemplate" ref="producerTemplate"/>
-        <property name="messagingService" ref="messagingService"/>
-        <property name="propertiesUtil" ref="propertiesUtil" />
-        <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
-
-    </bean>
     <bean id="propertiesUtil" class="won.protocol.util.PropertiesUtil"></bean>
-
-    <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
-        <property name="delegate" ref="ownerProtocolNeedServiceClientJMSBased" />
-        <!--property name="linkedDataRestClient" ref="linkedDataRestClient" />
-        <property name="uriService" ref="uriService" /-->
-    </bean>
-
-    <bean id="ownerProtocolNeedReadService" class="won.owner.protocol.impl.OwnerProtocolNeedReadServiceImpl">
-    </bean>
 
     <bean id="uriService" class="won.owner.service.impl.URIService">
         <property name="ownerProtocolOwnerServiceEndpointURI" value="${uri.owner.protocol.endpoint}" />
@@ -81,6 +57,29 @@
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
 
 
-    <!--bean id="messageProducer" class="won.owner.protocol.impl.MessageProducer"></bean-->
+
+
+    <!-- protocol-level services -->
+
+    <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
+        <property name="delegate" ref="ownerProtocolNeedServiceClientJMSBased" />
+        <!--property name="linkedDataRestClient" ref="linkedDataRestClient" />
+        <property name="uriService" ref="uriService" /-->
+    </bean>
+
+    <bean id="ownerProtocolNeedServiceClientWSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientWSBased">
+        <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
+    </bean>
+
+    <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientJMSBased">
+        <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
+        <property name="producerTemplate" ref="producerTemplate"/>
+        <property name="messagingService" ref="messagingService"/>
+        <property name="propertiesUtil" ref="propertiesUtil" />
+        <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
+    </bean>
+
+    <bean id="ownerProtocolNeedReadService" class="won.owner.protocol.impl.OwnerProtocolNeedReadServiceImpl">
+    </bean>
 
 </beans>

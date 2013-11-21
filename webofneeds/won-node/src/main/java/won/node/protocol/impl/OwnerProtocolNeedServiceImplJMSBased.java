@@ -1,4 +1,4 @@
-package won.node.jms;
+package won.node.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.*;
@@ -34,18 +34,6 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
     private OwnerFacingNeedCommunicationService needCommunicationService;
 
     private ProducerTemplate producerTemplate;
-    /*
-    @Override
-    public void onMessage(Message message) {
-        logger.info("onMessage: message received: {}", message);
-    }
-
-    @Override
-    public void consume(URI connectionURI, Message msg) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    } */
-
-   // @Consume(uri="bean:activemq:queue:WON.REGISTER")
 
     public List<String> getEndpointsForOwnerApplication(
             @Header("ownerApplicationID") String ownerApplicationID, Exchange exchange){
@@ -67,31 +55,33 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
             @Header("activate") boolean activate,
             @Header("ownerApplicationID") String ownerApplicationID,
             Exchange exchange) throws IllegalNeedContentException, JMSException {
+
         URI connectionURI = null;
         URI ownerURIconvert = URI.create(ownerURI);
         Model contentconvert = RdfUtils.toModel(content);
 
-        logger.info(ownerURI);
-        logger.info("pattern: ", exchange.getPattern());
-        logger.info(exchange.getProperties().toString());
         logger.info("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
 
         connectionURI = needManagementService.createNeed(ownerURIconvert, contentconvert, activate, ownerApplicationID);
-        exchange.getOut().setBody(connectionURI);
+       // exchange.getOut().setBody(connectionURI);
+
        return connectionURI;
     }
 
     @Consume(uri="bean:activemq:queue:WON.ACTIVATENEED")
-    public void activate(@Header("needURI") String needURI) throws NoSuchNeedException {
-        URI needURIconvert = URI.create(needURI);
+    public void activate(
+            @Header("needURI") String needURI) throws NoSuchNeedException {
         logger.info("activateNeed: message received: {}", needURI);
+
+        URI needURIconvert = URI.create(needURI);
         needManagementService.activate(needURIconvert);
     }
     @Consume(uri="bean:activemq:queue:WON.DEACTIVATENEED")
-    public void deactivate(@Header("needURI") String needURI) throws NoSuchNeedException{
+    public void deactivate(
+            @Header("needURI") String needURI) throws NoSuchNeedException{
+        logger.info("deactivateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
-        logger.info("deactivateNeed: message received: {}", needURI);
         needManagementService.deactivate(needURIconvert);
     }
 
@@ -151,21 +141,27 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
     }
 
     @Consume(uri="bean:activemq:queue:WON.OPEN")
-    public void open(@Header("connectionURI")String connectionURI, @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(
+            @Header("connectionURI")String connectionURI,
+            @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         URI connectionURIConvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(content);
         connectionCommunicationService.open(connectionURIConvert, contentConvert);
     }
 
     @Consume(uri="bean:activemq:queue:WON.CLOSE")
-    public void close(@Header("connectionURI")String connectionURI, @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void close(
+            @Header("connectionURI")String connectionURI,
+            @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         URI connectionURIConvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(content);
         connectionCommunicationService.open(connectionURIConvert, contentConvert);
     }
 
     @Consume(uri="bean:activemq:queue:WON.TEXTMESSAGE")
-    public void textMessage(@Header("connectionURI") String connectionURI, @Header("message")String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void textMessage(
+            @Header("connectionURI") String connectionURI,
+            @Header("message")String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         URI connectionURIconvert = URI.create(connectionURI);
 
         connectionCommunicationService.textMessage(connectionURIconvert, message);
@@ -173,17 +169,17 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
 
 
     @Consume(uri="bean:activemq:queue:WON.CONNECTNEED")
-    public URI connect(@Header("needURI") String needURI, @Header("otherNeedURI") String otherNeedURI, @Header("content") String content, Exchange exchange) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+    public URI connect(
+            @Header("needURI") String needURI,
+            @Header("otherNeedURI") String otherNeedURI,
+            @Header("content") String content, Exchange exchange) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+        logger.info("connectNeed: message received: {}", content);
+
         URI result = null;
         URI needURIConvert = URI.create(needURI);
         URI otherNeedURIConvert = URI.create(otherNeedURI);
         Model contentConvert = RdfUtils.toModel(content);
-        logger.info(needURIConvert.toString());
-        logger.info("pattern: ", exchange.getPattern());
-        logger.info(exchange.getProperties().toString());
-        logger.info("connectNeed: message received: {}", content);
         result = needCommunicationService.connect(needURIConvert, otherNeedURIConvert, contentConvert);
-
 
         return result;
     }
