@@ -21,8 +21,8 @@ public class MatcherCLI
 
   public static void main(String[] args)
   {
-    String need1 = "http://localhost:8080/won/ld/resource/need/1";
-    String need2 = "http://localhost:8080/won/ld/resource/need/2";
+    String need1 = "http://localhost:8080/won/resource/need/1";
+    String need2 = "http://localhost:8080/won/resource/need/2";
     String org = "http://localhost:8080/matcher";
     double score = 1;
 
