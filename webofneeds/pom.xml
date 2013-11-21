@@ -118,6 +118,12 @@
                 <version>${javax.servlet.jstl.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>${javax.validation.version}</version>
+            </dependency>
+
             <!-- commons-httpclient -->
             <dependency>
                 <groupId>commons-httpclient</groupId>
@@ -213,6 +219,27 @@
                 <artifactId>spring-web</artifactId>
                 <version>${org.springframework.version}</version>
             </dependency>
+                <!-- spring-security -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-web</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-config</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-taglibs</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
 
 
 
@@ -245,6 +272,11 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-c3p0</artifactId>
                 <version>${org.hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${org.hibernate.hibernate-validator.version}</version>
             </dependency>
 
 
@@ -314,6 +346,21 @@
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
                 <version>${commons-collections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>${commons-fileupload.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${com.google.guava.version}</version>
             </dependency>
 
             <!-- TESTING -->
@@ -478,7 +525,6 @@
             -Xlint:deprecation,fallthrough,finally,path,serial,unchecked
         </maven.compile.compilerargs>
         <compile.forked>false</compile.forked>
-
         <java.source.version>1.7</java.source.version>
         <java.target.version>1.7</java.target.version>
         <surefire.skip>false</surefire.skip>
@@ -487,14 +533,16 @@
         <surefire.reportformat>brief</surefire.reportformat>
         <surefire.usefile>false</surefire.usefile>
         <dependencies.scope>compile</dependencies.scope>
-
         <!-- versions for various dependencies -->
         <commons-collections.version>3.2.1</commons-collections.version>
+        <commons-fileupload.version>1.2.2</commons-fileupload.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
+        <commons-io.version>2.1</commons-io.version>
         <solr.version>3.5.0</solr.version>
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>
         <com.github.jsonld-java.version>0.3-SNAPSHOT</com.github.jsonld-java.version>
+        <com.google.guava.version>15.0</com.google.guava.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
         <com.sun.xml.version>2.0EA3</com.sun.xml.version>
@@ -504,6 +552,7 @@
         <org.apache.jena.jsonld.version>0.0.1-SNAPSHOT</org.apache.jena.jsonld.version>
         <org.apache.jena.version>2.11.0</org.apache.jena.version>
         <org.hibernate.version>4.1.8.Final</org.hibernate.version>
+        <org.hibernate.hibernate-validator.version>4.2.0.Final</org.hibernate.hibernate-validator.version>
         <org.springframework.data.commons.version>1.4.0.RELEASE</org.springframework.data.commons.version>
         <org.springframework.data.jpa.version>1.2.0.RELEASE</org.springframework.data.jpa.version>
         <org.springframework.version>3.2.4.RELEASE</org.springframework.version>
@@ -512,6 +561,7 @@
         <org.hsqldb.version>2.2.9</org.hsqldb.version>
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
+        <javax.validation.version>1.0.0.GA</javax.validation.version>
         <cargo.version>1.4.2</cargo.version>
         <jrebel.version>1.1.3</jrebel.version>
         <wagon.version>1.0-beta-3</wagon.version>

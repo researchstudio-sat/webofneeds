@@ -12,10 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>won-owner-webapp</artifactId>
 
-	<properties>
-		<commons.fileupload.version>1.2.2</commons.fileupload.version>
-		<commons.io.version>2.1</commons.io.version>
-	</properties>
+
 
 	<dependencies>
         <!--
@@ -74,30 +71,38 @@
 	    <dependency>
 		    <groupId>org.springframework.security</groupId>
 		    <artifactId>spring-security-web</artifactId>
-		    <version>${org.springframework.security.version}</version>
+            <scope>${dependencies.scope}</scope>
 	    </dependency>
 	    <dependency>
 		    <groupId>org.springframework.security</groupId>
 		    <artifactId>spring-security-config</artifactId>
-		    <version>${org.springframework.security.version}</version>
+            <scope>${dependencies.scope}</scope>
 	    </dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-taglibs</artifactId>
-			<version>${org.springframework.security.version}</version>
+            <scope>${dependencies.scope}</scope>
 		</dependency>
 
-		<!-- Hibernate Validator -->
+        <!-- Hibernate Validator -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>4.2.0.Final</version>
+            <scope>${dependencies.scope}</scope>
 		</dependency>
 
-		<dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
+
+
+        <dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>15.0</version>
+            <scope>${dependencies.scope}</scope>
 		</dependency>
 
 		<dependency>
@@ -109,13 +114,13 @@
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
-			<version>${commons.fileupload.version}</version>
+            <scope>${dependencies.scope}</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>${commons.io.version}</version>
+            <scope>${dependencies.scope}</scope>
 		</dependency>
 
         <dependency>

@@ -51,9 +51,7 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
-			<version>${org.springframework.security.version}</version>
 		</dependency>
-
 	</dependencies>
 
     <build>
