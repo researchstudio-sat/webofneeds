@@ -19,18 +19,9 @@ package won.node.protocol.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
-import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.util.RdfUtils;
-import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
-import won.protocol.ws.fault.ConnectionAlreadyExistsFault;
-import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
-import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
-import won.protocol.ws.fault.NoSuchConnectionFault;
-
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -45,44 +36,22 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
-  private NeedProtocolNeedClientFactory clientFactory;
-
-    public void setMessagingService(MessagingService messagingService) {
-        this.messagingService = messagingService;
-    }
-
     private MessagingService messagingService;
 
   @Override
   public Future<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-      Map headerMap = new HashMap<String, String>();
+      Map<String,String> headerMap = new HashMap<>();
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("needURI", needURI.toString()) ;
       headerMap.put("otherNeedURI", otherNeedURI.toString());
       headerMap.put("otherConnectionURI", otherConnectionURI.toString()) ;
       headerMap.put("content",RdfUtils.toString(content));
-
       headerMap.put("methodName","connect");
 
-      return messagingService.sendInOutMessage(null,headerMap,null, "outgoingMessages" );
+      return messagingService.sendInOutMessageGeneric(null, headerMap,null, "outgoingMessages");
+      //return messagingService.sendInOutMessage(null,headerMap,null, "outgoingMessages" );
   }
-   /*
-    @Override
-    public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connectionURI));
-        try {
-            NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connectionURI);
-            proxy.open(connectionURI, RdfUtils.toString(content));
-        } catch (MalformedURLException e) {
-            logger.warn("couldnt create URL for needProtocolEndpoint", e);
-        } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
-          throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
-        } catch (NoSuchConnectionFault noSuchConnectionFault) {
-          throw NoSuchConnectionFault.toException(noSuchConnectionFault);
-        }
-    }   */
 
     @Override
     public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
@@ -91,7 +60,6 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
         headerMap.put("protocol","NeedProtocol");
         headerMap.put("connectionURI", connectionURI.toString()) ;
         headerMap.put("content", RdfUtils.toString(content));
-
         headerMap.put("methodName","open");
         messagingService.sendInOnlyMessage(null,headerMap,null, "outgoingMessages" );
     }
@@ -124,10 +92,9 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
   }
 
-  public void setClientFactory(final NeedProtocolNeedClientFactory clientFactory)
-  {
-    this.clientFactory = clientFactory;
-  }
+    public void setMessagingService(MessagingService messagingService) {
+        this.messagingService = messagingService;
+    }
 
 
 }

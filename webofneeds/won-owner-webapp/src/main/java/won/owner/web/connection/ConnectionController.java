@@ -61,7 +61,6 @@ public class ConnectionController {
        if(con==null)
             return "noNeedFound";
         //Connection con = cons.get(0);
-        logger.info("CONNECTION CONTROLLER-Connection State: "+con.getState().toString());
         try {
             switch (con.getState()) {
                 case REQUEST_RECEIVED:

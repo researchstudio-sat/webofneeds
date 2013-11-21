@@ -75,9 +75,7 @@
         <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
     </bean>
     <bean name="needProtocolNeedClientJMSBased" class="won.node.protocol.impl.NeedProtocolNeedClientImplJMSBased">
-        <property name="clientFactory" ref="needProtocolNeedWebServiceClientFactory" />
         <property name="messagingService" ref="messagingService"/>
-
     </bean>
 
 

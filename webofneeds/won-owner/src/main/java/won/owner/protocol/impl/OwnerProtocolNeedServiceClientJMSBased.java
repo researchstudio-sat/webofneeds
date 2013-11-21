@@ -124,7 +124,8 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationListen
         headerMap.put("content",RdfUtils.toString(content));
 
         headerMap.put("methodName","connect");
-        return messagingService.sendInOutMessage(null,headerMap,null, "outgoingMessages");
+        return messagingService.sendInOutMessageGeneric(null,headerMap,null,"outgoingMessages");
+       // return messagingService.sendInOutMessage(null,headerMap,null, "outgoingMessages");
     }
 
     @Override
@@ -156,7 +157,8 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationListen
         logger.info("sending register message");
         Map headerMap = new HashMap();
         headerMap.put("methodName","register");
-        return messagingService.sendInOutMessageForString("register", null, null, "outgoingMessages");
+        return messagingService.sendInOutMessageGeneric(null, headerMap,null,"outgoingMessages");
+       // return messagingService.sendInOutMessageForString("register", null, null, "outgoingMessages");
 
 
     }
@@ -237,7 +239,8 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationListen
         headerMap.put("activate",activate);
 
         headerMap.put("methodName","createNeed");
-        return messagingService.sendInOutMessage(headerMap,headerMap,null,"outgoingMessages" );
+        return messagingService.sendInOutMessageGeneric(null, headerMap,null,"outgoingMessages");
+     //   return messagingService.sendInOutMessage(headerMap,headerMap,null,"outgoingMessages" );
 
     }
 

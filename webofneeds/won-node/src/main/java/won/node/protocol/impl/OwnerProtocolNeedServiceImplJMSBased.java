@@ -48,7 +48,6 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         return ownerApplicationId;
     }
 
-    @Consume(uri="bean:activemq:queue:WON.CREATENEED")
     public URI createNeed(
             @Header("ownerURI") String ownerURI,
             @Header("model") String content,
@@ -63,12 +62,11 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         logger.info("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
 
         connectionURI = needManagementService.createNeed(ownerURIconvert, contentconvert, activate, ownerApplicationID);
-       // exchange.getOut().setBody(connectionURI);
+        exchange.getOut().setBody(connectionURI);
 
        return connectionURI;
     }
 
-    @Consume(uri="bean:activemq:queue:WON.ACTIVATENEED")
     public void activate(
             @Header("needURI") String needURI) throws NoSuchNeedException {
         logger.info("activateNeed: message received: {}", needURI);
@@ -76,7 +74,7 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         URI needURIconvert = URI.create(needURI);
         needManagementService.activate(needURIconvert);
     }
-    @Consume(uri="bean:activemq:queue:WON.DEACTIVATENEED")
+
     public void deactivate(
             @Header("needURI") String needURI) throws NoSuchNeedException{
         logger.info("deactivateNeed: message received: {}", needURI);
@@ -140,7 +138,6 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         return delegate.readConnectionContent(connectionURI);
     }
 
-    @Consume(uri="bean:activemq:queue:WON.OPEN")
     public void open(
             @Header("connectionURI")String connectionURI,
             @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
@@ -149,7 +146,6 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         connectionCommunicationService.open(connectionURIConvert, contentConvert);
     }
 
-    @Consume(uri="bean:activemq:queue:WON.CLOSE")
     public void close(
             @Header("connectionURI")String connectionURI,
             @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
@@ -158,7 +154,6 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         connectionCommunicationService.open(connectionURIConvert, contentConvert);
     }
 
-    @Consume(uri="bean:activemq:queue:WON.TEXTMESSAGE")
     public void textMessage(
             @Header("connectionURI") String connectionURI,
             @Header("message")String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
@@ -167,8 +162,6 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         connectionCommunicationService.textMessage(connectionURIconvert, message);
     }
 
-
-    @Consume(uri="bean:activemq:queue:WON.CONNECTNEED")
     public URI connect(
             @Header("needURI") String needURI,
             @Header("otherNeedURI") String otherNeedURI,

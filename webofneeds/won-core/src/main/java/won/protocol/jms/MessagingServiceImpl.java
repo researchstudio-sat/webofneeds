@@ -21,34 +21,6 @@ public class MessagingServiceImpl<T> implements MessagingService,CamelContextAwa
     private ProducerTemplate producerTemplate;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public Future<String> sendInOutMessageForString(String methodName, Map headers, Object body, String endpoint){
-        Exchange exchange = new DefaultExchange(getCamelContext());
-
-        Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
-        exchange.setProperty("methodName", methodName);
-        exchange.getIn().setHeaders(headers);
-        exchange.getIn().setBody(body);
-        exchange.setPattern(ExchangePattern.InOut);
-        final SettableFuture<String> result = SettableFuture.create();
-
-        producerTemplate.asyncCallback(ep,exchange, new Synchronization() {
-            @Override
-            public void onComplete(Exchange exchange) {
-                String resultObject = exchange.getOut().getBody().toString();
-                result.set(resultObject);
-            }
-
-            @Override
-            public void onFailure(Exchange exchange) {
-                result.cancel(true);
-            }
-        });
-
-        logger.info("sending InOut Message: "+ methodName);
-
-
-        return result;
-    }
     public Future<T> sendInOutMessageGeneric(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
 
@@ -112,42 +84,7 @@ public class MessagingServiceImpl<T> implements MessagingService,CamelContextAwa
         }
 
     }
-    //todo: deprecated method.. use sendInOutMessageGeneric instead
-    public Future<URI> sendInOutMessage(Map properties, Map headers, Object body, String endpoint){
-        Exchange exchange = new DefaultExchange(getCamelContext());
 
-        Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
-        if(properties != null)        {
-            if(properties.containsKey("methodName"))
-                exchange.setProperty("methodName", properties.get("methodName"));
-            if (properties.containsKey("protocol"))
-                exchange.setProperty("protocol",properties.get("protocol"));
-        }
-        if(headers != null)
-            exchange.getIn().setHeaders(headers);
-
-        exchange.getIn().setBody(body);
-        exchange.setPattern(ExchangePattern.InOut);
-        final SettableFuture<URI> result = SettableFuture.create();
-
-        producerTemplate.asyncCallback(ep,exchange, new Synchronization() {
-            @Override
-            public void onComplete(Exchange exchange) {
-                URI resultObject = (URI)exchange.getOut().getBody();
-                result.set(resultObject);
-            }
-
-            @Override
-            public void onFailure(Exchange exchange) {
-                result.cancel(true);
-            }
-        });
-
-
-
-
-        return result;
-    }
     public void sendInOnlyMessage(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
