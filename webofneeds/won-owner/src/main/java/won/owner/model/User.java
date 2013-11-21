@@ -35,7 +35,7 @@ public class User implements UserDetails{
 
 	private String password;
 
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	private List<Need> needs;
 
 	@Transient

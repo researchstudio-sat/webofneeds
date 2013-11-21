@@ -181,11 +181,17 @@ public class RestNeedController {
 			method = RequestMethod.POST
 	)
 	public NeedPojo createNeed(@RequestBody NeedPojo needPojo) {
+		User user = (User) wonUserDetailService.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 
 		logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getCreationDate() + "/" +
 				needPojo.getLongitude() + "/" + needPojo.getLatitude() + "/" + (needPojo.getState() == NeedState.ACTIVE));
 
-		return resolve(needPojo);
+		NeedPojo createdNeedPojo = resolve(needPojo);
+		List<Need> needs = needRepository.findByNeedURI(URI.create(createdNeedPojo.getNeedURI()));
+		user.getNeeds().add(needs.get(0));
+		wonUserDetailService.save(user);
+
+		return createdNeedPojo;
 	}
 
 	@ResponseBody
@@ -272,7 +278,7 @@ public class RestNeedController {
 					needModel.add(needModel.createStatement(needContent, WON.HAS_TAG, tag.trim()));
 				}
 			}
-      if (!needPojo.getImages().isEmpty()){
+      if (needPojo.getImages() != null && !needPojo.getImages().isEmpty()){
         Seq mediaSeq = needModel.createSeq();
         int imageIndex = 1;
         for (ImagePojo imagePojo: needPojo.getImages()) {

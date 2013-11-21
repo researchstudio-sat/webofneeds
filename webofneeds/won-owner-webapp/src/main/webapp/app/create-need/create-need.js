@@ -88,7 +88,7 @@ createNeedModule.directive('wonGallery', function factory() {
 				angular.element("#photo-form").scope().submit();
 			});
 		},
-		controller : function($scope) {
+		controller : function($scope, $location) {
 			$scope.selectedPhoto = 0;
 			$scope.getCleanPhotos = function() {
 				return [
@@ -115,7 +115,9 @@ createNeedModule.directive('wonGallery', function factory() {
 			});
 
 			$scope.$on('fileuploadstop', function (e, data) {
-				$scope.photos[$scope.selectedPhoto].uri = 'http://localhost:8080/owner/rest/needphoto/' + $scope.need.binaryFolder + "/" + $scope.selectedPhoto + $scope.lastExtension + '/';
+				var absPath = $location.absUrl();
+				var ownerPath = absPath.substr(0,absPath.indexOf('#'));
+				$scope.photos[$scope.selectedPhoto].uri = ownerPath + 'rest/needphoto/' + $scope.need.binaryFolder + "/" + $scope.selectedPhoto + $scope.lastExtension + '/';
 				$scope.need.images = [];
 				angular.forEach($scope.photos, function(photo) {
 					if(photo.uri) {
