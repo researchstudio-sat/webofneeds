@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.node.protocol.impl.NeedProtocolNeedClientSide;
+import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerServiceClient;

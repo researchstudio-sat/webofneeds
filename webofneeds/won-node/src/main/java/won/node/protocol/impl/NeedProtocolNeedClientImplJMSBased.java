@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
+import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.util.RdfUtils;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -38,6 +39,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
     private MessagingService messagingService;
 
+    //TODO: debugging needed. when a established connection is closed then reconnected, both connections are in state "request sent"
   @Override
   public Future<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
@@ -50,7 +52,6 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       headerMap.put("methodName","connect");
 
       return messagingService.sendInOutMessageGeneric(null, headerMap,null, "outgoingMessages");
-      //return messagingService.sendInOutMessage(null,headerMap,null, "outgoingMessages" );
   }
 
     @Override

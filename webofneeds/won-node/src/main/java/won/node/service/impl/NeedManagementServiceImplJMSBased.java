@@ -16,7 +16,6 @@ import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.model.OwnerApplication;
-import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.owner.OwnerProtocolOwnerServiceClient;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.OwnerApplicationRepository;
@@ -64,6 +63,20 @@ public class NeedManagementServiceImplJMSBased implements NeedManagementService
         need = needRepository.save(need);
         //now, create the need URI and save again
         need.setNeedURI(URIService.createNeedURI(need));
+
+
+        need = needRepository.saveAndFlush(need);
+        List<Need>needs = needRepository.findByNeedURI(need.getNeedURI());
+        String baseURI = need.getNeedURI().toString();
+        RdfUtils.replaceBaseURI(content, baseURI);
+
+        rdfStorage.storeContent(need, content);
+        authorizeOwnerApplicationForNeed(ownerApplicationID,need.getNeedURI());
+        return need.getNeedURI();
+    }
+    @Override
+    public void authorizeOwnerApplicationForNeed(final String ownerApplicationID, URI needURI){
+        Need need = needRepository.findByNeedURI(needURI).get(0);
         List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
         if(ownerApplications.size()>0)  {
             OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID).get(0);
@@ -80,22 +93,8 @@ public class NeedManagementServiceImplJMSBased implements NeedManagementService
             need.setAuthorizedApplications(ownerApplicationList);
             logger.info("setting OwnerApp ID: "+ownerApplicationList.get(0));
         }
-        logger.info("CREATED NEED-NEED URI: "+need.getNeedURI());
-        logger.info("OwnerApp ID param: "+need.getAuthorizedApplications().get(0).getOwnerApplicationId());
-        logger.info("CREATED NEED-OwnerApp ID: "+need.getAuthorizedApplications().get(0).getOwnerApplicationId());
         need = needRepository.saveAndFlush(need);
-        List<Need>needs = needRepository.findByNeedURI(need.getNeedURI());
-        need = needs.get(0);
-        logger.info("SAVED NEED-NEED URI: "+need.getNeedURI());
-        logger.info("SAVED NEED-OwnerApp ID: "+need.getAuthorizedApplications().get(0).getOwnerApplicationId());
-        String baseURI = need.getNeedURI().toString();
-        RdfUtils.replaceBaseURI(content, baseURI);
-
-        rdfStorage.storeContent(need, content);
-
-        return need.getNeedURI();
     }
-
 
     @Override
     public void activate(final URI needURI) throws NoSuchNeedException

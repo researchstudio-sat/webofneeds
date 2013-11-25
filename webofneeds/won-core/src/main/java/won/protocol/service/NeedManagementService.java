@@ -35,6 +35,9 @@ public interface NeedManagementService
    * Creates a new need with the specified content, ownerURI and active state.
    *
    *
+   *
+   *
+   *
    * @param ownerURI
    * @param content
    * @param activate
@@ -43,12 +46,13 @@ public interface NeedManagementService
    */
   public URI createNeed(final URI ownerURI, Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException;
 
-  /**
-   * Activates the need object.
-   *
-   * @param needURI
-   * @throws won.protocol.exception.NoSuchNeedException if needURI does not refer to an existing need
-   */
+  public void authorizeOwnerApplicationForNeed(final String ownerApplicationID, URI needURI);
+    /**
+     * Activates the need object.
+     *
+     * @param needURI
+     * @throws won.protocol.exception.NoSuchNeedException if needURI does not refer to an existing need
+     */
   public void activate(URI needURI) throws NoSuchNeedException;
 
   /**

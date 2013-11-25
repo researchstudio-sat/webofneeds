@@ -25,7 +25,7 @@ public class OwnerManagementServiceImpl implements OwnerManagementService {
 
     @Override
     public String registerOwnerApplication() {
-        UUID ownerApplicationId = UUID.randomUUID();  //TODO: review when looking for security issues
+        UUID ownerApplicationId = UUID.randomUUID();  //TODO: owner application id generation shall be reviewed.
         logger.info("ownerApplicationId: "+ownerApplicationId.toString() );
         OwnerApplication ownerApplication = new OwnerApplication();
         ownerApplication.setOwnerApplicationId(ownerApplicationId.toString());

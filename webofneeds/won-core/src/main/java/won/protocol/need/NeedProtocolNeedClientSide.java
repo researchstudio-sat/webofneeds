@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.node.protocol.impl;
+package won.protocol.need;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;

@@ -10,6 +10,7 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.repository.NeedRepository;
 import won.protocol.service.*;
 import won.protocol.util.RdfUtils;
 import javax.jms.JMSException;
@@ -21,17 +22,20 @@ import java.util.List;
  * User: LEIH-NB
  * Date: 22.10.13
  */
-public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNeedService /*, WonMessageListener*/ {
+public class OwnerProtocolNeedServiceImplJMSBased{// implements //OwnerProtocolNeedService{ /*, WonMessageListener*/
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
     private OwnerProtocolNeedService delegate;
-    private ConnectionCommunicationService connectionCommunicationService;
    // private ActiveMQComponent activeMQComponent;
-    private NeedManagementService needManagementService;
+
     private OwnerManagementService ownerManagementService;
     @Autowired
     private QueueManagementService queueManagementService;
 
     private OwnerFacingNeedCommunicationService needCommunicationService;
+    @Autowired
+    private NeedRepository needRepository;
 
     private ProducerTemplate producerTemplate;
 
@@ -61,7 +65,9 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
 
         logger.info("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
 
-        connectionURI = needManagementService.createNeed(ownerURIconvert, contentconvert, activate, ownerApplicationID);
+        connectionURI = delegate.createNeed(ownerURIconvert, contentconvert, activate,ownerApplicationID );
+
+
         exchange.getOut().setBody(connectionURI);
 
        return connectionURI;
@@ -72,7 +78,7 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         logger.info("activateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
-        needManagementService.activate(needURIconvert);
+        delegate.activate(needURIconvert);
     }
 
     public void deactivate(
@@ -80,7 +86,7 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         logger.info("deactivateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
-        needManagementService.deactivate(needURIconvert);
+        delegate.deactivate(needURIconvert);
     }
 
     //@Override
@@ -143,7 +149,7 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
             @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         URI connectionURIConvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(content);
-        connectionCommunicationService.open(connectionURIConvert, contentConvert);
+        delegate.open(connectionURIConvert, contentConvert);
     }
 
     public void close(
@@ -151,7 +157,7 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
             @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         URI connectionURIConvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(content);
-        connectionCommunicationService.open(connectionURIConvert, contentConvert);
+        delegate.close(connectionURIConvert, contentConvert);
     }
 
     public void textMessage(
@@ -159,7 +165,7 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
             @Header("message")String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         URI connectionURIconvert = URI.create(connectionURI);
 
-        connectionCommunicationService.textMessage(connectionURIconvert, message);
+        delegate.textMessage(connectionURIconvert, message);
     }
 
     public URI connect(
@@ -181,25 +187,11 @@ public class OwnerProtocolNeedServiceImplJMSBased {//implements OwnerProtocolNee
         this.delegate = delegate;
     }
 
-    public NeedManagementService getNeedManagementService() {
-        return needManagementService;
-    }
-
-    public void setNeedManagementService(NeedManagementService needManagementService) {
-        this.needManagementService = needManagementService;
-    }
-
-   /* public void setActiveMQComponent(ActiveMQComponent activeMQComponent) {
-        this.activeMQComponent = activeMQComponent;
-    }              */
 
     public void setProducerTemplate(ProducerTemplate producerTemplate) {
         this.producerTemplate = producerTemplate;
     }
 
-    public void setConnectionCommunicationService(ConnectionCommunicationService connectionCommunicationService) {
-        this.connectionCommunicationService = connectionCommunicationService;
-    }
     public void setNeedCommunicationService(OwnerFacingNeedCommunicationService needCommunicationService) {
         this.needCommunicationService = needCommunicationService;
     }
