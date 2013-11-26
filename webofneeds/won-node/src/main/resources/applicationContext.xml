@@ -7,6 +7,7 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation=
                "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                 http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
@@ -26,7 +27,6 @@
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
     </bean>
-
     <context:property-placeholder location="classpath:activemq.properties" />
 
     <!-- Activate Annotation based configuration -->
@@ -40,17 +40,21 @@
     <!-- Camel configuration -->
     <camel:camelContext>
         <camel:packageScan>
-            <camel:package>won.node.routes.fixed</camel:package>
+            <camel:package>won.node.camel.routes.fixed</camel:package>
         </camel:packageScan>
         <camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
         <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG" />
     </camel:camelContext>
 
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <!-- note: this URI does not need to be configurable via the
+        config file, it will be the same on any system -->
          <property name="brokerURL" value="vm://localhost:61616"/>
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
     </bean>
-
+    <bean id="needProtocolActiveMQService" class="won.node.protocol.impl.NeedProtocolActiveMQServiceImpl">
+        <property name="componentName" value="activemq"/>
+    </bean>
     <!-- Configuring Broker -->
     <bean id="embeddedBroker1" class="org.apache.activemq.xbean.PooledBrokerFactoryBean">
         <property name="config" value="classpath:activemq.xml"/>
@@ -59,6 +63,8 @@
     </bean>
 
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker1">
+        <!-- note: this URI does not need to be configurable via the
+        config file, it will be the same on any system -->
         <property name="brokerURL" value="vm://localhost:61616"/>
     </bean>
 

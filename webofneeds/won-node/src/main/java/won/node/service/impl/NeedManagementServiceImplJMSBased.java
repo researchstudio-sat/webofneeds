@@ -63,6 +63,7 @@ public class NeedManagementServiceImplJMSBased implements NeedManagementService
         need = needRepository.save(need);
         //now, create the need URI and save again
         need.setNeedURI(URIService.createNeedURI(need));
+        need.setWonNodeURI(URI.create(URIService.getGeneralURIPrefix()));
 
 
         need = needRepository.saveAndFlush(need);

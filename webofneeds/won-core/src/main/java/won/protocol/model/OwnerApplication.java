@@ -31,6 +31,9 @@ public class OwnerApplication {
     @Column(name="queueName")
     private List<String> queueNames;
 
+    @Column(name="incomingEndpoint")
+    private String incomingEndpoint;
+
     @Column( name = "ownerApplicationId", unique = true )
     private String ownerApplicationId;
 
@@ -64,6 +67,9 @@ public class OwnerApplication {
 
     public void setQueueNames(List<String> queueNames) {
         this.queueNames = queueNames;
+    }
+    public void setIncomingEndpoint(String incomingEndpoint){
+
     }
 }
 

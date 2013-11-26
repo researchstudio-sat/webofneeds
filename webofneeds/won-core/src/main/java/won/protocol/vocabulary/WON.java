@@ -34,13 +34,17 @@ import won.protocol.model.NeedState;
 public class WON
 {
   public static final String BASE_URI = "http://purl.org/webofneeds/model#";
-  private static Model m = ModelFactory.createDefaultModel();
+
+    private static Model m = ModelFactory.createDefaultModel();
 
   public static final Resource NEED = m.createResource(BASE_URI + "Need");
   public static final Property NEED_CREATION_DATE = m.createProperty(BASE_URI, "needCreationDate");
   public static final Property NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "needProtocolEndpoint");
   public static final Property MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "matcherProtocolEndpoint");
   public static final Property OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "ownerProtocolEndpoint");
+  public static final Property HAS_ACTIVEMQ_SERVICE = m.createProperty(BASE_URI,"hasActiveMQService");
+  public static final Property HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,"hasActiveMQNeedProtocolQueueName");
+  public static final Property HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,"hasActiveMQOwnerProtocolQueueName");
   public static final Property EMBED_SPIN_ASK = m.createProperty(BASE_URI, "embedSpinAsk");
 
 

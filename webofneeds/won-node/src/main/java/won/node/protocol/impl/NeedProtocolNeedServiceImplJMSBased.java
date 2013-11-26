@@ -39,6 +39,8 @@ public class NeedProtocolNeedServiceImplJMSBased implements NeedProtocolNeedServ
 {
   protected NeedFacingNeedCommunicationService needFacingNeedCommunicationService;
   protected ConnectionCommunicationService connectionCommunicationService;
+  protected NeedProtocolNeedService delegate;
+
     final Logger logger = LoggerFactory.getLogger(getClass());
 
   //@Consume(uri="bean:activemq:queue:WON.NeedProtocol.Connect.In")
@@ -50,14 +52,14 @@ public class NeedProtocolNeedServiceImplJMSBased implements NeedProtocolNeedServ
        URI otherConnectionURIConvert = URI.create(otherConnectionURI);
        Model contentConvert = RdfUtils.toModel(content);
 
-       return this.needFacingNeedCommunicationService.connect(needURIConvert, otherNeedURIConvert, otherConnectionURIConvert, contentConvert);
+       return this.delegate.connect(needURIConvert, otherNeedURIConvert, otherConnectionURIConvert, contentConvert);
   }
 
   public void open(@Header("connectionURI")final String connectionURI,@Header("content") final String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
       logger.info("NODE2: open received for need {], otherNeed{},connectionURI {}, content {}");
       URI connectionURIConvert = URI.create(connectionURI);
       Model contentConvert = RdfUtils.toModel(content);
-      connectionCommunicationService.open(connectionURIConvert, contentConvert);
+      delegate.open(connectionURIConvert, contentConvert);
   }
 
   public void close(@Header("connectionURI")final String connectionURI,@Header("content") final String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
@@ -65,7 +67,7 @@ public class NeedProtocolNeedServiceImplJMSBased implements NeedProtocolNeedServ
       logger.info("NODE2: close received for need {], otherNeed{},connectionURI {}, content {}");
       URI connectionURIConvert = URI.create(connectionURI);
       Model contentConvert = RdfUtils.toModel(content);
-      connectionCommunicationService.close(connectionURIConvert, contentConvert);
+      delegate.close(connectionURIConvert, contentConvert);
   }
 
   public void textMessage(@Header("connectionURI")final String connectionURI, @Header("content")final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
@@ -73,7 +75,7 @@ public class NeedProtocolNeedServiceImplJMSBased implements NeedProtocolNeedServ
       logger.info("NODE2: text message received for connection {], message {}",connectionURI,message);
       URI connectionURIConvert = URI.create(connectionURI);
 
-        connectionCommunicationService.textMessage(connectionURIConvert, message);
+        delegate.textMessage(connectionURIConvert, message);
   }
 
 
@@ -105,5 +107,9 @@ public class NeedProtocolNeedServiceImplJMSBased implements NeedProtocolNeedServ
     @Override
     public URI connect(URI needURI, URI otherNeedURI, URI otherConnectionURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setDelegate(NeedProtocolNeedService delegate) {
+        this.delegate = delegate;
     }
 }

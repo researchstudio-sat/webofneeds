@@ -48,6 +48,10 @@ public class Need
   @Column( name = "ownerURI" )
   private URI ownerURI;
 
+    /* The need protocol endpoint URI where the won node of the need can be reached */
+    @Column(name="wonNodeURI")
+    private URI wonNodeURI;
+
   /* The creation date of the need */
   @Temporal(TemporalType.TIMESTAMP)
   @Column( name = "creationDate", nullable = false)
@@ -167,4 +171,11 @@ public class Need
     }
 
 
+    public URI getWonNodeURI() {
+        return wonNodeURI;
+    }
+
+    public void setWonNodeURI(URI wonNodeURI) {
+        this.wonNodeURI = wonNodeURI;
+    }
 }

@@ -154,4 +154,7 @@ public class URIService
   {
     return URI.create(con.getConnectionURI()+"/event/"+event.getId());
   }
+  public String getGeneralURIPrefix(){
+      return this.generalURIPrefix;
+  }
 }

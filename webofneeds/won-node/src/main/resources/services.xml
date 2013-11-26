@@ -46,11 +46,16 @@
         <!--property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService" /-->
     </bean>
 
-    <bean id="needProtocolNeedService" class="won.node.protocol.impl.NeedProtocolNeedServiceImplJMSBased">
+    <bean id="needProtocolNeedServiceJMSBased" class="won.node.protocol.impl.NeedProtocolNeedServiceImplJMSBased">
         <property name="needFacingNeedCommunicationService" ref="needCommunicationService" />
         <!-- the connection communication service injected here is need facing, not owner facing -->
         <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService" />
         <qualifier value="needProtocolNeedService"/>
+        <property name="delegate" ref="needProtocolNeedService"/>
+    </bean>
+    <bean id="needProtocolNeedService" class="won.node.protocol.impl.NeedProtocolNeedServiceImpl">
+        <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService"/>
+        <property name="needFacingNeedCommunicationService" ref="needCommunicationService"/>
     </bean>
 
     <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor">
@@ -76,6 +81,10 @@
     </bean>
     <bean name="needProtocolNeedClientJMSBased" class="won.node.protocol.impl.NeedProtocolNeedClientImplJMSBased">
         <property name="messagingService" ref="messagingService"/>
+        <property name="needProtocolActiveMQService" ref="needProtocolActiveMQService"/>
+    </bean>
+    <bean name="needProtocolActiveMQService" class="won.node.protocol.impl.NeedProtocolActiveMQServiceImpl">
+        <property name="componentName" value="activemq"/>
     </bean>
 
 
@@ -157,6 +166,9 @@
         <property name="needProtocolEndpoint" value="${uri.protocol.need}" />
         <property name="matcherProtocolEndpoint" value="${uri.protocol.matcher}" />
         <property name="ownerProtocolEndpoint" value="${uri.protocol.owner}" />
+        <property name="activeMqEndpoint" value="${uri.protocol.activemq}" />
+        <property name="activeMqNeedProtcolQueueName" value="${activemq.queuename.need.incoming}" />
+        <property name="activeMqOwnerProtcolQueueName" value="${activemq.queuename.owner.incoming}" />
         <property name="rdfStorage" ref="rdfStorageRef" />
         <property name="pageSize" value="${linkeddata.pagesize}" />
     </bean>

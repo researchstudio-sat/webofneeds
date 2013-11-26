@@ -17,27 +17,42 @@
 package won.node.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.camel.CamelContext;
+import org.apache.camel.CamelContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import won.node.camel.routes.NeedProtocolDynamicRoutes;
 import won.protocol.exception.*;
+import won.protocol.jms.ActiveMQService;
 import won.protocol.jms.MessagingService;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.util.RdfUtils;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
+
+import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComponent;
 
 /**
  * User: fkleedorfer
  * Date: 28.11.12
  */
-public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClientSide
+public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClientSide, CamelContextAware
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
 
     private MessagingService messagingService;
+
+    private CamelContext camelContext;
+
+    @Autowired
+    private NeedProtocolNeedClientFactory clientFactory;
+    private ActiveMQService needProtocolActiveMQService;
 
     //TODO: debugging needed. when a established connection is closed then reconnected, both connections are in state "request sent"
   @Override
@@ -51,7 +66,28 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       headerMap.put("content",RdfUtils.toString(content));
       headerMap.put("methodName","connect");
 
-      return messagingService.sendInOutMessageGeneric(null, headerMap,null, "outgoingMessages");
+      Map<String, String> propertyMap = new HashMap<>();
+      //TODO: when shall be the remote won node unregistered?
+
+      URI remoteBrokerURI = needProtocolActiveMQService.getActiveMQBrokerURIForNeed(otherNeedURI);
+      URI ownBrokerURI = needProtocolActiveMQService.getActiveMQBrokerURIForNeed(needURI);
+      try {
+          if (!remoteBrokerURI.equals(ownBrokerURI))
+
+                  needProtocolActiveMQService.configureCamelEndpointForNeedURI(otherNeedURI,true);
+
+          else
+              needProtocolActiveMQService.configureCamelEndpointForNeedURI(needURI,false);
+      } catch (Exception e) {
+          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      }
+
+
+      headerMap.put("remoteBrokerEndpoint", needProtocolActiveMQService.getEndpoint());
+      return messagingService.sendInOutMessageGeneric(propertyMap,headerMap,null,"outgoingMessages");
+
+
+
   }
 
     @Override
@@ -98,4 +134,15 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
     }
 
 
+    public CamelContext getCamelContext() {
+        return camelContext;
+    }
+
+    public void setCamelContext(CamelContext camelContext) {
+        this.camelContext = camelContext;
+    }
+
+    public void setNeedProtocolActiveMQService(ActiveMQService needProtocolActiveMQService) {
+        this.needProtocolActiveMQService = needProtocolActiveMQService;
+    }
 }

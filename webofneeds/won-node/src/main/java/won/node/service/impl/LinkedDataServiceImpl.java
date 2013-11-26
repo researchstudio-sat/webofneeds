@@ -16,6 +16,7 @@
 
 package won.node.service.impl;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -73,8 +74,16 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   private NeedInformationService needInformationService;
 
+    public void setActiveMqEndpoint(String activeMqEndpoint) {
+        this.activeMqEndpoint = activeMqEndpoint;
+    }
 
-  public Model listNeedURIs(final int page)
+    private String activeMqEndpoint;
+    private String activeMqNeedProtcolQueueName;
+    private String activeMqOwnerProtcolQueueName;
+
+
+    public Model listNeedURIs(final int page)
   {
     Collection<URI> uris = null;
     if (page >= 0) {
@@ -142,11 +151,15 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return model;
   }
 
+  //TODO: protocol endpoint specification in RDF model needs refactoring!
   private void addProtocolEndpoints(Model model, Resource res)
   {
     res.addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
         .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
-        .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint));
+        .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint))
+        .addProperty(WON.HAS_ACTIVEMQ_SERVICE, model.createResource(this.activeMqEndpoint))
+        .addProperty(WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME, model.createTypedLiteral(this.activeMqNeedProtcolQueueName, XSDDatatype.XSDstring))
+        .addProperty(WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME, model.createTypedLiteral(this.activeMqOwnerProtcolQueueName, XSDDatatype.XSDstring));
   }
 
   public Model getConnectionModel(final URI connectionUri) throws NoSuchConnectionException
@@ -303,4 +316,12 @@ public class LinkedDataServiceImpl implements LinkedDataService
   {
     this.pageSize = pageSize;
   }
+
+    public void setActiveMqOwnerProtcolQueueName(String activeMqOwnerProtcolQueueName) {
+        this.activeMqOwnerProtcolQueueName = activeMqOwnerProtcolQueueName;
+    }
+
+    public void setActiveMqNeedProtcolQueueName(String activeMqNeedProtcolQueueName) {
+        this.activeMqNeedProtcolQueueName = activeMqNeedProtcolQueueName;
+    }
 }

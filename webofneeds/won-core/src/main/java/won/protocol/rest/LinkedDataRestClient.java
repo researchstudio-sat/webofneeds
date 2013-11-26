@@ -60,5 +60,14 @@ public class LinkedDataRestClient
     Statement stmt = stmts.next();
     return URI.create(stmt.getObject().toString());
   }
-
+    public String getStringPropertyForResource(final URI resourceURI, Property property)
+    {
+        Model rdfModel =  readResourceData(resourceURI);
+        StmtIterator stmts = rdfModel.listStatements(
+                new SimpleSelector(rdfModel.createResource(resourceURI.toString()), property, (RDFNode) null));
+        //assume only one endpoint
+        if (!stmts.hasNext()) return null;
+        Statement stmt = stmts.next();
+        return stmt.getString();
+    }
 }

@@ -15,10 +15,8 @@
  */
 
 
-package won.node.routes.fixed;
-import org.apache.camel.ExchangePattern;
+package won.node.camel.routes.fixed;
 import org.apache.camel.builder.RouteBuilder;
-import won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor;
 
 /**
  * User: LEIH-NB
@@ -27,8 +25,21 @@ import won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor;
 public class AmqpToJms extends RouteBuilder{
 
 
+
     @Override
     public void configure(){
+        from("seda:OUTMSG")
+                .wireTap("bean:messagingService?method=inspectMessage")
+                .to("log:OUTMSG FROM NODE")
+                .choice()
+                .when(header("protocol").isEqualTo("NeedProtocol"))
+                .to("log:NeedProtocol FROM NODE")
+                .to("seda:NeedProtocolOut")
+                .when(header("protocol").isEqualTo("OwnerProtocol"))
+                .to("log:OwnerProtocol FROM NODE")
+                .to("seda:OwnerProtocolOut")
+                .otherwise()
+                .to("log:No protocol defined in header");
         from("activemq:queue:WON.CREATENEED")
                 .to("log:INMSG")
                 .to("bean:ownerProtocolNeedJMSService?method=createNeed");
@@ -76,28 +87,7 @@ public class AmqpToJms extends RouteBuilder{
                 .otherwise()
                 .to("log:UNSUPPORTED METHOD") ;   */
 
-        from("seda:NeedProtocolOut")
-            .choice()
-                .when(header("methodName").isEqualTo("connect"))
-                .to("activemq:queue:WON.NeedProtocol.Connect.In")
-                .when(header("methodName").isEqualTo("open"))
-                .to("activemq:queue:WON.NeedProtocol.Open.In")
-                .when(header("methodName").isEqualTo("close"))
-                .to("activemq:queue:WON.NeedProtocol.Close.In")
-                .when(header("methodName").isEqualTo("textMessage"))
-                .to("activemq:queue:WON.NeedProtocol.TextMessage.In");
-        from("activemq:queue:WON.NeedProtocol.Connect.In")
-                .to("log:Routing message from queue WON.NeedProtocol.Connect.In")
-                .to("bean:needProtocolNeedService?method=connect");
-        from("activemq:queue:WON.NeedProtocol.Open.In")
-                .to("log:Routing message from queue WON.NeedProtocol.Open.In")
-                .to("bean:needProtocolNeedService?method=open");
-        from("activemq:queue:WON.NeedProtocol.Close.In")
-                .to("log:Routing message from queue WON.NeedProtocol.Close.In")
-                .to("bean:needProtocolNeedService?method=close");
-        from("activemq:queue:WON.NeedProtocol.TextMessage.In")
-                .to("log:Routing message from queue WON.NeedProtocol.TextMessage.In")
-                .to("bean:needProtocolNeedService?method=textMessage");
+
 
     }
 

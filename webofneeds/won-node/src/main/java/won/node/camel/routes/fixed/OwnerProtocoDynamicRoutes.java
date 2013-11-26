@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.node.routes.fixed;
+package won.node.camel.routes.fixed;
 
 import org.apache.camel.builder.RouteBuilder;
 
@@ -22,18 +22,9 @@ import org.apache.camel.builder.RouteBuilder;
  * User: LEIH-NB
  * Date: 19.11.13
  */
-public class OwnerProtocolRoutes extends RouteBuilder {
+public class OwnerProtocoDynamicRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
-        from("seda:OUTMSG")
-                .to("log:OUTMSG FROM NODE")
-                .choice()
-                .when(header("protocol").isEqualTo("NeedProtocol"))
-                .to("seda:NeedProtocolOut")
-                .when(header("protocol").isEqualTo("OwnerProtocol"))
-                .to("seda:OwnerProtocolOut")
-                .otherwise()
-                .to("log:No protocol defined in header");
         from("seda:OwnerProtocolOut")
                 .to("bean:ownerProtocolOutgoingMessagesProcessor")
                 .wireTap("bean:messagingService?method=inspectMessage")
