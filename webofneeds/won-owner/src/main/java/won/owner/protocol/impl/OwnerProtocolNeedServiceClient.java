@@ -261,16 +261,25 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedService
       OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
       URI uri = proxy.connect(needURI, otherNeedURI, RdfUtils.toString(content));
 
+      Resource baseRes = content.getResource(content.getNsPrefixURI(""));
+      StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
+
+      if (!stmtIterator.hasNext()) {
+        throw new IllegalArgumentException("at least one RDF node must be of type won:" + WON.HAS_FACET.getLocalName());
+      }
+
+      URI facetURI =  URI.create(stmtIterator.next().getObject().asResource().getURI());
+
       List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri);
       if (existingConnections.size() > 0) {
         for (Connection conn : existingConnections) {
-          if (ConnectionState.CONNECTED == conn.getState() ||
-              ConnectionState.REQUEST_SENT == conn.getState()) {
-            throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);
-          } else {
-            conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
-            connectionRepository.saveAndFlush(conn);
-          }
+          if (facetURI.equals(conn.getTypeURI()))
+            if (! ConnectionEventType.OWNER_OPEN.isMessageAllowed(conn.getState())) {
+              throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);
+            } else {
+              conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
+              connectionRepository.saveAndFlush(conn);
+            }
         }
       } else {
         //Create new connection object

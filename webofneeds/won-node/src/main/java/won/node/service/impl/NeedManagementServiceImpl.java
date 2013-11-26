@@ -28,7 +28,6 @@ import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Facet;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.ConnectionCommunicationService;
@@ -49,7 +48,6 @@ import java.util.Collection;
 public class NeedManagementServiceImpl implements NeedManagementService
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
-  private OwnerProtocolOwnerService ownerProtocolOwnerService;
   //used to close connections when a need is deactivated
   private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
   private NeedInformationService needInformationService;
@@ -87,6 +85,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     if(!stmtIterator.hasNext())
       throw new IllegalArgumentException("at least one RDF node must be of type won:HAS_FACET");
     else
+      //TODO: check if there is a implementation for the facet on the node
       do {
         Facet facet = new Facet();
         facet.setNeedURI(need.getNeedURI());
@@ -128,12 +127,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
   private boolean isNeedActive(final Need need)
   {
     return NeedState.ACTIVE == need.getState();
-  }
-
-
-  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerService ownerProtocolOwnerService)
-  {
-    this.ownerProtocolOwnerService = ownerProtocolOwnerService;
   }
 
   public void setOwnerFacingConnectionCommunicationService(final ConnectionCommunicationService ownerFacingConnectionCommunicationService)

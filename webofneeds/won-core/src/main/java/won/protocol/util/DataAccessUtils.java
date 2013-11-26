@@ -31,8 +31,7 @@ import java.util.List;
  * User: fkleedorfer
  * Date: 05.11.12
  */
-public class DataAccessUtils
-{
+public class DataAccessUtils {
 
     /**
     * Loads the specified need from the database and raises an exception if it is not found.

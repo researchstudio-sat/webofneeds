@@ -17,28 +17,17 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ResIterator;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import won.node.facet.impl.FacetImplRegistry;
+import won.node.facet.impl.FacetRegistry;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.WonProtocolException;
-import won.protocol.model.*;
-import won.protocol.repository.ChatMessageRepository;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.EventRepository;
-import won.protocol.repository.FacetRepository;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionEvent;
+import won.protocol.model.ConnectionEventType;
 import won.protocol.service.ConnectionCommunicationService;
-import won.protocol.util.DataAccessUtils;
-import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.util.Date;
-import java.util.concurrent.ExecutorService;
 
 /**
  * User: fkleedorfer
@@ -47,187 +36,54 @@ import java.util.concurrent.ExecutorService;
 public class OwnerFacingConnectionCommunicationServiceImpl implements ConnectionCommunicationService
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  private ConnectionCommunicationService needFacingConnectionClient;
-
-  private ExecutorService executorService;
-
-  private FacetImplRegistry reg;
-
-  @Autowired
-  private ConnectionRepository connectionRepository;
-  @Autowired
-  private ChatMessageRepository chatMessageRepository;
-  @Autowired
-  private EventRepository eventRepository;
-  @Autowired
-  private FacetRepository facetRepository;
-  @Autowired
-  private RDFStorageService rdfStorageService;
+  private FacetRegistry reg;
+  private DataAccessService dataService;
 
   @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_OPEN);
-    //set new state and save in the db
-    con.setState(nextState);
-    //save in the db
-    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
 
-    ConnectionEvent event = new ConnectionEvent();
-    event.setConnectionURI(con.getConnectionURI());
-    event.setType(ConnectionEventType.OWNER_OPEN);
-    event.setOriginatorUri(con.getRemoteConnectionURI());
-    eventRepository.saveAndFlush(event);
+    Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
 
-    rdfStorageService.storeContent(event, content);
+    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.OWNER_OPEN);
 
-    //inform the other side
-    if (con.getRemoteConnectionURI() != null) {
-      executorService.execute(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          try {
-            needFacingConnectionClient.open(connectionForRunnable.getRemoteConnectionURI(), content);
-          } catch (WonProtocolException e) {
-            logger.debug("caught Exception:", e);
-          }
-        }
-      });
-    }
+    dataService.saveAdditionalContentForEvent(content, con, event);
+
+    //invoke facet implementation
+    reg.get(con).openFromOwner(con, content);
   }
 
   @Override
   public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("CLOSE received from the owner side for connection {0} with content {1}", connectionURI, content);
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_CLOSE);
-    //set new state and save in the db
-    con.setState(nextState);
-    //save in the db
-    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
 
-    ConnectionEvent event = new ConnectionEvent();
-    event.setConnectionURI(con.getConnectionURI());
-    event.setType(ConnectionEventType.OWNER_CLOSE);
-    event.setOriginatorUri(con.getRemoteConnectionURI());
-    eventRepository.saveAndFlush(event);
+    Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
 
-    rdfStorageService.storeContent(event, content);
+    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.OWNER_CLOSE);
 
-    //inform the other side
-    if (con.getRemoteConnectionURI() != null) {
-      executorService.execute(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          try {
-            needFacingConnectionClient.close(connectionForRunnable.getRemoteConnectionURI(), content);
-          } catch (WonProtocolException e) {
-            logger.warn("caught WonProtocolException:", e);
-          }
-        }
-      });
-    }
+    dataService.saveAdditionalContentForEvent(content, con, event);
+
+    //invoke facet implementation
+    reg.get(con).closeFromOwner(con, content);
   }
 
   @Override
   public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    if (message == null) throw new IllegalArgumentException("message is not set");
-      //load connection, checking if it exists
-      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+    Connection con = dataService.saveChatMessage(connectionURI,message);
 
-      //if(facetRepository.findByNeedURIAndTypeURI(con.getNeedURI(), con.getTypeURI()) == ??)
-
-      //perform state transit (should not result in state change)
-      //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
-      //construct chatMessage object to store in the db
-      ChatMessage chatMessage = new ChatMessage();
-      chatMessage.setCreationDate(new Date());
-      chatMessage.setLocalConnectionURI(con.getConnectionURI());
-      chatMessage.setMessage(message);
-      chatMessage.setOriginatorURI(con.getNeedURI());
-      //save in the db
-      chatMessageRepository.saveAndFlush(chatMessage);
-      final URI remoteConnectionURI = con.getRemoteConnectionURI();
-      //inform the other side
-      executorService.execute(new Runnable()
-      {
-          @Override
-          public void run()
-          {
-              try {
-                  needFacingConnectionClient.textMessage(remoteConnectionURI, message);
-              } catch (WonProtocolException e) {
-                  logger.warn("caught WonProtocolException:", e);
-              }
-          }
-      });
+    //invoke facet implementation
+    reg.get(con).textMessageFromOwner(con, message);
   }
 
-  public void setNeedFacingConnectionClient(final ConnectionCommunicationService needFacingConnectionClient)
-  {
-    this.needFacingConnectionClient = needFacingConnectionClient;
+  public void setReg(FacetRegistry reg) {
+    this.reg = reg;
   }
 
-  public void setConnectionRepository(final ConnectionRepository connectionRepository)
-  {
-    this.connectionRepository = connectionRepository;
+  public void setDataService(DataAccessService dataService) {
+    this.dataService = dataService;
   }
-
-  public void setChatMessageRepository(final ChatMessageRepository chatMessageRepository)
-  {
-    this.chatMessageRepository = chatMessageRepository;
-  }
-
-  /**
-   * Calculates the connectionState resulting from the message in the current connection state.
-   * Checks if the specified message is allowed in the connection's state and throws an exception if not.
-   *
-   * @param con
-   * @param msg
-   * @return
-   * @throws won.protocol.exception.IllegalMessageForConnectionStateException
-   *          if the message is not allowed in the connection's current state
-   */
-  private ConnectionState performStateTransit(Connection con, ConnectionEventType msg) throws IllegalMessageForConnectionStateException
-  {
-    if (!msg.isMessageAllowed(con.getState())) {
-      throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(), con.getState());
-    }
-    return con.getState().transit(msg);
-  }
-
-  public void setExecutorService(final ExecutorService executorService)
-  {
-    this.executorService = executorService;
-  }
-
-  public void setRdfStorageService(final RDFStorageService rdfStorageService)
-  {
-    this.rdfStorageService = rdfStorageService;
-  }
-
-    public FacetImplRegistry getReg() {
-        return reg;
-    }
-
-    public void setReg(FacetImplRegistry reg) {
-        this.reg = reg;
-    }
 }

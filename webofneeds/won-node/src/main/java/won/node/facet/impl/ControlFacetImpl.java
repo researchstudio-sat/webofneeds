@@ -9,7 +9,7 @@ import won.protocol.model.FacetType;
  * Time: 19:00
  * To change this template use File | Settings | File Templates.
  */
-public class ControlFacetImpl extends FacetImpl {
+public class ControlFacetImpl extends Facet {
     @Override
     public FacetType getFacetType() {
         return FacetType.ControlFacet;

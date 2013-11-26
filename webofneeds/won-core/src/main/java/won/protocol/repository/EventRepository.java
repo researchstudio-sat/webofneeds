@@ -27,11 +27,8 @@ import java.util.List;
  * Date: 24.04.2013
  * Time: 11:56
  */
-public interface EventRepository extends WonRepository<ConnectionEvent>
-{
+public interface EventRepository extends WonRepository<ConnectionEvent> {
   List<ConnectionEvent> findByConnectionURI(URI uri);
-
-//  List<ConnectionEvent> findByOriginatorURI(URI uri);
 
   List<ConnectionEvent> findByType(ConnectionEventType type);
 }

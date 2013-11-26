@@ -1,18 +1,20 @@
 package won.owner.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
-import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Date;
@@ -40,8 +42,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
     @Autowired
     private ChatMessageRepository chatMessageRepository;
 
-    @Autowired
-    private OwnerProtocolNeedService ownerService;
+    //TODO: refactor this to use DataAccessService
 
     @Override
     public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
@@ -89,29 +90,50 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
 
         //Load need (throws exception if not found)
-        Need need = DataAccessUtils.loadNeed(needRepository,ownNeedURI);
-        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
-        //Create new connection object on our side
+        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
+        if (!isNeedActive(need))
+          throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
 
-        //set new uri
-        List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURI, otherNeedURI);
-        if (existingConnections.size() > 0){
-            for(Connection conn: existingConnections){
-                if (ConnectionState.CONNECTED == conn.getState() ||
-                        ConnectionState.REQUEST_RECEIVED == conn.getState()) {
-                    throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),ownNeedURI,otherNeedURI);
-                } else {
-                    conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
-                    connectionRepository.saveAndFlush(conn);
-                }
-            }
-        } else {
-            Connection con = new Connection();
-            con.setNeedURI(ownNeedURI);
-            con.setState(ConnectionState.REQUEST_RECEIVED);
-            con.setRemoteNeedURI(otherNeedURI);
-            con.setConnectionURI(ownConnectionURI);
-            connectionRepository.saveAndFlush(con);
+        Resource baseRes = content.getResource(content.getNsPrefixURI(""));
+        StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
+
+        if (!stmtIterator.hasNext()) {
+          throw new IllegalArgumentException("at least one RDF node must be of type won:" + WON.HAS_FACET.getLocalName());
+        }
+
+        URI facetURI =  URI.create(stmtIterator.next().getObject().asResource().getURI());
+
+        List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURI, otherNeedURI);
+        Connection con = null;
+
+        for(Connection c : connections) {
+          //TODO: check remote need type as well or create GroupMemberFacet
+          if (facetURI.equals(c.getTypeURI()))
+            con = c;
+        }
+
+        //TODO: impose unique constraint on connections
+        if(con != null) {
+          if(ConnectionEventType.PARTNER_OPEN.isMessageAllowed(con.getState())) {
+            //TODO: Move this to the transition() - Method in ConnectionState
+            con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
+            con = connectionRepository.saveAndFlush(con);
+          } else {
+            throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
+          }
+        }
+
+        if (con == null) {
+          /* Create connection */
+          con = new Connection();
+          con.setNeedURI(ownNeedURI);
+          con.setState(ConnectionState.REQUEST_RECEIVED);
+          con.setRemoteNeedURI(otherNeedURI);
+          con.setConnectionURI(ownConnectionURI);
+          con.setTypeURI(facetURI);
+          connectionRepository.saveAndFlush(con);
+
+          //TODO: do we save the connection content? where? as a chat content?
         }
     }
 
@@ -161,9 +183,5 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         chatMessage.setOriginatorURI(con.getRemoteNeedURI());
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);
-    }
-
-    public void setOwnerService(OwnerProtocolNeedService ownerService) {
-        this.ownerService = ownerService;
     }
 }
