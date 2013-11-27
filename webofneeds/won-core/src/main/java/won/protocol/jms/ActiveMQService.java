@@ -25,10 +25,12 @@ import java.net.URI;
 public interface ActiveMQService {
 
 
-    public void configureCamelEndpointForNeedURI(URI needURI,boolean remote) throws Exception;
+    public void configureCamelEndpointForNeedURI(URI needURI,boolean remote,String from) throws Exception;
+    public void configureCamelEndpointForNeeds(URI needURI, URI otherNeedURI, String from) throws Exception;
     public URI getActiveMQBrokerURIForNeed(URI needURI);
     public String getActiveMQNeedProtocolQueueNameForNeed(URI needURI);
     public String getActiveMQOwnerProtocolQueueNameForNeed(URI needURI);
+    public void configureCamelEndpointForConnection(URI connectionURI,String from) throws Exception;
     public void addRoutes(RouteBuilder route) throws Exception;
     public String getEndpoint();
 }

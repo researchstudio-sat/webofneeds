@@ -24,7 +24,7 @@ public class MessagingServiceImpl<T> implements MessagingService,CamelContextAwa
     public Future<T> sendInOutMessageGeneric(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
 
-        Endpoint ep = getCamelContext().getEndpoint("outgoingMessages");
+        Endpoint ep = getCamelContext().getEndpoint(endpoint);
         if (properties!=null){
             if(properties.containsKey("methodName"))
                 exchange.setProperty("methodName", properties.get("methodName"));
@@ -96,8 +96,7 @@ public class MessagingServiceImpl<T> implements MessagingService,CamelContextAwa
         }
         if (headers!=null)
              exchange.getIn().setHeaders(headers);
-       // List<OwnerApplication> ownerApplications= (List<OwnerApplication>) exchange.getIn().getHeader("ownerApplications");
-      //  logger.info(String.valueOf(ownerApplications.size()));
+
         exchange.getIn().setBody(body);
         producerTemplate.send(ep, exchange);
     }

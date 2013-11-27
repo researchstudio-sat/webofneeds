@@ -24,8 +24,12 @@ import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.camel.routes.NeedProtocolDynamicRoutes;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.ActiveMQService;
+import won.protocol.model.Connection;
+import won.protocol.repository.ConnectionRepository;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WON;
 
 import javax.ws.rs.core.Response;
@@ -46,6 +50,9 @@ public class NeedProtocolActiveMQServiceImpl implements CamelContextAware,Active
     private String endpoint;
     @Autowired
     private LinkedDataRestClient linkedDataRestClient;
+
+    @Autowired
+    private ConnectionRepository connectionRepository;
 
     @Override
     public void setCamelContext(CamelContext camelContext) {
@@ -121,7 +128,7 @@ public class NeedProtocolActiveMQServiceImpl implements CamelContextAware,Active
 
         return activeMQOwnerProtocolQueueName;
     }
-    public void configureCamelEndpointForNeedURI(URI needURI,boolean remote) throws Exception {
+    public void configureCamelEndpointForNeedURI(URI needURI,boolean remote,String from) throws Exception {
         URI brokerURI = getActiveMQBrokerURIForNeed(needURI);
 
         if (remote){
@@ -132,10 +139,38 @@ public class NeedProtocolActiveMQServiceImpl implements CamelContextAware,Active
         endpoint = componentName+":queue:"+getActiveMQNeedProtocolQueueNameForNeed(needURI);
         List<String> endpointList = new ArrayList<>();
         endpointList.add(endpoint);
-        NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,endpointList);
+        NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,endpointList,from);
         addRoutes(needProtocolRouteBuilder);
 
     }
+
+    public void configureCamelEndpointForNeeds(URI needURI, URI otherNeedURI, String from) throws Exception {
+        if (camelContext.getEndpoint(from)!=null){
+            URI brokerURI = getActiveMQBrokerURIForNeed(needURI);
+            URI remoteBrokerURI = getActiveMQBrokerURIForNeed(otherNeedURI);
+            URI ownBrokerURI = getActiveMQBrokerURIForNeed(needURI);
+
+            if (!remoteBrokerURI.equals(ownBrokerURI)){
+                componentName = componentName+brokerURI;
+                camelContext.addComponent(componentName,activeMQComponent(brokerURI.toString()));
+            }
+            endpoint = componentName+":queue:"+getActiveMQNeedProtocolQueueNameForNeed(needURI);
+            List<String> endpointList = new ArrayList<>();
+            endpointList.add(endpoint);
+            NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,endpointList,from);
+            addRoutes(needProtocolRouteBuilder);
+        }
+    }
+    public void configureCamelEndpointForConnection(URI connectionURI,String from) throws Exception {
+        if (camelContext.getEndpoint(from)!=null){
+            Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+            URI needURI = con.getNeedURI();
+            URI otherNeedURI = con.getRemoteNeedURI();
+            configureCamelEndpointForNeeds(needURI,otherNeedURI,from);
+        }
+    }
+
+
     public void addRoutes(RouteBuilder route) throws Exception {
         camelContext.addRoutes(route);
     }

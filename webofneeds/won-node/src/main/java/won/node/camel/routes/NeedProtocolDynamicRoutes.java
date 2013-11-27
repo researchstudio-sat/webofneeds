@@ -27,63 +27,23 @@ import java.util.List;
  */
 public class NeedProtocolDynamicRoutes extends RouteBuilder {
 
+
     List<String> endpoints;
-    public NeedProtocolDynamicRoutes(CamelContext camelContext, List<String> Endpoints){
+    String routeID;
+    String from;
+
+    public NeedProtocolDynamicRoutes(CamelContext camelContext, List<String> Endpoints, String from){
         super(camelContext);
         this.endpoints = endpoints;
+        this.routeID = routeID;
+        this.from = from;
 
     }
     @Override
     public void configure() throws Exception {
-        from("seda:NeedProtocolOut")
+        from(from).routeId(from)
                 .to("log:Dynamic Route FROM NODE")
                 .recipientList(header("remoteBrokerEndpoint"));
-
-
-                /*.wireTap("bean:messagingService?method=inspectMessage")
-                .choice()
-                .when(property("remoteBrokerEndpoint").isNotNull())
-                .to("seda:NeedProtocolOutRemote")
-                .otherwise()
-                .to("seda:NeedProtocolOutLocal");
-        from("seda:NeedProtocolOutRemote")
-                .to("$property.remoteBrokerEndpoint");
-        from("seda:NeedProtocolOutLocal")
-                .to(endpoints.get(0));     */
-              /*
-        for (int i = 0; i<endpoints.size();i++){
-            from("seda:NeedProtocolOut")
-                    .wireTap("bean:messagingService?method=inspectMessage")
-
-            from(endpoints.get(i))
-                    .wireTap("bean:messagingService?method=inspectMessage")
-                    .choice()
-                    .when(header("methodName").isEqualTo("connect"))
-                    .to("log:OWNER CONNECT RECEIVED")
-                    .to("bean:ownerProtocolOwnerService?method=connect")
-                    .when(header("methodName").isEqualTo("hint"))
-                    .to("bean:ownerProtocolOwnerService?method=hint")
-                    .when(header("methodName").isEqualTo("textMessage"))
-                    .to("bean:ownerProtocolOwnerService?method=textMessage")
-                    .when(header("methodName").isEqualTo("open"))
-                    .to("bean:ownerProtocolOwnerService?method=open")
-                    .when(header("methodName").isEqualTo("close"))
-                    .to("bean:ownerProtocolOwnerService?method=close")
-                    .otherwise()
-                    .to("log:Message Type Not Supported");
-        }
-        from("seda:NeedProtocolOut")
-
-
-                .otherwise()
-                    .when(header("methodName").isEqualTo("connect"))
-                    .to("activemq:queue:WON.NeedProtocol.Connect.In")
-                    .when(header("methodName").isEqualTo("open"))
-                    .to("activemq:queue:WON.NeedProtocol.Open.In")
-                    .when(header("methodName").isEqualTo("close"))
-                    .to("activemq:queue:WON.NeedProtocol.Close.In")
-                    .when(header("methodName").isEqualTo("textMessage"))
-                    .to("activemq:queue:WON.NeedProtocol.TextMessage.In");     */
 
     }
 }
