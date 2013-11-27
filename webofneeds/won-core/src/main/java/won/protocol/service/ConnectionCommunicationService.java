@@ -23,6 +23,7 @@ import java.net.URI;
 
 /**
  * Interface defining methods for connection manipulation. These are the same from the owner side as from the node side.
+ * TODO [REFACTORING]: delete this and move methods to owner and node interface
  */
 public interface ConnectionCommunicationService
 {

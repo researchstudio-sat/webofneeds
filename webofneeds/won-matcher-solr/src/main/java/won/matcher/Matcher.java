@@ -83,8 +83,8 @@ public class Matcher
     //add all queries
     queryFactories = new HashSet<>();
     queryFactories.add(new BasicNeedTypeQueryFactory(BooleanClause.Occur.MUST, SolrFields.BASIC_NEED_TYPE));
-    queryFactories.add(new DoubleRangeQueryFactory(BooleanClause.Occur.SHOULD, SolrFields.LOWER_PRICE_LIMIT, SolrFields.UPPER_PRICE_LIMIT));
-    queryFactories.add(new TimeRangeQueryFactory(BooleanClause.Occur.SHOULD, SolrFields.TIME_START, SolrFields.TIME_END));
+    queryFactories.add(new RangeQueryFactory(BooleanClause.Occur.SHOULD, SolrFields.PRICE, "-"));
+    queryFactories.add(new RangeQueryFactory(BooleanClause.Occur.SHOULD, SolrFields.DURATION, "/"));
     queryFactories.add(new TextMatcherQueryFactory(BooleanClause.Occur.SHOULD, new String[]{SolrFields.TITLE, SolrFields.DESCRIPTION}));
     queryFactories.add(new MultipleValueFieldQueryFactory(BooleanClause.Occur.SHOULD, SolrFields.TAG));
     queryFactories.add(new SpatialQueryFactory(BooleanClause.Occur.MUST, SolrFields.LOCATION));

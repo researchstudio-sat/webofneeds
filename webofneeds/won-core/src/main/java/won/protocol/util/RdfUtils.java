@@ -15,9 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: gabriel
- * Date: 20.05.13
- * Time: 20:19
+ * Utilities for RDF manipulation with Jena.
  */
 public class RdfUtils
 {
