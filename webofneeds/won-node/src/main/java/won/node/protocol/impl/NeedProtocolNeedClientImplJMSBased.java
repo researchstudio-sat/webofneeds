@@ -19,25 +19,18 @@ package won.node.protocol.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
-import org.apache.camel.Endpoint;
-import org.apache.camel.component.seda.SedaEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.camel.routes.NeedProtocolDynamicRoutes;
 import won.protocol.exception.*;
-import won.protocol.jms.ActiveMQService;
 import won.protocol.jms.MessagingService;
-import won.protocol.model.Connection;
+import won.protocol.jms.NeedProtocolActiveMQService;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
@@ -60,13 +53,13 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
     @Autowired
     private NeedProtocolNeedClientFactory clientFactory;
-    private ActiveMQService needProtocolActiveMQService;
+    private NeedProtocolActiveMQService needProtocolActiveMQService;
 
     //TODO: debugging needed. when a established connection is closed then reconnected, both connections are in state "request sent"
   @Override
   public Future<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
-      Map<String,String> headerMap = new HashMap<>();
+      Map<String, String> headerMap = new HashMap<>();
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("needURI", needURI.toString()) ;
       headerMap.put("otherNeedURI", otherNeedURI.toString());
@@ -163,7 +156,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
         this.camelContext = camelContext;
     }
 
-    public void setNeedProtocolActiveMQService(ActiveMQService needProtocolActiveMQService) {
+    public void setNeedProtocolActiveMQService(NeedProtocolActiveMQService needProtocolActiveMQService) {
         this.needProtocolActiveMQService = needProtocolActiveMQService;
     }
 }

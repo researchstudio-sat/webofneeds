@@ -15,19 +15,17 @@
  */
 
 package won.protocol.jms;
-import org.apache.camel.builder.RouteBuilder;
+
 import java.net.URI;
 
 /**
  * User: LEIH-NB
- * Date: 26.11.13
+ * Date: 28.11.13
  */
-public interface ActiveMQService {
-
-
-    public String getEndpoint();
-    public URI getActiveMQBrokerURIForNode(URI needURI);
-    public void addRoutes(RouteBuilder route) throws Exception;
+public interface OwnerProtocolActiveMQService extends ActiveMQService{
+    public String getActiveMQOwnerProtocolQueueNameForNeed(URI needURI);
+    public URI configureCamelEndpointForNodeURI( URI wonNodeURI, String from) throws Exception;
+    public void configureCamelEndpointForConnection(URI connectionURI,String from) throws Exception;
+    public void configureCamelEndpointForNeed(URI needURI,String from) throws Exception;
 
 }
-

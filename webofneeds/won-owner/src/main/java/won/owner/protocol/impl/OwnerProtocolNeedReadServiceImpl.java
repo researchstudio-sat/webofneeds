@@ -127,7 +127,7 @@ public class OwnerProtocolNeedReadServiceImpl implements OwnerProtocolNeedReadSe
     @Override
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException {
         logger.debug("need-facing: READ_CONNECTION_CONTENT called for connection {}", connectionURI);
-        URI connectionProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.OWNER_PROTOCOL_ENDPOINT);
+        URI connectionProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.HAS_OWNER_PROTOCOL_ENDPOINT);
         if (connectionProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
 
         return linkedDataRestClient.readResourceData(URI.create(connectionProtocolEndpoint.toString()));

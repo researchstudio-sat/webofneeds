@@ -16,16 +16,17 @@
 
 package won.node.protocol.impl;
 
+import com.hp.hpl.jena.shared.PrefixMapping;
+import com.hp.hpl.jena.sparql.path.Path;
+import com.hp.hpl.jena.sparql.path.PathParser;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.builder.RouteBuilder;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.camel.routes.NeedProtocolDynamicRoutes;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.jms.ActiveMQService;
+import won.protocol.jms.NeedProtocolActiveMQService;
 import won.protocol.model.Connection;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.rest.LinkedDataRestClient;
@@ -43,7 +44,11 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  * User: sbyim
  * Date: 26.11.13
  */
-public class NeedProtocolActiveMQServiceImpl implements CamelContextAware,ActiveMQService {
+//TODO: devide this class into two classes, OwnerProtocolActiveMQServiceImpl and NeedProtocolActiveMQServiceImpl
+public class NeedProtocolActiveMQServiceImpl implements CamelContextAware,NeedProtocolActiveMQService {
+
+    public static final String PATH_BROKER_URI = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_BROKER_URI + ">";
+    public static final String PATH_NEED_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME + ">";
 
     private CamelContext camelContext;
     private String componentName;
@@ -80,11 +85,13 @@ public class NeedProtocolActiveMQServiceImpl implements CamelContextAware,Active
         this.endpoint = endpoint;
     }
 
-    public URI getActiveMQBrokerURIForNeed(URI needURI){
+
+    public URI getActiveMQBrokerURIForNode(URI needURI){
         URI activeMQEndpoint = null;
         try{
 
-            activeMQEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.HAS_ACTIVEMQ_SERVICE);
+            Path path = PathParser.parse(PATH_BROKER_URI, PrefixMapping.Standard);
+            activeMQEndpoint = linkedDataRestClient.getURIPropertyForPropertyPath(needURI, path);
         } catch (UniformInterfaceException e){
             ClientResponse response = e.getResponse();
             if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
@@ -100,8 +107,8 @@ public class NeedProtocolActiveMQServiceImpl implements CamelContextAware,Active
         String activeMQNeedProtocolQueueName = null;
         try{
 
-
-            activeMQNeedProtocolQueueName = linkedDataRestClient.getStringPropertyForResource(needURI, WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME);
+            Path path = PathParser.parse(PATH_NEED_PROTOCOL_QUEUE_NAME, PrefixMapping.Standard);
+            activeMQNeedProtocolQueueName = linkedDataRestClient.getStringPropertyForPropertyPath(needURI, path);
         } catch (UniformInterfaceException e){
             ClientResponse response = e.getResponse();
             if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
@@ -113,42 +120,13 @@ public class NeedProtocolActiveMQServiceImpl implements CamelContextAware,Active
         return activeMQNeedProtocolQueueName;
     }
 
-    public String getActiveMQOwnerProtocolQueueNameForNeed(URI needURI){
-        String activeMQOwnerProtocolQueueName = null;
-        try{
 
-            activeMQOwnerProtocolQueueName = linkedDataRestClient.getStringPropertyForResource(needURI, WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME);
-        } catch (UniformInterfaceException e){
-            ClientResponse response = e.getResponse();
-            if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
-                return null;
-            }
-            else throw e;
-        }
-
-        return activeMQOwnerProtocolQueueName;
-    }
-    public void configureCamelEndpointForNeedURI(URI needURI,boolean remote,String from) throws Exception {
-        URI brokerURI = getActiveMQBrokerURIForNeed(needURI);
-
-        if (remote){
-            componentName = componentName+brokerURI;
-            camelContext.addComponent(componentName,activeMQComponent(brokerURI.toString()));
-        }
-
-        endpoint = componentName+":queue:"+getActiveMQNeedProtocolQueueNameForNeed(needURI);
-        List<String> endpointList = new ArrayList<>();
-        endpointList.add(endpoint);
-        NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,endpointList,from);
-        addRoutes(needProtocolRouteBuilder);
-
-    }
 
     public void configureCamelEndpointForNeeds(URI needURI, URI otherNeedURI, String from) throws Exception {
         if (camelContext.getEndpoint(from)!=null){
-            URI brokerURI = getActiveMQBrokerURIForNeed(needURI);
-            URI remoteBrokerURI = getActiveMQBrokerURIForNeed(otherNeedURI);
-            URI ownBrokerURI = getActiveMQBrokerURIForNeed(needURI);
+            URI brokerURI = getActiveMQBrokerURIForNode(needURI);
+            URI remoteBrokerURI = getActiveMQBrokerURIForNode(otherNeedURI);
+            URI ownBrokerURI = getActiveMQBrokerURIForNode(needURI);
 
             if (!remoteBrokerURI.equals(ownBrokerURI)){
                 componentName = componentName+brokerURI;

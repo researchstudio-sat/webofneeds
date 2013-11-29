@@ -58,7 +58,7 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
 
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpointForNeed(URI needURI) throws NoSuchNeedException, MalformedURLException
   {
-    URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.OWNER_PROTOCOL_ENDPOINT);
+    URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.HAS_OWNER_PROTOCOL_ENDPOINT);
     if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
 
     logger.debug("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
@@ -75,7 +75,7 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
 
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpointForConnection(URI connectionURI) throws NoSuchConnectionException, MalformedURLException
   {
-    URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.OWNER_PROTOCOL_ENDPOINT);
+    URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.HAS_OWNER_PROTOCOL_ENDPOINT);
     if (needProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
 
     logger.debug("need protocol endpoint of connection {} is {}", connectionURI.toString(), needProtocolEndpoint.toString());

@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.ws.NeedProtocolNeedWebServiceClient;
-import won.protocol.model.Need;
 import won.protocol.repository.NeedRepository;
 import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.NoSuchConnectionException;
@@ -58,7 +57,7 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
   {
     URI needProtocolEndpoint = null;
     try{
-      needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.NEED_PROTOCOL_ENDPOINT);
+      needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.HAS_NEED_PROTOCOL_ENDPOINT);
     } catch (UniformInterfaceException e){
       ClientResponse response = e.getResponse();
       if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){

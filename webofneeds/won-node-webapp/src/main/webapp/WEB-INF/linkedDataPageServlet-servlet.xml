@@ -46,6 +46,7 @@
         <property name="dataURIPrefix" value="${uri.prefix.data}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
         <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
+        <property name="nodeResourceURIPrefix" value="${uri.prefix.node}"/>
         <property name="pageURIPrefix" value="${uri.prefix.page}" />
         <property name="uriService" ref="uriService" />
     </bean>

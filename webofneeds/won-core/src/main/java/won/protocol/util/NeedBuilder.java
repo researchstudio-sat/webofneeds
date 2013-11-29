@@ -57,6 +57,7 @@ public interface NeedBuilder<T>
   public NeedBuilder<T> setAvailableAtLocation(String latitude, String longitude);
   public NeedBuilder<T> setAvailableAtLocation(String region);
   public NeedBuilder<T> setCreationDate(Date date);
+   //TODO: adapt to new protocol implementations
   public NeedBuilder<T> setNeedProtocolEndpoint(URI endpoint);
   public NeedBuilder<T> setNeedProtocolEndpoint(String endpoint);
   public NeedBuilder<T> setOwnerProtocolEndpoint(URI endpoint);

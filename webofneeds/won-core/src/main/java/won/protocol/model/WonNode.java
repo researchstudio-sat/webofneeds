@@ -34,6 +34,10 @@ public class WonNode {
 
     @Column( name = "wonNodeURI", unique = true )
     private URI wonNodeURI;
+
+    @Column( name = "brokerURI")
+    private URI brokerURI;
+
     private String ownerApplicationID;
 
     public URI getWonNodeURI() {
@@ -51,6 +55,14 @@ public class WonNode {
 
     public void setOwnerApplicationID(String ownerApplicationID) {
         this.ownerApplicationID = ownerApplicationID;
+    }
+
+    public URI getBrokerURI() {
+        return brokerURI;
+    }
+
+    public void setBrokerURI(URI brokerURI) {
+        this.brokerURI = brokerURI;
     }
 }
 

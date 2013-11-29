@@ -26,6 +26,8 @@ import java.util.List;
 /**
  * User: sbyim
  * Date: 14.11.13
+ * Each Won Node provides queues for owner applications that are registered on the node.
+ * Owner Application shall generate routes dynamically in runtime that listen to those queues.
  */
 public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
 

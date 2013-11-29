@@ -32,6 +32,11 @@
 
     <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
 
+    <bean id="activeMQService" class="won.owner.protocol.impl.OwnerProtocolActiveMQServiceImpl">
+        <property name="componentName" value="activemq"/>
+        <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
+    </bean>
+
     <bean id="ownerProtocolNeedClientFactory" class="won.owner.ws.OwnerProtocolNeedClientFactory" />
 
     <bean id="ownerProtocolOwnerService" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
@@ -46,6 +51,7 @@
         <property name="ownerProtocolOwnerServiceEndpointURI" value="${uri.owner.protocol.endpoint}" />
         <property name="defaultOwnerProtocolNeedServiceEndpointURI" value="${uri.need.protocol.endpoint.default}" />
         <property name="ownerProtocolOwnerURI" value="${uri.prefix.owner}"/>
+
     </bean>
 
     <bean id="dataReloadService" class="won.owner.service.impl.DataReloadService">
@@ -55,9 +61,6 @@
     <!-- Model Mapper for RDF -->
     <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"/>
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"/>
-
-
-
 
     <!-- protocol-level services -->
 
@@ -77,6 +80,7 @@
         <property name="messagingService" ref="messagingService"/>
         <property name="propertiesUtil" ref="propertiesUtil" />
         <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
+        <property name="ownerProtocolActiveMQService" ref="activeMQService"/>
     </bean>
 
     <bean id="ownerProtocolNeedReadService" class="won.owner.protocol.impl.OwnerProtocolNeedReadServiceImpl">

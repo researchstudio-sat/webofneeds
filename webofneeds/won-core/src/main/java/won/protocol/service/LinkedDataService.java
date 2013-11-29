@@ -59,6 +59,8 @@ public interface LinkedDataService
    * @return
    * @throws NoSuchConnectionException
    */
+
+  public Model getNodeModel();
   public Model getConnectionModel(final URI connectionUri) throws NoSuchConnectionException;
 
 
@@ -71,4 +73,6 @@ public interface LinkedDataService
    * @throws NoSuchNeedException
    */
   public Model listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException;
+
+    public Model showNodeInformation(final int page);
 }

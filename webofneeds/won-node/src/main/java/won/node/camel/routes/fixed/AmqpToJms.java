@@ -40,53 +40,11 @@ public class AmqpToJms extends RouteBuilder{
                 .to("seda:OwnerProtocolOut")
                 .otherwise()
                 .to("log:No protocol defined in header");
-        from("activemq:queue:WON.CREATENEED")
-                .to("log:INMSG")
-                .to("bean:ownerProtocolNeedJMSService?method=createNeed");
-               // beanRef("ownerProtocolNeedJMSService","createNeed") ;
-        from("activemq:queue:WON.CONNECTNEED")
-                .to("log:CONNECTNEED IN")
-                .to("bean:ownerProtocolNeedJMSService?method=connect");
-        from("activemq:queue:WON.ACTIVATENEED")
-                .to("log:ACTIVATENEED IN")
-                .to("bean:ownerProtocolNeedJMSService?method=activate");
-        from("activemq:queue:WON.DEACTIVATENEED")
-                .to("log:DEACTIVATENEED IN")
-                .to("bean:ownerProtocolNeedJMSService?method=deactivate");
-        from("activemq:queue:WON.OPEN")
-                .to("log:OPEN IN")
-                .to("bean:ownerProtocolNeedJMSService?method=open");
-        from("activemq:queue:WON.CLOSE")
-                .to("log:CLOSE IN")
-                .to("bean:ownerProtocolNeedJMSService?method=close");
         from("activemq:queue:WON.REGISTER")
                 .to("bean:ownerProtocolNeedJMSService?method=registerOwnerApplication");
-        from("activemq:queue:WON.TEXTMESSAGE")
-                .to("log:TEXTMESSAGE IN")
-                .to("bean:ownerProtocolNeedJMSService?method=textMessage");
         from("activemq:queue:WON.GETENDPOINTS")
                 .to("log:Get Endpoints IN")
                 .to("bean:ownerProtocolNeedJMSService?method=getEndpointsForOwnerApplication");
-       /* from("activemq:queue:WON.INMSG")
-            .choice()
-                .when(property("methodName").isEqualTo("connect"))
-                .to("activemq:queue:WON.CONNECTNEED")
-                .when(property("methodName").isEqualTo("activate"))
-                .to("log:ACTIVATEMSG")
-                .to("activemq:queue:WON.ACTIVATENEED")
-                .when(property("methodName").isEqualTo("deactivate"))
-                .to("activemq:queue:WON.DEACTIVATENEED")
-                .when(property("methodName").isEqualTo("textMessage"))
-                .to("activemq:queue:WON.TEXTMESSAGE")
-                .when(property("methodName").isEqualTo("createNeed"))
-                .to("activemq:queue:WON.CREATENEED")
-                .when(property("methodName").isEqualTo("open"))
-                .to("activemq:queue:WON.OPEN")
-                .when(property("methodName").isEqualTo("close"))
-                .to("activemq:queue:WON.CLOSE")
-                .otherwise()
-                .to("log:UNSUPPORTED METHOD") ;   */
-
 
 
     }

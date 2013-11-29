@@ -104,6 +104,15 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
     return model;
   }
+    public Model showNodeInformation(final int page)
+    {
+        Model model = ModelFactory.createDefaultModel();
+        setNsPrefixes(model);
+        Resource showNodePageResource = null;
+        showNodePageResource = model.createResource(this.resourceURIPrefix);
+        addProtocolEndpoints(model, showNodePageResource);
+        return model;
+    }
 
   public Model listConnectionURIs(final int page)
   {
@@ -150,16 +159,35 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     return model;
   }
+    public Model getNodeModel()
+    {
+        Model model = ModelFactory.createDefaultModel();
+        setNsPrefixes(model);
+        Resource showNodePageResource = null;
+        showNodePageResource = model.createResource(this.resourceURIPrefix);
+        addProtocolEndpoints(model, showNodePageResource);
+        return model;
+    }
 
   //TODO: protocol endpoint specification in RDF model needs refactoring!
   private void addProtocolEndpoints(Model model, Resource res)
   {
-    res.addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
-        .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
-        .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint))
-        .addProperty(WON.HAS_ACTIVEMQ_SERVICE, model.createResource(this.activeMqEndpoint))
-        .addProperty(WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME, model.createTypedLiteral(this.activeMqNeedProtcolQueueName, XSDDatatype.XSDstring))
-        .addProperty(WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME, model.createTypedLiteral(this.activeMqOwnerProtcolQueueName, XSDDatatype.XSDstring));
+      Resource blankNodeActiveMq = model.createResource();
+      res.addProperty(WON.SUPPORTS_WON_PROTOCOL_IMPL, blankNodeActiveMq);
+      blankNodeActiveMq
+              .addProperty(RDF.type, WON.WON_OVER_ACTIVE_MQ)
+              .addProperty(WON.HAS_BROKER_URI, model.createResource(this.activeMqEndpoint))
+          .addProperty(WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME,this.activeMqOwnerProtcolQueueName,XSDDatatype.XSDstring)
+              .addProperty(WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME,this.activeMqNeedProtcolQueueName,XSDDatatype.XSDstring)
+      ;
+      Resource blankNodeSoapWs = model.createResource();
+      res.addProperty(WON.SUPPORTS_WON_PROTOCOL_IMPL, blankNodeSoapWs);
+      blankNodeSoapWs
+              .addProperty(RDF.type, WON.WON_OVER_SOAP_WS)
+              .addProperty(WON.HAS_MATCHER_PROTOCOL_ENDPOINT,model.createResource(this.matcherProtocolEndpoint))
+              .addProperty(WON.HAS_NEED_PROTOCOL_ENDPOINT,model.createResource(this.needProtocolEndpoint))
+              .addProperty(WON.HAS_OWNER_PROTOCOL_ENDPOINT,model.createResource(this.ownerProtocolEndpoint));
+
   }
 
   public Model getConnectionModel(final URI connectionUri) throws NoSuchConnectionException

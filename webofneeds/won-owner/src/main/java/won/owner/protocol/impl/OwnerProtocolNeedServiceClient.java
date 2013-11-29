@@ -4,6 +4,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
@@ -41,7 +42,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
-
+    @Value(value = "${uri.prefix.node.default}")
+    String wonNodeDefault;
 
 
 
@@ -152,8 +154,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
         logger.info("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
                 new Object[]{ownerURI, content, activate});
 
-        final Future<URI> uri = delegate.createNeed(ownerURI, content, activate, wonNodeURI);
 
+        final Future<URI> uri = delegate.createNeed(ownerURI, content, activate, wonNodeURI);
         new Thread(
                 new Runnable() {
                     @Override
@@ -164,7 +166,11 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                            // logger.info(need.getNeedURI().toString());
                             need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
                             need.setOwnerURI(ownerURI);
+
+                            if (wonNodeURI==null) need.setWonNodeURI(URI.create(wonNodeDefault));
+                            else need.setWonNodeURI(wonNodeURI);
                             needRepository.saveAndFlush(need);
+                            needRepository.findByNeedURI(need.getNeedURI());
                             logger.info("saving URI", need.getNeedURI().toString());
                         } catch (InterruptedException e) {
                             logger.warn("interrupted",e);

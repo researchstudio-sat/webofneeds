@@ -25,30 +25,6 @@ import org.apache.camel.builder.RouteBuilder;
 public class NeedProtocolStaticRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
-       /* from("seda:NeedProtocolOut")
-                .wireTap("bean:messagingService?method=inspectMessage")
-                .choice()
-                .when(property("remoteBrokerEndpoint").isNull())
-                .when(header("methodName").isEqualTo("connect"))
-                .to("activemq:queue:WON.NeedProtocol.Connect.In")
-                .when(header("methodName").isEqualTo("open"))
-                .to("activemq:queue:WON.NeedProtocol.Open.In")
-                .when(header("methodName").isEqualTo("close"))
-                .to("activemq:queue:WON.NeedProtocol.Close.In")
-                .when(header("methodName").isEqualTo("textMessage"))
-                .to("activemq:queue:WON.NeedProtocol.TextMessage.In");   */
-        from("activemq:queue:WON.NeedProtocol.Connect.In")
-                .to("log:Routing message from queue WON.NeedProtocol.Connect.In")
-                .to("bean:needProtocolNeedServiceJMSBased?method=connect");
-        from("activemq:queue:WON.NeedProtocol.Open.In")
-                .to("log:Routing message from queue WON.NeedProtocol.Open.In")
-                .to("bean:needProtocolNeedServiceJMSBased?method=open");
-        from("activemq:queue:WON.NeedProtocol.Close.In")
-                .to("log:Routing message from queue WON.NeedProtocol.Close.In")
-                .to("bean:needProtocolNeedServiceJMSBased?method=close");
-        from("activemq:queue:WON.NeedProtocol.TextMessage.In")
-                .to("log:Routing message from queue WON.NeedProtocol.TextMessage.In")
-                .to("bean:needProtocolNeedServiceJMSBased?method=textMessage");
         from("activemq:queue:NeedProtocol.in")
                 .choice()
                 .when(header("methodName").isEqualTo("connect"))
@@ -62,6 +38,7 @@ public class NeedProtocolStaticRoutes extends RouteBuilder {
                 .to("bean:needProtocolNeedServiceJMSBased?method=textMessage")
                 .otherwise()
                 .to("log:Not supported");
+
 
     }
 }

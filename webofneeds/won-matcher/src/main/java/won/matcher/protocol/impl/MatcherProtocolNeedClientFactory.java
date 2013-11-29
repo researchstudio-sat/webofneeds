@@ -26,7 +26,7 @@ public class MatcherProtocolNeedClientFactory extends AbstractClientFactory<Matc
 
   public MatcherProtocolNeedWebServiceEndpoint getMatcherProtocolEndpointForNeed(URI needURI) throws NoSuchNeedException, MalformedURLException
   {
-    URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.MATCHER_PROTOCOL_ENDPOINT);
+    URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.HAS_MATCHER_PROTOCOL_ENDPOINT);
     if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
     logger.debug("need won.matcher.protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
 
