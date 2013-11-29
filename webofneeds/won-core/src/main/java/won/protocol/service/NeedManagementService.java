@@ -15,28 +15,19 @@
  */
 
 package won.protocol.service;
-
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.model.Match;
-import org.apache.camel.Exchange;
 import java.net.URI;
-import java.util.Collection;
 
 /**
- * User: fkleedorfer
- * Date: 05.11.12
+ * Service for creating and manipulating needs.
+ * TODO [REFACTORING]: delete and move methods to owner and node interfaces.
  */
 public interface NeedManagementService
 {
   /**
    * Creates a new need with the specified content, ownerURI and active state.
-   *
-   *
-   *
-   *
    *
    * @param ownerURI
    * @param content

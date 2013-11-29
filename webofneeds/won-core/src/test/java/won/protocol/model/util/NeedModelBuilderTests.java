@@ -19,7 +19,7 @@ package won.protocol.model.util;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileUtils;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 import won.protocol.util.NeedModelBuilder;
 
@@ -35,9 +35,21 @@ import java.io.StringWriter;
 public class NeedModelBuilderTests
 {
   @Test
-  public void testRoundTrip() throws FileNotFoundException
+  public void testRoundTrip1() throws FileNotFoundException
   {
-    Model model = readTTL("won-core/src/test/resources/docs/test_content_cupboard_45_45_15.ttl","http://www.example.com/resource/need/12");
+    Model model = readTTL("won-core/src/test/resources/docs/test_content_cupboard_45_45_15.ttl", "http://www.example.com/resource/need/12");
+    testRoundTrip(model);
+  }
+
+  @Test
+  public void testRoundTrip2() throws FileNotFoundException
+  {
+    Model model = readTTL("won-core/src/test/resources/docs/test_intervals.ttl", "http://www.example.com/resource/need/12");
+    testRoundTrip(model);
+  }
+
+  public void testRoundTrip(Model model) throws FileNotFoundException
+  {
     NeedModelBuilder builder = new NeedModelBuilder();
     NeedModelBuilder otherBuilder = new NeedModelBuilder();
     builder.copyValuesFromProduct(model);
@@ -46,8 +58,9 @@ public class NeedModelBuilderTests
     Assert.assertTrue(model.isIsomorphicWith(model2));
   }
 
-  private static void printModel(String label, Model model){
-    System.out.println(label+":");
+  private static void printModel(String label, Model model)
+  {
+    System.out.println(label + ":");
     model.write(System.out, FileUtils.langTurtle);
   }
 

@@ -27,6 +27,7 @@ import java.util.List;
  * Time: 15:19
  */
 @Controller
+//@RequestMapping("/connection")
 public class ConnectionController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 

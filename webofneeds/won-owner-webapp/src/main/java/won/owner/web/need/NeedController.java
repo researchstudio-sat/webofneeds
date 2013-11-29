@@ -49,6 +49,7 @@ import java.util.concurrent.Future;
  */
 
 @Controller
+@RequestMapping("/need")
 public class NeedController
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
@@ -115,6 +116,7 @@ public class NeedController
     return "createNeed";
   }
 
+  //TODO use NeedModelBuilder here instead
   @RequestMapping(value = "/create", method = RequestMethod.POST)
   public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) throws ExecutionException, InterruptedException, IOException, URISyntaxException {
     URI needURI;
@@ -158,9 +160,9 @@ public class NeedController
       if (needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
         Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
         if (needPojo.getLowerPriceLimit() != null)
-          priceSpecification.addProperty(WON.HAS_LOWER_PRICE_LIMIT, Double.toString(needPojo.getLowerPriceLimit()), XSDDatatype.XSDdouble);
+          priceSpecification.addProperty(WON.HAS_LOWER_PRICE_LIMIT, Double.toString(needPojo.getLowerPriceLimit()), XSDDatatype.XSDfloat);
         if (needPojo.getUpperPriceLimit() != null)
-          priceSpecification.addProperty(WON.HAS_UPPER_PRICE_LIMIT, Double.toString(needPojo.getUpperPriceLimit()), XSDDatatype.XSDdouble);
+          priceSpecification.addProperty(WON.HAS_UPPER_PRICE_LIMIT, Double.toString(needPojo.getUpperPriceLimit()), XSDDatatype.XSDfloat);
         if (!needPojo.getCurrency().isEmpty())
           priceSpecification.addProperty(WON.HAS_CURRENCY, needPojo.getCurrency(), XSDDatatype.XSDstring);
 
@@ -220,7 +222,7 @@ public class NeedController
     RdfUtils.attachModelByBaseResource(resourceToLinkTo,propertyToLinkThrough, model);
   }
 
-  @RequestMapping(value = "", method = RequestMethod.GET)
+  @RequestMapping(value = "/", method = RequestMethod.GET)
   public String listNeeds(Model model)
   {
 

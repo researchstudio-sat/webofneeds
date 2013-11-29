@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
@@ -44,7 +45,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/rest")
 public class RestController
 {
 
@@ -111,6 +112,7 @@ public class RestController
   @GET
   @Path("/{needId}/matches")
   @Produces(MediaType.APPLICATION_JSON)
+  @ResponseBody
   @RequestMapping(
       value="/{needId}/matches",
       produces = MediaType.APPLICATION_JSON,
@@ -118,7 +120,7 @@ public class RestController
   public List<NeedPojo> findMatches(@PathParam("needId") long needId)
   {
 
-    logger.info("Looking for matches for Need: " + needId);
+    logger.info("Looking for matches for Need: " +  needId);
 
     List<NeedPojo> returnList = new ArrayList<NeedPojo>();
 
@@ -173,7 +175,8 @@ public class RestController
   }
 
 
-  @RequestMapping(
+	@ResponseBody
+	@RequestMapping(
       value = "/create",
       consumes = MediaType.APPLICATION_JSON,
       produces = MediaType.APPLICATION_JSON,
@@ -188,7 +191,8 @@ public class RestController
   }
 
 
-  @RequestMapping(
+	@ResponseBody
+	@RequestMapping(
       value = "/",
       produces = MediaType.APPLICATION_JSON,
       method = RequestMethod.GET

@@ -17,8 +17,8 @@
 package won.protocol.util;
 
 /**
- * User: fkleedorfer
- * Date: 25.02.13
+ * Some HTTP constants.
+ * TODO [REFACTORING]: move to vocabulary package.
  */
 public class HTTP
 {

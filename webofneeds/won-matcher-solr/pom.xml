@@ -61,9 +61,6 @@
         </dependency>
 
 
-
-
-
         <!-- START: used for testing solr -->
         <dependency>
             <groupId>javax.servlet</groupId>

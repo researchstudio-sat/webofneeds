@@ -76,7 +76,6 @@
         <qualifier value="needProtocolNeedService"/>
     </bean-->
     <bean id="matcherProtocolNeedService" class="won.node.protocol.impl.MatcherProtocolNeedServiceImpl">
-        <property name="needInformationService" ref="needInformationService" />
         <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
     </bean>
     <bean name="needProtocolNeedClientJMSBased" class="won.node.protocol.impl.NeedProtocolNeedClientImplJMSBased">

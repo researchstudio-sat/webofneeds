@@ -17,7 +17,6 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>WEB-INF/spring-ws-servlet.xml
-            WEB-INF/restController-servlet.xml
             classpath:ownerServices.xml
             classpath:ownerApplicationContext.xml
         </param-value>
@@ -40,41 +39,18 @@
         <url-pattern>/protocol</url-pattern>
     </servlet-mapping>
 
-    <!-- SPRING WEB MVC config -->
-    <servlet>
-        <servlet-name>needController</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
+	<!-- SPRING WEB MVC config -->
 
-    <servlet-mapping>
-        <servlet-name>needController</servlet-name>
-        <url-pattern>/need/*</url-pattern>
-    </servlet-mapping>
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 
-    <!-- SPRING WEB MVC config -->
-    <servlet>
-        <servlet-name>restController</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>restController</servlet-name>
-        <url-pattern>/rest/*</url-pattern>
-    </servlet-mapping>
-
-
-    <servlet>
-        <servlet-name>connectionController</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>connectionController</servlet-name>
-        <url-pattern>/connection/*</url-pattern>
-    </servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
 
     <!-- GENERAL -->
 
