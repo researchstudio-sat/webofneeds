@@ -21,9 +21,17 @@ public class MessagingServiceImpl<T> implements MessagingService,CamelContextAwa
     private ProducerTemplate producerTemplate;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    /**
+     * This method shall be used for Request-Reply messaging.
+     * @param properties
+     * @param headers
+     * @param body
+     * @param endpoint
+     * @return
+     */
     public Future<T> sendInOutMessageGeneric(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
-
+        //TODO: the method name shall be set in the header of the message.
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
         if (properties!=null){
             if(properties.containsKey("methodName"))
