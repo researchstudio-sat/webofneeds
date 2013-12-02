@@ -1,6 +1,7 @@
 package won.owner.protocol.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,13 @@ import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.*;
+import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.ConnectionModelMapper;
+import won.protocol.util.NeedModelMapper;
+import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WON;
+import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
+import won.protocol.ws.fault.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -34,6 +42,7 @@ import java.util.concurrent.Future;
  * * implement a JMS-based implementation of that interface and change spring config so it is used here
  */
 public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceClientSide {
+{
     /* Linked Data default paths */
     private static final String NEED_URI_PATH_PREFIX = "/data/need";
     private static final String CONNECTION_URI_PATH_PREFIX = "/data/connection";

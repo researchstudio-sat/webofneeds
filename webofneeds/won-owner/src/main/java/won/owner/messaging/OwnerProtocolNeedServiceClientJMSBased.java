@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.owner.protocol.impl;
+package won.owner.messaging;
 import javax.jms.Destination;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import won.owner.protocol.impl.MessageProducer;
 import won.owner.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.ws.OwnerProtocolNeedClientFactory;
 import won.protocol.exception.*;

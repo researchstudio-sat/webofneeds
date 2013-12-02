@@ -14,18 +14,23 @@
  *    limitations under the License.
  */
 
-package won.owner.protocol.impl;
+package won.owner.ws;
 
 import com.google.common.util.concurrent.SettableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.ws.OwnerProtocolNeedClientFactory;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.repository.FacetRepository;
+import won.protocol.repository.MatchRepository;
+import won.protocol.util.ConnectionModelMapper;
+import won.protocol.util.NeedModelMapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
 import won.protocol.ws.fault.*;
@@ -44,6 +49,15 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private OwnerProtocolNeedClientFactory clientFactory;
 
+
+    @Autowired
+    private MatchRepository matchRepository;
+
+    @Autowired
+    private NeedModelMapper needModelMapper;
+
+    @Autowired
+    private ConnectionModelMapper connectionModelMapper;
 
     //@Override
     public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {

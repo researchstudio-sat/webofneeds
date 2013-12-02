@@ -28,7 +28,7 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 31.10.12
  */
-public interface OwnerProtocolOwnerServiceClient extends ConnectionCommunicationService
+public interface OwnerProtocolOwnerServiceClientSide extends ConnectionCommunicationService
 {
   /**
    * Informs the owner of a hint that has been received for the need.

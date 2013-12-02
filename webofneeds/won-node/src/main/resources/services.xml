@@ -24,8 +24,45 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
+    <!--- DataAccessService -->
+    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessService" >
+      <property name="URIService" ref="uriService" />
+      <property name="rdfStorageService" ref="rdfStorageRef" />
+    </bean>
+
     <!--- RDF Storage -->
     <bean id="rdfStorageRef" class="won.node.service.impl.RDFFileStorageService" />
+
+    <!--- Facet Registry -->
+    <bean id="facetImplRegistryRef" class="won.node.facet.impl.FacetRegistry" >
+        <property name="map" ref="facetMap" />
+    </bean>
+
+    <bean id="facetMap" class="java.util.HashMap">
+        <constructor-arg index="0" type="java.util.Map">
+            <map key-type="won.protocol.model.FacetType" value-type="won.node.facet.impl.Facet">
+                <entry key="#{T(won.protocol.model.FacetType).ControlFacet}" value-ref="controlFacetImplRef" />
+                <entry key="#{T(won.protocol.model.FacetType).OwnerFacet}" value-ref="ownerFacetImplRef" />
+                <entry key="#{T(won.protocol.model.FacetType).GroupFacet}" value-ref="groupFacetImplRef" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="abstractFacetRef" abstract="true" class="won.node.facet.impl.Facet">
+        <property name="needProtocolNeedService" ref="needProtocolNeedClient" />
+        <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
+        <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
+        <property name="needFacingConnectionCommunicationService" ref="needFacingConnectionCommunicationService" />
+        <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
+        <property name="ownerFacingConnectionClient" ref="ownerProtocolOwnerClient" />
+        <property name="URIService" ref="uriService" />
+        <property name="executorService" ref="threadPoolExecutor" />
+        <property name="dataService" ref="dataServiceRef" />
+    </bean>
+
+    <bean id="controlFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ControlFacetImpl" />
+    <bean id="ownerFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.OwnerFacetImpl" />
+    <bean id="groupFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.GroupFacetImpl" />
 
     <!-- protocol-level services -->
     <bean id="ownerProtocolNeedService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
@@ -89,8 +126,9 @@
 
 
 
+	<!-- TODO: rewiring needed for JMSBased functionalities -->
     <!-- service-level services -->
-    <bean id="needCommunicationService" class="won.node.service.impl.NeedCommunicationServiceImplJMSBased">
+    <bean id="needCommunicationServiceJMSBased" class="won.node.service.impl.NeedCommunicationServiceImplJMSBased">
         <property name="needProtocolNeedService" ref="needProtocolNeedClientJMSBased" />
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
         <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
@@ -98,6 +136,11 @@
         <property name="URIService" ref="uriService" />
         <property name="executorService" ref="threadPoolExecutor" />
         <property name="rdfStorageService" ref="rdfStorageRef" />
+	</bean>
+    <bean id="needCommunicationService" class="won.node.service.impl.NeedCommunicationServiceImpl">
+        <property name="dataService" ref="dataServiceRef" />
+        <property name="reg" ref="facetImplRegistryRef" />
+
     </bean>
 
     <bean id="queueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/>
@@ -110,7 +153,6 @@
     <bean id="needManagementService" class="won.node.service.impl.NeedManagementServiceImpl">
         <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
         <property name="needInformationService" ref="needInformationService"/>
-        <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
         <property name="URIService" ref="uriService" />
         <property name="rdfStorage" ref="rdfStorageRef" />
     </bean>
@@ -126,15 +168,16 @@
 
     <bean id="needFacingConnectionCommunicationService"
           class="won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl">
-        <property name="ownerFacingConnectionClient" ref="ownerProtocolOwnerClient" />
-        <property name="executorService" ref="threadPoolExecutor" />
-        <property name="rdfStorageService" ref="rdfStorageRef" />
+        <property name="dataService" ref="dataServiceRef" />
+        <property name="reg" ref="facetImplRegistryRef" />
     </bean>
-
+	<!-- TODO: rewiring and refactoring needed to support both JMS and WS based protocols and adapt to changes introduced by facets -->
     <bean id="ownerFacingConnectionCommunicationService" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl">
         <property name="needFacingConnectionClient" ref="needProtocolNeedClientJMSBased" />
         <property name="executorService" ref="threadPoolExecutor" />
         <property name="rdfStorageService" ref="rdfStorageRef" />
+        <property name="dataService" ref="dataServiceRef" />
+        <property name="reg" ref="facetImplRegistryRef" />
     </bean>
 
     <bean id="ownerFacingConnectionCommunicationServiceJMSBased" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl"/>
@@ -146,7 +189,6 @@
         <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
         <property name="pageURIPrefix" value="${uri.prefix.page}" />
         <property name="generalURIPrefix" value="${uri.prefix}" />
-
     </bean>
 
     <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">

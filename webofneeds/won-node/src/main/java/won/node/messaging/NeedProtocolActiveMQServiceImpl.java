@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.node.protocol.impl;
+package won.node.messaging;
 
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;

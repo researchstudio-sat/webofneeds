@@ -221,7 +221,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
       Model additionalDataModel = rdfStorage.loadContent(e);
       if (additionalDataModel != null && additionalDataModel.size() > 0) {
         Resource additionalData = additionalDataModel.createResource();
-        RdfUtils.replaceBaseResource(additionalDataModel, additionalData);
+        //TODO: check if the statement below is now necessary
+        //RdfUtils.replaceBaseResource(additionalDataModel, additionalData);
         model.add(model.createStatement(eventMember, WON.HAS_ADDITIONAL_DATA, additionalData));
         model.add(additionalDataModel);
       }

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.owner.protocol.impl;
+package won.owner.messaging;
 
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;

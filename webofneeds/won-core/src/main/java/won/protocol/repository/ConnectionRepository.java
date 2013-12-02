@@ -39,5 +39,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
 
     List<Connection> findByNeedURIAndRemoteNeedURI(URI needURI, URI remoteNeedURI);
 
+    List<Connection> findByNeedURIAndStateAndTypeURI(URI needURI, ConnectionState connectionState, URI facetType);
+
     List<Connection> findByNeedURIAndRemoteNeedURIAndState(URI needURI, URI remoteNeedURI, ConnectionState connectionState);
 }

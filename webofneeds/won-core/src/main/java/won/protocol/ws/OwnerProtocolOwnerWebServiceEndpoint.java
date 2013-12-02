@@ -55,6 +55,6 @@ public interface OwnerProtocolOwnerWebServiceEndpoint {
     @WebMethod
     public void textMessage(
             @WebParam(name = "connectionURI") final URI connectionURI,
-            @WebParam(name = "message") final String message)
+            @WebParam(name = "content") final String message)
             throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 }

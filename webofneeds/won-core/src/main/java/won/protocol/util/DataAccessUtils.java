@@ -34,8 +34,7 @@ import java.util.List;
  * User: fkleedorfer
  * Date: 05.11.12
  */
-public class DataAccessUtils
-{
+public class DataAccessUtils {
 
   /**
    * Loads the specified need from the database and raises an exception if it is not found.
@@ -82,4 +81,18 @@ public class DataAccessUtils
     }
 
 
+    /**
+    * Loads the specified connection from the database and raises an exception if it is not found.
+    * @param connectionRepository
+    * @param connectionURI
+    * @return
+    * @throws NoSuchConnectionException
+    */
+    public static Connection loadConnection(ConnectionRepository connectionRepository, final URI connectionURI) throws NoSuchConnectionException
+    {
+        List<Connection> connections = connectionRepository.findByConnectionURI(connectionURI);
+        if (connections.size() == 0) throw new NoSuchConnectionException(connectionURI);
+        if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple connections found with URI {0}",connectionURI));
+        return connections.get(0);
+    }
 }

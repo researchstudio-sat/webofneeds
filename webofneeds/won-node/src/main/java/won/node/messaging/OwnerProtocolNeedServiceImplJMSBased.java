@@ -1,4 +1,4 @@
-package won.node.protocol.impl;
+package won.node.messaging;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.*;

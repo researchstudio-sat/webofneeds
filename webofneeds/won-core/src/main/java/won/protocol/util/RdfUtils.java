@@ -4,9 +4,13 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.util.FileUtils;
 import com.hp.hpl.jena.util.ResourceUtils;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionEvent;
+import won.protocol.vocabulary.WON;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,6 +83,7 @@ public class RdfUtils
       model.add(newStmt);
       iterator.remove();
     }
+    model.setNsPrefix("", replacement.getURI());
   }
 
   /**
@@ -173,5 +178,30 @@ public class RdfUtils
       ResourceUtils.renameResource(model.getResource(baseURI), model.getNsPrefixURI(""));
     }
     return model;
+  }
+
+  /**
+   * Stores additional data if there is any in the specified model.
+   *
+   * @param eventURI
+   * @param content
+   * @param con
+   * @param event
+   * @param score
+   */
+  public static Model createContentForEvent(final URI eventURI, final Model content, final Connection con,
+                                            final ConnectionEvent event, final Double score) {
+    //TODO: define what content may contain and check that here! May content contain any RDF or must it be linked to the <> node?
+    Model extraDataModel = ModelFactory.createDefaultModel();
+    Resource eventNode = extraDataModel.createResource(eventURI.toString());
+    if(score != null)
+      eventNode.addLiteral(WON.HAS_MATCH_SCORE, score.doubleValue());
+    extraDataModel.setNsPrefix("", eventNode.getURI().toString());
+    if (content != null) {
+      RdfUtils.replaceBaseResource(content, eventNode);
+      //TODO: check if the correct data is saved
+      extraDataModel.add(content);
+    }
+    return extraDataModel;
   }
 }

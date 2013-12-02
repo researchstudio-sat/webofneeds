@@ -37,7 +37,7 @@ import java.text.MessageFormat;
  * User: fkleedorfer
  * Date: 28.11.12
  */
-public class NeedProtocolNeedClientImpl implements NeedProtocolNeedService
+public class NeedProtocolNeedClient implements NeedProtocolNeedService
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
 

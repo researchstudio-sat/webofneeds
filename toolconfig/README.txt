@@ -16,4 +16,3 @@ IMPORTING:
 To import settings, go to 
   File->Import Settings...
 and select the settings you like
-

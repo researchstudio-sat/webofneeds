@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package won.node.protocol.impl;
+package won.node.messaging;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.CamelContext;
@@ -22,6 +22,7 @@ import org.apache.camel.CamelContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.node.protocol.impl.NeedProtocolNeedClientFactory;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
 import won.protocol.jms.NeedProtocolActiveMQService;
