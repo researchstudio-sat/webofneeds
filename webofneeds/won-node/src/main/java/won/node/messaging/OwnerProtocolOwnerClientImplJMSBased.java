@@ -26,7 +26,7 @@ import won.protocol.jms.MessagingService;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.OwnerApplication;
-import won.protocol.owner.OwnerProtocolOwnerServiceClient;
+import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.DataAccessUtils;
@@ -42,7 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerServiceClient
+public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerServiceClientSide
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
 

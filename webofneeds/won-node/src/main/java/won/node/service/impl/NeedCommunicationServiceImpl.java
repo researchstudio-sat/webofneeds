@@ -19,6 +19,7 @@ package won.node.service.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.facet.impl.FacetRegistry;
 import won.protocol.exception.ConnectionAlreadyExistsException;
@@ -28,10 +29,8 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
-import won.protocol.need.NeedProtocolNeedClientSide;
-import won.protocol.exception.*;
-import won.protocol.model.*;
-import won.protocol.owner.OwnerProtocolOwnerServiceClient;
+import won.protocol.need.NeedProtocolNeedService;
+import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
 import won.protocol.repository.NeedRepository;
@@ -41,10 +40,7 @@ import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 
 import java.net.URI;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 
 @Component

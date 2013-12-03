@@ -41,7 +41,7 @@ import java.util.concurrent.Future;
  * connecting to a WS-based service is done in that class only (and not here)
  * * implement a JMS-based implementation of that interface and change spring config so it is used here
  */
-public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceClientSide {
+public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceClientSide
 {
     /* Linked Data default paths */
     private static final String NEED_URI_PATH_PREFIX = "/data/need";
@@ -54,7 +54,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     @Value(value = "${uri.prefix.node.default}")
     String wonNodeDefault;
 
-
+    @Autowired
+    private FacetRepository facetRepository;
 
     @Autowired
     private ChatMessageRepository chatMessageRepository;
@@ -96,7 +97,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
         logger.info(MessageFormat.format("need-facing: OPEN called for connection {0} with model {1}", connectionURI, content));
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
         if (cons.size() != 1)
@@ -112,7 +114,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public void close(final URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void close(final URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
         logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0} with model {1}", connectionURI, content));
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
         if (cons.size() != 1)
@@ -126,7 +129,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
     @Override
     public void textMessage(final URI connectionURI, final String message)
-            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
         logger.debug("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
 
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
@@ -149,17 +153,20 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
 
     @Override
-    public Future<String> register() {
+    public Future<String> register()
+    {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException {
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException
+    {
         return createNeed(ownerURI, content, activate, null);
     }
 
     @Override
-    public Future<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeURI) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException {
+    public Future<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeURI) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException
+    {
         logger.info("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
                 new Object[]{ownerURI, content, activate});
 
@@ -169,6 +176,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                 new Runnable() {
                     @Override
                     public void run() {
+                        //TODO: move the DB part into its own layer or something, because the owner webapp is designed to be syncronous, but the code below may slow down the web-app.
                         Need need = new Need();
                         try {
                             need.setNeedURI(uri.get());
@@ -181,6 +189,24 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                             needRepository.saveAndFlush(need);
                             needRepository.findByNeedURI(need.getNeedURI());
                             logger.info("saving URI", need.getNeedURI().toString());
+
+                            ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
+                            if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
+
+                            Resource needRes = needIt.next();
+                            logger.debug("processing need resource {}", needRes.getURI());
+
+                            StmtIterator stmtIterator = content.listStatements(needRes, WON.HAS_FACET, (RDFNode) null);
+                            if(!stmtIterator.hasNext())
+                                throw new IllegalArgumentException("at least one RDF node must be of type won:HAS_FACET");
+                            else
+                                do {
+                                    Facet facet = new Facet();
+                                    facet.setNeedURI(need.getNeedURI());
+                                    facet.setTypeURI(URI.create(stmtIterator.next().getObject().asResource().getURI()));
+                                    facetRepository.save(facet);
+                                } while(stmtIterator.hasNext());
+
                         } catch (InterruptedException e) {
                             logger.warn("interrupted",e);
                         } catch (ExecutionException e) {
@@ -192,53 +218,65 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                 }
         ).start();
 
-        return uri;
 
+
+        return uri;
     }
 
     @Override
-    public Future<URI> connect(final URI needURI, final  URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException {
+    public Future<URI> connect(final URI needURI, final  URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException
+    {
         logger.info("need-facing: CONNECT called for other need {}, own need {} and content {}", new Object[]{needURI, otherNeedURI, content});
 
             final Future<URI> uri = delegate.connect(needURI, otherNeedURI, content);
+            Resource baseRes = content.getResource(content.getNsPrefixURI(""));
+            StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
 
+            if (!stmtIterator.hasNext()) {
+                throw new IllegalArgumentException("at least one RDF node must be of type won:" + WON.HAS_FACET.getLocalName());
+            }
+            URI facetURI =  URI.create(stmtIterator.next().getObject().asResource().getURI());
             List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri.get());
             if (existingConnections.size() > 0) {
                 for (Connection conn : existingConnections) {
-                    if (ConnectionState.CONNECTED == conn.getState() ||
-                            ConnectionState.REQUEST_SENT == conn.getState()) {
-                        throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);
-                    } else {
-                        conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
-                        connectionRepository.saveAndFlush(conn);
-                    }
-                }
-            } else {
-                new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-
-                                //set new uri
-                                try {
-                                    //Create new connection object
-                                    Connection con = new Connection();
-                                    con.setNeedURI(needURI);
-                                    con.setState(ConnectionState.REQUEST_SENT);
-                                    con.setRemoteNeedURI(otherNeedURI);
-                                    con.setConnectionURI(uri.get());
-                                    connectionRepository.saveAndFlush(con);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                                } catch (ExecutionException e) {
-                                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                                }
-
-                            }
+                    if (facetURI.equals(conn.getTypeURI()))
+                        if (! ConnectionEventType.OWNER_OPEN.isMessageAllowed(conn.getState())) {
+                            throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);
+                        } else {
+                            conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
+                            connectionRepository.saveAndFlush(conn);
                         }
-                ).start();
+                }
+            }  else {
+                    new Thread(
+                            new Runnable() {
+                                @Override
+                                public void run() {
 
-            }
+                                    //set new uri
+                                    try {
+                                        //Create new connection object
+                                        Connection con = new Connection();
+                                        con.setNeedURI(needURI);
+                                        con.setState(ConnectionState.REQUEST_SENT);
+                                        con.setRemoteNeedURI(otherNeedURI);
+                                        con.setConnectionURI(uri.get());
+                                        connectionRepository.saveAndFlush(con);
+
+
+
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                    } catch (ExecutionException e) {
+                                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                    }
+
+                                }
+                            }
+                    ).start();
+
+                }
+
 
 
         return uri;
@@ -247,7 +285,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
 
 
-    public void setDelegate(OwnerProtocolNeedServiceClientSide delegate) {
+    public void setDelegate(OwnerProtocolNeedServiceClientSide delegate)
+    {
         this.delegate = delegate;
     }
 }

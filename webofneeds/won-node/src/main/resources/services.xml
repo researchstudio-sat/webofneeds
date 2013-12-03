@@ -68,11 +68,12 @@
     <bean id="ownerProtocolNeedService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
         <!-- the connection communication service injected here is owner facing -->
         <property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
-        <property name="needCommunicationService" ref="needCommunicationService" />
+        <!--property name="needCommunicationService" ref="needCommunicationServiceJMSBased" /-->
+        <property name="needCommunicationService" ref="needCommunicationService"/>
         <property name="needInformationService" ref="needInformationService" />
         <property name="needManagementService" ref="needManagementServiceJMSBased"/>
     </bean>
-    <bean id="ownerProtocolNeedJMSService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImplJMSBased">
+    <bean id="ownerProtocolNeedJMSService" class="won.node.messaging.OwnerProtocolNeedServiceImplJMSBased">
         <!-- the connection communication service injected here 7s owner facing -->
         <property name="delegate" ref="ownerProtocolNeedService" />
         <!--property name="activeMQComponent" ref="activemqComponent" /-->
@@ -84,7 +85,7 @@
     </bean>
 
     <bean id="needProtocolNeedServiceJMSBased" class="won.node.protocol.impl.NeedProtocolNeedServiceImplJMSBased">
-        <property name="needFacingNeedCommunicationService" ref="needCommunicationService" />
+        <property name="needFacingNeedCommunicationService" ref="needCommunicationService"/>
         <!-- the connection communication service injected here is need facing, not owner facing -->
         <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService" />
         <qualifier value="needProtocolNeedService"/>
@@ -98,12 +99,23 @@
     <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor">
         <property name="queueManagementService" ref="queueManagementService"/>
     </bean>
-    <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClientImpl">
+    <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClient">
+         <property name="delegate" ref="ownerProtocolOwnerClientJMSBased"/>
+    </bean>
+    <bean name="ownerProtocolOwnerClientWSBased" class="won.node.ws.OwnerProtocolOwnerClientImplWSBased"></bean>
+    <bean name="ownerProtocolOwnerClientJMSBased" class="won.node.messaging.OwnerProtocolOwnerClientImplJMSBased">
         <property name="clientFactory" ref="ownerProtocolOwnerWebServiceClientFactory" />
         <property name="messagingService" ref="messagingService"/>
     </bean>
-    <bean name="needProtocolNeedClient" class="won.node.protocol.impl.NeedProtocolNeedClientImpl">
+    <bean name="needProtocolNeedClient" class="won.node.protocol.impl.NeedProtocolNeedClient">
+        <property name="delegate" ref="needProtocolNeedClientJMSBased"/>
+    </bean>
+    <bean name="needProtocolNeedClientWSBased" class="won.node.ws.NeedProtocolNeedClientImplWSBased">
         <property name="clientFactory" ref="needProtocolNeedWebServiceClientFactory" />
+    </bean>
+    <bean name="needProtocolNeedClientJMSBased" class="won.node.messaging.NeedProtocolNeedClientImplJMSBased">
+        <property name="messagingService" ref="messagingService"/>
+        <property name="needProtocolActiveMQService" ref="needProtocolActiveMQService"/>
     </bean>
 
     <!-- bean id="needProtocolNeedServiceWSBased" class="won.node.protocol.impl.NeedProtocolNeedServiceImpl">
@@ -115,11 +127,8 @@
     <bean id="matcherProtocolNeedService" class="won.node.protocol.impl.MatcherProtocolNeedServiceImpl">
         <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
     </bean>
-    <bean name="needProtocolNeedClientJMSBased" class="won.node.protocol.impl.NeedProtocolNeedClientImplJMSBased">
-        <property name="messagingService" ref="messagingService"/>
-        <property name="needProtocolActiveMQService" ref="needProtocolActiveMQService"/>
-    </bean>
-    <bean name="needProtocolActiveMQService" class="won.node.protocol.impl.NeedProtocolActiveMQServiceImpl">
+
+    <bean name="needProtocolActiveMQService" class="won.node.messaging.NeedProtocolActiveMQServiceImpl">
         <property name="componentName" value="activemq"/>
     </bean>
 
@@ -128,7 +137,7 @@
 
 	<!-- TODO: rewiring needed for JMSBased functionalities -->
     <!-- service-level services -->
-    <bean id="needCommunicationServiceJMSBased" class="won.node.service.impl.NeedCommunicationServiceImplJMSBased">
+    <!--bean id="needCommunicationServiceJMSBased" class="won.node.service.impl.NeedCommunicationServiceImplJMSBased">
         <property name="needProtocolNeedService" ref="needProtocolNeedClientJMSBased" />
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
         <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
@@ -136,7 +145,7 @@
         <property name="URIService" ref="uriService" />
         <property name="executorService" ref="threadPoolExecutor" />
         <property name="rdfStorageService" ref="rdfStorageRef" />
-	</bean>
+	</bean-->
     <bean id="needCommunicationService" class="won.node.service.impl.NeedCommunicationServiceImpl">
         <property name="dataService" ref="dataServiceRef" />
         <property name="reg" ref="facetImplRegistryRef" />
@@ -173,9 +182,9 @@
     </bean>
 	<!-- TODO: rewiring and refactoring needed to support both JMS and WS based protocols and adapt to changes introduced by facets -->
     <bean id="ownerFacingConnectionCommunicationService" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl">
-        <property name="needFacingConnectionClient" ref="needProtocolNeedClientJMSBased" />
-        <property name="executorService" ref="threadPoolExecutor" />
-        <property name="rdfStorageService" ref="rdfStorageRef" />
+        <!-- property name="needFacingConnectionClient" ref="needProtocolNeedClientJMSBased" /-->
+        <!-- property name="executorService" ref="threadPoolExecutor" /-->
+        <!-- property name="rdfStorageService" ref="rdfStorageRef" /-->
         <property name="dataService" ref="dataServiceRef" />
         <property name="reg" ref="facetImplRegistryRef" />
     </bean>

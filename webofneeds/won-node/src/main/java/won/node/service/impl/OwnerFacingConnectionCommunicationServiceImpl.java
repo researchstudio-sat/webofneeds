@@ -30,7 +30,6 @@ import won.protocol.model.ConnectionEventType;
 import won.protocol.service.ConnectionCommunicationService;
 
 import won.protocol.util.DataAccessUtils;
-import won.node.protocol.impl.MessageProducer;
 import java.net.URI;
 
 

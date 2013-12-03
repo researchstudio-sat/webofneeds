@@ -52,6 +52,9 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    *
    *
    *
+   *
+   *
+   *
    * @param ownNeedURI
    * @param otherNeedURI
    * @param ownConnectionURI

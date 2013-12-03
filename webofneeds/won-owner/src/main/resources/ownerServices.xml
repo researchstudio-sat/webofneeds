@@ -32,15 +32,6 @@
 
     <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
 
-    <bean id="activeMQService" class="won.owner.protocol.impl.OwnerProtocolActiveMQServiceImpl">
-        <property name="componentName" value="activemq"/>
-        <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
-    </bean>
-
-    <bean id="ownerProtocolNeedClientFactory" class="won.owner.ws.OwnerProtocolNeedClientFactory" />
-
-    <bean id="ownerProtocolOwnerService" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
-
     <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
         <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
@@ -64,17 +55,29 @@
 
     <!-- protocol-level services -->
 
+    <bean id="activeMQService" class="won.owner.messaging.OwnerProtocolActiveMQServiceImpl">
+        <property name="componentName" value="activemq"/>
+        <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
+    </bean>
+
+    <bean id="ownerProtocolNeedClientFactory" class="won.owner.ws.OwnerProtocolNeedClientFactory" />
+
+    <bean id="ownerProtocolOwnerService" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
+
+    <bean id="ownerProtocolOwnerServiceJMSBased" class="won.owner.messaging.OwnerProtocolOwnerServiceImplJMSBased"></bean>
+
     <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
         <property name="delegate" ref="ownerProtocolNeedServiceClientJMSBased" />
         <!--property name="linkedDataRestClient" ref="linkedDataRestClient" />
         <property name="uriService" ref="uriService" /-->
     </bean>
 
-    <bean id="ownerProtocolNeedServiceClientWSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientWSBased">
+
+    <bean id="ownerProtocolNeedServiceClientWSBased" class="won.owner.ws.OwnerProtocolNeedServiceClientWSBased">
         <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
     </bean>
 
-    <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClientJMSBased">
+    <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.messaging.OwnerProtocolNeedServiceClientJMSBased">
         <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
         <property name="producerTemplate" ref="producerTemplate"/>
         <property name="messagingService" ref="messagingService"/>

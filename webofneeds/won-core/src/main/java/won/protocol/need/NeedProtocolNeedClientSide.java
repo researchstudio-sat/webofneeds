@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
 import won.protocol.need.NeedProtocolNeedService;
+import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.ws.fault.ConnectionAlreadyExistsFault;
@@ -41,17 +42,17 @@ import java.util.concurrent.Future;
  * User: fkleedorfer
  * Date: 28.11.12
  */
-public interface NeedProtocolNeedClientSide
+public interface NeedProtocolNeedClientSide   extends ConnectionCommunicationService
 {
 
   public Future<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
 
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  //public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  //public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  //public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 
 

@@ -23,14 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.node.protocol.impl.OwnerProtocolOwnerClientFactory;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
-import won.protocol.model.Connection;
-import won.protocol.model.Need;
-import won.protocol.model.OwnerApplication;
-import won.protocol.owner.OwnerProtocolOwnerService;
-import won.protocol.owner.OwnerProtocolOwnerServiceClient;
+import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
 import won.protocol.ws.fault.*;
@@ -39,11 +34,8 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerServiceClient
+public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerServiceClientSide
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
 

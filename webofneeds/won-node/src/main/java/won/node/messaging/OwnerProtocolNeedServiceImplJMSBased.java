@@ -178,7 +178,8 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //OwnerProtocolN
         URI needURIConvert = URI.create(needURI);
         URI otherNeedURIConvert = URI.create(otherNeedURI);
         Model contentConvert = RdfUtils.toModel(content);
-        result = needCommunicationService.connect(needURIConvert, otherNeedURIConvert, contentConvert);
+        result = delegate.connect(needURIConvert,otherNeedURIConvert,contentConvert);
+       // result = needCommunicationService.connect(needURIConvert, otherNeedURIConvert, contentConvert);
 
         return result;
     }

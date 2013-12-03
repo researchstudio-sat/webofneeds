@@ -16,6 +16,7 @@
 
 package won.node.ws;
 
+import com.google.common.util.concurrent.SettableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import won.protocol.ws.fault.NoSuchConnectionFault;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.concurrent.Future;
 
 /**
  * User: fkleedorfer
@@ -47,14 +49,17 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   private NeedProtocolNeedClientFactory clientFactory;
 
   @Override
-  public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public Future<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
 
     logger.info("need-facing: CONNECT called for other need {}, own need {}, own connection {}, and content {}",
         new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForNeed(needURI);
-      return proxy.connect(needURI, otherNeedURI, otherConnectionURI, RdfUtils.toString(content));
+      URI result = proxy.connect(needURI, otherNeedURI, otherConnectionURI, RdfUtils.toString(content));
+      SettableFuture<URI> futureResult = SettableFuture.create();
+      futureResult.set(result);
+
     } catch (MalformedURLException e) {
       //TODO think this through: what happens if we return null here?
       logger.warn("couldn't create URL for needProtocolEndpoint", e);

@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.exception.*;
 import won.protocol.model.*;
-import won.protocol.owner.OwnerProtocolOwnerServiceClient;
+import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
 import won.protocol.repository.NeedRepository;
@@ -49,6 +49,7 @@ import java.util.concurrent.Future;
  * User: fkleedorfer
  * Date: 02.11.12
  */
+//TODO: Adapt to changes made by Gabriels on facets and data access class.
 @Component
 public class NeedCommunicationServiceImplJMSBased implements
     OwnerFacingNeedCommunicationService,
@@ -60,7 +61,7 @@ public class NeedCommunicationServiceImplJMSBased implements
   /**
    * Client talking to the owner side via the owner protocol
    */
-  private OwnerProtocolOwnerServiceClient ownerProtocolOwnerService;
+  private OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService;
   /**
    * Client talking another need via the need protocol
    */
@@ -385,7 +386,7 @@ public class NeedCommunicationServiceImplJMSBased implements
   }
 
 
-  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerServiceClient ownerProtocolOwnerService)
+  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService)
   {
     this.ownerProtocolOwnerService = ownerProtocolOwnerService;
   }

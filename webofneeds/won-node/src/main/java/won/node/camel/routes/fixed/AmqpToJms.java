@@ -29,7 +29,7 @@ public class AmqpToJms extends RouteBuilder{
     @Override
     public void configure(){
         from("seda:OUTMSG")
-                .wireTap("bean:messagingService?method=inspectMessage")
+                //.wireTap("bean:messagingService?method=inspectMessage")
                 .to("log:OUTMSG FROM NODE")
                 .choice()
                 .when(header("protocol").isEqualTo("NeedProtocol"))

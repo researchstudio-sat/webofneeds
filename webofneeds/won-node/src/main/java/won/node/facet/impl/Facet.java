@@ -12,13 +12,16 @@ import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.need.NeedProtocolNeedService;
-import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.need.NeedProtocolNeedClientSide;
+import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.service.ConnectionCommunicationService;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,11 +36,11 @@ public abstract class Facet {
   /**
    * Client talking another need via the need protocol
    */
-  protected NeedProtocolNeedService needProtocolNeedService;
+  protected NeedProtocolNeedClientSide needProtocolNeedService;
   /**
    * Client talking to the owner side via the owner protocol
    */
-  protected OwnerProtocolOwnerService ownerProtocolOwnerService;
+  protected OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService;
 
   /**
    * Client talking to this need service from the need side
@@ -230,8 +233,8 @@ public abstract class Facet {
       @Override
       public void run() {
         try {
-          URI remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(), con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
-          dataService.updateRemoteConnectionURI(con, remoteConnectionURI);
+          Future<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(), con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
+          dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
         } catch (WonProtocolException e) {
           // we can't connect the connection. we send a close back to the owner
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
@@ -244,6 +247,10 @@ public abstract class Facet {
           } catch (IllegalMessageForConnectionStateException e1) {
             logger.warn("caught IllegalMessageForConnectionStateException:", e1);
           }
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (ExecutionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
       }
     });
@@ -282,11 +289,11 @@ public abstract class Facet {
     this.needFacingConnectionCommunicationService = needFacingConnectionCommunicationService;
   }
 
-  public void setNeedProtocolNeedService(NeedProtocolNeedService needProtocolNeedService) {
-    this.needProtocolNeedService = needProtocolNeedService;
+  public void setNeedProtocolNeedService(NeedProtocolNeedClientSide needProtocolNeedServiceClient) {
+    this.needProtocolNeedService = needProtocolNeedServiceClient;
   }
 
-  public void setOwnerProtocolOwnerService(OwnerProtocolOwnerService ownerProtocolOwnerService) {
+  public void setOwnerProtocolOwnerService(OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService) {
     this.ownerProtocolOwnerService = ownerProtocolOwnerService;
   }
 }
