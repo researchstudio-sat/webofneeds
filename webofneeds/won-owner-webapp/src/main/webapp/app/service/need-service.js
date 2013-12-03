@@ -24,7 +24,11 @@ NeeLD = function (needURI, needLD) {
 				if (node['@id'] == contentId) {
 					this.title = node['dc:title']
 					if (node['won:hasTag']) {
-						this.tags = node['won:hasTag'].split(',');
+						if(angular.isArray(node['won:hasTag'])) {
+							this.tags = node['won:hasTag'];
+						} else {
+							this.tags = [node['won:hasTag']];
+						}
 					}
 					if (node['won:hasTextDescription']) {
 						this.textDescription = node['won:hasTextDescription'];

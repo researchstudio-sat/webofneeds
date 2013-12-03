@@ -3,8 +3,11 @@
 		<h2 class="col-lg-2">Create need</h2>
 
 		<div class="col-lg-8">
-			<div class="alert alert-dismissable alert-success" ng-show="succesShow" style="margin-top:10px; margin-bottom: 10px;">
+			<div ng-cloak class="alert alert-dismissable alert-success" ng-show="succesShow" style="margin-top:10px; margin-bottom: 10px;">
 				Need has been successfully saved
+			</div>
+			<div ng-cloak class="alert alert-dismissable alert-error" ng-show="error" style="margin-top:10px; margin-bottom: 10px;">
+			        Error occurred during saving of need	
 			</div>
 		</div>
 		<div class="col-lg-2" style="text-align:right;margin-top:15px;">
