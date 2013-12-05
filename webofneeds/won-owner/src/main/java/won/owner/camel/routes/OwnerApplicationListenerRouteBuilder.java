@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-package won.owner.routes;
+package won.owner.camel.routes;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.CamelContextAware;
 import org.apache.camel.builder.RouteBuilder;
 
 import java.util.List;
@@ -44,7 +43,7 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
     public void configure() throws Exception {
        for (int i = 0; i<endpoints.size();i++){
            from(endpoints.get(i))
-           //.wireTap("bean:messagingService?method=inspectMessage")
+           .wireTap("bean:messagingService?method=inspectMessage")
            .choice()
                 .when(header("methodName").isEqualTo("connect"))
                 .to("log:OWNER CONNECT RECEIVED")

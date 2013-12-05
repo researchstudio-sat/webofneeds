@@ -19,13 +19,11 @@ package won.protocol.rest;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.path.PathParser;
 import com.hp.hpl.jena.sparql.path.eval.PathEval;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import javafx.scene.shape.PathElement;
 
 import java.net.URI;
 import java.util.Iterator;

@@ -56,6 +56,7 @@ public class NeedManagementServiceImplJMSBased implements NeedManagementService
     @Override
     public URI createNeed(final URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException
     {
+        logger.info("CREATING need. OwnerURI:{}, OwnerApplicationId:{}",ownerURI, ownerApplicationID);
         if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
         Need need = new Need();
         need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
@@ -77,6 +78,7 @@ public class NeedManagementServiceImplJMSBased implements NeedManagementService
     }
     @Override
     public void authorizeOwnerApplicationForNeed(final String ownerApplicationID, URI needURI){
+        logger.info("AUTHORIZING owner application. needURI:{}, OwnerApplicationId:{}",needURI, ownerApplicationID);
         Need need = needRepository.findByNeedURI(needURI).get(0);
         List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
         if(ownerApplications.size()>0)  {
@@ -100,6 +102,7 @@ public class NeedManagementServiceImplJMSBased implements NeedManagementService
     @Override
     public void activate(final URI needURI) throws NoSuchNeedException
     {
+        logger.info("ACTIVATING need. needURI:{}",needURI);
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
         Need need = DataAccessUtils.loadNeed(needRepository, needURI);
         need.setState(NeedState.ACTIVE);
@@ -110,6 +113,7 @@ public class NeedManagementServiceImplJMSBased implements NeedManagementService
     @Override
     public void deactivate(final URI needURI) throws NoSuchNeedException
     {
+        logger.info("DEACTIVATING need. needURI:{}",needURI);
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
         Need need = DataAccessUtils.loadNeed(needRepository, needURI);
         need.setState(NeedState.INACTIVE);

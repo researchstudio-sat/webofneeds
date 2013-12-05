@@ -4,19 +4,15 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.*;
-import won.protocol.rest.LinkedDataRestClient;
-import won.protocol.util.ConnectionModelMapper;
-import won.protocol.util.NeedModelMapper;
-import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
-import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
-import won.protocol.ws.fault.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -48,7 +44,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     private static final String CONNECTION_URI_PATH_PREFIX = "/data/connection";
     private static final String NEED_CONNECTION_URI_PATH_SUFFIX = "/connections";
     private static final String NEED_MATCH_URI_PATH_SUFFIX = "/matches";
-
+    private ApplicationContext ownerApplicationContext;
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value(value = "${uri.prefix.node.default}")
@@ -153,7 +149,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
 
     @Override
-    public Future<String> register()
+    public Future<String> register(String endpointURI)
     {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -288,5 +284,10 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     public void setDelegate(OwnerProtocolNeedServiceClientSide delegate)
     {
         this.delegate = delegate;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.ownerApplicationContext = applicationContext;
     }
 }

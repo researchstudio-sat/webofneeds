@@ -37,7 +37,7 @@
 
 
     <!-- Camel configuration -->
-    <camel:camelContext>
+    <camel:camelContext id="wonNodeCamel">
         <camel:packageScan>
             <camel:package>won.node.camel.routes.fixed</camel:package>
         </camel:packageScan>
@@ -48,7 +48,7 @@
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
         <!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
-         <property name="brokerURL" value="vm://localhost:61616"/>
+         <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/-->
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
     </bean>
     <bean id="needProtocolActiveMQService" class="won.node.messaging.NeedProtocolActiveMQServiceImpl">
@@ -64,12 +64,13 @@
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker1">
         <!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
-        <property name="brokerURL" value="vm://localhost:61616"/>
+        <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
     </bean>
 
     <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
         <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
         <property name="sessionCacheSize" value="10"></property>
+     
     </bean>
 
     <!-- Database connection -->

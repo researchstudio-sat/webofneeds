@@ -76,6 +76,11 @@ public class NeedProtocolActiveMQServiceImpl implements CamelContextAware,NeedPr
     public void setComponentName(String componentName) {
         this.componentName = componentName;
     }
+    //todo: starting endpoint is currently only needed by ownerprotocol.
+    @Override
+    public String getStartingEndpoint() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
     public String getEndpoint() {
         return endpoint;
@@ -129,7 +134,8 @@ public class NeedProtocolActiveMQServiceImpl implements CamelContextAware,NeedPr
             URI ownBrokerURI = getActiveMQBrokerURIForNode(needURI);
 
             if (!remoteBrokerURI.equals(ownBrokerURI)){
-                componentName = componentName+brokerURI;
+                 //TODO: implement register method for node-to-node communication
+                componentName = componentName+brokerURI.toString().replaceAll(":","_");
                 camelContext.addComponent(componentName,activeMQComponent(brokerURI.toString()));
             }
             endpoint = componentName+":queue:"+getActiveMQNeedProtocolQueueNameForNeed(needURI);

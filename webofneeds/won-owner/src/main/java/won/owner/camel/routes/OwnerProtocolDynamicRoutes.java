@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.owner.routes;
+package won.owner.camel.routes;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
@@ -26,6 +26,7 @@ import java.util.List;
  * Date: 25.11.13
  * This class is used to dynamically generate routes for outgoing messages from owner application.
  */
+//TODO: check if this class is really needed.
 public class OwnerProtocolDynamicRoutes extends RouteBuilder {
 
 
@@ -55,7 +56,7 @@ public class OwnerProtocolDynamicRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from(from).routeId(from)
-                //.wireTap("bean:messagingService?method=inspectMessage")
+                .wireTap("bean:messagingService?method=inspectMessage")
                 .to("log:Dynamic Route FROM Owner")
                 .recipientList(header("remoteBrokerEndpoint"));
 

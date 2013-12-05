@@ -28,4 +28,5 @@ public interface NeedProtocolActiveMQService extends ActiveMQService {
     public String getActiveMQNeedProtocolQueueNameForNeed(URI needURI);
     public void configureCamelEndpointForConnection(URI connectionURI,String from) throws Exception;
     public String getEndpoint();
+
 }

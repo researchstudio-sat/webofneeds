@@ -36,6 +36,7 @@ import won.protocol.util.HTTP;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -224,6 +225,11 @@ public class LinkedDataWebController
     URI dataUri = URI.create(this.dataURIPrefix);
     String requestUri = request.getRequestURI();
     String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), dataUri.getPath());
+    logger.debug("resource URI requested with data mime type. redirecting from {} to {}", requestUri, redirectToURI);
+    if (redirectToURI.equals(requestUri)) {
+        logger.debug("redirecting to same URI avoided, sending status 500 instead");
+        return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = addNeverExpiresHeaders(new HttpHeaders());
@@ -249,6 +255,11 @@ public class LinkedDataWebController
     String requestUri = request.getRequestURI();
 
     String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), pageUriPrefix.getPath());
+    logger.debug("resource URI requested with page mime type. redirecting from {} to {}", requestUri, redirectToURI);
+      if (redirectToURI.equals(requestUri)) {
+          logger.debug("redirecting to same URI avoided, sending status 500 instead");
+          return new ResponseEntity<String>("Could not redirect to linked data page", HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = addNeverExpiresHeaders(new HttpHeaders());
     headers.add("Location",redirectToURI);

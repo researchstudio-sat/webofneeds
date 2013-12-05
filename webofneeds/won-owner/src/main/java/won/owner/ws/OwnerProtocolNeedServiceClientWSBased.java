@@ -20,14 +20,14 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.owner.ws.OwnerProtocolNeedClientFactory;
+import org.springframework.context.ApplicationContext;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
-import won.protocol.repository.FacetRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.NeedModelMapper;
@@ -48,7 +48,7 @@ import java.util.concurrent.Future;
 public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedServiceClientSide {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private OwnerProtocolNeedClientFactory clientFactory;
-
+    private ApplicationContext ownerApplicationContext;
 
     @Autowired
     private MatchRepository matchRepository;
@@ -105,7 +105,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
 
 
     @Override
-    public Future<String> register() {
+    public Future<String> register(String endpointURI) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -232,5 +232,11 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
 
     public void setClientFactory(OwnerProtocolNeedClientFactory clientFactory) {
         //To change body of created methods use File | Settings | File Templates.
+    }
+
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+
     }
 }

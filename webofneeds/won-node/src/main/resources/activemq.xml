@@ -29,6 +29,7 @@
             <list>
                 <value>classpath:activemq.properties</value>
                 <value>activemq.properties</value>
+                <value>classpath:needserver.properties</value>
             </list>
 
         </property>
@@ -37,7 +38,7 @@
     <!--
         The <broker> element is used to configure the ActiveMQ broker.
     -->
-    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" persistent="false" >
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="wonBroker" persistent="false" >
 
         <!--
             For better performances use VM cursor and small memory limit.
@@ -149,9 +150,9 @@
         -->
         <transportConnectors>
             <!-- DOS protection, limit concurrent connections to 1000 and frame size to 100MB -->
-            <transportConnector name="openwire" uri="tcp://localhost:62616?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/>
-            <transportConnector name="amqp" uri="amqp://localhost:5672?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/>
-            <transportConnector name="tcp" uri="tcp://localhost:61616" />
+            <!--transportConnector name="openwire" uri="tcp://localhost:62616?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/-->
+            <!--transportConnector name="amqp" uri="amqp://localhost:5672?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/-->
+            <transportConnector name="tcp" uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600" />
         </transportConnectors>
         <!--networkConnectors>
             <networkConnector uri="static:(tcp://localhost:61617)" ></networkConnector>

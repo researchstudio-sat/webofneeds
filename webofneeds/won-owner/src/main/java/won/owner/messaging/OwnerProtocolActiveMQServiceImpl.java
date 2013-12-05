@@ -24,8 +24,10 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.builder.RouteBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.owner.routes.OwnerProtocolDynamicRoutes;
+import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
 import won.protocol.jms.OwnerProtocolActiveMQService;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
@@ -47,14 +49,17 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  * Date: 28.11.13
  */
 public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,OwnerProtocolActiveMQService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private CamelContext camelContext;
     private String componentName;
+    private String startingComponent;
     private String defaultNodeURI;
     public static final String PATH_OWNER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME + ">";
     @Autowired
     private LinkedDataRestClient linkedDataRestClient;
     public static final String PATH_BROKER_URI = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_BROKER_URI + ">";
     private String endpoint;
+    private String startingEndpoint;
     @Autowired
     private ConnectionRepository connectionRepository;
     @Autowired
@@ -85,9 +90,12 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
      * @throws Exception
      */
     public URI configureCamelEndpointForNodeURI(URI wonNodeURI, String from) throws Exception {
+        //TODO: the linked data description of the won node must be at [NODE-URI]/resource
+        // according to this code. This should be explicitly defined somewhere
         URI resourceURI = URI.create(wonNodeURI.toString()+"/resource");
         URI brokerURI = getActiveMQBrokerURIForNode(resourceURI);
         String tempComponentName = componentName;
+        String tempStartingComponentName = startingComponent;
         if (!wonNodeURI.equals(URI.create(defaultNodeURI))){
             tempComponentName = componentName+brokerURI;
             //componentName = componentName+brokerURI;
@@ -96,12 +104,24 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         }
 
         endpoint = tempComponentName+":queue:"+getActiveMQOwnerProtocolQueueNameForNeed(resourceURI);
+
         List<String> endpointList = new ArrayList<>();
         endpointList.add(endpoint);
+        //there can be only one route per endpoint. Thus, consuming endpoint of each route shall be unique.
+        //todo: using replaceAll might result in security issues. change this.
+        tempStartingComponentName = tempStartingComponentName + endpoint.replaceAll(":","_");
+        setStartingEndpoint(tempStartingComponentName);
         if (camelContext.getComponent(tempComponentName)==null){
-            OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext,endpointList,endpoint);
+            OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext,endpointList,tempStartingComponentName);
             addRoutes(ownerProtocolRouteBuilder);
+        } else{
+            if(camelContext.getRoute(endpoint)==null)
+            {
+                OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext,endpointList,tempStartingComponentName);
+                addRoutes(ownerProtocolRouteBuilder);
+            }
         }
+
         return brokerURI;
 
 
@@ -129,6 +149,7 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
 
     @Override
     public URI getActiveMQBrokerURIForNode(URI nodeURI) {
+        logger.debug("obtaining broker URI for node {}", nodeURI);
         String nodeInformationPath = nodeURI.toString();
         URI activeMQEndpoint = null;
         try{
@@ -178,5 +199,17 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
 
     public void setDefaultNodeURI(String defaultNodeURI) {
         this.defaultNodeURI = defaultNodeURI;
+    }
+
+    public void setStartingComponent(String startingComponent) {
+        this.startingComponent = startingComponent;
+    }
+
+    public String getStartingEndpoint() {
+        return startingEndpoint;
+    }
+
+    public void setStartingEndpoint(String startingEndpoint) {
+        this.startingEndpoint = startingEndpoint;
     }
 }

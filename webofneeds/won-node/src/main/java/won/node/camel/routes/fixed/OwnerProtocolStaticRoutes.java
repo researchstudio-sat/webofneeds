@@ -26,7 +26,12 @@ public class OwnerProtocolStaticRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from("activemq:queue:OwnerProtocol.in")
+            .wireTap("bean:messagingService?method=inspectMessage")
             .choice()
+            .when(header("methodName").isEqualTo("register"))
+            .to("bean:ownerProtocolNeedJMSService?method=registerOwnerApplication")
+            .when(header("methodName").isEqualTo("getEndpoints"))
+            .to("bean:ownerProtocolNeedJMSService?method=getEndpointsForOwnerApplication")
             .when(header("methodName").isEqualTo("createNeed"))
             .to("bean:ownerProtocolNeedJMSService?method=createNeed")
             .when(header("methodName").isEqualTo("connect"))

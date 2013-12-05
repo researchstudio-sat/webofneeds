@@ -70,6 +70,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
       Map<String, String> propertyMap = new HashMap<>();
       //TODO: when shall be the remote won node unregistered?
+      //TODO; shall be checked if the endpoint for the remote won node already exists. configuring remote endpoints for each message is inefficient
       try {
           needProtocolActiveMQService.configureCamelEndpointForNeeds(needURI,otherNeedURI,"seda:NeedProtocol.out.connect");
       } catch (Exception e) {

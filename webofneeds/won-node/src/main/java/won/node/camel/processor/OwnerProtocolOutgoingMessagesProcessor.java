@@ -16,6 +16,7 @@
 
 package won.node.camel.processor;
 
+import org.apache.activemq.network.NetworkConnector;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.LoggerFactory;

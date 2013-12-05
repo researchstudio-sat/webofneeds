@@ -58,6 +58,7 @@
     <bean id="activeMQService" class="won.owner.messaging.OwnerProtocolActiveMQServiceImpl">
         <property name="componentName" value="activemq"/>
         <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
+        <property name="startingComponent" value="seda:"/>
     </bean>
 
     <bean id="ownerProtocolNeedClientFactory" class="won.owner.ws.OwnerProtocolNeedClientFactory" />

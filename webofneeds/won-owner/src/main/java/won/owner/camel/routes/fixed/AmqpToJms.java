@@ -15,8 +15,7 @@
  */
 
 
-package won.owner.routes.fixed;
-import org.apache.camel.ExchangePattern;
+package won.owner.camel.routes.fixed;
 import org.apache.camel.builder.RouteBuilder;
 /**
  * User: LEIH-NB
@@ -27,15 +26,17 @@ public class AmqpToJms extends RouteBuilder{
     @Override
     public void configure(){
         from("seda:outgoingMessages")
+                //todo: broker endpoint negotiation shall be run here and not in the service client classes.
+                .wireTap("bean:messagingService?method=inspectMessage")
                 .recipientList(header("remoteBrokerEndpoint"));
 
-        from("seda:OUTMSG")
+      /*  from("seda:OUTMSG")
                 .to("log:OUTMSG")
                 .choice()
                     .when(header("methodName").isEqualTo("register"))
                     .to("activemq:queue:WON.REGISTER")
                     .when(header("methodName").isEqualTo("getEndpoints"))
-                    .to("activemq:queue:WON.GETENDPOINTS");
+                    .to("activemq:queue:WON.GETENDPOINTS");     */
 
     }
 

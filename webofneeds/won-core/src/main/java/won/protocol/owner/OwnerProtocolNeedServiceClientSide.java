@@ -17,6 +17,7 @@
 package won.protocol.owner;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.springframework.context.ApplicationContextAware;
 import won.protocol.exception.*;
 import won.protocol.owner.OwnerProtocolNeedService;
 
@@ -30,12 +31,14 @@ import java.util.concurrent.Future;
  * User: LEIH-NB
  * Date: 17.10.13
  */
-public interface OwnerProtocolNeedServiceClientSide  {
+public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAware{
 
     /**
      * registers the owner application on WON Node and receive client ID
-     **/
-    public Future<String> register();
+     *
+     * @param endpointURI
+     * */
+    public Future<String> register(String endpointURI);
 
     /**
      * Creates a new need with the specified content, ownerURI and active state.

@@ -25,12 +25,12 @@
     </bean>
 
     <!-- messaging beans -->
-    <camel:camelContext>
+    <camel:camelContext id="wonOwnerCamel">
         <camel:packageScan>
-            <camel:package>won.owner.routes.fixed</camel:package>
+            <camel:package>won.owner.camel.routes.fixed</camel:package>
         </camel:packageScan>
         <camel:template id="producerTemplate" defaultEndpoint="direct:OUTMSG1"/>
-        <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG" />
+        <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG"/>
         <camel:endpoint id="needMessageQueue" uri="activemq:WON.MSG" pattern="InOut"></camel:endpoint>
     </camel:camelContext>
 
@@ -45,7 +45,7 @@
     </bean>
 
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" >
-        <property name="brokerURL" value="tcp://localhost:61616"/>
+        <!--property name="brokerURL" value="tcp://localhost:61616"/-->
         <!--property name="brokerURL" value="amqp://localhost:5672"/-->
     </bean>
     <!--bean id="pooledConnectionFactory"
