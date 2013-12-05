@@ -8,8 +8,10 @@ import org.slf4j.LoggerFactory;
 import won.matcher.Matcher;
 import won.matcher.processor.HintSender;
 import won.matcher.service.ScoreTransformer;
+import won.protocol.Config;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
 
@@ -33,7 +35,14 @@ public class UpdateListener implements SolrEventListener
     documentStorage = DocumentStorage.getInstance();
     Properties props = new Properties();
     try {
-      props.load(this.getClass().getClassLoader().getResourceAsStream("matcher.properties"));
+      InputStream is = Config.getInputStreamForConfigFile(Config.PROPERTIES_FILE_MATCHER);
+      props.load(is);
+      if (is != null)
+      try {
+        is.close();
+      } catch (Exception e) {
+        logger.debug("error closing input stream on " + Config.PROPERTIES_FILE_MATCHER);
+      }
     } catch (IOException e) {
       logger.error("could not load WON matcher property file {}", PROPERTY_FILE_NAME, e);
     }

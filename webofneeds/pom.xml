@@ -373,9 +373,14 @@
                 <version>${org.slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${log4j.version}</version>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${ch.qos.logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${ch.qos.logback.version}</version>
             </dependency>
 
             <!-- UTILS -->
@@ -570,6 +575,7 @@
         <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed-->
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>
+        <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
         <com.github.jsonld-java.version>0.3-SNAPSHOT</com.github.jsonld-java.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
@@ -615,20 +621,6 @@
             </properties>
         </profile>
 
-        <profile>
-            <id>localhost</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <won.node.properties.dir>src/main/resources.localhost</won.node.properties.dir>
-                <won.node-test.properties.dir>src/test/resources.localhost</won.node-test.properties.dir>
-                <won.owner.properties.dir>src/main/resources.localhost</won.owner.properties.dir>
-                <won.owner-test.properties.dir>src/test/resources.localhost</won.owner-test.properties.dir>
-                <won.matcher.properties.dir>src/main/resources.localhost</won.matcher.properties.dir>
-                <won.matcher-test.properties.dir>src/test/resources.localhost</won.matcher-test.properties.dir>
-            </properties>
-        </profile>
 
         <!-- copies the dependencies of each module to a subfolder inside that module -->
         <profile>

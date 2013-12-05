@@ -16,19 +16,9 @@
                 http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.1.xsd
                 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
                 http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
-
-    <bean id="propertyConfigurer"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>classpath:/needserver.properties</value>
-                <value>classpath:/override/needserver.properties</value>
-            </list>
-        </property>
-        <property name="ignoreResourceNotFound" value="true"/>
-    </bean>
     <context:property-placeholder location="classpath:activemq.properties" />
 
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" />
     <!-- Activate Annotation based configuration -->
     <context:annotation-config />
 

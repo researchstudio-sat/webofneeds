@@ -24,6 +24,8 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" />
+
     <!--- DataAccessService -->
     <bean id="dataServiceRef" class="won.node.service.impl.DataAccessService" >
       <property name="URIService" ref="uriService" />

@@ -68,17 +68,11 @@
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
-            <resource>
-                <directory>src/main/resources.localhost</directory>
-            </resource>
         </resources>
 
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
-            </testResource>
-            <testResource>
-                <directory>${won.node-test.properties.dir}</directory>
             </testResource>
         </testResources>
 
