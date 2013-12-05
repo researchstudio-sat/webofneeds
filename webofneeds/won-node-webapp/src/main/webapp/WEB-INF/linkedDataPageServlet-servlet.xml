@@ -26,9 +26,7 @@
 
     <!-- auto-detect controllers -->
     <context:component-scan base-package="won.node.web" />
-    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-        <property name="location" value="classpath:needserver.properties" />
-    </bean>
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" />
 
     <!-- it seems the following config element plus dependencies is required
          to get produces/consumes working in spring 3.1

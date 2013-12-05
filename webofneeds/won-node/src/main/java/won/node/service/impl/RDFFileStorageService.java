@@ -49,7 +49,7 @@ public class RDFFileStorageService implements RDFStorageService {
             out = new FileOutputStream(new File(path, filename));
             graph.write(out, "TTL");
         } catch (SecurityException se) {
-            throw new RDFStorageException("Check the value of rdf.file.path in the needserver properties file!", se);
+            throw new RDFStorageException("Check the value of rdf.file.path in the node properties file!", se);
         } catch (FileNotFoundException e) {
             throw new RDFStorageException("Could not create File!", e);
         } finally {

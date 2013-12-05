@@ -11,7 +11,7 @@
 
     <context:component-scan base-package="won.matcher.webapp"/> <!-- searches here for annotated classes -->
 
-    <context:property-placeholder location="classpath:matcher.properties" />
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" />
     <mvc:annotation-driven conversion-service="conversionService">
         <mvc:message-converters>
             <bean class="won.protocol.rest.RdfModelConverter"/>
