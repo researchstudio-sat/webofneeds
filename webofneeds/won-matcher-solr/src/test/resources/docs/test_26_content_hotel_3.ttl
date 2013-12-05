@@ -1,0 +1,48 @@
+@prefix :    <http://www.example.com/resource/need/15> .
+@prefix dc:  <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:     <http://purl.org/webofneeds/model#> .
+@prefix gr:  <http://purl.org/goodrelations/v1#> .
+@prefix ldp:     <http://www.w3.org/ns/ldp#> .
+@prefix sp:  <http://spinrdf.org/sp#>.
+@prefix acco: <http://purl.org/acco/ns#>.
+
+<http://www.example.com/resource/need/26>
+  a   won:Need ;
+  won:hasBasicNeedType
+      won:Supply ;
+  won:hasConnections <http://www.example.com/resource/need/26/connections/> ;
+  won:hasContent
+      [ a   won:NeedContent ;
+        won:hasContentDescription
+        [ a acco:HotelRoom, gr:SomeItems ;
+              gr:name "Double-room with sea-side view"@en ;
+              gr:description "Enjoy your breakfasts on the spacious balcony with a unique view of the bay"@en ;
+              acco:bed acco:Double ;
+              # Link to the hotel and its features
+              # acco:partOf foo:Hotel1 ; #TODO: how do we want to link to other entities (maybe shared by a number of needs, like the hotel here)
+              # We assume the same price for single or double occupancy
+              acco:occupancy [ a gr:QuantitativeValue ;
+                               gr:hasUnitOfMeasurement  "C62"^^xsd:string ;
+                               gr:hasMinValue "1"^^xsd:int ;
+                               gr:hasMaxValue "2"^^xsd:int ]
+        ]
+      ] ;
+  won:hasNeedModality
+      [ a   won:NeedModality
+      ] ;
+  won:isInState won:Active ;
+  won:matcherProtocolEndpoint
+      <http://www.example.com/won/protocol/matcher> ;
+  won:needCreationDate
+      "2013-09-252T10:49:54.054+0000" ;
+  won:needProtocolEndpoint
+      <http://www.example.com/won/protocol/need> ;
+  won:ownerProtocolEndpoint
+      <http://www.example.com/won/protocol/owner> .
+
+<http://www.example.com/resource/need/26/connections/>
+  a   ldp:Container .

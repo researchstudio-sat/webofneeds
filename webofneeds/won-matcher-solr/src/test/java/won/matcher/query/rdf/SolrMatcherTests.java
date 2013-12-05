@@ -259,6 +259,11 @@ public class SolrMatcherTests
     assertTopHit("23", "15");
   }
 
+  @Test
+  public void testRdfMatcherForHotel() throws IOException
+  {
+    assertTopHit("27", "24");
+  }
 
   /**
    * ******************** UTILS ***********************************
@@ -421,293 +426,337 @@ public class SolrMatcherTests
   {
     Map<String, SolrInputDocument> docs = new HashMap<String, SolrInputDocument>();
 
-    SolrInputDocument doc1 = new SolrInputDocument();
+    SolrInputDocument doc = new SolrInputDocument();
     String url = "http://www.example.com/resource/need/1";
-    doc1.addField(SolrFields.URL, url);
-    doc1.addField(SolrFields.TITLE, "Sofa");
-    doc1.addField(SolrFields.DESCRIPTION, "I have a very nice red sofa to give away.");
-    doc1.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
-    doc1.addField(SolrFields.TAG, "sofa");
-    doc1.addField(SolrFields.TAG, "red");
-    doc1.addField(SolrFields.TAG, "leather");
-    doc1.addField(SolrFields.TAG, "used");
-    doc1.addField(SolrFields.PRICE, "10.0-100.0");
-    doc1.addField(SolrFields.LOCATION, "48.2088,16.3726");
-    doc1.addField(SolrFields.DURATION, "2013-08-01T00:01:00.000Z/2013-08-30T23:00:00.000Z");
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Sofa");
+    doc.addField(SolrFields.DESCRIPTION, "I have a very nice red sofa to give away.");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc.addField(SolrFields.TAG, "sofa");
+    doc.addField(SolrFields.TAG, "red");
+    doc.addField(SolrFields.TAG, "leather");
+    doc.addField(SolrFields.TAG, "used");
+    doc.addField(SolrFields.PRICE, "10.0-100.0");
+    doc.addField(SolrFields.LOCATION, "48.2088,16.3726");
+    doc.addField(SolrFields.DURATION, "2013-08-01T00:01:00.000Z/2013-08-30T23:00:00.000Z");
 
-    docs.put(url, doc1);
+    docs.put(url, doc);
 
     //11km away from other points
-    SolrInputDocument doc2 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/2";
-    doc2.addField(SolrFields.URL, url);
-    doc2.addField(SolrFields.TITLE, "Sofa or couch");
-    doc2.addField(SolrFields.DESCRIPTION, "I am giving away my couch.");
-    doc2.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
-    doc2.addField(SolrFields.TAG, "blue");
-    doc2.addField(SolrFields.TAG, "dirty");
-    doc2.addField(SolrFields.TAG, "couch");
-    doc2.addField(SolrFields.PRICE, "50.0-*");
-    doc2.addField(SolrFields.LOCATION, "48.3089,16.3726");
-    doc2.addField(SolrFields.DURATION, "2013-07-01T00:01:00.000Z/2013-08-30T23:00:00.000Z");
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Sofa or couch");
+    doc.addField(SolrFields.DESCRIPTION, "I am giving away my couch.");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc.addField(SolrFields.TAG, "blue");
+    doc.addField(SolrFields.TAG, "dirty");
+    doc.addField(SolrFields.TAG, "couch");
+    doc.addField(SolrFields.PRICE, "50.0-*");
+    doc.addField(SolrFields.LOCATION, "48.3089,16.3726");
+    doc.addField(SolrFields.DURATION, "2013-07-01T00:01:00.000Z/2013-08-30T23:00:00.000Z");
 
-    docs.put(url, doc2);
+    docs.put(url, doc);
 
-    SolrInputDocument doc3 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/3";
-    doc3.addField(SolrFields.URL, url);
-    doc3.addField(SolrFields.TITLE, "House");
-    doc3.addField(SolrFields.DESCRIPTION, "Selling a 3 story house in the suburbs of Vienna. Ideal for a big family with kids.");
-    doc3.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
-    doc3.addField(SolrFields.TAG, "house");
-    doc3.addField(SolrFields.TAG, "family");
-    doc3.addField(SolrFields.TAG, "suburbs");
-    doc3.addField(SolrFields.TAG, "kids");
-    doc3.addField(SolrFields.PRICE, "100000.0-500000.0");
-    doc3.addField(SolrFields.LOCATION, "48.2088,16.3726");
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "House");
+    doc.addField(SolrFields.DESCRIPTION, "Selling a 3 story house in the suburbs of Vienna. Ideal for a big family with kids.");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc.addField(SolrFields.TAG, "house");
+    doc.addField(SolrFields.TAG, "family");
+    doc.addField(SolrFields.TAG, "suburbs");
+    doc.addField(SolrFields.TAG, "kids");
+    doc.addField(SolrFields.PRICE, "100000.0-500000.0");
+    doc.addField(SolrFields.LOCATION, "48.2088,16.3726");
 
-    docs.put(url, doc3);
+    docs.put(url, doc);
 
 
-    SolrInputDocument doc4 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/4";
-    doc4.addField(SolrFields.URL, url);
-    doc4.addField(SolrFields.TITLE, "Sofa");
-    doc4.addField(SolrFields.DESCRIPTION, "I need a sofa.");
-    doc4.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc4.addField(SolrFields.TAG, "sofa");
-    doc4.addField(SolrFields.TAG, "furniture");
-    doc4.addField(SolrFields.PRICE, "*-150.0");
-    doc4.addField(SolrFields.LOCATION, "48.2088,16.3726");
-    doc4.addField(SolrFields.DURATION, "2013-06-01T00:01:00.000Z/2013-07-30T23:00:00.000Z");
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Sofa");
+    doc.addField(SolrFields.DESCRIPTION, "I need a sofa.");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "sofa");
+    doc.addField(SolrFields.TAG, "furniture");
+    doc.addField(SolrFields.PRICE, "*-150.0");
+    doc.addField(SolrFields.LOCATION, "48.2088,16.3726");
+    doc.addField(SolrFields.DURATION, "2013-06-01T00:01:00.000Z/2013-07-30T23:00:00.000Z");
 
 
-    docs.put(url, doc4);
+    docs.put(url, doc);
 
-    SolrInputDocument doc5 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/5";
-    doc5.addField(SolrFields.URL, url);
-    doc5.addField(SolrFields.TITLE, "Looking for sofa or couch");
-    doc5.addField(SolrFields.DESCRIPTION, "I am looking for a sofa or a couch for my living room.");
-    doc5.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc5.addField(SolrFields.TAG, "sofa");
-    doc5.addField(SolrFields.TAG, "blue");
-    doc5.addField(SolrFields.TAG, "red");
-    doc5.addField(SolrFields.TAG, "couch");
-    doc5.addField(SolrFields.TAG, "leather");
-    doc5.addField(SolrFields.PRICE, "*-50.0");
-    doc5.addField(SolrFields.LOCATION, "48.2088,16.3726");
-    doc5.addField(SolrFields.DURATION, "2013-07-01T00:01:00.000Z/2013-09-30T23:00:00.000Z");
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Looking for sofa or couch");
+    doc.addField(SolrFields.DESCRIPTION, "I am looking for a sofa or a couch for my living room.");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "sofa");
+    doc.addField(SolrFields.TAG, "blue");
+    doc.addField(SolrFields.TAG, "red");
+    doc.addField(SolrFields.TAG, "couch");
+    doc.addField(SolrFields.TAG, "leather");
+    doc.addField(SolrFields.PRICE, "*-50.0");
+    doc.addField(SolrFields.LOCATION, "48.2088,16.3726");
+    doc.addField(SolrFields.DURATION, "2013-07-01T00:01:00.000Z/2013-09-30T23:00:00.000Z");
 
-    docs.put(url, doc5);
+    docs.put(url, doc);
 
-    SolrInputDocument doc6 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/6";
-    doc6.addField(SolrFields.URL, url);
-    doc6.addField(SolrFields.TITLE, "Looking for a place to live");
-    doc6.addField(SolrFields.DESCRIPTION, "Me and my family are looking for a house or a large apartment! Thank you.");
-    doc6.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc6.addField(SolrFields.TAG, "house");
-    doc6.addField(SolrFields.TAG, "apartment");
-    doc6.addField(SolrFields.TAG, "family");
-    doc6.addField(SolrFields.PRICE, "*-250000.0");
-    doc6.addField(SolrFields.LOCATION, "48.2088,16.3726");
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Looking for a place to live");
+    doc.addField(SolrFields.DESCRIPTION, "Me and my family are looking for a house or a large apartment! Thank you.");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "house");
+    doc.addField(SolrFields.TAG, "apartment");
+    doc.addField(SolrFields.TAG, "family");
+    doc.addField(SolrFields.PRICE, "*-250000.0");
+    doc.addField(SolrFields.LOCATION, "48.2088,16.3726");
 
-    docs.put(url, doc6);
+    docs.put(url, doc);
 
     //a document with ntriples content
-    SolrInputDocument doc7 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/7";
-    doc7.addField(SolrFields.URL, "http://www.example.com/resource/need/7");
-    doc7.addField(SolrFields.TITLE, "Table");
-    doc7.addField(SolrFields.DESCRIPTION, "");
-    doc7.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
-    doc7.addField(SolrFields.TAG, "table");
-    doc7.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_content_table1.ttl", url));
+    doc.addField(SolrFields.URL, "http://www.example.com/resource/need/7");
+    doc.addField(SolrFields.TITLE, "Table");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc.addField(SolrFields.TAG, "table");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_7_content_table1.ttl", url));
 
-    docs.put(url, doc7);
+    docs.put(url, doc);
 
     //another document with ntriples content identical to doc7, the rest different
-    SolrInputDocument doc8 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/8";
-    doc8.addField(SolrFields.URL, url);
-    doc8.addField(SolrFields.TITLE, "Tisch");
-    doc8.addField(SolrFields.DESCRIPTION, "");
-    doc8.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc8.addField(SolrFields.TAG, "tisch");
-    doc8.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_content_cupboard_sameas_1.ttl", url));
-    docs.put(url, doc8);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Tisch");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "tisch");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_8_content_cupboard_sameas_1.ttl", url));
+    docs.put(url, doc);
 
     //another document with ntriples content slightly different from doc 7 and 8, the rest different from all others
-    SolrInputDocument doc9 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/9";
-    doc9.addField(SolrFields.URL, url);
-    doc9.addField(SolrFields.TITLE, "mesa");
-    doc9.addField(SolrFields.DESCRIPTION, "");
-    doc9.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc9.addField(SolrFields.TAG, "mesa");
-    doc9.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_content_cupboard_similar_to_1.ttl", url));
-    docs.put(url, doc9);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "mesa");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "mesa");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_9_content_cupboard_similar_to_1.ttl", url));
+    docs.put(url, doc);
 
     //another document with ntriples content identical to doc7 (the blank nodes are named differently), the rest different
-    SolrInputDocument doc10 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/10";
-    doc10.addField(SolrFields.URL, "http://www.example.com/resource/need/10");
-    doc10.addField(SolrFields.TITLE, "Bord");
-    doc10.addField(SolrFields.DESCRIPTION, "");
-    doc10.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc10.addField(SolrFields.TAG, "bord");
-    doc10.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_content_cupboard_similar_to_1b.ttl", url));
-    docs.put(url, doc10);
+    doc.addField(SolrFields.URL, "http://www.example.com/resource/need/10");
+    doc.addField(SolrFields.TITLE, "Bord");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "bord");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_10_content_cupboard_similar_to_1b.ttl", url));
+    docs.put(url, doc);
 
 
     //another document with ntriples content containing SPIN restrictions
-    SolrInputDocument doc11 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/11";
-    doc11.addField(SolrFields.URL, url);
-    doc11.addField(SolrFields.TITLE, "Kästchen");
-    doc11.addField(SolrFields.DESCRIPTION, "");
-    doc11.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc11.addField(SolrFields.TAG, "kästchen");
-    doc11.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_spin_le_3times.ttl", url));
-    docs.put(url, doc11);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Kästchen");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "kästchen");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_11_spin_le_3times.ttl", url));
+    docs.put(url, doc);
 
 
     //another document with ntriples content (matches 11)
-    SolrInputDocument doc12 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/12";
-    doc12.addField(SolrFields.URL, url);
-    doc12.addField(SolrFields.TITLE, "Cupboard");
-    doc12.addField(SolrFields.DESCRIPTION, "");
-    doc12.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
-    doc12.addField(SolrFields.TAG, "cupboard");
-    doc12.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_content_cupboard_45_45_15.ttl", url));
-    docs.put(url, doc12);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Cupboard");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc.addField(SolrFields.TAG, "cupboard");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_12_content_cupboard_45_45_15.ttl", url));
+    docs.put(url, doc);
 
 
     //same as 12, but doesn't match the spin restrictions of 11
-    SolrInputDocument doc13 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/13";
-    doc13.addField(SolrFields.URL, url);
-    doc13.addField(SolrFields.TITLE, "Cupboard");
-    doc13.addField(SolrFields.DESCRIPTION, "");
-    doc13.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
-    doc13.addField(SolrFields.TAG, "cupboard");
-    doc13.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_content_cupboard_100_100_100.ttl", url));
-    docs.put(url, doc13);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Cupboard");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc.addField(SolrFields.TAG, "cupboard");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_13_content_cupboard_100_100_100.ttl", url));
+    docs.put(url, doc);
 
 
     //same as 12, but doesn't match the spin restrictions of 11, and lacks width
-    SolrInputDocument doc14 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/14";
-    doc14.addField(SolrFields.URL, url);
-    doc14.addField(SolrFields.TITLE, "Cupboard");
-    doc14.addField(SolrFields.DESCRIPTION, "");
-    doc14.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
-    doc14.addField(SolrFields.TAG, "cupboard");
-    doc14.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_content_cupboard_200_200.ttl", url));
-    docs.put(url, doc14);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Cupboard");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc.addField(SolrFields.TAG, "cupboard");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_14_content_cupboard_200_200.ttl", url));
+    docs.put(url, doc);
 
 
     //another document with ntriples content containing SPIN restrictions
-    SolrInputDocument doc15 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/15";
-    doc15.addField(SolrFields.URL, url);
-    doc15.addField(SolrFields.TITLE, "Cupboard");
-    doc15.addField(SolrFields.DESCRIPTION, "");
-    doc15.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
-    doc15.addField(SolrFields.TAG, "cupboard");
-    doc15.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_content_cupboard_40_40_18_different_literals.ttl", url));
-    docs.put(url, doc15);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Cupboard");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc.addField(SolrFields.TAG, "cupboard");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_15_content_cupboard_40_40_18_different_literals.ttl", url));
+    docs.put(url, doc);
 
     //like 11 (embedded spin), but with restrictions combined with &&
-    SolrInputDocument doc16 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/16";
-    doc16.addField(SolrFields.URL, url);
-    doc16.addField(SolrFields.TITLE, "Kästchen");
-    doc16.addField(SolrFields.DESCRIPTION, "");
-    doc16.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc16.addField(SolrFields.TAG, "kästchen");
-    doc16.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_spin_ge_le_and.ttl", url));
-    docs.put(url, doc16);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Kästchen");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "kästchen");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_16_spin_ge_le_and.ttl", url));
+    docs.put(url, doc);
 
     //like 11 (embedded spin), but with restrictions combined with && and ||
-    SolrInputDocument doc17 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/17";
-    doc17.addField(SolrFields.URL, url);
-    doc17.addField(SolrFields.TITLE, "Kästchen");
-    doc17.addField(SolrFields.DESCRIPTION, "");
-    doc17.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc17.addField(SolrFields.TAG, "kästchen");
-    doc17.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_spin_ge_le_and_or.ttl", url));
-    docs.put(url, doc17);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "Kästchen");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "kästchen");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_17_spin_ge_le_and_or.ttl", url));
+    docs.put(url, doc);
 
     //like 11 (embedded spin), but with SPARQL as text (not in SPIN rdf notation)
-    SolrInputDocument doc18 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/18";
-    doc18.addField(SolrFields.URL, url);
-    doc18.addField(SolrFields.TITLE, "");
-    doc18.addField(SolrFields.DESCRIPTION, "");
-    doc18.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc18.addField(SolrFields.TAG, "");
-    doc18.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_spin_le_sp-text.ttl", url));
-    docs.put(url, doc18);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_18_spin_le_sp-text.ttl", url));
+    docs.put(url, doc);
 
     //like 11 (matches 12 exactly) but without SPIN
-    SolrInputDocument doc19 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/19";
-    doc19.addField(SolrFields.URL, url);
-    doc19.addField(SolrFields.TITLE, "");
-    doc19.addField(SolrFields.DESCRIPTION, "");
-    doc19.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc19.addField(SolrFields.TAG, "");
-    doc19.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_content_cupboard_45_45_15_exact-match.ttl", url));
-    docs.put(url, doc19);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_19_content_cupboard_45_45_15_exact-match.ttl", url));
+    docs.put(url, doc);
 
     // a very simple need, no title, desc etc, just one content triple
-    SolrInputDocument doc20 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/20";
-    doc20.addField(SolrFields.URL, url);
-    doc20.addField(SolrFields.TITLE, "");
-    doc20.addField(SolrFields.DESCRIPTION, "");
-    doc20.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc20.addField(SolrFields.TAG, "");
-    doc20.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_content_table_simple.ttl", url));
-    docs.put(url, doc20);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_20_content_table_simple.ttl", url));
+    docs.put(url, doc);
 
     //like 18 (embedded SPARQL as text) but for testing '=' and '!='
     // a very simple need, no title, desc etc, just one content triple
-    SolrInputDocument doc21 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/21";
-    doc21.addField(SolrFields.URL, url);
-    doc21.addField(SolrFields.TITLE, "");
-    doc21.addField(SolrFields.DESCRIPTION, "");
-    doc21.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc21.addField(SolrFields.TAG, "");
-    doc21.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_spin_eq_ne-text.ttl", url));
-    docs.put(url, doc21);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_21_spin_eq_ne-text.ttl", url));
+    docs.put(url, doc);
 
     //testing sparql "in" function
-    SolrInputDocument doc22 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/22";
-    doc22.addField(SolrFields.URL, url);
-    doc22.addField(SolrFields.TITLE, "");
-    doc22.addField(SolrFields.DESCRIPTION, "");
-    doc22.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc22.addField(SolrFields.TAG, "");
-    doc22.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_spin_in-text.ttl", url));
-    docs.put(url, doc22);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_22_spin_in-text.ttl", url));
+    docs.put(url, doc);
 
     //testing sparql "not in" function
-    SolrInputDocument doc23 = new SolrInputDocument();
+    doc = new SolrInputDocument();
     url = "http://www.example.com/resource/need/23";
-    doc23.addField(SolrFields.URL, url);
-    doc23.addField(SolrFields.TITLE, "");
-    doc23.addField(SolrFields.DESCRIPTION, "");
-    doc23.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
-    doc23.addField(SolrFields.TAG, "");
-    doc23.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_spin_notin-text.ttl", url));
-    docs.put(url, doc23);
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_23_spin_notin-text.ttl", url));
+    docs.put(url, doc);
+
+    //testing a need from the hotel domain
+    doc = new SolrInputDocument();
+    url = "http://www.example.com/resource/need/24";
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc.addField(SolrFields.TAG, "");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_24_content_hotel_1.ttl", url));
+    docs.put(url, doc);
+
+    //testing a need from the hotel domain
+    doc = new SolrInputDocument();
+    url = "http://www.example.com/resource/need/25";
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc.addField(SolrFields.TAG, "");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_25_content_hotel_2.ttl", url));
+    docs.put(url, doc);
+
+    //testing a need from the hotel domain
+    doc = new SolrInputDocument();
+    url = "http://www.example.com/resource/need/26";
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_SUPPLY.getURI());
+    doc.addField(SolrFields.TAG, "");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_26_content_hotel_3.ttl", url));
+    docs.put(url, doc);
+
+    //testing a need from the hotel domain
+    doc = new SolrInputDocument();
+    url = "http://www.example.com/resource/need/27";
+    doc.addField(SolrFields.URL, url);
+    doc.addField(SolrFields.TITLE, "");
+    doc.addField(SolrFields.DESCRIPTION, "");
+    doc.addField(SolrFields.BASIC_NEED_TYPE, WON.BASIC_NEED_TYPE_DEMAND.getURI());
+    doc.addField(SolrFields.TAG, "");
+    doc.addField(SolrFields.NTRIPLE, getNTriples("won-matcher-solr/src/test/resources/docs/test_27_content_hotel_4.ttl", url));
+    docs.put(url, doc);
     return docs;
 
   }
