@@ -61,6 +61,7 @@ public abstract class Facet {
 
   public void openFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
+     System.out.println("DAKI111: openFromOwner");
     if (con.getRemoteConnectionURI() != null) {
       executorService.execute(new Runnable() {
         @Override
@@ -74,9 +75,10 @@ public abstract class Facet {
       });
     }
   }
-
+          //receive close from the owner (node)
   public void closeFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
+    System.out.println("DAKI: closeFromOwner");
     if (con.getRemoteConnectionURI() != null) {
       executorService.execute(new Runnable()
       {
@@ -110,6 +112,7 @@ public abstract class Facet {
 
   public void openFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
+      System.out.println("DAKI: openFromNeed");
     executorService.execute(new Runnable()
     {
       @Override
@@ -126,6 +129,7 @@ public abstract class Facet {
 
   public void closeFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
+    System.out.println("DAKI closeFromNeed");
     executorService.execute(new Runnable()
     {
       @Override
@@ -157,6 +161,7 @@ public abstract class Facet {
   public void hint(final Connection con, final double score, final URI originator, final Model content)
       throws NoSuchNeedException, IllegalMessageForNeedStateException {
 
+    System.out.println("DAKI hint");
     ResIterator remoteFacetIt = content.listSubjectsWithProperty(RDF.type, WON.HAS_REMOTE_FACET);
     if (!remoteFacetIt.hasNext())
       throw new IllegalArgumentException("at least one RDF node must be of type won:RemoteFacet");
@@ -182,8 +187,6 @@ public abstract class Facet {
   }
 
   public void connectFromNeed(final Connection con, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-
-
     final Connection connectionForRunnable = con;
     executorService.execute(new Runnable() {
       @Override
@@ -208,6 +211,8 @@ public abstract class Facet {
   }
 
   public void connectFromOwner(final Connection con, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+
+      System.out.println("DAKI: connectFromOwner");
     Resource baseRes = content.getResource(content.getNsPrefixURI(""));
 
     StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_REMOTE_FACET);

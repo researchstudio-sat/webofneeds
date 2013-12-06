@@ -44,6 +44,7 @@
                 <entry key="#{T(won.protocol.model.FacetType).ControlFacet}" value-ref="controlFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).OwnerFacet}" value-ref="ownerFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).GroupFacet}" value-ref="groupFacetImplRef" />
+                <entry key="#{T(won.protocol.model.FacetType).TwoPCFacet}" value-ref="twoPCFacetImplRef" />
             </map>
         </constructor-arg>
     </bean>
@@ -63,6 +64,7 @@
     <bean id="controlFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ControlFacetImpl" />
     <bean id="ownerFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.OwnerFacetImpl" />
     <bean id="groupFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.GroupFacetImpl" />
+    <bean id="twoPCFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.TwoPCFacetImpl" />
 
     <!-- protocol-level services -->
 

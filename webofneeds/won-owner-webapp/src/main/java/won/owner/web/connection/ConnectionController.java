@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.TextMessagePojo;
 import won.protocol.model.Connection;
+import won.protocol.model.FacetType;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
@@ -66,7 +67,13 @@ public class ConnectionController {
                     model.addAttribute("message", "Pending....");
                     return "showMessage";
                 case CLOSED:
-                    model.addAttribute("message", "Connection Closed!");
+                    if(!((con.getTypeURI()).equals(FacetType.TwoPCFacet.getURI()))){
+                        model.addAttribute("message", "Connection Closed!");
+                    }
+                    else{
+                        model.addAttribute("message", "Connection Closed!   Participant vote is NO!  The whole transaction is aborted!");
+                    }
+
                     return "showMessage";
                 case CONNECTED:
                     model.addAttribute("messages", chatMessageRepository.findByLocalConnectionURI(con.getConnectionURI()));

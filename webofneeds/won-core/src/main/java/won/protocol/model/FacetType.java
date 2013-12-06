@@ -19,7 +19,8 @@ import java.util.List;
 public enum FacetType {
     ControlFacet("ControlFacet"),
     OwnerFacet("OwnerFacet"),
-    GroupFacet("GroupFacet");
+    GroupFacet("GroupFacet"),
+    TwoPCFacet("TwoPCFacet");
 
     private static final Logger logger = LoggerFactory.getLogger(BasicNeedType.class);
 
@@ -40,6 +41,8 @@ public enum FacetType {
            return FacetType.GroupFacet;
        else if(uri.equals(FacetType.OwnerFacet.getURI()))
            return FacetType.OwnerFacet;
+       else if(uri.equals(FacetType.TwoPCFacet.getURI()))
+           return FacetType.TwoPCFacet;
        else
            return null;
     }
