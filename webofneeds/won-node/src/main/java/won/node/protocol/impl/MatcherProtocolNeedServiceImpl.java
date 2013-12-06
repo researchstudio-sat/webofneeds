@@ -22,7 +22,6 @@ import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
-import won.protocol.service.NeedInformationService;
 
 import javax.jws.WebMethod;
 import java.net.URI;
@@ -35,7 +34,6 @@ import java.net.URI;
 public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedService
 {
   private MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService;
-  private NeedInformationService needInformationService;
 
   @Override
   public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
@@ -47,11 +45,6 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
   public void setMatcherFacingNeedCommunicationService(final MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService)
   {
     this.matcherFacingNeedCommunicationService = matcherFacingNeedCommunicationService;
-  }
-
-  public void setNeedInformationService(final NeedInformationService needInformationService)
-  {
-    this.needInformationService = needInformationService;
   }
 
 }

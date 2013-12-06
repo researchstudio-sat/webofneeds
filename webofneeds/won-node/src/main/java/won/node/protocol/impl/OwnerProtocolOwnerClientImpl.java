@@ -79,7 +79,7 @@ public class OwnerProtocolOwnerClientImpl implements OwnerProtocolOwnerService
   @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}", connectionURI));
+    logger.info(MessageFormat.format("owner-facing: OPEN called for connection {0}", connectionURI));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
       proxy.open(connectionURI, RdfUtils.toString(content));

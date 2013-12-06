@@ -24,6 +24,7 @@ import java.net.URI;
 
 /**
  * Interface defining methods for need communication.
+ * TODO [REFACTORING]: delete this and move methods to node interface
  */
 public interface MatcherFacingNeedCommunicationService
 {

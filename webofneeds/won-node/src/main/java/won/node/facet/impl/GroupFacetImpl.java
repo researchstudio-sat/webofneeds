@@ -60,15 +60,26 @@ public class GroupFacetImpl extends Facet {
     List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
         ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
 
+    executorService.execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+        } catch (WonProtocolException e) {
+          logger.warn("caught WonProtocolException:", e);
+        }
+      }
+    });
     for (Connection c : cons) {
-      System.out.println("textFromNeed: " + c.getConnectionURI());
       if(! c.equals(con)) {
         final URI remoteConnectionURI = c.getRemoteConnectionURI();
+        //final URI ownerURI = c.getConnectionURI();
         //inform the other side
         executorService.execute(new Runnable() {
           @Override
           public void run() {
             try {
+              //ownerFacingConnectionClient.textMessage(ownerURI, message);
               needFacingConnectionClient.textMessage(remoteConnectionURI, message);
             } catch (WonProtocolException e) {
               logger.warn("caught WonProtocolException:", e);

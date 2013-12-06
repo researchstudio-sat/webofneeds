@@ -25,6 +25,7 @@ import java.net.URI;
 
 /**
  * Interface defining methods for need communication.
+ * TODO [REFACTORING]: delete and move methods to need interface.
  */
 public interface OwnerFacingNeedCommunicationService
 {

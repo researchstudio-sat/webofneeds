@@ -49,23 +49,23 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     Resource basicNeedTypeResource = needResource.getPropertyResourceValue(WON.HAS_BASIC_NEED_TYPE);
     if (basicNeedTypeResource != null) this.setBasicNeedType(basicNeedTypeResource.getURI().toString());
     Statement creationDateStmt = needResource.getProperty(WON.NEED_CREATION_DATE);
-    if (creationDateStmt != null){
+    if (creationDateStmt != null) {
       this.setCreationDate(DateTimeUtils.toDate(creationDateStmt.getObject(), needModel));
     }
-    Resource ownerProtocolEndpoint= needResource.getPropertyResourceValue(WON.OWNER_PROTOCOL_ENDPOINT);
-    if (ownerProtocolEndpoint != null){
+    Resource ownerProtocolEndpoint = needResource.getPropertyResourceValue(WON.OWNER_PROTOCOL_ENDPOINT);
+    if (ownerProtocolEndpoint != null) {
       this.setOwnerProtocolEndpoint(ownerProtocolEndpoint.getURI());
     }
     Resource matcherProtocolEndpoint = needResource.getPropertyResourceValue(WON.MATCHER_PROTOCOL_ENDPOINT);
-    if (matcherProtocolEndpoint != null){
+    if (matcherProtocolEndpoint != null) {
       this.setMatcherProtocolEndpoint(matcherProtocolEndpoint.getURI());
     }
     Resource needProtocolEndpoint = needResource.getPropertyResourceValue(WON.NEED_PROTOCOL_ENDPOINT);
-    if (needProtocolEndpoint != null){
+    if (needProtocolEndpoint != null) {
       this.setNeedProtocolEndpoint(needProtocolEndpoint.getURI());
     }
     Resource needState = needResource.getPropertyResourceValue(WON.IS_IN_STATE);
-    if (needState != null){
+    if (needState != null) {
       this.setState(needState.getURI());
     }
     Resource needContent = needResource.getPropertyResourceValue(WON.HAS_CONTENT);
@@ -79,11 +79,11 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
   private void copyValuesFromNeedModality(final Resource needModality)
   {
     StmtIterator it = needModality.listProperties(WON.HAS_TIME_SPECIFICATION);
-    while (it.hasNext()){
+    while (it.hasNext()) {
       Statement stmt = it.next();
       RDFNode timeSpec = stmt.getObject();
-      if (timeSpec.isResource()){
-        this.addInterval(toInterval((Resource)timeSpec));
+      if (timeSpec.isResource()) {
+        this.addInterval(toInterval((Resource) timeSpec));
       }
     }
     Resource locationResource = needModality.getPropertyResourceValue(WON.AVAILABLE_AT_LOCATION);
@@ -97,13 +97,12 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     }
     Resource priceSpec = needModality.getPropertyResourceValue(WON.HAS_PRICE_SPECIFICATION);
     if (priceSpec != null) {
-      setUpperPriceLimit(extractFloatFromObject(priceSpec.getProperty(WON.HAS_UPPER_PRICE_LIMIT)));
-      setLowerPriceLimit(extractFloatFromObject(priceSpec.getProperty(WON.HAS_LOWER_PRICE_LIMIT)));
+      Double from = extractDoubleFromObject(priceSpec.getProperty(WON.HAS_UPPER_PRICE_LIMIT));
+      Double to = extractDoubleFromObject(priceSpec.getProperty(WON.HAS_LOWER_PRICE_LIMIT));
+      setPriceLimit(from, to);
       setCurrency(extractStringFromObject(priceSpec.getProperty(WON.HAS_CURRENCY)));
     }
   }
-
-
 
   private Interval toInterval(final Resource timeSpec)
   {
@@ -119,7 +118,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
   {
     if (fromStmt != null) {
       RDFNode obj = fromStmt.getObject();
-      if (obj.isLiteral()){
+      if (obj.isLiteral()) {
         return DateTimeUtils.toDate(obj.asLiteral(), fromStmt.getModel());
       }
     }
@@ -132,6 +131,14 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     RDFNode obj = stmt.getObject();
     if (!obj.isLiteral()) return null;
     return stmt.getFloat();
+  }
+
+  private Double extractDoubleFromObject(final Statement stmt)
+  {
+    if (stmt == null) return null;
+    RDFNode obj = stmt.getObject();
+    if (!obj.isLiteral()) return null;
+    return stmt.getDouble();
   }
 
   private String extractStringFromObject(final Statement stmt)
@@ -150,35 +157,35 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
       GraphExtract extract = new GraphExtract(TripleBoundary.stopNowhere);
       Graph contentDescriptionGraph = extract.extract(contentDescription.asNode(), g);
       //now replace the contentDescription node with the default URI of the extracted graph
-      contentDescriptionGraph.getPrefixMapping().setNsPrefix("","no:uri"); //it really doesn't matter what we set here
+      contentDescriptionGraph.getPrefixMapping().setNsPrefix("", "no:uri"); //it really doesn't matter what we set here
       String prefixURI = contentDescriptionGraph.getPrefixMapping().getNsPrefixURI("");
       Node prefixNode = Node.createURI(prefixURI);
       ExtendedIterator<Triple> it = contentDescriptionGraph.find(contentDescription.asNode(), Node.ANY, Node.ANY);
       while (it.hasNext()) {
         Triple triple = it.next();
         it.remove();
-        contentDescriptionGraph.add(new Triple(prefixNode,triple.getPredicate(), triple.getObject()));
+        contentDescriptionGraph.add(new Triple(prefixNode, triple.getPredicate(), triple.getObject()));
       }
       Model contentDescriptionModel = ModelFactory.createModelForGraph(contentDescriptionGraph);
       contentDescriptionModel.getRDFNode(contentDescription.asNode());
       this.setContentDescription(contentDescriptionModel);
     }
     Statement textDescriptionStmt = needContent.getProperty(WON.HAS_TEXT_DESCRIPTION);
-    if (textDescriptionStmt != null){
+    if (textDescriptionStmt != null) {
       RDFNode textDescriptionNode = textDescriptionStmt.getObject();
       if (textDescriptionNode.isLiteral()) {
         this.setDescription(textDescriptionNode.asLiteral().getString());
       }
     }
     Statement titleStmt = needContent.getProperty(DC.title);
-    if (titleStmt != null){
+    if (titleStmt != null) {
       RDFNode titleNode = titleStmt.getObject();
       if (titleNode.isLiteral()) {
         this.setTitle(titleNode.asLiteral().getString());
       }
     }
     StmtIterator it = needContent.listProperties(WON.HAS_TAG);
-    while(it.hasNext()) {
+    while (it.hasNext()) {
       Statement stmt = it.next();
       RDFNode obj = stmt.getObject();
       if (obj.isLiteral()) {
@@ -193,21 +200,26 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     Resource needResource = null;
     //try fetching the base URI resource. If that is a Need, we'll assume we found the need resource
     String baseUri = needModel.getNsPrefixURI("");
-    if (baseUri != null){
+    if (baseUri != null) {
       //fetch the resource, check if it has the rdf:type won:Need
       needResource = needModel.getResource(baseUri);
-      if (! needResource.hasProperty(RDF.type, WON.NEED)){ needResource = null; }
+      if (!needResource.hasProperty(RDF.type, WON.NEED)) {
+        needResource = null;
+      }
     }
     if (needResource != null) return needResource;
     //found no need resource yet. Try to find it by type. We expect to find exactly one, otherwise we report an error
     ResIterator it = needModel.listSubjectsWithProperty(RDF.type, WON.NEED);
     if (it.hasNext()) needResource = it.next();
-    if (it.hasNext()) throw new IllegalArgumentException("expecting only one resource of type won:Need in specified model");
-    if (needResource == null) throw new IllegalArgumentException("expected to find a resource of type won:Need in specified model");
+    if (it.hasNext())
+      throw new IllegalArgumentException("expecting only one resource of type won:Need in specified model");
+    if (needResource == null)
+      throw new IllegalArgumentException("expected to find a resource of type won:Need in specified model");
     return needResource;
   }
 
-  private void addResourceIfPresent(Resource subject, Property predicate, URI object){
+  private void addResourceIfPresent(Resource subject, Property predicate, URI object)
+  {
     if (object == null) return;
     subject.addProperty(predicate, subject.getModel().createResource(object.toString()));
   }
@@ -217,7 +229,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     Model needModel = ModelFactory.createDefaultModel();
     DefaultPrefixUtils.setDefaultPrefixes(needModel);
     if (getURI() != null) {
-      needModel.setNsPrefix("",getURI().toString());
+      needModel.setNsPrefix("", getURI().toString());
     }
     Resource needResource = needModel.createResource(getNeedURIString(), WON.NEED);
     // need type
@@ -226,7 +238,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     addResourceIfPresent(needResource, WON.OWNER_PROTOCOL_ENDPOINT, getOwnerProtocolEndpointURI());
     addResourceIfPresent(needResource, WON.MATCHER_PROTOCOL_ENDPOINT, getMatcherProtocolEndpointURI());
     addResourceIfPresent(needResource, WON.IS_IN_STATE, getStateURI());
-    addLiteralValueIfPresent(needModel,needResource, WON.NEED_CREATION_DATE, DateTimeUtils.toLiteral(getCreationDate(), needModel));
+    addLiteralValueIfPresent(needModel, needResource, WON.NEED_CREATION_DATE, DateTimeUtils.toLiteral(getCreationDate(), needModel));
     // need content
     addNeedContent(needModel, needResource);
     // need modalities
@@ -237,7 +249,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
   private void addLiteralValueIfPresent(final Model needModel, final Resource subject, final Property property, final Literal literal)
   {
     if (literal != null) {
-      subject.addProperty(property,literal);
+      subject.addProperty(property, literal);
     }
   }
 
@@ -246,10 +258,10 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     Resource needModality = needModel.createResource(WON.NEED_MODALITY);
 
     //price and currency
-    if (getUpperPriceLimit() != null || getLowerPriceLimit() != null) {
+    if (getPriceLimit() != null) {
       Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
-      addLiteralValueIfPresent(needModel, priceSpecification, WON.HAS_LOWER_PRICE_LIMIT, getLowerPriceLimit(), XSDDatatype.XSDfloat);
-      addLiteralValueIfPresent(needModel, priceSpecification, WON.HAS_UPPER_PRICE_LIMIT, getUpperPriceLimit(), XSDDatatype.XSDfloat);
+      addLiteralValueIfPresent(needModel, priceSpecification, WON.HAS_LOWER_PRICE_LIMIT, getPriceLimit().getMinimum(), XSDDatatype.XSDfloat);
+      addLiteralValueIfPresent(needModel, priceSpecification, WON.HAS_UPPER_PRICE_LIMIT, getPriceLimit().getMaximum(), XSDDatatype.XSDfloat);
       addLiteralValueIfPresent(needModel, priceSpecification, WON.HAS_CURRENCY, getCurrency(), XSDDatatype.XSDstring);
       needModel.add(needModel.createStatement(needModality, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
     }
@@ -265,8 +277,8 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     if (!getIntervals().isEmpty()) {
       for (Interval interval : getIntervals()) {
         Resource timeConstraint = needModel.createResource(WON.TIME_SPECIFICATION);
-        addLiteralValueIfPresent(needModel, timeConstraint, WON.HAS_START_TIME, interval.from, XSDDatatype.XSDdateTime);
-        addLiteralValueIfPresent(needModel, timeConstraint, WON.HAS_END_TIME, interval.to, XSDDatatype.XSDdateTime);
+        addLiteralValueIfPresent(needModel, timeConstraint, WON.HAS_START_TIME, DateTimeUtils.toLiteral(interval.from, needModel));
+        addLiteralValueIfPresent(needModel, timeConstraint, WON.HAS_END_TIME, DateTimeUtils.toLiteral(interval.to, needModel));
         needModel.add(needModel.createStatement(needModality, WON.HAS_TIME_SPECIFICATION, timeConstraint));
       }
     }

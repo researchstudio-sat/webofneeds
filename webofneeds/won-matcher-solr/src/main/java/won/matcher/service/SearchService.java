@@ -163,9 +163,8 @@ public class SearchService
         .setAvailableAtLocation(latitude, longitude)
         .setTitle(document.get(SolrFields.TITLE))
         .setDescription(document.get(SolrFields.DESCRIPTION))
-        .setLowerPriceLimit(document.get(SolrFields.LOWER_PRICE_LIMIT))
-        .setUpperPriceLimit(document.get(SolrFields.UPPER_PRICE_LIMIT))
-        //.addInterval(document.get(SolrFields.TIME_START), document.get(SolrFields.TIME_END)) TODO: we don't have time intervals in the solr doc yet.
+        .setPriceLimit(document.get(SolrFields.PRICE))
+        .addInterval(document.get(SolrFields.DURATION))// TODO: we don't have time intervals in the solr doc yet. AT: now we do, hope it works
         .build();
   }
 

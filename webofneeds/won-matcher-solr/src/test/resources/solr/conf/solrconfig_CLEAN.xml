@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+     For more details about configurations options that may appear in this 
+     file, see http://wiki.apache.org/solr/SolrConfigXml.
+
+     Specifically, the Solr Config can support XInclude, which may make it easier to manage
+     the configuration.  See https://issues.apache.org/jira/browse/SOLR-1167
+-->
+<config>
+    <abortOnConfigurationError>${solr.abortOnConfigurationError:true}</abortOnConfigurationError>
+
+    <luceneMatchVersion>LUCENE_35</luceneMatchVersion>
+
+    <!--  The DirectoryFactory to use for indexes.
+    solr.RAMDirectoryFactory is memory based, for unit test only. -->
+    <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
+
+    <!-- Example of Registration of the siren query parser. -->
+    <queryParser name="siren" class="org.sindice.siren.solr.SirenQParserPlugin"/>
+
+    <requestHandler name="siren" class="solr.StandardRequestHandler">
+        <!-- default values for query parameters -->
+        <lst name="defaults">
+            <str name="defType">siren</str>
+            <str name="echoParams">explicit</str>
+            <!-- Disable field query in keyword parser -->
+            <str name="disableField">true</str>
+            <str name="qf">
+                ntriple^1.0 url^1.2
+            </str>
+            <str name="nqf">
+                ntriple^1.0
+            </str>
+            <!-- the NTriple query multi-field operator:
+                 - disjunction: the query should match in at least one of the fields
+                 - scattered: each Ntriple patterns should match in at least on of the fields
+            -->
+            <str name="nqfo">scattered</str>
+
+            <str name="tqf">
+                tabular^1.0
+            </str>
+            <!-- the Tabular query multi-field operator:
+                 - disjunction: the query should match in at least one of the fields
+                 - scattered: each tabular patterns should match in at least on of the fields
+            -->
+            <str name="tqfo">scattered</str>
+
+            <str name="fl">
+                id
+            </str>
+        </lst>
+    </requestHandler>
+
+
+    <!-- config for the admin interface -->
+    <admin>
+        <defaultQuery>solr</defaultQuery>
+    </admin>
+
+</config>

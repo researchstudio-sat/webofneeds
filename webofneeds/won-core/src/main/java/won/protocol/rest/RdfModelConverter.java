@@ -35,10 +35,9 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import java.io.IOException;
 import java.util.Collection;
 
-//import org.codehaus.jackson.map.JsonSerializableWithType
 
 /**
- * HttpMessageConverter for using jena models with Spring WebMVC. Supports all formats jena supports.
+ * HttpMessageConverter for using jena models with Spring WebMVC. Supports all formats jena supports, plus JSON-LD
  */
 public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
     private static final Logger logger = LoggerFactory.getLogger(RdfModelConverter.class);

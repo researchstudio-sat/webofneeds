@@ -141,7 +141,7 @@ public class DataAccessService {
     //load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_CLOSE);
+    ConnectionState nextState = performStateTransit(con, connectionEventType);
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
