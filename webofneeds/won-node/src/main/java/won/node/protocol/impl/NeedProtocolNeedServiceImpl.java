@@ -17,14 +17,15 @@
 package won.node.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
-//import com.hp.hpl.jena.util.ModelQueryUtil;
-//import com.sun.xml.internal.bind.v2.TODO;
+import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
 import won.protocol.need.NeedProtocolNeedService;
-import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 
 import java.net.URI;
+
+//import com.hp.hpl.jena.util.ModelQueryUtil;
+//import com.sun.xml.internal.bind.v2.TODO;
 
 /**
  * User: fkleedorfer
@@ -33,7 +34,7 @@ import java.net.URI;
 public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
 {
   protected NeedFacingNeedCommunicationService needFacingNeedCommunicationService;
-  protected ConnectionCommunicationService connectionCommunicationService;
+  protected NeedFacingConnectionCommunicationServiceImpl connectionCommunicationService;
 
   @Override
   public URI connect(final URI need, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
@@ -64,7 +65,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
     this.needFacingNeedCommunicationService = needFacingNeedCommunicationService;
   }
 
-  public void setConnectionCommunicationService(final ConnectionCommunicationService connectionCommunicationService)
+  public void setConnectionCommunicationService(final NeedFacingConnectionCommunicationServiceImpl connectionCommunicationService)
   {
     this.connectionCommunicationService = connectionCommunicationService;
   }

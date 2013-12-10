@@ -31,7 +31,6 @@ import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.util.DataAccessUtils;
@@ -51,7 +50,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   final Logger logger = LoggerFactory.getLogger(getClass());
   private OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService;
   //used to close connections when a need is deactivated
-  private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
+  private OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
   private NeedInformationService needInformationService;
   private URIService URIService;
   private RDFStorageService rdfStorage;
@@ -142,7 +141,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     this.ownerProtocolOwnerService = ownerProtocolOwnerService;
   }
 
-  public void setOwnerFacingConnectionCommunicationService(final ConnectionCommunicationService ownerFacingConnectionCommunicationService)
+  public void setOwnerFacingConnectionCommunicationService(final OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService)
   {
     this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
   }

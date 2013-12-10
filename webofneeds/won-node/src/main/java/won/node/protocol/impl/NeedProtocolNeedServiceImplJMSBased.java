@@ -20,9 +20,9 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
 import won.protocol.need.NeedProtocolNeedService;
-import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.util.RdfUtils;
 
@@ -38,7 +38,7 @@ import java.net.URI;
 public class NeedProtocolNeedServiceImplJMSBased implements NeedProtocolNeedService
 {
   protected NeedFacingNeedCommunicationService needFacingNeedCommunicationService;
-  protected ConnectionCommunicationService connectionCommunicationService;
+  protected NeedFacingConnectionCommunicationServiceImpl connectionCommunicationService;
   protected NeedProtocolNeedService delegate;
 
     final Logger logger = LoggerFactory.getLogger(getClass());
@@ -84,7 +84,7 @@ public class NeedProtocolNeedServiceImplJMSBased implements NeedProtocolNeedServ
     this.needFacingNeedCommunicationService = needFacingNeedCommunicationService;
   }
 
-  public void setConnectionCommunicationService(final ConnectionCommunicationService connectionCommunicationService)
+  public void setConnectionCommunicationService(final NeedFacingConnectionCommunicationServiceImpl connectionCommunicationService)
   {
     this.connectionCommunicationService = connectionCommunicationService;
   }
