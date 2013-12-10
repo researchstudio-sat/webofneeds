@@ -34,7 +34,6 @@ import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
@@ -65,12 +64,12 @@ public class NeedCommunicationServiceImpl implements
   /**
    * Client talking to this need service from the need side
    */
-  private ConnectionCommunicationService needFacingConnectionCommunicationService;
+  private NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService;
 
   /**
    * Client talking to this need service from the owner side
    */
-  private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
+  private OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
 
   private URIService URIService;
 

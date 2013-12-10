@@ -7,6 +7,8 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.node.service.impl.DataAccessService;
+import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
+import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
@@ -14,8 +16,6 @@ import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
-import won.protocol.service.ConnectionCommunicationService;
-import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -45,14 +45,14 @@ public abstract class Facet {
   /**
    * Client talking to this need service from the need side
    */
-  protected ConnectionCommunicationService needFacingConnectionCommunicationService;
+  protected NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService;
   /**
    * Client talking to this need service from the owner side
    */
-  protected ConnectionCommunicationService ownerFacingConnectionCommunicationService;
+  protected OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
 
-  protected ConnectionCommunicationService needFacingConnectionClient;
-  protected ConnectionCommunicationService ownerFacingConnectionClient;
+  protected NeedProtocolNeedClientSide needFacingConnectionClient;
+  protected OwnerProtocolOwnerServiceClientSide ownerFacingConnectionClient;
 
   protected won.node.service.impl.URIService URIService;
 
@@ -264,7 +264,7 @@ public abstract class Facet {
     return NeedState.ACTIVE == need.getState();
   }
 
-  public void setOwnerFacingConnectionClient(ConnectionCommunicationService ownerFacingConnectionClient) {
+  public void setOwnerFacingConnectionClient(OwnerProtocolOwnerServiceClientSide ownerFacingConnectionClient) {
     this.ownerFacingConnectionClient = ownerFacingConnectionClient;
   }
 
@@ -280,15 +280,15 @@ public abstract class Facet {
     this.URIService = URIService;
   }
 
-  public void setNeedFacingConnectionClient(ConnectionCommunicationService needFacingConnectionClient) {
+  public void setNeedFacingConnectionClient(NeedProtocolNeedClientSide needFacingConnectionClient) {
     this.needFacingConnectionClient = needFacingConnectionClient;
   }
 
-  public void setOwnerFacingConnectionCommunicationService(ConnectionCommunicationService ownerFacingConnectionCommunicationService) {
+  public void setOwnerFacingConnectionCommunicationService(OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService) {
     this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
   }
 
-  public void setNeedFacingConnectionCommunicationService(ConnectionCommunicationService needFacingConnectionCommunicationService) {
+  public void setNeedFacingConnectionCommunicationService(NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService) {
     this.needFacingConnectionCommunicationService = needFacingConnectionCommunicationService;
   }
 

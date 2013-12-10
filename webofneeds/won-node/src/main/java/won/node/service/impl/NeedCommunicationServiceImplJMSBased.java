@@ -23,14 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.exception.*;
 import won.protocol.model.*;
+import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
@@ -70,12 +69,12 @@ public class NeedCommunicationServiceImplJMSBased implements
   /**
    * Client talking to this need service from the need side
    */
-  private ConnectionCommunicationService needFacingConnectionCommunicationService;
+  private NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService;
 
   /**
    * Client talking to this need service from the owner side
    */
-  private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
+  private OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
 
   private URIService URIService;
 
@@ -417,12 +416,12 @@ public class NeedCommunicationServiceImplJMSBased implements
     this.executorService = executorService;
   }
 
-  public void setNeedFacingConnectionCommunicationService(final ConnectionCommunicationService needFacingConnectionCommunicationService)
+  public void setNeedFacingConnectionCommunicationService(final NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService)
   {
     this.needFacingConnectionCommunicationService = needFacingConnectionCommunicationService;
   }
 
-  public void setOwnerFacingConnectionCommunicationService(final ConnectionCommunicationService ownerFacingConnectionCommunicationService)
+  public void setOwnerFacingConnectionCommunicationService(final OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService)
   {
     this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
   }

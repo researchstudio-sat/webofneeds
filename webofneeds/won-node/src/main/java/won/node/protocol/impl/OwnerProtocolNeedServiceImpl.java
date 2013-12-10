@@ -18,6 +18,7 @@ package won.node.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
@@ -36,7 +37,7 @@ import java.util.List;
  */
 public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     private OwnerFacingNeedCommunicationService needCommunicationService;
-    private ConnectionCommunicationService connectionCommunicationService;
+    private OwnerFacingConnectionCommunicationServiceImpl connectionCommunicationService;
     private NeedManagementService needManagementService;
     private NeedInformationService needInformationService;
     private OwnerManagementService ownerManagementService;
@@ -146,7 +147,7 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
         this.needCommunicationService = needCommunicationService;
     }
 
-    public void setConnectionCommunicationService(final ConnectionCommunicationService connectionCommunicationService) {
+    public void setConnectionCommunicationService(final OwnerFacingConnectionCommunicationServiceImpl connectionCommunicationService) {
         this.connectionCommunicationService = connectionCommunicationService;
     }
 
