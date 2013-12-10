@@ -17,11 +17,16 @@
 package won.node.messaging;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import won.node.protocol.impl.NeedProtocolNeedClientFactory;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
@@ -73,11 +78,13 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       //TODO; shall be checked if the endpoint for the remote won node already exists. configuring remote endpoints for each message is inefficient
       try {
           needProtocolActiveMQService.configureCamelEndpointForNeeds(needURI,otherNeedURI,"seda:NeedProtocol.out.connect");
+
       } catch (Exception e) {
           e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
 
       headerMap.put("remoteBrokerEndpoint", needProtocolActiveMQService.getEndpoint());
+      logger.info("sending connect message to remoteBrokerEndpoint {}",needProtocolActiveMQService.getEndpoint());
       return messagingService.sendInOutMessageGeneric(propertyMap,headerMap,null,"seda:NeedProtocol.out.connect");
 
 
@@ -161,4 +168,5 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
     public void setNeedProtocolActiveMQService(NeedProtocolActiveMQService needProtocolActiveMQService) {
         this.needProtocolActiveMQService = needProtocolActiveMQService;
     }
+
 }

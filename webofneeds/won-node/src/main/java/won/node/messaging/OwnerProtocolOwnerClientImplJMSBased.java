@@ -88,7 +88,7 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
         List<Need> needs = needRepository.findByNeedURI(ownNeedURI);
         List<Need> needs2 = needRepository.findByNeedURI(otherNeedURI);
         Need need = needs.get(0);
-        Need otherNeed = needs2.get(0);
+       // Need otherNeed = needs2.get(0);
         List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
 
         logger.info(ownerApplications.get(0).getOwnerApplicationId());

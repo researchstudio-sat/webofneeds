@@ -31,6 +31,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.jms.connection.CachingConnectionFactory;
 import won.owner.protocol.impl.MessageProducer;
 import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.ws.OwnerProtocolNeedClientFactory;
@@ -111,6 +112,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
                     activemqConnectionFactory.setBrokerURL(brokerURI.toString()+"?useLocalHost=false");
                     ActiveMQComponent activeMQComponent = (ActiveMQComponent) ownerApplicationContext.getBean("activemq");
                     activeMQComponent.setBrokerURL(brokerURI.toString()+"?useLocalHost=false");
+
 
                //     logger.info(activeMQComponent.getConfiguration().getListenerConnectionFactory().);
                    //  javax.jms.Connection connection = activemqConnectionFactory.createConnection();

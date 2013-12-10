@@ -28,9 +28,9 @@ import java.util.List;
 public class NeedProtocolDynamicRoutes extends RouteBuilder {
 
 
-    List<String> endpoints;
-    String routeID;
-    String from;
+    private List<String> endpoints;
+    private String routeID;
+    private String from;
 
     public NeedProtocolDynamicRoutes(CamelContext camelContext, List<String> Endpoints, String from){
         super(camelContext);

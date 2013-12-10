@@ -6,6 +6,9 @@ import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.spi.Synchronization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import won.protocol.model.OwnerApplication;
 
 import java.net.URI;
@@ -16,10 +19,11 @@ import java.util.concurrent.Future;
  * User: LEIH-NB
  * Date: 04.11.13
  */
-public class MessagingServiceImpl<T> implements MessagingService,CamelContextAware {
+public class MessagingServiceImpl<T> implements ApplicationContextAware,MessagingService,CamelContextAware {
     private CamelContext camelContext;
     private ProducerTemplate producerTemplate;
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private ApplicationContext applicationContext;
 
     /**
      * This method shall be used for Request-Reply messaging.
@@ -120,5 +124,10 @@ public class MessagingServiceImpl<T> implements MessagingService,CamelContextAwa
 
     public void setProducerTemplate(ProducerTemplate producerTemplate) {
         this.producerTemplate = producerTemplate;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

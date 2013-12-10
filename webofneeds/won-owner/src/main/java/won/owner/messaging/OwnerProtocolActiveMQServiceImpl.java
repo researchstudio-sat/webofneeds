@@ -159,6 +159,7 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         } catch (UniformInterfaceException e){
             ClientResponse response = e.getResponse();
             if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
+                logger.warn("BrokerURI not found for node URI:{]",nodeURI);
                 return null;
             }
             else throw e;
