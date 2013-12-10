@@ -69,7 +69,8 @@ public abstract class Facet {
         @Override
         public void run() {
           try {
-            needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
+              needFacingConnectionClient.open(con.getConnectionURI(), content);
+            //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
           } catch (WonProtocolException e) {
             logger.debug("caught Exception:", e);
           }
@@ -87,7 +88,8 @@ public abstract class Facet {
         public void run()
         {
           try {
-            needFacingConnectionClient.close(con.getRemoteConnectionURI(), content);
+              needFacingConnectionClient.close(con.getConnectionURI(), content);
+              //needFacingConnectionClient.close(con.getRemoteConnectionURI(), content);
           } catch (WonProtocolException e) {
             logger.warn("caught WonProtocolException:", e);
           }
@@ -103,7 +105,8 @@ public abstract class Facet {
       @Override
       public void run() {
         try {
-          needFacingConnectionClient.textMessage(remoteConnectionURI, message);
+            needFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+         // needFacingConnectionClient.textMessage(remoteConnectionURI, message);
         } catch (WonProtocolException e) {
           logger.warn("caught WonProtocolException:", e);
         }
@@ -233,7 +236,7 @@ public abstract class Facet {
       @Override
       public void run() {
         try {
-          Future<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(), con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
+          Future<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
           dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
         } catch (WonProtocolException e) {
           // we can't connect the connection. we send a close back to the owner

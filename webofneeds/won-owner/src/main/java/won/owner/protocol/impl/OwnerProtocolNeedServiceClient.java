@@ -222,7 +222,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     @Override
     public Future<URI> connect(final URI needURI, final  URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException
     {
-        logger.info("need-facing: CONNECT called for other need {}, own need {} and content {}", new Object[]{needURI, otherNeedURI, content});
+        logger.info("need-facing: CONNECT called for need {}, other need {} and content {}", new Object[]{needURI, otherNeedURI, content});
 
             final Future<URI> uri = delegate.connect(needURI, otherNeedURI, content);
             Resource baseRes = content.getResource(content.getNsPrefixURI(""));

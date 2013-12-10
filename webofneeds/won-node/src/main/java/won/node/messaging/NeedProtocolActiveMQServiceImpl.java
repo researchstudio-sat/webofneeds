@@ -140,24 +140,28 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
      */
     public void configureCamelEndpointForNeeds(URI needURI, URI otherNeedURI, String from) throws Exception {
         if (camelContext.getEndpoint(from)!=null){
-            URI brokerURI = getActiveMQBrokerURIForNode(needURI);
             URI remoteBrokerURI = getActiveMQBrokerURIForNode(otherNeedURI);
+            URI brokerURI = getActiveMQBrokerURIForNode(otherNeedURI);
             URI ownBrokerURI = getActiveMQBrokerURIForNode(needURI);
             String tempComponentName = componentName;
 
 
-            if (!remoteBrokerURI.equals(ownBrokerURI)){
+            if (!brokerURI.equals(ownBrokerURI)){
                  //TODO: implement register method for node-to-node communication
 
-                tempComponentName = componentName+brokerURI.toString().replaceAll("[/:]","");
+                tempComponentName = componentName+remoteBrokerURI.toString().replaceAll("[/:]","");
                 //if (camelContext.getComponent(tempComponentName)==null)   {
+                    if (camelContext.getComponent(tempComponentName)==null){
+                        //TODO: check configuration of activemq component. e.g. using cachedConnectionFactory
+                        ActiveMQComponent activeMQComponent = new ActiveMQComponent();
+                        activeMQComponent.setAutoStartup(true);
+                        activeMQComponent.setApplicationContext(applicationContext);
+                        activeMQComponent.setCamelContext(camelContext);
+                        //camelContext.addComponent(tempComponentName,activeMQComponent(remoteBrokerURI.toString()+"?useLocalHost=false"));
 
-                   //TODO: check configuration of activemq component. e.g. using cachedConnectionFactory
-                    ActiveMQComponent activeMQComponent = new ActiveMQComponent();activeMQComponent.setAutoStartup(true);
-                    activeMQComponent.setApplicationContext(applicationContext);
-                    activeMQComponent.setCamelContext(camelContext);
-                    //camelContext.addComponent(tempComponentName,activeMQComponent(brokerURI.toString()+"?useLocalHost=false"));
-                    camelContext.addComponent(tempComponentName,activeMQComponent(brokerURI.toString()+"?useLocalHost=false"));
+                        camelContext.addComponent(tempComponentName,activeMQComponent(remoteBrokerURI.toString()+"?useLocalHost=false"));
+                    }
+
                // }
             }
             //endpoint = tempComponentName+":queue:"+getActiveMQNeedProtocolQueueNameForNeed(needURI);
@@ -177,6 +181,7 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
     public void configureCamelEndpointForConnection(URI connectionURI,String from) throws Exception {
         if (camelContext.getEndpoint(from)!=null){
             Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+
             URI needURI = con.getNeedURI();
             URI otherNeedURI = con.getRemoteNeedURI();
             configureCamelEndpointForNeeds(needURI,otherNeedURI,from);

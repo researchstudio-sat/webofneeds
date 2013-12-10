@@ -357,6 +357,7 @@ public class NeedCommunicationServiceImplJMSBased implements
         }
       });
 
+      logger.info("new connection: {]",con.getConnectionURI().toString());
       //return the URI of the new connection
       return con.getConnectionURI();
     }
