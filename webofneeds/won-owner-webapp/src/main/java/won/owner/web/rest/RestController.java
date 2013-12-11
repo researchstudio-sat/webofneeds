@@ -9,12 +9,14 @@ import org.apache.commons.collections.map.LRUMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
 import won.protocol.exception.IllegalNeedContentException;
@@ -22,7 +24,6 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
@@ -35,9 +36,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @Controller
 @RequestMapping("/rest")
@@ -47,7 +52,8 @@ public class RestController
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private OwnerProtocolNeedService ownerService;
+  @Qualifier("ownerProtocolNeedServiceClientJMSBased")
+  private OwnerProtocolNeedServiceClientSide ownerService;
 
   @Autowired
   private NeedRepository needRepository;
@@ -83,7 +89,7 @@ public class RestController
     this.uriService = uriService;
   }
 
-  public void setOwnerService(OwnerProtocolNeedService ownerService)
+  public void setOwnerService(OwnerProtocolNeedServiceClientSide ownerService)
   {
     this.ownerService = ownerService;
   }
@@ -176,8 +182,7 @@ public class RestController
       produces = MediaType.APPLICATION_JSON,
       method = RequestMethod.POST
       )
-  public NeedPojo createNeed(NeedPojo needPojo)
-  {
+  public NeedPojo createNeed(NeedPojo needPojo) throws ExecutionException, InterruptedException, IOException, URISyntaxException {
 
     logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getCreationDate() + "/" +
         needPojo.getLongitude() + "/" + needPojo.getLatitude() + "/" + (needPojo.getState() == NeedState.ACTIVE));
@@ -209,8 +214,7 @@ public class RestController
     return returnList;
   }
 
-  private NeedPojo resolve(NeedPojo needPojo)
-  {
+  private NeedPojo resolve(NeedPojo needPojo) throws ExecutionException, InterruptedException, IOException, URISyntaxException {
 
 
     if (needPojo.getNeedId() >= 0) {
@@ -292,9 +296,11 @@ public class RestController
       needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
 
       if (needPojo.getWonNode().equals("")) {
-        needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+        Future<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+        needURI = futureResult.get();
       } else {
-        needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, needPojo.getWonNode());
+        Future<URI> futureResult = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, URI.create(needPojo.getWonNode()));
+        needURI = futureResult.get();
       }
 
       List<Need> needs = needRepository.findByNeedURI(needURI);

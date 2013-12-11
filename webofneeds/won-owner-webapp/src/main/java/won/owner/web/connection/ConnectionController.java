@@ -3,6 +3,7 @@ package won.owner.web.connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -10,11 +11,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.TextMessagePojo;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
-import won.protocol.model.FacetType;
-import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.util.DataAccessUtils;
 
 import java.util.List;
 
@@ -30,7 +32,8 @@ public class ConnectionController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private OwnerProtocolNeedService ownerService;
+    @Qualifier("ownerProtocolNeedServiceClient")
+    private OwnerProtocolNeedServiceClientSide ownerService;
 
     @Autowired
     private ConnectionRepository connectionRepository;
@@ -52,12 +55,13 @@ public class ConnectionController {
 
 
     @RequestMapping(value = "/{conId}/body", method = RequestMethod.GET)
-    public String listMessages(@PathVariable String conId, Model model) {
-        List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
+    public String listMessages(@PathVariable String conId, Model model) throws NoSuchConnectionException {
+        Connection con = DataAccessUtils.loadConnection(connectionRepository,Long.valueOf(conId));
+     //   List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
 
-        if(cons.isEmpty())
+       if(con==null)
             return "noNeedFound";
-        Connection con = cons.get(0);
+        //Connection con = cons.get(0);
         try {
             switch (con.getState()) {
                 case REQUEST_RECEIVED:
@@ -67,13 +71,7 @@ public class ConnectionController {
                     model.addAttribute("message", "Pending....");
                     return "showMessage";
                 case CLOSED:
-                    if(!((con.getTypeURI()).equals(FacetType.TwoPCFacet.getURI()))){
-                        model.addAttribute("message", "Connection Closed!");
-                    }
-                    else{
-                        model.addAttribute("message", "Connection Closed!   Participant vote is NO!  The whole transaction is aborted!");
-                    }
-
+                    model.addAttribute("message", "Connection Closed!");
                     return "showMessage";
                 case CONNECTED:
                     model.addAttribute("messages", chatMessageRepository.findByLocalConnectionURI(con.getConnectionURI()));
@@ -97,8 +95,8 @@ public class ConnectionController {
           //TODO: rework such that an rdf model can be sent here instead of the text message
           ownerService.textMessage(con.getConnectionURI(), text.getText());
         } catch (Exception e) {
-          logger.warn("error sending text message");
-          return "error sending text message: " + e.getMessage();
+            logger.warn("error sending text message");
+            return "error sending text message: " + e.getMessage();
         }
 
         return  "redirect:/connection/" + con.getId().toString();//"viewConnection";

@@ -18,6 +18,7 @@ package won.node.ws;
 
 import com.hp.hpl.jena.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import won.protocol.exception.*;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.util.LazySpringBeanAutowiringSupport;

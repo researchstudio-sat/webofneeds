@@ -18,10 +18,13 @@ package won.protocol.util;
 
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.NoSuchOwnerApplicationException;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
+import won.protocol.model.OwnerApplication;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.repository.OwnerApplicationRepository;
 
 import java.net.URI;
 import java.text.MessageFormat;
@@ -33,20 +36,37 @@ import java.util.List;
  */
 public class DataAccessUtils {
 
-    /**
-    * Loads the specified need from the database and raises an exception if it is not found.
-    *
-    * @param needURI
-    * @throws won.protocol.exception.NoSuchNeedException
-    * @return the connection
-    */
-    public static Need loadNeed(NeedRepository needRepository, final URI needURI) throws NoSuchNeedException
+  /**
+   * Loads the specified need from the database and raises an exception if it is not found.
+   *
+   * @param needURI
+   * @throws won.protocol.exception.NoSuchNeedException
+   * @return the connection
+   */
+  public static Need loadNeed(NeedRepository needRepository, final URI needURI) throws NoSuchNeedException
+  {
+    List<Need> needs = needRepository.findByNeedURI(needURI);
+    if (needs.size() == 0) throw new NoSuchNeedException(needURI);
+    if (needs.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}", needURI));
+    return needs.get(0);
+  }
+
+
+  public static String loadOwnerApplication(OwnerApplicationRepository ownerApplicationRepository, final String ownerApplicationId) throws NoSuchOwnerApplicationException {
+    List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationId);
+    if(ownerApplications.size()==0) throw new NoSuchOwnerApplicationException();
+    if (ownerApplications.size()>1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple connections found with URI {0}",ownerApplicationId));
+    return ownerApplications.get(0).getOwnerApplicationId();
+
+  }
+    public static Connection loadConnection(ConnectionRepository connectionRepository, final Long id) throws NoSuchConnectionException
     {
-        List<Need> needs = needRepository.findByNeedURI(needURI);
-        if (needs.size() == 0) throw new NoSuchNeedException(needURI);
-        if (needs.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}", needURI));
-        return needs.get(0);
+        List<Connection> connections = connectionRepository.findById(id);
+        if (connections.size() == 0) throw new NoSuchConnectionException(id);
+        if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple connections found with URI {0}", id));
+        return connections.get(0);
     }
+
 
     /**
     * Loads the specified connection from the database and raises an exception if it is not found.
@@ -62,4 +82,5 @@ public class DataAccessUtils {
         if (connections.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple connections found with URI {0}",connectionURI));
         return connections.get(0);
     }
+
 }

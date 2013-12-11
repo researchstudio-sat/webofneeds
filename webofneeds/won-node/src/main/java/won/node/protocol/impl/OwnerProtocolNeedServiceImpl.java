@@ -17,15 +17,15 @@
 package won.node.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.springframework.beans.factory.annotation.Autowired;
+import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
-import won.protocol.service.ConnectionCommunicationService;
-import won.protocol.service.NeedInformationService;
-import won.protocol.service.NeedManagementService;
-import won.protocol.service.OwnerFacingNeedCommunicationService;
+import won.protocol.repository.OwnerApplicationRepository;
+import won.protocol.service.*;
 
 import java.net.URI;
 import java.util.Collection;
@@ -37,13 +37,24 @@ import java.util.List;
  */
 public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     private OwnerFacingNeedCommunicationService needCommunicationService;
-    private ConnectionCommunicationService connectionCommunicationService;
+    private OwnerFacingConnectionCommunicationServiceImpl connectionCommunicationService;
     private NeedManagementService needManagementService;
     private NeedInformationService needInformationService;
+    private OwnerManagementService ownerManagementService;
+
+    @Autowired
+    private OwnerApplicationRepository ownerApplicationRepository;
 
     @Override
-    public URI createNeed(URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException {
-        return this.needManagementService.createNeed(ownerURI, content, activate);
+    public URI createNeed(URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException {
+        URI needURI = this.needManagementService.createNeed(ownerURI, content, activate, ownerApplicationID);
+
+        return needURI;
+    }
+
+    @Override
+    public void authorizeOwnerApplicationForNeed(String ownerApplicationID, URI needURI) {
+        needManagementService.authorizeOwnerApplicationForNeed(ownerApplicationID,needURI);
     }
 
     @Override
@@ -66,12 +77,12 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
         return needInformationService.listConnectionURIs(needURI, page);
     }
 
-    @Override
+   // @Override
     public void activate(final URI needURI) throws NoSuchNeedException {
         this.needManagementService.activate(needURI);
     }
 
-    @Override
+   // @Override
     public void deactivate(final URI needURI) throws NoSuchNeedException {
         this.needManagementService.deactivate(needURI);
     }
@@ -136,7 +147,7 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
         this.needCommunicationService = needCommunicationService;
     }
 
-    public void setConnectionCommunicationService(final ConnectionCommunicationService connectionCommunicationService) {
+    public void setConnectionCommunicationService(final OwnerFacingConnectionCommunicationServiceImpl connectionCommunicationService) {
         this.connectionCommunicationService = connectionCommunicationService;
     }
 

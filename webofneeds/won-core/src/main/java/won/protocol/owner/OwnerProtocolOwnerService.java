@@ -19,10 +19,14 @@ package won.protocol.owner;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.service.ConnectionCommunicationService;
+import javax.jms.Message;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -47,6 +51,10 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    *
    *
    *
+   *
+   *
+   *
+   *
    * @param ownNeedURI
    * @param otherNeedURI
    * @param ownConnectionURI
@@ -57,6 +65,7 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    * @throws ConnectionAlreadyExistsException
    *                             if the two needs are already connected
    */
-  public void connect(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI, Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
+  public void connect(String ownNeedURI, String otherNeedURI, String ownConnectionURI, String content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
+  //TODO move to another interface maybe?
 }

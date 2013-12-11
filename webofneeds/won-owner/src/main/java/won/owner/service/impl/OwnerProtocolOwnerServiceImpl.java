@@ -1,5 +1,5 @@
 package won.owner.service.impl;
-
+import com.github.jsonldjava.core.RDFDatasetUtils;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -9,13 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerService;
-import won.protocol.repository.ChatMessageRepository;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.MatchRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.*;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
-
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -26,7 +23,8 @@ import java.util.List;
  * Date: 03.12.12
  * Time: 14:12
  */
-public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService {
+    //TODO: refactor service interfaces.
+public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -80,9 +78,14 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
     }
 
     @Override
-    public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI,
-                        final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
+    public void connect(final String ownNeedURI, final String otherNeedURI, final String ownConnectionURI,
+                        final String content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
+        //TODO: String or URI that is the question..
+        URI ownNeedURIConvert = URI.create(ownNeedURI);
+        URI otherNeedURIConvert = URI.create(otherNeedURI);
+        URI ownConnectionURIConvert = URI.create(ownConnectionURI);
+        Model contentConvert = RdfUtils.toModel(content);
         logger.info("node-facing: CONNECTION_REQUESTED called for own need {}, other need {}, own connection {} and content ''{}''", new Object[]{ownNeedURI,otherNeedURI,ownConnectionURI, content});
         if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
         if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
@@ -90,11 +93,11 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
         if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
 
         //Load need (throws exception if not found)
-        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
+        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURIConvert);
         if (!isNeedActive(need))
-          throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
+          throw new IllegalMessageForNeedStateException(ownNeedURIConvert, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
 
-        Resource baseRes = content.getResource(content.getNsPrefixURI(""));
+        Resource baseRes = contentConvert.getResource(contentConvert.getNsPrefixURI(""));
         StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
 
         if (!stmtIterator.hasNext()) {
@@ -103,7 +106,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
 
         URI facetURI =  URI.create(stmtIterator.next().getObject().asResource().getURI());
 
-        List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURI, otherNeedURI);
+        List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURIConvert, otherNeedURIConvert);
         Connection con = null;
 
         for(Connection c : connections) {
@@ -114,22 +117,24 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService 
 
         //TODO: impose unique constraint on connections
         if(con != null) {
-          if(ConnectionEventType.PARTNER_OPEN.isMessageAllowed(con.getState())) {
+            if (ConnectionState.CONNECTED == con.getState()||ConnectionState.REQUEST_RECEIVED==con.getState()){
+          //if(ConnectionEventType.PARTNER_OPEN.isMessageAllowed(con.getState())) {
             //TODO: Move this to the transition() - Method in ConnectionState
-            con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
-            con = connectionRepository.saveAndFlush(con);
+                throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
           } else {
-            throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
+                con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
+                con = connectionRepository.saveAndFlush(con);
+
           }
         }
 
         if (con == null) {
           /* Create connection */
           con = new Connection();
-          con.setNeedURI(ownNeedURI);
+          con.setNeedURI(ownNeedURIConvert);
           con.setState(ConnectionState.REQUEST_RECEIVED);
-          con.setRemoteNeedURI(otherNeedURI);
-          con.setConnectionURI(ownConnectionURI);
+          con.setRemoteNeedURI(otherNeedURIConvert);
+          con.setConnectionURI(ownConnectionURIConvert);
           con.setTypeURI(facetURI);
           connectionRepository.saveAndFlush(con);
 

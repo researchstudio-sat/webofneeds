@@ -112,9 +112,11 @@ public class DataAccessService {
 
     //TODO: impose unique constraint on connections
     if(con != null) {
-      if(!eventType.isMessageAllowed(con.getState())){
+        if(con.getState()== ConnectionState.CONNECTED || con.getState()==ConnectionState.REQUEST_SENT)
+            throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
+      /*if(!eventType.isMessageAllowed(con.getState())){
         throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
-      } else {
+      }*/ else {
         //TODO: Move this to the transition() - Method in ConnectionState
         con.setState(con.getState().transit(eventType));
         con = connectionRepository.saveAndFlush(con);

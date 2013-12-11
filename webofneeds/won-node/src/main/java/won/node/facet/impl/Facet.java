@@ -7,18 +7,21 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.node.service.impl.DataAccessService;
+import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
+import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.need.NeedProtocolNeedService;
-import won.protocol.owner.OwnerProtocolOwnerService;
-import won.protocol.service.ConnectionCommunicationService;
+import won.protocol.need.NeedProtocolNeedClientSide;
+import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,23 +36,23 @@ public abstract class Facet {
   /**
    * Client talking another need via the need protocol
    */
-  protected NeedProtocolNeedService needProtocolNeedService;
+  protected NeedProtocolNeedClientSide needProtocolNeedService;
   /**
    * Client talking to the owner side via the owner protocol
    */
-  protected OwnerProtocolOwnerService ownerProtocolOwnerService;
+  protected OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService;
 
   /**
    * Client talking to this need service from the need side
    */
-  protected ConnectionCommunicationService needFacingConnectionCommunicationService;
+  protected NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService;
   /**
    * Client talking to this need service from the owner side
    */
-  protected ConnectionCommunicationService ownerFacingConnectionCommunicationService;
+  protected OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
 
-  protected ConnectionCommunicationService needFacingConnectionClient;
-  protected ConnectionCommunicationService ownerFacingConnectionClient;
+  protected NeedProtocolNeedClientSide needFacingConnectionClient;
+  protected OwnerProtocolOwnerServiceClientSide ownerFacingConnectionClient;
 
   protected won.node.service.impl.URIService URIService;
 
@@ -67,7 +70,8 @@ public abstract class Facet {
         @Override
         public void run() {
           try {
-            needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
+              needFacingConnectionClient.open(con, content);
+            //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
           } catch (WonProtocolException e) {
             logger.debug("caught Exception:", e);
           }
@@ -86,7 +90,8 @@ public abstract class Facet {
         public void run()
         {
           try {
-            needFacingConnectionClient.close(con.getRemoteConnectionURI(), content);
+              needFacingConnectionClient.close(con, content);
+              //needFacingConnectionClient.close(con.getRemoteConnectionURI(), content);
           } catch (WonProtocolException e) {
             logger.warn("caught WonProtocolException:", e);
           }
@@ -102,7 +107,8 @@ public abstract class Facet {
       @Override
       public void run() {
         try {
-          needFacingConnectionClient.textMessage(remoteConnectionURI, message);
+            needFacingConnectionClient.textMessage(con, message);
+         // needFacingConnectionClient.textMessage(remoteConnectionURI, message);
         } catch (WonProtocolException e) {
           logger.warn("caught WonProtocolException:", e);
         }
@@ -235,8 +241,8 @@ public abstract class Facet {
       @Override
       public void run() {
         try {
-          URI remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(), con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
-          dataService.updateRemoteConnectionURI(con, remoteConnectionURI);
+          Future<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
+          dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
         } catch (WonProtocolException e) {
           // we can't connect the connection. we send a close back to the owner
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
@@ -249,6 +255,10 @@ public abstract class Facet {
           } catch (IllegalMessageForConnectionStateException e1) {
             logger.warn("caught IllegalMessageForConnectionStateException:", e1);
           }
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (ExecutionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
       }
     });
@@ -259,7 +269,7 @@ public abstract class Facet {
     return NeedState.ACTIVE == need.getState();
   }
 
-  public void setOwnerFacingConnectionClient(ConnectionCommunicationService ownerFacingConnectionClient) {
+  public void setOwnerFacingConnectionClient(OwnerProtocolOwnerServiceClientSide ownerFacingConnectionClient) {
     this.ownerFacingConnectionClient = ownerFacingConnectionClient;
   }
 
@@ -275,23 +285,23 @@ public abstract class Facet {
     this.URIService = URIService;
   }
 
-  public void setNeedFacingConnectionClient(ConnectionCommunicationService needFacingConnectionClient) {
+  public void setNeedFacingConnectionClient(NeedProtocolNeedClientSide needFacingConnectionClient) {
     this.needFacingConnectionClient = needFacingConnectionClient;
   }
 
-  public void setOwnerFacingConnectionCommunicationService(ConnectionCommunicationService ownerFacingConnectionCommunicationService) {
+  public void setOwnerFacingConnectionCommunicationService(OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService) {
     this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
   }
 
-  public void setNeedFacingConnectionCommunicationService(ConnectionCommunicationService needFacingConnectionCommunicationService) {
+  public void setNeedFacingConnectionCommunicationService(NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService) {
     this.needFacingConnectionCommunicationService = needFacingConnectionCommunicationService;
   }
 
-  public void setNeedProtocolNeedService(NeedProtocolNeedService needProtocolNeedService) {
-    this.needProtocolNeedService = needProtocolNeedService;
+  public void setNeedProtocolNeedService(NeedProtocolNeedClientSide needProtocolNeedServiceClient) {
+    this.needProtocolNeedService = needProtocolNeedServiceClient;
   }
 
-  public void setOwnerProtocolOwnerService(OwnerProtocolOwnerService ownerProtocolOwnerService) {
+  public void setOwnerProtocolOwnerService(OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService) {
     this.ownerProtocolOwnerService = ownerProtocolOwnerService;
   }
 }

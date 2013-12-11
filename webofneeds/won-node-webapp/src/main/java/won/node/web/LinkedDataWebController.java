@@ -36,6 +36,7 @@ import won.protocol.util.HTTP;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -92,7 +93,7 @@ public class LinkedDataWebController
   private String resourceURIPrefix;
   //prefix for human readable pages
   private String pageURIPrefix;
-
+  private String  nodeResourceURIPrefix;
   @Autowired
   private LinkedDataService linkedDataService;
 
@@ -109,7 +110,9 @@ public class LinkedDataWebController
     return "index";
   }
 
-  //webmvc controller method
+
+
+    //webmvc controller method
   @RequestMapping("${uri.path.page.need}/{identifier}")
   public String showNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
     try {
@@ -155,8 +158,22 @@ public class LinkedDataWebController
       return "rdfModelView";
   }
 
+    @RequestMapping("${uri.path.page}")
+    public String showNodeInformationPage(
+            @RequestParam(defaultValue="-1") int page,
+            HttpServletRequest request,
+            Model model,
+            HttpServletResponse response) {
+        com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.showNodeInformation(page);
+        model.addAttribute("rdfModel", rdfModel);
+        model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+        model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
+        return "rdfModelView";
+    }
 
-  //webmvc controller method
+
+
+    //webmvc controller method
   @RequestMapping("${uri.path.page.connection}")
   public String showConnectionURIListPage(
       @RequestParam(defaultValue="-1") int page,
@@ -191,7 +208,13 @@ public class LinkedDataWebController
     }
   }
 
-
+    /**
+     * If the HTTP 'Accept' header is an RDF MIME type
+     * (as listed in the 'produces' value of the RequestMapping annotation),
+     * a redirect to a data uri is sent.
+     * @param request
+     * @return
+     */
   @RequestMapping(
       value="${uri.path.resource}/**",
       method = RequestMethod.GET,
@@ -202,6 +225,11 @@ public class LinkedDataWebController
     URI dataUri = URI.create(this.dataURIPrefix);
     String requestUri = request.getRequestURI();
     String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), dataUri.getPath());
+    logger.debug("resource URI requested with data mime type. redirecting from {} to {}", requestUri, redirectToURI);
+    if (redirectToURI.equals(requestUri)) {
+        logger.debug("redirecting to same URI avoided, sending status 500 instead");
+        return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = addNeverExpiresHeaders(new HttpHeaders());
@@ -209,6 +237,13 @@ public class LinkedDataWebController
     return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(null, headers, HttpStatus.SEE_OTHER);
   }
 
+    /**
+     * If the HTTP 'Accept' header is 'text/html'
+     * (as listed in the 'produces' value of the RequestMapping annotation),
+     * a redirect to a page uri is sent.
+     * @param request
+     * @return
+     */
   @RequestMapping(
       value="${uri.path.resource}/**",
       method = RequestMethod.GET,
@@ -220,6 +255,11 @@ public class LinkedDataWebController
     String requestUri = request.getRequestURI();
 
     String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), pageUriPrefix.getPath());
+    logger.debug("resource URI requested with page mime type. redirecting from {} to {}", requestUri, redirectToURI);
+      if (redirectToURI.equals(requestUri)) {
+          logger.debug("redirecting to same URI avoided, sending status 500 instead");
+          return new ResponseEntity<String>("Could not redirect to linked data page", HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = addNeverExpiresHeaders(new HttpHeaders());
     headers.add("Location",redirectToURI);
@@ -270,8 +310,24 @@ public class LinkedDataWebController
     } catch (NoSuchNeedException e) {
       return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.NOT_FOUND);
     }
+
   }
 
+    @RequestMapping(
+            value="${uri.path.data}",
+            method = RequestMethod.GET,
+            produces={"application/rdf+xml","application/x-turtle","text/turtle","text/rdf+n3","application/json","application/ld+json"})
+    public ResponseEntity<com.hp.hpl.jena.rdf.model.Model> readNode(
+            HttpServletRequest request) {
+        logger.debug("readNode() called");
+        URI nodedUri = URI.create(this.nodeResourceURIPrefix);
+
+            com.hp.hpl.jena.rdf.model.Model model = linkedDataService.getNodeModel();
+            //TODO: need information does change over time. The immutable need information should never expire, the mutable should
+            HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), nodedUri));
+            return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(model, headers, HttpStatus.OK);
+
+    }
 
   @RequestMapping(
       value="${uri.path.data.connection}/{identifier}",
@@ -406,4 +462,11 @@ public class LinkedDataWebController
     this.pageURIPrefix = pageURIPrefix;
   }
 
+    public String getNodeResourceURIPrefix() {
+        return nodeResourceURIPrefix;
+    }
+
+    public void setNodeResourceURIPrefix(String nodeResourceURIPrefix) {
+        this.nodeResourceURIPrefix = nodeResourceURIPrefix;
+    }
 }

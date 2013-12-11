@@ -19,6 +19,7 @@ package won.node.service.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.facet.impl.FacetRegistry;
 import won.protocol.exception.ConnectionAlreadyExistsException;
@@ -28,11 +29,17 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
+import won.protocol.need.NeedProtocolNeedService;
+import won.protocol.owner.OwnerProtocolOwnerService;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.EventRepository;
+import won.protocol.repository.NeedRepository;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 
 import java.net.URI;
+import java.util.concurrent.ExecutorService;
 
 
 @Component
@@ -44,6 +51,38 @@ public class NeedCommunicationServiceImpl implements
   final Logger logger = LoggerFactory.getLogger(NeedCommunicationServiceImpl.class);
   private FacetRegistry reg;
   private DataAccessService dataService;
+
+  /**
+   * Client talking to the owner side via the owner protocol
+   */
+  private OwnerProtocolOwnerService ownerProtocolOwnerService;
+  /**
+   * Client talking another need via the need protocol
+   */
+  private NeedProtocolNeedService needProtocolNeedService;
+
+  /**
+   * Client talking to this need service from the need side
+   */
+  private NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService;
+
+  /**
+   * Client talking to this need service from the owner side
+   */
+  private OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
+
+  private URIService URIService;
+
+  private ExecutorService executorService;
+
+  @Autowired
+  private NeedRepository needRepository;
+  @Autowired
+  private ConnectionRepository connectionRepository;
+  @Autowired
+  private EventRepository eventRepository;
+  @Autowired
+  private RDFStorageService rdfStorageService;
 
   @Override
   public void hint(final URI needURI, final URI otherNeedURI, final double score, final URI originator, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException {

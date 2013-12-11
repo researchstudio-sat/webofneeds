@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.ws.NeedProtocolNeedWebServiceClient;
+import won.protocol.repository.NeedRepository;
 import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
@@ -27,6 +28,7 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
 
   @Autowired
   private LinkedDataRestClient linkedDataRestClient;
+  private NeedRepository needRepository;
 
   public void setLinkedDataRestClient(final LinkedDataRestClient linkedDataRestClient)
   {
@@ -55,7 +57,7 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
   {
     URI needProtocolEndpoint = null;
     try{
-      needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.NEED_PROTOCOL_ENDPOINT);
+      needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.HAS_NEED_PROTOCOL_ENDPOINT);
     } catch (UniformInterfaceException e){
       ClientResponse response = e.getResponse();
       if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
@@ -83,4 +85,9 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
 
     return client.getNeedProtocolNeedWebServiceEndpointPort();
   }
+    //TODO: change this method so that it gets the URI from RDF triples.
+
+
+
+
 }

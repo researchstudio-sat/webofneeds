@@ -17,12 +17,14 @@
 package won.protocol.model;
 
 import org.hibernate.cfg.Configuration;
+import org.hibernate.mapping.Set;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -46,10 +48,21 @@ public class Need
   @Column( name = "ownerURI" )
   private URI ownerURI;
 
+    /* The need protocol endpoint URI where the won node of the need can be reached */
+    @Column(name="wonNodeURI")
+    private URI wonNodeURI;
+
   /* The creation date of the need */
   @Temporal(TemporalType.TIMESTAMP)
   @Column( name = "creationDate", nullable = false)
   private Date creationDate;
+
+
+   @ManyToMany(targetEntity = OwnerApplication.class,fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+   @JoinTable(name="NEED_OWNERAPP",
+           joinColumns = @JoinColumn(name="need_id"),
+           inverseJoinColumns = @JoinColumn(name = "owner_application_id"))
+   private List<OwnerApplication> authorizedApplications;
 
   @PrePersist
   protected void onCreate() {
@@ -147,4 +160,22 @@ public class Need
        config.configure();
        new SchemaExport(config).create(true, true);
    }
+
+
+    public List<OwnerApplication> getAuthorizedApplications() {
+        return authorizedApplications;
+    }
+
+    public void setAuthorizedApplications(List<OwnerApplication> authorizedApplications) {
+        this.authorizedApplications = authorizedApplications;
+    }
+
+
+    public URI getWonNodeURI() {
+        return wonNodeURI;
+    }
+
+    public void setWonNodeURI(URI wonNodeURI) {
+        this.wonNodeURI = wonNodeURI;
+    }
 }

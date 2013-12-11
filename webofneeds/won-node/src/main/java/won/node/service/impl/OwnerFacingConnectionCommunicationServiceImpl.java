@@ -19,6 +19,8 @@ package won.node.service.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import won.protocol.need.NeedProtocolNeedClientSide;
 import won.node.facet.impl.FacetRegistry;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
@@ -27,7 +29,9 @@ import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.service.ConnectionCommunicationService;
 
+import won.protocol.util.DataAccessUtils;
 import java.net.URI;
+
 
 /**
  * User: fkleedorfer

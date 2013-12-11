@@ -35,6 +35,19 @@
                  <dependencyManagement> section in the parent pom!
 
         -->
+        <!-- Messaging stuff -->
+        <dependency>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
         <!-- REST stuff -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -86,7 +99,10 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons-core</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
+        </dependency>
         <!-- ORM  -->
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -137,21 +153,16 @@
         <!-- LOGGING -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
         </dependency>
-
         <!-- TESTING -->
         <dependency>
             <groupId>org.springframework</groupId>

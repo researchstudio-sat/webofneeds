@@ -16,6 +16,7 @@
 
 package won.node.service.impl;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -73,8 +74,16 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   private NeedInformationService needInformationService;
 
+    public void setActiveMqEndpoint(String activeMqEndpoint) {
+        this.activeMqEndpoint = activeMqEndpoint;
+    }
 
-  public Model listNeedURIs(final int page)
+    private String activeMqEndpoint;
+    private String activeMqNeedProtcolQueueName;
+    private String activeMqOwnerProtcolQueueName;
+
+
+    public Model listNeedURIs(final int page)
   {
     Collection<URI> uris = null;
     if (page >= 0) {
@@ -95,6 +104,15 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
     return model;
   }
+    public Model showNodeInformation(final int page)
+    {
+        Model model = ModelFactory.createDefaultModel();
+        setNsPrefixes(model);
+        Resource showNodePageResource = null;
+        showNodePageResource = model.createResource(this.resourceURIPrefix);
+        addProtocolEndpoints(model, showNodePageResource);
+        return model;
+    }
 
   public Model listConnectionURIs(final int page)
   {
@@ -141,12 +159,35 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     return model;
   }
+    public Model getNodeModel()
+    {
+        Model model = ModelFactory.createDefaultModel();
+        setNsPrefixes(model);
+        Resource showNodePageResource = null;
+        showNodePageResource = model.createResource(this.resourceURIPrefix);
+        addProtocolEndpoints(model, showNodePageResource);
+        return model;
+    }
 
+  //TODO: protocol endpoint specification in RDF model needs refactoring!
   private void addProtocolEndpoints(Model model, Resource res)
   {
-    res.addProperty(WON.NEED_PROTOCOL_ENDPOINT, model.createResource(this.needProtocolEndpoint))
-        .addProperty(WON.OWNER_PROTOCOL_ENDPOINT, model.createResource(this.ownerProtocolEndpoint))
-        .addProperty(WON.MATCHER_PROTOCOL_ENDPOINT, model.createResource(this.matcherProtocolEndpoint));
+      Resource blankNodeActiveMq = model.createResource();
+      res.addProperty(WON.SUPPORTS_WON_PROTOCOL_IMPL, blankNodeActiveMq);
+      blankNodeActiveMq
+              .addProperty(RDF.type, WON.WON_OVER_ACTIVE_MQ)
+              .addProperty(WON.HAS_BROKER_URI, model.createResource(this.activeMqEndpoint))
+          .addProperty(WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME,this.activeMqOwnerProtcolQueueName,XSDDatatype.XSDstring)
+              .addProperty(WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME,this.activeMqNeedProtcolQueueName,XSDDatatype.XSDstring)
+      ;
+      Resource blankNodeSoapWs = model.createResource();
+      res.addProperty(WON.SUPPORTS_WON_PROTOCOL_IMPL, blankNodeSoapWs);
+      blankNodeSoapWs
+              .addProperty(RDF.type, WON.WON_OVER_SOAP_WS)
+              .addProperty(WON.HAS_MATCHER_PROTOCOL_ENDPOINT,model.createResource(this.matcherProtocolEndpoint))
+              .addProperty(WON.HAS_NEED_PROTOCOL_ENDPOINT,model.createResource(this.needProtocolEndpoint))
+              .addProperty(WON.HAS_OWNER_PROTOCOL_ENDPOINT,model.createResource(this.ownerProtocolEndpoint));
+
   }
 
   public Model getConnectionModel(final URI connectionUri) throws NoSuchConnectionException
@@ -304,4 +345,12 @@ public class LinkedDataServiceImpl implements LinkedDataService
   {
     this.pageSize = pageSize;
   }
+
+    public void setActiveMqOwnerProtcolQueueName(String activeMqOwnerProtcolQueueName) {
+        this.activeMqOwnerProtcolQueueName = activeMqOwnerProtcolQueueName;
+    }
+
+    public void setActiveMqNeedProtcolQueueName(String activeMqNeedProtcolQueueName) {
+        this.activeMqNeedProtcolQueueName = activeMqNeedProtcolQueueName;
+    }
 }

@@ -19,6 +19,7 @@ package won.node.service.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.facet.impl.FacetRegistry;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
@@ -26,9 +27,15 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
+import won.protocol.exception.WonProtocolException;
+import won.protocol.model.*;
+import won.protocol.repository.*;
 import won.protocol.service.ConnectionCommunicationService;
 
 import java.net.URI;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * User: fkleedorfer
@@ -40,6 +47,21 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private FacetRegistry reg;
   private DataAccessService dataService;
+
+  private ExecutorService executorService;
+
+  @Autowired
+  private ConnectionRepository connectionRepository;
+  @Autowired
+  private ChatMessageRepository chatMessageRepository;
+  @Autowired
+  private EventRepository eventRepository;
+  @Autowired
+  private RDFStorageService rdfStorageService;
+  @Autowired
+  private OwnerApplicationRepository ownerApplicationRepository;
+  @Autowired
+  private NeedRepository needRepository;
 
   @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException

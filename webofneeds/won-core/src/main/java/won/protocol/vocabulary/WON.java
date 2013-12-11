@@ -28,22 +28,31 @@ import won.protocol.model.NeedState;
 /**
  * WON vocabulary.
  * <p/>
- * User: fkleedorfer
+ * User: fkleedorfer                     public Model showNodeInformation(final int page)
  * Date: 20.11.12
  */
 public class WON
 {
   public static final String BASE_URI = "http://purl.org/webofneeds/model#";
-  private static Model m = ModelFactory.createDefaultModel();
 
+
+    private static Model m = ModelFactory.createDefaultModel();
+
+  public static final Resource NODE = m.createResource(BASE_URI+"Node");
   public static final Resource NEED = m.createResource(BASE_URI + "Need");
   public static final Property NEED_CREATION_DATE = m.createProperty(BASE_URI, "needCreationDate");
-  public static final Property NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "needProtocolEndpoint");
-  public static final Property MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "matcherProtocolEndpoint");
-  public static final Property OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "ownerProtocolEndpoint");
+  public static final Property HAS_NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasNeedProtocolEndpoint");
+  public static final Property HAS_MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasMatcherProtocolEndpoint");
+  public static final Property HAS_OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasOwnerProtocolEndpoint");
+
+  public static final Property HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,"hasActiveMQNeedProtocolQueueName");
+  public static final Property HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,"hasActiveMQOwnerProtocolQueueName");
   public static final Property EMBED_SPIN_ASK = m.createProperty(BASE_URI, "embedSpinAsk");
 
-
+  public static final Property SUPPORTS_WON_PROTOCOL_IMPL = m.createProperty(BASE_URI + "supportsWonProtocolImpl");
+  public static final Resource WON_OVER_ACTIVE_MQ = m.createResource(BASE_URI + "WonOverActiveMq");
+  public static final Property HAS_BROKER_URI = m.createProperty(BASE_URI,"hasBrokerUri");
+  public static final Resource WON_OVER_SOAP_WS = m.createResource(BASE_URI + "WonOverSoapWs");
   public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
   public static final Resource NEED_STATE = m.createResource(BASE_URI + "NeedState");
 

@@ -1,0 +1,127 @@
+/*
+ * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package won.node.ws;
+
+import com.google.common.util.concurrent.SettableFuture;
+import com.hp.hpl.jena.rdf.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import won.node.protocol.impl.NeedProtocolNeedClientFactory;
+import won.protocol.model.Connection;
+import won.protocol.need.NeedProtocolNeedClientSide;
+import won.protocol.util.RdfUtils;
+import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
+import won.protocol.exception.*;
+import won.protocol.ws.fault.ConnectionAlreadyExistsFault;
+import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
+import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
+import won.protocol.ws.fault.NoSuchConnectionFault;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.text.MessageFormat;
+import java.util.concurrent.Future;
+
+/**
+ * User: fkleedorfer
+ * Date: 28.11.12
+ */
+public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClientSide
+{
+  final Logger logger = LoggerFactory.getLogger(getClass());
+
+  @Autowired
+  private NeedProtocolNeedClientFactory clientFactory;
+
+  @Override
+  public Future<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  {
+
+    logger.info("need-facing: CONNECT called for other need {}, own need {}, own connection {}, and content {}",
+        new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
+    try {
+      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForNeed(needURI);
+      URI result = proxy.connect(needURI, otherNeedURI, otherConnectionURI, RdfUtils.toString(content));
+      SettableFuture<URI> futureResult = SettableFuture.create();
+      futureResult.set(result);
+
+    } catch (MalformedURLException e) {
+      //TODO think this through: what happens if we return null here?
+      logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    } catch (ConnectionAlreadyExistsFault connectionAlreadyExistsFault) {
+      throw ConnectionAlreadyExistsFault.toException(connectionAlreadyExistsFault);
+    } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
+      throw IllegalMessageForNeedStateFault.toException(illegalMessageForNeedStateFault);
+    }
+    return null;
+  }
+
+    @Override
+    public void open(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connection));
+        try {
+            NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
+            proxy.open(connection.getRemoteConnectionURI(), RdfUtils.toString(content));
+        } catch (MalformedURLException e) {
+            logger.warn("couldnt create URL for needProtocolEndpoint", e);
+        } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+          throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+        } catch (NoSuchConnectionFault noSuchConnectionFault) {
+          throw NoSuchConnectionFault.toException(noSuchConnectionFault);
+        }
+    }
+
+  @Override
+  public void close(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  {
+    logger.info("need-facing: CLOSE called for connection {}", connection);
+    try {
+      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
+      proxy.close(connection.getRemoteConnectionURI(), RdfUtils.toString(content));
+    } catch (MalformedURLException e) {
+      logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+      throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+    } catch (NoSuchConnectionFault noSuchConnectionFault) {
+      throw NoSuchConnectionFault.toException(noSuchConnectionFault);
+    }
+  }
+
+  @Override
+  public void textMessage(final Connection connection, final String messager) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  {
+    logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, messager);
+    try {
+      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
+      proxy.textMessage(connection.getRemoteConnectionURI(), messager);
+    } catch (MalformedURLException e) {
+      logger.warn("couldn't create URL for needProtocolEndpoint", e);
+    } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
+      throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
+    } catch (NoSuchConnectionFault noSuchConnectionFault) {
+      throw NoSuchConnectionFault.toException(noSuchConnectionFault);
+    }
+  }
+
+  public void setClientFactory(final NeedProtocolNeedClientFactory clientFactory)
+  {
+    this.clientFactory = clientFactory;
+  }
+
+
+}

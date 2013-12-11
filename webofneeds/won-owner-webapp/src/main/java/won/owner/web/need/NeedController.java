@@ -8,6 +8,7 @@ import com.hp.hpl.jena.vocabulary.DC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.NeedPojo;
-import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
 import won.protocol.exception.ConnectionAlreadyExistsException;
@@ -24,6 +25,7 @@ import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.model.NeedState;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.MatchRepository;
@@ -33,9 +35,12 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Created with IntelliJ IDEA.
@@ -51,7 +56,8 @@ public class NeedController
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private OwnerProtocolNeedService ownerService;
+  @Qualifier("ownerProtocolNeedServiceClient")
+  private OwnerProtocolNeedServiceClientSide ownerService;
 
   @Autowired
   private NeedRepository needRepository;
@@ -86,7 +92,7 @@ public class NeedController
     this.uriService = uriService;
   }
 
-  public void setOwnerService(OwnerProtocolNeedService ownerService)
+  public void setOwnerService(OwnerProtocolNeedServiceClientSide ownerService)
   {
     this.ownerService = ownerService;
   }
@@ -115,8 +121,7 @@ public class NeedController
 
   //TODO use NeedModelBuilder here instead
   @RequestMapping(value = "/create", method = RequestMethod.POST)
-  public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model)
-  {
+  public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) throws ExecutionException, InterruptedException, IOException, URISyntaxException {
     URI needURI;
 
     try {
@@ -197,13 +202,15 @@ public class NeedController
       needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
 
       if (needPojo.getWonNode().equals("")) {
-        needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+          Future<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+          needURI = futureResult.get();
       } else {
-        needURI = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, needPojo.getWonNode());
+          Future<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE,URI.create(needPojo.getWonNode()));
+          needURI = futureResult.get();
       }
 
       List<Need> needs = needRepository.findByNeedURI(needURI);
-
+      //TODO: race condition between need saving logic and redirect. adapt interface.
       if (needs.size() == 1)
         return "redirect:/need/" + needs.get(0).getId().toString();
       // return viewNeed(need.getId().toString(), model);
@@ -320,9 +327,13 @@ public class NeedController
       logger.warn("caught IllegalMessageForNeedStateException:", e);
     } catch (NoSuchNeedException e) {
       logger.warn("caught NoSuchNeedException:", e);
+    }  catch (InterruptedException e) {
+       logger.warn("caught InterruptedException", e);
+    } catch (ExecutionException e) {
+        logger.warn("caught ExcutionException", e);
     }
 
-    return "noNeedFound";
+      return "noNeedFound";
   }
 
   @RequestMapping(value = "/{needId}/toggle", method = RequestMethod.POST)
@@ -365,8 +376,12 @@ public class NeedController
       logger.warn("caught IllegalMessageForNeedStateException:", e);
     } catch (NoSuchNeedException e) {
       logger.warn("caught NoSuchNeedException:", e);
+    } catch (InterruptedException e) {
+      logger.warn("caught InterruptedEception",e);
+    } catch (ExecutionException e) {
+      logger.warn("caught ExecutionException",e);
     }
 
-    return ret;
+      return ret;
   }
 }

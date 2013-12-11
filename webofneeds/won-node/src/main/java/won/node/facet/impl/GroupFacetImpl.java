@@ -11,7 +11,6 @@ import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
 
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -32,55 +31,20 @@ public class GroupFacetImpl extends Facet {
     return FacetType.GroupFacet;
   }
 
-  @Override
-  public void textMessageFromOwner(final Connection con, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info("SEND_TEXT_Message received with facet type GroupFacet from Owner");
-    List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
-        ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
-
-    for (Connection c : cons) {
-      final URI remoteConnectionURI = c.getRemoteConnectionURI();
-      //inform the other side
-      executorService.execute(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            needFacingConnectionClient.textMessage(remoteConnectionURI, message);
-          } catch (WonProtocolException e) {
-            logger.warn("caught WonProtocolException:", e);
-          }
-        }
-      });
-    }
-  }
-
-  @Override
+    @Override
   public void textMessageFromNeed(final Connection con, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.info("SEND_TEXT_Message received with facet type GroupFacet from Need");
     List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
         ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
-
-    executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
-        } catch (WonProtocolException e) {
-          logger.warn("caught WonProtocolException:", e);
-        }
-      }
-    });
-    for (Connection c : cons) {
+    for (final Connection c : cons) {
       if(! c.equals(con)) {
-        final URI remoteConnectionURI = c.getRemoteConnectionURI();
-        //final URI ownerURI = c.getConnectionURI();
         //inform the other side
         executorService.execute(new Runnable() {
           @Override
           public void run() {
             try {
               //ownerFacingConnectionClient.textMessage(ownerURI, message);
-              needFacingConnectionClient.textMessage(remoteConnectionURI, message);
+              needFacingConnectionClient.textMessage(c, message);
             } catch (WonProtocolException e) {
               logger.warn("caught WonProtocolException:", e);
             }

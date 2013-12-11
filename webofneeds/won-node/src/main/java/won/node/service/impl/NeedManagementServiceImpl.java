@@ -28,9 +28,9 @@ import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Facet;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
+import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.util.DataAccessUtils;
@@ -48,8 +48,9 @@ import java.util.Collection;
 public class NeedManagementServiceImpl implements NeedManagementService
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
+  private OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService;
   //used to close connections when a need is deactivated
-  private ConnectionCommunicationService ownerFacingConnectionCommunicationService;
+  private OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
   private NeedInformationService needInformationService;
   private URIService URIService;
   private RDFStorageService rdfStorage;
@@ -60,7 +61,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   private FacetRepository facetRepository;
 
   @Override
-  public URI createNeed(final URI ownerURI, final Model content, final boolean activate) throws IllegalNeedContentException
+  public URI createNeed(final URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException
   {
     if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
     Need need = new Need();
@@ -96,6 +97,11 @@ public class NeedManagementServiceImpl implements NeedManagementService
     return need.getNeedURI();
   }
 
+    @Override
+    public void authorizeOwnerApplicationForNeed(String ownerApplicationID, URI needURI) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 
   @Override
   public void activate(final URI needURI) throws NoSuchNeedException
@@ -129,7 +135,13 @@ public class NeedManagementServiceImpl implements NeedManagementService
     return NeedState.ACTIVE == need.getState();
   }
 
-  public void setOwnerFacingConnectionCommunicationService(final ConnectionCommunicationService ownerFacingConnectionCommunicationService)
+
+  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService)
+  {
+    this.ownerProtocolOwnerService = ownerProtocolOwnerService;
+  }
+
+  public void setOwnerFacingConnectionCommunicationService(final OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService)
   {
     this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
   }
