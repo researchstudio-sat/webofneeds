@@ -148,6 +148,7 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
 
             if (!brokerURI.equals(ownBrokerURI)){
                  //TODO: implement register method for node-to-node communication
+                 //TODO: -> registration for node-to-node messaging is not needed at the moment. 20131210
 
                 tempComponentName = componentName+remoteBrokerURI.toString().replaceAll("[/:]","");
                 //if (camelContext.getComponent(tempComponentName)==null)   {
