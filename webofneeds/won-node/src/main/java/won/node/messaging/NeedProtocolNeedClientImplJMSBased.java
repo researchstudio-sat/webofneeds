@@ -17,16 +17,11 @@
 package won.node.messaging;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import won.node.protocol.impl.NeedProtocolNeedClientFactory;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
@@ -92,23 +87,23 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
 
   }
-    @Override
-    public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connectionURI));
 
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+    public void open(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connection));
+
+       // Connection con = DataAccessUtils.loadConnection(connectionRepository, connection);
         Map headerMap = new HashMap<String, String>();
 
         headerMap.put("protocol","NeedProtocol");
         //remoteConnectionURI is the connectionURI on the other node.
-        headerMap.put("connectionURI", con.getRemoteConnectionURI().toString()) ;
+        headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
         headerMap.put("content", RdfUtils.toString(content));
         headerMap.put("methodName","open");
 
 
         try {
 
-            needProtocolActiveMQService.configureCamelEndpointForConnection(connectionURI,"seda:NeedProtocol.out.open");
+            needProtocolActiveMQService.configureCamelEndpointForConnection(connection.getConnectionURI(),"seda:NeedProtocol.out.open");
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -117,22 +112,22 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
         messagingService.sendInOnlyMessage(null,headerMap,null, "seda:NeedProtocol.out.open" );
     }
 
-    @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+
+  public void close(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-      logger.info("need-facing: CLOSE called for connection {}", connectionURI);
-      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+      logger.info("need-facing: CLOSE called for connection {}", connection);
+      //Connection con = DataAccessUtils.loadConnection(connectionRepository, connection);
       Map headerMap = new HashMap<String, String>();
 
       headerMap.put("protocol","NeedProtocol");
       //remoteConnectionURI is the connectionURI on the other node.
-      headerMap.put("connectionURI", con.getRemoteConnectionURI().toString()) ;
+      headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
       headerMap.put("content", RdfUtils.toString(content));
       headerMap.put("methodName","close");
 
       try {
 
-          needProtocolActiveMQService.configureCamelEndpointForConnection(connectionURI,"seda:NeedProtocol.out.close");
+          needProtocolActiveMQService.configureCamelEndpointForConnection(connection.getConnectionURI(),"seda:NeedProtocol.out.close");
       } catch (Exception e) {
           e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
@@ -141,21 +136,21 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
   }
 
-  @Override
-  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+
+  public void textMessage(final Connection connection, final String messager) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-      logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
-      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+      logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, messager);
+      //Connection con = DataAccessUtils.loadConnection(connectionRepository, connection);
       Map headerMap = new HashMap<String, String>();
       headerMap.put("protocol","NeedProtocol");
       //remoteConnectionURI is the connectionURI on the other node.
-      headerMap.put("connectionURI", con.getRemoteConnectionURI().toString()) ;
-      headerMap.put("content", message);
+      headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
+      headerMap.put("content", messager);
       headerMap.put("methodName","textMessage");
 
       try {
 
-          needProtocolActiveMQService.configureCamelEndpointForConnection(connectionURI,"seda:NeedProtocol.out.textMessage");
+          needProtocolActiveMQService.configureCamelEndpointForConnection(connection.getConnectionURI(),"seda:NeedProtocol.out.textMessage");
       } catch (Exception e) {
           e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }

@@ -22,11 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.protocol.impl.NeedProtocolNeedClientFactory;
+import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.*;
-import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.ws.fault.ConnectionAlreadyExistsFault;
 import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
 import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
@@ -72,11 +72,11 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   }
 
     @Override
-    public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connectionURI));
+    public void open(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connection));
         try {
-            NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connectionURI);
-            proxy.open(connectionURI, RdfUtils.toString(content));
+            NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
+            proxy.open(connection.getRemoteConnectionURI(), RdfUtils.toString(content));
         } catch (MalformedURLException e) {
             logger.warn("couldnt create URL for needProtocolEndpoint", e);
         } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
@@ -87,12 +87,12 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
     }
 
   @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void close(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("need-facing: CLOSE called for connection {}", connectionURI);
+    logger.info("need-facing: CLOSE called for connection {}", connection);
     try {
-      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connectionURI);
-      proxy.close(connectionURI, RdfUtils.toString(content));
+      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
+      proxy.close(connection.getRemoteConnectionURI(), RdfUtils.toString(content));
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
@@ -103,12 +103,12 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   }
 
   @Override
-  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessage(final Connection connection, final String messager) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
+    logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, messager);
     try {
-      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connectionURI);
-      proxy.textMessage(connectionURI, message);
+      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
+      proxy.textMessage(connection.getRemoteConnectionURI(), messager);
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {

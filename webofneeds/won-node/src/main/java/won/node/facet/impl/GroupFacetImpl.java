@@ -36,7 +36,7 @@ public class GroupFacetImpl extends Facet {
     logger.info("SEND_TEXT_Message received with facet type GroupFacet from Need");
     List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
         ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
-    for (Connection c : cons) {
+    for (final Connection c : cons) {
       if(! c.equals(con)) {
         //inform the other side
         executorService.execute(new Runnable() {
@@ -44,7 +44,7 @@ public class GroupFacetImpl extends Facet {
           public void run() {
             try {
               //ownerFacingConnectionClient.textMessage(ownerURI, message);
-              needFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+              needFacingConnectionClient.textMessage(c, message);
             } catch (WonProtocolException e) {
               logger.warn("caught WonProtocolException:", e);
             }

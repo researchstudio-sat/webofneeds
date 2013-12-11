@@ -35,7 +35,7 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 02.11.12
  */
-public class NeedProtocolNeedServiceImplJMSBased implements NeedProtocolNeedService
+public class NeedProtocolNeedServiceImplJMSBased
 {
   protected NeedFacingNeedCommunicationService needFacingNeedCommunicationService;
   protected NeedFacingConnectionCommunicationServiceImpl connectionCommunicationService;
@@ -88,26 +88,7 @@ public class NeedProtocolNeedServiceImplJMSBased implements NeedProtocolNeedServ
   {
     this.connectionCommunicationService = connectionCommunicationService;
   }
-   //TODO: Refactoring of service interfaces needed. the four methods below differs from the methods above in parameter types. These methods are used by WSBased class.
-    @Override
-    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 
-    @Override
-    public void close(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void textMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public URI connect(URI needURI, URI otherNeedURI, URI otherConnectionURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
 
     public void setDelegate(NeedProtocolNeedService delegate) {
         this.delegate = delegate;

@@ -21,16 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
+import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
-import won.protocol.need.NeedProtocolNeedService;
-import won.protocol.util.RdfUtils;
-import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
-import won.protocol.ws.fault.ConnectionAlreadyExistsFault;
-import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
-import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
-import won.protocol.ws.fault.NoSuchConnectionFault;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.concurrent.Future;
@@ -60,24 +53,24 @@ public class NeedProtocolNeedClient implements NeedProtocolNeedClientSide
   }
 
     @Override
-    public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connectionURI));
-        delegate.open(connectionURI,content);
+    public void open(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connection));
+        delegate.open(connection,content);
     }
 
   @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void close(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("need-facing: CLOSE called for connection {}", connectionURI);
-    delegate.close(connectionURI,content);
+    logger.info("need-facing: CLOSE called for connection {}", connection);
+    delegate.close(connection,content);
 
   }
 
   @Override
-  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessage(final Connection connection, final String messager) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
-    delegate.textMessage(connectionURI,message);
+    logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, messager);
+    delegate.textMessage(connection, messager);
 
   }
 
