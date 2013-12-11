@@ -24,9 +24,8 @@ import java.net.URI;
  */
 public interface NeedProtocolActiveMQService extends ActiveMQService {
 
-    public void configureCamelEndpointForNeeds(URI needURI, URI otherNeedURI, String from) throws Exception;
+    public String getCamelEndpointForNeed(URI needURI, URI otherNeedURI, String from) throws Exception;
     public String getActiveMQNeedProtocolQueueNameForNeed(URI needURI);
-    public void configureCamelEndpointForConnection(URI connectionURI,String from) throws Exception;
-    public String getEndpoint();
+    public String getCamelEndpointForConnection(URI connectionURI, String from) throws Exception;
 
 }

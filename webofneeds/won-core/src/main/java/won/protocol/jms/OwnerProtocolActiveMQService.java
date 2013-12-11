@@ -23,6 +23,7 @@ import java.net.URI;
  * Date: 28.11.13
  */
 public interface OwnerProtocolActiveMQService extends ActiveMQService{
+
     public String getActiveMQOwnerProtocolQueueNameForNeed(URI needURI);
     public URI configureCamelEndpointForNodeURI( URI wonNodeURI, String from) throws Exception;
     public void configureCamelEndpointForConnection(URI connectionURI,String from) throws Exception;

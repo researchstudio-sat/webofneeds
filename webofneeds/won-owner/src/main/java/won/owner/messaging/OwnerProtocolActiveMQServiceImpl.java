@@ -142,7 +142,6 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
 
     }
 
-    @Override
     public String getEndpoint() {
         return endpoint;
     }
