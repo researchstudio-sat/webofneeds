@@ -69,7 +69,7 @@ public abstract class Facet {
         @Override
         public void run() {
           try {
-              needFacingConnectionClient.open(con.getConnectionURI(), content);
+              needFacingConnectionClient.open(con, content);
             //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
           } catch (WonProtocolException e) {
             logger.debug("caught Exception:", e);
@@ -88,7 +88,7 @@ public abstract class Facet {
         public void run()
         {
           try {
-              needFacingConnectionClient.close(con.getConnectionURI(), content);
+              needFacingConnectionClient.close(con, content);
               //needFacingConnectionClient.close(con.getRemoteConnectionURI(), content);
           } catch (WonProtocolException e) {
             logger.warn("caught WonProtocolException:", e);
@@ -105,7 +105,7 @@ public abstract class Facet {
       @Override
       public void run() {
         try {
-            needFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+            needFacingConnectionClient.textMessage(con, message);
          // needFacingConnectionClient.textMessage(remoteConnectionURI, message);
         } catch (WonProtocolException e) {
           logger.warn("caught WonProtocolException:", e);

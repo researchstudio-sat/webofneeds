@@ -74,7 +74,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     //todo: make this configurable
     private String startingEndpoint ="seda:outgoingMessages";
 
-    private OwnerProtocolActiveMQService ownerProtocolActiveMQService;
+    private OwnerProtocolActiveMQServiceImpl ownerProtocolActiveMQService;
 
     @Autowired
     private WonNodeRepository wonNodeRepository;
@@ -403,7 +403,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         return this.camelContext; //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void setOwnerProtocolActiveMQService(OwnerProtocolActiveMQService ownerProtocolActiveMQService) {
+    public void setOwnerProtocolActiveMQService(OwnerProtocolActiveMQServiceImpl ownerProtocolActiveMQService) {
         this.ownerProtocolActiveMQService = ownerProtocolActiveMQService;
     }
 
