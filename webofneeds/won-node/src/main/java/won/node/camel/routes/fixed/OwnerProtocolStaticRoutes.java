@@ -45,6 +45,7 @@ public class OwnerProtocolStaticRoutes extends RouteBuilder {
             .when(header("methodName").isEqualTo("close"))
             .to("bean:ownerProtocolNeedJMSService?method=close")
             .when(header("methodName").isEqualTo("textMessage"))
+            .to("log:Route. Owner Protocol TextMessage Received")
             .to("bean:ownerProtocolNeedJMSService?method=textMessage")
             .when(header("methodName").isEqualTo("registerOwnerApplication"))
             .to("bean:ownerProtocolNeedJMSService?method=registerOwnerApplication")

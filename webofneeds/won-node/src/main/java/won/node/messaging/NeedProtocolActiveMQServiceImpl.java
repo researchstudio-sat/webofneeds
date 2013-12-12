@@ -140,10 +140,19 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
      * @throws Exception
      */
     public String getCamelEndpointForNeed(URI needURI, URI otherNeedURI, String from) throws Exception {
-        logger.debug("fetching camel endpoint for need {}, remote need {}, from {}", new Object[]{needURI, otherNeedURI, from});
+        logger.info("fetching camel endpoint for need {}, remote need {}, from {}", new Object[]{needURI, otherNeedURI, from});
+        List<String> endpointList = new ArrayList<>();
         String endpoint = knownBrokersByNeed.get(otherNeedURI);
-        logger.debug("cached endpoint for need {},is {}", otherNeedURI, endpoint);
-        if (endpoint != null) return endpoint;
+        logger.info("cached endpoint for need {},is {}", otherNeedURI, endpoint);
+        if (endpoint != null){
+            endpointList.add(endpoint);
+            // tempComponentName = tempComponentName+endpoint.replaceAll(":","_");
+            ActiveMQConnectionFactory activemqConnectionFactory = (ActiveMQConnectionFactory) applicationContext.getBean("activemqConnectionFactory");
+
+            NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,endpointList,from);
+            addRoutes(needProtocolRouteBuilder);
+            return endpoint;
+        }
         if (camelContext.getEndpoint(from)!=null){
 
             URI remoteBrokerURI = getActiveMQBrokerURIForNode(otherNeedURI);
@@ -175,7 +184,7 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
             //endpoint = tempComponentName+":queue:"+getActiveMQNeedProtocolQueueNameForNeed(needURI);
             endpoint = tempComponentName+":queue:"+getActiveMQNeedProtocolQueueNameForNeed(needURI);
             logger.debug("created endpoint: {} for need {}", endpoint, otherNeedURI);
-            List<String> endpointList = new ArrayList<>();
+
             endpointList.add(endpoint);
            // tempComponentName = tempComponentName+endpoint.replaceAll(":","_");
             ActiveMQConnectionFactory activemqConnectionFactory = (ActiveMQConnectionFactory) applicationContext.getBean("activemqConnectionFactory");
