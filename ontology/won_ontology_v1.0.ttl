@@ -66,15 +66,15 @@ xsd:duration rdf:type rdfs:Datatype .
 
 
 
-###  http://purl.org/webofneeds/model#hasAdditionalInformation
+###  http://purl.org/webofneeds/model#hasAdditionalData
 
-:hasAdditionalInformation rdf:type owl:ObjectProperty ;
-                          
-                          rdfs:comment "Contains additional information in form of an RDF graph about an event."^^xsd:string ;
-                          
-                          rdfs:domain :Event ;
-                          
-                          rdfs:range owl:Thing .
+:hasAdditionalData rdf:type owl:ObjectProperty ;
+                   
+                   rdfs:comment "Contains additional information in form of an RDF graph about an event."^^xsd:string ;
+                   
+                   rdfs:domain :Event ;
+                   
+                   rdfs:range owl:Thing .
 
 
 
@@ -339,6 +339,16 @@ xsd:duration rdf:type rdfs:Datatype .
 
 
 
+###  http://purl.org/webofneeds/model#hasTag
+
+:hasTag rdf:type owl:ObjectProperty ;
+        
+        rdfs:comment "Specifies a tag for the need content." ;
+        
+        rdfs:range xsd:string .
+
+
+
 ###  http://purl.org/webofneeds/model#hasTextDescription
 
 :hasTextDescription rdf:type owl:FunctionalProperty ,
@@ -546,9 +556,7 @@ xsd:duration rdf:type rdfs:Datatype .
 
 :hasTag rdf:type owl:DatatypeProperty ;
         
-        rdfs:comment "Specifies a tag for the need content." ;
-        
-        rdfs:range xsd:string .
+        rdfs:comment "Specifies a tag for the need content." .
 
 
 
