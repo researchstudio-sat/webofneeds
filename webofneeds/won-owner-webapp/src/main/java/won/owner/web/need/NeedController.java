@@ -16,16 +16,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.NeedPojo;
-import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.model.*;
-import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.model.Facet;
+import won.protocol.model.Match;
+import won.protocol.model.Need;
 import won.protocol.model.NeedState;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.MatchRepository;
@@ -155,10 +156,6 @@ public class NeedController
           needModel.add(needModel.createStatement(needResource, WON.HAS_FACET, needModel.createResource(ft)));
       }
 
-      // owner
-      if (needPojo.isAnonymize()) {
-        needModel.add(needModel.createStatement(needResource, WON.HAS_OWNER, WON.ANONYMIZED_OWNER));
-      }
 
       // need modalities
       Resource needModality = needModel.createResource(WON.NEED_MODALITY);

@@ -1,7 +1,9 @@
 package won.node.facet.impl;
 
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.vocabulary.WON;
 
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -163,12 +166,7 @@ public abstract class Facet {
   public void hint(final Connection con, final double score, final URI originator, final Model content)
       throws NoSuchNeedException, IllegalMessageForNeedStateException {
 
-    ResIterator remoteFacetIt = content.listSubjectsWithProperty(RDF.type, WON.HAS_REMOTE_FACET);
-    if (!remoteFacetIt.hasNext())
-      throw new IllegalArgumentException("at least one RDF node must be of type won:RemoteFacet");
-
-    //TODO: This should just remove RemoteFacet from content and replace the value of Facet with the one from RemoteFacet
-    final Model remoteFacetModel = remoteFacetIt.next().getModel();
+    final Model remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
 
     executorService.execute(new Runnable() {
       @Override
@@ -214,22 +212,8 @@ public abstract class Facet {
   }
 
   public void connectFromOwner(final Connection con, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    Resource baseRes = content.getResource(content.getNsPrefixURI(""));
 
-    StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_REMOTE_FACET);
-    if (!stmtIterator.hasNext())
-      throw new IllegalArgumentException("at least one RDF node must be of type won:hasRemoteFacet");
-
-    //TODO: This should just remove RemoteFacet from content and replace the value of Facet with the one from RemoteFacet
-
-    final Model remoteFacetModel = ModelFactory.createDefaultModel();
-
-    remoteFacetModel.setNsPrefix("", "no:uri");
-    baseRes = remoteFacetModel.createResource(remoteFacetModel.getNsPrefixURI(""));
-    Resource remoteFacetResource = stmtIterator.next().getObject().asResource();
-    baseRes.addProperty(WON.HAS_FACET, remoteFacetModel.createResource(remoteFacetResource.getURI()));
-    RDFDataMgr.write(System.out, remoteFacetModel, Lang.TTL);
-
+    final Model remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
     final Connection connectionForRunnable = con;
     //send to need
     executorService.execute(new Runnable() {
@@ -257,6 +241,39 @@ public abstract class Facet {
         }
       }
     });
+
+  }
+
+  /**
+   * Creates a copy of the specified model, replacing won:hasRemoteFacet by won:hasFacet.
+   * @param model
+   * @return
+   */
+  private Model changeHasRemoteFacetToHasFacet(Model model) {
+    Resource baseRes = model.getResource(model.getNsPrefixURI(""));
+
+    StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_REMOTE_FACET);
+    if (!stmtIterator.hasNext())
+      throw new IllegalArgumentException("at least one facet must be specified with won:hasRemoteFacet");
+
+
+    final Model newModel = ModelFactory.createDefaultModel();
+    newModel.setNsPrefix("", model.getNsPrefixURI(""));
+    newModel.add(model);
+    newModel.removeAll(null, WON.HAS_REMOTE_FACET, null);
+    baseRes = newModel.createResource(newModel.getNsPrefixURI(""));
+    while (stmtIterator.hasNext()) {
+      Resource facet = stmtIterator.nextStatement().getObject().asResource();
+      baseRes.addProperty(WON.HAS_FACET, facet);
+    }
+    if (logger.isDebugEnabled()){
+      StringWriter modelAsString = new StringWriter();
+      RDFDataMgr.write(modelAsString, model, Lang.TTL);
+      StringWriter newModelAsString = new StringWriter();
+      RDFDataMgr.write(newModelAsString, model, Lang.TTL);
+      logger.debug("changed hasRemoteFacet to hasFacet. Old: \n{},\n new: \n{}",modelAsString.toString(), newModelAsString.toString());
+    }
+    return newModel;
 
   }
 

@@ -38,9 +38,8 @@ public class WON
 
     private static Model m = ModelFactory.createDefaultModel();
 
-  public static final Resource NODE = m.createResource(BASE_URI+"Node");
+
   public static final Resource NEED = m.createResource(BASE_URI + "Need");
-  public static final Property NEED_CREATION_DATE = m.createProperty(BASE_URI, "needCreationDate");
   public static final Property HAS_NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasNeedProtocolEndpoint");
   public static final Property HAS_MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasMatcherProtocolEndpoint");
   public static final Property HAS_OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasOwnerProtocolEndpoint");
@@ -54,25 +53,14 @@ public class WON
   public static final Property HAS_BROKER_URI = m.createProperty(BASE_URI,"hasBrokerUri");
   public static final Resource WON_OVER_SOAP_WS = m.createResource(BASE_URI + "WonOverSoapWs");
   public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
-  public static final Resource NEED_STATE = m.createResource(BASE_URI + "NeedState");
 
   public static final Property HAS_BASIC_NEED_TYPE = m.createProperty(BASE_URI, "hasBasicNeedType");
-  public static final Resource BASIC_NEED_TYPE = m.createResource(BASE_URI + "BasicNeedType");
 
   public static final Property HAS_CONTENT = m.createProperty(BASE_URI, "hasContent");
   public static final Resource NEED_CONTENT = m.createResource(BASE_URI + "NeedContent");
   public static final Property HAS_TEXT_DESCRIPTION = m.createProperty(BASE_URI, "hasTextDescription");
   public static final Property HAS_CONTENT_DESCRIPTION = m.createProperty(BASE_URI, "hasContentDescription");
   public static final Property HAS_TAG = m.createProperty(BASE_URI, "hasTag");
-  public static final Property HAS_HEIGHT = m.createProperty(BASE_URI, "hasHeight");
-  public static final Property HAS_DEPTH = m.createProperty(BASE_URI, "hasDepth");
-  public static final Property HAS_WIDTH = m.createProperty(BASE_URI, "hasWidth");
-  public static final Property HAS_WEIGHT = m.createProperty(BASE_URI, "hasWeight");
-  public static final Property HAS_QUANTITATIVE_PROPERTY = m.createProperty(BASE_URI, "hasQuantitativeProperty");
-
-  public static final Property HAS_OWNER = m.createProperty(BASE_URI, "hasOwner");
-  public static final Resource OWNER = m.createResource(BASE_URI + "Owner");
-  public static final Resource ANONYMIZED_OWNER = m.createResource(BASE_URI + "AnonymizedOwner");
 
   public static final Property HAS_FACET = m.createProperty(BASE_URI, "hasFacet");
   public static final Resource FACET = m.createResource(BASE_URI + "Facet");
@@ -124,15 +112,18 @@ public class WON
   public static final Property HAS_RECUR_INFINITE_TIMES = m.createProperty(BASE_URI, "hasRecurInfiniteTimes");
 
   // Resource individuals
-  public static final Resource EVENT_TYPE_CLOSE = m.createResource(ConnectionEventType.OWNER_CLOSE.getURI().toString());
-  public static final Resource EVENT_TYPE_OPEN = m.createResource(ConnectionEventType.OWNER_OPEN.getURI().toString());
+  public static final Resource EVENT_TYPE_OWNER_CLOSE = m.createResource(ConnectionEventType.OWNER_CLOSE.getURI().toString());
+  public static final Resource EVENT_TYPE_OWNER_OPEN = m.createResource(ConnectionEventType.OWNER_OPEN.getURI().toString());
+  public static final Resource EVENT_TYPE_PARTNER_CLOSE = m.createResource(ConnectionEventType.PARTNER_CLOSE.getURI().toString());
+  public static final Resource EVENT_TYPE_PARTNER_OPEN = m.createResource(ConnectionEventType.PARTNER_OPEN.getURI().toString());
+  public static final Resource EVENT_TYPE_PARTNER_MESSAGE = m.createResource(ConnectionEventType.PARTNER_MESSAGE.getURI().toString());
+  public static final Resource EVENT_TYPE_OWNER_MESSAGE = m.createResource(ConnectionEventType.OWNER_MESSAGE.getURI().toString());
   public static final Resource EVENT_TYPE_HINT = m.createResource(ConnectionEventType.MATCHER_HINT.getURI().toString());
 
   public static final Resource BASIC_NEED_TYPE_DO_TOGETHER = m.createResource(BasicNeedType.DO_TOGETHER.getURI().toString());
   public static final Resource BASIC_NEED_TYPE_SUPPLY = m.createResource(BasicNeedType.SUPPLY.getURI().toString());
   public static final Resource BASIC_NEED_TYPE_DEMAND = m.createResource(BasicNeedType.DEMAND.getURI().toString());
   public static final Resource BASIC_NEED_TYPE_CRITIQUE = m.createResource(BasicNeedType.CRITIQUE.getURI().toString());
-  public static final Property ALLOWS_MATCH_WITH = m.createProperty(BASE_URI, "allowsMatchWith");
 
   public static final Resource NEED_STATE_ACTIVE = m.createResource(NeedState.ACTIVE.getURI().toString());
   public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
@@ -208,13 +199,19 @@ public class WON
   {
     switch (type) {
       case OWNER_CLOSE:
+        return EVENT_TYPE_OWNER_CLOSE;
       case PARTNER_CLOSE:
-        return EVENT_TYPE_CLOSE;
+        return EVENT_TYPE_PARTNER_CLOSE;
       case MATCHER_HINT:
         return EVENT_TYPE_HINT;
       case OWNER_OPEN:
+        return EVENT_TYPE_OWNER_OPEN;
       case PARTNER_OPEN:
-        return EVENT_TYPE_OPEN;
+        return EVENT_TYPE_PARTNER_OPEN;
+      case OWNER_MESSAGE:
+        return EVENT_TYPE_OWNER_MESSAGE;
+      case PARTNER_MESSAGE:
+        return EVENT_TYPE_PARTNER_MESSAGE;
       default:
         throw new IllegalStateException("No such case specified for " + type.name());
     }

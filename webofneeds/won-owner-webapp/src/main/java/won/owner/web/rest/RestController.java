@@ -249,11 +249,6 @@ public class RestController
         needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
       needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
 
-      // owner
-      if (needPojo.isAnonymize()) {
-        needModel.add(needModel.createStatement(needResource, WON.HAS_OWNER, WON.ANONYMIZED_OWNER));
-      }
-
       // need modalities
       Resource needModality = needModel.createResource(WON.NEED_MODALITY);
 

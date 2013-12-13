@@ -29,13 +29,16 @@ public enum ConnectionEventType
   //in general, be permissive about messages where possible. Don't care about duplicate messages
 
   //close may always be called. It always closes the connnection.
-  OWNER_CLOSE("Close", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
+  OWNER_CLOSE("OwnerClose", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
           ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED),
-  PARTNER_CLOSE("Close", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
+  PARTNER_CLOSE("PartnerClose", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
           ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED),
 
-  OWNER_OPEN("Open", ConnectionState.REQUEST_RECEIVED, ConnectionState.SUGGESTED),
-  PARTNER_OPEN("Open", ConnectionState.REQUEST_SENT, ConnectionState.SUGGESTED),
+  OWNER_OPEN("OwnerOpen", ConnectionState.REQUEST_RECEIVED, ConnectionState.SUGGESTED),
+  PARTNER_OPEN("PartnerOpen", ConnectionState.REQUEST_SENT, ConnectionState.SUGGESTED),
+
+  OWNER_MESSAGE("OwnerMessage", ConnectionState.CONNECTED),
+  PARTNER_MESSAGE("PartnerMessage", ConnectionState.CONNECTED),
 
   MATCHER_HINT("Hint");
 
