@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
+import won.protocol.exception.BrokerConfigurationFailedException;
 import won.protocol.jms.OwnerProtocolActiveMQService;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
@@ -48,7 +49,7 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  * User: sbyim
  * Date: 28.11.13
  */
-public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,OwnerProtocolActiveMQService {
+public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListener,CamelContextAware,OwnerProtocolActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private CamelContext camelContext;
     private String componentName;
@@ -94,13 +95,17 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         // according to this code. This should be explicitly defined somewhere
         URI resourceURI = URI.create(wonNodeURI.toString()+"/resource");
         URI brokerURI = getActiveMQBrokerURIForNode(resourceURI);
+
         String tempComponentName = componentName;
         String tempStartingComponentName = startingComponent;
         if (!wonNodeURI.equals(URI.create(defaultNodeURI))){
-            tempComponentName = componentName+brokerURI;
+            tempComponentName = componentName+brokerURI.toString().replaceAll("[/:]","");
+
             //componentName = componentName+brokerURI;
             from = from+wonNodeURI;
+            //todo: component may already exist.
             camelContext.addComponent(tempComponentName,activeMQComponent(brokerURI.toString()));
+            logger.info("adding component with component name {}",tempComponentName);
         }
 
         endpoint = tempComponentName+":queue:"+getActiveMQOwnerProtocolQueueNameForNeed(resourceURI);

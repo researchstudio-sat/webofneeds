@@ -149,20 +149,18 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
 
     @Override
-    public Future<String> register(String endpointURI)
+    public String register(URI endpointURI)
     {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException
-    {
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws Exception {
         return createNeed(ownerURI, content, activate, null);
     }
 
     @Override
-    public Future<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeURI) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException
-    {
+    public Future<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeURI) throws Exception {
         logger.info("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
                 new Object[]{ownerURI, content, activate});
 

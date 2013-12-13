@@ -19,7 +19,6 @@ package won.protocol.owner;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.context.ApplicationContextAware;
 import won.protocol.exception.*;
-import won.protocol.owner.OwnerProtocolNeedService;
 
 import java.io.IOException;
 import java.net.URI;
@@ -38,7 +37,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      *
      * @param endpointURI
      * */
-    public Future<String> register(String endpointURI);
+    public String register(URI endpointURI) throws Exception;
 
     /**
      * Creates a new need with the specified content, ownerURI and active state.
@@ -48,7 +47,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      * @param activate
      * @return the URI of the newly created need
      */
-    public Future<URI> createNeed(final URI ownerURI, Model content, final boolean activate) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException;
+    public Future<URI> createNeed(final URI ownerURI, Model content, final boolean activate) throws Exception;
 
     /**
      * Activates the need object.
@@ -66,7 +65,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      */
     public void deactivate(URI needURI) throws NoSuchNeedException;
 
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException, ExecutionException, InterruptedException, IOException, URISyntaxException;
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws Exception;
     /**
      * Opens a connection identified by connectionURI. A rdf graph can be sent along with the request.
      *
