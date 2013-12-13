@@ -31,7 +31,7 @@ public class NeedPojo
 
   private String title;
   private BasicNeedType basicNeedType;
-  private NeedState state;
+  private NeedState state = NeedState.ACTIVE;
   private String[] needFacetURIs;
   private String[] facetURIs = FacetType.getNames();
   private String ownFacetURI;

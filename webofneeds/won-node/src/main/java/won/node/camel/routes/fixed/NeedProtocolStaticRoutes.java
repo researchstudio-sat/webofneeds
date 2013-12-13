@@ -31,10 +31,12 @@ public class NeedProtocolStaticRoutes extends RouteBuilder {
                 .to("log:Connect Incoming")
                 .to("bean:needProtocolNeedServiceJMSBased?method=connect")
                 .when(header("methodName").isEqualTo("open"))
+                .to("log:log:NeedProtocolRoutes OpenConnection Incoming")
                 .to("bean:needProtocolNeedServiceJMSBased?method=open")
                 .when(header("methodName").isEqualTo("close"))
                 .to("bean:needProtocolNeedServiceJMSBased?method=close")
                 .when(header("methodName").isEqualTo("textMessage"))
+                .to("log:NeedProtocolRoutes TextMessage Incoming")
                 .to("bean:needProtocolNeedServiceJMSBased?method=textMessage")
                 .otherwise()
                 .to("log:Not supported");

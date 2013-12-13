@@ -19,10 +19,7 @@ import javax.jms.Destination;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.Connection;
-import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.*;
-import org.apache.xbean.spring.context.ClassPathXmlApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -31,13 +28,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.jms.connection.CachingConnectionFactory;
 import won.owner.protocol.impl.MessageProducer;
 import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.ws.OwnerProtocolNeedClientFactory;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
-import won.protocol.jms.OwnerProtocolActiveMQService;
 import won.protocol.model.WonNode;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.WonNodeRepository;
@@ -47,6 +42,7 @@ import won.protocol.util.RdfUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +57,7 @@ import java.util.concurrent.Future;
 public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContextAware,ApplicationListener<ContextRefreshedEvent>,OwnerProtocolNeedServiceClientSide,CamelContextAware {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private boolean onApplicationRun = false;
+    public static boolean brokerConnected = false;
     private MessageProducer messageProducer;
     private OwnerProtocolNeedClientFactory clientFactory;
     private ProducerTemplate producerTemplate;
@@ -71,6 +68,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     private PropertiesUtil propertiesUtil;
     private URI defaultNodeURI;
     private ApplicationContext ownerApplicationContext;
+    private List<OwnerApplicationListener> ownerApplicationListeners = new ArrayList<>();
     //todo: make this configurable
     private String startingEndpoint ="seda:outgoingMessages";
 
@@ -91,76 +89,22 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         //todo: consider the case where wonNodeURI is specified explicitly
         if (!onApplicationRun){
-            logger.info("DEFAULTNODE: "+defaultNodeURI);
-            List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(defaultNodeURI);
-            String ownerApplicationID="";
-            URI brokerURI = null;
-            String remoteEndpoint = null;
-            // String startingEndpoint = null;
-
-            if (wonNodeList.size()>0){
-                ownerApplicationID = wonNodeList.get(0).getOwnerApplicationID();
-                //TODO: it may be that we have an id, but the node has forgotten it... in that case, our code will fail
-            } else{
-                try {
-                    brokerURI = ownerProtocolActiveMQService.configureCamelEndpointForNodeURI(defaultNodeURI,"seda:outgoingMessages");
-                    //todo: revisit this part of code for case completeness
-                    //todo: this code is activemq specific.. shall be avoided.
-
-                    ActiveMQConnectionFactory activemqConnectionFactory = (ActiveMQConnectionFactory) ownerApplicationContext.getBean("activemqConnectionFactory");
-                    logger.info("before setting BrokerURI: "+activemqConnectionFactory.getBrokerURL());
-                    activemqConnectionFactory.setBrokerURL(brokerURI.toString()+"?useLocalHost=false");
-                    ActiveMQComponent activeMQComponent = (ActiveMQComponent) ownerApplicationContext.getBean("activemq");
-                    activeMQComponent.setBrokerURL(brokerURI.toString()+"?useLocalHost=false");
-
-
-               //     logger.info(activeMQComponent.getConfiguration().getListenerConnectionFactory().);
-                   //  javax.jms.Connection connection = activemqConnectionFactory.createConnection();
-                   //  connection.start();
-                    logger.info("after setting BrokerURI: " + activemqConnectionFactory.getBrokerURL());
-                } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-                remoteEndpoint = ownerProtocolActiveMQService.getEndpoint();
-                logger.info("getting remoteEndpoint: "+remoteEndpoint);
-                //   startingEndpoint = ownerProtocolActiveMQService.getStartingEndpoint();
-                Future<String> futureResults = register(ownerProtocolActiveMQService.getEndpoint());
-                ownerApplicationID = null;
-                try {
-                    ownerApplicationID = futureResults.get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                } catch (ExecutionException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-                logger.info("registered ownerappID: "+ownerApplicationID);
-                WonNode wonNode = new WonNode();
-                wonNode.setOwnerApplicationID(ownerApplicationID);
-                wonNode.setWonNodeURI(defaultNodeURI);
-                try {
-                    wonNode.setBrokerURI(brokerURI);
-                } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-                wonNode = wonNodeRepository.saveAndFlush(wonNode);
-            }
-            Map headerMap = new HashMap<String, Object>();
-            headerMap.put("ownerApplicationID", ownerApplicationID) ;
-
-            //todo: refactor to an own method getEndpoints()
-            headerMap.put("methodName","getEndpoints");
-            headerMap.put("remoteBrokerEndpoint",remoteEndpoint);
-            Future<List<String>> futureResults =messagingService.sendInOutMessageGeneric(headerMap, headerMap, null, "seda:outgoingMessages");
-            List<String> endpoints = null;
             try {
-                endpoints = futureResults.get();
-                OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(camelContext, endpoints);
-                camelContext.addRoutes(ownerApplicationListenerRouteBuilder);
+                new Thread(){
+                    @Override
+                    public void run() {
+                        try {
+                            register(defaultNodeURI);
+                        } catch (Exception e) {
+                            logger.warn("Could not register with default won node {}", defaultNodeURI,e);
+                        }
+                    }
+                }.start();
             } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                logger.info("registering ownerapplication on the node {} failed",defaultNodeURI);
+
             }
-            //TODO: some checks needed to assure that the application is configured correctly.
-            onApplicationRun = true;
+
         }
 
     }
@@ -225,13 +169,77 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public Future<String> register(String endpointURI) {
+    public synchronized String register(URI wonNodeURI) throws Exception {
+        logger.info("WON NODE: "+wonNodeURI);
+        List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeURI);
+        String ownerApplicationID=null;
+        URI brokerURI = null;
+        String remoteEndpoint = null;
+        // String startingEndpoint = null;
 
-        logger.info("sending register message to remoteBrokerEndpoint {}",endpointURI);
-        Map headerMap = new HashMap();
-        headerMap.put("remoteBrokerEndpoint",endpointURI);
-        headerMap.put("methodName","register");
-        return messagingService.sendInOutMessageGeneric(null, headerMap,null,startingEndpoint);
+        if (wonNodeList.size()>0){
+            ownerApplicationID = wonNodeList.get(0).getOwnerApplicationID();
+            //TODO: it may be that we have an id, but the node has forgotten it... in that case, our code will fail
+        } else{
+            //todo: revisit this part of code for case completeness
+            //todo: this code is activemq specific.. shall be avoided.
+                brokerURI = ownerProtocolActiveMQService.configureCamelEndpointForNodeURI(wonNodeURI,"seda:outgoingMessages");
+
+                if (brokerURI==null)
+                    throw new BrokerConfigurationFailedException(wonNodeURI);
+                ActiveMQConnectionFactory activemqConnectionFactory = (ActiveMQConnectionFactory) ownerApplicationContext.getBean("activemqConnectionFactory");
+                logger.info("before setting BrokerURI: "+activemqConnectionFactory.getBrokerURL());
+                activemqConnectionFactory.setBrokerURL(brokerURI.toString()+"?useLocalHost=false");
+                logger.info("after setting BrokerURI: " + activemqConnectionFactory.getBrokerURL());
+
+            remoteEndpoint = ownerProtocolActiveMQService.getEndpoint();
+            logger.info("getting remoteEndpoint: "+remoteEndpoint);
+            //   startingEndpoint = ownerProtocolActiveMQService.getStartingEndpoint();
+            logger.info("sending register message to remoteBrokerEndpoint {}",ownerProtocolActiveMQService.getEndpoint());
+            Map headerMap = new HashMap();
+            headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
+            headerMap.put("methodName","register");
+            Future<String> futureResults = messagingService.sendInOutMessageGeneric(null, headerMap, null, startingEndpoint);
+
+            ownerApplicationID = null;
+            try {
+                ownerApplicationID = futureResults.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (ExecutionException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+            if (ownerApplicationID!=null)
+                brokerConnected = true;
+            logger.info("registered ownerappID: "+ownerApplicationID);
+            WonNode wonNode = new WonNode();
+            wonNode.setOwnerApplicationID(ownerApplicationID);
+            wonNode.setWonNodeURI(wonNodeURI);
+            try {
+                wonNode.setBrokerURI(brokerURI);
+            } catch (Exception e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+            wonNode = wonNodeRepository.saveAndFlush(wonNode);
+        }
+        Map headerMap = new HashMap<String, Object>();
+        headerMap.put("ownerApplicationID", ownerApplicationID) ;
+
+        //todo: refactor to an own method getEndpoints()
+        headerMap.put("methodName","getEndpoints");
+        headerMap.put("remoteBrokerEndpoint",remoteEndpoint);
+        Future<List<String>> futureResults =messagingService.sendInOutMessageGeneric(headerMap, headerMap, null, "seda:outgoingMessages");
+        List<String> endpoints = null;
+        try {
+            endpoints = futureResults.get();
+            OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(camelContext, endpoints);
+            camelContext.addRoutes(ownerApplicationListenerRouteBuilder);
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        //TODO: some checks needed to assure that the application is configured correctly.
+
+       return ownerApplicationID.toString();
        // return messagingService.sendInOutMessageForString("register", null, null, "outgoingMessages");
 
 
@@ -239,7 +247,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
 
 
     @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException, IOException, ExecutionException, InterruptedException, URISyntaxException {
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws Exception {
 
         return createNeed(ownerURI, content, activate,defaultNodeURI);
     }
@@ -302,7 +310,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException, IOException, ExecutionException, InterruptedException, URISyntaxException {
+    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws Exception {
         Map headerMap = new HashMap();
 
         headerMap.put("ownerUri", ownerURI.toString());
@@ -325,25 +333,25 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         if(wonNodeURI == null)
             wonNodeURI=defaultNodeURI;
 
-        try {
+        /*try {
             //TODO: make this thread-safe!
             ownerProtocolActiveMQService.configureCamelEndpointForNodeURI(wonNodeURI,startingEndpoint);
         } catch (Exception e) {  //TODO: error handling needed
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+            logger.info("configuring camelEndpoint for node URI {} failed",wonNodeURI); //To change body of catch statement use File | Settings | File Templates.
+        }       */
 
         List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeURI);
         String ownerApplicationId;
         URI brokerURI = null;
         if(wonNodeList.size()==0)  {
-            try {
+           /* try {
                 brokerURI = ownerProtocolActiveMQService.configureCamelEndpointForNodeURI(defaultNodeURI,"seda:outgoingMessages");
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+            }     */
             //todo: methods of ownerProtocolActiveMQService might have some concurrency issues. this problem will be resolved in the future, and this code here shall be revisited then.
-            Future<String> futureResults = register(ownerProtocolActiveMQService.getEndpoint());
-            ownerApplicationId = futureResults.get();
+            String results = register(wonNodeURI);
+            ownerApplicationId = results;
 
             logger.info("registered ownerappID: "+ownerApplicationId);
             WonNode wonNode = new WonNode();
@@ -351,7 +359,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
             wonNode.setWonNodeURI(wonNodeURI);
             wonNode = wonNodeRepository.saveAndFlush(wonNode);
 
-        }
+        } //todo: if wonNodeList is >0 and is different from default won Node. what shall be done?
         else{
             ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
             logger.info("existing ownerApplicationId: "+ownerApplicationId);
@@ -411,4 +419,5 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.ownerApplicationContext = applicationContext;
     }
+
 }

@@ -49,7 +49,6 @@ public class ConnectionController {
         Connection con = cons.get(0);
         model.addAttribute("connection", con);
         model.addAttribute("command", new TextMessagePojo());
-
         return "viewConnection";
     }
 

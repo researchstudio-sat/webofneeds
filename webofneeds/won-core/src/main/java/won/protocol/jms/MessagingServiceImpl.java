@@ -46,7 +46,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
         exchange.getIn().setBody(body);
         exchange.setPattern(ExchangePattern.InOut);
         final SettableFuture<T> result = SettableFuture.create();
-
+        logger.info("sending inout message");
         producerTemplate.asyncCallback(ep,exchange, new Synchronization() {
             @Override
             public void onComplete(Exchange exchange) {

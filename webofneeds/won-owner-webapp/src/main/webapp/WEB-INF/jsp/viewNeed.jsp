@@ -19,6 +19,11 @@
 <dl>
     <dt>Created on</dt>
         <dd><c:out value="${pojo.creationDate}" /></dd>
+    <dt>Facets:</dt>
+        <c:forEach var="facet" items="${pojo.facetURIs}">
+            <dd><c:out value="${facet}" /> </dd>
+        </c:forEach>
+    <dt>Need type</dt>
     <dt>Text description</dt>
         <dd><c:out value="${pojo.textDescription}" /></dd>
     <dt>Tags</dt>

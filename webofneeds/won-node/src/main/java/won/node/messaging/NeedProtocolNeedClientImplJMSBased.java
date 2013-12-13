@@ -132,7 +132,8 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
           e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
       headerMap.put("remoteBrokerEndpoint", endpoint);
-      messagingService.sendInOnlyMessage(null,headerMap,null, "seda:NeedProtocol.out.close" );
+
+      messagingService.sendInOnlyMessage(null,headerMap,null, "seda:NeedProtocol.out.close" ) ;
 
   }
 
@@ -152,10 +153,12 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       try {
 
           endpoint = needProtocolActiveMQService.getCamelEndpointForConnection(connection.getConnectionURI(), "seda:NeedProtocol.out.textMessage");
+          logger.info("retrieved endpoint for connection. Endpoint: {}", endpoint);
       } catch (Exception e) {
           e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
       headerMap.put("remoteBrokerEndpoint", endpoint);
+      logger.info("NeedProtocolNeedClientImpl: sending text message to remoteBrokerEndpoint: {}",endpoint);
       messagingService.sendInOnlyMessage(null,headerMap,null, "seda:NeedProtocol.out.textMessage" );
 
   }

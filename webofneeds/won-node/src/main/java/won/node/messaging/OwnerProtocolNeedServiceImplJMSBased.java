@@ -49,6 +49,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //OwnerProtocolN
             Exchange exchange) throws IllegalNeedContentException, JMSException {
         logger.info("register: message received");
         String ownerApplicationId = ownerManagementService.registerOwnerApplication();
+
         return ownerApplicationId;
     }
 
