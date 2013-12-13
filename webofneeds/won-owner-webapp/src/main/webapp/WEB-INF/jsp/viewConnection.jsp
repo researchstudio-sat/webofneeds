@@ -13,7 +13,14 @@
 </head>
 <body>
 <h1>Connection: <c:out value="${connection.id}" /></h1>
-
+<table>
+    <tr>
+        <td>Belongs to Need:</td><td><c:out value="${connection.needURI}" /></td>
+    </tr>
+    <tr>
+        <td>Facet:</td><td><c:out value="${connection.typeURI}" /></td>
+    </tr>
+</table>
 <form:form method="POST" action="/owner/connection/${connection.id}/send">
     <table>
         <tr>

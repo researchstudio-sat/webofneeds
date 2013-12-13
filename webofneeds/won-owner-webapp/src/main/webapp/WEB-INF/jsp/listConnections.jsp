@@ -13,6 +13,8 @@
     <tr>
         <th>Connection ID</th>
         <th>Connection URI</th>
+        <th>Need URI</th>
+        <th>facet URI</th>
         <th>State</th>
         <th>View Connection</th>
     </tr>
@@ -20,9 +22,12 @@
         <tr>
             <td>${connection.id}</td>
             <td>${connection.connectionURI}</td>
+            <td>${connection.needURI}</td>
+            <td>${connection.typeURI}</td>
             <td>${connection.state}</td>
             <td><a href="/owner/connection/${connection.id}" target="_parent" >connection</a>
             </td>
         </tr>
     </c:forEach>
 </table>
+

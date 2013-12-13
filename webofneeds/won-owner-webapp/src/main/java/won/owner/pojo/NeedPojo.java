@@ -15,8 +15,6 @@ import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,7 +30,7 @@ public class NeedPojo
 
   private String title;
   private BasicNeedType basicNeedType;
-  private NeedState state;
+  private NeedState state = NeedState.ACTIVE;
   private String[] needFacetURIs;
   private String[] facetURIs = FacetType.getNames();
   private String ownFacetURI;
