@@ -81,11 +81,6 @@
                 <version>${activemq.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.camel</groupId>
-                <artifactId>camel-amqp</artifactId>
-                <version>${camel.version}</version> <!-- use the same version as your Camel core version -->
-            </dependency>
-            <dependency>
                 <groupId>org.apache.qpid</groupId>
                 <artifactId>qpid-client</artifactId>
                 <version>${qpid.version}</version>
