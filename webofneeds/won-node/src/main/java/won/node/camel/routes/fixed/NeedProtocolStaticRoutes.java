@@ -40,7 +40,5 @@ public class NeedProtocolStaticRoutes extends RouteBuilder {
                 .to("bean:needProtocolNeedServiceJMSBased?method=textMessage")
                 .otherwise()
                 .to("log:Not supported");
-
-
     }
 }
