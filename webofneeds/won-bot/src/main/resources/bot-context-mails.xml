@@ -24,23 +24,54 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <bean id="directoryBased" class="">
+    <context:property-placeholder location="${WON_CONFIG_DIR}/mail-dir-bot.properties" />
 
+    <bean id="supplyNeedFactory" class="won.bot.generator.impl.TemplateBasedNeedFactory" >
+        <property name="modelResource" value="${template.supply}" />
+        <property name="wrappedFactory">
+            <bean class="won.bot.generator.impl.DirectoryBasedNeedFactory">
+                <property name="directory" value="${mail.directory.supply}" />
+                <property name="repeat" value="false" />
+                <property name="fileBasedNeedFactory">
+                    <bean class="won.bot.generator.impl.MailFileNeedFactory" />
+                </property>
+            </bean>
+        </property>
     </bean>
-    <bean id="" class="">
-
+    <bean id="demandNeedFactory" class="won.bot.generator.impl.TemplateBasedNeedFactory" >
+        <property name="modelResource" value="${template.demand}" />
+        <property name="wrappedFactory">
+            <bean class="won.bot.generator.impl.DirectoryBasedNeedFactory">
+                <property name="directory" value="${mail.directory.demand}" />
+                <property name="repeat" value="false" />
+                <property name="fileBasedNeedFactory">
+                    <bean class="won.bot.generator.impl.MailFileNeedFactory" />
+                </property>
+            </bean>
+        </property>
     </bean>
-    <bean id="" class="">
-
+    <bean id="doTogetherNeedFactory" class="won.bot.generator.impl.TemplateBasedNeedFactory" >
+        <property name="modelResource" value="${template.toTogether}" />
+        <property name="wrappedFactory">
+            <bean class="won.bot.generator.impl.DirectoryBasedNeedFactory">
+                <property name="directory" value="${mail.directory.doTogether}" />
+                <property name="repeat" value="false" />
+                <property name="fileBasedNeedFactory">
+                    <bean class="won.bot.generator.impl.MailFileNeedFactory" />
+                </property>
+            </bean>
+        </property>
     </bean>
-    <bean id="" class="">
-
+    <bean id="critiqueNeedFactory" class="won.bot.generator.impl.TemplateBasedNeedFactory" >
+        <property name="modelResource" value="${mail.template.critique}" />
+        <property name="wrappedFactory">
+            <bean class="won.bot.generator.impl.DirectoryBasedNeedFactory">
+                <property name="directory" value="${mail.directory.critique}" />
+                <property name="repeat" value="false" />
+                <property name="fileBasedNeedFactory">
+                    <bean class="won.bot.generator.impl.MailFileNeedFactory" />
+                </property>
+            </bean>
+        </property>
     </bean>
-    <bean id="" class="">
-
-    </bean>
-    <bean id="" class="">
-
-    </bean>
-
 </beans>

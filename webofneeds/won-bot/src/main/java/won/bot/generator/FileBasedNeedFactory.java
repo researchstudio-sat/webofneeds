@@ -19,6 +19,7 @@ package won.bot.generator;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * User: fkleedorfer
@@ -26,5 +27,5 @@ import java.io.File;
  */
 public interface FileBasedNeedFactory
 {
-  public Model readNeedFromFile(File file);
+  public Model readNeedFromFile(File file) throws IOException;
 }

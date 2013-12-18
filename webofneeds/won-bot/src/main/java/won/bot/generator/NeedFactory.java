@@ -25,8 +25,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 public interface NeedFactory
 {
   /**
-   * Returns a new Model that represents the created need.
-   * @return
+   * Returns a new Model that represents the created need or null if no more needs can be created.
+   * @return a model or null
    */
   public Model create();
 

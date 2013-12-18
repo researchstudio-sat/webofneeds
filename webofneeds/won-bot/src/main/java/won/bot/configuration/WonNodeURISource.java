@@ -16,10 +16,16 @@
 
 package won.bot.configuration;
 
+import java.net.URI;
+
 /**
- *
+ * Interface that is used to obtain a WON node URI.
  */
 public interface WonNodeURISource
 {
+  /**
+   * Returns a WON node's URI. Must point to the URI that, when dereferenced, yields the RDF description of the WON node.
+   * @return
+   */
   public URI getWonNodeURI();
 }
