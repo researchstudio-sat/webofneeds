@@ -40,13 +40,6 @@ public class AmqpToJms extends RouteBuilder{
                 .to("seda:OwnerProtocolOut")
                 .otherwise()
                 .to("log:No protocol defined in header");
-       /* from("activemq:queue:WON.REGISTER")
-                .to("bean:ownerProtocolNeedJMSService?method=registerOwnerApplication");
-        from("activemq:queue:WON.GETENDPOINTS")
-                .to("log:Get Endpoints IN")
-                .to("bean:ownerProtocolNeedJMSService?method=getEndpointsForOwnerApplication");  */
-
-
     }
 
 

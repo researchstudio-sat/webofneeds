@@ -105,7 +105,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
 
 
     @Override
-    public Future<String> register(String endpointURI) {
+    public String register(URI endpointURI) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -122,6 +122,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
             String modelAsString = RdfUtils.toString(content);
             URI result = proxy.createNeed(ownerURI, modelAsString , activate);
             SettableFuture<URI> futureResult = SettableFuture.create();
+
             futureResult.set(result);
             return  futureResult;
         } catch (MalformedURLException e) {

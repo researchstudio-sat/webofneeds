@@ -21,6 +21,7 @@ import com.hp.hpl.jena.graph.*;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.DCTerms;
 import com.hp.hpl.jena.vocabulary.RDF;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
@@ -48,7 +49,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     this.setUri(needResource.getURI());
     Resource basicNeedTypeResource = needResource.getPropertyResourceValue(WON.HAS_BASIC_NEED_TYPE);
     if (basicNeedTypeResource != null) this.setBasicNeedType(basicNeedTypeResource.getURI().toString());
-    Statement creationDateStmt = needResource.getProperty(WON.NEED_CREATION_DATE);
+    Statement creationDateStmt = needResource.getProperty(DCTerms.created);
     if (creationDateStmt != null) {
       this.setCreationDate(DateTimeUtils.toDate(creationDateStmt.getObject(), needModel));
     }
@@ -238,7 +239,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     addResourceIfPresent(needResource, WON.HAS_OWNER_PROTOCOL_ENDPOINT, getOwnerProtocolEndpointURI());
     addResourceIfPresent(needResource, WON.HAS_MATCHER_PROTOCOL_ENDPOINT, getMatcherProtocolEndpointURI());
     addResourceIfPresent(needResource, WON.IS_IN_STATE, getStateURI());
-    addLiteralValueIfPresent(needModel, needResource, WON.NEED_CREATION_DATE, DateTimeUtils.toLiteral(getCreationDate(), needModel));
+    addLiteralValueIfPresent(needModel, needResource, DCTerms.created, DateTimeUtils.toLiteral(getCreationDate(), needModel));
     // need content
     addNeedContent(needModel, needResource);
     // need modalities

@@ -5,6 +5,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.DCTerms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.model.BasicNeedType;
@@ -15,8 +16,6 @@ import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,7 +31,7 @@ public class NeedPojo
 
   private String title;
   private BasicNeedType basicNeedType;
-  private NeedState state;
+  private NeedState state = NeedState.ACTIVE;
   private String[] needFacetURIs;
   private String[] facetURIs = FacetType.getNames();
   private String ownFacetURI;
@@ -81,7 +80,7 @@ public class NeedPojo
   {
     this.needURI = needUri.toString();
     Resource need = model.getResource(needUri.toString());
-    creationDate = need.getProperty(WON.NEED_CREATION_DATE).getString();
+    creationDate = need.getProperty(DCTerms.created).getString();
 
     Statement basicNeedStat = need.getProperty(WON.HAS_BASIC_NEED_TYPE);
     if (basicNeedStat != null) {

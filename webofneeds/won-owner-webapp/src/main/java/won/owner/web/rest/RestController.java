@@ -182,7 +182,7 @@ public class RestController
       produces = MediaType.APPLICATION_JSON,
       method = RequestMethod.POST
       )
-  public NeedPojo createNeed(NeedPojo needPojo) throws ExecutionException, InterruptedException, IOException, URISyntaxException {
+  public NeedPojo createNeed(NeedPojo needPojo) throws Exception {
 
     logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getCreationDate() + "/" +
         needPojo.getLongitude() + "/" + needPojo.getLatitude() + "/" + (needPojo.getState() == NeedState.ACTIVE));
@@ -214,7 +214,7 @@ public class RestController
     return returnList;
   }
 
-  private NeedPojo resolve(NeedPojo needPojo) throws ExecutionException, InterruptedException, IOException, URISyntaxException {
+  private NeedPojo resolve(NeedPojo needPojo) throws Exception {
 
 
     if (needPojo.getNeedId() >= 0) {
@@ -248,11 +248,6 @@ public class RestController
       if (!needPojo.getTextDescription().isEmpty())
         needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
       needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
-
-      // owner
-      if (needPojo.isAnonymize()) {
-        needModel.add(needModel.createStatement(needResource, WON.HAS_OWNER, WON.ANONYMIZED_OWNER));
-      }
 
       // need modalities
       Resource needModality = needModel.createResource(WON.NEED_MODALITY);

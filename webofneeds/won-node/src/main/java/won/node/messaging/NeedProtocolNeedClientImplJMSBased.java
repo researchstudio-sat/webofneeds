@@ -29,7 +29,6 @@ import won.protocol.jms.NeedProtocolActiveMQService;
 import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -63,6 +62,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
   public Future<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
       Map<String, String> headerMap = new HashMap<>();
+      String endpoint=null;
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("needURI", needURI.toString()) ;
       headerMap.put("otherNeedURI", otherNeedURI.toString());
@@ -74,14 +74,14 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       //TODO: when shall be the remote won node unregistered?
       //TODO; shall be checked if the endpoint for the remote won node already exists. configuring remote endpoints for each message is inefficient
       try {
-          needProtocolActiveMQService.configureCamelEndpointForNeeds(otherNeedURI,needURI,"seda:NeedProtocol.out.connect");
+           endpoint = needProtocolActiveMQService.getCamelEndpointForNeed(otherNeedURI, needURI, "seda:NeedProtocol.out.connect");
 
       } catch (Exception e) {
           e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
 
-      headerMap.put("remoteBrokerEndpoint", needProtocolActiveMQService.getEndpoint());
-      logger.info("sending connect message to remoteBrokerEndpoint {}",needProtocolActiveMQService.getEndpoint());
+      headerMap.put("remoteBrokerEndpoint", endpoint);
+      logger.info("sending connect message to remoteBrokerEndpoint {}",endpoint);
       return messagingService.sendInOutMessageGeneric(propertyMap,headerMap,null,"seda:NeedProtocol.out.connect");
 
 
@@ -93,7 +93,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
        // Connection con = DataAccessUtils.loadConnection(connectionRepository, connection);
         Map headerMap = new HashMap<String, String>();
-
+        String endpoint = null;
         headerMap.put("protocol","NeedProtocol");
         //remoteConnectionURI is the connectionURI on the other node.
         headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
@@ -103,12 +103,12 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
         try {
 
-            needProtocolActiveMQService.configureCamelEndpointForConnection(connection.getConnectionURI(),"seda:NeedProtocol.out.open");
+            endpoint = needProtocolActiveMQService.getCamelEndpointForConnection(connection.getConnectionURI(), "seda:NeedProtocol.out.open");
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        headerMap.put("remoteBrokerEndpoint", needProtocolActiveMQService.getEndpoint());
+        headerMap.put("remoteBrokerEndpoint", endpoint);
         messagingService.sendInOnlyMessage(null,headerMap,null, "seda:NeedProtocol.out.open" );
     }
 
@@ -118,7 +118,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       logger.info("need-facing: CLOSE called for connection {}", connection);
       //Connection con = DataAccessUtils.loadConnection(connectionRepository, connection);
       Map headerMap = new HashMap<String, String>();
-
+      String endpoint = null;
       headerMap.put("protocol","NeedProtocol");
       //remoteConnectionURI is the connectionURI on the other node.
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
@@ -127,12 +127,13 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
       try {
 
-          needProtocolActiveMQService.configureCamelEndpointForConnection(connection.getConnectionURI(),"seda:NeedProtocol.out.close");
+          endpoint = needProtocolActiveMQService.getCamelEndpointForConnection(connection.getConnectionURI(), "seda:NeedProtocol.out.close");
       } catch (Exception e) {
           e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
-      headerMap.put("remoteBrokerEndpoint", needProtocolActiveMQService.getEndpoint());
-      messagingService.sendInOnlyMessage(null,headerMap,null, "seda:NeedProtocol.out.close" );
+      headerMap.put("remoteBrokerEndpoint", endpoint);
+
+      messagingService.sendInOnlyMessage(null,headerMap,null, "seda:NeedProtocol.out.close" ) ;
 
   }
 
@@ -142,6 +143,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, messager);
       //Connection con = DataAccessUtils.loadConnection(connectionRepository, connection);
       Map headerMap = new HashMap<String, String>();
+      String endpoint = null;
       headerMap.put("protocol","NeedProtocol");
       //remoteConnectionURI is the connectionURI on the other node.
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
@@ -150,11 +152,13 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
       try {
 
-          needProtocolActiveMQService.configureCamelEndpointForConnection(connection.getConnectionURI(),"seda:NeedProtocol.out.textMessage");
+          endpoint = needProtocolActiveMQService.getCamelEndpointForConnection(connection.getConnectionURI(), "seda:NeedProtocol.out.textMessage");
+          logger.info("retrieved endpoint for connection. Endpoint: {}", endpoint);
       } catch (Exception e) {
           e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
-      headerMap.put("remoteBrokerEndpoint", needProtocolActiveMQService.getEndpoint());
+      headerMap.put("remoteBrokerEndpoint", endpoint);
+      logger.info("NeedProtocolNeedClientImpl: sending text message to remoteBrokerEndpoint: {}",endpoint);
       messagingService.sendInOnlyMessage(null,headerMap,null, "seda:NeedProtocol.out.textMessage" );
 
   }

@@ -103,7 +103,6 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
         return NeedState.ACTIVE == need.getState();
     }
 
-  //  @Override
     public void connect(@Header("ownNeedURI") final String ownNeedURI, @Header("otherNeedURI")final String otherNeedURI, @Header("ownConnectionURI")final String ownConnectionURI,
                         @Header("content")final String content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
@@ -115,111 +114,23 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
         if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
 
         delegate.connect(ownNeedURI,otherNeedURI,ownConnectionURI,content);
-        //Load need (throws exception if not found)
-       /* Need need = DataAccessUtils.loadNeed(needRepository,ownNeedURIConvert);
-        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURIConvert, ConnectionEventType.PARTNER_OPEN.name(), need.getState()); */
-        //Create new connection object on our side
 
-        //set new uri
-        /*List<Connection> existingConnections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURIConvert, otherNeedURIConvert);
-        if (existingConnections.size() > 0){
-            for(Connection conn: existingConnections){
-                if (ConnectionState.CONNECTED == conn.getState() ||
-                        ConnectionState.REQUEST_RECEIVED == conn.getState()) {
-                    throw new ConnectionAlreadyExistsException(conn.getConnectionURI(),ownNeedURIConvert,otherNeedURIConvert);
-                } else {
-                    conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
-                    connectionRepository.saveAndFlush(conn);
-                }
-            }
-        } else {
-            Connection con = new Connection();
-            con.setNeedURI(ownNeedURIConvert);
-            con.setState(ConnectionState.REQUEST_RECEIVED);
-            con.setRemoteNeedURI(otherNeedURIConvert);
-            con.setConnectionURI(ownConnectionURIConvert);
-            connectionRepository.saveAndFlush(con);
-
-        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
-        if (!isNeedActive(need))
-          throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
-
-        Resource baseRes = content.getResource(content.getNsPrefixURI(""));
-        StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
-
-        if (!stmtIterator.hasNext()) {
-          throw new IllegalArgumentException("at least one RDF node must be of type won:" + WON.HAS_FACET.getLocalName());
-        }
-
-        URI facetURI =  URI.create(stmtIterator.next().getObject().asResource().getURI());
-
-        List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURI, otherNeedURI);
-        Connection con = null;
-
-        for(Connection c : connections) { */
-          //TODO: check remote need type as well or create GroupMemberFacet
-       /*   if (facetURI.equals(c.getTypeURI()))
-            con = c;
-        }        */
-
-        //TODO: impose unique constraint on connections
-       /* if(con != null) {
-          if(ConnectionEventType.PARTNER_OPEN.isMessageAllowed(con.getState())) {
-            //TODO: Move this to the transition() - Method in ConnectionState
-            con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
-            con = connectionRepository.saveAndFlush(con);
-          } else {
-            throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
-          }
-        }
-
-        if (con == null) {  */
-          /* Create connection */
-       /*   con = new Connection();
-          con.setNeedURI(ownNeedURI);
-          con.setState(ConnectionState.REQUEST_RECEIVED);
-          con.setRemoteNeedURI(otherNeedURI);
-          con.setConnectionURI(ownConnectionURI);
-          con.setTypeURI(facetURI);
-          connectionRepository.saveAndFlush(con);
-                                           */
-          //TODO: do we save the connection content? where? as a chat content?
-
-       // }
     }
 
-    //@Override
     public void open(@Header("connectionURI")String connectionURI, @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         logger.info("node-facing: OPEN called for connection {} with content {}.", connectionURI, RdfUtils.toModel(content));
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         delegate.open(URI.create(connectionURI), RdfUtils.toModel(content));
-        //load connection, checking if it exists
-       // Connection con = DataAccessUtils.loadConnection(connectionRepository, URI.create(connectionURI));
-        //set new state and save in the db
-       /* logger.info("CONNECTION STATE: "+con.getState().toString());
-        con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
-        logger.info("Connection State after Transit: "+con.getState().toString());  */
-        //save in the db
-        //connectionRepository.saveAndFlush(con);
     }
 
-  //  @Override
     public void close(@Header("connectionURI")final String connectionURI, @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         logger.info("node-facing: CLOSE called for connection {}", connectionURI);
 
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         delegate.close(URI.create(connectionURI),RdfUtils.toModel(content));
-        //load connection, checking if it exists
-        //Connection con = DataAccessUtils.loadConnection(connectionRepository, URI.create(connectionURI));
-        //set new state and save in the db
-       // con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
-        //save in the db
-       // connectionRepository.saveAndFlush(con);
     }
 
-
-  //  @Override
     public void textMessage(@Header("connectionURI")final String connectionURI, @Header("message")final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
 
@@ -228,21 +139,6 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
         if (message == null) throw new IllegalArgumentException("message is not set");
 
         delegate.textMessage(URI.create(connectionURI),message);
-
-       // URI connectionURIConvert = URI.create(connectionURI);
-        //load connection, checking if it exists
-       // Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURIConvert);
-
-        //perform state transit (should not result in state change)
-        //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
-        //construct chatMessage object to store in the db
-       /* ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setCreationDate(new Date());
-        chatMessage.setLocalConnectionURI(con.getConnectionURI());
-        chatMessage.setMessage(message);
-        chatMessage.setOriginatorURI(con.getRemoteNeedURI());   */
-        //save in the db
-       //chatMessageRepository.saveAndFlush(chatMessage);
     }
 
 

@@ -25,7 +25,6 @@ import java.net.URI;
 public interface ActiveMQService {
 
     public String getStartingEndpoint();
-    public String getEndpoint();
     public URI getActiveMQBrokerURIForNode(URI needURI);
     public void addRoutes(RouteBuilder route) throws Exception;
 

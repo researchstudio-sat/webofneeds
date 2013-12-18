@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
+import won.protocol.exception.BrokerConfigurationFailedException;
+import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.OwnerProtocolActiveMQService;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
@@ -48,7 +50,7 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  * User: sbyim
  * Date: 28.11.13
  */
-public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,OwnerProtocolActiveMQService {
+public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListener,CamelContextAware,OwnerProtocolActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private CamelContext camelContext;
     private String componentName;
@@ -83,31 +85,40 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
     }
 
     /**
-     *
+     * this method is used for owner-node endpoint negotiation.
+     * using the wonNodeURI, it retrieves brokerURI.
+     * if the won node URI, to which the endpoint shall be configured is different from default node URI,
+     * a new activemq component with unique name shall be generated and added into camel context.
+     * Endpoint is configured using component name and remote queue name.
+     * When broker and endpoint are configured, new routes shall be generated for them.
      * @param wonNodeURI
      * @param from
      * @return returns brokerURI of wonNode
      * @throws Exception
      */
-    public URI configureCamelEndpointForNodeURI(URI wonNodeURI, String from) throws Exception {
+    public URI configureCamelEndpointForNodeURI(URI wonNodeURI, String from) throws CamelConfigurationFailedException {
         //TODO: the linked data description of the won node must be at [NODE-URI]/resource
         // according to this code. This should be explicitly defined somewhere
         URI resourceURI = URI.create(wonNodeURI.toString()+"/resource");
         URI brokerURI = getActiveMQBrokerURIForNode(resourceURI);
+
         String tempComponentName = componentName;
         String tempStartingComponentName = startingComponent;
         if (!wonNodeURI.equals(URI.create(defaultNodeURI))){
-            tempComponentName = componentName+brokerURI;
-            //componentName = componentName+brokerURI;
-            from = from+wonNodeURI;
+            tempComponentName = componentName+brokerURI.toString().replaceAll("[/:]","");
+           // from = from+wonNodeURI;
+            //todo: component may already exist.
             camelContext.addComponent(tempComponentName,activeMQComponent(brokerURI.toString()));
+            logger.info("adding component with component name {}",tempComponentName);
         }
 
         endpoint = tempComponentName+":queue:"+getActiveMQOwnerProtocolQueueNameForNeed(resourceURI);
 
         List<String> endpointList = new ArrayList<>();
         endpointList.add(endpoint);
-        //there can be only one route per endpoint. Thus, consuming endpoint of each route shall be unique.
+        /**
+         * there can be only one route per endpoint. Thus, consuming endpoint of each route shall be unique.
+         */
         //todo: using replaceAll might result in security issues. change this.
         tempStartingComponentName = tempStartingComponentName + endpoint.replaceAll(":","_");
         setStartingEndpoint(tempStartingComponentName);
@@ -142,7 +153,6 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
 
     }
 
-    @Override
     public String getEndpoint() {
         return endpoint;
     }
@@ -169,8 +179,14 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
     }
 
     @Override
-    public void addRoutes(RouteBuilder route) throws Exception {
-        camelContext.addRoutes(route);
+    public void addRoutes(RouteBuilder route) throws CamelConfigurationFailedException {
+
+
+        try {
+            camelContext.addRoutes(route);
+        } catch (Exception e) {
+            throw new CamelConfigurationFailedException("adding route to camel context failed",e);
+        }
     }
 
     @Override

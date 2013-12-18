@@ -14,22 +14,20 @@
  *    limitations under the License.
  */
 
+package won.protocol.exception;
 
-package won.owner.camel.routes.fixed;
-import org.apache.camel.builder.RouteBuilder;
+import java.net.URI;
+import java.text.MessageFormat;
+
 /**
  * User: LEIH-NB
- * Date: 10.10.13
+ * Date: 13.12.13
  */
-//TODO: change to asyncronous processing maybe
-public class AmqpToJms extends RouteBuilder{
-    @Override
-    public void configure(){
-        from("seda:outgoingMessages")
-                //todo: broker endpoint negotiation shall be run here and not in the service client classes.
-                .wireTap("bean:messagingService?method=inspectMessage")
-                .recipientList(header("remoteBrokerEndpoint"));
-
+public class BrokerConfigurationFailedException extends WonProtocolException {
+    private URI wonNodeURI;
+    public BrokerConfigurationFailedException(final URI wonNodeURI)
+    {
+        super(MessageFormat.format("setting up broker for won node URI {0} failed",wonNodeURI.toString()));
+        this.wonNodeURI = wonNodeURI;
     }
-
 }

@@ -81,11 +81,6 @@
                 <version>${activemq.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.camel</groupId>
-                <artifactId>camel-amqp</artifactId>
-                <version>${camel.version}</version> <!-- use the same version as your Camel core version -->
-            </dependency>
-            <dependency>
                 <groupId>org.apache.qpid</groupId>
                 <artifactId>qpid-client</artifactId>
                 <version>${qpid.version}</version>
@@ -379,6 +374,12 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
                 <version>${ch.qos.logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.17</version>
+                <scope>test</scope>
             </dependency>
 
             <!-- UTILS -->
