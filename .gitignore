@@ -39,4 +39,5 @@ bin/setenv.*
 /webofneeds/won-node/src/main/resources.lan/*
 /webofneeds/won-owner/src/main/resources.lan/*
 
-
+#local config
+webofneeds/conf.local
