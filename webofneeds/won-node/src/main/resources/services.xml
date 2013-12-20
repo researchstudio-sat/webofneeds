@@ -50,6 +50,8 @@
                 <entry key="#{T(won.protocol.model.FacetType).ControlFacet}" value-ref="controlFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).OwnerFacet}" value-ref="ownerFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).GroupFacet}" value-ref="groupFacetImplRef" />
+                <entry key="#{T(won.protocol.model.FacetType).CoordinatorFacet}" value-ref="coordinatorFacetImplRef" />
+                <entry key="#{T(won.protocol.model.FacetType).ParticipantFacet}" value-ref="participantFacetImplRef" />
             </map>
         </constructor-arg>
     </bean>
@@ -69,7 +71,8 @@
     <bean id="controlFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ControlFacetImpl" />
     <bean id="ownerFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.OwnerFacetImpl" />
     <bean id="groupFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.GroupFacetImpl" />
-
+    <bean id="coordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CoordinatorFacetImpl" />
+    <bean id="participantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ParticipantFacetImpl" />
     <!-- protocol-level services -->
     <bean id="ownerProtocolNeedService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
         <!-- the connection communication service injected here is owner facing -->
