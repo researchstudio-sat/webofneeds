@@ -2,6 +2,7 @@ package won.owner.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -11,12 +12,14 @@ import org.springframework.context.ApplicationContext;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
-import won.protocol.repository.*;
+import won.protocol.repository.ChatMessageRepository;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.FacetRepository;
+import won.protocol.repository.NeedRepository;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
@@ -68,7 +71,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
     @Override
     public void activate(URI needURI) throws NoSuchNeedException {
-        logger.info("need-facing: ACTIVATE called for need {}", needURI);
+        logger.debug("need-facing: ACTIVATE called for need {}", needURI);
         List<Need> needs = needRepository.findByNeedURI(needURI);
         if (needs.size() != 1)
             throw new NoSuchNeedException(needURI);
@@ -80,7 +83,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
     @Override
     public void deactivate(URI needURI) throws NoSuchNeedException {
-        logger.info(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
+        logger.debug(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
 
         List<Need> needs = needRepository.findByNeedURI(needURI);
         if (needs.size() != 1)
@@ -95,7 +98,9 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     @Override
     public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0} with model {1}", connectionURI, content));
+        if (logger.isDebugEnabled()) {
+          logger.debug(MessageFormat.format("need-facing: OPEN called for connection {0} with model {1}", connectionURI, StringUtils.abbreviate(RdfUtils.toString(content),200)));
+        }
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
         if (cons.size() != 1)
             throw new NoSuchConnectionException(connectionURI);
@@ -112,7 +117,9 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     @Override
     public void close(final URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.info(MessageFormat.format("need-facing: CLOSE called for connection {0} with model {1}", connectionURI, content));
+        if (logger.isDebugEnabled()) {
+          logger.debug(MessageFormat.format("need-facing: CLOSE called for connection {0} with model {1}", connectionURI, StringUtils.abbreviate(RdfUtils.toString(content),200)));
+        }
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
         if (cons.size() != 1)
             throw new NoSuchConnectionException(connectionURI);
@@ -161,8 +168,10 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
     @Override
     public Future<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeURI) throws Exception {
-        logger.info("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
-                new Object[]{ownerURI, content, activate});
+        if (logger.isDebugEnabled()) {
+          logger.debug("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
+                new Object[]{ownerURI, StringUtils.abbreviate(RdfUtils.toString(content),200), activate});
+        }
 
 
         final Future<URI> uri = delegate.createNeed(ownerURI, content, activate, wonNodeURI);
@@ -174,7 +183,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                         Need need = new Need();
                         try {
                             need.setNeedURI(uri.get());
-                           // logger.info(need.getNeedURI().toString());
+                           // logger.debug(need.getNeedURI().toString());
                             need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
                             need.setOwnerURI(ownerURI);
 
@@ -182,7 +191,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                             else need.setWonNodeURI(wonNodeURI);
                             needRepository.saveAndFlush(need);
                             needRepository.findByNeedURI(need.getNeedURI());
-                            logger.info("saving URI", need.getNeedURI().toString());
+                            logger.debug("saving URI", need.getNeedURI().toString());
 
                             ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
                             if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
@@ -220,7 +229,9 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     @Override
     public Future<URI> connect(final URI needURI, final  URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException
     {
-        logger.info("need-facing: CONNECT called for need {}, other need {} and content {}", new Object[]{needURI, otherNeedURI, content});
+      if (logger.isDebugEnabled()) {
+        logger.debug("need-facing: CONNECT called for need {}, other need {} and content {}", new Object[]{needURI, otherNeedURI, StringUtils.abbreviate(RdfUtils.toString(content),200)});
+      }
 
             final Future<URI> uri = delegate.connect(needURI, otherNeedURI, content);
             Resource baseRes = content.getResource(content.getNsPrefixURI(""));

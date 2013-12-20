@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import won.protocol.model.OwnerApplication;
 
-import java.net.URI;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 /**
@@ -46,7 +45,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
         exchange.getIn().setBody(body);
         exchange.setPattern(ExchangePattern.InOut);
         final SettableFuture<T> result = SettableFuture.create();
-        logger.info("sending inout message");
+        logger.debug("sending inout message");
         producerTemplate.asyncCallback(ep,exchange, new Synchronization() {
             @Override
             public void onComplete(Exchange exchange) {
@@ -71,15 +70,15 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
         inspectProperties(exchange);
         inspectHeaders(exchange);
         if(exchange.getIn().getBody()!=null)
-        logger.info(exchange.getIn().getBody().toString());
+        logger.debug(exchange.getIn().getBody().toString());
     }
     public void inspectProperties(Exchange exchange){
         Map properties = (Map) exchange.getProperties();
         Iterator iter =  properties.entrySet().iterator();
-        logger.info("WIRETAP: properties size: "+properties.size());
+        logger.debug("WIRETAP: properties size: "+properties.size());
         while(iter.hasNext()){
             Map.Entry pairs = (Map.Entry)iter.next();
-            logger.info("key: "+pairs.getKey()+" value: "+pairs.getValue());
+            logger.debug("key: "+pairs.getKey()+" value: "+pairs.getValue());
         }
 
     }
@@ -88,11 +87,11 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
     public void inspectHeaders(Exchange exchange){
         Map headers = (Map) exchange.getIn().getHeaders();
         Iterator iter =  headers.entrySet().iterator();
-        logger.info("WIRETAP: headers size: "+headers.size());
+        logger.debug("WIRETAP: headers size: "+headers.size());
         while(iter.hasNext()){
             Map.Entry pairs = (Map.Entry)iter.next();
             if(pairs.getValue()!=null)
-                logger.info("key: "+pairs.getKey()+" value: "+pairs.getValue());
+                logger.debug("key: "+pairs.getKey()+" value: "+pairs.getValue());
         }
 
     }

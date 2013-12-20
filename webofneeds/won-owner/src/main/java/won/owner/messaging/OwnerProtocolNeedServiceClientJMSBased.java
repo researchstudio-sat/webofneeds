@@ -15,11 +15,11 @@
  */
 
 package won.owner.messaging;
-import javax.jms.Destination;
-
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.camel.*;
+import org.apache.camel.CamelContext;
+import org.apache.camel.CamelContextAware;
+import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -28,8 +28,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import won.owner.protocol.impl.MessageProducer;
 import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
+import won.owner.protocol.impl.MessageProducer;
 import won.owner.ws.OwnerProtocolNeedClientFactory;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
@@ -39,9 +39,8 @@ import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.PropertiesUtil;
 import won.protocol.util.RdfUtils;
 
-import java.io.IOException;
+import javax.jms.Destination;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -272,7 +271,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
 
         messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint );
-        logger.info("sending text message: ");
+        logger.debug("sending text message: ");
 
     }
 
@@ -291,7 +290,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
 
         messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint);
-        logger.info("sending close message: ");
+        logger.debug("sending close message: ");
     }
 
     @Override
@@ -308,7 +307,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         }
         headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
         messagingService.sendInOnlyMessage(null,headerMap,null, startingEndpoint);
-        logger.info("sending open message: ");
+        logger.debug("sending open message: ");
 
     }
 
@@ -356,7 +355,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         }
         else{
             ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
-            logger.info("existing ownerApplicationId: "+ownerApplicationId);
+            logger.debug("existing ownerApplicationId: "+ownerApplicationId);
         }
         headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
         headerMap.put("ownerApplicationID",ownerApplicationId);
