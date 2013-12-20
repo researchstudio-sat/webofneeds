@@ -14,18 +14,15 @@
  *    limitations under the License.
  */
 
-package won.bot.generator;
+package won.bot.needconsumer;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
  * User: fkleedorfer
- * Date: 17.12.13
+ * Date: 18.12.13
  */
-public interface FileBasedNeedFactory
+public interface NeedConsumer
 {
-  public Model readNeedFromFile(File file) throws IOException;
+  public void consume(Model need);
 }

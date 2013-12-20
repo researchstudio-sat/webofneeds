@@ -26,7 +26,12 @@
 
     <!-- auto-detect controllers -->
     <context:component-scan base-package="won.node.web" />
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" />
+    <!--
+         Load properties but ignore unresolvable properties so that
+         they are searched in other property configuerers defined in the context
+    -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
+
 
     <!-- it seems the following config element plus dependencies is required
          to get produces/consumes working in spring 3.1

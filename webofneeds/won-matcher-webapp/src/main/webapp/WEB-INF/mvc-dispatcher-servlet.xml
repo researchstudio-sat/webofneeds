@@ -11,7 +11,11 @@
 
     <context:component-scan base-package="won.matcher.webapp"/> <!-- searches here for annotated classes -->
 
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" />
+    <!--
+         Load properties but ignore unresolvable properties so that
+         they are searched in other property configuerers defined in the context
+    -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" ignore-unresolvable="true"/>
     <mvc:annotation-driven conversion-service="conversionService">
         <mvc:message-converters>
             <bean class="won.protocol.rest.RdfModelConverter"/>

@@ -14,18 +14,18 @@
  *    limitations under the License.
  */
 
-package won.bot.configuration;
+package won.bot.needproducer;
 
-import java.net.URI;
+import com.hp.hpl.jena.rdf.model.Model;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
- * Interface that is used to obtain a WON node URI.
+ * User: fkleedorfer
+ * Date: 17.12.13
  */
-public interface WonNodeURISource
+public interface FileBasedNeedProducer
 {
-  /**
-   * Returns a WON node's URI. Must point to the URI that, when dereferenced, yields the RDF description of the WON node.
-   * @return
-   */
-  public URI getWonNodeURI();
+  public Model readNeedFromFile(File file) throws IOException;
 }
