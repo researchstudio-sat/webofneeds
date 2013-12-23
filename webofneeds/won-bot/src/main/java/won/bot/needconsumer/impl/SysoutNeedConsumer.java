@@ -31,4 +31,10 @@ public class SysoutNeedConsumer implements NeedConsumer
   {
     RDFDataMgr.write(System.out, need, Lang.TTL);
   }
+
+  @Override
+  public boolean isExhausted()
+  {
+    return true;
+  }
 }

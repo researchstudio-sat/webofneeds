@@ -28,7 +28,7 @@ public class NeedProsumer
   private NeedProducer needProducer;
   private NeedConsumer needConsumer;
   public void consumeAll(){
-    while (!needProducer.isExhausted()){
+    while (!needProducer.isExhausted() && ! needConsumer.isExhausted()){
       needConsumer.consume(needProducer.create());
     }
   }

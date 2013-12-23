@@ -30,4 +30,10 @@ public class NopNeedConsumer implements NeedConsumer
   {
     //don't do anything
   }
+
+  @Override
+  public boolean isExhausted()
+  {
+    return true;
+  }
 }
