@@ -16,6 +16,8 @@
 
 package won.bot.nodeurisource.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.nodeurisource.NodeURISource;
 
 import java.net.URI;
@@ -30,6 +32,7 @@ import java.util.Random;
  */
 public class RandomMultiNodeUriSource implements NodeURISource
 {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   private List<URI> nodeURIs = null;
   private long seed = System.currentTimeMillis();
   private Random random = new Random(seed);
@@ -39,7 +42,9 @@ public class RandomMultiNodeUriSource implements NodeURISource
   public URI getWonNodeURI()
   {
     if (this.nodeURIs == null || this.nodeURIs.isEmpty()) return null;
-    return this.nodeURIs.get(this.random.nextInt(this.nodeURIs.size()));
+    URI nodeUri =  this.nodeURIs.get(this.random.nextInt(this.nodeURIs.size()));
+    logger.debug("using node URI '{}'", nodeUri);
+    return nodeUri;
   }
 
   public void setNodeURIs(final Collection<URI> nodeURIs)
