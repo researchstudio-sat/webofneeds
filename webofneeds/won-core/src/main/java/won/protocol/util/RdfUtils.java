@@ -345,9 +345,10 @@ public class RdfUtils
       eventNode.addLiteral(WON.HAS_MATCH_SCORE, score.doubleValue());
     extraDataModel.setNsPrefix("", eventNode.getURI().toString());
     if (content != null) {
-      RdfUtils.replaceBaseResource(content, eventNode);
+
       //TODO: check if the correct data is saved
       extraDataModel.add(content);
+      RdfUtils.replaceBaseResource(extraDataModel, eventNode);
     }
     return extraDataModel;
   }
