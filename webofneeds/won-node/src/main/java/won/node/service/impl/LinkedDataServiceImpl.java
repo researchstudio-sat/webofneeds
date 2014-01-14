@@ -63,6 +63,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   @Autowired
   private RDFStorageService rdfStorage;
+
+  //TODO: used to access/create event URIs for connection model rendering. Could be removed if events knew their URIs.
+  @Autowired
+  private URIService uriService;
   @Autowired
   private NeedModelMapper needModelMapper;
   @Autowired
@@ -211,7 +215,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     //add event members and attach them
     for (ConnectionEvent e : events) {
-      Resource eventMember = model.createResource(WON.toResource(e.getType()));
+      Resource eventMember = model.createResource(this.uriService.createEventURI(connection,e).toString(),WON.toResource(e.getType()));
       if (e.getOriginatorUri() != null)
         eventMember.addProperty(WON.HAS_ORIGINATOR, model.createResource(e.getOriginatorUri().toString()));
 
@@ -331,7 +335,11 @@ public class LinkedDataServiceImpl implements LinkedDataService
     this.pageURIPrefix = pageURIPrefix;
   }
 
-  public void setRdfStorage(RDFStorageService rdfStorage)
+  public void setUriService(URIService uriService) {
+    this.uriService = uriService;
+  }
+
+    public void setRdfStorage(RDFStorageService rdfStorage)
   {
     this.rdfStorage = rdfStorage;
   }

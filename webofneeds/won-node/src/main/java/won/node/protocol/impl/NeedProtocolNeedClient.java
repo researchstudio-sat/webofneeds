@@ -67,10 +67,10 @@ public class NeedProtocolNeedClient implements NeedProtocolNeedClientSide
   }
 
   @Override
-  public void textMessage(final Connection connection, final String messager) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessage(final Connection connection, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, messager);
-    delegate.textMessage(connection, messager);
+    logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
+    delegate.textMessage(connection, message);
 
   }
 

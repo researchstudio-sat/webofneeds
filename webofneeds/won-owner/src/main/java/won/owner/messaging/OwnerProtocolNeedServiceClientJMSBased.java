@@ -254,12 +254,11 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public void textMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-
+    public void textMessage(URI connectionURI, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        String messageConvert = RdfUtils.toString(message);
         Map headerMap = new HashMap();
         headerMap.put("connectionURI",connectionURI.toString());
-        headerMap.put("message",message);
-
+        headerMap.put("message",messageConvert);
         headerMap.put("methodName","textMessage");
 
         try {
@@ -270,6 +269,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
 
         messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint );
+
         logger.debug("sending text message: ");
 
     }
@@ -319,9 +319,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("activate",activate);
         headerMap.put("methodName","createNeed");
 
-        if (content != null) {
-            content.setNsPrefix("",ownerURI.toString());
-        }
+
         /**
          * if wonNodeURI is not the default wonNodeURI, following steps shall be followed.
          *  1) new activeMQ connection to the remote broker shall be established.

@@ -74,8 +74,8 @@ public class NeedProtocolNeedServiceImplJMSBased
   {
       logger.info("NODE2: text message received for connection {], message {}",connectionURI,message);
       URI connectionURIConvert = URI.create(connectionURI);
-
-        delegate.textMessage(connectionURIConvert, message);
+      Model messageConvert = RdfUtils.toModel(message);
+        delegate.textMessage(connectionURIConvert, messageConvert);
   }
 
 

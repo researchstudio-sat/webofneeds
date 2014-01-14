@@ -129,12 +129,13 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
   }
 
   @Override
-  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info(MessageFormat.format("owner-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
-      proxy.textMessage(connectionURI, message);
+      String messageConvert = RdfUtils.toString(message);
+      proxy.textMessage(connectionURI, messageConvert);
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {

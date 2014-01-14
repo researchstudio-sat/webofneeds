@@ -53,7 +53,7 @@ public interface NeedProtocolNeedClientSide   //extends ConnectionCommunicationS
 
   public void close(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  public void textMessage(final Connection connection, final String messager) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void textMessage(final Connection connection, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 
 

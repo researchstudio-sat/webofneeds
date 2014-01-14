@@ -40,7 +40,8 @@ public enum ConnectionEventType
   OWNER_MESSAGE("OwnerMessage", ConnectionState.CONNECTED),
   PARTNER_MESSAGE("PartnerMessage", ConnectionState.CONNECTED),
 
-  MATCHER_HINT("Hint");
+  MATCHER_HINT("Hint"),
+  CHAT_MESSAGE("Message",ConnectionState.CONNECTED);
 
   private String name;
   private ConnectionState[] permittingStates;

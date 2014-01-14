@@ -16,6 +16,7 @@
 
 package won.node.ws;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
@@ -51,7 +52,8 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     {
         wireDependenciesLazily();
       try {
-        ownerProtocolNeedService.textMessage(connectionURI, message);
+        Model messageConvert = RdfUtils.toModel(message);
+        ownerProtocolNeedService.textMessage(connectionURI, messageConvert);
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {

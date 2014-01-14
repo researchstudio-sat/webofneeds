@@ -101,7 +101,7 @@ public abstract class Facet {
     }
   }
 
-  public void textMessageFromOwner(final Connection con, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     final URI remoteConnectionURI = con.getRemoteConnectionURI();
     //inform the other side
     executorService.execute(new Runnable() {
@@ -149,7 +149,7 @@ public abstract class Facet {
     });
   }
 
-  public void textMessageFromNeed(final Connection con, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //send to the need side
     executorService.execute(new Runnable() {
       @Override

@@ -57,6 +57,10 @@ public class WON
   public static final Property HAS_BASIC_NEED_TYPE = m.createProperty(BASE_URI, "hasBasicNeedType");
 
   public static final Property HAS_CONTENT = m.createProperty(BASE_URI, "hasContent");
+
+  public static final Resource TEXT_MESSAGE = m.createResource(BASE_URI + "TextMessage");
+  public static final Property HAS_TEXT_MESSAGE = m.createProperty(BASE_URI + "hasTextMessage");
+
   public static final Resource NEED_CONTENT = m.createResource(BASE_URI + "NeedContent");
   public static final Property HAS_TEXT_DESCRIPTION = m.createProperty(BASE_URI, "hasTextDescription");
   public static final Property HAS_CONTENT_DESCRIPTION = m.createProperty(BASE_URI, "hasContentDescription");
@@ -119,6 +123,7 @@ public class WON
   public static final Resource EVENT_TYPE_PARTNER_MESSAGE = m.createResource(ConnectionEventType.PARTNER_MESSAGE.getURI().toString());
   public static final Resource EVENT_TYPE_OWNER_MESSAGE = m.createResource(ConnectionEventType.OWNER_MESSAGE.getURI().toString());
   public static final Resource EVENT_TYPE_HINT = m.createResource(ConnectionEventType.MATCHER_HINT.getURI().toString());
+  public static final Resource EVENT_TYPE_CHAT_MESSAGE = m.createResource(ConnectionEventType.CHAT_MESSAGE.getURI().toString());
 
   public static final Resource BASIC_NEED_TYPE_DO_TOGETHER = m.createResource(BasicNeedType.DO_TOGETHER.getURI().toString());
   public static final Resource BASIC_NEED_TYPE_SUPPLY = m.createResource(BasicNeedType.SUPPLY.getURI().toString());
@@ -212,6 +217,8 @@ public class WON
         return EVENT_TYPE_OWNER_MESSAGE;
       case PARTNER_MESSAGE:
         return EVENT_TYPE_PARTNER_MESSAGE;
+      case CHAT_MESSAGE:
+            return EVENT_TYPE_CHAT_MESSAGE;
       default:
         throw new IllegalStateException("No such case specified for " + type.name());
     }
