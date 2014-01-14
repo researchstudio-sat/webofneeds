@@ -16,6 +16,7 @@
 
 package won.bot.app;
 
+import org.apache.camel.CamelContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -27,6 +28,8 @@ public class SimpleMaildirToOwnerBot implements CommandLineRunner
 {
   @Autowired
   private NeedProsumer prosumer;
+  @Autowired
+  CamelContext camelContext;
 
   public static void main(String[] args) {
     SpringApplication app = new SpringApplication(
@@ -39,5 +42,6 @@ public class SimpleMaildirToOwnerBot implements CommandLineRunner
   public void run(final String... strings) throws Exception
   {
     prosumer.consumeAll();
+    camelContext.stop();
   }
 }

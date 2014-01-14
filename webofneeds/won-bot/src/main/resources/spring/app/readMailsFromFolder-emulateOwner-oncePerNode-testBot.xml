@@ -30,7 +30,7 @@
         <property name="needConsumer" ref="needConsumer" />
         <property name="needProducer" ref="needProducer" />
     </bean>
-    <bean id="commandLineRunner" class="won.bot.app.SimpleMaildirToSysoutBot" />
+    <bean id="commandLineRunner" class="won.bot.app.SimpleMaildirToOwnerOncePerNodeBot" />
 
 
 </beans>
