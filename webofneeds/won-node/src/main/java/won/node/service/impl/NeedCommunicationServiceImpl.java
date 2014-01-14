@@ -139,8 +139,9 @@ public class NeedCommunicationServiceImpl implements
 
     //create Connection in Database
     Connection con =  dataService.createConnection(needURI, otherNeedURI, otherConnectionURI, content,
-        ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
-
+    ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
+    String baseURI = con.getConnectionURI().toString();
+    RdfUtils.replaceBaseURI(content, baseURI);
     //create ConnectionEvent in Database
     ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_OPEN);
 

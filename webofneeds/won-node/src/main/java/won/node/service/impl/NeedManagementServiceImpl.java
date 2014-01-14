@@ -16,6 +16,11 @@
 
 package won.node.service.impl;
 
+/**
+ * User: LEIH-NB
+ * Date: 28.10.13
+ */
+
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
@@ -28,9 +33,11 @@ import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Facet;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
+import won.protocol.model.OwnerApplication;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.util.DataAccessUtils;
@@ -38,11 +45,15 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * User: fkleedorfer
  * Date: 02.11.12
+ */
+/* TODO: The logic of the methods of this class has nothing to do with JMS. should be merged with NeedManagementServiceImpl class. The only change was made in createNeed method, where the concept of authorizedApplications for each need was introduced.
  */
 @Component
 public class NeedManagementServiceImpl implements NeedManagementService
@@ -57,12 +68,16 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
   @Autowired
   private NeedRepository needRepository;
-  @Autowired
-  private FacetRepository facetRepository;
+
+    @Autowired
+    FacetRepository facetRepository;
+    @Autowired
+    private OwnerApplicationRepository ownerApplicationRepository;
 
   @Override
   public URI createNeed(final URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException
   {
+    logger.info("CREATING need. OwnerURI:{}, OwnerApplicationId:{}",ownerURI, ownerApplicationID);
     if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
     Need need = new Need();
     need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
@@ -70,12 +85,13 @@ public class NeedManagementServiceImpl implements NeedManagementService
     need = needRepository.save(need);
     //now, create the need URI and save again
     need.setNeedURI(URIService.createNeedURI(need));
+    need.setWonNodeURI(URI.create(URIService.getGeneralURIPrefix()));
     need = needRepository.saveAndFlush(need);
+
     String baseURI = need.getNeedURI().toString();
     RdfUtils.replaceBaseURI(content, baseURI);
 
     rdfStorage.storeContent(need, content);
-
     ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
     if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
 
@@ -84,85 +100,109 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
     StmtIterator stmtIterator = content.listStatements(needRes, WON.HAS_FACET, (RDFNode) null);
     if(!stmtIterator.hasNext())
-      throw new IllegalArgumentException("at least one RDF node must be of type won:HAS_FACET");
+        throw new IllegalArgumentException("at least one RDF node must be of type won:HAS_FACET");
     else
-      //TODO: check if there is a implementation for the facet on the node
-      do {
+    //TODO: check if there is a implementation for the facet on the node
+    do {
         Facet facet = new Facet();
         facet.setNeedURI(need.getNeedURI());
         facet.setTypeURI(URI.create(stmtIterator.next().getObject().asResource().getURI()));
         facetRepository.save(facet);
-      } while(stmtIterator.hasNext());
+    } while(stmtIterator.hasNext());
 
+    authorizeOwnerApplicationForNeed(ownerApplicationID,need.getNeedURI());
     return need.getNeedURI();
   }
+    @Override
+    public void authorizeOwnerApplicationForNeed(final String ownerApplicationID, URI needURI){
+        logger.info("AUTHORIZING owner application. needURI:{}, OwnerApplicationId:{}",needURI, ownerApplicationID);
+        Need need = needRepository.findByNeedURI(needURI).get(0);
+        List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
+        if(ownerApplications.size()>0)  {
+            OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID).get(0);
+            List<OwnerApplication> authorizedApplications = new ArrayList<>();
+            authorizedApplications.add(ownerApplication);
+            need.setAuthorizedApplications(authorizedApplications);
+        }
+
+        else{
+            List<OwnerApplication> ownerApplicationList = new ArrayList<>();
+            OwnerApplication ownerApplication = new OwnerApplication();
+            ownerApplication.setOwnerApplicationId(ownerApplicationID);
+            ownerApplicationList.add(ownerApplication);
+            need.setAuthorizedApplications(ownerApplicationList);
+            logger.info("setting OwnerApp ID: "+ownerApplicationList.get(0));
+        }
+        need = needRepository.saveAndFlush(need);
+    }
 
     @Override
-    public void authorizeOwnerApplicationForNeed(String ownerApplicationID, URI needURI) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void activate(final URI needURI) throws NoSuchNeedException
+    {
+        logger.info("ACTIVATING need. needURI:{}",needURI);
+        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+        Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+        need.setState(NeedState.ACTIVE);
+        logger.info("Setting Need State: "+ need.getState());
+        needRepository.saveAndFlush(need);
+    }
+
+    @Override
+    public void deactivate(final URI needURI) throws NoSuchNeedException
+    {
+        logger.info("DEACTIVATING need. needURI:{}",needURI);
+        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+        Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+        need.setState(NeedState.INACTIVE);
+        need = needRepository.saveAndFlush(need);
+        //close all connections
+        Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());
+        for (URI connURI : connectionURIs) {
+            try {
+                ownerFacingConnectionCommunicationService.close(connURI, null);
+            } catch (WonProtocolException e) {
+                logger.warn("caught exception when trying to close connection", e);
+            }
+        }
+    }
+
+    private boolean isNeedActive(final Need need)
+    {
+        return NeedState.ACTIVE == need.getState();
     }
 
 
-  @Override
-  public void activate(final URI needURI) throws NoSuchNeedException
-  {
-    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    need.setState(NeedState.ACTIVE);
-    needRepository.saveAndFlush(need);
-  }
-
-  @Override
-  public void deactivate(final URI needURI) throws NoSuchNeedException
-  {
-    if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-    Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    need.setState(NeedState.INACTIVE);
-    need = needRepository.saveAndFlush(need);
-    //close all connections
-    Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());
-    for (URI connURI : connectionURIs) {
-      try {
-        ownerFacingConnectionCommunicationService.close(connURI, null);
-      } catch (WonProtocolException e) {
-        logger.warn("caught exception when trying to close connection", e);
-      }
+    public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService)
+    {
+        this.ownerProtocolOwnerService = ownerProtocolOwnerService;
     }
-  }
 
-  private boolean isNeedActive(final Need need)
-  {
-    return NeedState.ACTIVE == need.getState();
-  }
+    public void setOwnerFacingConnectionCommunicationService(final OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService)
+    {
+        this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
+    }
 
+    public void setNeedInformationService(final NeedInformationService needInformationService)
+    {
+        this.needInformationService = needInformationService;
+    }
 
-  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService)
-  {
-    this.ownerProtocolOwnerService = ownerProtocolOwnerService;
-  }
+    public void setURIService(final URIService URIService)
+    {
+        this.URIService = URIService;
+    }
 
-  public void setOwnerFacingConnectionCommunicationService(final OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService)
-  {
-    this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
-  }
+    public void setNeedRepository(final NeedRepository needRepository)
+    {
+        this.needRepository = needRepository;
+    }
 
-  public void setNeedInformationService(final NeedInformationService needInformationService)
-  {
-    this.needInformationService = needInformationService;
-  }
+    public void setRdfStorage(RDFStorageService rdfStorage)
+    {
+        this.rdfStorage = rdfStorage;
+    }
 
-  public void setURIService(final URIService URIService)
-  {
-    this.URIService = URIService;
-  }
-
-  public void setNeedRepository(final NeedRepository needRepository)
-  {
-    this.needRepository = needRepository;
-  }
-
-  public void setRdfStorage(RDFStorageService rdfStorage)
-  {
-    this.rdfStorage = rdfStorage;
-  }
+    public void setOwnerApplicationRepository(OwnerApplicationRepository ownerApplicationRepository) {
+        this.ownerApplicationRepository = ownerApplicationRepository;
+    }
 }
