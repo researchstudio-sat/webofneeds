@@ -103,14 +103,14 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
                 logger.info("registering ownerapplication on the node {} failed",defaultNodeURI);
 
             }
-
+            onApplicationRun = true;
         }
 
     }
 
     @Override
     public Future<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-        boolean endpointConfigured = true;
+
         Map headerMap = new HashMap<String, Object>();
         headerMap.put("needURI", needURI.toString()) ;
         headerMap.put("otherNeedURI", otherNeedURI.toString());
@@ -125,7 +125,6 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         }
         headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
         return messagingService.sendInOutMessageGeneric(null,headerMap,null,startingEndpoint);
-       // return messagingService.sendInOutMessage(null,headerMap,null, "outgoingMessages");
     }
 
     @Override
