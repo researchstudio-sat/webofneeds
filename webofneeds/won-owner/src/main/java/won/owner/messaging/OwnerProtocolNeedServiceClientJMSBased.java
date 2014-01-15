@@ -117,13 +117,13 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("content",RdfUtils.toString(content));
 
         headerMap.put("methodName","connect");
-
+        String endpoint = null;
         try {
-            ownerProtocolActiveMQService.configureCamelEndpointForNeed(needURI,startingEndpoint);
+            endpoint = ownerProtocolActiveMQService.configureCamelEndpointForNeed(needURI,startingEndpoint);
         } catch (Exception e) {
 
         }
-        headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
+        headerMap.put("remoteBrokerEndpoint",endpoint);
         return messagingService.sendInOutMessageGeneric(null,headerMap,null,startingEndpoint);
     }
 
@@ -134,13 +134,13 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("needURI",needURI.toString());
 
         headerMap.put("methodName","deactivate");
-
+        String endpoint = null;
         try {
-            ownerProtocolActiveMQService.configureCamelEndpointForNeed(needURI,startingEndpoint);
+            endpoint = ownerProtocolActiveMQService.configureCamelEndpointForNeed(needURI,startingEndpoint);
         } catch (Exception e) {    //todo: error handling needed
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
+        headerMap.put("remoteBrokerEndpoint",endpoint);
 
         messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint );
         logger.info("sending activate message: "+ needURI.toString());
@@ -151,15 +151,14 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
 
         Map headerMap = new HashMap();
         headerMap.put("needURI",needURI.toString());
-
         headerMap.put("methodName","activate");
-
+        String endpoint = null;
         try {
-            ownerProtocolActiveMQService.configureCamelEndpointForNeed(needURI,startingEndpoint);
+            endpoint = ownerProtocolActiveMQService.configureCamelEndpointForNeed(needURI,startingEndpoint);
         } catch (Exception e) { //todo: error handling needed
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
+        headerMap.put("remoteBrokerEndpoint",endpoint);
 
         messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint );
         logger.info("sending activate message: "+ needURI.toString());
@@ -200,11 +199,11 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
                 activemqConnectionFactory.setBrokerURL(brokerURI.toString()+"?useLocalHost=false");
                 logger.info("after setting BrokerURI: " + activemqConnectionFactory.getBrokerURL());
 
-            remoteEndpoint = ownerProtocolActiveMQService.getEndpoint();
+            remoteEndpoint = ownerProtocolActiveMQService.getEndpoint(wonNodeURI);
             logger.info("getting remoteEndpoint: "+remoteEndpoint);
-            logger.info("sending register message to remoteBrokerEndpoint {}",ownerProtocolActiveMQService.getEndpoint());
+            logger.info("sending register message to remoteBrokerEndpoint {}",ownerProtocolActiveMQService.getEndpoint(wonNodeURI));
             Map headerMap = new HashMap();
-            headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
+            headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint(wonNodeURI));
             headerMap.put("methodName","register");
             Future<String> futureResults = messagingService.sendInOutMessageGeneric(null, headerMap, null, startingEndpoint);
 
@@ -260,13 +259,13 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("connectionURI",connectionURI.toString());
         headerMap.put("message",messageConvert);
         headerMap.put("methodName","textMessage");
-
+        String endpoint = null;
         try {
-            ownerProtocolActiveMQService.configureCamelEndpointForConnection(connectionURI,startingEndpoint);
+            endpoint = ownerProtocolActiveMQService.configureCamelEndpointForConnection(connectionURI,startingEndpoint);
         } catch (Exception e) { //todo: error handling needed
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
+        headerMap.put("remoteBrokerEndpoint",endpoint);
 
         messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint );
 
@@ -280,13 +279,13 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("connectionURI",connectionURI.toString());
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","close");
-
+        String endpoint = null;
         try {
-            ownerProtocolActiveMQService.configureCamelEndpointForConnection(connectionURI,startingEndpoint);
+            endpoint = ownerProtocolActiveMQService.configureCamelEndpointForConnection(connectionURI,startingEndpoint);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
+        headerMap.put("remoteBrokerEndpoint",endpoint);
 
         messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint);
         logger.debug("sending close message: ");
@@ -298,13 +297,13 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("connectionURI",connectionURI.toString());
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","open");
-
+        String endpoint = null;
         try {
-            ownerProtocolActiveMQService.configureCamelEndpointForConnection(connectionURI,startingEndpoint);
+            endpoint = ownerProtocolActiveMQService.configureCamelEndpointForConnection(connectionURI,startingEndpoint);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
+        headerMap.put("remoteBrokerEndpoint",endpoint);
         messagingService.sendInOnlyMessage(null,headerMap,null, startingEndpoint);
         logger.debug("sending open message: ");
 
@@ -347,14 +346,16 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
             WonNode wonNode = new WonNode();
             wonNode.setOwnerApplicationID(ownerApplicationId);
             wonNode.setWonNodeURI(wonNodeURI);
-            wonNode = wonNodeRepository.saveAndFlush(wonNode);
+            //wonNode = wonNodeRepository.saveAndFlush(wonNode);
 
         }
         else{
+
             ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
-            logger.debug("existing ownerApplicationId: "+ownerApplicationId);
+            ownerProtocolActiveMQService.configureCamelEndpointForNodeURI(wonNodeURI,"seda:outgoingMessages");
+            logger.debug("existing ownerApplicationId: " + ownerApplicationId);
         }
-        headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint());
+        headerMap.put("remoteBrokerEndpoint",ownerProtocolActiveMQService.getEndpoint(wonNodeURI));
         headerMap.put("ownerApplicationID",ownerApplicationId);
         return messagingService.sendInOutMessageGeneric(null, headerMap,null,startingEndpoint);
 

@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
-import won.protocol.exception.BrokerConfigurationFailedException;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.OwnerProtocolActiveMQService;
 import won.protocol.model.Connection;
@@ -42,7 +41,9 @@ import won.protocol.vocabulary.WON;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComponent;
 
@@ -60,7 +61,7 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
     @Autowired
     private LinkedDataRestClient linkedDataRestClient;
     public static final String PATH_BROKER_URI = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_BROKER_URI + ">";
-    private String endpoint;
+    private Map<URI,String> endpointMap;
     private String startingEndpoint;
     @Autowired
     private ConnectionRepository connectionRepository;
@@ -99,6 +100,7 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
     public URI configureCamelEndpointForNodeURI(URI wonNodeURI, String from) throws CamelConfigurationFailedException {
         //TODO: the linked data description of the won node must be at [NODE-URI]/resource
         // according to this code. This should be explicitly defined somewhere
+        endpointMap = new HashMap<>();
         URI resourceURI = URI.create(wonNodeURI.toString()+"/resource");
         URI brokerURI = getActiveMQBrokerURIForNode(resourceURI);
 
@@ -111,8 +113,9 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
             camelContext.addComponent(tempComponentName,activeMQComponent(brokerURI.toString()));
             logger.info("adding component with component name {}",tempComponentName);
         }
+        String endpoint = tempComponentName+":queue:"+getActiveMQOwnerProtocolQueueNameForNeed(resourceURI);
+        endpointMap.put(wonNodeURI,endpoint);
 
-        endpoint = tempComponentName+":queue:"+getActiveMQOwnerProtocolQueueNameForNeed(resourceURI);
 
         List<String> endpointList = new ArrayList<>();
         endpointList.add(endpoint);
@@ -120,13 +123,13 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
          * there can be only one route per endpoint. Thus, consuming endpoint of each route shall be unique.
          */
         //todo: using replaceAll might result in security issues. change this.
-        tempStartingComponentName = tempStartingComponentName + endpoint.replaceAll(":","_");
+        tempStartingComponentName = tempStartingComponentName + endpointMap.get(wonNodeURI).replaceAll(":","_");
         setStartingEndpoint(tempStartingComponentName);
         if (camelContext.getComponent(tempComponentName)==null){
             OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext,endpointList,tempStartingComponentName);
             addRoutes(ownerProtocolRouteBuilder);
         } else{
-            if(camelContext.getRoute(endpoint)==null)
+            if(camelContext.getRoute(endpointMap.get(wonNodeURI))==null)
             {
                 OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext,endpointList,tempStartingComponentName);
                 addRoutes(ownerProtocolRouteBuilder);
@@ -138,23 +141,24 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
 
     }
 
-    public void configureCamelEndpointForConnection(URI connectionURI,String from) throws Exception {
+    public String configureCamelEndpointForConnection(URI connectionURI, String from) throws Exception {
 
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         URI needURI = con.getNeedURI();
-        configureCamelEndpointForNeed(needURI,from);
+        return configureCamelEndpointForNeed(needURI,from);
 
     }
-    public void configureCamelEndpointForNeed(URI needURI,String from) throws Exception {
+    public String configureCamelEndpointForNeed(URI needURI, String from) throws Exception {
 
         Need need = needRepository.findByNeedURI(needURI).get(0);
         URI wonNodeURI = need.getWonNodeURI();
         configureCamelEndpointForNodeURI(wonNodeURI, from);
-
+        return getEndpoint(wonNodeURI);
     }
 
-    public String getEndpoint() {
-        return endpoint;
+    public String getEndpoint(URI wonNodeURI) {
+
+        return endpointMap.get(wonNodeURI);
     }
 
     @Override
@@ -199,9 +203,7 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
         return this.camelContext;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
-    }
+
     public String getComponentName() {
         return componentName;
     }
