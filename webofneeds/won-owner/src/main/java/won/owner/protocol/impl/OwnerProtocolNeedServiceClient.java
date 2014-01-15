@@ -131,7 +131,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public void textMessage(final URI connectionURI, final String message)
+    public void textMessage(final URI connectionURI, final Model message)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         logger.debug("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
@@ -140,12 +140,30 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
         if (cons.isEmpty())
             throw new NoSuchConnectionException(connectionURI);
         Connection con = cons.get(0);
+        //todo: text message shall be returned
         delegate.textMessage(connectionURI, message);
-
+        //todo: the parameter for setMessage method shall be set by retrieving the result of delegate.textMessage method
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setCreationDate(new Date());
         chatMessage.setLocalConnectionURI(connectionURI);
-        chatMessage.setMessage(message);
+
+        Resource baseRes = message.getResource(message.getNsPrefixURI(""));
+        StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
+        String textMessage = null;
+        while (stmtIterator.hasNext()){
+            RDFNode obj = stmtIterator.nextStatement().getObject();
+            if (obj.isLiteral()) {
+                textMessage = obj.asLiteral().getLexicalForm();
+                break;
+            }
+        }
+        if (textMessage == null){
+            logger.debug("could not extract text message from RDF content of message");
+            textMessage = "[could not extract text message]";
+        }
+
+
+        chatMessage.setMessage(textMessage);
         chatMessage.setOriginatorURI(con.getNeedURI());
 
         //save in the db

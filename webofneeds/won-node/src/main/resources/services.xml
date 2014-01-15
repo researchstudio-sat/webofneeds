@@ -168,13 +168,13 @@
         <property name="rdfStorage" ref="rdfStorageRef" />
     </bean>
 
-    <bean id="needManagementService" class="won.node.service.impl.NeedManagementServiceImpl">
+    <!--bean id="needManagementService" class="won.node.service.impl.NeedManagementServiceImpl">
         <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
         <property name="needInformationService" ref="needInformationService"/>
         <property name="URIService" ref="uriService" />
         <property name="rdfStorage" ref="rdfStorageRef" />
-    </bean>
-    <bean id="needManagementServiceJMSBased" class="won.node.service.impl.NeedManagementServiceImplJMSBased">
+    </bean-->
+    <bean id="needManagementServiceJMSBased" class="won.node.service.impl.NeedManagementServiceImpl">
         <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
         <property name="needInformationService" ref="needInformationService"/>
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />

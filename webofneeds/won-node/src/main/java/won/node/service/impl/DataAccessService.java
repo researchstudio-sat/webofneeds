@@ -1,9 +1,6 @@
 package won.node.service.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
@@ -150,11 +147,10 @@ public class DataAccessService {
     return connectionRepository.saveAndFlush(con);
   }
 
-  public Connection saveChatMessage(URI connectionURI, String message) throws NoSuchConnectionException {          //load connection, checking if it exists
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+  public Connection saveChatMessage(Connection con, String message) throws NoSuchConnectionException {          //load connection, checking if it exists
+    if (con == null) throw new IllegalArgumentException("connectionURI is not set");
     if (message == null) throw new IllegalArgumentException("message is not set");
 
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     //construct chatMessage object to store in the db
     ChatMessage chatMessage = new ChatMessage();
     chatMessage.setCreationDate(new Date());
@@ -177,8 +173,21 @@ public class DataAccessService {
         RdfUtils.createContentForEvent(
             this.URIService.createEventURI(con, event), content, con, event, score));
   }
+    /*
+    public void saveAdditionalContentForEventReplace(final Model content, final Connection con, final ConnectionEvent event)
+    {
+        //TODO: define what content may contain and check that here! May content contain any RDF or must it be linked to the <> node?
+        Model extraDataModel = ModelFactory.createDefaultModel();
+        Resource eventNode = extraDataModel.createResource(this.URIService.createEventURI(con,event).toString());
+        extraDataModel.setNsPrefix("",eventNode.getURI().toString());
+        if (content != null) {
+            RdfUtils.replaceBaseResource(content, eventNode);
+            rdfStorageService.storeContent(event, extraDataModel);
+        }
+    }
+    */
 
-  public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {
+    public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {
     con.setRemoteConnectionURI(remoteConnectionURI);
     connectionRepository.saveAndFlush(con);
   }

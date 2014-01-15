@@ -26,7 +26,7 @@ public interface OwnerProtocolActiveMQService extends ActiveMQService{
 
     public String getActiveMQOwnerProtocolQueueNameForNeed(URI needURI);
     public URI configureCamelEndpointForNodeURI( URI wonNodeURI, String from) throws Exception;
-    public void configureCamelEndpointForConnection(URI connectionURI,String from) throws Exception;
-    public void configureCamelEndpointForNeed(URI needURI,String from) throws Exception;
+    public String configureCamelEndpointForConnection(URI connectionURI, String from) throws Exception;
+    public String configureCamelEndpointForNeed(URI needURI, String from) throws Exception;
 
 }

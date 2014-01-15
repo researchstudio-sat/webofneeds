@@ -37,6 +37,7 @@ import won.protocol.repository.NeedRepository;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
+import won.protocol.util.RdfUtils;
 
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
@@ -120,6 +121,8 @@ public class NeedCommunicationServiceImpl implements
     //create ConnectionEvent in Database
     ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.OWNER_OPEN);
 
+    String baseURI = con.getConnectionURI().toString();
+    RdfUtils.replaceBaseURI(content, baseURI);
     //create rdf content for the ConnectionEvent and save it to disk
     dataService.saveAdditionalContentForEvent(content, con, event, null);
 
@@ -136,8 +139,9 @@ public class NeedCommunicationServiceImpl implements
 
     //create Connection in Database
     Connection con =  dataService.createConnection(needURI, otherNeedURI, otherConnectionURI, content,
-        ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
-
+    ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
+    String baseURI = con.getConnectionURI().toString();
+    RdfUtils.replaceBaseURI(content, baseURI);
     //create ConnectionEvent in Database
     ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_OPEN);
 
