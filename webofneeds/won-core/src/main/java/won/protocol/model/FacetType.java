@@ -21,7 +21,10 @@ public enum FacetType {
     OwnerFacet("OwnerFacet"),
     GroupFacet("GroupFacet"),
     CoordinatorFacet("CoordinatorFacet"),
-    ParticipantFacet("ParticipantFacet");
+    ParticipantFacet("ParticipantFacet"),
+    BAParticipantCompletion_ParticipantFacet("BAParticipantCompletion_ParticipantFacet"),
+    BAParticipantCompletion_CoordinatorFacet("BAParticipantCompletion_CoordinatorFacet");
+
 
     private static final Logger logger = LoggerFactory.getLogger(BasicNeedType.class);
 
@@ -46,6 +49,10 @@ public enum FacetType {
            return FacetType.CoordinatorFacet;
        else if(uri.equals(FacetType.ParticipantFacet.getURI()))
            return FacetType.ParticipantFacet;
+       else if(uri.equals(FacetType.BAParticipantCompletion_ParticipantFacet))
+           return FacetType.BAParticipantCompletion_ParticipantFacet;
+       else if(uri.equals(FacetType.BAParticipantCompletion_CoordinatorFacet))
+           return FacetType.BAParticipantCompletion_CoordinatorFacet;
        else
            return null;
     }
