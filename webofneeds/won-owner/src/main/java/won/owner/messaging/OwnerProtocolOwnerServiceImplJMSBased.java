@@ -137,8 +137,8 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
         logger.info("node-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         if (message == null) throw new IllegalArgumentException("message is not set");
-
-        delegate.textMessage(URI.create(connectionURI),message);
+        Model messageConvert = RdfUtils.toModel(message);
+        delegate.textMessage(URI.create(connectionURI),messageConvert);
     }
 
 

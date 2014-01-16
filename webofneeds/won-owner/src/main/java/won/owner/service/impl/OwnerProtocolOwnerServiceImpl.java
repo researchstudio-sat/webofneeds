@@ -1,6 +1,6 @@
 package won.owner.service.impl;
-import com.github.jsonldjava.core.RDFDatasetUtils;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
@@ -170,21 +170,34 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     }
 
     @Override
-    public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         logger.info("node-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         if (message == null) throw new IllegalArgumentException("message is not set");
         //load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-
+        Resource baseRes = message.getResource(message.getNsPrefixURI(""));
+        StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
+        String textMessage = null;
+        while (stmtIterator.hasNext()){
+            RDFNode obj = stmtIterator.nextStatement().getObject();
+            if (obj.isLiteral()) {
+                textMessage = obj.asLiteral().getLexicalForm();
+                break;
+            }
+        }
+        if (textMessage == null){
+            logger.debug("could not extract text message from RDF content of message");
+            textMessage = "[could not extract text message]";
+        }
         //perform state transit (should not result in state change)
         //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
         //construct chatMessage object to store in the db
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setCreationDate(new Date());
         chatMessage.setLocalConnectionURI(con.getConnectionURI());
-        chatMessage.setMessage(message);
+        chatMessage.setMessage(textMessage);
         chatMessage.setOriginatorURI(con.getRemoteNeedURI());
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);

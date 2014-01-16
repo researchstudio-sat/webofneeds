@@ -54,11 +54,12 @@ public interface ConnectionCommunicationService
    * Sends a chat message via the local connection identified by the specified connectionURI
    * to the remote partner.
    *
+   *
    * @param connectionURI the local connection
    * @param message       the chat message
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void textMessage(URI connectionURI, String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void textMessage(URI connectionURI, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 }

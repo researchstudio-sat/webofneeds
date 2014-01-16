@@ -17,13 +17,12 @@
 package won.protocol.need;
 
 import won.protocol.service.ConnectionCommunicationService;
-import won.protocol.service.ConnectionMessagingService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 
 /**
  * User: fkleedorfer
  * Date: 31.10.12
  */
-public interface NeedProtocolNeedServiceWSBased extends NeedProtocolNeedService, ConnectionCommunicationService, ConnectionMessagingService, NeedFacingNeedCommunicationService
+public interface NeedProtocolNeedServiceWSBased extends NeedProtocolNeedService, ConnectionCommunicationService,  NeedFacingNeedCommunicationService
 {
 }

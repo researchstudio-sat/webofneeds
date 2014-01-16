@@ -27,5 +27,5 @@ public interface NodeURISource
    * Returns a WON node's URI. Must point to the URI that, when dereferenced, yields the RDF description of the WON node.
    * @return
    */
-  public URI getWonNodeURI();
+  public URI getNodeURI();
 }

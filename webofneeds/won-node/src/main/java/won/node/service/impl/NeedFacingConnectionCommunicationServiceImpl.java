@@ -17,6 +17,8 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +29,12 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
-import won.protocol.exception.WonProtocolException;
-import won.protocol.model.*;
 import won.protocol.repository.*;
 import won.protocol.service.ConnectionCommunicationService;
+import won.protocol.util.DataAccessUtils;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -91,16 +91,35 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     //invoke facet implementation
     reg.get(con).closeFromNeed(con, content);
   }
+    @Override
+    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    {
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        Resource baseRes = message.getResource(message.getNsPrefixURI(""));
+        StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
+        String textMessage = stmtIterator.next().getObject().toString();
+        dataService.saveChatMessage(con,textMessage);
+        //create ConnectionEvent in Database
+        ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.OWNER_OPEN);
 
+        //create rdf content for the ConnectionEvent and save it to disk
+        dataService.saveAdditionalContentForEvent(message, con, event, null);
+
+        //invoke facet implementation
+        reg.get(con).textMessageFromNeed(con, message);
+    }
+  /*
   @Override
-  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     logger.info("SEND_TEXT_MESSAGE received from the need side for connection {} with message '{}'", connectionURI, message);
     Connection con = dataService.saveChatMessage(connectionURI,message);
 
     //invoke facet implementation
     reg.get(con).textMessageFromNeed(con, message);
-  }
+
+
+  }       */
 
   public void setReg(FacetRegistry reg) {
     this.reg = reg;

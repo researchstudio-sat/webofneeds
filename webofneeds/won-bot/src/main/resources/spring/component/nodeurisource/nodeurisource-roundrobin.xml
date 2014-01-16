@@ -23,12 +23,14 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-    <import resource="classpath:spring/component/nodeurisource/nodeurisource-roundrobin.xml" />
-    <import resource="classpath:ownerServices.xml" />
-    <import resource="classpath:ownerApplicationContext.xml" />
 
-    <bean id="needConsumer" class="won.bot.needconsumer.impl.OwnerEmulatingNeedConsumer" >
-        <property name="nodeURISource" ref="nodeUriSource" />
-        <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
+    <!--
+         Load properties but ignore unresolvable properties so that
+         they are searched in other property configuerers defined in the context
+    -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/>
+
+    <bean id="nodeUriSource" class="won.bot.nodeurisource.impl.RoundRobinMultiNodeUriSource" >
+        <property name="nodeURIs" value="#{'${won.node.uris}'.split(' ')}" />
     </bean>
 </beans>

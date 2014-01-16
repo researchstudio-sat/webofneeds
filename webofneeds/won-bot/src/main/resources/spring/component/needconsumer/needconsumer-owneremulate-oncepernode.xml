@@ -30,5 +30,6 @@
     <bean id="needConsumer" class="won.bot.needconsumer.impl.OwnerEmulatingNeedConsumer" >
         <property name="nodeURISource" ref="nodeUriSource" />
         <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
+        <property name="consumeOncePerNode" value="true" />
     </bean>
 </beans>

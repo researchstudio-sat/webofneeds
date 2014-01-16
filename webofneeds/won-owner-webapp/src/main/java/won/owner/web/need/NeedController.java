@@ -129,7 +129,8 @@ public class NeedController
 
       com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
-      Resource needResource = needModel.createResource(ownerURI.toString(), WON.NEED);
+      Resource needResource = needModel.createResource("no:uri", WON.NEED);
+      needModel.setNsPrefix("","no:uri");
 
       // need type
       needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));

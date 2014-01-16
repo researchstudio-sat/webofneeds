@@ -1,5 +1,6 @@
 package won.node.facet.impl;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class GroupFacetImpl extends Facet {
   }
 
     @Override
-  public void textMessageFromNeed(final Connection con, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.info("SEND_TEXT_Message received with facet type GroupFacet from Need");
     List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
         ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());

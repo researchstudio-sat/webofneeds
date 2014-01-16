@@ -1,5 +1,10 @@
 package won.owner.web.connection;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +22,9 @@ import won.protocol.model.Connection;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.vocabulary.WON;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -92,7 +99,15 @@ public class ConnectionController {
 
         try {
           //TODO: rework such that an rdf model can be sent here instead of the text message
-          ownerService.textMessage(con.getConnectionURI(), text.getText());
+            com.hp.hpl.jena.rdf.model.Model facetModel = ModelFactory.createDefaultModel();
+
+            facetModel.setNsPrefix("", "no:uri");
+            Resource baseRes = facetModel.createResource(facetModel.getNsPrefixURI(""));
+            baseRes.addProperty(RDF.type, WON.TEXT_MESSAGE);
+            baseRes.addProperty(WON.HAS_TEXT_MESSAGE,text.getText(),XSDDatatype.XSDstring);
+
+
+          ownerService.textMessage(con.getConnectionURI(),facetModel);
         } catch (Exception e) {
             logger.warn("error sending text message");
             return "error sending text message: " + e.getMessage();

@@ -54,7 +54,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   }
 
   @Override
-  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     connectionCommunicationService.textMessage(connectionURI, message);
   }

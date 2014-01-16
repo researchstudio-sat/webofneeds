@@ -24,25 +24,27 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 /**
- * User: fkleedorfer
- * Date: 19.12.13
+ * NodeUriSource that is given a list of URIs and returns each element in a round robin fashion.
  */
-public class RandomMultiNodeUriSource implements NodeURISource
+public class RoundRobinMultiNodeUriSource implements NodeURISource
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private List<URI> nodeURIs = null;
-  private long seed = System.currentTimeMillis();
-  private Random random = new Random(seed);
+  private int lastIndex = -1;
 
 
   @Override
   public URI getNodeURI()
   {
     if (this.nodeURIs == null || this.nodeURIs.isEmpty()) return null;
-    URI nodeUri =  this.nodeURIs.get(this.random.nextInt(this.nodeURIs.size()));
+    int index = lastIndex + 1;
+    if (index >= this.nodeURIs.size()){
+      index = 0;
+    }
+    URI nodeUri =  this.nodeURIs.get(index);
+    this.lastIndex = index;
     logger.debug("using node URI '{}'", nodeUri);
     return nodeUri;
   }
@@ -56,12 +58,5 @@ public class RandomMultiNodeUriSource implements NodeURISource
       this.nodeURIs.addAll(nodeURIs);
     }
   }
-
-  public void setSeed(final long seed)
-  {
-    this.seed = seed;
-    this.random = new Random(this.seed);
-  }
-
 
 }

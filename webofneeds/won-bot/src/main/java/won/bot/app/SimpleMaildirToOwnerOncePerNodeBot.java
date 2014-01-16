@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import won.bot.needprosumer.NeedProsumer;
 
 @Component
-public class SimpleMaildirToOwnerBot implements CommandLineRunner
+public class SimpleMaildirToOwnerOncePerNodeBot implements CommandLineRunner
 {
   @Autowired
   private NeedProsumer prosumer;
@@ -33,7 +33,7 @@ public class SimpleMaildirToOwnerBot implements CommandLineRunner
 
   public static void main(String[] args) {
     SpringApplication app = new SpringApplication(
-        new Object[]{"classpath:/spring/app/readMailsFromFolder-emulateOwner-testBot.xml"}
+        new Object[]{"classpath:/spring/app/readMailsFromFolder-emulateOwner-oncePerNode-testBot.xml"}
     );
     app.run(args);
   }
@@ -44,4 +44,6 @@ public class SimpleMaildirToOwnerBot implements CommandLineRunner
     prosumer.consumeAll();
     camelContext.stop();
   }
+
+
 }

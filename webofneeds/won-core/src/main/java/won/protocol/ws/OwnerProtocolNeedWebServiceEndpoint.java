@@ -16,6 +16,7 @@
 
 package won.protocol.ws;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.ws.fault.*;
 
 import javax.jws.WebMethod;

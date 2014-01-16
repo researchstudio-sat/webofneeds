@@ -199,10 +199,10 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
     }
   }   */
     @Override
-    public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         logger.info(MessageFormat.format("owner-facing: TEXTMESSAGE_REQUESTED called for connectionURI {0}, message {1}", connectionURI,message));
-
+        String messageConvert = RdfUtils.toString(message);
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         URI needURI = con.getNeedURI();
         Need need = needRepository.findByNeedURI(needURI).get(0);
@@ -210,7 +210,7 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
         Map headerMap = new HashMap<String, String>();
         logger.info(ownerApplicationList.get(0).getOwnerApplicationId());
         headerMap.put("connectionURI", connectionURI.toString()) ;
-        headerMap.put("message",message);
+        headerMap.put("message",messageConvert);
         headerMap.put("ownerApplications", ownerApplicationList);
         headerMap.put("protocol","OwnerProtocol");
         headerMap.put("methodName", "textMessage");

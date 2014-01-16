@@ -138,16 +138,17 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
   }
 
 
-  public void textMessage(final Connection connection, final String messager) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void textMessage(final Connection connection, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-      logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, messager);
+      logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
       //Connection con = DataAccessUtils.loadConnection(connectionRepository, connection);
       Map headerMap = new HashMap<String, String>();
       String endpoint = null;
+      String messageConvert = RdfUtils.toString(message);
       headerMap.put("protocol","NeedProtocol");
       //remoteConnectionURI is the connectionURI on the other node.
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
-      headerMap.put("content", messager);
+      headerMap.put("content", messageConvert);
       headerMap.put("methodName","textMessage");
 
       try {
