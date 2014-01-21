@@ -16,6 +16,7 @@
 
 package won.owner.ws;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
@@ -39,7 +40,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Future;
 
 /**
  * User: LEIH-NB
@@ -111,12 +111,12 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
     //@Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
+    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
         return createNeed(ownerURI, content, activate,null);
     }
 
     //@Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException {
+    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(wonNodeURI);
             content.setNsPrefix("",ownerURI.toString());
@@ -160,7 +160,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
     //@Override
-    public Future<URI> connect(URI needURI, URI otherNeedURI, Model content) throws
+    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws
             NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);

@@ -1,5 +1,6 @@
 package won.owner.protocol.impl;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +25,6 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * Implementation of the OwnerProtocolNeedService to be used on the owner side. It contains the
@@ -180,19 +180,19 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws Exception {
+    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate) throws Exception {
         return createNeed(ownerURI, content, activate, null);
     }
 
     @Override
-    public Future<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeURI) throws Exception {
+    public ListenableFuture<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeURI) throws Exception {
         if (logger.isDebugEnabled()) {
           logger.debug("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
                 new Object[]{ownerURI, StringUtils.abbreviate(RdfUtils.toString(content),200), activate});
         }
 
 
-        final Future<URI> uri = delegate.createNeed(ownerURI, content, activate, wonNodeURI);
+        final ListenableFuture<URI> uri = delegate.createNeed(ownerURI, content, activate, wonNodeURI);
         new Thread(
                 new Runnable() {
                     @Override
@@ -245,13 +245,13 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public Future<URI> connect(final URI needURI, final  URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException
+    public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException
     {
       if (logger.isDebugEnabled()) {
         logger.debug("need-facing: CONNECT called for need {}, other need {} and content {}", new Object[]{needURI, otherNeedURI, StringUtils.abbreviate(RdfUtils.toString(content),200)});
       }
 
-            final Future<URI> uri = delegate.connect(needURI, otherNeedURI, content);
+            final ListenableFuture<URI> uri = delegate.connect(needURI, otherNeedURI, content);
             Resource baseRes = content.getResource(content.getNsPrefixURI(""));
             StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
 

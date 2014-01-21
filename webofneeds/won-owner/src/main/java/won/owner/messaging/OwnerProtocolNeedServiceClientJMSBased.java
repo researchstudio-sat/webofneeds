@@ -15,6 +15,7 @@
  */
 
 package won.owner.messaging;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.camel.CamelContext;
@@ -109,7 +110,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public Future<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
         Map headerMap = new HashMap<String, Object>();
         headerMap.put("needURI", needURI.toString()) ;
@@ -247,7 +248,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
 
 
     @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws Exception {
+    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate) throws Exception {
 
         return createNeed(ownerURI, content, activate,defaultNodeURI);
     }
@@ -310,7 +311,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws CamelConfigurationFailedException, ExecutionException, BrokerConfigurationFailedException, InterruptedException {
+    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws CamelConfigurationFailedException, ExecutionException, BrokerConfigurationFailedException, InterruptedException {
         Map headerMap = new HashMap();
 
         headerMap.put("ownerUri", ownerURI.toString());
