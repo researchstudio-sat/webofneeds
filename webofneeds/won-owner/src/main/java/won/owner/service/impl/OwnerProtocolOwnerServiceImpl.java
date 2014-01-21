@@ -1,4 +1,5 @@
 package won.owner.service.impl;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -9,10 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerService;
-import won.protocol.repository.*;
+import won.owner.service.OwnerProtocolOwnerServiceHandler;
+import won.protocol.repository.ChatMessageRepository;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.MatchRepository;
+import won.protocol.repository.NeedRepository;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
+
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +45,10 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
     @Autowired
     private ChatMessageRepository chatMessageRepository;
+
+    //handler for incoming won protocol messages. The default handler does nothing.
+    @Autowired(required = false)
+    private OwnerProtocolOwnerServiceHandler ownerServiceHandler = new NopOwnerProtocolOwnerServiceHandler();
 
     //TODO: refactor this to use DataAccessService
 
@@ -71,6 +81,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         }
         match.setScore(score);
         matchRepository.saveAndFlush(match);
+        ownerServiceHandler.onHint(match);
     }
 
     private boolean isNeedActive(final Need need) {
@@ -140,6 +151,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
           //TODO: do we save the connection content? where? as a chat content?
         }
+        ownerServiceHandler.onConnect(con);
     }
 
     @Override
@@ -153,6 +165,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
         //save in the db
         connectionRepository.saveAndFlush(con);
+        ownerServiceHandler.onOpen(con);
     }
 
     @Override
@@ -167,6 +180,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
         //save in the db
         connectionRepository.saveAndFlush(con);
+        ownerServiceHandler.onClose(con);
     }
 
     @Override
@@ -201,5 +215,6 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         chatMessage.setOriginatorURI(con.getRemoteNeedURI());
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);
+        ownerServiceHandler.onTextMessage(chatMessage);
     }
 }

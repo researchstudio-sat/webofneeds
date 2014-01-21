@@ -20,7 +20,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
-import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -30,19 +29,14 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
-import won.owner.protocol.impl.MessageProducer;
-import won.owner.ws.OwnerProtocolNeedClientFactory;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
 import won.protocol.model.WonNode;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.WonNodeRepository;
-import won.protocol.util.PropertiesUtil;
 import won.protocol.util.RdfUtils;
 
-import javax.jms.Destination;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,17 +52,10 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private boolean onApplicationRun = false;
     public static boolean brokerConnected = false;
-    private MessageProducer messageProducer;
-    private OwnerProtocolNeedClientFactory clientFactory;
-    private ProducerTemplate producerTemplate;
-    private Destination destination;
-    private org.springframework.jms.connection.CachingConnectionFactory con;
     private CamelContext camelContext;
     private MessagingService messagingService;
-    private PropertiesUtil propertiesUtil;
     private URI defaultNodeURI;
     private ApplicationContext ownerApplicationContext;
-    private List<OwnerApplicationListener> ownerApplicationListeners = new ArrayList<>();
     //todo: make this configurable
     private String startingEndpoint ="seda:outgoingMessages";
 
@@ -363,29 +350,9 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
 
-    public void setClientFactory(OwnerProtocolNeedClientFactory clientFactory) {
-        this.clientFactory = clientFactory;
-    }
-
-    public void setMessageProducer(MessageProducer messageProducer) {
-        this.messageProducer = messageProducer;
-    }
-
-    public void setProducerTemplate(ProducerTemplate producerTemplate) {
-
-        this.producerTemplate = producerTemplate;
-    }
-
-
-
     public void setMessagingService(MessagingService messagingService) {
         this.messagingService = messagingService;
     }
-
-    public void setPropertiesUtil(PropertiesUtil propertiesUtil) {
-        this.propertiesUtil = propertiesUtil;
-    }
-
     public void setDefaultNodeURI(URI defaultNodeURI) {
         this.defaultNodeURI = defaultNodeURI;
     }

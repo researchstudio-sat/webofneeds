@@ -17,8 +17,7 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>WEB-INF/spring-ws-servlet.xml
-            classpath:ownerServices.xml
-            classpath:ownerApplicationContext.xml
+            classpath:/spring/owner-jmsonly.xml
         </param-value>
     </context-param>
 
