@@ -52,7 +52,7 @@ public class NopOwnerProtocolOwnerServiceHandler implements OwnerProtocolOwnerSe
   }
 
   @Override
-  public void onTextMessage(final ChatMessage message)
+  public void onTextMessage(Connection con, final ChatMessage message)
   {
 
   }

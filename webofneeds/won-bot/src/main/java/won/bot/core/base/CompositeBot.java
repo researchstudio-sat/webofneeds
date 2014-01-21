@@ -17,6 +17,9 @@
 package won.bot.core.base;
 
 import won.bot.core.Bot;
+import won.protocol.model.ChatMessage;
+import won.protocol.model.Connection;
+import won.protocol.model.Match;
 
 import java.util.Collections;
 import java.util.Map;
@@ -31,33 +34,33 @@ public abstract class CompositeBot extends BasicServiceBot
 
 
   @Override
-  public void onConnectFromOtherNeed()
+  public void onConnectFromOtherNeed(Connection con) throws Exception
   {
-    super.onConnectFromOtherNeed();
+    super.onConnectFromOtherNeed(con);
   }
 
   @Override
-  public void onOpenFromOtherNeed()
+  public void onOpenFromOtherNeed(Connection con) throws Exception
   {
-    super.onOpenFromOtherNeed();
+    super.onOpenFromOtherNeed(con);
   }
 
   @Override
-  public void onCloseFromOtherNeed()
+  public void onCloseFromOtherNeed(Connection con) throws Exception
   {
-    super.onCloseFromOtherNeed();
+    super.onCloseFromOtherNeed(con);
   }
 
   @Override
-  public void onHintFromMatcher()
+  public void onHintFromMatcher(Match match) throws Exception
   {
-    super.onHintFromMatcher();
+    super.onHintFromMatcher(match);
   }
 
   @Override
-  public void onMessageFromOtherNeed()
+  public void onMessageFromOtherNeed(Connection con, ChatMessage message) throws Exception
   {
-    super.onMessageFromOtherNeed();
+    super.onMessageFromOtherNeed(con, message);
   }
 
   @Override

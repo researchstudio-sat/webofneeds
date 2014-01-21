@@ -16,6 +16,11 @@
 
 package won.bot.core;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import won.protocol.model.ChatMessage;
+import won.protocol.model.Connection;
+import won.protocol.model.Match;
+
 import java.net.URI;
 
 /**
@@ -26,11 +31,17 @@ import java.net.URI;
 public interface Bot
 {
   public boolean knowsNeedURI(URI needURI);
-  public void onConnectFromOtherNeed();
-  public void onOpenFromOtherNeed();
-  public void onCloseFromOtherNeed();
-  public void onHintFromMatcher();
-  public void onMessageFromOtherNeed();
+  public void onConnectFromOtherNeed(Connection con) throws Exception;
+  public void onOpenFromOtherNeed(Connection con) throws Exception;
+  public void onCloseFromOtherNeed(Connection con) throws Exception;
+  public void onHintFromMatcher(Match match) throws Exception;
+  public void onMessageFromOtherNeed(Connection con, ChatMessage message) throws Exception;
+  /**
+   * Override this to be informed whenever the bot has created a new need successfully.
+   * @param needUri
+   * @param needModel
+   */
+  public void onNewNeedCreated(URI needUri, URI wonNodeUri, final Model needModel);
 
   /**
    * Init method, called exactly once by the framework before any other method is invoked.

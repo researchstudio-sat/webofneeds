@@ -16,13 +16,15 @@
 
 package won.bot.core.base;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.context.BotContext;
 import won.bot.core.Bot;
 import won.bot.core.BotLifecyclePhase;
 import won.bot.core.BotState;
+import won.protocol.model.ChatMessage;
+import won.protocol.model.Connection;
+import won.protocol.model.Match;
 
 import java.net.URI;
 
@@ -92,22 +94,15 @@ public class BaseBot implements Bot
     return botContext;
   }
 
-  /**
-   * Override this to be informed whenever the bot has created a new need successfully.
-   * @param needUri
-   * @param needModel
-   */
-  protected void onNewNeedCreated(URI needUri, URI wonNodeUri, final Model needModel){}
+  @Override public void onConnectFromOtherNeed(Connection con) throws Exception {}
 
-  @Override public void onConnectFromOtherNeed() {}
+  @Override public void onOpenFromOtherNeed(Connection con) throws Exception {}
 
-  @Override public void onOpenFromOtherNeed() {}
+  @Override public void onCloseFromOtherNeed(Connection con) throws Exception {}
 
-  @Override public void onCloseFromOtherNeed(){}
+  @Override public void onHintFromMatcher(Match match) throws Exception {}
 
-  @Override public void onHintFromMatcher(){}
-
-  @Override public void onMessageFromOtherNeed(){}
+  @Override public void onMessageFromOtherNeed(Connection con, ChatMessage message) throws Exception {}
 
   @Override public void act() throws Exception
   {}

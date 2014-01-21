@@ -34,5 +34,5 @@ public interface OwnerProtocolOwnerServiceHandler
 
   void onClose(Connection con);
 
-  void onTextMessage(ChatMessage message);
+  void onTextMessage(Connection con, ChatMessage message);
 }

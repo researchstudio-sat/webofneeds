@@ -215,6 +215,6 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         chatMessage.setOriginatorURI(con.getRemoteNeedURI());
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);
-        ownerServiceHandler.onTextMessage(chatMessage);
+        ownerServiceHandler.onTextMessage(con, chatMessage);
     }
 }
