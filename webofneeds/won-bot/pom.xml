@@ -76,5 +76,11 @@
           <groupId>ch.qos.logback</groupId>
           <artifactId>logback-core</artifactId>
       </dependency>
+
+      <!-- TESTING -->
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+      </dependency>
   </dependencies>
 </project>
