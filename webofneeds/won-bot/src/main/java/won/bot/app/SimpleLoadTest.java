@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 public class SimpleLoadTest implements CommandLineRunner
 {
 
+
   public static void main(String[] args) {
     SpringApplication app = new SpringApplication(
         new Object[]{"classpath:/spring/app/simpleLoadTest.xml"}
@@ -35,7 +36,7 @@ public class SimpleLoadTest implements CommandLineRunner
   public void run(final String... strings) throws Exception
   {
     //TODO: implement a shutdown hook or something
-    Thread.sleep(60000);
+    Thread.sleep(5*60*1000);
   }
 
 

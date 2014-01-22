@@ -22,26 +22,31 @@ public class SimpleReactiveBot extends BasicServiceBot {
 
   @Override
   public void onConnectFromOtherNeed(Connection con) throws Exception {
+    logger.debug("bot received connect for need {}, connection {}", con.getNeedURI(), con.getConnectionURI());
     getOwnerService().open(con.getConnectionURI(), null);
   }
 
   @Override
   public void onHintFromMatcher(Match match) throws Exception {
+    logger.debug("bot received hint for need {}", match.getFromNeed());
     getOwnerService().connect(match.getFromNeed(), match.getToNeed(), null);
   }
 
   @Override
   public void onMessageFromOtherNeed(Connection con, ChatMessage message) throws Exception {
+    logger.debug("bot received message for need {}, connection {}", con.getNeedURI(), con.getConnectionURI());
     sendNextMessageViaConnectionOrClose(con);
   }
 
   @Override
   public void onNewNeedCreated(URI needUri, URI wonNodeUri, Model needModel) {
+    logger.debug("bot created new need {} on won node {}", needUri, wonNodeUri);
     //do nothing
   }
 
   @Override
   public void onOpenFromOtherNeed(Connection con) throws Exception {
+    logger.debug("bot received open for need {}, connection {}", con.getNeedURI(), con.getConnectionURI());
     sendNextMessageViaConnectionOrClose(con);
   }
 

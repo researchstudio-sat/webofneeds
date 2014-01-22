@@ -15,6 +15,7 @@
  */
 
 package won.owner.messaging;
+
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -37,6 +38,7 @@ import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -381,7 +383,9 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
             //camelContext.getComponent()
             WonNode wonNode = wonNodeList.get(0);
             ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
-            addActiveMQComponentForWonNode(wonNodeList.get(0));
+            if (camelContext.getComponent(wonNodeList.get(0).getBrokerComponent())==null) {
+              addActiveMQComponentForWonNode(wonNodeList.get(0));
+            }
             String startingComponent = wonNode.getStartingComponent();
             String ownerApplicationID = wonNode.getOwnerApplicationID();
             String remoteEndpoint = wonNode.getOwnerProtocolEndpoint();
