@@ -24,9 +24,18 @@ import java.text.MessageFormat;
  * Date: 13.12.13
  */
 public class CamelConfigurationFailedException extends WonProtocolException {
+    public CamelConfigurationFailedException() {
+    }
 
-    public CamelConfigurationFailedException(final String message,Throwable cause)
-    {
+    public CamelConfigurationFailedException(String message) {
         super(message);
+    }
+
+    public CamelConfigurationFailedException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public CamelConfigurationFailedException(Throwable cause) {
+        super(cause);
     }
 }

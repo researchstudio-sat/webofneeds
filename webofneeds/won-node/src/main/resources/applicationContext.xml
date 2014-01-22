@@ -41,7 +41,7 @@
         <!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
          <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/-->
-        <property name="connectionFactory" ref="cachedConnectionFactory"/>
+        <!--property name="connectionFactory" ref="cachedConnectionFactory"/-->
     </bean>
     <bean id="needProtocolActiveMQService" class="won.node.messaging.NeedProtocolActiveMQServiceImpl">
         <property name="componentName" value="activemq"/>

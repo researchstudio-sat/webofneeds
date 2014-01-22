@@ -106,28 +106,7 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
 
 
     }
-   /*
-    @Override
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-<<<<<<< HEAD
-    logger.info(MessageFormat.format("owner-facing: Open called for connection {0}", connectionURI));
-=======
-    logger.info(MessageFormat.format("owner-facing: OPEN called for connection {0}", connectionURI));
->>>>>>> facets
-    try {
-      OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
-      proxy.open(connectionURI, RdfUtils.toString(content));
-    } catch (MalformedURLException e) {
-      logger.warn("couldn't create URL for needProtocolEndpoint", e);
-    } catch (NoSuchNeedException e) {
-      logger.warn("could not get owner protocol endpoint", e);
-    }catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
-      throw IllegalMessageForConnectionStateFault.toException(illegalMessageForConnectionStateFault);
-    } catch (NoSuchConnectionFault noSuchConnectionFault) {
-      throw NoSuchConnectionFault.toException(noSuchConnectionFault);
-    }
-  }      */
+
     @Override
     public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
