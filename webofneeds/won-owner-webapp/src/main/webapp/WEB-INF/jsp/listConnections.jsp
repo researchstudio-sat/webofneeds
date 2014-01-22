@@ -22,7 +22,7 @@
         <tr>
             <td>${connection.id}</td>
             <td>${connection.connectionURI}</td>
-            <td>${connection.needURI}</td>
+            <td><a href="${connection.needURI}" target="_parent"/></td>
             <td>${connection.typeURI}</td>
             <td>${connection.state}</td>
             <td><a href="/owner/connection/${connection.id}" target="_parent" >connection</a>

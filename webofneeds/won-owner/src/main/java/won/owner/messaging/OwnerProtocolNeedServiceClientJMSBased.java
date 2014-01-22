@@ -144,7 +144,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("remoteBrokerEndpoint",endpoint);
 
         messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint );
-        logger.info("sending activate message: "+ needURI.toString());
+        logger.info("sending activate message: " + needURI.toString());
     }
 
     @Override
@@ -255,7 +255,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
 
         ownerProtocolActiveMQService.addCamelComponentForWonNodeBroker(brokerComponentName, wonNode.getWonNodeURI(), brokerURI);
     }
-    private void configureRemoteEndpointsForOwnerApplication(String ownerApplicationID, String remoteEndpoint) throws CamelConfigurationFailedException, ExecutionException, InterruptedException {
+    private String configureRemoteEndpointsForOwnerApplication(String ownerApplicationID, String remoteEndpoint) throws CamelConfigurationFailedException, ExecutionException, InterruptedException {
         Map headerMap = new HashMap<String, Object>();
         headerMap.put("ownerApplicationID", ownerApplicationID) ;
         //todo: refactor to an own method getEndpoints()
@@ -302,9 +302,9 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         } catch (Exception e) { //todo: error handling needed
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        headerMap.put("remoteBrokerEndpoint",endpoint);
+        headerMap.put("remoteBrokerEndpoint", endpoint);
 
-        messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint );
+        messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
 
         logger.debug("sending text message: ");
 
@@ -347,7 +347,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws CamelConfigurationFailedException, ExecutionException, BrokerConfigurationFailedException, InterruptedException {
+    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws Exception {
         Map headerMap = new HashMap();
 
         headerMap.put("ownerUri", ownerURI.toString());
