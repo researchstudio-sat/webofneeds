@@ -16,6 +16,7 @@
 
 package won.node.messaging;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
@@ -30,13 +31,11 @@ import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.RdfUtils;
+
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Future;
-
-import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComponent;
 
 /**
  * User: fkleedorfer
@@ -59,7 +58,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
     //TODO: debugging needed. when a established connection is closed then reconnected, both connections are in state "request sent"
   @Override
-  public Future<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
       Map<String, String> headerMap = new HashMap<>();
       String endpoint=null;

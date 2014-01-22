@@ -1,5 +1,6 @@
 package won.protocol.jms;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import org.apache.camel.*;
 import org.apache.camel.impl.DefaultExchange;
@@ -12,7 +13,6 @@ import org.springframework.context.ApplicationContextAware;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.Future;
 
 /**
  * User: LEIH-NB
@@ -26,13 +26,14 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
 
     /**
      * This method shall be used for Request-Reply messaging.
+     *
      * @param properties
      * @param headers
      * @param body
      * @param endpoint
      * @return
      */
-    public Future<T> sendInOutMessageGeneric(Map properties, Map headers, Object body, String endpoint){
+    public ListenableFuture sendInOutMessageGeneric(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
         //TODO: the method name shall be set in the header of the message.
         Endpoint ep = getCamelContext().getEndpoint(endpoint);

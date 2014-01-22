@@ -15,6 +15,7 @@
  */
 
 package won.owner.messaging;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.camel.CamelContext;
@@ -39,6 +40,7 @@ import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.PropertiesUtil;
 import won.protocol.util.RdfUtils;
 
+import javax.jms.Destination;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,11 +61,14 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     private MessageProducer messageProducer;
     private OwnerProtocolNeedClientFactory clientFactory;
     private ProducerTemplate producerTemplate;
+    private Destination destination;
+    private org.springframework.jms.connection.CachingConnectionFactory con;
     private CamelContext camelContext;
     private MessagingService messagingService;
     private PropertiesUtil propertiesUtil;
     private URI defaultNodeURI;
     private ApplicationContext ownerApplicationContext;
+    private List<OwnerApplicationListener> ownerApplicationListeners = new ArrayList<>();
     //todo: make this configurable
     private String startingEndpoint ="seda:outgoingMessages";
 
@@ -105,12 +110,13 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public Future<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
         Map headerMap = new HashMap<String, Object>();
         headerMap.put("needURI", needURI.toString()) ;
         headerMap.put("otherNeedURI", otherNeedURI.toString());
         headerMap.put("content",RdfUtils.toString(content));
+
         headerMap.put("methodName","connect");
         String endpoint = null;
         try {
@@ -127,6 +133,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
 
         Map headerMap = new HashMap();
         headerMap.put("needURI",needURI.toString());
+
         headerMap.put("methodName","deactivate");
         String endpoint = null;
         try {
@@ -218,6 +225,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
             headerMap.put("methodName","register");
             Future<String> futureResults = messagingService.sendInOutMessageGeneric(null, headerMap, null, startingEndpoint);
 
+            ownerApplicationID = null;
             ownerApplicationID = futureResults.get();
 
             if (ownerApplicationID!=null)
@@ -250,6 +258,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     private void configureRemoteEndpointsForOwnerApplication(String ownerApplicationID, String remoteEndpoint) throws CamelConfigurationFailedException, ExecutionException, InterruptedException {
         Map headerMap = new HashMap<String, Object>();
         headerMap.put("ownerApplicationID", ownerApplicationID) ;
+        //todo: refactor to an own method getEndpoints()
         headerMap.put("methodName","getEndpoints");
         headerMap.put("remoteBrokerEndpoint",remoteEndpoint);
         Future<List<String>> futureResults =messagingService.sendInOutMessageGeneric(headerMap, headerMap, null, "seda:outgoingMessages");
@@ -263,12 +272,19 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
             logger.debug("adding route to camel context failed", e);
             throw new CamelConfigurationFailedException("adding route to camel context failed",e);
         }
+
+
         //TODO: some checks needed to assure that the application is configured correctly.
+
+       return ownerApplicationID.toString();
+       // return messagingService.sendInOutMessageForString("register", null, null, "outgoingMessages");
+
 
     }
 
+
     @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate) throws Exception {
+    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate) throws Exception {
 
         return createNeed(ownerURI, content, activate,defaultNodeURI);
     }
@@ -331,7 +347,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws Exception {
+    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws CamelConfigurationFailedException, ExecutionException, BrokerConfigurationFailedException, InterruptedException {
         Map headerMap = new HashMap();
 
         headerMap.put("ownerUri", ownerURI.toString());

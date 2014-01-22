@@ -16,15 +16,13 @@
 
 package won.protocol.owner;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.context.ApplicationContextAware;
 import won.protocol.exception.*;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * User: LEIH-NB
@@ -42,12 +40,13 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
     /**
      * Creates a new need with the specified content, ownerURI and active state.
      *
+     *
      * @param ownerURI
      * @param content
      * @param activate
      * @return the URI of the newly created need
      */
-    public Future<URI> createNeed(final URI ownerURI, Model content, final boolean activate) throws Exception;
+    public ListenableFuture<URI> createNeed(final URI ownerURI, Model content, final boolean activate) throws Exception;
 
     /**
      * Activates the need object.
@@ -65,7 +64,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      */
     public void deactivate(URI needURI) throws NoSuchNeedException;
 
-    public Future<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws Exception;
+    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws Exception;
     /**
      * Opens a connection identified by connectionURI. A rdf graph can be sent along with the request.
      *
@@ -101,6 +100,6 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      */
     public void textMessage(URI connectionURI, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-    public Future<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException;
+    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException;
 
 }

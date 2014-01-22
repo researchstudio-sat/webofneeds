@@ -16,6 +16,7 @@
 
 package won.node.protocol.impl;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,6 @@ import won.protocol.need.NeedProtocolNeedClientSide;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.concurrent.Future;
 
 /**
  * User: fkleedorfer
@@ -43,7 +43,7 @@ public class NeedProtocolNeedClient implements NeedProtocolNeedClientSide
   private NeedProtocolNeedClientSide delegate;
 
   @Override
-  public Future<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
 
     logger.info("need-facing: CONNECT called for other need {}, own need {}, own connection {}, and content {}",
