@@ -22,45 +22,76 @@ import won.protocol.model.Connection;
 import won.protocol.model.Match;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Bot that takes other (delegate) bots when it is created and provides the logic to decide when to delegate to which.
  * Always delegates initialize and shutdown.
+ * All event handler methods (on*) are delegated synchronously to all bots in the order they are specified in the delegate list.
  */
-public abstract class CompositeBot extends BasicServiceBot
+public class CompositeBot extends BasicServiceBot
 {
-  Map<String, BasicServiceBot> delegates = null;
+  List<BasicServiceBot> delegates= null;
 
 
   @Override
   public void onConnectFromOtherNeed(Connection con) throws Exception
   {
-    super.onConnectFromOtherNeed(con);
+    for(Bot delegate: delegates){
+      try {
+        delegate.onConnectFromOtherNeed(con);
+      } catch (Exception e){
+        logger.warn("caught exception during onConnectFromOtherNeed({}): ", con.getConnectionURI(), e);
+      }
+    }
   }
 
   @Override
   public void onOpenFromOtherNeed(Connection con) throws Exception
   {
-    super.onOpenFromOtherNeed(con);
+    for(Bot delegate: delegates){
+      try {
+        delegate.onOpenFromOtherNeed(con);
+      } catch (Exception e){
+        logger.warn("caught exception during onOpenFromOtherNeed({}): ", con.getConnectionURI(), e);
+      }
+    }
   }
 
   @Override
   public void onCloseFromOtherNeed(Connection con) throws Exception
   {
-    super.onCloseFromOtherNeed(con);
+    for(Bot delegate: delegates){
+      try {
+        delegate.onCloseFromOtherNeed(con);
+      } catch (Exception e){
+        logger.warn("caught exception during onCloseFromOtherNeed({}): ", con.getConnectionURI(), e);
+      }
+    }
   }
 
   @Override
   public void onHintFromMatcher(Match match) throws Exception
   {
-    super.onHintFromMatcher(match);
+    for(Bot delegate: delegates){
+      try {
+        delegate.onHintFromMatcher(match);
+      } catch (Exception e){
+        logger.warn("caught exception during onHintFromMatcher({}): ", match, e);
+      }
+    }
   }
 
   @Override
   public void onMessageFromOtherNeed(Connection con, ChatMessage message) throws Exception
   {
-    super.onMessageFromOtherNeed(con, message);
+    for(Bot delegate: delegates){
+      try {
+        delegate.onMessageFromOtherNeed(con, message);
+      } catch (Exception e){
+        logger.warn("caught exception during onMessageFromOtherNeed({}): ", con.getConnectionURI(), e);
+      }
+    }
   }
 
   @Override
@@ -73,7 +104,7 @@ public abstract class CompositeBot extends BasicServiceBot
   protected final void doInitialize()
   {
     if (this.delegates != null){
-      for (Bot delegate : this.delegates.values()){
+      for (Bot delegate : this.delegates){
         if (delegate.getLifecyclePhase().isDown()) try {
           if (delegate instanceof BaseBot){
             ((BaseBot)delegate).setBotContext(getBotContext());
@@ -102,7 +133,7 @@ public abstract class CompositeBot extends BasicServiceBot
   protected final void doShutdown()
   {
     if (this.delegates != null){
-      for (Bot delegate : this.delegates.values()){
+      for (Bot delegate : this.delegates){
         if (delegate.getLifecyclePhase().isActive()) try {
           delegate.shutdown();
         } catch (Exception e) {
@@ -118,19 +149,13 @@ public abstract class CompositeBot extends BasicServiceBot
    */
   protected void doInitializeCustom() {};
 
-  protected Map<String, BasicServiceBot> getDelegates()
+  protected List<BasicServiceBot> getDelegates()
   {
     return delegates;
   }
 
-  public void setDelegates(final Map<String, BasicServiceBot> delegates)
+  public void setDelegates(final List<BasicServiceBot> delegates)
   {
-    this.delegates = Collections.unmodifiableMap(delegates);
-    if (this.delegates != null){
-      for (BasicServiceBot delegate : this.delegates.values()){
-        //let the bots share the same context
-        delegate.setBotContext(this.getBotContext());
-      }
-    }
+    this.delegates = Collections.unmodifiableList(delegates);
   }
 }

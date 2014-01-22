@@ -27,6 +27,8 @@
     <import resource="classpath:/spring/component/botRegistry/botRegistry.xml" />
     <import resource="classpath:/spring/component/needproducer/needproducer-mails.xml" />
     <import resource="classpath:/spring/component/nodeurisource/nodeurisource-random.xml" />
+    <import resource="classpath:/spring/owner-jmsonly.xml" />
+
 
 
 </beans>

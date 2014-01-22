@@ -30,7 +30,7 @@
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/>
 
-    <bean id="nodeUriSource" class="won.bot.nodeurisource.impl.RoundRobinMultiNodeUriSource" >
+    <bean id="nodeUriSourceRoundRobin" class="won.bot.nodeurisource.impl.RoundRobinMultiNodeUriSource" >
         <property name="nodeURIs" value="#{'${won.node.uris}'.split(' ')}" />
     </bean>
 </beans>

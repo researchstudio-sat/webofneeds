@@ -18,6 +18,16 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean "triggeredCreationImmediatelyReactingBot" class="
 
+    <import resource="classpath:spring/bot/simpleReactiveBot.xml" />
+    <import resource="classpath:spring/bot/mailBasedTriggeredProducerBot.xml" />
+
+    <bean id="mailBasedSimpleReactiveBot" class="won.bot.core.base.CompositeBot">
+        <property name="delegates">
+            <list>
+                <ref bean="simpleReactiveBot" />
+                <ref bean="mailBasedTriggeredProducerBot" />
+            </list>
+        </property>
+    </bean>
 </beans>

@@ -27,8 +27,8 @@
     <import resource="classpath:/spring/owner-jmsonly.xml" />
 
 
-    <bean id="needConsumer" class="won.bot.needconsumer.impl.OwnerEmulatingNeedConsumer" >
-        <property name="nodeURISource" ref="nodeUriSource" />
+    <bean id="needConsumerOwnerEmulate" class="won.bot.needconsumer.impl.OwnerEmulatingNeedConsumer" >
+        <property name="nodeURISource" ref="nodeUriSourceRoundRobin" />
         <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
     </bean>
 </beans>

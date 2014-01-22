@@ -20,6 +20,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="botRegistry" class="won.bot.registry.impl.SpringAwareBotRegistryImpl" />
+    <bean id="botRegistry" class="won.bot.manager.impl.SpringAwareBotManagerImpl" />
 
 </beans>

@@ -36,7 +36,7 @@ public class SimpleReactiveBot extends BasicServiceBot {
   }
 
   @Override
-  protected void onNewNeedCreated(URI needUri, URI wonNodeUri, Model needModel) {
+  public void onNewNeedCreated(URI needUri, URI wonNodeUri, Model needModel) {
     //do nothing
   }
 

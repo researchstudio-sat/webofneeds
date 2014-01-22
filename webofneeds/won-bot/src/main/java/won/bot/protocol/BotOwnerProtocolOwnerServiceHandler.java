@@ -2,7 +2,7 @@ package won.bot.protocol;
 
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.core.Bot;
-import won.bot.registry.BotRegistry;
+import won.bot.manager.BotRegistry;
 import won.owner.service.OwnerProtocolOwnerServiceHandler;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;

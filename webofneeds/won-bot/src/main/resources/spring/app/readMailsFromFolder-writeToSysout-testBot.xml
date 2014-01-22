@@ -27,8 +27,8 @@
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml" />
 
     <bean id="needProsumer" class="won.bot.needprosumer.NeedProsumer" >
-        <property name="needConsumer" ref="needConsumer" />
-        <property name="needProducer" ref="needProducer" />
+        <property name="needConsumer" ref="needConsumerSysout" />
+        <property name="needProducer" ref="needProducerFromMails" />
     </bean>
     <bean id="commandLineRunner" class="won.bot.app.SimpleMaildirToSysoutBot" />
 

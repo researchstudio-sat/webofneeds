@@ -16,6 +16,7 @@
 
 package won.bot.core.base;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.context.BotContext;
@@ -93,6 +94,8 @@ public class BaseBot implements Bot
   {
     return botContext;
   }
+
+  @Override public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) {}
 
   @Override public void onConnectFromOtherNeed(Connection con) throws Exception {}
 
