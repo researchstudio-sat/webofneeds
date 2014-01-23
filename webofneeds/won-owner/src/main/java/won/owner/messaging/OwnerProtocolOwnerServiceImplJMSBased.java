@@ -21,9 +21,11 @@ import org.apache.camel.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.owner.messaging.OwnerProtocolNeedServiceClientJMSBased;
 import won.protocol.exception.*;
-import won.protocol.model.*;
+import won.protocol.model.ConnectionEventType;
+import won.protocol.model.Match;
+import won.protocol.model.Need;
+import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.*;
 import won.protocol.util.DataAccessUtils;
@@ -62,7 +64,6 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
 
     @Autowired
     private ChatMessageRepository chatMessageRepository;
-
 
     @Autowired
     private OwnerProtocolNeedServiceClientJMSBased ownerService;

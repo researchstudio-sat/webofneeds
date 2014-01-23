@@ -35,10 +35,6 @@ import java.util.concurrent.ExecutionException;
  * Date: 03.12.12
  * Time: 14:42
  * TODO: refactor to separate communication code from business logic!
- * * introduce new member of type OwnerProtocolNeedService (that forwards to such a service)
- * * extract the code for proxy creation into a class implementing that interface, so that
- * connecting to a WS-based service is done in that class only (and not here)
- * * implement a JMS-based implementation of that interface and change spring config so it is used here
  */
 public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceClientSide
 {

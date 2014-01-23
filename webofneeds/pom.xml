@@ -419,6 +419,11 @@
                 <artifactId>jsoup</artifactId>
                 <version>1.7.3</version>
             </dependency>
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>${org.quartz-scheduler.version}</version>
+            </dependency>
 
             <!-- SPRING-BOOT -->
             <dependency>
@@ -631,6 +636,7 @@
         <org.apache.jena.jsonld.version>0.0.1-SNAPSHOT</org.apache.jena.jsonld.version>
         <org.apache.jena.version>2.11.0</org.apache.jena.version>
         <org.hibernate.version>4.1.8.Final</org.hibernate.version>
+        <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
         <org.springframework.boot.version>0.5.0.M5</org.springframework.boot.version>
         <org.springframework.data.commons.version>1.4.0.RELEASE</org.springframework.data.commons.version>
         <org.springframework.data.jpa.version>1.2.0.RELEASE</org.springframework.data.jpa.version>
