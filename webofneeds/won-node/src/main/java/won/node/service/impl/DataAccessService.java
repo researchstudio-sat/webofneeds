@@ -48,7 +48,7 @@ public class DataAccessService {
     URI facetURI =  getFacet(content, WON.HAS_FACET);
 
     //TODO: create a proper exception if a facet is not supported by a need
-    if(facetRepository.findByNeedURIAndTypeURI(needURI, facetURI).size() < 0) throw new RuntimeException("Facet is not supported by Need: " + facetURI);
+    if(facetRepository.findByNeedURIAndTypeURI(needURI, facetURI).isEmpty()) throw new RuntimeException("Facet is not supported by Need: " + facetURI);
 
     List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
     Connection con = getConnection(connections, facetURI, connectionEventType);

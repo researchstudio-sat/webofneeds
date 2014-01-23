@@ -245,7 +245,7 @@ public abstract class Facet {
   }
 
   /**
-   * Creates a copy of the specified model, replacing won:hasRemoteFacet by won:hasFacet.
+   * Creates a copy of the specified model, replacing won:hasRemoteFacet by won:hasFacet and vice versa.
    * @param model
    * @return
    */
@@ -261,10 +261,20 @@ public abstract class Facet {
     newModel.setNsPrefix("", model.getNsPrefixURI(""));
     newModel.add(model);
     newModel.removeAll(null, WON.HAS_REMOTE_FACET, null);
-    baseRes = newModel.createResource(newModel.getNsPrefixURI(""));
+    newModel.removeAll(null, WON.HAS_FACET, null);
+    Resource newBaseRes = newModel.createResource(newModel.getNsPrefixURI(""));
+    //replace won:hasFacet
     while (stmtIterator.hasNext()) {
       Resource facet = stmtIterator.nextStatement().getObject().asResource();
-      baseRes.addProperty(WON.HAS_FACET, facet);
+      newBaseRes.addProperty(WON.HAS_FACET, facet);
+    }
+    //replace won:hasRemoteFacet
+    stmtIterator = baseRes.listProperties(WON.HAS_FACET);
+    if (stmtIterator != null) {
+        while (stmtIterator.hasNext()) {
+          Resource facet = stmtIterator.nextStatement().getObject().asResource();
+          newBaseRes.addProperty(WON.HAS_REMOTE_FACET, facet);
+        }
     }
     if (logger.isDebugEnabled()){
       StringWriter modelAsString = new StringWriter();

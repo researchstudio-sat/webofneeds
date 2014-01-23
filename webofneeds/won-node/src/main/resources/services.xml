@@ -52,8 +52,8 @@
                 <entry key="#{T(won.protocol.model.FacetType).GroupFacet}" value-ref="groupFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).CoordinatorFacet}" value-ref="coordinatorFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).ParticipantFacet}" value-ref="participantFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).BAParticipantCompletion_ParticipantFacet}" value-ref="baParticipantCompletionParticipantFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).BAParticipantCompletion_CoordinatorFacet}" value-ref="baParticipantCompletionCoordinatorFacetImplRef" />
+                <entry key="#{T(won.protocol.model.FacetType).BAPCCoordinatorFacet}" value-ref="baPCCoordinatorFacetImplRef" />
+                <entry key="#{T(won.protocol.model.FacetType).BAPCParticipantFacet}" value-ref="baPCParticipantFacetImplRef" />
             </map>
         </constructor-arg>
     </bean>
@@ -75,8 +75,10 @@
     <bean id="groupFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.GroupFacetImpl" />
     <bean id="coordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CoordinatorFacetImpl" />
     <bean id="participantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ParticipantFacetImpl" />
-    <bean id="baParticipantCompletionParticipantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BAParticipantCompletion_ParticipantFacetImpl" />
-    <bean id="baParticipantCompletionCoordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BAParticipantCompletion_CoordinatorFacetImpl" />
+    <bean id="baPCCoordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BAPCCoordinatorFacetImpl" />
+    <bean id="baPCParticipantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BAPCParticipantFacetImpl" />
+
+
 
     <!-- protocol-level services -->
     <bean id="ownerProtocolNeedService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
@@ -173,13 +175,13 @@
         <property name="rdfStorage" ref="rdfStorageRef" />
     </bean>
 
-    <bean id="needManagementService" class="won.node.service.impl.NeedManagementServiceImpl">
+    <!--bean id="needManagementService" class="won.node.service.impl.NeedManagementServiceImpl">
         <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
         <property name="needInformationService" ref="needInformationService"/>
         <property name="URIService" ref="uriService" />
         <property name="rdfStorage" ref="rdfStorageRef" />
-    </bean>
-    <bean id="needManagementServiceJMSBased" class="won.node.service.impl.NeedManagementServiceImplJMSBased">
+    </bean-->
+    <bean id="needManagementServiceJMSBased" class="won.node.service.impl.NeedManagementServiceImpl">
         <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
         <property name="needInformationService" ref="needInformationService"/>
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />

@@ -258,7 +258,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
             if (!stmtIterator.hasNext()) {
                 throw new IllegalArgumentException("at least one RDF node must be of type won:" + WON.HAS_FACET.getLocalName());
             }
-            URI facetURI =  URI.create(stmtIterator.next().getObject().asResource().getURI());
+            final URI facetURI =  URI.create(stmtIterator.next().getObject().asResource().getURI());
+            //TODO: here's a blocking call to Future.get()! shouldn't we do that in a callback?
             List<Connection> existingConnections = connectionRepository.findByConnectionURI(uri.get());
             if (existingConnections.size() > 0) {
                 for (Connection conn : existingConnections) {
@@ -271,6 +272,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                         }
                 }
             }  else {
+                //TODO: run in a thread pool!
                     new Thread(
                             new Runnable() {
                                 @Override
@@ -282,6 +284,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                                         Connection con = new Connection();
                                         con.setNeedURI(needURI);
                                         con.setState(ConnectionState.REQUEST_SENT);
+                                        con.setTypeURI(facetURI);
                                         con.setRemoteNeedURI(otherNeedURI);
                                         con.setConnectionURI(uri.get());
                                         connectionRepository.saveAndFlush(con);
