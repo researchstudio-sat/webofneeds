@@ -147,14 +147,14 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
         if (endpoint != null){
             endpointList.add(endpoint);
             // tempComponentName = tempComponentName+endpoint.replaceAll(":","_");
-            ActiveMQConnectionFactory activemqConnectionFactory = (ActiveMQConnectionFactory) applicationContext.getBean("activemqConnectionFactory");
+            //ActiveMQConnectionFactory activemqConnectionFactory = (ActiveMQConnectionFactory) applicationContext.getBean("activemqConnectionFactory");
 
             NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,endpointList,from);
             addRoutes(needProtocolRouteBuilder);
             return endpoint;
         }
         if (camelContext.getEndpoint(from)!=null){
-
+            logger.debug("getting activemq brokerURI for node with otherneed URI {}",otherNeedURI);
             URI remoteBrokerURI = getActiveMQBrokerURIForNode(otherNeedURI);
             URI ownBrokerURI = getActiveMQBrokerURIForNode(needURI);
             String tempComponentName = componentName;
@@ -204,6 +204,7 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
 
             URI needURI = con.getNeedURI();
             URI otherNeedURI = con.getRemoteNeedURI();
+            logger.debug("getting camel endpoint for needs {} and {}",needURI, otherNeedURI);
             return getCamelEndpointForNeed(needURI, otherNeedURI, from);
         }
         return  null;

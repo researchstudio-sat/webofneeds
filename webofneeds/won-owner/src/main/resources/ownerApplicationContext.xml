@@ -30,10 +30,10 @@
         <camel:endpoint id="needMessageQueue" uri="activemq:WON.MSG" pattern="InOut"></camel:endpoint>
     </camel:camelContext>
 
-    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+    <!--bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
           <property name="configuration" ref="jmsConfig"></property>
 
-    </bean>
+    </bean-->
 
     <bean id = "jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
         <property name="connectionFactory" ref="cachedConnectionFactory"/>

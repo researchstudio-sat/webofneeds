@@ -43,11 +43,11 @@ public class QueueManagementServiceImpl implements QueueManagementService {
 
         logger.info(ownerApplication.getOwnerApplicationId());
         List<String> queueNames = new ArrayList<>();
-        queueNames.add("activemq:queue:OwnerProtocol." + "connect" + ".Out." + ownerApplication.getOwnerApplicationId());
-        queueNames.add("activemq:queue:OwnerProtocol."+"hint"+".Out."+ownerApplication.getOwnerApplicationId());
-        queueNames.add("activemq:queue:OwnerProtocol."+"textMessage"+".Out."+ownerApplication.getOwnerApplicationId());
-        queueNames.add("activemq:queue:OwnerProtocol."+"open"+".Out."+ownerApplication.getOwnerApplicationId());
-        queueNames.add("activemq:queue:OwnerProtocol."+"close"+".Out."+ownerApplication.getOwnerApplicationId());
+        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol." + "connect" + ".Out."+ownerApplication.getOwnerApplicationId());
+        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"hint"+".Out."+ownerApplication.getOwnerApplicationId());
+        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"textMessage"+".Out."+ownerApplication.getOwnerApplicationId());
+        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"open"+".Out."+ownerApplication.getOwnerApplicationId());
+        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"close"+".Out."+ownerApplication.getOwnerApplicationId());
         ownerApplication.setQueueNames(queueNames);
         logger.info(ownerApplication.getQueueNames().get(0));
         logger.info(ownerApplication.getQueueNames().get(1));
@@ -62,7 +62,9 @@ public class QueueManagementServiceImpl implements QueueManagementService {
         String endpoint="";
         for (int i = 0; i< queueNames.size();i++){
             if (queueNames.get(i).contains(methodName)){
+
                 endpoint=queueNames.get(i);
+                endpoint = endpoint.replaceFirst(ownerApplicationID,"");
                 break;
             }
 

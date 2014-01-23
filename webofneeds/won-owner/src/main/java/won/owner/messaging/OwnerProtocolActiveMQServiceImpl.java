@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.OwnerProtocolActiveMQService;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
@@ -111,7 +112,7 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
 
         String tempComponentName = componentName;
         String tempStartingComponentName = startingComponent;
-        tempComponentName = addCamelComponentForWonNodeBroker(tempComponentName,wonNodeURI,brokerURI);
+        tempComponentName = addCamelComponentForWonNodeBroker(tempComponentName,wonNodeURI,brokerURI,null);
 
         String endpoint = tempComponentName+":queue:"+getActiveMQOwnerProtocolQueueNameForNeed(resourceURI);
         endpointMap.put(wonNodeURI,endpoint);
@@ -126,9 +127,9 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
         logger.info("endpoint of wonNodeURI {} is {}",wonNodeURI,endpointMap.get(wonNodeURI));
         tempStartingComponentName = tempStartingComponentName + endpointMap.get(wonNodeURI).replaceAll(":","_");
         //todo: make
-        setStartingEndpoint(tempStartingComponentName);
+        setStartingEndpoint(wonNodeURI, tempStartingComponentName);
 
-        startingComponentMap.put(wonNodeURI,tempStartingComponentName);
+
         if (camelContext.getComponent(tempComponentName)==null){
             addRouteForEndpoint(camelContext,endpointList,tempStartingComponentName);
         } else{
@@ -146,24 +147,36 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
         OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext,endpointList,startingComponentName);
         addRoutes(ownerProtocolRouteBuilder);
     }
-    public String addCamelComponentForWonNodeBroker(String componentName, URI wonNodeURI, URI brokerURI){
-        if (!wonNodeURI.equals(URI.create(defaultNodeURI))){
-            componentName = this.componentName +brokerURI.toString().replaceAll("[/:]","");
-            // from = from+wonNodeURI;
-            //todo: component may already exist.
-
-            ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURI);
-            CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(activeMQConnectionFactory);
-            JmsConfiguration jmsConfiguration = new JmsConfiguration(cachingConnectionFactory);
-            ActiveMQComponent activeMQComponent = activeMQComponent();
-            activeMQComponent.setConfiguration(jmsConfiguration);
-            camelContext.addComponent(componentName,activeMQComponent);
-
-            logger.info("adding component with component name {}",componentName);
-        }else{
-            camelContext.getComponent(this.componentName);
+    public String addCamelComponentForWonNodeBroker(String componentName, URI wonNodeURI, URI brokerURI,String ownerApplicationId){
+        if (ownerApplicationId==null){
+            if (!wonNodeURI.equals(URI.create(defaultNodeURI)))
+                componentName = this.componentName+brokerURI.toString().replaceAll("[/:]","");
+            else
+                componentName = this.componentName;
+        }else
+            componentName = this.componentName+ownerApplicationId;
+        if(camelContext.getComponent(componentName,false)!=null){
+            return componentName;
         }
+        ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURI);
+        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(activeMQConnectionFactory);
+        JmsConfiguration jmsConfiguration = new JmsConfiguration(cachingConnectionFactory);
+        ActiveMQComponent activeMQComponent = activeMQComponent();
+        activeMQComponent.setConfiguration(jmsConfiguration);
+        camelContext.addComponent(componentName,activeMQComponent);
+
+
+        logger.info("adding component with component name {}",componentName);
         brokerComponentMap.put(wonNodeURI,componentName);
+        return componentName;
+    }
+    public String replaceComponentNameWithOwnerApplicationId(String componentName, String ownerApplicationId){
+        ActiveMQComponent activeMQComponent = (ActiveMQComponent)camelContext.getComponent(componentName);
+        camelContext.removeComponent(componentName);
+        componentName = this.componentName+ownerApplicationId;
+
+        camelContext.addComponent(componentName, activeMQComponent);
+
         return componentName;
     }
     public String configureCamelEndpointForConnection(URI connectionURI, String from) throws Exception {
@@ -172,6 +185,18 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
         URI needURI = con.getNeedURI();
         return configureCamelEndpointForNeed(needURI,from);
 
+    }
+    public URI getOwnWonNodeUriWithConnection(URI connectionURI) throws NoSuchConnectionException {
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        URI needURI = con.getNeedURI();
+
+        return getOwnWonNodeUriWithNeed(needURI);
+    }
+
+    public URI getOwnWonNodeUriWithNeed(URI needURI){
+        Need need = needRepository.findByNeedURI(needURI).get(0);
+        URI wonNodeURI = need.getWonNodeURI();
+        return wonNodeURI;
     }
     public String configureCamelEndpointForNeed(URI needURI, String from) throws Exception {
 
@@ -260,7 +285,8 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
         return startingEndpoint;
     }
 
-    public void setStartingEndpoint(String startingEndpoint) {
-        this.startingEndpoint = startingEndpoint;
+    public void setStartingEndpoint(URI wonNodeURI, String startingEndpoint) {
+        startingComponentMap.put(wonNodeURI,startingEndpoint);
+
     }
 }
