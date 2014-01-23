@@ -97,15 +97,15 @@ public class BaseBot implements Bot
 
   @Override public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) {}
 
-  @Override public void onConnectFromOtherNeed(Connection con) throws Exception {}
+  @Override public void onConnectFromOtherNeed(Connection con, final Model content) throws Exception {}
 
-  @Override public void onOpenFromOtherNeed(Connection con) throws Exception {}
+  @Override public void onOpenFromOtherNeed(Connection con, final Model content) throws Exception {}
 
-  @Override public void onCloseFromOtherNeed(Connection con) throws Exception {}
+  @Override public void onCloseFromOtherNeed(Connection con, final Model content) throws Exception {}
 
-  @Override public void onHintFromMatcher(Match match) throws Exception {}
+  @Override public void onHintFromMatcher(Match match, final Model content) throws Exception {}
 
-  @Override public void onMessageFromOtherNeed(Connection con, ChatMessage message) throws Exception {}
+  @Override public void onMessageFromOtherNeed(Connection con, ChatMessage message, final Model content) throws Exception {}
 
   @Override public void act() throws Exception
   {}

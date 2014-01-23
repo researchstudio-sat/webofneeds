@@ -31,11 +31,11 @@ import java.net.URI;
 public interface Bot
 {
   public boolean knowsNeedURI(URI needURI);
-  public void onConnectFromOtherNeed(Connection con) throws Exception;
-  public void onOpenFromOtherNeed(Connection con) throws Exception;
-  public void onCloseFromOtherNeed(Connection con) throws Exception;
-  public void onHintFromMatcher(Match match) throws Exception;
-  public void onMessageFromOtherNeed(Connection con, ChatMessage message) throws Exception;
+  public void onConnectFromOtherNeed(Connection con, final Model content) throws Exception;
+  public void onOpenFromOtherNeed(Connection con, final Model content) throws Exception;
+  public void onCloseFromOtherNeed(Connection con, final Model content) throws Exception;
+  public void onHintFromMatcher(Match match, final Model content) throws Exception;
+  public void onMessageFromOtherNeed(Connection con, ChatMessage message, final Model content) throws Exception;
   /**
    * Override this to be informed whenever the bot has created a new need successfully.
    * @param needUri

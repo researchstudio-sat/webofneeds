@@ -16,6 +16,7 @@
 
 package won.bot.core.base;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.core.Bot;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
@@ -35,11 +36,11 @@ public class CompositeBot extends BasicServiceBot
 
 
   @Override
-  public void onConnectFromOtherNeed(Connection con) throws Exception
+  public void onConnectFromOtherNeed(Connection con, final Model content) throws Exception
   {
     for(Bot delegate: delegates){
       try {
-        delegate.onConnectFromOtherNeed(con);
+        delegate.onConnectFromOtherNeed(con, content);
       } catch (Exception e){
         logger.warn("caught exception during onConnectFromOtherNeed({}): ", con.getConnectionURI(), e);
       }
@@ -47,11 +48,11 @@ public class CompositeBot extends BasicServiceBot
   }
 
   @Override
-  public void onOpenFromOtherNeed(Connection con) throws Exception
+  public void onOpenFromOtherNeed(Connection con, final Model content) throws Exception
   {
     for(Bot delegate: delegates){
       try {
-        delegate.onOpenFromOtherNeed(con);
+        delegate.onOpenFromOtherNeed(con, content);
       } catch (Exception e){
         logger.warn("caught exception during onOpenFromOtherNeed({}): ", con.getConnectionURI(), e);
       }
@@ -59,11 +60,11 @@ public class CompositeBot extends BasicServiceBot
   }
 
   @Override
-  public void onCloseFromOtherNeed(Connection con) throws Exception
+  public void onCloseFromOtherNeed(Connection con, final Model content) throws Exception
   {
     for(Bot delegate: delegates){
       try {
-        delegate.onCloseFromOtherNeed(con);
+        delegate.onCloseFromOtherNeed(con, content);
       } catch (Exception e){
         logger.warn("caught exception during onCloseFromOtherNeed({}): ", con.getConnectionURI(), e);
       }
@@ -71,11 +72,11 @@ public class CompositeBot extends BasicServiceBot
   }
 
   @Override
-  public void onHintFromMatcher(Match match) throws Exception
+  public void onHintFromMatcher(Match match, final Model content) throws Exception
   {
     for(Bot delegate: delegates){
       try {
-        delegate.onHintFromMatcher(match);
+        delegate.onHintFromMatcher(match, content);
       } catch (Exception e){
         logger.warn("caught exception during onHintFromMatcher({}): ", match, e);
       }
@@ -83,11 +84,11 @@ public class CompositeBot extends BasicServiceBot
   }
 
   @Override
-  public void onMessageFromOtherNeed(Connection con, ChatMessage message) throws Exception
+  public void onMessageFromOtherNeed(Connection con, ChatMessage message, final Model content) throws Exception
   {
     for(Bot delegate: delegates){
       try {
-        delegate.onMessageFromOtherNeed(con, message);
+        delegate.onMessageFromOtherNeed(con, message, content);
       } catch (Exception e){
         logger.warn("caught exception during onMessageFromOtherNeed({}): ", con.getConnectionURI(), e);
       }

@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerService;
-import won.owner.service.OwnerProtocolOwnerServiceHandler;
+import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
@@ -48,7 +48,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
     //handler for incoming won protocol messages. The default handler does nothing.
     @Autowired(required = false)
-    private OwnerProtocolOwnerServiceHandler ownerServiceHandler = new NopOwnerProtocolOwnerServiceHandler();
+    private OwnerProtocolOwnerServiceCallback ownerServiceCallback = new NopOwnerProtocolOwnerServiceCallback();
 
     //TODO: refactor this to use DataAccessService
 
@@ -81,7 +81,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         }
         match.setScore(score);
         matchRepository.saveAndFlush(match);
-        ownerServiceHandler.onHint(match);
+        ownerServiceCallback.onHint(match, content);
     }
 
     private boolean isNeedActive(final Need need) {
@@ -93,6 +93,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
                         final String content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
         //TODO: String or URI that is the question..
+        //TODO: why do we pass a String content here?
         URI ownNeedURIConvert = URI.create(ownNeedURI);
         URI otherNeedURIConvert = URI.create(otherNeedURI);
         URI ownConnectionURIConvert = URI.create(ownConnectionURI);
@@ -151,7 +152,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
           //TODO: do we save the connection content? where? as a chat content?
         }
-        ownerServiceHandler.onConnect(con);
+        ownerServiceCallback.onConnect(con, contentConvert);
     }
 
     @Override
@@ -165,7 +166,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
         //save in the db
         connectionRepository.saveAndFlush(con);
-        ownerServiceHandler.onOpen(con);
+        ownerServiceCallback.onOpen(con, content);
     }
 
     @Override
@@ -180,7 +181,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
         //save in the db
         connectionRepository.saveAndFlush(con);
-        ownerServiceHandler.onClose(con);
+        ownerServiceCallback.onClose(con, content);
     }
 
     @Override
@@ -215,6 +216,6 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         chatMessage.setOriginatorURI(con.getRemoteNeedURI());
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);
-        ownerServiceHandler.onTextMessage(con, chatMessage);
+        ownerServiceCallback.onTextMessage(con, chatMessage, message);
     }
 }

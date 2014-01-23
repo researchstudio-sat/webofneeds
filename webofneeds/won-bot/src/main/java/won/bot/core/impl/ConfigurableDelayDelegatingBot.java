@@ -34,12 +34,12 @@ public class ConfigurableDelayDelegatingBot extends ScheduledActionBot {
 
 
   @Override
-  public void onCloseFromOtherNeed(final Connection con) throws Exception {
+  public void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception {
     getTaskScheduler().schedule(new Runnable() {
       @Override
       public void run() {
         try {
-          delegate.onCloseFromOtherNeed(con);
+          delegate.onCloseFromOtherNeed(con, content);
         } catch (Exception e) {
           logger.warn("caught exception", e);
         }
@@ -48,12 +48,12 @@ public class ConfigurableDelayDelegatingBot extends ScheduledActionBot {
   }
 
   @Override
-  public void onConnectFromOtherNeed(final Connection con) throws Exception {
+  public void onConnectFromOtherNeed(final Connection con, final Model content) throws Exception {
     getTaskScheduler().schedule(new Runnable() {
       @Override
       public void run() {
         try {
-          delegate.onConnectFromOtherNeed(con);
+          delegate.onConnectFromOtherNeed(con, content);
         } catch (Exception e) {
           logger.warn("caught exception", e);
         }
@@ -62,12 +62,12 @@ public class ConfigurableDelayDelegatingBot extends ScheduledActionBot {
   }
 
   @Override
-  public void onHintFromMatcher(final Match match) throws Exception {
+  public void onHintFromMatcher(final Match match, final Model content) throws Exception {
     getTaskScheduler().schedule(new Runnable() {
       @Override
       public void run() {
         try {
-          delegate.onHintFromMatcher(match);
+          delegate.onHintFromMatcher(match, content);
         } catch (Exception e) {
           logger.warn("caught exception", e);
         }
@@ -76,12 +76,12 @@ public class ConfigurableDelayDelegatingBot extends ScheduledActionBot {
   }
 
   @Override
-  public void onMessageFromOtherNeed(final Connection con, final ChatMessage message) throws Exception {
+  public void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final Model content) throws Exception {
     getTaskScheduler().schedule(new Runnable() {
       @Override
       public void run() {
         try {
-          delegate.onMessageFromOtherNeed(con, message);
+          delegate.onMessageFromOtherNeed(con, message, content);
         } catch (Exception e) {
           logger.warn("caught exception", e);
         }
@@ -104,12 +104,12 @@ public class ConfigurableDelayDelegatingBot extends ScheduledActionBot {
   }
 
   @Override
-  public void onOpenFromOtherNeed(final Connection con) throws Exception {
+  public void onOpenFromOtherNeed(final Connection con, final Model content) throws Exception {
     getTaskScheduler().schedule(new Runnable() {
       @Override
       public void run() {
         try {
-          delegate.onOpenFromOtherNeed(con);
+          delegate.onOpenFromOtherNeed(con, content);
         } catch (Exception e) {
           logger.warn("caught exception", e);
         }
