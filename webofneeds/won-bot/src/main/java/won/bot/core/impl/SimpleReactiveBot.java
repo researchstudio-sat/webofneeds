@@ -50,6 +50,13 @@ public class SimpleReactiveBot extends BasicServiceBot {
     sendNextMessageViaConnectionOrClose(con);
   }
 
+  @Override
+  public void onCloseFromOtherNeed(final Connection con) throws Exception
+  {
+    logger.debug("bot received close for need {}, connection {}", con.getNeedURI(), con.getConnectionURI());
+    //do nothing
+  }
+
   private void sendNextMessageViaConnectionOrClose(Connection con) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     synchronized (this) {
       int msgCount = this.messageCountPerConnection.get(con.getConnectionURI());
