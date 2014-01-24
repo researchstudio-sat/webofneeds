@@ -16,7 +16,8 @@
 
 package won.owner.service.impl;
 
-import won.owner.service.OwnerProtocolOwnerServiceHandler;
+import com.hp.hpl.jena.rdf.model.Model;
+import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -25,34 +26,34 @@ import won.protocol.model.Match;
  * Handler implementation that does nothing. Useful for extending as well as pull-only cases
  * such as a simple Web application.
  */
-public class NopOwnerProtocolOwnerServiceHandler implements OwnerProtocolOwnerServiceHandler
+public class NopOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerServiceCallback
 {
   @Override
-  public void onHint(final Match match)
+  public void onHint(final Match match, final Model content)
   {
 
   }
 
   @Override
-  public void onConnect(final Connection con)
+  public void onConnect(final Connection con, final Model content)
   {
 
   }
 
   @Override
-  public void onOpen(final Connection con)
+  public void onOpen(final Connection con, final Model content)
   {
 
   }
 
   @Override
-  public void onClose(final Connection con)
+  public void onClose(final Connection con, final Model content)
   {
 
   }
 
   @Override
-  public void onTextMessage(Connection con, final ChatMessage message)
+  public void onTextMessage(Connection con, final ChatMessage message, final Model content)
   {
 
   }

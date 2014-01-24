@@ -16,6 +16,7 @@
 
 package won.owner.service;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -24,15 +25,15 @@ import won.protocol.model.Match;
  * User: fkleedorfer
  * Date: 21.01.14
  */
-public interface OwnerProtocolOwnerServiceHandler
+public interface OwnerProtocolOwnerServiceCallback
 {
-  void onHint(Match match);
+  void onHint(Match match, final Model content);
 
-  void onConnect(Connection con);
+  void onConnect(Connection con, final Model content);
 
-  void onOpen(Connection con);
+  void onOpen(Connection con, final Model content);
 
-  void onClose(Connection con);
+  void onClose(Connection con, final Model content);
 
-  void onTextMessage(Connection con, ChatMessage message);
+  void onTextMessage(Connection con, ChatMessage message, final Model content);
 }

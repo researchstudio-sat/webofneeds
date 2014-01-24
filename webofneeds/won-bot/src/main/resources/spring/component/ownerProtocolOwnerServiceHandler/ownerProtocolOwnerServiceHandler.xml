@@ -30,7 +30,7 @@
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/>
     <!-- expects a botRegistry and a taskScheduler bean -->
-    <bean id="ownerProtocolOwnerServiceHandler" class="won.bot.protocol.BotOwnerProtocolOwnerServiceHandler" >
+    <bean id="ownerProtocolOwnerServiceHandler" class="won.bot.protocol.BotOwnerProtocolOwnerServiceCallback" >
         <property name="botRegistry" ref="botRegistry" />
         <property name="taskScheduler" ref="taskScheduler" />
     </bean>

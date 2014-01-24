@@ -6,6 +6,7 @@ import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.model.Match;
 import won.protocol.util.MessageModelUtils;
 
@@ -18,22 +19,22 @@ import java.util.Map;
  */
 public class SimpleReactiveBot extends BasicServiceBot {
   private Map<URI, Integer> messageCountPerConnection = new HashMap<URI, Integer>();
-  private static final int MAX_MESSAGE_COUNT = 3;
+  private int messageCount = 3;
 
   @Override
-  public void onConnectFromOtherNeed(Connection con) throws Exception {
+  public void onConnectFromOtherNeed(Connection con, final Model content) throws Exception {
     logger.debug("bot received connect for need {}, connection {}", con.getNeedURI(), con.getConnectionURI());
     getOwnerService().open(con.getConnectionURI(), null);
   }
 
   @Override
-  public void onHintFromMatcher(Match match) throws Exception {
+  public void onHintFromMatcher(Match match, final Model content) throws Exception {
     logger.debug("bot received hint for need {}", match.getFromNeed());
     getOwnerService().connect(match.getFromNeed(), match.getToNeed(), null);
   }
 
   @Override
-  public void onMessageFromOtherNeed(Connection con, ChatMessage message) throws Exception {
+  public void onMessageFromOtherNeed(Connection con, ChatMessage message, final Model content) throws Exception {
     logger.debug("bot received message for need {}, connection {}", con.getNeedURI(), con.getConnectionURI());
     sendNextMessageViaConnectionOrClose(con);
   }
@@ -45,15 +46,32 @@ public class SimpleReactiveBot extends BasicServiceBot {
   }
 
   @Override
-  public void onOpenFromOtherNeed(Connection con) throws Exception {
+  public void onOpenFromOtherNeed(Connection con, final Model content) throws Exception {
     logger.debug("bot received open for need {}, connection {}", con.getNeedURI(), con.getConnectionURI());
     sendNextMessageViaConnectionOrClose(con);
   }
 
+  @Override
+  public void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
+  {
+    logger.debug("bot received close for need {}, connection {}", con.getNeedURI(), con.getConnectionURI());
+    //do nothing
+  }
+
+  /**
+   * Set the number of messages to send before closing.
+   * @param messageCount
+   */
+  public void setMessageCount(final int messageCount)
+  {
+    this.messageCount = messageCount;
+  }
+
   private void sendNextMessageViaConnectionOrClose(Connection con) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    if (con.getState() == ConnectionState.CLOSED) return;
     synchronized (this) {
       int msgCount = this.messageCountPerConnection.get(con.getConnectionURI());
-      if (msgCount < MAX_MESSAGE_COUNT){
+      if (msgCount < messageCount){
         msgCount++;
         Model messageModel = MessageModelUtils.textMessage("message " + msgCount + " [" + con.getConnectionURI().toString() + "]");
         getOwnerService().textMessage(con.getConnectionURI(), messageModel);
