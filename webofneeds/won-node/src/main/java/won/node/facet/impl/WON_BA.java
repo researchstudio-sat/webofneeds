@@ -18,6 +18,7 @@ public class WON_BA {
 
     public static final String DEFAULT_PREFIX= "won-tx";
 
+
     private static Model m = ModelFactory.createDefaultModel();
 
     public static final Property COORDINATION_MESSAGE = m.createProperty(BASE_URI + "coordinationMessage");
@@ -29,7 +30,10 @@ public class WON_BA {
     public static final Resource COORDINATION_MESSAGE_ABORT_AND_COMPENSATE = m.createResource(BASE_URI + "AbortAndCompensate");
 
 
-
+    public static final Resource MESSAGE_CANCEL = m.createResource(BASE_URI + "MessageCancel");
+    public static final Resource MESSAGE_CANCEL = m.createResource(BASE_URI + "MessageCancel");
+    public static final Resource MESSAGE_CANCEL = m.createResource(BASE_URI + "MessageCancel");
+    public static final Resource MESSAGE_CANCEL = m.createResource(BASE_URI + "MessageCancel");
 
     /** returns the URI for this schema
      * @return the URI for this schema

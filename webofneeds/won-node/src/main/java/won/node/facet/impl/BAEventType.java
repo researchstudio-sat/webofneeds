@@ -145,15 +145,19 @@ public enum BAEventType {
         return URI.create(WON_BA.BASE_URI + name);
     }
 
-    public BAEventType getBAEventTypeFromURI (String sURI)
+    public BAEventType getBAEventTypeFromURIParticipantInbound (String sURI)
     {
-        if(sURI.equals(BAEventType.PARTICIPANT_INBOUND_CANCEL.getURI().toString()))
+        for (BAEventType eventType: BAEventType.values()){
+            if (sURI.equals(eventType.getURI().toString())) return eventType;
+        }
+        return null;
+        /*if(sURI.toString().equals(WON_BA.MESSAGE_CANCEL.toString()))
             return BAEventType.PARTICIPANT_INBOUND_CANCEL;
         else if(sURI.toString().equals(BAEventType.PARTICIPANT_INBOUND_CLOSE.getURI().toString()))
             return BAEventType.PARTICIPANT_INBOUND_CLOSE;
         else if(sURI.toString().equals((BAEventType.PARTICIPANT_INBOUND_COMPENSATE.getURI().toString())))
             return BAEventType.PARTICIPANT_INBOUND_COMPENSATE;
-        else return null;
+        else return null;   */
 
         //TODO implement all!
 

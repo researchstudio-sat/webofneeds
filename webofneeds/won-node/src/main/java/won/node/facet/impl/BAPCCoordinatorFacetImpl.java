@@ -131,7 +131,7 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     Resource coordMsg = coordMsgNode.asResource();
                     String sCoordMsg = coordMsg.toString(); //URI
                     BAEventType eventType = null;
-                    eventType = eventType.getBAEventTypeFromURI(sCoordMsg);
+                    eventType = eventType.getBAEventTypeFromURIParticipantInbound(sCoordMsg);
                     //TODO: create BAEvent from coordMSG
                     BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
                     stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
