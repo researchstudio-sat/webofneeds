@@ -3,7 +3,6 @@ package won.owner.web.connection;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,15 +15,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.TextMessagePojo;
-import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.util.MessageModelUtils;
 import won.protocol.vocabulary.WON;
 
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -98,16 +97,8 @@ public class ConnectionController {
         Connection con = cons.get(0);
 
         try {
-          //TODO: rework such that an rdf model can be sent here instead of the text message
-            com.hp.hpl.jena.rdf.model.Model facetModel = ModelFactory.createDefaultModel();
 
-            facetModel.setNsPrefix("", "no:uri");
-            Resource baseRes = facetModel.createResource(facetModel.getNsPrefixURI(""));
-            baseRes.addProperty(RDF.type, WON.TEXT_MESSAGE);
-            baseRes.addProperty(WON.HAS_TEXT_MESSAGE,text.getText(),XSDDatatype.XSDstring);
-
-
-          ownerService.textMessage(con.getConnectionURI(),facetModel);
+            ownerService.textMessage(con.getConnectionURI(), MessageModelUtils.textMessage(text.getText()));
         } catch (Exception e) {
             logger.warn("error sending text message");
             return "error sending text message: " + e.getMessage();

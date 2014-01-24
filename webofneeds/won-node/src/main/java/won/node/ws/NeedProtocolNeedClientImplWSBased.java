@@ -16,17 +16,18 @@
 
 package won.node.ws;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.protocol.impl.NeedProtocolNeedClientFactory;
+import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
-import won.protocol.exception.*;
 import won.protocol.ws.fault.ConnectionAlreadyExistsFault;
 import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
 import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
@@ -35,7 +36,6 @@ import won.protocol.ws.fault.NoSuchConnectionFault;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.concurrent.Future;
 
 /**
  * User: fkleedorfer
@@ -49,7 +49,7 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   private NeedProtocolNeedClientFactory clientFactory;
 
   @Override
-  public Future<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
 
     logger.info("need-facing: CONNECT called for other need {}, own need {}, own connection {}, and content {}",

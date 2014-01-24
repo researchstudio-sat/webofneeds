@@ -1,4 +1,5 @@
 package won.owner.service.impl;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -9,10 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerService;
-import won.protocol.repository.*;
+import won.owner.service.OwnerProtocolOwnerServiceCallback;
+import won.protocol.repository.ChatMessageRepository;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.MatchRepository;
+import won.protocol.repository.NeedRepository;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
+
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +45,10 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
     @Autowired
     private ChatMessageRepository chatMessageRepository;
+
+    //handler for incoming won protocol messages. The default handler does nothing.
+    @Autowired(required = false)
+    private OwnerProtocolOwnerServiceCallback ownerServiceCallback = new NopOwnerProtocolOwnerServiceCallback();
 
     //TODO: refactor this to use DataAccessService
 
@@ -71,6 +81,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         }
         match.setScore(score);
         matchRepository.saveAndFlush(match);
+        ownerServiceCallback.onHint(match, content);
     }
 
     private boolean isNeedActive(final Need need) {
@@ -82,6 +93,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
                         final String content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
         //TODO: String or URI that is the question..
+        //TODO: why do we pass a String content here?
         URI ownNeedURIConvert = URI.create(ownNeedURI);
         URI otherNeedURIConvert = URI.create(otherNeedURI);
         URI ownConnectionURIConvert = URI.create(ownConnectionURI);
@@ -140,6 +152,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
           //TODO: do we save the connection content? where? as a chat content?
         }
+        ownerServiceCallback.onConnect(con, contentConvert);
     }
 
     @Override
@@ -153,6 +166,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
         //save in the db
         connectionRepository.saveAndFlush(con);
+        ownerServiceCallback.onOpen(con, content);
     }
 
     @Override
@@ -167,6 +181,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
         //save in the db
         connectionRepository.saveAndFlush(con);
+        ownerServiceCallback.onClose(con, content);
     }
 
     @Override
@@ -201,5 +216,6 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         chatMessage.setOriginatorURI(con.getRemoteNeedURI());
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);
+        ownerServiceCallback.onTextMessage(con, chatMessage, message);
     }
 }

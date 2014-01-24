@@ -1,5 +1,6 @@
 package won.node.facet.impl;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -220,7 +221,7 @@ public abstract class Facet {
       @Override
       public void run() {
         try {
-          Future<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
+          ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
           dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
         } catch (WonProtocolException e) {
           // we can't connect the connection. we send a close back to the owner

@@ -38,7 +38,24 @@ public class WonNode {
     @Column( name = "brokerURI")
     private URI brokerURI;
 
+    @Column(name = "ownerProtocolEndpoint")
+    private String ownerProtocolEndpoint;
+
+    @Column(name = "startingComponent")
+    private String startingComponent;
+
+    @Column(name = "brokerComponent")
+    private String brokerComponent;
+
     private String ownerApplicationID;
+
+    public String getOwnerProtocolEndpoint() {
+        return ownerProtocolEndpoint;
+    }
+
+    public void setOwnerProtocolEndpoint(String ownerProtocolEndpoint) {
+        this.ownerProtocolEndpoint = ownerProtocolEndpoint;
+    }
 
     public URI getWonNodeURI() {
         return wonNodeURI;
@@ -63,6 +80,22 @@ public class WonNode {
 
     public void setBrokerURI(URI brokerURI) {
         this.brokerURI = brokerURI;
+    }
+
+    public String getStartingComponent() {
+        return startingComponent;
+    }
+
+    public void setStartingComponent(String startingComponent) {
+        this.startingComponent = startingComponent;
+    }
+
+    public String getBrokerComponent() {
+        return brokerComponent;
+    }
+
+    public void setBrokerComponent(String brokerComponent) {
+        this.brokerComponent = brokerComponent;
     }
 }
 

@@ -23,26 +23,19 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-
-    <!-- REST stuff
-    <context:component-scan base-package="won.protocol.rest">
-        <context:include-filter type="regex" expression="won.protocol.rest.*"/>
-    </context:component-scan>
+    <!--
+         Load properties but ignore unresolvable properties so that
+         they are searched in other property configurers defined in the context
     -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/owner.properties" ignore-unresolvable="true"/>
 
     <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
 
-    <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
-        <property name="producerTemplate" ref="producerTemplate"/>
-    </bean>
-
-    <bean id="propertiesUtil" class="won.protocol.util.PropertiesUtil"/>
 
     <bean id="uriService" class="won.owner.service.impl.URIService">
         <property name="ownerProtocolOwnerServiceEndpointURI" value="${uri.owner.protocol.endpoint}" />
         <property name="defaultOwnerProtocolNeedServiceEndpointURI" value="${uri.need.protocol.endpoint.default}" />
         <property name="ownerProtocolOwnerURI" value="${uri.prefix.owner}"/>
-
     </bean>
 
     <bean id="dataReloadService" class="won.owner.service.impl.DataReloadService">
@@ -53,38 +46,16 @@
     <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"/>
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"/>
 
-    <!-- protocol-level services -->
-
-    <bean id="activeMQService" class="won.owner.messaging.OwnerProtocolActiveMQServiceImpl">
-        <property name="componentName" value="activemq"/>
-        <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
-        <property name="startingComponent" value="seda:"/>
-    </bean>
-
-    <bean id="ownerProtocolNeedClientFactory" class="won.owner.ws.OwnerProtocolNeedClientFactory" />
-
     <bean id="ownerProtocolOwnerService" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
 
     <bean id="ownerProtocolOwnerServiceJMSBased" class="won.owner.messaging.OwnerProtocolOwnerServiceImplJMSBased"></bean>
 
     <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
-        <property name="delegate" ref="ownerProtocolNeedServiceClientJMSBased" />
-        <!--property name="linkedDataRestClient" ref="linkedDataRestClient" />
-        <property name="uriService" ref="uriService" /-->
-    </bean>
-
-
-    <bean id="ownerProtocolNeedServiceClientWSBased" class="won.owner.ws.OwnerProtocolNeedServiceClientWSBased">
-        <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
-    </bean>
-
-    <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.messaging.OwnerProtocolNeedServiceClientJMSBased">
-        <property name="clientFactory" ref="ownerProtocolNeedClientFactory" />
-        <property name="producerTemplate" ref="producerTemplate"/>
-        <property name="messagingService" ref="messagingService"/>
-        <property name="propertiesUtil" ref="propertiesUtil" />
-        <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
-        <property name="ownerProtocolActiveMQService" ref="activeMQService"/>
+        <!-- expects a bean named "ownerProtocolNeedServiceClientDelegate" in the context.
+             That bean may be used to make clever decisions regarding the transport or just be hard-wired to
+             use eg jms
+         -->
+        <property name="delegate" ref="ownerProtocolNeedServiceClientDelegate" />
     </bean>
 
     <bean id="ownerProtocolNeedReadService" class="won.owner.protocol.impl.OwnerProtocolNeedReadServiceImpl">

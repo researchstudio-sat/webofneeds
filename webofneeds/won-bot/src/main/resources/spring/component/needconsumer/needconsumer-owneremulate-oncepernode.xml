@@ -24,11 +24,10 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-roundrobin.xml" />
-    <import resource="classpath:ownerServices.xml" />
-    <import resource="classpath:ownerApplicationContext.xml" />
+    <import resource="classpath:spring/owner-jmsonly.xml" />
 
-    <bean id="needConsumer" class="won.bot.needconsumer.impl.OwnerEmulatingNeedConsumer" >
-        <property name="nodeURISource" ref="nodeUriSource" />
+    <bean id="needConsumerOwnerEmulateOncePerNode" class="won.bot.needconsumer.impl.OwnerEmulatingNeedConsumer" >
+        <property name="nodeURISource" ref="nodeUriSourceRoundRobin" />
         <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
         <property name="consumeOncePerNode" value="true" />
     </bean>
