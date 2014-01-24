@@ -94,12 +94,6 @@ public enum BAParticipantCompletionState {
                 return ENDED;
             case COORDINATOR_OUTBOUND_NOT_COMPLETED:
                 return ENDED;
-            case MATCHER_HINT:
-                return SUGGESTED;
-            case OWNER_OPEN:
-                return REQUEST_SENT;
-            case PARTNER_OPEN:
-                return REQUEST_RECEIVED;
         }
         throw new IllegalArgumentException("Connection creation failed: Wrong ConnectionEventType");
     }
@@ -340,50 +334,6 @@ public enum BAParticipantCompletionState {
                     default:
                         logger.info("Invalid State");
                         return ENDED;
-                }
-
-            case SUGGESTED:
-                switch (msg) {
-                    case OWNER_OPEN:
-                        return REQUEST_SENT;
-                    case PARTNER_OPEN:
-                        return REQUEST_RECEIVED;
-                    case OWNER_CLOSE:
-                        return CLOSED;
-                    case PARTNER_CLOSE:
-                        return CLOSED;
-                }
-            case REQUEST_SENT: //the owner has initiated the connection, the request was sent to the remote need
-                switch (msg) {
-                    case PARTNER_OPEN:
-                        return CONNECTED;  //the partner accepted
-                    case OWNER_CLOSE:
-                        return CLOSED;
-                    case PARTNER_CLOSE:
-                        return CLOSED;
-                }
-            case REQUEST_RECEIVED: //a remote need has requested a connection
-                switch (msg) {
-                    case OWNER_OPEN:
-                        return CONNECTED;
-                    case OWNER_CLOSE:
-                        return CLOSED;
-                    case PARTNER_CLOSE:
-                        return CLOSED;
-                }
-            case CONNECTED: //the connection is established
-                switch (msg) {
-                    case PARTNER_CLOSE:
-                        return CLOSED;
-                    case OWNER_CLOSE:
-                        return CLOSED;
-                }
-            case CLOSED:
-                switch (msg) {
-                    case OWNER_OPEN:
-                        return REQUEST_SENT; //reopen connection
-                    case PARTNER_OPEN:
-                        return REQUEST_RECEIVED;
                 }
         }
         return this;
