@@ -15,20 +15,6 @@ public enum BAEventType {
     //in general, be permissive about messages where possible. Don't care about duplicate messages
 
     //close may always be called. It always closes the connnection.
-    OWNER_CLOSE("OwnerClose", BAParticipantCompletionState.SUGGESTED, BAParticipantCompletionState.REQUEST_SENT,
-            BAParticipantCompletionState.REQUEST_RECEIVED, BAParticipantCompletionState.CONNECTED),
-    PARTNER_CLOSE("PartnerClose", BAParticipantCompletionState.SUGGESTED, BAParticipantCompletionState.REQUEST_SENT,
-            BAParticipantCompletionState.REQUEST_RECEIVED, BAParticipantCompletionState.CONNECTED),
-
-    OWNER_OPEN("OwnerOpen", BAParticipantCompletionState.REQUEST_RECEIVED, BAParticipantCompletionState.SUGGESTED),
-    PARTNER_OPEN("PartnerOpen", BAParticipantCompletionState.REQUEST_SENT, BAParticipantCompletionState.SUGGESTED),
-
-    OWNER_MESSAGE("OwnerMessage", BAParticipantCompletionState.CONNECTED),
-    PARTNER_MESSAGE("PartnerMessage", BAParticipantCompletionState.CONNECTED),
-
-    MATCHER_HINT("Hint"),
-
-
     ///
     PARTICIPANT_INBOUND_CANCEL("ParticipantInboundCancel", BAParticipantCompletionState.ACTIVE,
             BAParticipantCompletionState.CANCELING,  BAParticipantCompletionState.COMPLETED,

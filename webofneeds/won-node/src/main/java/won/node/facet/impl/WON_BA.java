@@ -29,11 +29,24 @@ public class WON_BA {
     public static final Resource COORDINATION_MESSAGE_COMMIT = m.createResource(BASE_URI + "Commit");
     public static final Resource COORDINATION_MESSAGE_ABORT_AND_COMPENSATE = m.createResource(BASE_URI + "AbortAndCompensate");
 
+    //Business Activities
+    public static final Resource MESSAGE_CANCEL = m.createResource(BASE_URI + "MessageCancel");
+    public static final Resource MESSAGE_CLOSE = m.createResource(BASE_URI + "MessageClose");
+    public static final Resource MESSAGE_COMPENSATE = m.createResource(BASE_URI + "MessageCompensate");
+    public static final Resource MESSAGE_FAILED = m.createResource(BASE_URI + "MessageFailed");
+    public static final Resource MESSAGE_EXITED = m.createResource(BASE_URI + "MessageExited");
+    public static final Resource MESSAGE_NOTCOMPLETED = m.createResource(BASE_URI + "MessageNotCompleted");
 
-    public static final Resource MESSAGE_CANCEL = m.createResource(BASE_URI + "MessageCancel");
-    public static final Resource MESSAGE_CANCEL = m.createResource(BASE_URI + "MessageCancel");
-    public static final Resource MESSAGE_CANCEL = m.createResource(BASE_URI + "MessageCancel");
-    public static final Resource MESSAGE_CANCEL = m.createResource(BASE_URI + "MessageCancel");
+    public static final Resource MESSAGE_EXIT = m.createResource(BASE_URI + "MessageExit");
+    public static final Resource MESSAGE_COMPLETED = m.createResource(BASE_URI + "MessageCompleted");
+    public static final Resource MESSAGE_FAIL = m.createResource(BASE_URI + "MessageFail");
+    public static final Resource MESSAGE_CANNOTCOMPLETE= m.createResource(BASE_URI + "MessageCanNotComplete");
+    public static final Resource MESSAGE_CANCELED = m.createResource(BASE_URI + "MessageCanceled");
+    public static final Resource MESSAGE_CLOSED = m.createResource(BASE_URI + "MessageClose");
+    public static final Resource MESSAGE_COMPENSATED = m.createResource(BASE_URI + "MessageCompensated");
+
+
+
 
     /** returns the URI for this schema
      * @return the URI for this schema
