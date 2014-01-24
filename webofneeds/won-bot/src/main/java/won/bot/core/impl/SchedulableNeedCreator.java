@@ -18,6 +18,7 @@ package won.bot.core.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.camel.CamelContextAware;
 import won.bot.core.base.TriggeredBot;
 
 import java.net.URI;

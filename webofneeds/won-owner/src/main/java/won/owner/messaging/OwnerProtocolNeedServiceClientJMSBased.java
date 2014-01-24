@@ -367,6 +367,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     @Override
     public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws Exception {
         Map headerMap = new HashMap();
+        camelContext.getShutdownStrategy().setSuppressLoggingOnTimeout(true);
 
         headerMap.put("ownerUri", ownerURI.toString());
         headerMap.put("model", RdfUtils.toString(content));
@@ -419,7 +420,8 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
             String remoteEndpoint = wonNode.getOwnerProtocolEndpoint();
             List<String> endpointList = new ArrayList<>();
             endpointList.add(remoteEndpoint);
-            ownerProtocolActiveMQService.addRouteForEndpoint(camelContext,endpointList,startingComponent);
+            if(camelContext.getRoute(remoteEndpoint)==null)
+                ownerProtocolActiveMQService.addRouteForEndpoint(camelContext,endpointList,remoteEndpoint);
             //ownerProtocolActiveMQService.configureCamelEndpointForNodeURI(wonNodeURI,"seda:outgoingMessages");
             logger.debug("existing ownerApplicationId: " + ownerApplicationId);
         }
