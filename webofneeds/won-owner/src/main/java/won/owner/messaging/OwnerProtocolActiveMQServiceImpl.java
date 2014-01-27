@@ -163,6 +163,7 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
         CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(activeMQConnectionFactory);
         JmsConfiguration jmsConfiguration = new JmsConfiguration(cachingConnectionFactory);
         ActiveMQComponent activeMQComponent = activeMQComponent();
+
         activeMQComponent.setConfiguration(jmsConfiguration);
         camelContext.addComponent(componentName,activeMQComponent);
 

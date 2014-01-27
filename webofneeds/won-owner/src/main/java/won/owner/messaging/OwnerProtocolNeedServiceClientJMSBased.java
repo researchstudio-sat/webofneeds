@@ -194,7 +194,8 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
             List<String> endpointList = new ArrayList<>();
             endpointList.add(remoteEndpoint);
 
-            addActiveMQComponentForWonNode(wonNode);
+            brokerComponentName = addActiveMQComponentForWonNode(wonNode);
+            camelContext.getComponent(brokerComponentName).createEndpoint(remoteEndpoint);
             ownerProtocolActiveMQService.addRouteForEndpoint(camelContext,endpointList,startingComponent);
             //TODO: it may be that we have an id, but the node has forgotten it... in that case, our code will fail
         } else{
@@ -238,12 +239,12 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         return ownerApplicationID.toString();
 
     }
-    private void addActiveMQComponentForWonNode(WonNode wonNode){
+    private String addActiveMQComponentForWonNode(WonNode wonNode){
 
         URI brokerURI = wonNode.getBrokerURI();
         String brokerComponentName = wonNode.getBrokerComponent();
 
-        ownerProtocolActiveMQService.addCamelComponentForWonNodeBroker(brokerComponentName, wonNode.getWonNodeURI(), brokerURI,wonNode.getOwnerApplicationID());
+        return ownerProtocolActiveMQService.addCamelComponentForWonNodeBroker(brokerComponentName, wonNode.getWonNodeURI(), brokerURI,wonNode.getOwnerApplicationID());
     }
     /*private void addActiveMQRemoteEndpointForWonNode(WonNode wonNode){
         String remoteEndpoint = wonNode.getOwnerProtocolEndpoint();
