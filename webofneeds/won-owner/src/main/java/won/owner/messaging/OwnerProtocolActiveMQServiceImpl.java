@@ -25,6 +25,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
+import org.apache.camel.Endpoint;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jms.JmsConfiguration;
 import org.slf4j.Logger;
@@ -69,7 +70,7 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
     private Map<URI,String> endpointMap = new HashMap();
     private Map<URI,String> startingComponentMap = new HashMap<>();
     private Map<URI, String> brokerComponentMap = new HashMap<>();
-    private String startingEndpoint;
+
     @Autowired
     private ConnectionRepository connectionRepository;
     @Autowired
@@ -169,6 +170,18 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
         logger.info("adding component with component name {}",componentName);
         brokerComponentMap.put(wonNodeURI,componentName);
         return componentName;
+    }
+    public String replaceEndpointNameWithOwnerApplicationId(String endpointName, String ownerApplicationId) throws Exception {
+        Endpoint ep = camelContext.getEndpoint(endpointName);
+        camelContext.removeEndpoints(endpointName);
+        String[] endpointSplit = endpointName.split(":");
+        endpointSplit[0] = endpointSplit[0]+ownerApplicationId;
+        endpointName = endpointSplit[0]+":"+endpointSplit[1]+":"+endpointSplit[2];
+
+      //  endpointName = endpointName.replaceFirst(endpointName,endpointName+ownerApplicationId);
+
+        camelContext.addEndpoint(endpointName, ep);
+        return endpointName;
     }
     public String replaceComponentNameWithOwnerApplicationId(String componentName, String ownerApplicationId){
         ActiveMQComponent activeMQComponent = (ActiveMQComponent)camelContext.getComponent(componentName);
@@ -281,9 +294,7 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
         return startingComponentMap.get(wonNodeURI);
     }
 
-    public String getStartingEndpoint() {
-        return startingEndpoint;
-    }
+
 
     public void setStartingEndpoint(URI wonNodeURI, String startingEndpoint) {
         startingComponentMap.put(wonNodeURI,startingEndpoint);

@@ -14,18 +14,13 @@
  *    limitations under the License.
  */
 
-package won.protocol.jms;
-import org.apache.camel.builder.RouteBuilder;
-import java.net.URI;
+package won.owner.messaging;
 
 /**
- * User: LEIH-NB
- * Date: 26.11.13
+ * User: syim
+ * Date: 27.01.14
  */
-public interface ActiveMQService {
-
-    public URI getActiveMQBrokerURIForNode(URI needURI);
-    public void addRoutes(RouteBuilder route) throws Exception;
+public class OwnerProtocolCamelServiceImpl {
+    //public String addCamelComponentForWonNodeBroker
 
 }
-
