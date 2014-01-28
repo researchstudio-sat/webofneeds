@@ -57,7 +57,7 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  * User: sbyim
  * Date: 28.11.13
  */
-public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListener,CamelContextAware,OwnerProtocolActiveMQService {
+public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,OwnerProtocolActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private CamelContext camelContext;
     private String componentName;
@@ -67,7 +67,7 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
     @Autowired
     private LinkedDataRestClient linkedDataRestClient;
     public static final String PATH_BROKER_URI = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_BROKER_URI + ">";
-    private Map<URI,String> endpointMap = new HashMap();
+    private Map<URI,String> endpointMap = new HashMap<>();
     private Map<URI,String> startingComponentMap = new HashMap<>();
     private Map<URI, String> brokerComponentMap = new HashMap<>();
 
@@ -78,7 +78,7 @@ public class OwnerProtocolActiveMQServiceImpl implements OwnerApplicationListene
 
     @Override
     public String getActiveMQOwnerProtocolQueueNameForNeed(URI needURI){
-        String activeMQOwnerProtocolQueueName = null;
+        String activeMQOwnerProtocolQueueName;
         try{
             Path path = PathParser.parse(PATH_OWNER_PROTOCOL_QUEUE_NAME, PrefixMapping.Standard);
             activeMQOwnerProtocolQueueName = linkedDataRestClient.getStringPropertyForPropertyPath(needURI, path);
