@@ -1,9 +1,5 @@
 package won.owner.web.connection;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +17,7 @@ import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.DataAccessUtils;
-import won.protocol.util.MessageModelUtils;
-import won.protocol.vocabulary.WON;
+import won.protocol.util.WonRdfUtils;
 
 import java.util.List;
 
@@ -98,7 +93,7 @@ public class ConnectionController {
 
         try {
 
-            ownerService.textMessage(con.getConnectionURI(), MessageModelUtils.textMessage(text.getText()));
+            ownerService.textMessage(con.getConnectionURI(), WonRdfUtils.textMessage(text.getText()));
         } catch (Exception e) {
             logger.warn("error sending text message");
             return "error sending text message: " + e.getMessage();

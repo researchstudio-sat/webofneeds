@@ -18,8 +18,9 @@ package won.bot.core.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
-import org.apache.camel.CamelContextAware;
+import org.apache.commons.lang3.StringUtils;
 import won.bot.core.base.TriggeredBot;
+import won.protocol.util.RdfUtils;
 
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
@@ -32,8 +33,13 @@ public class SchedulableNeedCreator extends TriggeredBot
   @Override
   public void act() throws Exception
   {
+    if (getNeedProducer().isExhausted()){
+      logger.info("bot's need procucer is exhausted. will not reschedule execution");
+      getScheduledExecution().cancel(true);
+    }
     final Model needModel = getNeedProducer().create();
     final URI wonNodeUri = getNodeURISource().getNodeURI();
+    logger.info("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
     final ListenableFuture<URI> futureNeedUri = getOwnerService().createNeed(URI.create("we://dont.need.this/anymore"), needModel, true, wonNodeUri);
     //add a listener that adds the need URI to the botContext
     futureNeedUri.addListener(new Runnable()
@@ -44,6 +50,7 @@ public class SchedulableNeedCreator extends TriggeredBot
         if (futureNeedUri.isDone()){
           try {
             URI uri = futureNeedUri.get();
+            logger.info("need creation finished, new need URI is: {}", uri);
             getBotContext().rememberNeedUri(uri);
             onNewNeedCreated(uri, wonNodeUri, needModel);
           } catch (InterruptedException e) {

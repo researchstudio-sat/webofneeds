@@ -16,8 +16,14 @@
 
 package won.matcher;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.search.QueryParsing;
@@ -30,7 +36,11 @@ import won.matcher.query.*;
 import won.matcher.query.rdf.TriplesQueryFactory;
 import won.matcher.service.ScoreTransformer;
 import won.protocol.solr.SolrFields;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WON;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -199,9 +209,11 @@ public class Matcher
           double normalizedScore = scoreTransformer.transform(scoreDoc.score);
           logger.debug("score of {} was normalized to {}", scoreDoc.score, normalizedScore);
           if (isNewHint(fromDoc, toDoc, normalizedScore)) {
+            logger.debug("determining which facets to use in hint");
+            Model facetModel = determineFacets(fromDoc, toDoc);
             logger.debug("calling MatchProcessors for match {} -> {} :: {}", new Object[]{fromDoc, toDoc, normalizedScore});
             for (MatchProcessor proc: matchProcessors){
-              proc.process(fromDoc,toDoc,normalizedScore,originatorURI,null);
+              proc.process(fromDoc,toDoc,normalizedScore,originatorURI,facetModel);
             }
           } else {
             logger.debug("Suppressed duplicate hint {} -> {} :: {}", new Object[]{fromDoc, toDoc, normalizedScore});
@@ -214,8 +226,53 @@ public class Matcher
 
   }
 
+  private Model determineFacets(URI fromDocUri, URI toDocUri) throws IOException
+  {
+    Model fromModel = readModelFromSolrIndex(fromDocUri);
+    if (fromModel == null || fromModel.isEmpty()) return null;
+    logger.debug("loaded triples from index for {}", fromDocUri);
+    Model toModel = readModelFromSolrIndex(fromDocUri);
+    if (toModel == null || toModel.isEmpty()) return null;
+    logger.debug("loaded triples from index for {}", toDocUri);
+    URI fromFacetURI = WonRdfUtils.FacetUtils.getFacet(fromModel);
+    if (fromFacetURI == null ) return null;
+    logger.debug("extracted facet for {}: {}", fromDocUri, fromFacetURI);
+    URI toFacetURI = WonRdfUtils.FacetUtils.getFacet(toModel);
+    if (toFacetURI == null ) return null;
+    logger.debug("extracted facet for {}: {}", toDocUri, toFacetURI);
+    //for now, just use the first facets for matching. TODO: implement a clever strategy here
+    Model facetModel = ModelFactory.createDefaultModel();
+    Resource baseResource = RdfUtils.findOrCreateBaseResource(facetModel);
+    baseResource.addProperty(WON.HAS_FACET, facetModel.getResource(fromFacetURI.toString()));
+    baseResource.addProperty(WON.HAS_REMOTE_FACET, facetModel.getResource(toFacetURI.toString()));
+    logger.debug("matcher chose these facets: from:{} to:{}", fromFacetURI, toFacetURI);
+    return facetModel;
+  }
 
-    private boolean isNewHint(URI fromURI, URI toURI, double score){
+  private Model readModelFromSolrIndex(final URI docUri) throws IOException
+  {
+    TopDocs searchResult = this.solrIndexSearcher.search(new TermQuery(new Term(SolrFields.URL, docUri.toString())), 1);
+    if (searchResult == null || searchResult.totalHits == 0) {
+      logger.debug("found no document in index with URI {}", docUri);
+      return null;
+    }
+    Document doc = this.solrIndexSearcher.getIndexReader().document(searchResult.scoreDocs[0].doc);
+    if (doc == null) {
+      logger.debug("could not read document from index for URI {}", docUri);
+      return null;
+    }
+    String rdfAsString = doc.get(SolrFields.NTRIPLE);
+    if (rdfAsString == null) {
+      logger.debug("could not read RDF content from index document for URI {}", docUri);
+      return null;
+    }
+    Model fromModel = ModelFactory.createDefaultModel();
+    RDFDataMgr.read(fromModel, new ByteArrayInputStream(rdfAsString.getBytes()), Lang.NTRIPLES);
+    return fromModel;
+  }
+
+
+  private boolean isNewHint(URI fromURI, URI toURI, double score){
       return this.hintMemory.add("" + fromURI + toURI + Double.toString(score));
     }
 

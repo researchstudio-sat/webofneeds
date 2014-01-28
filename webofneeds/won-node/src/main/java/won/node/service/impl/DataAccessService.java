@@ -7,11 +7,11 @@ import won.protocol.model.*;
 import won.protocol.repository.*;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * User: gabriel
@@ -32,6 +32,19 @@ public class DataAccessService {
   @Autowired
   private FacetRepository facetRepository;
 
+  /**
+   * Creates a new Connection object. Expects <> won:hasFacet [FACET] in the RDF content, will throw exception if it's not there.
+   * @param needURI
+   * @param otherNeedURI
+   * @param otherConnectionURI
+   * @param content
+   * @param connectionState
+   * @param connectionEventType
+   * @return
+   * @throws NoSuchNeedException
+   * @throws IllegalMessageForNeedStateException
+   * @throws ConnectionAlreadyExistsException
+   */
   public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
                                       final Model content, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
       throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
@@ -45,8 +58,8 @@ public class DataAccessService {
     if (!isNeedActive(need))
       throw new IllegalMessageForNeedStateException(needURI, connectionEventType.name(), need.getState());
 
-    URI facetURI =  getFacet(content, WON.HAS_FACET);
-
+    URI facetURI =  getFacet(content);
+    if (facetURI == null) throw new IllegalArgumentException("at least one RDF node must be of type won:" + WON.HAS_FACET.getLocalName());
     //TODO: create a proper exception if a facet is not supported by a need
     if(facetRepository.findByNeedURIAndTypeURI(needURI, facetURI).isEmpty()) throw new RuntimeException("Facet is not supported by Need: " + facetURI);
 
@@ -73,16 +86,41 @@ public class DataAccessService {
     return con;
   }
 
-  public URI getFacet(Model content, Property property) {
-
+  public Collection<URI> getSupportedFacets(URI needUri) throws NoSuchNeedException
+  {
+    List<URI> ret = new LinkedList<URI>();
+    Need need = DataAccessUtils.loadNeed(needRepository, needUri);
+    Model content = rdfStorageService.loadContent(need);
+    if (content == null) return ret;
     Resource baseRes = content.getResource(content.getNsPrefixURI(""));
-    StmtIterator stmtIterator = baseRes.listProperties(property);
-
-    if (!stmtIterator.hasNext()) {
-      throw new IllegalArgumentException("at least one RDF node must be of type won:" + property.getLocalName());
+    StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
+    while (stmtIterator.hasNext()) {
+      RDFNode object = stmtIterator.nextStatement().getObject();
+      if (object.isURIResource()){
+        ret.add(URI.create(object.toString()));
+      }
     }
+    return ret;
+  }
 
-    return URI.create(stmtIterator.next().getObject().asResource().getURI());
+  /**
+   * Returns the first facet found in the model, attached to the null relative URI '<>'.
+   * Returns null if there is no such facet.
+   * @param content
+   * @return
+   */
+  public URI getFacet(Model content) {
+    return WonRdfUtils.FacetUtils.getFacet(content);
+  }
+
+  /**
+   * Adds a triple to the model of the form <> won:hasFacet [facetURI].
+   * @param content
+   * @param facetURI
+   */
+  public void addFacet(final Model content, final URI facetURI)
+  {
+    WonRdfUtils.FacetUtils.addFacet(content, facetURI);
   }
 
   public Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
@@ -221,4 +259,6 @@ public class DataAccessService {
   public void setRdfStorageService(RDFStorageService rdfStorageService) {
     this.rdfStorageService = rdfStorageService;
   }
+
+
 }
