@@ -87,6 +87,17 @@ public class WonRdfUtils
       Resource baseRes = RdfUtils.getBaseResource(content);
       baseRes.addProperty(WON.HAS_FACET, content.createResource(facetURI.toString()));
     }
+
+    /**
+     * Adds a triple to the model of the form <> won:hasRemoteFacet [facetURI].
+     * @param content
+     * @param facetURI
+     */
+    public static void addRemoteFacet(final Model content, final URI facetURI)
+    {
+      Resource baseRes = RdfUtils.getBaseResource(content);
+      baseRes.addProperty(WON.HAS_REMOTE_FACET, content.createResource(facetURI.toString()));
+    }
   }
 
 

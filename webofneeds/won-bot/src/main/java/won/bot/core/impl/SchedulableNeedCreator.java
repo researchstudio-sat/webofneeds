@@ -23,7 +23,6 @@ import won.bot.core.base.TriggeredBot;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Bot that can be scheduled to create new needs with a Trigger.
@@ -53,9 +52,7 @@ public class SchedulableNeedCreator extends TriggeredBot
             logger.info("need creation finished, new need URI is: {}", uri);
             getBotContext().rememberNeedUri(uri);
             onNewNeedCreated(uri, wonNodeUri, needModel);
-          } catch (InterruptedException e) {
-            logger.warn("interrupted while waiting for result of createNeed",e);
-          } catch (ExecutionException e) {
+          } catch (Exception e){
             logger.warn("createNeed failed", e);
           }
         }

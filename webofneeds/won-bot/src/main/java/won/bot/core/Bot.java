@@ -41,7 +41,7 @@ public interface Bot
    * @param needUri
    * @param needModel
    */
-  public void onNewNeedCreated(URI needUri, URI wonNodeUri, final Model needModel);
+  public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception;
 
   /**
    * Init method, called exactly once by the framework before any other method is invoked.
