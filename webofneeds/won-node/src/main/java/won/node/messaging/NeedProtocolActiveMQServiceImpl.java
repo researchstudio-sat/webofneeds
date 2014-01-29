@@ -87,10 +87,6 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
         this.componentName = componentName;
     }
     //todo: starting endpoint is currently only needed by ownerprotocol.
-    @Override
-    public String getStartingEndpoint() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
 
 
 
