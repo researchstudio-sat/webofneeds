@@ -19,6 +19,7 @@ package won.matcher;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.lucene.document.Document;
@@ -40,7 +41,6 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
@@ -234,8 +234,10 @@ public class Matcher
   }
 
   private Model convertRdfStringToModel(String uri, String rdf){
+    logger.debug("converting rdf string for need {} to rdf model. Rdf string starts with {}", uri, StringUtils.abbreviate(rdf,20));
     Model model = ModelFactory.createDefaultModel();
-    RDFDataMgr.read(model, new StringReader(rdf), String uri, Lang.NTRIPLES);
+    model.setNsPrefix("", uri);
+    RDFDataMgr.read(model, new StringReader(rdf), uri, Lang.NTRIPLES);
     return model;
   }
 
@@ -249,23 +251,35 @@ public class Matcher
    * @return
    */
   private Model determineFacetsForHint(URI fromDocUri, URI toDocUri, Model fromModel, Model toModel) {
+    logger.debug("determining facets for use in hint.");
+    if (logger.isDebugEnabled()){
+      logger.debug("fromModel:");
+      RDFDataMgr.write(System.out, fromModel, Lang.TURTLE);
+      logger.debug("[end fromModel]\n\n\n");
+    }
     URI fromFacetURI = WonRdfUtils.FacetUtils.getFacet(fromModel);
+    logger.debug("'from' need {} has facet {}", fromDocUri, fromFacetURI);
     if (fromFacetURI == null ) return null;
-    logger.debug("extracted facet for {}: {}", fromDocUri, fromFacetURI);
+    if (logger.isDebugEnabled()){
+      logger.debug("toModel:");
+      RDFDataMgr.write(System.out, toModel, Lang.TURTLE);
+      logger.debug("[end toModel]\n\n\n");
+    }
     URI toFacetURI = WonRdfUtils.FacetUtils.getFacet(toModel);
+    logger.debug("'to' need {} has facet {}", toDocUri, toFacetURI);
     if (toFacetURI == null ) return null;
-    logger.debug("extracted facet for {}: {}", toDocUri, toFacetURI);
     //for now, just use the first facets for matching. TODO: implement a clever strategy here
     Model facetModel = createFacetModel(fromFacetURI, toFacetURI);
     return facetModel;
   }
 
   private Model createFacetModel(URI fromFacetURI, URI toFacetURI) {
+    logger.debug("creating an rdf model with the facet information to use in the hint message");
     Model facetModel = ModelFactory.createDefaultModel();
     Resource baseResource = RdfUtils.findOrCreateBaseResource(facetModel);
     baseResource.addProperty(WON.HAS_FACET, facetModel.getResource(fromFacetURI.toString()));
     baseResource.addProperty(WON.HAS_REMOTE_FACET, facetModel.getResource(toFacetURI.toString()));
-    logger.debug("matcher chose these facets: from:{} to:{}", fromFacetURI, toFacetURI);
+    logger.debug("facet model contains these facets: from:{} to:{}", fromFacetURI, toFacetURI);
     return facetModel;
   }
 
@@ -277,23 +291,26 @@ public class Matcher
    */
   private Model readModelFromSolrIndex(final URI docUri) throws IOException
   {
+    logger.debug("Reading need model from solr index for uri {}", docUri);
     TopDocs searchResult = this.solrIndexSearcher.search(new TermQuery(new Term(SolrFields.URL, docUri.toString())), 1);
     if (searchResult == null || searchResult.totalHits == 0) {
-      logger.debug("found no document in index with URI {}", docUri);
+      logger.debug("Found no document in index with URI {}", docUri);
       return null;
     }
     Document doc = this.solrIndexSearcher.getIndexReader().document(searchResult.scoreDocs[0].doc);
     if (doc == null) {
-      logger.debug("could not read document from index for URI {}", docUri);
+      logger.debug("Could not read document from index for URI {}", docUri);
       return null;
     }
     String rdfAsString = doc.get(SolrFields.NTRIPLE);
     if (rdfAsString == null) {
-      logger.debug("could not read RDF content from index document for URI {}", docUri);
+      logger.debug("Could not read RDF content from index document for URI {}", docUri);
       return null;
     }
+    logger.debug("Reading rdf model from string. String starts with {}",StringUtils.abbreviate(rdfAsString,20));
     Model fromModel = ModelFactory.createDefaultModel();
-    RDFDataMgr.read(fromModel, new ByteArrayInputStream(rdfAsString.getBytes()), Lang.NTRIPLES);
+    fromModel.setNsPrefix("", docUri.toString());
+    RDFDataMgr.read(fromModel, new StringReader(rdfAsString), docUri.toString(), Lang.NTRIPLES);
     return fromModel;
   }
 

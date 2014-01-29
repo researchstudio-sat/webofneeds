@@ -73,7 +73,7 @@ public class SimpleReactiveBot extends BasicServiceBot {
       int msgCount = this.messageCountPerConnection.get(con.getConnectionURI());
       if (msgCount < messageCount){
         msgCount++;
-        Model messageModel = WonRdfUtils.textMessage("message " + msgCount + " [" + con.getConnectionURI().toString() + "]");
+        Model messageModel = WonRdfUtils.MessageUtils.textMessage("message " + msgCount + " [" + con.getConnectionURI().toString() + "]");
         getOwnerService().textMessage(con.getConnectionURI(), messageModel);
         this.messageCountPerConnection.put(con.getConnectionURI(), msgCount);
       } else {

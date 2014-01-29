@@ -93,7 +93,7 @@ public class ConnectionController {
 
         try {
 
-            ownerService.textMessage(con.getConnectionURI(), WonRdfUtils.textMessage(text.getText()));
+            ownerService.textMessage(con.getConnectionURI(), WonRdfUtils.MessageUtils.textMessage(text.getText()));
         } catch (Exception e) {
             logger.warn("error sending text message");
             return "error sending text message: " + e.getMessage();

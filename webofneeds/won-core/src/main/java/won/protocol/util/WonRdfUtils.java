@@ -3,6 +3,8 @@ package won.protocol.util;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -14,6 +16,7 @@ import java.util.LinkedList;
  */
 public class WonRdfUtils
 {
+  private static final Logger logger = LoggerFactory.getLogger(WonRdfUtils.class);
   public static class MessageUtils {
     /**
      * Creates an RDF model containing a text message.
@@ -39,10 +42,20 @@ public class WonRdfUtils
      * @return
      */
     public static URI getFacet(Model content) {
+      logger.debug("getFacet(model) called");
       Resource baseRes = RdfUtils.getBaseResource(content);
       StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
-      if (!stmtIterator.hasNext()) return null;
-      return URI.create(stmtIterator.next().getObject().asResource().getURI());
+      if (!stmtIterator.hasNext()) {
+        logger.debug("no facet found in model");
+        return null;
+      }
+      URI facetURI = URI.create(stmtIterator.next().getObject().asResource().getURI());
+      if (logger.isDebugEnabled()){
+        if (stmtIterator.hasNext()){
+          logger.debug("returning facet {}, but model has more facets than just this one.");
+        }
+      }
+      return facetURI;
     }
 
     /**
