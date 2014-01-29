@@ -42,6 +42,7 @@ import won.protocol.vocabulary.WON;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -124,7 +125,7 @@ public class Matcher
     String url = inputDocument.getFieldValue(SolrFields.URL).toString();
     try {
       BooleanQuery booleanQuery = createQueryForDocument(inputDocument);
-      processQuery(url, booleanQuery);
+      processQuery(url, booleanQuery, inputDocument);
     } catch (Throwable t) {
       logger.info("caught throwable while processing doc with url {}", url, t);
     }
@@ -136,11 +137,13 @@ public class Matcher
   /**
    * Executes queries for the specified document. Matches are stored in an internal
    * queue and are processed in <code>processMatches()</code>.
+   *
    * @param url
    * @param booleanQuery
+   * @param inputDocument - used for passing the rdf triples to the match processing logic
    * @throws IOException
    */
-  private void processQuery(final String url, final BooleanQuery booleanQuery) throws IOException
+  private void processQuery(final String url, final BooleanQuery booleanQuery, SolrInputDocument inputDocument) throws IOException
   {
     logger.debug("Final solr query: {}", QueryParsing.toString(booleanQuery, solrIndexSearcher.getSchema()));
     //get top MAX_MATCHES
@@ -148,7 +151,7 @@ public class Matcher
     //if no matches or not good enough skip them
 
     if (topDocs.scoreDocs.length != 0 && scoreTransformer.isAboveInputThreshold(topDocs.getMaxScore())) {
-      matches.add(new MatchResult(url, topDocs));
+      matches.add(new MatchResult(url, topDocs, (String) inputDocument.getFieldValue(SolrFields.NTRIPLE)));
       logger.debug("found {} matches for {}", topDocs.totalHits, url);
     } else {
       logger.debug("Found only {} matches with highest score {} for {}. Not sending any hints", new Object[]{topDocs.scoreDocs.length, topDocs.getMaxScore(), url});
@@ -195,28 +198,32 @@ public class Matcher
 
     while (!matches.isEmpty()) {
       MatchResult match = matches.poll();
-      URI fromDoc = URI.create(match.getUrl());
+      URI fromDocUri = URI.create(match.getUrl());
+      Model fromDocModel = null; //lazily initialize this model if a match is found
       for (ScoreDoc scoreDoc : match.getTopDocs().scoreDocs) {
         try {
           Document document = indexReader.document(scoreDoc.doc);
-          URI toDoc = URI.create(document.get(SolrFields.URL));
-          logger.debug("preparing to send match between {} and {} with score {}", new Object[]{fromDoc, toDoc,scoreDoc.score});
-          if (toDoc.equals(fromDoc)) continue;
+          URI toDocUri = URI.create(document.get(SolrFields.URL));
+          logger.debug("preparing to send match between {} and {} with score {}", new Object[]{fromDocUri, toDocUri,scoreDoc.score});
+          if (toDocUri.equals(fromDocUri)) continue;
           if (!scoreTransformer.isAboveInputThreshold(scoreDoc.score)) {
-            logger.debug("score {} lower than threshold {}, suppressed match between {} and {}", new Object[]{scoreDoc.score, scoreTransformer.getInputThreshold(), fromDoc, toDoc});
+            logger.debug("score {} lower than threshold {}, suppressed match between {} and {}", new Object[]{scoreDoc.score, scoreTransformer.getInputThreshold(), fromDocUri, toDocUri});
             continue;
           }
           double normalizedScore = scoreTransformer.transform(scoreDoc.score);
           logger.debug("score of {} was normalized to {}", scoreDoc.score, normalizedScore);
-          if (isNewHint(fromDoc, toDoc, normalizedScore)) {
+          if (isNewHint(fromDocUri, toDocUri, normalizedScore)) {
             logger.debug("determining which facets to use in hint");
-            Model facetModel = determineFacets(fromDoc, toDoc);
-            logger.debug("calling MatchProcessors for match {} -> {} :: {}", new Object[]{fromDoc, toDoc, normalizedScore});
+            if (fromDocModel == null) {
+              fromDocModel = convertRdfStringToModel(fromDocUri.toString(), match.getRdfContent());
+            }
+            Model facetModel = determineFacetsForHint(fromDocUri, toDocUri, fromDocModel, readModelFromSolrIndex(toDocUri));
+            logger.debug("calling MatchProcessors for match {} -> {} :: {}", new Object[]{fromDocUri, toDocUri, normalizedScore});
             for (MatchProcessor proc: matchProcessors){
-              proc.process(fromDoc,toDoc,normalizedScore,originatorURI,facetModel);
+              proc.process(fromDocUri,toDocUri,normalizedScore,originatorURI,facetModel);
             }
           } else {
-            logger.debug("Suppressed duplicate hint {} -> {} :: {}", new Object[]{fromDoc, toDoc, normalizedScore});
+            logger.debug("Suppressed duplicate hint {} -> {} :: {}", new Object[]{fromDocUri, toDocUri, normalizedScore});
           }
         } catch (Throwable t) {
           logger.error("error while processing match result {}",match, t);
@@ -226,14 +233,22 @@ public class Matcher
 
   }
 
-  private Model determineFacets(URI fromDocUri, URI toDocUri) throws IOException
-  {
-    Model fromModel = readModelFromSolrIndex(fromDocUri);
-    if (fromModel == null || fromModel.isEmpty()) return null;
-    logger.debug("loaded triples from index for {}", fromDocUri);
-    Model toModel = readModelFromSolrIndex(fromDocUri);
-    if (toModel == null || toModel.isEmpty()) return null;
-    logger.debug("loaded triples from index for {}", toDocUri);
+  private Model convertRdfStringToModel(String uri, String rdf){
+    Model model = ModelFactory.createDefaultModel();
+    RDFDataMgr.read(model, new StringReader(rdf), String uri, Lang.NTRIPLES);
+    return model;
+  }
+
+
+  /**
+   * Just takes the first facet from both needs. TODO: Needs refinement once we get more clever with multiple facets.
+   * @param fromDocUri
+   * @param toDocUri
+   * @param fromModel
+   * @param toModel
+   * @return
+   */
+  private Model determineFacetsForHint(URI fromDocUri, URI toDocUri, Model fromModel, Model toModel) {
     URI fromFacetURI = WonRdfUtils.FacetUtils.getFacet(fromModel);
     if (fromFacetURI == null ) return null;
     logger.debug("extracted facet for {}: {}", fromDocUri, fromFacetURI);
@@ -241,6 +256,11 @@ public class Matcher
     if (toFacetURI == null ) return null;
     logger.debug("extracted facet for {}: {}", toDocUri, toFacetURI);
     //for now, just use the first facets for matching. TODO: implement a clever strategy here
+    Model facetModel = createFacetModel(fromFacetURI, toFacetURI);
+    return facetModel;
+  }
+
+  private Model createFacetModel(URI fromFacetURI, URI toFacetURI) {
     Model facetModel = ModelFactory.createDefaultModel();
     Resource baseResource = RdfUtils.findOrCreateBaseResource(facetModel);
     baseResource.addProperty(WON.HAS_FACET, facetModel.getResource(fromFacetURI.toString()));
@@ -249,6 +269,12 @@ public class Matcher
     return facetModel;
   }
 
+  /**
+   * Fetches the ntriples content from the solr index and builds a jena Model from it.
+   * @param docUri
+   * @return
+   * @throws IOException
+   */
   private Model readModelFromSolrIndex(final URI docUri) throws IOException
   {
     TopDocs searchResult = this.solrIndexSearcher.search(new TermQuery(new Term(SolrFields.URL, docUri.toString())), 1);
@@ -280,10 +306,13 @@ public class Matcher
       private String url;
       private TopDocs topDocs;
 
-      public MatchResult(final String url, final TopDocs topDocs)
-      {
-        this.url = url;
+
+      private String rdfContent; //we use string content, we lazily convert it to RDF when needed
+
+      private MatchResult(String url, TopDocs topDocs, String rdfContent) {
+        this.rdfContent = rdfContent;
         this.topDocs = topDocs;
+        this.url = url;
       }
 
       public String getUrl()
@@ -306,26 +335,12 @@ public class Matcher
         this.topDocs = topDocs;
       }
 
-      @Override
-      public boolean equals(final Object o)
-      {
-        if (this == o) return true;
-        if (!(o instanceof MatchResult)) return false;
-
-        final MatchResult that = (MatchResult) o;
-
-        if (topDocs != null ? !topDocs.equals(that.topDocs) : that.topDocs != null) return false;
-        if (url != null ? !url.equals(that.url) : that.url != null) return false;
-
-        return true;
+      public String getRdfContent() {
+        return rdfContent;
       }
 
-      @Override
-      public int hashCode()
-      {
-        int result = url != null ? url.hashCode() : 0;
-        result = 31 * result + (topDocs != null ? topDocs.hashCode() : 0);
-        return result;
+      public void setRdfContent(String rdfContent) {
+        this.rdfContent = rdfContent;
       }
 
       @Override
@@ -334,6 +349,28 @@ public class Matcher
         return "MatchResult{" +
             "url='" + url + '\'' +
             '}';
+      }
+
+      @Override
+      public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MatchResult that = (MatchResult) o;
+
+        if (rdfContent != null ? !rdfContent.equals(that.rdfContent) : that.rdfContent != null) return false;
+        if (topDocs != null ? !topDocs.equals(that.topDocs) : that.topDocs != null) return false;
+        if (url != null ? !url.equals(that.url) : that.url != null) return false;
+
+        return true;
+      }
+
+      @Override
+      public int hashCode() {
+        int result = url != null ? url.hashCode() : 0;
+        result = 31 * result + (topDocs != null ? topDocs.hashCode() : 0);
+        result = 31 * result + (rdfContent != null ? rdfContent.hashCode() : 0);
+        return result;
       }
     }
 }
