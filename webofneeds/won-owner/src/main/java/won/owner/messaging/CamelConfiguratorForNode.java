@@ -16,6 +16,8 @@
 
 package won.owner.messaging;
 
+import org.apache.camel.CamelContext;
+
 import java.net.URI;
 
 /**
@@ -25,6 +27,11 @@ import java.net.URI;
 public class CamelConfiguratorForNode extends CamelConfigurator {
     @Override
     public String execute(URI uri) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public CamelContext getCamelContext() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

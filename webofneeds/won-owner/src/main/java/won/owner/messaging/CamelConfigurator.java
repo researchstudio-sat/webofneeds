@@ -85,6 +85,8 @@ public abstract class CamelConfigurator implements CamelContextAware{
     }
 
 
+
+
     final String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI,String ownerProtocolQueueName) throws CamelConfigurationFailedException {
         //TODO: the linked data description of the won node must be at [NODE-URI]/resource
         // according to this code. This should be explicitly defined somewhere

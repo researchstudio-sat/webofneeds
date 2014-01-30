@@ -259,7 +259,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         String brokerComponentName = wonNode.getBrokerComponent();
 
 
-        return ownerProtocolActiveMQService.addCamelComponentForWonNodeBroker(brokerComponentName, wonNode.getWonNodeURI(), brokerURI,wonNode.getOwnerApplicationID());
+        return ownerProtocolActiveMQService.addCamelComponentForWonNodeBroker( wonNode.getWonNodeURI(), brokerURI,wonNode.getOwnerApplicationID());
     }
 
     private String configureRemoteEndpointsForOwnerApplication(String ownerApplicationID, String remoteEndpoint) throws CamelConfigurationFailedException, ExecutionException, InterruptedException {
