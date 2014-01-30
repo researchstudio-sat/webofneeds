@@ -72,9 +72,9 @@ public class TriggeredBot extends ScheduledActionBot
   protected void doShutdownCustom() {};
 
 
-  protected Trigger getTrigger()
+  protected void cancelTrigger()
   {
-    return trigger;
+    scheduledExecution.cancel(true);
   }
 
   protected ScheduledFuture getScheduledExecution()

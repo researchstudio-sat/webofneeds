@@ -34,7 +34,7 @@ public class SchedulableNeedCreator extends TriggeredBot
   {
     if (getNeedProducer().isExhausted()){
       logger.info("bot's need procucer is exhausted. will not reschedule execution");
-      getScheduledExecution().cancel(true);
+      cancelTrigger();
     }
     final Model needModel = getNeedProducer().create();
     final URI wonNodeUri = getNodeURISource().getNodeURI();
