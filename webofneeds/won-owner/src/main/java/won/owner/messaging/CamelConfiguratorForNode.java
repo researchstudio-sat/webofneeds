@@ -14,18 +14,17 @@
  *    limitations under the License.
  */
 
-package won.protocol.jms;
-import org.apache.camel.builder.RouteBuilder;
+package won.owner.messaging;
+
 import java.net.URI;
 
 /**
  * User: LEIH-NB
- * Date: 26.11.13
+ * Date: 28.01.14
  */
-public interface ActiveMQService {
-
-    public URI getActiveMQBrokerURIForNode(URI needURI);
-    public void addRoutes(RouteBuilder route) throws Exception;
-
+public class CamelConfiguratorForNode extends CamelConfigurator {
+    @Override
+    public String execute(URI uri) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
-

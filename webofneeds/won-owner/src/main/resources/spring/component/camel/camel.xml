@@ -39,6 +39,7 @@
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
         <property name="concurrentConsumers" value="10"/>
     </bean>
+    <bean id = "camelConfiguratorFactory" class="won.owner.messaging.CamelConfiguratorFactory"></bean>
 
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" >
         <!--property name="brokerURL" value="tcp://localhost:61616"/-->

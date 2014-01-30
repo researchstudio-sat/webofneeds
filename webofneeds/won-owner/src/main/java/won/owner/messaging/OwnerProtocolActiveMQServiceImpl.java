@@ -100,20 +100,20 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
      * a new activemq component with unique name shall be generated and added into camel context.
      * Endpoint is configured using component name and remote queue name.
      * When broker and endpoint are configured, new routes shall be generated for them.
+     *
      * @param wonNodeURI
-     * @param from
      * @return returns brokerURI of wonNode
      * @throws Exception
      */
-    public URI configureCamelEndpointForNodeURI(URI wonNodeURI, String from) throws CamelConfigurationFailedException {
+    public URI configureCamelEndpointForNodeURI(URI wonNodeURI) throws CamelConfigurationFailedException {
         //TODO: the linked data description of the won node must be at [NODE-URI]/resource
         // according to this code. This should be explicitly defined somewhere
         URI resourceURI = URI.create(wonNodeURI.toString()+"/resource");
-        URI brokerURI = getActiveMQBrokerURIForNode(resourceURI);
+        URI brokerURI = getBrokerURIForNode(resourceURI);
 
         String tempComponentName = componentName;
         String tempStartingComponentName = startingComponent;
-        tempComponentName = addCamelComponentForWonNodeBroker(tempComponentName,wonNodeURI,brokerURI,null);
+        tempComponentName = addCamelComponentForWonNodeBroker(wonNodeURI,brokerURI,null);
 
         String endpoint = tempComponentName+":queue:"+getActiveMQOwnerProtocolQueueNameForNeed(resourceURI);
         endpointMap.put(wonNodeURI,endpoint);
@@ -131,7 +131,7 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         setStartingEndpoint(wonNodeURI, tempStartingComponentName);
 
 
-        if (camelContext.getComponent(tempComponentName)==null){
+        if (camelContext.getComponent(tempStartingComponentName)==null){
             addRouteForEndpoint(camelContext,endpointList,tempStartingComponentName);
         } else{
             if(camelContext.getRoute(endpointMap.get(wonNodeURI))==null)
@@ -148,7 +148,8 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext,endpointList,startingComponentName);
         addRoutes(ownerProtocolRouteBuilder);
     }
-    public String addCamelComponentForWonNodeBroker(String componentName, URI wonNodeURI, URI brokerURI,String ownerApplicationId){
+    public String addCamelComponentForWonNodeBroker( URI wonNodeURI, URI brokerURI,String ownerApplicationId){
+        String componentName;
         if (ownerApplicationId==null){
             if (!wonNodeURI.equals(URI.create(defaultNodeURI)))
                 componentName = this.componentName+brokerURI.toString().replaceAll("[/:]","");
@@ -169,7 +170,8 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
 
 
         logger.info("adding component with component name {}",componentName);
-        brokerComponentMap.put(wonNodeURI,componentName);
+        if (!brokerComponentMap.containsKey(wonNodeURI))
+            brokerComponentMap.put(wonNodeURI,componentName);
         return componentName;
     }
     public String replaceEndpointNameWithOwnerApplicationId(String endpointName, String ownerApplicationId) throws Exception {
@@ -216,7 +218,7 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
 
         Need need = needRepository.findByNeedURI(needURI).get(0);
         URI wonNodeURI = need.getWonNodeURI();
-        configureCamelEndpointForNodeURI(wonNodeURI, from);
+        configureCamelEndpointForNodeURI(wonNodeURI);
         return getEndpoint(wonNodeURI);
     }
 
@@ -227,7 +229,7 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
 
 
     @Override
-    public URI getActiveMQBrokerURIForNode(URI nodeURI) {
+    public URI getBrokerURIForNode(URI nodeURI) {
         logger.debug("obtaining broker URI for node {}", nodeURI);
         String nodeInformationPath = nodeURI.toString();
         URI activeMQEndpoint = null;

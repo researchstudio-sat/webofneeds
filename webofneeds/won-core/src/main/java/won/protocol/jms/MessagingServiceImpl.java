@@ -59,10 +59,6 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
                 result.cancel(true);
             }
         });
-
-
-
-
         return result;
     }
 
@@ -71,28 +67,27 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
         inspectProperties(exchange);
         inspectHeaders(exchange);
         if(exchange.getIn().getBody()!=null)
-        logger.debug(exchange.getIn().getBody().toString());
+        logger.info(exchange.getIn().getBody().toString());
     }
     public void inspectProperties(Exchange exchange){
         Map properties = (Map) exchange.getProperties();
         Iterator iter =  properties.entrySet().iterator();
-        logger.debug("WIRETAP: properties size: "+properties.size());
+        logger.info("WIRETAP: properties size: "+properties.size());
         while(iter.hasNext()){
             Map.Entry pairs = (Map.Entry)iter.next();
-            logger.debug("key: "+pairs.getKey()+" value: "+pairs.getValue());
+            logger.info("key: "+pairs.getKey()+" value: "+pairs.getValue());
         }
 
     }
 
-
     public void inspectHeaders(Exchange exchange){
         Map headers = (Map) exchange.getIn().getHeaders();
         Iterator iter =  headers.entrySet().iterator();
-        logger.debug("WIRETAP: headers size: "+headers.size());
+        logger.info("WIRETAP: headers size: "+headers.size());
         while(iter.hasNext()){
             Map.Entry pairs = (Map.Entry)iter.next();
             if(pairs.getValue()!=null)
-                logger.debug("key: "+pairs.getKey()+" value: "+pairs.getValue());
+                logger.info("key: "+pairs.getKey()+" value: "+pairs.getValue());
         }
 
     }

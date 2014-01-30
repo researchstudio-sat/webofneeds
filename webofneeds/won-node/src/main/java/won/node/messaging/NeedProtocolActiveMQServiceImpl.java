@@ -91,7 +91,7 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
 
 
 
-    public URI getActiveMQBrokerURIForNode(URI needURI){
+    public URI getBrokerURIForNode(URI needURI){
         URI activeMQEndpoint = null;
         try{
             logger.debug("fetching Broker URI for need {}", needURI);
@@ -151,8 +151,8 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
         }
         if (camelContext.getEndpoint(from)!=null){
             logger.debug("getting activemq brokerURI for node with otherneed URI {}",otherNeedURI);
-            URI remoteBrokerURI = getActiveMQBrokerURIForNode(otherNeedURI);
-            URI ownBrokerURI = getActiveMQBrokerURIForNode(needURI);
+            URI remoteBrokerURI = getBrokerURIForNode(otherNeedURI);
+            URI ownBrokerURI = getBrokerURIForNode(needURI);
             String tempComponentName = componentName;
 
 

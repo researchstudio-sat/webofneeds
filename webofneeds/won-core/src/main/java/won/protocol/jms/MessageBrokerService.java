@@ -14,13 +14,19 @@
  *    limitations under the License.
  */
 
-package won.owner.messaging;
+package won.protocol.jms;
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URI;
 
 /**
- * User: syim
- * Date: 27.01.14
+ * User: LEIH-NB
+ * Date: 26.11.13
  */
-public class OwnerProtocolCamelServiceImpl {
-    //public String addCamelComponentForWonNodeBroker
+public interface MessageBrokerService {
+
+
+    public URI getBrokerURIForNode(URI needURI);
+    public void addRoutes(RouteBuilder route) throws Exception;
 
 }
+

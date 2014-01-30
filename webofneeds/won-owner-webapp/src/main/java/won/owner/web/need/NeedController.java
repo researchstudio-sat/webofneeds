@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.NeedPojo;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.IllegalNeedContentException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.*;
 import won.protocol.model.Facet;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
@@ -329,6 +326,8 @@ public class NeedController
        logger.warn("caught InterruptedException", e);
     } catch (ExecutionException e) {
         logger.warn("caught ExcutionException", e);
+    } catch (CamelConfigurationFailedException e) {
+        logger.warn("caught CameConfigurationException", e);  //To change body of catch statement use File | Settings | File Templates.
     }
 
       return "noNeedFound";
@@ -378,6 +377,8 @@ public class NeedController
       logger.warn("caught InterruptedEception",e);
     } catch (ExecutionException e) {
       logger.warn("caught ExecutionException",e);
+    } catch (CamelConfigurationFailedException e) {
+        logger.warn("caught CamelConfigurationException", e); //To change body of catch statement use File | Settings | File Templates.
     }
 
       return ret;

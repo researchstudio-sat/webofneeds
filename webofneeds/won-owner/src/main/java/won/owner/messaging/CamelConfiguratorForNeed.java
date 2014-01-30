@@ -14,19 +14,17 @@
  *    limitations under the License.
  */
 
-package won.protocol.jms;
+package won.owner.messaging;
 
 import java.net.URI;
 
 /**
  * User: LEIH-NB
- * Date: 28.11.13
+ * Date: 28.01.14
  */
-public interface OwnerProtocolActiveMQService extends MessageBrokerService {
-
-    public String getActiveMQOwnerProtocolQueueNameForNeed(URI needURI);
-    public URI configureCamelEndpointForNodeURI(URI wonNodeURI) throws Exception;
-    public String configureCamelEndpointForConnection(URI connectionURI, String from) throws Exception;
-    public String configureCamelEndpointForNeed(URI needURI, String from) throws Exception;
-
+public class CamelConfiguratorForNeed extends CamelConfigurator {
+    @Override
+    public String execute(URI uri) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
