@@ -40,6 +40,7 @@ import won.protocol.service.OwnerFacingNeedCommunicationService;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
 
@@ -94,11 +95,18 @@ public class NeedCommunicationServiceImpl implements
     //create Connection in Database
     Connection con = null;
     try {
+      //see if there is a facet specified in the content
+      URI facet = dataService.getFacet(content);
+      if (facet == null){
+        //get the first one of the need's supported facets. TODO: implement some sort of strategy for choosing a facet here (and in the matcher)
+        Collection<URI> facets = dataService.getSupportedFacets(needURI);
+        if (facets.isEmpty()) throw new IllegalArgumentException("hint does not specify facets, falling back to using one of the need's supported facets failed as the need does not support any facets");
+        //add the facet to the model.
+        dataService.addFacet(content, facets.iterator().next());
+      }
       con = dataService.createConnection(needURI, otherNeedURI, null, content, ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT);
     } catch (ConnectionAlreadyExistsException e) {
-      //TODO: Make this more beautiful
-      //should not happen
-      e.printStackTrace();
+      logger.info("could not create connection", e);
     }
 
     //create ConnectionEvent in Database
@@ -153,6 +161,8 @@ public class NeedCommunicationServiceImpl implements
 
     return con.getConnectionURI();
   }
+
+
 
   public void setReg(FacetRegistry reg) {
     this.reg = reg;
