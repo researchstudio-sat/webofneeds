@@ -52,6 +52,7 @@ public class Connect2NeedsBot extends CreateNNeedsAndReactBot
   {
     Model model = ModelFactory.createDefaultModel();
     model.setNsPrefix("", "no:uri");
+    WonRdfUtils.FacetUtils.addFacet(model, FacetType.OwnerFacet.getURI());
     WonRdfUtils.FacetUtils.addRemoteFacet(model, FacetType.OwnerFacet.getURI());
     return model;
   }
