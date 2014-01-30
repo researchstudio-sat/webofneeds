@@ -10,12 +10,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.facet.businessactivity.BAStateManager;
 import won.node.facet.businessactivity.SimpleBAStateManager;
+import won.node.facet.businessactivity.BAEventType;
+import won.node.facet.businessactivity.BAParticipantCompletionState;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.vocabulary.WON;
+
+
+
 
 
 
@@ -36,7 +41,7 @@ import java.util.concurrent.Future;
  */
 public class BAPCCoordinatorFacetImpl extends Facet {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private BAStateManager stateManager = new SimpleBAStateManager();
+    private SimpleBAStateManager stateManager = new SimpleBAStateManager();
 
 
     @Autowired
@@ -80,7 +85,7 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                             " con.getState():" + con.getState() + " con.getTypeURI():" + con.getTypeURI());
                    // NeedPojo n = new NeedPojo(con.getRemoteNeedURI(), null);
 
-                    System.out.println("daki message"+message.toString());
+                   //System.out.println("daki message"+message.toString());
                      // message:
                     NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_BA.BASE_URI,"hasTextMessage"));
                     System.out.println(ni.toList().get(0).toString());
@@ -112,11 +117,11 @@ public class BAPCCoordinatorFacetImpl extends Facet {
 
     public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //send to the need side
-        System.out.println("daki Poziva: "+"Coordinator textMessageFromNeed");
         executorService.execute(new Runnable() {
             @Override
             public void run() {
                 try {
+                    System.out.println("daki Received message from Participant: "+message.toString());
                     NodeIterator it = message.listObjectsOfProperty(WON_BA.COORDINATION_MESSAGE);
                     if (!it.hasNext()) {
                         logger.info("message did not contain a won-ba:coordinationMessage");
@@ -127,28 +132,39 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                         logger.info("message did not contain a won-ba:coordinationMessage URI");
                         return;
                     }
-                    System.out.println("daki Primeljeno od participanta: "+message.toString());
+
                     Resource coordMsg = coordMsgNode.asResource();
                     String sCoordMsg = coordMsg.toString(); //URI
-                    BAEventType eventType = null;
-                    eventType = eventType.getBAEventTypeFromURIParticipantInbound(sCoordMsg);
-                    //TODO: create BAEvent from coordMSG
+
+                    // URI -> eventType
+                    BAEventType eventType = getCoordinationEventType(sCoordMsg);
+
                     BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
+                    logger.info("Current state of the Coordinator: "+state.getURI().toString());
                     stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
+                    logger.info("New state of the Coordinator:"+state.getURI().toString());
 
-
-                    Model myMessage = ModelFactory.createDefaultModel();
-                    myMessage.setNsPrefix("","no:uri");
-                    Resource baseResource = myMessage.createResource("no:uri");
-                    baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, WON_TX.COORDINATION_MESSAGE_COMMIT);
-
-
-                    ownerFacingConnectionClient.textMessage(con.getConnectionURI(), myMessage);
+                    ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
                 }
 
             }
         });
+    }
+
+
+    public BAEventType getCoordinationEventType(final String fragment)
+    {
+        String s = fragment.substring(fragment.lastIndexOf("#Message")+8,fragment.length());
+       // System.out.println("daki: Poredi sa: "+s);
+        for (BAEventType event : BAEventType.values())
+            if (event.name().equals("MESSAGE_"+fragment.substring(fragment.lastIndexOf("#Message")+8,fragment.length()).toUpperCase()))
+            {
+                return event;
+            }
+
+        logger.warn("No enum could be matched for: {}", fragment);
+        return null;
     }
 }

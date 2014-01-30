@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
+import won.node.facet.businessactivity.SimpleBAStateManager;
+
 import java.net.URI;
 
 /**
@@ -360,5 +362,8 @@ public enum BAParticipantCompletionState {
         logger.warn("No enum could be matched for: {}", fragment);
         return null;
     }
+
+
+
 }
 

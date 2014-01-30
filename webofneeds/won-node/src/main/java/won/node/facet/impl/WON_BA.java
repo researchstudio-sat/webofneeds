@@ -16,6 +16,7 @@ public class WON_BA {
    // public static final String BASE_URI = "http://purl.org/webofneeds/tx/model#";
     public static final String BASE_URI = "http://purl.org/webofneeds/model#";
 
+
     public static final String DEFAULT_PREFIX= "won-tx";
 
 
