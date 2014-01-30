@@ -41,7 +41,7 @@ public interface Bot
    * @param needUri
    * @param needModel
    */
-  public void onNewNeedCreated(URI needUri, URI wonNodeUri, final Model needModel);
+  public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception;
 
   /**
    * Init method, called exactly once by the framework before any other method is invoked.
@@ -49,7 +49,7 @@ public interface Bot
    */
   public void initialize() throws Exception;
   /**
-   * Called by the framework to on-reactive tasks.
+   * Called by the framework to execute non-reactive tasks.
    * The callee must make sure this call is thread-safe, but explicit synchronization is strongly discouraged.
    */
   public void act() throws Exception;

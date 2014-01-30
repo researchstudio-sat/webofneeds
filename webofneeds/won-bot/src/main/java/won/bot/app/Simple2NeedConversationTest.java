@@ -14,18 +14,30 @@
  *    limitations under the License.
  */
 
-package won.protocol.jms;
-import org.apache.camel.builder.RouteBuilder;
-import java.net.URI;
+package won.bot.app;
 
-/**
- * User: LEIH-NB
- * Date: 26.11.13
- */
-public interface ActiveMQService {
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.stereotype.Component;
 
-    public URI getActiveMQBrokerURIForNode(URI needURI);
-    public void addRoutes(RouteBuilder route) throws Exception;
+@Component
+public class Simple2NeedConversationTest implements CommandLineRunner
+{
+
+
+  public static void main(String[] args) {
+    SpringApplication app = new SpringApplication(
+        new Object[]{"classpath:/spring/app/simple2NeedConversationTest.xml"}
+    );
+    app.run(args);
+  }
+
+  @Override
+  public void run(final String... strings) throws Exception
+  {
+    //TODO: implement a shutdown hook or something
+    Thread.sleep(5*60*1000);
+  }
+
 
 }
-
