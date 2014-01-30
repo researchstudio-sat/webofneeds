@@ -8,7 +8,7 @@ import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Match;
-import won.protocol.util.MessageModelUtils;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -73,7 +73,7 @@ public class SimpleReactiveBot extends BasicServiceBot {
       int msgCount = this.messageCountPerConnection.get(con.getConnectionURI());
       if (msgCount < messageCount){
         msgCount++;
-        Model messageModel = MessageModelUtils.textMessage("message " + msgCount + " [" + con.getConnectionURI().toString() + "]");
+        Model messageModel = WonRdfUtils.MessageUtils.textMessage("message " + msgCount + " [" + con.getConnectionURI().toString() + "]");
         getOwnerService().textMessage(con.getConnectionURI(), messageModel);
         this.messageCountPerConnection.put(con.getConnectionURI(), msgCount);
       } else {

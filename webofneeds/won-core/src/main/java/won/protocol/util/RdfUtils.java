@@ -140,6 +140,23 @@ public class RdfUtils
   }
 
   /**
+   * Finds the resource representing the model's base resource, i.e. the resource with the
+   * model's base URI. If no such URI is specified, a dummy base URI is set and a resource is
+   * returned referencing that URI.
+   *
+   * @param model
+   * @return
+   */
+  public static Resource findOrCreateBaseResource(Model model) {
+    String baseURI = model.getNsPrefixURI("");
+    if (baseURI == null){
+      model.setNsPrefix("","no:uri");
+      baseURI = model.getNsPrefixURI("");
+    }
+    return model.getResource(baseURI);
+  }
+
+  /**
    * Returns the resource representing the model's base resource, i.e. the resource with the
    * model's base URI.
    * @param model

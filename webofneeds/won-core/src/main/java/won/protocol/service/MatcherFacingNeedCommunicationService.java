@@ -32,6 +32,8 @@ public interface MatcherFacingNeedCommunicationService
    * Notifies the need of a matching otherNeed with the specified match score. Originator
    * identifies the entity making the call. Normally, originator is a matching service.
    *
+   * Expects <> won:hasFacet [FACET] in the RDF content, will choose a facet supported by the need if none is present.
+   *
    * @param needURI    the URI of the need
    * @param otherNeed  URI of the other need (may be on the local needserver)
    * @param score      match score between 0.0 (bad) and 1.0 (good). Implementations treat lower values as 0.0 and higher values as 1.0.

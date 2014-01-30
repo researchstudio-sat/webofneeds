@@ -77,6 +77,11 @@ public class TriggeredBot extends ScheduledActionBot
     return trigger;
   }
 
+  protected ScheduledFuture getScheduledExecution()
+  {
+    return scheduledExecution;
+  }
+
   public void setTrigger(final Trigger trigger)
   {
     this.trigger = trigger;
