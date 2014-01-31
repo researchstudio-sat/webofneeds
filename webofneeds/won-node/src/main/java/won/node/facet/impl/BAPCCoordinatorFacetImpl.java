@@ -66,8 +66,8 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                 try {
                     ownerFacingConnectionClient.open(con.getConnectionURI(), content);
 
-                    stateManager.setStateForNeedUri(BAParticipantCompletionState.ACTIVE, con.getNeedURI());
-                    logger.info("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI()));
+                    stateManager.setStateForNeedUri(BAParticipantCompletionState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
+                    logger.info("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
                 } catch (WonProtocolException e) {
                     logger.debug("caught Exception:", e);
                 }
@@ -106,10 +106,10 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     {
                         if(eventType.isBAPCCoordinatorEventType(eventType))
                         {
-                            BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
+                            BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                             logger.info("Current state of the Coordinator: "+state.getURI().toString());
-                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
-                            logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI()));
+                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
+                            logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
@@ -159,10 +159,10 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     // URI -> eventType
                     BAEventType eventType = getCoordinationEventType(sCoordMsg);
 
-                    BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
+                    BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                     logger.info("Current state of the Coordinator: "+state.getURI().toString());
-                    stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
-                    logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI()));
+                    stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
+                    logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
                 } catch (WonProtocolException e) {

@@ -58,8 +58,8 @@ public class BAPCParticipantFacetImpl extends Facet{
                         needFacingConnectionClient.open(con, content);
                         //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
 
-                        stateManager.setStateForNeedUri(BAParticipantCompletionState.ACTIVE, con.getNeedURI());
-                        logger.info("Participant state: "+stateManager.getStateForNeedUri(con.getNeedURI()));
+                        stateManager.setStateForNeedUri(BAParticipantCompletionState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
+                        logger.info("Participant state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
                     } catch (WonProtocolException e) {
                         logger.debug("caught Exception:", e);
                     }
@@ -104,10 +104,10 @@ public class BAPCParticipantFacetImpl extends Facet{
                     {
                         if(eventType.isBAPCParticipantEventType(eventType))
                         {
-                            BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
+                            BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                             logger.info("Current state of the Participant: "+state.getURI().toString());
-                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
-                            logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI()));
+                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
+                            logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
@@ -161,10 +161,11 @@ public class BAPCParticipantFacetImpl extends Facet{
                     // URI -> eventType
                     BAEventType eventType = getCoordinationEventType2(sCoordMsg);
 
-                    BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
+                    BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()
+                    );
                     logger.info("Current state of the Participant: "+state.getURI().toString());
-                    stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
-                    logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI()));
+                    stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
+                    logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
                 } catch (WonProtocolException e) {
