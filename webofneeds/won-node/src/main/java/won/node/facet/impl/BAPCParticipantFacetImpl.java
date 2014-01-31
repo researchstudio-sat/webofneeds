@@ -100,28 +100,35 @@ public class BAPCParticipantFacetImpl extends Facet{
 
                     // message -> eventType
                     eventType = getCoordinationEventType(messageForSending);
-                    if(eventType.isBAPCParticipantEventType(eventType))
+                    if((eventType!=null))
                     {
-                        eventType.isBAPCParticipantEventType(eventType);
-                        System.out.println("daki1: "+con.getNeedURI());
+                        if(eventType.isBAPCParticipantEventType(eventType))
+                        {
+                            eventType.isBAPCParticipantEventType(eventType);
 
 
-                        BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
-                        logger.info("Current state of the Participant: "+state.getURI().toString());
-                        stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
-                        logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI()));
+                            BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
+                            logger.info("Current state of the Participant: "+state.getURI().toString());
+                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
+                            logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI()));
 
-                        // eventType -> URI Resource
-                        r = myContent.createResource(eventType.getURI().toString());
-                        baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
-                        //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
+                            // eventType -> URI Resource
+                            r = myContent.createResource(eventType.getURI().toString());
+                            baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
+                            //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
 
-                        needFacingConnectionClient.textMessage(con, myContent);
+                            needFacingConnectionClient.textMessage(con, myContent);
+                        }
+                        else
+                        {
+                            logger.info("The eventType: "+eventType.getURI().toString()+" can not be triggered by Participant.");
+                        }
                     }
                     else
                     {
-                        logger.info("The eventType: "+eventType.getURI().toString()+" can not be triggered by Participant");
+                        logger.info("The event type denoted by "+messageForSending+" is not allowed.");
                     }
+
 
 
                 } catch (WonProtocolException e) {
@@ -153,8 +160,6 @@ public class BAPCParticipantFacetImpl extends Facet{
             {
                 return event;
             }
-
-        logger.warn("No enum could be matched for: {}", fragment);
         return null;
     }
 

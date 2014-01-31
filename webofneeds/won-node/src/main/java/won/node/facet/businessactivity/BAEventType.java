@@ -214,16 +214,6 @@ public enum BAEventType {
             if (sURI.equals(eventType.getURI().toString())) return eventType;
         }
         return null;
-        /*if(sURI.toString().equals(WON_BA.MESSAGE_CANCEL.toString()))
-            return BAEventType.PARTICIPANT_INBOUND_CANCEL;
-        else if(sURI.toString().equals(BAEventType.PARTICIPANT_INBOUND_CLOSE.getURI().toString()))
-            return BAEventType.PARTICIPANT_INBOUND_CLOSE;
-        else if(sURI.toString().equals((BAEventType.PARTICIPANT_INBOUND_COMPENSATE.getURI().toString())))
-            return BAEventType.PARTICIPANT_INBOUND_COMPENSATE;
-        else return null;   */
-
-        //TODO implement all!
-
     }
 
     public boolean isBAPCParticipantEventType(final BAEventType event)
@@ -234,7 +224,6 @@ public enum BAEventType {
                 || event.equals(BAEventType.MESSAGE_CANCELED) || event.equals(BAEventType.MESSAGE_COMPENSATED)
                 || event.equals(BAEventType.MESSAGE_CLOSED))
             ret=true;
-        System.out.println("Vraca ovo: "+ret);
         return ret;
     }
 

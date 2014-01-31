@@ -144,7 +144,7 @@ public class BAPCCoordinatorFacetImpl extends Facet {
 
                     // URI -> eventType
                     BAEventType eventType = getCoordinationEventType(sCoordMsg);
-                    System.out.println("daki2: "+con.getNeedURI());
+
                     BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
                     logger.info("Current state of the Coordinator: "+state.getURI().toString());
                     stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
@@ -163,13 +163,9 @@ public class BAPCCoordinatorFacetImpl extends Facet {
     public BAEventType getCoordinationEventType(final String fragment)
     {
         String s = fragment.substring(fragment.lastIndexOf("#Message")+8,fragment.length());
-       // System.out.println("daki: Poredi sa: "+s);
         for (BAEventType event : BAEventType.values())
             if (event.name().equals("MESSAGE_"+fragment.substring(fragment.lastIndexOf("#Message")+8,fragment.length()).toUpperCase()))
-            {
                 return event;
-            }
-
         logger.warn("No enum could be matched for: {}", fragment);
         return null;
     }
