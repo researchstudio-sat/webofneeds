@@ -34,6 +34,32 @@ import java.net.URI;
 import java.util.concurrent.Executor;
 
 /**
+ * Base class for bots that define their behaviour through event listeners.
+ *
+ * All methods from the Bot interface are converted to Events by the EventBot.
+ * Subclasses should implement the initializeEventListeners() method to register their
+ * event listeners. The corresponding shutdownEventListeners() is called when the bot's
+ * shutdown method is called an may be used to perform shutdown work for listeners.
+ *
+ * An event bot implementation should take care not to do long or blocking work in event
+ * listeners. Whenever a long computation or a blocking call is done, it should be
+ * done in a Runnable, executed in the Executor (see below).
+ *
+ * The bot's services and other environment can be accessed in listeners through the
+ * instance of EventListenerContext.
+ *
+ * these services include:
+ *
+ * <ul>
+ *   <li>the event bus - for subscribing for/unsubscribing for/publishing event</li>
+ *   <li>the task scheduler - for scheduling tasks (Runnables) to be run after a timeout</li>
+ *   <li>the executor - for running tasks (Runnables) immediately in the task scheduler's thread pool</li>
+ *   <li>the node uri source - for obtaining a won node URI for need creation</li>
+ *   <li>the need producer - for obtaining a valid need content in RDF that can be used to create a need</li>
+ *   <li>the owner service - for sending messages to won nodes (create needs, connect, open, message, close) </li>
+ *   <li>shutting down the trigger - an event bot may have a trigger that calls the bot's act() method regularly.</li>
+ * </ul>
+ *
  *
  */
 public class EventBot extends TriggeredBot
