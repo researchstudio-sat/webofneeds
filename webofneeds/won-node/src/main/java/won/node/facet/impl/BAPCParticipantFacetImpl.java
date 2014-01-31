@@ -70,7 +70,7 @@ public class BAPCParticipantFacetImpl extends Facet{
 
 
 
-
+    // Participant sends message to Coordinator
     public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         final URI remoteConnectionURI = con.getRemoteConnectionURI();
        // System.out.println("daki Poziva: "+"Participant textMessageFromOwner");
@@ -104,9 +104,6 @@ public class BAPCParticipantFacetImpl extends Facet{
                     {
                         if(eventType.isBAPCParticipantEventType(eventType))
                         {
-                            eventType.isBAPCParticipantEventType(eventType);
-
-
                             BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
                             logger.info("Current state of the Participant: "+state.getURI().toString());
                             stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
@@ -138,6 +135,7 @@ public class BAPCParticipantFacetImpl extends Facet{
         });
     }
 
+    // Participant receives message from Coordinator
     public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //send to the need side
         System.out.println("daki Poziva: "+"Participant textMessageFromNeed");
@@ -145,10 +143,34 @@ public class BAPCParticipantFacetImpl extends Facet{
             @Override
             public void run() {
                 try {
+                    System.out.println("daki Received message from Coordinator: "+message.toString());
+                    NodeIterator it = message.listObjectsOfProperty(WON_BA.COORDINATION_MESSAGE);
+                    if (!it.hasNext()) {
+                        logger.info("message did not contain a won-ba:coordinationMessage");
+                        return;
+                    }
+                    RDFNode coordMsgNode = it.nextNode();
+                    if (!coordMsgNode.isURIResource()){
+                        logger.info("message did not contain a won-ba:coordinationMessage URI");
+                        return;
+                    }
+
+                    Resource coordMsg = coordMsgNode.asResource();
+                    String sCoordMsg = coordMsg.toString(); //URI
+
+                    // URI -> eventType
+                    BAEventType eventType = getCoordinationEventType2(sCoordMsg);
+
+                    BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
+                    logger.info("Current state of the Participant: "+state.getURI().toString());
+                    stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
+                    logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI()));
+
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
                 }
+
             }
         });
     }
@@ -160,6 +182,16 @@ public class BAPCParticipantFacetImpl extends Facet{
             {
                 return event;
             }
+        return null;
+    }
+
+    public BAEventType getCoordinationEventType2(final String fragment)
+    {
+        String s = fragment.substring(fragment.lastIndexOf("#Message")+8,fragment.length());
+        for (BAEventType event : BAEventType.values())
+            if (event.name().equals("MESSAGE_"+fragment.substring(fragment.lastIndexOf("#Message")+8,fragment.length()).toUpperCase()))
+                return event;
+        logger.warn("No enum could be matched for: {}", fragment);
         return null;
     }
 

@@ -58,7 +58,6 @@ public class BAPCCoordinatorFacetImpl extends Facet {
     public void openFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //inform the need side
         //CONNECTED state
-        System.out.println("daki Coordinator: openFromNeed");
         executorService.execute(new Runnable()
         {
             @Override
@@ -76,44 +75,58 @@ public class BAPCCoordinatorFacetImpl extends Facet {
         });
     }
 
+    //Coordinator sends message to Participant
     public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         final URI remoteConnectionURI = con.getRemoteConnectionURI();
-        System.out.println("daki Poziva: "+"Coordinator textMessageFromOwner");
         //inform the other side
         executorService.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    System.out.println("daki: stanje:"+stateManager.getStateForNeedUri(con.getNeedURI()).toString());
-                    needFacingConnectionClient.textMessage(con, message);
-                    System.out.println("daki Con: con.getNeedURI():" + con.getNeedURI() + " con.remoteNeedURI():" + con.getRemoteNeedURI() +
-                            " con.getConnectionURI():" + con.getConnectionURI() + " con.getRemoteConnectionURI:" + con.getRemoteConnectionURI() +
-                            " con.getState():" + con.getState() + " con.getTypeURI():" + con.getTypeURI());
-                   // NeedPojo n = new NeedPojo(con.getRemoteNeedURI(), null);
+                    String messageForSending = new String();
+                    BAEventType eventType = null;
+                    Model myContent = null;
+                    Resource r = null;
 
-                   //System.out.println("daki message"+message.toString());
-                     // message:
+                    //message (event) for sending
                     NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_BA.BASE_URI,"hasTextMessage"));
-                    System.out.println(ni.toList().get(0).toString());
+                    //System.out.println("daki: Participant sents:"+message.toString());
 
-                   /* StmtIterator iter = message.listStatements();
-                    boolean found = false;
-                    while(iter.hasNext() && !found)
+                    messageForSending = ni.toList().get(0).toString();
+                    messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
+                    logger.info("Cooridnator sents: " + messageForSending);
+
+                    myContent = ModelFactory.createDefaultModel();
+                    myContent.setNsPrefix("","no:uri");
+                    Resource baseResource = myContent.createResource("no:uri");
+
+                    // message -> eventType
+                    eventType = getCoordinationEventType2(messageForSending);
+                    if((eventType!=null))
                     {
-                        Statement stmt = iter.nextStatement();  // get next statement
-                        Property  predicate = stmt.getPredicate();   // get the predicate
-                        if(predicate.toString().equals(WON_BA.BASE_URI+"hasTextMessage"))
+                        if(eventType.isBAPCCoordinatorEventType(eventType))
                         {
-                            System.out.print("Poruka je: " + stmt.getObject().toString() + " ");
+                            BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
+                            logger.info("Current state of the Coordinator: "+state.getURI().toString());
+                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
+                            logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI()));
+
+                            // eventType -> URI Resource
+                            r = myContent.createResource(eventType.getURI().toString());
+                            baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
+                            //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
+
+                            needFacingConnectionClient.textMessage(con, myContent);
                         }
-                    }*/
-
-
-
-
-
-
-                    // needFacingConnectionClient.textMessage(remoteConnectionURI, message);
+                        else
+                        {
+                            logger.info("The eventType: "+eventType.getURI().toString()+" can not be triggered by Coordinator.");
+                        }
+                    }
+                    else
+                    {
+                        logger.info("The event type denoted by "+messageForSending+" is not allowed.");
+                    }
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
                 }
@@ -121,6 +134,7 @@ public class BAPCCoordinatorFacetImpl extends Facet {
         });
     }
 
+    //Coordinator receives message from Participant
     public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //send to the need side
         executorService.execute(new Runnable() {
@@ -167,6 +181,16 @@ public class BAPCCoordinatorFacetImpl extends Facet {
             if (event.name().equals("MESSAGE_"+fragment.substring(fragment.lastIndexOf("#Message")+8,fragment.length()).toUpperCase()))
                 return event;
         logger.warn("No enum could be matched for: {}", fragment);
+        return null;
+    }
+
+    public BAEventType getCoordinationEventType2(final String fragment)
+    {
+        for (BAEventType event : BAEventType.values())
+            if (event.name().equals(fragment))
+            {
+                return event;
+            }
         return null;
     }
 }
