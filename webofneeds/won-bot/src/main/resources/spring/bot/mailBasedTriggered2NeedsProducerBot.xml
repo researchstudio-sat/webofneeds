@@ -21,9 +21,9 @@
     <import resource="classpath:spring/component/needproducer/needproducer-mails.xml"/>
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
 
-    <bean id="mailBasedTriggered2NeedsProducerBot" class="won.bot.core.impl.Connect2NeedsBot">
+    <bean id="mailBasedTriggered2NeedsProducerBot" class="won.bot.impl.Connect2NeedsBot">
         <property name="botContext">
-            <bean class="won.bot.context.impl.InMemoryBotContext" />
+            <bean class="won.bot.framework.core.context.impl.InMemoryBotContext" />
         </property>
         <property name="taskScheduler" ref="taskScheduler" />
         <property name="needProducer" ref="needProducerFromMails" />

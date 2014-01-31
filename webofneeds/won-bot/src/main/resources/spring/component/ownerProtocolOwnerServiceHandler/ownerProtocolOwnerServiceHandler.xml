@@ -29,9 +29,9 @@
          they are searched in other property configuerers defined in the context
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/>
-    <!-- expects a botRegistry and a taskScheduler bean -->
-    <bean id="ownerProtocolOwnerServiceHandler" class="won.bot.protocol.BotOwnerProtocolOwnerServiceCallback" >
-        <property name="botRegistry" ref="botRegistry" />
+    <!-- expects a botManager and a taskScheduler bean -->
+    <bean id="ownerProtocolOwnerServiceHandler" class="won.bot.integration.BotOwnerProtocolOwnerServiceCallback" >
+        <property name="botManager" ref="botManager" />
         <property name="taskScheduler" ref="taskScheduler" />
     </bean>
 </beans>
