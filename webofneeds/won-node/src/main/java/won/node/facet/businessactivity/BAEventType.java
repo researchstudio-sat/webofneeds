@@ -225,6 +225,23 @@ public enum BAEventType {
         //TODO implement all!
 
     }
+
+    public boolean isBAPCParticipantEventType(final BAEventType event)
+    {
+        boolean ret = false;
+        if(event.equals(BAEventType.MESSAGE_COMPLETED) || event.equals(BAEventType.MESSAGE_EXIT)
+                || event.equals(BAEventType.MESSAGE_FAIL) || event.equals(BAEventType.MESSAGE_CANNOTCOMPLETE)
+                || event.equals(BAEventType.MESSAGE_CANCELED) || event.equals(BAEventType.MESSAGE_COMPENSATED)
+                || event.equals(BAEventType.MESSAGE_CLOSED))
+            ret=true;
+        System.out.println("Vraca ovo: "+ret);
+        return ret;
+    }
+
+    public boolean isBAPCCoordinatorEventType(final BAEventType event)
+    {
+        return !this.isBAPCParticipantEventType(event);
+    }
 }
 
 

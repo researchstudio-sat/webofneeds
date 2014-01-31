@@ -8,10 +8,13 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.node.facet.businessactivity.BAStateManager;
 import won.node.facet.businessactivity.SimpleBAStateManager;
 import won.node.facet.businessactivity.BAEventType;
 import won.node.facet.businessactivity.BAParticipantCompletionState;
+
+
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
@@ -55,6 +58,7 @@ public class BAPCCoordinatorFacetImpl extends Facet {
     public void openFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //inform the need side
         //CONNECTED state
+        System.out.println("daki Coordinator: openFromNeed");
         executorService.execute(new Runnable()
         {
             @Override
@@ -62,7 +66,9 @@ public class BAPCCoordinatorFacetImpl extends Facet {
             {
                 try {
                     ownerFacingConnectionClient.open(con.getConnectionURI(), content);
+
                     stateManager.setStateForNeedUri(BAParticipantCompletionState.ACTIVE, con.getNeedURI());
+                    logger.info("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI()));
                 } catch (WonProtocolException e) {
                     logger.debug("caught Exception:", e);
                 }
@@ -138,11 +144,11 @@ public class BAPCCoordinatorFacetImpl extends Facet {
 
                     // URI -> eventType
                     BAEventType eventType = getCoordinationEventType(sCoordMsg);
-
+                    System.out.println("daki2: "+con.getNeedURI());
                     BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
                     logger.info("Current state of the Coordinator: "+state.getURI().toString());
                     stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
-                    logger.info("New state of the Coordinator:"+state.getURI().toString());
+                    logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI()));
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
                 } catch (WonProtocolException e) {

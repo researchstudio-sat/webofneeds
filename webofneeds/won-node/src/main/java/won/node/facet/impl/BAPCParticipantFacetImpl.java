@@ -9,6 +9,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.node.facet.businessactivity.*;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
@@ -16,7 +17,11 @@ import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.vocabulary.WON;
 
+import won.node.facet.businessactivity.BAStateManager;
+import won.node.facet.businessactivity.SimpleBAStateManager;
 import won.node.facet.businessactivity.BAEventType;
+import won.node.facet.businessactivity.BAParticipantCompletionState;
+
 
 import java.net.URI;
 import java.util.List;
@@ -35,11 +40,36 @@ public class BAPCParticipantFacetImpl extends Facet{
 
     @Autowired
     private ConnectionRepository connectionRepository;
+    private SimpleBAStateManager stateManager = new SimpleBAStateManager();
 
     @Override
     public FacetType getFacetType() {
         return FacetType.BAPCParticipantFacet;
     }
+
+    // particiapant -> accept
+    public void openFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        //inform the other side
+        if (con.getRemoteConnectionURI() != null) {
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        needFacingConnectionClient.open(con, content);
+                        //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
+
+                        stateManager.setStateForNeedUri(BAParticipantCompletionState.ACTIVE, con.getNeedURI());
+                        logger.info("Participant state: "+stateManager.getStateForNeedUri(con.getNeedURI()));
+                    } catch (WonProtocolException e) {
+                        logger.debug("caught Exception:", e);
+                    }
+                }
+            });
+        }
+    }
+
+
+
 
     public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         final URI remoteConnectionURI = con.getRemoteConnectionURI();
@@ -62,7 +92,7 @@ public class BAPCParticipantFacetImpl extends Facet{
 
                     messageForSending = ni.toList().get(0).toString();
                     messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
-                    logger.info("Participant sents: "+messageForSending);
+                    logger.info("Participant sents: " + messageForSending);
 
                     myContent = ModelFactory.createDefaultModel();
                     myContent.setNsPrefix("","no:uri");
@@ -70,13 +100,29 @@ public class BAPCParticipantFacetImpl extends Facet{
 
                     // message -> eventType
                     eventType = getCoordinationEventType(messageForSending);
+                    if(eventType.isBAPCParticipantEventType(eventType))
+                    {
+                        eventType.isBAPCParticipantEventType(eventType);
+                        System.out.println("daki1: "+con.getNeedURI());
 
-                    // eventType -> URI Resource
-                    r = myContent.createResource(eventType.getURI().toString());
-                    baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
-                    //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
 
-                    needFacingConnectionClient.textMessage(con, myContent);
+                        BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI());
+                        logger.info("Current state of the Participant: "+state.getURI().toString());
+                        stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI());
+                        logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI()));
+
+                        // eventType -> URI Resource
+                        r = myContent.createResource(eventType.getURI().toString());
+                        baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
+                        //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
+
+                        needFacingConnectionClient.textMessage(con, myContent);
+                    }
+                    else
+                    {
+                        logger.info("The eventType: "+eventType.getURI().toString()+" can not be triggered by Participant");
+                    }
+
 
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
@@ -111,4 +157,9 @@ public class BAPCParticipantFacetImpl extends Facet{
         logger.warn("No enum could be matched for: {}", fragment);
         return null;
     }
+
+
+
+
+
 }
