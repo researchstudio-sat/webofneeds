@@ -5,7 +5,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import won.bot.framework.core.Bot;
+import won.bot.framework.bot.Bot;
 
 import java.util.Iterator;
 import java.util.List;

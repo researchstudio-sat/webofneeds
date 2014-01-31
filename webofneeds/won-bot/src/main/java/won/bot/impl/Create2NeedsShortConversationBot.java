@@ -16,9 +16,9 @@
 
 package won.bot.impl;
 
-import won.bot.framework.core.base.EventBot;
-import won.bot.framework.core.event.*;
-import won.bot.framework.core.eventlistener.*;
+import won.bot.framework.bot.base.EventBot;
+import won.bot.framework.events.event.*;
+import won.bot.framework.events.listener.*;
 import won.protocol.model.FacetType;
 import won.protocol.util.WonRdfUtils;
 

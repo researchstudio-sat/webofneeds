@@ -23,7 +23,7 @@
 
     <bean id="mailBasedTriggered2NeedsProducerBot" class="won.bot.impl.Connect2NeedsBot">
         <property name="botContext">
-            <bean class="won.bot.framework.core.context.impl.InMemoryBotContext" />
+            <bean class="won.bot.framework.bot.context.InMemoryBotContext" />
         </property>
         <property name="taskScheduler" ref="taskScheduler" />
         <property name="needProducer" ref="needProducerFromMails" />

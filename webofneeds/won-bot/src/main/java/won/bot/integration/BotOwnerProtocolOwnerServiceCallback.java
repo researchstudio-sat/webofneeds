@@ -2,7 +2,7 @@ package won.bot.integration;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.scheduling.TaskScheduler;
-import won.bot.framework.core.Bot;
+import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.model.ChatMessage;

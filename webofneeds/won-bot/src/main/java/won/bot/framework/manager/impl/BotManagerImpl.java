@@ -2,7 +2,7 @@ package won.bot.framework.manager.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.core.Bot;
+import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
 
 import java.net.URI;

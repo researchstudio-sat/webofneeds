@@ -1,6 +1,6 @@
 package won.bot.framework.manager;
 
-import won.bot.framework.core.Bot;
+import won.bot.framework.bot.Bot;
 
 import java.net.URI;
 import java.util.Collection;

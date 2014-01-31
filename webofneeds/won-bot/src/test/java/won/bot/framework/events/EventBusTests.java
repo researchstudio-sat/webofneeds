@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import won.bot.framework.events.impl.SchedulerEventBusImpl;
+import won.bot.framework.events.bus.SchedulerEventBusImpl;
 
 import java.util.concurrent.CountDownLatch;
 

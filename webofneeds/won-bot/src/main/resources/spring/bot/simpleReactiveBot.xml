@@ -23,7 +23,7 @@
 
     <bean id="simpleReactiveBot" class="won.bot.impl.SimpleReactiveBot">
         <property name="botContext">
-            <bean class="won.bot.framework.core.context.impl.InMemoryBotContext" />
+            <bean class="won.bot.framework.bot.context.InMemoryBotContext" />
         </property>
         <property name="needProducer" ref="needProducerFromMails" />
         <property name="nodeURISource" ref="nodeUriSourceRandom" />
