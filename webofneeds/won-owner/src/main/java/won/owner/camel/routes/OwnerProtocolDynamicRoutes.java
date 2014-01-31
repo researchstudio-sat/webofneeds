@@ -37,14 +37,11 @@ public class OwnerProtocolDynamicRoutes extends RouteBuilder {
     /**
      *
      * @param camelContext the camelContext where the routes are added
-     * @param Endpoints
      * @param from each route has the starting consuming endpoint per node it wants to send the messages to.
      */
-    public OwnerProtocolDynamicRoutes(CamelContext camelContext, List<String> Endpoints, String from){
+    public OwnerProtocolDynamicRoutes(CamelContext camelContext, String from){
         super(camelContext);
         //TODO: consider if we need these variables.
-        this.endpoints = endpoints;
-        this.routeID = routeID;
         this.from = from;
 
     }

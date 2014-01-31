@@ -26,7 +26,7 @@ public interface MessageBrokerService {
 
 
     public URI getBrokerURIForNode(URI needURI);
-    public void addRoutes(RouteBuilder route) throws Exception;
+
 
 }
 

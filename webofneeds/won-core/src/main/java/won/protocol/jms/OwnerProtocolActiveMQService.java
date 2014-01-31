@@ -22,11 +22,7 @@ import java.net.URI;
  * User: LEIH-NB
  * Date: 28.11.13
  */
-public interface OwnerProtocolActiveMQService extends MessageBrokerService {
+    public interface OwnerProtocolActiveMQService extends MessageBrokerService {
 
-    public String getActiveMQOwnerProtocolQueueNameForNeed(URI needURI);
-    public URI configureCamelEndpointForNodeURI(URI wonNodeURI) throws Exception;
-    public String configureCamelEndpointForConnection(URI connectionURI, String from) throws Exception;
-    public String configureCamelEndpointForNeed(URI needURI, String from) throws Exception;
-
+    public String getOwnerProtocolQueueNameWithResource(URI needURI);
 }

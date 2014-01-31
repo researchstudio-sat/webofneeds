@@ -30,22 +30,21 @@
         <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
 
-    <bean id="activeMQService" class="won.owner.messaging.OwnerProtocolActiveMQServiceImpl">
-        <property name="componentName" value="activemq"/>
-        <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
-        <property name="startingComponent" value="seda:"/>
-    </bean>
-
-    <bean id="camelConfigurator" class="won.owner.messaging.CamelConfigurator">
+    <bean id="camelConfigurator" class="won.owner.messaging.CamelConfigurator" abstract="true">
        <property name="startingComponent" value="seda:"/>
         <property name="componentName" value="activemq"/>
         <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
     </bean>
 
+    <bean id="ownerProtocolCommunicationService" class="won.owner.messaging.OwnerProtocolCommunicationService">
+       <property name="activeMQServiceFactory" ref="activeMQServiceFactory"/>
+
+    </bean>
+
     <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.messaging.OwnerProtocolNeedServiceClientJMSBased">
         <property name="messagingService" ref="messagingService"/>
         <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
-        <property name="ownerProtocolActiveMQService" ref="activeMQService"/>
+        <property name="ownerProtocolActiveMQService" ref="messageBrokerService"/>
     </bean>
 
 </beans>

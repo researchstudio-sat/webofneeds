@@ -61,6 +61,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     private String startingEndpoint ="seda:outgoingMessages";
 
     private OwnerProtocolActiveMQServiceImpl ownerProtocolActiveMQService;
+    private OwnerProtocolCommunicationService ownerProtocolCamelService;
 
     @Autowired
     private WonNodeRepository wonNodeRepository;
@@ -201,11 +202,14 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         logger.info("size of wonNodeList {}",wonNodeList.size());
         if (wonNodeList.size()>0){
             WonNode wonNode = wonNodeList.get(0);
-            String startingComponent = wonNode.getStartingComponent();
-            ownerApplicationID = wonNode.getOwnerApplicationID();
             remoteEndpoint = wonNode.getOwnerProtocolEndpoint();
             List<String> endpointList = new ArrayList<>();
             endpointList.add(remoteEndpoint);
+
+            String startingComponent = wonNode.getStartingComponent();
+            ownerApplicationID = wonNode.getOwnerApplicationID();
+
+
             brokerComponentName = addActiveMQComponentForWonNode(wonNode);
             camelContext.getComponent(brokerComponentName).createEndpoint(remoteEndpoint);
             ownerProtocolActiveMQService.addRouteForEndpoint(camelContext,endpointList,startingComponent);
@@ -250,7 +254,6 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         logger.info("configuring remoteEndpoint with ownerapplication id {} and remote endpoint {} ", ownerApplicationID, remoteEndpoint);
         configureRemoteEndpointsForOwnerApplication(ownerApplicationID, remoteEndpoint);
         return ownerApplicationID;
-
     }
 
     private String addActiveMQComponentForWonNode(WonNode wonNode){
@@ -306,6 +309,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         String endpoint = null;
         URI wonNodeURI = ownerProtocolActiveMQService.getOwnWonNodeUriWithConnection(connectionURI);
         List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeURI);
+
         if (wonNodeList.size()>0){
             WonNode wonNode = wonNodeList.get(0);
             endpoint = wonNode.getOwnerProtocolEndpoint();
@@ -415,9 +419,6 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
 
         }
         else{
-
-
-
             //todo refactor with register()
             //camelContext.getComponent()
             WonNode wonNode = wonNodeList.get(0);

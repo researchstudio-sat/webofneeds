@@ -21,15 +21,15 @@ package won.owner.messaging;
  * Date: 28.01.14
  */
 public class CamelConfiguratorFactory {
-    public CamelConfigurator createCamelCongurator(String methodName){
+    public CamelConfigurator createCamelConfigurator(String methodName){
         CamelConfigurator camelConfigurator = null;
 
         if (methodName.equals("connect")||methodName.equals("deactivate")||methodName.equals("activate")){
-            camelConfigurator = new CamelConfiguratorForNeed();
+            camelConfigurator = new CamelConfigurator();
         } else if (methodName.equals("register")||methodName.equals("createNeed")){
-            camelConfigurator = new CamelConfiguratorForNode();
+            camelConfigurator = new CamelConfigurator();
         } else if (methodName.equals("textMessage")||methodName.equals("close")||methodName.equals("open")){
-            camelConfigurator = new CamelConfiguratorForConnection();
+            camelConfigurator = new CamelConfigurator();
         }
         return camelConfigurator;
     }

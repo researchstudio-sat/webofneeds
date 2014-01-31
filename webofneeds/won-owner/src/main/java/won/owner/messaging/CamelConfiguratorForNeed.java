@@ -25,10 +25,7 @@ import java.net.URI;
  * Date: 28.01.14
  */
 public class CamelConfiguratorForNeed extends CamelConfigurator {
-    @Override
-    public String execute(URI uri) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+
 
     @Override
     public CamelContext getCamelContext() {

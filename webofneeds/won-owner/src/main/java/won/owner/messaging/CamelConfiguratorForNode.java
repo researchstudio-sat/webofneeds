@@ -17,6 +17,7 @@
 package won.owner.messaging;
 
 import org.apache.camel.CamelContext;
+import won.protocol.exception.CamelConfigurationFailedException;
 
 import java.net.URI;
 
@@ -25,9 +26,18 @@ import java.net.URI;
  * Date: 28.01.14
  */
 public class CamelConfiguratorForNode extends CamelConfigurator {
-    @Override
-    public String execute(URI uri) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    /**
+     *
+     * @param uri may be either needURI, nodeURI or connectionURI
+     * @param brokerURI
+     * @param ownerProtocolQueueName
+     * @return
+     * @throws CamelConfigurationFailedException
+     */
+
+
+    public String execute(URI uri,URI brokerURI, String ownerProtocolQueueName) throws CamelConfigurationFailedException {
+        return configureCamelEndpointForNodeURI(uri,brokerURI,ownerProtocolQueueName);  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

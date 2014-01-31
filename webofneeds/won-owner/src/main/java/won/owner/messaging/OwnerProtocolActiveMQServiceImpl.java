@@ -77,11 +77,11 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
     private NeedRepository needRepository;
 
     @Override
-    public String getActiveMQOwnerProtocolQueueNameForNeed(URI needURI){
+    public String getOwnerProtocolQueueNameWithResource(URI resourceURI){
         String activeMQOwnerProtocolQueueName;
         try{
             Path path = PathParser.parse(PATH_OWNER_PROTOCOL_QUEUE_NAME, PrefixMapping.Standard);
-            activeMQOwnerProtocolQueueName = linkedDataRestClient.getStringPropertyForPropertyPath(needURI, path);
+            activeMQOwnerProtocolQueueName = linkedDataRestClient.getStringPropertyForPropertyPath(resourceURI, path);
         } catch (UniformInterfaceException e){
             ClientResponse response = e.getResponse();
             if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
@@ -115,7 +115,7 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         String tempStartingComponentName = startingComponent;
         tempComponentName = addCamelComponentForWonNodeBroker(wonNodeURI,brokerURI,null);
 
-        String endpoint = tempComponentName+":queue:"+getActiveMQOwnerProtocolQueueNameForNeed(resourceURI);
+        String endpoint = tempComponentName+":queue:"+ getOwnerProtocolQueueNameWithResource(resourceURI);
         endpointMap.put(wonNodeURI,endpoint);
 
 
@@ -145,7 +145,7 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
 
     }
     public void addRouteForEndpoint(CamelContext camelContext, List<String> endpointList, String startingComponentName) throws CamelConfigurationFailedException {
-        OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext,endpointList,startingComponentName);
+        OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext, startingComponentName);
         addRoutes(ownerProtocolRouteBuilder);
     }
     public String addCamelComponentForWonNodeBroker( URI wonNodeURI, URI brokerURI,String ownerApplicationId){
@@ -166,10 +166,10 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         ActiveMQComponent activeMQComponent = activeMQComponent();
 
         activeMQComponent.setConfiguration(jmsConfiguration);
-        camelContext.addComponent(componentName,activeMQComponent);
+        camelContext.addComponent(componentName, activeMQComponent);
 
 
-        logger.info("adding component with component name {}",componentName);
+        logger.info("adding component with component name {}", componentName);
         if (!brokerComponentMap.containsKey(wonNodeURI))
             brokerComponentMap.put(wonNodeURI,componentName);
         return componentName;
@@ -249,9 +249,7 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         return activeMQEndpoint;
     }
 
-    @Override
     public void addRoutes(RouteBuilder route) throws CamelConfigurationFailedException {
-
 
         try {
             camelContext.addRoutes(route);

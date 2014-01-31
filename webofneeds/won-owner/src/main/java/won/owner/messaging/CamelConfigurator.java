@@ -20,18 +20,19 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
-import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Endpoint;
 import org.apache.camel.component.jms.JmsConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
+import won.protocol.model.Connection;
 import won.protocol.model.Need;
-import won.protocol.model.WonNode;
+import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -45,12 +46,14 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  * User: LEIH-NB
  * Date: 28.01.14
  */
-public abstract class CamelConfigurator implements CamelContextAware{
+public class CamelConfigurator implements CamelContextAware{
 
     private CamelContext camelContext;
 
     @Autowired
     private NeedRepository needRepository;
+    @Autowired
+    private ConnectionRepository connectionRepository;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -66,24 +69,19 @@ public abstract class CamelConfigurator implements CamelContextAware{
     protected CamelConfigurator() {
     }
 
-    final String configureCamelEndpoint(ArrayList<WonNode> wonNodeList, URI uri){
-        String endpoint;
-        if (wonNodeList.size()>0){
-            WonNode wonNode = wonNodeList.get(0);
-            endpoint = wonNode.getOwnerProtocolEndpoint();
-        } else{
-            endpoint = execute(uri);
-        }
-        return endpoint;
-    }
-
     final String configureCamelEndpointForNeed(URI needURI, URI brokerURI,String ownerProtocolQueueName) throws Exception {
         Need need = needRepository.findByNeedURI(needURI).get(0);
         URI wonNodeURI = need.getWonNodeURI();
         return configureCamelEndpointForNodeURI(wonNodeURI, brokerURI,ownerProtocolQueueName);
 
     }
+    final String configureCamelEndpointForConnection(URI connectionURI, URI brokerURI, String ownerProtocolQueueName) throws Exception {
 
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        URI needURI = con.getNeedURI();
+        return configureCamelEndpointForNeed(needURI,brokerURI, ownerProtocolQueueName);
+
+    }
 
 
 
@@ -91,13 +89,10 @@ public abstract class CamelConfigurator implements CamelContextAware{
         //TODO: the linked data description of the won node must be at [NODE-URI]/resource
         // according to this code. This should be explicitly defined somewhere
 
-        String tempComponentName = componentName;
-
-        tempComponentName = addCamelComponentForWonNodeBroker(wonNodeURI,brokerURI,null);
+        String tempComponentName = addCamelComponentForWonNodeBroker(wonNodeURI,brokerURI,null);
 
         String endpoint = tempComponentName+":queue:"+ownerProtocolQueueName;
         endpointMap.put(wonNodeURI,endpoint);
-
 
         List<String> endpointList = new ArrayList<>();
         endpointList.add(endpoint);
@@ -134,7 +129,7 @@ public abstract class CamelConfigurator implements CamelContextAware{
         return componentName;
     }
 
-    public void addRouteForEndpoint(URI wonNodeURI,List<String> endpointList, String startingComponentName) throws CamelConfigurationFailedException {
+    public void addRouteForEndpoint(URI wonNodeURI) throws CamelConfigurationFailedException {
         /**
          * there can be only one route per endpoint. Thus, consuming endpoint of each route shall be unique.
          */
@@ -145,7 +140,7 @@ public abstract class CamelConfigurator implements CamelContextAware{
         setStartingEndpoint(wonNodeURI, tempStartingComponentName);
 
         if (camelContext.getComponent(tempStartingComponentName)==null||camelContext.getRoute(endpointMap.get(wonNodeURI))==null){
-            OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext,endpointList,tempStartingComponentName);
+            OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext, tempStartingComponentName);
             try {
                 camelContext.addRoutes(ownerProtocolRouteBuilder);
             } catch (Exception e) {
@@ -159,10 +154,35 @@ public abstract class CamelConfigurator implements CamelContextAware{
         startingComponentMap.put(wonNodeURI,startingEndpoint);
 
     }
-    abstract String execute(URI uri);
+    public String replaceEndpointNameWithOwnerApplicationId(String endpointName, String ownerApplicationId) throws Exception {
+        Endpoint ep = camelContext.getEndpoint(endpointName);
+        camelContext.removeEndpoints(endpointName);
+        String[] endpointSplit = endpointName.split(":");
+        endpointSplit[0] = endpointSplit[0]+ownerApplicationId;
+        endpointName = endpointSplit[0]+":"+endpointSplit[1]+":"+endpointSplit[2];
+
+        //  endpointName = endpointName.replaceFirst(endpointName,endpointName+ownerApplicationId);
+
+        camelContext.addEndpoint(endpointName, ep);
+        return endpointName;
+    }
+    public String replaceComponentNameWithOwnerApplicationId(String componentName, String ownerApplicationId){
+        ActiveMQComponent activeMQComponent = (ActiveMQComponent)camelContext.getComponent(componentName);
+        camelContext.removeComponent(componentName);
+        componentName = this.componentName+ownerApplicationId;
+
+        camelContext.addComponent(componentName, activeMQComponent);
+
+        return componentName;
+    }
 
     public void setCamelContext(CamelContext camelContext) {
         this.camelContext = camelContext;
+    }
+
+    @Override
+    public CamelContext getCamelContext() {
+        return camelContext;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void setStartingComponent(String startingComponent) {
