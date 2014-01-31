@@ -16,27 +16,22 @@
 
 package won.bot.app;
 
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SimpleLoadTest implements CommandLineRunner
+public class SimpleLoadTest
 {
 
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     SpringApplication app = new SpringApplication(
-        new Object[]{"classpath:/spring/app/simpleLoadTest.xml"}
+        new Object[]{"classpath:/spring/app/simple2NeedConversationTest.xml"}
     );
-    app.run(args);
-  }
-
-  @Override
-  public void run(final String... strings) throws Exception
-  {
-    //TODO: implement a shutdown hook or something
+    ConfigurableApplicationContext applicationContext =  app.run(args);
     Thread.sleep(5*60*1000);
+    app.exit(applicationContext);
   }
 
 
