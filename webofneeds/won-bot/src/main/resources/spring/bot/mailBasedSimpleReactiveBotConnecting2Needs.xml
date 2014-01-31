@@ -19,15 +19,25 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="classpath:spring/bot/simpleReactiveBot.xml" />
-    <import resource="classpath:spring/bot/mailBasedTriggered2NeedsProducerBot.xml" />
+    <import resource="classpath:spring/component/needproducer/needproducer-mails.xml"/>
+    <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
 
-    <bean id="mailBasedSimpleReactiveBot" class="won.bot.core.base.CompositeBot">
-        <property name="delegates">
-            <list>
-                <ref bean="simpleReactiveBot" />
-                <ref bean="mailBasedTriggered2NeedsProducerBot" />
-            </list>
+    <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.Create2NeedsShortConversationBot">
+        <property name="botContext">
+            <bean class="won.bot.framework.core.context.impl.InMemoryBotContext" />
+        </property>
+        <property name="taskScheduler" ref="taskScheduler" />
+        <property name="needProducer" ref="needProducerFromMails" />
+        <property name="nodeURISource" ref="nodeUriSourceRandom" />
+        <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
+        <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
+        <property name="trigger">
+            <bean class="org.springframework.scheduling.support.PeriodicTrigger">
+                <constructor-arg name="period" value="2000" />
+                <constructor-arg name="timeUnit" value="MILLISECONDS" />
+                <property name="initialDelay" value="10000" /> <!-- wait 10s at the beginning -->
+                <property name="fixedRate" value="false" />  <!-- fixed delay after completion -->
+            </bean>
         </property>
     </bean>
 </beans>

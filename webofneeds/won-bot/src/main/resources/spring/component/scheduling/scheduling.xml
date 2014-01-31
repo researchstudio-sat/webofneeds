@@ -25,5 +25,4 @@
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
     <bean id="taskScheduler" class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler" />
-
 </beans>

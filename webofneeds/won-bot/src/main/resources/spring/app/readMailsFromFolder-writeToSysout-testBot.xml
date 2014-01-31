@@ -26,7 +26,7 @@
     <import resource="classpath:spring/component/needproducer/needproducer-mails.xml" />
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml" />
 
-    <bean id="needProsumer" class="won.bot.needprosumer.NeedProsumer" >
+    <bean id="needProsumer" class="won.bot.framework.component.needprosumer.NeedProsumer" >
         <property name="needConsumer" ref="needConsumerSysout" />
         <property name="needProducer" ref="needProducerFromMails" />
     </bean>
