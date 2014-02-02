@@ -16,16 +16,12 @@
 
 package won.bot.framework.events.event;
 
-import won.bot.framework.events.Event;
-
 /**
- * Base class for events.
+ * Event indicating that the bot's work is done.
+ * This event is informative only and has no effect on the bot
+ * framework. It is used for testing, though: integration tests
+ * subscribe to this event and run their asserts after seeing it.
  */
-public abstract class BaseEvent implements Event
+public class WorkDoneEvent extends BaseEvent
 {
-  public String toString(){
-    return this.getClass().getSimpleName() + "@" + Integer.toHexString(hashCode());
-  }
-
-
 }

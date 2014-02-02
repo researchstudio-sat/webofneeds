@@ -16,6 +16,7 @@
 
 package won.bot.framework.bot.base;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
@@ -44,6 +45,7 @@ public abstract class BasicServiceBot extends BaseBot
     return ownerService;
   }
 
+  @Qualifier("default")
   public void setOwnerService(final OwnerProtocolNeedServiceClientSide ownerService)
   {
     this.ownerService = ownerService;

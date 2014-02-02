@@ -18,6 +18,7 @@ package won.bot.framework.events.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.bot.framework.events.Event;
 import won.bot.framework.events.EventListener;
 
 /**
@@ -27,6 +28,9 @@ public abstract class BaseEventListener implements EventListener
 {
   protected final Logger logger = LoggerFactory.getLogger(getClass());
   private EventListenerContext context;
+  private int eventCount = 0;
+  private int exceptionCount = 0;
+  private long millisExecuting = 0;
 
   /**
    * Constructor is private so that subclasses must implement the one-arg constructor.
@@ -37,6 +41,52 @@ public abstract class BaseEventListener implements EventListener
   {
     this.context = context;
   }
+
+  @Override
+  public final void onEvent(final Event event) throws Exception
+  {
+    countEvent(event);
+    long startTime = System.currentTimeMillis();
+    try {
+      doOnEvent(event);
+    } catch (Exception e) {
+      countException(e);
+      throw e;
+    } finally {
+      noteTimeExecuting(startTime);
+    }
+  }
+
+  public long getMillisExecuting()
+  {
+    return millisExecuting;
+  }
+
+  public int getExceptionCount()
+  {
+    return exceptionCount;
+  }
+
+  public int getEventCount()
+  {
+    return eventCount;
+  }
+
+  protected synchronized void countException(final Exception e){
+    this.exceptionCount ++;
+   }
+
+  private synchronized void noteTimeExecuting(final long startTime)
+  {
+    this.millisExecuting += System.currentTimeMillis() - startTime;
+  }
+
+  private synchronized void countEvent(final Event event)
+  {
+    this.eventCount ++;
+  }
+
+  protected abstract void doOnEvent(Event event) throws Exception;
 
   protected EventListenerContext getEventListenerContext(){
     return context;

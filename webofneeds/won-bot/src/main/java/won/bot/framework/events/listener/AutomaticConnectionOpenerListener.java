@@ -34,7 +34,7 @@ public class AutomaticConnectionOpenerListener extends BaseEventListener
   }
 
   @Override
-  public void onEvent(final Event event) throws Exception
+  public void doOnEvent(final Event event) throws Exception
   {
     if (event instanceof ConnectFromOtherNeedEvent) {
       ConnectFromOtherNeedEvent connectEvent = (ConnectFromOtherNeedEvent) event;

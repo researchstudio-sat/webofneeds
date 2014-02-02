@@ -19,10 +19,10 @@ package won.bot.framework.bot.base;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.bot.BotContext;
 import won.bot.framework.bot.Bot;
+import won.bot.framework.bot.BotContext;
 import won.bot.framework.bot.BotLifecyclePhase;
-import won.bot.framework.bot.BotState;
+import won.bot.framework.bot.context.InMemoryBotContext;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -37,7 +37,7 @@ public class BaseBot implements Bot
   protected final Logger logger = LoggerFactory.getLogger(getClass());
   private BotContext botContext;
   private BotLifecyclePhase lifecyclePhase = BotLifecyclePhase.DOWN;
-  private BotState state = BotState.IDLE;
+  private boolean workDone = false;
 
   @Override
   public final boolean knowsNeedURI(final URI needURI)
@@ -50,9 +50,12 @@ public class BaseBot implements Bot
   {
     if (!this.lifecyclePhase.isDown()) return;
     this.lifecyclePhase = BotLifecyclePhase.STARTING_UP;
+    createDefaultBotContextIfNecessary();
     doInitialize();
     this.lifecyclePhase = BotLifecyclePhase.ACTIVE;
   }
+
+
 
   @Override
   public final synchronized void shutdown() throws Exception
@@ -73,16 +76,23 @@ public class BaseBot implements Bot
    */
   protected void doInitialize() {};
 
+  /**
+   * Sets the workDone flag to true.
+   */
+  protected void workIsDone(){
+    this.workDone = true;
+  }
+
+  @Override
+  public boolean isWorkDone()
+  {
+    return this.workDone;
+  }
+
   @Override
   public BotLifecyclePhase getLifecyclePhase()
   {
     return this.lifecyclePhase;
-  }
-
-  @Override
-  public BotState getState()
-  {
-    return this.state;
   }
 
   public final void setBotContext(final BotContext botContext)
@@ -109,4 +119,11 @@ public class BaseBot implements Bot
 
   @Override public void act() throws Exception
   {}
+
+  private final void createDefaultBotContextIfNecessary()
+  {
+    if (this.botContext == null) {
+      this.botContext = new InMemoryBotContext();
+    }
+  }
 }

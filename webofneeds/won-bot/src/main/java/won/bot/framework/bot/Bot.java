@@ -67,8 +67,10 @@ public interface Bot
   public BotLifecyclePhase getLifecyclePhase();
 
   /**
-   * The state of the bot.
+   * Indicates whether the bot considers its work done. If true, the bot is ok with not receiving
+   * incoming messages and not having its act() method called.
+   *
    * @return
    */
-  public BotState getState();
+  public boolean isWorkDone();
 }

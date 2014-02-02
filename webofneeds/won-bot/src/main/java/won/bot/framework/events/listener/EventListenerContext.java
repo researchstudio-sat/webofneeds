@@ -60,6 +60,11 @@ public interface EventListenerContext
   public void cancelTrigger();
 
   /**
+   * Signals to the framework that the bot's work is done and it may be shut down.
+   */
+  public void workIsDone();
+
+  /**
    * Returns the bot's event bus. Used to publish events and subscribe for them.
    * @return
    */

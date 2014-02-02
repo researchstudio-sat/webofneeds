@@ -17,23 +17,24 @@
 package won.bot.framework.events.listener;
 
 import won.bot.framework.events.Event;
+import won.bot.framework.events.EventListener;
 
 /**
  * Counts how often it is called, offers to call a callback when a certain number is reached.
  */
-public class ExecuteOnceAfterNEventsListener extends BaseEventListener
+public class DelegateOnceAfterNEventsListener extends BaseEventListener
 {
   private int targetCount;
   private int count = 0;
   private Object monitor = new Object();
   private boolean executed = false;
-  private Runnable task;
+  private EventListener delegate;
 
-  public ExecuteOnceAfterNEventsListener(final EventListenerContext context, Runnable task, int count)
+  public DelegateOnceAfterNEventsListener(final EventListenerContext context, int count, EventListener delegate)
   {
     super(context);
     this.targetCount = count;
-    this.task = task;
+    this.delegate = delegate;
   }
 
   @Override
@@ -44,8 +45,8 @@ public class ExecuteOnceAfterNEventsListener extends BaseEventListener
       count++;
       logger.debug("processing event {} of {}", count, targetCount);
       if (!executed && count >= targetCount) {
-        logger.debug("scheduling task ");
-        getEventListenerContext().getExecutor().execute(task);
+        logger.debug("forwarding event {} to delegate {}", event, delegate);
+        delegate.onEvent(event);
         executed = true;
       }
     }

@@ -16,16 +16,22 @@
 
 package won.bot.framework.events.event;
 
-import won.bot.framework.events.Event;
+import java.net.URI;
 
 /**
- * Base class for events.
+ *
  */
-public abstract class BaseEvent implements Event
+public class NeedDeactivatedEvent extends BaseEvent
 {
-  public String toString(){
-    return this.getClass().getSimpleName() + "@" + Integer.toHexString(hashCode());
+  private URI needURI;
+
+  public NeedDeactivatedEvent(final URI needURI)
+  {
+    this.needURI = needURI;
   }
 
-
+  public URI getNeedURI()
+  {
+    return needURI;
+  }
 }

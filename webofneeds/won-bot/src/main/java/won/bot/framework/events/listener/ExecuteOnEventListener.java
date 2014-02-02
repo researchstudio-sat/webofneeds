@@ -19,34 +19,42 @@ package won.bot.framework.events.listener;
 import won.bot.framework.events.Event;
 
 /**
- * Counts how often it is called, offers to call a callback when a certain number is reached.
+ * Executes a task when an event is seen.
  */
-public class ExecuteOnceAfterNEventsListener extends BaseEventListener
+public class ExecuteOnEventListener extends BaseEventListener
 {
-  private int targetCount;
-  private int count = 0;
-  private Object monitor = new Object();
-  private boolean executed = false;
   private Runnable task;
+  private int timesRun = 0;
+  private int timesToRun = 0;
+  private Object monitor = new Object();
 
-  public ExecuteOnceAfterNEventsListener(final EventListenerContext context, Runnable task, int count)
+  /**
+   *
+   * @param context
+   * @param task
+   * @param timesToRun if > 0, listener will unsubscribe from any events after the specified number of executions.
+   */
+  public ExecuteOnEventListener(final EventListenerContext context, Runnable task, int timesToRun)
   {
     super(context);
-    this.targetCount = count;
     this.task = task;
+    this.timesToRun = timesToRun;
   }
 
   @Override
   public void doOnEvent(final Event event) throws Exception
   {
-    if (executed) return;
     synchronized (monitor){
-      count++;
-      logger.debug("processing event {} of {}", count, targetCount);
-      if (!executed && count >= targetCount) {
-        logger.debug("scheduling task ");
+      timesRun++;
+      if (timesToRun <= 0){
         getEventListenerContext().getExecutor().execute(task);
-        executed = true;
+      } else if (timesRun < timesToRun) {
+        logger.debug("scheduling task, execution no {} ", timesRun);
+        getEventListenerContext().getExecutor().execute(task);
+      } else if (timesRun == timesToRun) {
+        logger.debug("scheduling task, execution no {} (last time)", timesRun);
+        getEventListenerContext().getEventBus().unsubscribe(this);
+        getEventListenerContext().getExecutor().execute(task);
       }
     }
   }

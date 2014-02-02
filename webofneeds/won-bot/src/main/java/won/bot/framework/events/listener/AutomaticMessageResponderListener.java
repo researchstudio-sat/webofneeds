@@ -27,12 +27,14 @@ import java.net.URI;
 import java.util.Date;
 
 /**
- *
+ * Listener that responds to open and message events with automatic messages.
+ * Can be configured to apply a timeout (non-blocking) before sending messages.
+ * Can be configured to send a fixed number of messages and then unsubscribe from events.
  */
 public class AutomaticMessageResponderListener extends BaseEventListener
 {
   private int targetNumberOfMessages = -1;
-  private int numberOfMessages = 0;
+  private int numberOfMessagesSent = 0;
   private long millisTimeoutBeforeReply = 1000;
   private Object monitor = new Object();
 
@@ -40,10 +42,11 @@ public class AutomaticMessageResponderListener extends BaseEventListener
   {
     super(context);
     this.targetNumberOfMessages = targetNumberOfMessages;
+    this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
   }
 
   @Override
-  public void onEvent(final Event event) throws Exception
+  public void doOnEvent(final Event event) throws Exception
   {
     if (event instanceof MessageFromOtherNeedEvent){
       handleMessageEvent((MessageFromOtherNeedEvent) event);
@@ -60,7 +63,9 @@ public class AutomaticMessageResponderListener extends BaseEventListener
    */
   private void handleOpenEvent(final OpenFromOtherNeedEvent openEvent)
   {
+    logger.debug("got open event for need: {}, connection state is: {}", openEvent.getCon().getNeedURI(), openEvent.getCon().getState());
     if (openEvent.getCon().getState() == ConnectionState.CONNECTED){
+      logger.debug("replying to open with message");
       getEventListenerContext().getTaskScheduler().schedule(new Runnable()
       {
         @Override
@@ -68,9 +73,10 @@ public class AutomaticMessageResponderListener extends BaseEventListener
         {
           URI connectionUri = openEvent.getCon().getConnectionURI();
           try {
+            countMessageAndUnsubscribeIfNecessary();
             getEventListenerContext().getOwnerService().textMessage(connectionUri, WonRdfUtils.MessageUtils.textMessage(createMessage()));
-          } catch (Exception e){
-            logger.warn("could not send message via connection {}", connectionUri,e);
+          } catch (Exception e) {
+            logger.warn("could not send message via connection {}", connectionUri, e);
           }
         }
       }, new Date(System.currentTimeMillis() + millisTimeoutBeforeReply));
@@ -93,14 +99,14 @@ public class AutomaticMessageResponderListener extends BaseEventListener
           logger.warn("could not send message via connection {}", connectionUri, e);
         }
       }
-    }, new Date(System.currentTimeMillis() + this.targetNumberOfMessages));
+    }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
   }
 
   private void countMessageAndUnsubscribeIfNecessary()
   {
     synchronized (monitor){
-      numberOfMessages++;
-      if (targetNumberOfMessages > 0 && targetNumberOfMessages >= numberOfMessages ){
+      numberOfMessagesSent++;
+      if (targetNumberOfMessages > 0 && numberOfMessagesSent >= targetNumberOfMessages){
         unsubscribe();
       }
     }
@@ -108,7 +114,7 @@ public class AutomaticMessageResponderListener extends BaseEventListener
 
   private String createMessage()
   {
-    String message = "auto reply no " + numberOfMessages;
+    String message = "auto reply no " + (numberOfMessagesSent +1);
     if (targetNumberOfMessages > 0){
       message += " of " + targetNumberOfMessages;
     }

@@ -71,6 +71,16 @@ public class TriggeredBot extends ScheduledActionBot
    */
   protected void doShutdownCustom() {};
 
+  /**
+   * Overrides the inherited method so as to also cancel the trigger when
+   * indicating that the bot's work is done.
+   */
+  @Override
+  protected void workIsDone()
+  {
+    this.cancelTrigger();
+    super.workIsDone();
+  }
 
   protected void cancelTrigger()
   {

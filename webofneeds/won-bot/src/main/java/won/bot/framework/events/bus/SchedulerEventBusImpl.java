@@ -23,11 +23,7 @@ import won.bot.framework.events.Event;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.EventListener;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 /**
  *
@@ -35,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SchedulerEventBusImpl implements EventBus
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  private ConcurrentHashMap<Class<? extends Event>,List<EventListener>> listenerMap = new ConcurrentHashMap<>();
+  private HashMap<Class<? extends Event>,List<EventListener>> listenerMap = new HashMap<>();
   private TaskScheduler taskScheduler;
   private Object monitor = new Object();
 
@@ -82,6 +78,26 @@ public class SchedulerEventBusImpl implements EventBus
     }
   }
 
+  @Override
+  public void unsubscribe(final EventListener listener)
+  {
+    logger.debug("unsubscribing listener {} from all events", listener);
+    synchronized (monitor){
+      for (Map.Entry<Class<? extends Event>, List<EventListener>> entry: listenerMap.entrySet()){
+        List<EventListener> listeners = entry.getValue();
+        if (listeners == null ) continue;
+        listeners = copyOrCreateList(listeners);
+        Iterator<EventListener> it = listeners.iterator();
+        while(it.hasNext()){
+          EventListener subscribedListener = it.next();
+          if (subscribedListener.equals(listener)) {
+            it.remove();
+          }
+        }
+        entry.setValue(listeners);
+      }
+    }
+  }
 
   private void callEventListeners(final List<EventListener> listeners, final Event event)
   {

@@ -18,4 +18,9 @@ public interface BotManager
    * @param bots
    */
   public void setBots(Collection<Bot> bots);
+
+  /**
+   * Indicates if all managed bots' work is done.
+   */
+  public boolean isWorkDone();
 }

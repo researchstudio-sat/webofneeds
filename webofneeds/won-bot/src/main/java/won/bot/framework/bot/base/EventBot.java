@@ -36,6 +36,9 @@ import java.util.concurrent.Executor;
 /**
  * Base class for bots that define their behaviour through event listeners.
  *
+ * Once the bot's work is done, the workIsDone() method should be called to allow the
+ * framework to shut down the bot gracefully.
+ *
  * All methods from the Bot interface are converted to Events by the EventBot.
  * Subclasses should implement the initializeEventListeners() method to register their
  * event listeners. The corresponding shutdownEventListeners() is called when the bot's
@@ -66,6 +69,8 @@ public class EventBot extends TriggeredBot
 {
   private EventBus eventBus;
   private EventListenerContext eventListenerContext = new MyEventListenerContext();
+
+
 
   @Override
   public final void act() throws Exception
@@ -180,6 +185,12 @@ public class EventBot extends TriggeredBot
 
     public void cancelTrigger(){
       EventBot.this.cancelTrigger();
+    }
+
+    @Override
+    public void workIsDone()
+    {
+      EventBot.this.workIsDone();
     }
 
     public EventBus getEventBus() {
