@@ -95,7 +95,7 @@ public class SchedulerEventBusImpl implements EventBus
             listener.onEvent(event);
             logger.debug("finished processing event {} on listener {}", event, listener);
           } catch (Exception e) {
-            logger.warn("caught exception during execution of event {} on listener {}", event, listener);
+            logger.warn("caught exception during execution of event {} on listener {}", new Object[]{event, listener}, e);
           }
         }
       }

@@ -399,14 +399,18 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
             //todo refactor with register()
             //camelContext.getComponent()
             WonNode wonNode = wonNodeList.get(0);
+            String startingComponent = wonNode.getStartingComponent();
             ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
-            if (camelContext.getComponent(wonNodeList.get(0).getBrokerComponent())==null)
-                addActiveMQComponentForWonNode(wonNodeList.get(0));
+            if (camelContext.getComponent(wonNodeList.get(0).getBrokerComponent())==null){
+                String brokerComponentName = addActiveMQComponentForWonNode(wonNodeList.get(0));
+                camelContext.getComponent(brokerComponentName).createEndpoint(wonNode.getOwnerProtocolEndpoint());
+            }
+
             String remoteEndpoint = wonNode.getOwnerProtocolEndpoint();
             List<String> endpointList = new ArrayList<>();
             endpointList.add(remoteEndpoint);
-            if(camelContext.getRoute(remoteEndpoint)==null)
-                ownerProtocolActiveMQService.addRouteForEndpoint(camelContext,endpointList,remoteEndpoint);
+            if(camelContext.getRoute(startingComponent)==null)
+                ownerProtocolActiveMQService.addRouteForEndpoint(camelContext,endpointList,startingComponent);
             logger.debug("existing ownerApplicationId: " + ownerApplicationId);
         }
         headerMap.put("remoteBrokerEndpoint",wonNodeList.get(0).getOwnerProtocolEndpoint());

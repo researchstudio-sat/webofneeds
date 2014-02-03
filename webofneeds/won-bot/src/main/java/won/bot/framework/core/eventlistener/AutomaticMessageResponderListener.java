@@ -117,6 +117,7 @@ public class AutomaticMessageResponderListener extends BaseEventListener
 
   private void unsubscribe()
   {
+    logger.debug("unsubscribing from MessageFromOtherNeedEvents");
     getEventListenerContext().getEventBus().unsubscribe(MessageFromOtherNeedEvent.class, this);
   }
 }
