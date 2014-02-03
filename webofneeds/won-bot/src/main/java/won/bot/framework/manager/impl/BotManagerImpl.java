@@ -2,7 +2,7 @@ package won.bot.framework.manager.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.core.Bot;
+import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
 
 import java.net.URI;
@@ -41,6 +41,7 @@ public class BotManagerImpl implements BotManager
   @Override
   public void addBot(Bot bot) {
     synchronized (getMonitor()) {
+      initializeBotIfNecessary(bot);
       this.bots.add(bot);
     }
   }
@@ -51,6 +52,28 @@ public class BotManagerImpl implements BotManager
       this.bots.clear();
       this.bots.addAll(bots);
       this.botByUri.clear();
+    }
+  }
+
+  @Override
+  public boolean isWorkDone()
+  {
+    synchronized (getMonitor()){
+      for(Bot bot: getBots()){
+        if (! bot.isWorkDone()) return false;
+      }
+    }
+    return true;
+  }
+
+  protected void initializeBotIfNecessary(Bot bot){
+    if (bot.getLifecyclePhase().isDown()){
+      try {
+        logger.info("initializing bot {}", bot);
+        bot.initialize();
+      } catch (Exception e) {
+        logger.warn("could not initialize bot {} ",bot, e);
+      }
     }
   }
 

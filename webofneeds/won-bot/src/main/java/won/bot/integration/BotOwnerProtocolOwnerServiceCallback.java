@@ -1,8 +1,10 @@
 package won.bot.integration;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
-import won.bot.framework.core.Bot;
+import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.model.ChatMessage;
@@ -17,6 +19,7 @@ import java.util.Date;
  */
 public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerServiceCallback
 {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   BotManager botManager;
 
   TaskScheduler taskScheduler;
@@ -28,7 +31,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
         try {
           getBotForNeedUri(con.getNeedURI()).onCloseFromOtherNeed(con, content);
         } catch (Exception e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+          logger.warn("error while handling onClose()",e);
         }
       }
     }, new Date());
@@ -41,7 +44,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
         try {
           getBotForNeedUri(match.getFromNeed()).onHintFromMatcher(match, content);
         } catch (Exception e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+          logger.warn("error while handling onHint()",e);
         }
       }
     }, new Date());
@@ -54,7 +57,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
         try {
           getBotForNeedUri(con.getNeedURI()).onConnectFromOtherNeed(con, content);
         } catch (Exception e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+          logger.warn("error while handling onConnect()",e);
         }
       }
     }, new Date());
@@ -67,7 +70,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
         try {
           getBotForNeedUri(con.getNeedURI()).onOpenFromOtherNeed(con, content);
         } catch (Exception e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+          logger.warn("error while handling onOpen()",e);
         }
       }
     }, new Date());
@@ -80,7 +83,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
         try {
           getBotForNeedUri(con.getNeedURI()).onMessageFromOtherNeed(con, message, content);
         } catch (Exception e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+          logger.warn("error while handling onTextMessage()",e);
         }
       }
     }, new Date());
@@ -98,6 +101,9 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   private Bot getBotForNeedUri(URI needUri) {
     Bot bot = botManager.getBot(needUri);
     if (bot == null) throw new IllegalStateException("No bot registered for uri " + needUri);
+    if (!bot.getLifecyclePhase().isActive()) {
+      throw new IllegalStateException("bot responsible for need " + needUri + " is not active (lifecycle phase is: " +bot.getLifecyclePhase()+")");
+    }
     return bot;
   }
 }

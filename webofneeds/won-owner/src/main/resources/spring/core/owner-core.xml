@@ -51,6 +51,10 @@
     <bean id="ownerProtocolOwnerServiceJMSBased" class="won.owner.messaging.OwnerProtocolOwnerServiceImplJMSBased"></bean>
 
     <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
+        <!-- used to distinguish different implementations when auto-wiring -->
+        <!-- see http://docs.spring.io/spring/docs/3.0.0.M3/reference/html/ch04s11.html -->
+        <qualifier value="default" />
+
         <!-- expects a bean named "ownerProtocolNeedServiceClientDelegate" in the context.
              That bean may be used to make clever decisions regarding the transport or just be hard-wired to
              use eg jms

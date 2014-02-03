@@ -23,9 +23,6 @@
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
 
     <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.Create2NeedsShortConversationBot">
-        <property name="botContext">
-            <bean class="won.bot.framework.core.context.impl.InMemoryBotContext" />
-        </property>
         <property name="taskScheduler" ref="taskScheduler" />
         <property name="needProducer" ref="needProducerFromMails" />
         <property name="nodeURISource" ref="nodeUriSourceRandom" />

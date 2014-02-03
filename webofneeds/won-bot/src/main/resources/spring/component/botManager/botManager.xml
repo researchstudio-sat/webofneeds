@@ -20,6 +20,15 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="botManager" class="won.bot.framework.manager.impl.SpringAwareBotManagerImpl" />
+    <bean id="botManager" class="won.bot.framework.manager.impl.SpringAwareBotManagerImpl" >
+        <property name="checkWorkDoneTrigger">
+            <bean class="org.springframework.scheduling.support.PeriodicTrigger">
+                <constructor-arg name="period" value="10" />
+                <constructor-arg name="timeUnit" value="SECONDS" />
+                <property name="fixedRate" value="true" />
+                <property name="initialDelay" value="10" />
+            </bean>
+        </property>
+    </bean>
 
 </beans>

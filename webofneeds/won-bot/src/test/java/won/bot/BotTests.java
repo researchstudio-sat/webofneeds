@@ -18,8 +18,8 @@ package won.bot;
 
 import org.junit.Assert;
 import org.junit.Test;
-import won.bot.framework.core.Bot;
-import won.bot.framework.core.base.BaseBot;
+import won.bot.framework.bot.Bot;
+import won.bot.framework.bot.base.BaseBot;
 
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
