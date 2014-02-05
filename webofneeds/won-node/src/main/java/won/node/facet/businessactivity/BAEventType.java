@@ -216,6 +216,25 @@ public enum BAEventType {
         return null;
     }
 
+    public static BAEventType getCoordinationEventTypeFromString(final String fragment)
+    {
+        for (BAEventType event : BAEventType.values())
+            if (event.name().equals(fragment))
+            {
+                return event;
+            }
+        return null;
+    }
+
+    public static BAEventType getCoordinationEventTypeFromURI(final String fragment)
+    {
+        String s = fragment.substring(fragment.lastIndexOf("#Message")+8,fragment.length());
+        for (BAEventType event : BAEventType.values())
+            if (event.name().equals("MESSAGE_"+fragment.substring(fragment.lastIndexOf("#Message")+8,fragment.length()).toUpperCase()))
+                return event;
+        return null;
+    }
+
     public boolean isBAPCParticipantEventType(final BAEventType event)
     {
         boolean ret = false;

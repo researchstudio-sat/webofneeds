@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.facet.impl.FacetRegistry;
-import won.node.facet.impl.WON_BA;
+
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
@@ -35,6 +35,7 @@ import won.protocol.repository.*;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WON;
+import won.node.facet.impl.WON_BA;
 
 import java.net.URI;
 import java.util.concurrent.ExecutorService;

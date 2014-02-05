@@ -90,18 +90,18 @@ public class BAPCCoordinatorFacetImpl extends Facet {
 
                     //message (event) for sending
                     NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_BA.BASE_URI,"hasTextMessage"));
-                    //System.out.println("daki: Participant sents:"+message.toString());
+                    //System.out.println("daki: Participant sends:"+message.toString());
 
                     messageForSending = ni.toList().get(0).toString();
                     messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
-                    logger.info("Cooridnator sents: " + messageForSending);
+                    logger.info("Cooridnator sends: " + messageForSending);
 
                     myContent = ModelFactory.createDefaultModel();
                     myContent.setNsPrefix("","no:uri");
                     Resource baseResource = myContent.createResource("no:uri");
 
                     // message -> eventType
-                    eventType = getCoordinationEventType2(messageForSending);
+                    eventType = BAEventType.getCoordinationEventTypeFromString(messageForSending);
                     if((eventType!=null))
                     {
                         if(eventType.isBAPCCoordinatorEventType(eventType))
@@ -141,7 +141,7 @@ public class BAPCCoordinatorFacetImpl extends Facet {
             @Override
             public void run() {
                 try {
-                    System.out.println("daki Received message from Participant: "+message.toString());
+                    logger.info("Received message from Participant: " + message.toString());
                     NodeIterator it = message.listObjectsOfProperty(WON_BA.COORDINATION_MESSAGE);
                     if (!it.hasNext()) {
                         logger.info("message did not contain a won-ba:coordinationMessage");
@@ -157,7 +157,7 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     String sCoordMsg = coordMsg.toString(); //URI
 
                     // URI -> eventType
-                    BAEventType eventType = getCoordinationEventType(sCoordMsg);
+                    BAEventType eventType = BAEventType.getCoordinationEventTypeFromURI(sCoordMsg);
 
                     BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                     logger.info("Current state of the Coordinator: "+state.getURI().toString());
@@ -165,32 +165,12 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+                    System.out.println("daki Nesto");
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
                 }
 
             }
         });
-    }
-
-
-    public BAEventType getCoordinationEventType(final String fragment)
-    {
-        String s = fragment.substring(fragment.lastIndexOf("#Message")+8,fragment.length());
-        for (BAEventType event : BAEventType.values())
-            if (event.name().equals("MESSAGE_"+fragment.substring(fragment.lastIndexOf("#Message")+8,fragment.length()).toUpperCase()))
-                return event;
-        logger.warn("No enum could be matched for: {}", fragment);
-        return null;
-    }
-
-    public BAEventType getCoordinationEventType2(final String fragment)
-    {
-        for (BAEventType event : BAEventType.values())
-            if (event.name().equals(fragment))
-            {
-                return event;
-            }
-        return null;
     }
 }

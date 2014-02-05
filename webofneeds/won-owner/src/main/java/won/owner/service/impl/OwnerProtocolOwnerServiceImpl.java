@@ -19,6 +19,7 @@ import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
+
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -187,13 +188,22 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     @Override
     public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
+        System.out.println("daki Message: "+message.toString());
         logger.info("node-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         if (message == null) throw new IllegalArgumentException("message is not set");
         //load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-        StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
+        StmtIterator stmtIterator = null;
+        if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) || con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()))
+        {
+            stmtIterator = baseRes.listProperties(WON.COORDINATION_MESSAGE);
+        }
+        else
+        {
+            stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
+        }
         String textMessage = null;
         while (stmtIterator.hasNext()){
             RDFNode obj = stmtIterator.nextStatement().getObject();
@@ -205,6 +215,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         if (textMessage == null){
             logger.debug("could not extract text message from RDF content of message");
             textMessage = "[could not extract text message]";
+            System.out.println("daki3");
         }
         //perform state transit (should not result in state change)
         //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);

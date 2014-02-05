@@ -143,7 +143,7 @@ public class WON
   public static final Property SEARCH_RESULT_URI = m.createProperty(BASE_URI,"uri");
   public static final Property SEARCH_RESULT_PREVIEW = m.createProperty(BASE_URI, "preview");
 
-
+    public static final Property COORDINATION_MESSAGE = m.createProperty(BASE_URI + "coordinationMessage");
   /**
    * Returns the base URI for this schema.
    *
