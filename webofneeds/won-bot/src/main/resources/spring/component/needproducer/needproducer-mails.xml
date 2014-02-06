@@ -86,7 +86,15 @@
                         </bean>
                     </property>
                 </bean>
+                <bean id="groupNeedDefaultProducer" class="won.bot.framework.component.needproducer.impl.TemplateBasedNeedProducer">
+                    <property name="template" value="classpath:/default-templates/default-template-group.ttl"/>
+                    <property name="wrappedProducer">
+                        <bean class="won.bot.framework.component.needproducer.impl.GroupNeedProducer">
+                        </bean>
+                    </property>
+                </bean>
             </set>
         </property>
     </bean>
-</beans>
+
+        </beans>

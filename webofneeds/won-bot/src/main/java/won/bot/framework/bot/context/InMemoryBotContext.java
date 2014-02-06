@@ -30,6 +30,7 @@ import java.util.Map;
 public class InMemoryBotContext implements BotContext
 {
   private List<URI> needUris = new ArrayList<URI>();
+  private List<URI> groupUris = new ArrayList<URI>();
   private Map<String,URI> namedNeedUris = new HashMap<String, URI>();
 
   @Override
@@ -38,10 +39,20 @@ public class InMemoryBotContext implements BotContext
     return needUris;
   }
 
-  @Override
+    @Override
+    public List<URI> listGroupUris() {
+        return groupUris;
+    }
+
+
+    @Override
   public boolean isNeedKnown(final URI needURI)
   {
-    return needUris.contains(needURI);
+    if (needUris.contains(needURI))
+        return needUris.contains(needURI);
+    else if (groupUris.contains(needURI))
+        return  groupUris.contains(needURI);
+    else return false;
   }
 
   /**
@@ -67,8 +78,13 @@ public class InMemoryBotContext implements BotContext
     needUris.add(uri);
   }
 
+    @Override
+    public void rememberGroupUri(URI uri) {
+        groupUris.add(uri);
+    }
 
-  @Override
+
+    @Override
   public URI getNeedByName(final String name)
   {
     return namedNeedUris.get(name);

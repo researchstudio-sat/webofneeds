@@ -14,28 +14,23 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.component.needproducer;
+package won.bot.app;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * Interface for producing needs. The needs produced must be suitable as the 'model'
- * argument to the createNeed protocol method (i.e., don't have a URI, and only contain user-definable data).
- */
-public interface NeedProducer
+public class Simple2NeedGroupingTest
 {
-  /**
-   * Returns a new Model that represents the created need or null if no more needs can be created.
-   * @return a model or null
-   */
-  public Model create();
 
-  public Model create(Class clazz);
+  public static void main(String[] args) throws Exception {
+    SpringApplication app = new SpringApplication(
+        new Object[]{"classpath:/spring/app/simple2NeedGroupingTest.xml"}
+    );
+    ConfigurableApplicationContext applicationContext =  app.run(args);
+    Thread.sleep(5*60*1000);
+    app.exit(applicationContext);
+  }
 
-  /**
-   * Indicates that no more needs will be created by this factory.
-   * @return
-   */
-  public boolean isExhausted();
+
 
 }

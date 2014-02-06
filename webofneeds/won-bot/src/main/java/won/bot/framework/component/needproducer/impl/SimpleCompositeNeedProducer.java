@@ -19,6 +19,7 @@ package won.bot.framework.component.needproducer.impl;
 
 import won.bot.framework.component.needproducer.NeedProducer;
 
+import java.util.Iterator;
 import java.util.Set;
 
 public class SimpleCompositeNeedProducer extends AbstractCompositeNeedProducer
@@ -29,5 +30,16 @@ public class SimpleCompositeNeedProducer extends AbstractCompositeNeedProducer
     Set<NeedProducer> factories = getNeedFactories();
     if (factories.size() > 0) return factories.iterator().next();
     return null;
+  }
+  @Override
+  protected NeedProducer selectActiveNeedFactoryOfType(Class clazz){
+      Set<NeedProducer> factories = getNeedFactories();
+      Iterator iter = factories.iterator();
+      while(iter.hasNext()){
+          AbstractNeedProducerWrapper needProducer = (AbstractNeedProducerWrapper) iter.next();
+          if (needProducer.getWrappedProducer().getClass().equals(clazz))
+              return needProducer;
+      }
+      return null;
   }
 }

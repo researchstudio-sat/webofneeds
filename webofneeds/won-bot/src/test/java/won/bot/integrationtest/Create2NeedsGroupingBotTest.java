@@ -29,6 +29,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import won.bot.framework.events.event.WorkDoneEvent;
 import won.bot.framework.events.listener.ExecuteOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
+import won.bot.impl.Create2NeedsGroupingBot;
 import won.bot.impl.Create2NeedsShortConversationBot;
 
 import java.util.concurrent.CyclicBarrier;
@@ -39,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
-public class Create2NeedsShortConversationBotTest
+public class Create2NeedsGroupingBotTest
 {
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
@@ -72,7 +73,7 @@ public class Create2NeedsShortConversationBotTest
    * @throws Exception
    */
   @Test
-  public void testCreate2NeedsShortConversationBot() throws Exception
+  public void testCreate2NeedsGroupingBot() throws Exception
   {
     //adding the bot to the bot manager will cause it to be initialized.
     //at that point, the trigger starts.
@@ -92,7 +93,7 @@ public class Create2NeedsShortConversationBotTest
    * add a listener to its internal event bus and to access its listeners, which
    * record information during the run that we later check with asserts.
    */
-  public static class MyBot extends Create2NeedsShortConversationBot
+  public static class MyBot extends Create2NeedsGroupingBot
   {
     /**
      * Used for synchronization with the @Test method: it should wait at the
@@ -143,11 +144,13 @@ public class Create2NeedsShortConversationBotTest
       Assert.assertEquals(2, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
       //2 create need events
-        /*
-      Assert.assertEquals(2, this.needConnector.getEventCount());
+      Assert.assertEquals(2, this.groupFacetCreator.getEventCount());
+      Assert.assertEquals(0, this.groupFacetCreator.getExceptionCount());
+      //1 create group events
+      Assert.assertEquals(1, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
       //1 connect, 1 open
-      Assert.assertEquals(2, this.autoOpener.getEventCount());
+      /* Assert.assertEquals(2, this.autoOpener.getEventCount());
       Assert.assertEquals(0, this.autoOpener.getExceptionCount());
       //10 messages
       Assert.assertEquals(10, this.autoResponder.getEventCount());
@@ -157,15 +160,16 @@ public class Create2NeedsShortConversationBotTest
       Assert.assertEquals(0, this.connectionCloser.getExceptionCount());
       //1 close (one sent, one received - but for sending we create no event)
       Assert.assertEquals(1, this.needDeactivator.getEventCount());
-      Assert.assertEquals(0, this.needDeactivator.getExceptionCount());  */
-      //2 needs deactivated
+      Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
+      */
+      //2 connect events
       Assert.assertEquals(2, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
       //TODO: there is more to check:
       //* what does the RDF look like?
       // --> pull it from the needURI/ConnectionURI and check contents
-      //* what does the database look like?
+      //* what does the database look like?      */
     }
 
   }

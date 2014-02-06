@@ -16,7 +16,9 @@
 
 package won.bot.impl;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import won.bot.framework.bot.base.EventBot;
+import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
@@ -25,12 +27,14 @@ import won.protocol.model.FacetType;
 /**
  *
  */
-public class Create2NeedsShortConversationBot extends EventBot
+public class Create2NeedsGroupingBot extends EventBot
 {
 
   private static final int NO_OF_NEEDS = 2;
+  private static final int NO_OF_GROUPS = 1;
   private static final int NO_OF_MESSAGES = 10;
   private static final long MILLIS_BETWEEN_MESSAGES = 1000;
+  private NeedProducer groupProducer;
 
   //we use protected members so we can extend the class and
   //access the listeners for unit test assertions and stats
@@ -38,6 +42,7 @@ public class Create2NeedsShortConversationBot extends EventBot
   //we use BaseEventListener as their types so we can access the generic
   //functionality offered by that class
   protected BaseEventListener needCreator;
+  protected BaseEventListener groupFacetCreator;
   protected BaseEventListener needConnector;
   protected BaseEventListener autoOpener;
   protected BaseEventListener autoResponder;
@@ -61,10 +66,29 @@ public class Create2NeedsShortConversationBot extends EventBot
 
 
 
+    //count until 2 needs were created, then create group facet
+    this.groupFacetCreator = new ExecuteOnceAfterNEventsListener(
+            ctx,
+            new EventBotActions.CreateGroupNeedAction(ctx),
+            NO_OF_NEEDS);
+    bus.subscribe(NeedCreatedEvent.class, this.groupFacetCreator);
+
+    this.needConnector = new ExecuteOnEventListener(ctx,
+        new EventBotActions.ConnectTwoNeedsWithGroupAction(ctx, FacetType.GroupFacet.getURI(),FacetType.OwnerFacet.getURI()),
+            1
+    );
+    bus.subscribe(GroupFacetCreatedEvent.class, this.needConnector);
+
+
+   this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
+              ctx,
+              new EventBotActions.SignalWorkDoneAction(ctx), NO_OF_NEEDS
+    );
+    bus.subscribe(ConnectFromOtherNeedEvent.class, this.workDoneSignaller);
 
     //count until 2 needs were created, then
     //   * connect the 2 needs
-    this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
+    /*this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
         new EventBotActions.ConnectTwoNeedsAction(
             ctx, FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI()), NO_OF_NEEDS);
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
@@ -106,7 +130,11 @@ public class Create2NeedsShortConversationBot extends EventBot
         new EventBotActions.SignalWorkDoneAction(ctx), NO_OF_NEEDS
     );
     bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
+
+ */
   }
-
-
+  @Qualifier("groupNeedDefaultProducer")
+  public void setGroupProducer(NeedProducer needProducer){
+     this.groupProducer = needProducer;
+  }
 }

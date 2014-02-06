@@ -14,28 +14,39 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.component.needproducer;
+package won.bot.framework.events.event;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
+import java.net.URI;
+
 /**
- * Interface for producing needs. The needs produced must be suitable as the 'model'
- * argument to the createNeed protocol method (i.e., don't have a URI, and only contain user-definable data).
+ * User: LEIH-NB
+ * Date: 05.02.14
  */
-public interface NeedProducer
-{
-  /**
-   * Returns a new Model that represents the created need or null if no more needs can be created.
-   * @return a model or null
-   */
-  public Model create();
+public class GroupFacetCreatedEvent extends BaseEvent{
+    private URI groupFacetURI;
+    private URI wonNodeURI;
+    private Model model;
 
-  public Model create(Class clazz);
+    public GroupFacetCreatedEvent(URI groupFacetURI, URI wonNodeURI, Model model) {
+        this.groupFacetURI = groupFacetURI;
+        this.wonNodeURI = wonNodeURI;
+        this.model = model;
 
-  /**
-   * Indicates that no more needs will be created by this factory.
-   * @return
-   */
-  public boolean isExhausted();
+    }
 
+    public URI getGroupFacetURI() {
+        return groupFacetURI;
+    }
+
+    public URI getWonNodeURI() {
+        return wonNodeURI;
+    }
+
+    public Model getModel() {
+        return model;
+    }
 }
+
+

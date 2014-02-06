@@ -21,6 +21,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.bot.framework.component.needproducer.impl.GroupNeedProducer;
+import won.bot.framework.events.event.GroupFacetCreatedEvent;
 import won.bot.framework.events.event.NeedCreatedEvent;
 import won.bot.framework.events.event.WorkDoneEvent;
 import won.protocol.util.RdfUtils;
@@ -112,6 +114,69 @@ public class EventBotActions
       }
     }
   }
+  public static class ConnectTwoNeedsWithGroupAction extends Action {
+      private URI remoteFacet;
+      private URI localFacet;
+      public ConnectTwoNeedsWithGroupAction (final EventListenerContext eventListenerContext, final URI remoteFacet, final URI localFacet)
+      {
+
+          super(eventListenerContext);
+          this.remoteFacet = remoteFacet;
+          this.localFacet = localFacet;
+      }
+
+      @Override
+      protected void doRun() throws Exception {
+          List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
+          List<URI> groups = getEventListenerContext().getBotContext().listGroupUris();
+          for (int i = 0; i< needs.size();i++){
+              try{
+                  //TODO: duplicate code. see ConnectTwoNeedsAction
+                  getEventListenerContext().getOwnerService().connect(needs.get(i),groups.get(0),WonRdfUtils.FacetUtils.createModelForConnect(localFacet,remoteFacet));
+              } catch (Exception e) {
+                  logger.warn("could not connect {} and {}", new Object[]{needs.get(i), groups.get(0)}, e);
+              }
+
+          }
+
+      }
+  }
+
+  public static class CreateGroupNeedAction extends Action{
+     public CreateGroupNeedAction(final EventListenerContext eventListenerContext){
+         super(eventListenerContext);
+     }
+
+     @Override
+      protected  void doRun() throws Exception{
+         if (getEventListenerContext().getNeedProducer().isExhausted()){
+             logger.info("group need bot's need procucer is exhausted.");
+             return;
+         }
+         final Model groupModel = getEventListenerContext().getNeedProducer().create(GroupNeedProducer.class);
+         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
+         final ListenableFuture<URI> futureNeedUri = getEventListenerContext().getOwnerService().createNeed(URI.create("we://dont.need.this/anymore"),groupModel,true,wonNodeUri);
+
+         futureNeedUri.addListener(new Runnable()
+         {
+             @Override
+             public void run()
+             {
+                 if (futureNeedUri.isDone()){
+                     try {
+                         URI uri = futureNeedUri.get();
+                         logger.info("group creation finished, new group URI is: {}", uri);
+                         getEventListenerContext().getBotContext().rememberGroupUri(uri);
+                         getEventListenerContext().getEventBus().publish(new GroupFacetCreatedEvent(uri, wonNodeUri, groupModel));
+                     } catch (Exception e){
+                         logger.warn("create group facet failed", e);
+                     }
+                 }
+
+             }
+         }, getEventListenerContext().getExecutor());
+     }
+  }
 
   public static class CreateNeedAction extends Action {
     public CreateNeedAction(final EventListenerContext eventListenerContext)
@@ -122,11 +187,12 @@ public class EventBotActions
     @Override
     protected void doRun() throws Exception
     {
-      if (getEventListenerContext().getNeedProducer().isExhausted()){
-        logger.info("bot's need procucer is exhausted.");
-        return;
-      }
+        if (getEventListenerContext().getNeedProducer().isExhausted()){
+            logger.info("bot's need procucer is exhausted.");
+            return;
+        }
       final Model needModel = getEventListenerContext().getNeedProducer().create();
+
       final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
       logger.info("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
       final ListenableFuture<URI> futureNeedUri = getEventListenerContext().getOwnerService().createNeed(URI.create("we://dont.need.this/anymore"), needModel, true, wonNodeUri);

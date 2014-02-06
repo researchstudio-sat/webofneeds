@@ -30,6 +30,7 @@ public interface BotContext
    */
   public List<URI> listNeedUris();
 
+  public List<URI> listGroupUris();
   /**
    * Check if this memory knows the specified need URI.
    * @param needURI
@@ -50,6 +51,7 @@ public interface BotContext
    */
   public void rememberNeedUri(URI uri);
 
+  public void rememberGroupUri(URI uri);
   /**
    * Fetch a need URI by its name. The URI must have been given a name previously.
    * @param name

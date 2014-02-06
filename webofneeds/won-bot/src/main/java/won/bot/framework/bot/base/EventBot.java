@@ -113,6 +113,11 @@ public class EventBot extends TriggeredBot
   {
     eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel));
   }
+  @Override
+  public void onNewGroupCreated(final URI groupURI, final URI wonNodeURI, final Model groupModel)
+  {
+    eventBus.publish(new GroupFacetCreatedEvent(groupURI, wonNodeURI, groupModel));
+  }
 
 
   /*
@@ -182,6 +187,7 @@ public class EventBot extends TriggeredBot
     {
       return EventBot.this.getNeedProducer();
     }
+
 
     public void cancelTrigger(){
       EventBot.this.cancelTrigger();
