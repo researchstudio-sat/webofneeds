@@ -1,7 +1,4 @@
-//owner.home.controller
-homeModule = angular.module('owner.home', [/*'ui.bootstrap.buttons'*/]);
-
-homeModule.controller('HomeCtrl', function ($scope, $location, userService) {
+angular.module('won.owner').controller('HomeCtrl', function ($scope, $location, userService) {
 
 	$scope.goToNewNeed = function() {
 		if(userService.isAuth()) {
@@ -30,7 +27,7 @@ homeModule.controller('HomeCtrl', function ($scope, $location, userService) {
 
 });
 
-homeModule.controller('SignInCtrl', function ($scope, $location, userService) {
+angular.module('won.owner').controller('SignInCtrl', function ($scope, $location, userService) {
 
 	$scope.user = {
 		username:'',
@@ -58,7 +55,7 @@ homeModule.controller('SignInCtrl', function ($scope, $location, userService) {
 
 });
 
-homeModule.controller('RegisterCtrl', function ($scope, $location, userService) {
+angular.module('won.owner').controller('RegisterCtrl', function ($scope, $location, userService) {
 
 	$scope.registerUser = new function(){
 		this.reset = function() {

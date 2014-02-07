@@ -1,7 +1,4 @@
-//owner.home.controller
-createNeedModule = angular.module('owner.createneed', ['ui.map', 'ui.bootstrap.buttons', 'owner.service.need', 'blueimp.fileupload']);
-
-createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http, needService, userService) {
+angular.module('won.owner').controller('CreateNeedCtrl', function ($scope, $location, $http, needService, userService) {
 	$scope.mapOptions = {
 		center : new google.maps.LatLng(35.784, -78.670),
 		zoom : 15,
@@ -30,7 +27,7 @@ createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http
 			wonNode:'',
 			binaryFolder:md5((new Date().getTime() + Math.random(1)).toString())
 		};
-	}
+	};
 
 	$scope.need = $scope.getCleanNeed();
 
@@ -45,7 +42,7 @@ createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http
 		}
 		$scope.need.latitude = $params[0].latLng.lat();
 		$scope.need.longitude = $params[0].latLng.lng();
-	}
+	};
 
 	$scope.addTag = function() {
 		var tags = $scope.need.tags;
@@ -54,11 +51,11 @@ createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http
 			$scope.need.tags.push(tagName);
 		}
 		$("#inputTagName").val('');
-	}
+	};
 
 	$scope.removeTag = function (tagName) {
 		$scope.need.tags.splice($scope.need.tags.indexOf(tagName),1);
-	}
+	};
 
 
 	$scope.save = function () {
@@ -66,16 +63,16 @@ createNeedModule.controller('CreateNeedCtrl', function ($scope, $location, $http
 			$scope.need = $scope.getCleanNeed();
 			$scope.succesShow = true;
 		});
-	}
+	};
 
 	$scope.cancel = function () {
 		$location.path("/");
-	}
+	};
 
 
 });
 
-createNeedModule.directive('wonGallery', function factory() {
+angular.module('won.owner').directive('wonGallery', function factory() {
 	return {
 		restrict : 'A',
 		templateUrl : "app/create-need/won-gallery.html",
@@ -96,13 +93,13 @@ createNeedModule.directive('wonGallery', function factory() {
 					{uri:''},
 					{uri:''}
 				];
-			}
+			};
 			$scope.photos = $scope.getCleanPhotos();
 
 			$scope.onClickPhoto = function(num) {
 				$scope.selectedPhoto = num;
 				console.log($scope.selectedPhoto);
-			}
+			};
 			$scope.$on('fileuploadsubmit', function (e, data) {
 				var filename = data.files[0].name;
 				$scope.lastExtension =  extension = filename.substr(filename.lastIndexOf(".") , filename.lenght);

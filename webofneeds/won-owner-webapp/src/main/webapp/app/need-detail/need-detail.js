@@ -1,7 +1,4 @@
-//owner.home.controller
-needDetailModule = angular.module('owner.needdetail', ['ui.map', 'ui.bootstrap.buttons', 'owner.service.need']);
-
-needDetailModule.controller('NeedDetailCtrl', function ($scope, $location, $http, $routeParams, needService) {
+angular.module('won.owner').controller('NeedDetailCtrl', function ($scope, $location, $http, $routeParams, needService) {
 	$scope.mapOptions = {
 		center:new google.maps.LatLng(35.784, -78.670),
 		zoom:15,

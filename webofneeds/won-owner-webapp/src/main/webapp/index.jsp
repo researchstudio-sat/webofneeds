@@ -26,6 +26,7 @@
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
 
+		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
@@ -34,23 +35,6 @@
 		<script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
-		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
-
-		<script type="text/javascript">
-			window.user = {
-				<sec:authorize access="isAuthenticated()">
-				username : '<sec:authentication property="principal.username" />',
-				isAuth : true
-				</sec:authorize>
-				<sec:authorize access="!isAuthenticated()">
-				isAuth : false
-				</sec:authorize>
-			};
-
-			function onGoogleReady() {
-				angular.bootstrap(document.getElementsByTagName("html")[0], ['owner']);
-			}
-		</script>
 	</head>
 	<body>
 		<span ng-init=""></span>
@@ -80,6 +64,22 @@
 
 		<div ng-view id="content" class="container">
 		</div>
+		
+		<script type="text/javascript">
+			window.user = {
+				<sec:authorize access="isAuthenticated()">
+				username : '<sec:authentication property="principal.username" />',
+				isAuth : true
+				</sec:authorize>
+				<sec:authorize access="!isAuthenticated()">
+				isAuth : false
+				</sec:authorize>
+			};
+
+			function onGoogleReady() {
+				angular.bootstrap(document.getElementsByTagName("html")[0], ['won.owner']);
+			}
+		</script>
 	</body>
 </html>
 

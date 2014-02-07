@@ -1,5 +1,4 @@
-
-app = angular.module('owner', ['owner.home', 'owner.header', 'owner.createneed', 'owner.needdetail', 'owner.needlist', 'owner.service.user']).config(function ($routeProvider, $httpProvider, $provide) {
+app = angular.module('won.owner', ['ui.bootstrap', 'ui.map', 'blueimp.fileupload']).config(function ($routeProvider, $httpProvider, $provide) {
 	$routeProvider.
 			when('/', {controller : 'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
 			when('/signin', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
@@ -118,5 +117,3 @@ angular.resetForm = function (scope, formName, defaults) {
 		scope[d] = defaults[d];
 	}
 };
-
-

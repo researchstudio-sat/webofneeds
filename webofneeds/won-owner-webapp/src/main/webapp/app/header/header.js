@@ -1,6 +1,4 @@
-headerModule = angular.module('owner.header', []);
-
-headerModule.controller("HeaderCtrl", function($scope, $location, userService) {
+angular.module('won.owner').controller("HeaderCtrl", function($scope, $location, userService) {
 
 	$scope.isActive = function(where) {
 		if ($location.path().indexOf(where) > -1) {
@@ -8,11 +6,11 @@ headerModule.controller("HeaderCtrl", function($scope, $location, userService) {
 		} else if(where == undefined && $location.path() == '/') {
 			return 'active';
 		}
-	}
+	};
 
 	$scope.showPublic = function() {
 		return !userService.isAuth();
-	}
+	};
 
 
 	onResponseSignOut = function (result) {
@@ -20,10 +18,10 @@ headerModule.controller("HeaderCtrl", function($scope, $location, userService) {
 			userService.resetAuth();
 			$location.path("/");
 		}
-	}
+	};
 
 	$scope.onClickSignOut = function() {
 		userService.logOut().then(onResponseSignOut);
-	}
+	};
 
 });

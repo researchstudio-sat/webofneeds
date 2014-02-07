@@ -1,7 +1,4 @@
-//owner.home.controller
-needListModule = angular.module('owner.needlist', ['ui.map', 'ui.bootstrap', 'owner.service.need', 'owner.service.connection']);
-
-needListModule.controller('NeedListCtrl', function ($scope, $location, $http, $q, needService, connectionService) {
+angular.module('won.owner').controller('NeedListCtrl', function ($scope, $location, $http, $q, needService, connectionService) {
 
 	NeedListPage = function() {
 		this.btnConversations = 0;
@@ -27,8 +24,8 @@ needListModule.controller('NeedListCtrl', function ($scope, $location, $http, $q
 			} else if (this.categorizedNeeds.suggestions.length > 0) {
 				this.btnSuggestions = 1;
 			}
-		}
-	}
+		};
+	};
 
 	$scope.model = new NeedListPage();
 
@@ -69,7 +66,7 @@ needListModule.controller('NeedListCtrl', function ($scope, $location, $http, $q
 		console.log(categorizedNeeds);
 		$scope.model.categorizedNeeds = categorizedNeeds;
 		$scope.model.startup();
-	}
+	};
 
 	needService.getAllNeeds().then(function(needs) {
 		$scope.model.myNeeds = needs;
@@ -86,7 +83,7 @@ needListModule.controller('NeedListCtrl', function ($scope, $location, $http, $q
 
 	$scope.goToDetail = function($id) {
 		$location.path("/need-detail/" + $id);
-	}
+	};
 
 	$scope.showMatches = function($event) {
 		$event.preventDefault();
@@ -109,10 +106,10 @@ needListModule.controller('NeedListCtrl', function ($scope, $location, $http, $q
 			}, 700, function () {
 				myScope.$apply(function() {
 					$(needPnl).scope().need.hidden = true;
-				})
+				});
 			});
 		});
-	}
+	};
 
 	$scope.hideMatches = function($event) {
 		$event.preventDefault();
@@ -132,16 +129,10 @@ needListModule.controller('NeedListCtrl', function ($scope, $location, $http, $q
 			});
 		});
 		this.need.selected = '';
-	}
+	};
 
 	$scope.connect = function() {
-	}
-
-	$scope.connect = function () {
-	}
-
-	$scope.connect = function () {
-	}
+	};
 
 });
 

@@ -1,6 +1,4 @@
-connectionServiceModule = angular.module('owner.service.connection', []);
-
-connectionServiceModule.factory('connectionService', function ($http) {
+angular.module('won.owner').factory('connectionService', function ($http) {
 
 	var connectionService = {};
 

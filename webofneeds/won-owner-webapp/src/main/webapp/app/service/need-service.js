@@ -1,5 +1,3 @@
-needServiceModule = angular.module('owner.service.need', []);
-
 NeeLD = function (needURI, needLD) {
 	this.needURI = needURI.replace('data', 'resource');
 	this.title = '';
@@ -79,7 +77,7 @@ CategorizedNeeds = function() {
 	}
 }
 
-needServiceModule.factory('needService', function ($http, $q, connectionService) {
+angular.module('won.owner').factory('needService', function ($http, $q, connectionService) {
 
 	var needService = {};
 

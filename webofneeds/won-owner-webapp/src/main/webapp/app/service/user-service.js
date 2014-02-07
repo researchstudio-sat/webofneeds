@@ -1,6 +1,4 @@
-needServiceModule = angular.module('owner.service.user', []);
-
-needServiceModule.factory('userService', function ($window, $http) {
+angular.module('won.owner').factory('userService', function ($window, $http) {
 
 	var user = {};
 	user = $window.user;
