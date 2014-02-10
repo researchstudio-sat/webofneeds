@@ -32,6 +32,8 @@ public class InMemoryBotContext implements BotContext
   private List<URI> needUris = new ArrayList<URI>();
   private List<URI> groupUris = new ArrayList<URI>();
   private Map<String,URI> namedNeedUris = new HashMap<String, URI>();
+  private Map<URI, Integer> sentMessagesCount = new HashMap<URI,Integer>();
+  private Map<URI, Integer> receivedMessagesCount = new HashMap<URI,Integer>();
 
   @Override
   public List<URI> listNeedUris()
@@ -42,6 +44,38 @@ public class InMemoryBotContext implements BotContext
     @Override
     public List<URI> listGroupUris() {
         return groupUris;
+    }
+
+
+    @Override
+    public Map<URI, Integer> getSentMessagesCount() {
+        return sentMessagesCount;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Map<URI, Integer> getReceivedMessagesCount() {
+        return receivedMessagesCount;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void increaseSentMessagesCount(URI needURI) {
+
+        if (sentMessagesCount.containsKey(needURI)) {
+            int count = sentMessagesCount.get(needURI);
+            sentMessagesCount.put(needURI, count++);
+        }else{
+            sentMessagesCount.put(needURI,1);
+        }
+    }
+
+    @Override
+    public void increaseReceivedMessagesCount(URI needURI) {
+        if (receivedMessagesCount.containsKey(needURI)) {
+            int count = receivedMessagesCount.get(needURI);
+            receivedMessagesCount.put(needURI, count++);
+        }else{
+            receivedMessagesCount.put(needURI, 1);
+        }
     }
 
 
@@ -81,6 +115,16 @@ public class InMemoryBotContext implements BotContext
     @Override
     public void rememberGroupUri(URI uri) {
         groupUris.add(uri);
+    }
+
+    @Override
+    public void forgetNeedUri(URI uri) {
+        needUris.remove(uri);
+    }
+
+    @Override
+    public void forgetGroupUri(URI uri) {
+        groupUris.remove(uri);
     }
 
 

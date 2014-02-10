@@ -19,6 +19,8 @@ import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
+import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
+import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import java.net.URI;
 import java.text.MessageFormat;
@@ -78,7 +80,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public void deactivate(URI needURI) throws NoSuchNeedException {
+    public void deactivate(URI needURI) throws NoSuchNeedException, NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         logger.debug(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
 
         List<Need> needs = needRepository.findByNeedURI(needURI);

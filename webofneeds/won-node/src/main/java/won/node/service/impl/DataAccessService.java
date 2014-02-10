@@ -246,7 +246,7 @@ public class DataAccessService {
    */
   private ConnectionState performStateTransit(Connection con, ConnectionEventType msg) throws IllegalMessageForConnectionStateException
   {
-    if (!msg.isMessageAllowed(con.getState())) {
+    if (msg.isMessageAllowed(con.getState())) {
       throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(), con.getState());
     }
     return con.getState().transit(msg);

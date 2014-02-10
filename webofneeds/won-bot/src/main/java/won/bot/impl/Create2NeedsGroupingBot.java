@@ -32,7 +32,7 @@ public class Create2NeedsGroupingBot extends EventBot
 
   private static final int NO_OF_NEEDS = 2;
   private static final int NO_OF_GROUPS = 1;
-  private static final int NO_OF_MESSAGES = 10;
+  private static final int NO_OF_MESSAGES = 4;
   private static final long MILLIS_BETWEEN_MESSAGES = 1000;
   private NeedProducer groupProducer;
 
@@ -47,6 +47,7 @@ public class Create2NeedsGroupingBot extends EventBot
   protected BaseEventListener autoOpener;
   protected BaseEventListener autoResponder;
   protected BaseEventListener connectionCloser;
+  protected BaseEventListener allNeedsDeactivator;
   protected BaseEventListener needDeactivator;
   protected BaseEventListener workDoneSignaller;
 
@@ -54,6 +55,7 @@ public class Create2NeedsGroupingBot extends EventBot
   protected void initializeEventListeners()
   {
     EventListenerContext ctx = getEventListenerContext();
+
     EventBus bus = getEventBus();
 
     //create needs every trigger execution until 2 needs are created
@@ -75,18 +77,56 @@ public class Create2NeedsGroupingBot extends EventBot
 
     this.needConnector = new ExecuteOnEventListener(ctx,
         new EventBotActions.ConnectTwoNeedsWithGroupAction(ctx, FacetType.GroupFacet.getURI(),FacetType.OwnerFacet.getURI()),
-            1
+            NO_OF_GROUPS
     );
     bus.subscribe(GroupFacetCreatedEvent.class, this.needConnector);
 
 
-   this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
-              ctx,
-              new EventBotActions.SignalWorkDoneAction(ctx), NO_OF_NEEDS
-    );
-    bus.subscribe(ConnectFromOtherNeedEvent.class, this.workDoneSignaller);
 
-    //count until 2 needs were created, then
+      //add a listener that is informed of the connect/open events and that auto-opens
+      //subscribe it to:
+      // * connect events - so it responds with open
+      // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
+      this.autoOpener = new AutomaticConnectionOpenerListener(ctx);
+      bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
+      bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
+
+
+      //add a listener that auto-responds to messages by a message
+      //after 10 messages, it unsubscribes from all events
+      //subscribe it to:
+      // * message events - so it responds
+      // * open events - so it initiates the chain reaction of responses
+      this.autoResponder = new AutomaticMessageResponderListener(ctx, NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
+      bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);
+      bus.subscribe(MessageFromOtherNeedEvent.class, this.autoResponder);
+
+
+      //add a listener that closes the connection after it has seen 10 messages
+      this.connectionCloser = new DelegateOnceAfterNEventsListener(
+              ctx,
+              NO_OF_MESSAGES,
+              new CloseConnectionListener(ctx));
+      bus.subscribe( MessageFromOtherNeedEvent.class, this.connectionCloser);
+
+      //add a listener that auto-responds to a close message with a deactivation of both needs.
+      //subscribe it to:
+      // * close events
+      this.allNeedsDeactivator = new DeactivateAllNeedsOnConnectionCloseListener(ctx);
+      bus.subscribe(CloseFromOtherNeedEvent.class, this.allNeedsDeactivator);
+      /*
+      this.needDeactivator = new DeactivateNeedOnConnectionCloseListener(ctx);
+      bus.subscribe(CloseFromOtherNeedEvent.class, this.needDeactivator);
+         */
+      //add a listener that counts two NeedDeactivatedEvents and then tells the
+      //framework that the bot's work is done
+      this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
+              ctx,
+              new EventBotActions.SignalWorkDoneAction(ctx), NO_OF_NEEDS+NO_OF_GROUPS
+      );
+      bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
+
+      //count until 2 needs were created, then
     //   * connect the 2 needs
     /*this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
         new EventBotActions.ConnectTwoNeedsAction(

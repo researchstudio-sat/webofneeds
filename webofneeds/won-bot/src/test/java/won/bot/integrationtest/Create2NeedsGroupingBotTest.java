@@ -44,7 +44,7 @@ public class Create2NeedsGroupingBotTest
 {
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
-  private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 1000;
+  private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 2000;
 
   MyBot bot;
 
@@ -149,21 +149,23 @@ public class Create2NeedsGroupingBotTest
       //1 create group events
       Assert.assertEquals(1, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
-      //1 connect, 1 open
-      /* Assert.assertEquals(2, this.autoOpener.getEventCount());
+      //2 connect, 2 open
+      Assert.assertEquals(4, this.autoOpener.getEventCount());
       Assert.assertEquals(0, this.autoOpener.getExceptionCount());
       //10 messages
-      Assert.assertEquals(10, this.autoResponder.getEventCount());
+      Assert.assertEquals(4, this.autoResponder.getEventCount());
       Assert.assertEquals(0, this.autoResponder.getExceptionCount());
       //10 messages
-      Assert.assertEquals(10, this.connectionCloser.getEventCount());
+      Assert.assertEquals(4, this.connectionCloser.getEventCount());
       Assert.assertEquals(0, this.connectionCloser.getExceptionCount());
-      //1 close (one sent, one received - but for sending we create no event)
-      Assert.assertEquals(1, this.needDeactivator.getEventCount());
-      Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
-      */
-      //2 connect events
-      Assert.assertEquals(2, this.workDoneSignaller.getEventCount());
+      //2 close (one sent, one received - but for sending we create no event)
+
+        Assert.assertEquals(2,this.allNeedsDeactivator.getEventCount());
+        Assert.assertEquals(0, this.allNeedsDeactivator.getExceptionCount());
+
+
+      //4 NeedDeactivated events
+      Assert.assertEquals(3, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
       //TODO: there is more to check:

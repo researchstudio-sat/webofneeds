@@ -36,6 +36,8 @@ import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
+import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
+import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -57,7 +59,7 @@ public class NeedController
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  @Qualifier("ownerProtocolNeedServiceClient")
+  @Qualifier("default")
   private OwnerProtocolNeedServiceClientSide ownerService;
 
   @Autowired
@@ -335,8 +337,7 @@ public class NeedController
   }
 
   @RequestMapping(value = "/{needId}/toggle", method = RequestMethod.POST)
-  public String toggleNeed(@PathVariable String needId, Model model)
-  {
+  public String toggleNeed(@PathVariable String needId, Model model) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
     List<Need> needs = needRepository.findById(Long.valueOf(needId));
     if (needs.isEmpty())
       return "noNeedFound";

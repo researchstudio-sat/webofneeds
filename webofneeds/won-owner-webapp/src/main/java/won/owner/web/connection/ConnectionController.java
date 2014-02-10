@@ -33,7 +33,7 @@ public class ConnectionController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    @Qualifier("ownerProtocolNeedServiceClient")
+    @Qualifier("default")
     private OwnerProtocolNeedServiceClientSide ownerService;
 
     @Autowired

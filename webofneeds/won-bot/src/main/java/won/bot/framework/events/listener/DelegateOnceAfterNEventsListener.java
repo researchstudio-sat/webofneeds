@@ -40,6 +40,7 @@ public class DelegateOnceAfterNEventsListener extends BaseEventListener
   @Override
   public void doOnEvent(final Event event) throws Exception
   {
+      logger.info("DELEGATEONCE "+  event.toString());
     if (executed) return;
     synchronized (monitor){
       count++;

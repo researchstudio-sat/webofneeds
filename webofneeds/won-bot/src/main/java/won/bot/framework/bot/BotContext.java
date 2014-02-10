@@ -17,7 +17,9 @@
 package won.bot.framework.bot;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Used by a bot to remember which needs it knows.
@@ -31,6 +33,15 @@ public interface BotContext
   public List<URI> listNeedUris();
 
   public List<URI> listGroupUris();
+
+  public Map<URI, Integer> getSentMessagesCount();
+
+  public Map<URI, Integer> getReceivedMessagesCount();
+
+  public void increaseSentMessagesCount(URI needURI);
+
+  public void increaseReceivedMessagesCount(URI needURI);
+
   /**
    * Check if this memory knows the specified need URI.
    * @param needURI
@@ -52,6 +63,10 @@ public interface BotContext
   public void rememberNeedUri(URI uri);
 
   public void rememberGroupUri(URI uri);
+
+  public void forgetNeedUri(URI uri);
+
+  public void forgetGroupUri(URI uri);
   /**
    * Fetch a need URI by its name. The URI must have been given a name previously.
    * @param name

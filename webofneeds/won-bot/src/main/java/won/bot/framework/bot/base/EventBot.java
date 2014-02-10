@@ -93,6 +93,7 @@ public class EventBot extends TriggeredBot
   @Override
   public final void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
   {
+    logger.info("ON CLOSE");
     eventBus.publish(new CloseFromOtherNeedEvent(con, content));
   }
 

@@ -148,7 +148,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
         }
     }
     //@Override
-    public void deactivate(URI needURI) throws NoSuchNeedException {
+    public void deactivate(URI needURI) throws NoSuchNeedException, NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
             proxy.deactivate(needURI);
