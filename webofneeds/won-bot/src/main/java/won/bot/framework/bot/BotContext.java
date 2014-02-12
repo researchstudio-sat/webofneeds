@@ -16,6 +16,8 @@
 
 package won.bot.framework.bot;
 
+import won.protocol.model.FacetType;
+
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -32,15 +34,7 @@ public interface BotContext
    */
   public List<URI> listNeedUris();
 
-  public List<URI> listGroupUris();
-
-  public Map<URI, Integer> getSentMessagesCount();
-
-  public Map<URI, Integer> getReceivedMessagesCount();
-
-  public void increaseSentMessagesCount(URI needURI);
-
-  public void increaseReceivedMessagesCount(URI needURI);
+  public List<URI> listNeedUrisOfType(FacetType type );
 
   /**
    * Check if this memory knows the specified need URI.
@@ -55,18 +49,15 @@ public interface BotContext
    * @param name
    */
   public void rememberNeedUriWithName(URI uri, String name);
-
+  public void rememberNeedUriWithType(URI uri, FacetType type);
   /**
    * Save the specified need URI in this memory.
    * @param uri
    */
   public void rememberNeedUri(URI uri);
 
-  public void rememberGroupUri(URI uri);
-
   public void forgetNeedUri(URI uri);
 
-  public void forgetGroupUri(URI uri);
   /**
    * Fetch a need URI by its name. The URI must have been given a name previously.
    * @param name

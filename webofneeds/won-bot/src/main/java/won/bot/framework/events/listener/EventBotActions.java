@@ -25,6 +25,7 @@ import won.bot.framework.component.needproducer.impl.GroupNeedProducer;
 import won.bot.framework.events.event.GroupFacetCreatedEvent;
 import won.bot.framework.events.event.NeedCreatedEvent;
 import won.bot.framework.events.event.WorkDoneEvent;
+import won.protocol.model.FacetType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
@@ -127,8 +128,8 @@ public class EventBotActions
 
       @Override
       protected void doRun() throws Exception {
-          List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
-          List<URI> groups = getEventListenerContext().getBotContext().listGroupUris();
+          List<URI> needs = getEventListenerContext().getBotContext().listNeedUrisOfType(FacetType.OwnerFacet);
+          List<URI> groups = getEventListenerContext().getBotContext().listNeedUrisOfType(FacetType.GroupFacet);
           for (int i = 0; i< needs.size();i++){
               try{
                   //TODO: duplicate code. see ConnectTwoNeedsAction
@@ -166,7 +167,7 @@ public class EventBotActions
                      try {
                          URI uri = futureNeedUri.get();
                          logger.info("group creation finished, new group URI is: {}", uri);
-                         getEventListenerContext().getBotContext().rememberGroupUri(uri);
+                         getEventListenerContext().getBotContext().rememberNeedUriWithType(uri, FacetType.GroupFacet);
                          getEventListenerContext().getEventBus().publish(new GroupFacetCreatedEvent(uri, wonNodeUri, groupModel));
                      } catch (Exception e){
                          logger.warn("create group facet failed", e);
@@ -207,6 +208,7 @@ public class EventBotActions
               URI uri = futureNeedUri.get();
               logger.info("need creation finished, new need URI is: {}", uri);
               getEventListenerContext().getBotContext().rememberNeedUri(uri);
+              getEventListenerContext().getBotContext().rememberNeedUriWithType(uri,FacetType.OwnerFacet);
               getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel));
             } catch (Exception e){
               logger.warn("createNeed failed", e);

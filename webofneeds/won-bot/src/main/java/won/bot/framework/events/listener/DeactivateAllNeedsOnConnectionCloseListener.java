@@ -45,37 +45,21 @@ public class DeactivateAllNeedsOnConnectionCloseListener extends BaseEventListen
     Connection con = ((CloseFromOtherNeedEvent) event).getCon();
     logger.debug("received close on connection {}, deactivating needs", con.getConnectionURI());
     List<URI> needUris = getEventListenerContext().getBotContext().listNeedUris();
-    List<URI> groupUris = getEventListenerContext().getBotContext().listGroupUris();
-    for (int i = 0; i<needUris.size();){
+    for (int i = 0; i<needUris.size();i++){
         logger.info("needUris size: "+needUris.size());
         deactivateNeed(needUris.get(i));
         getEventListenerContext().getBotContext().forgetNeedUri(needUris.get(i));
-
     }
-    for (int i = 0; i<groupUris.size();){
-        logger.info("groupUris size: "+groupUris.size());
-        getEventListenerContext().getOwnerService().deactivate(groupUris.get(i));
-        getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(groupUris.get(i)));
-        getEventListenerContext().getBotContext().forgetGroupUri(groupUris.get(i));
-    }
-
-
     logger.debug("EVENT COUNT FOR EVENT TYPE "+event.getClass()+" is "+ getEventCount());
   }
 
   private void deactivateNeed(final URI needURI) throws NoSuchConnectionFault, NoSuchNeedException, IllegalMessageForConnectionStateFault {
-      logger.info("sent messages count: "+ getEventListenerContext().getBotContext().getSentMessagesCount().get(needURI));
-      logger.info("received messages count: "+ getEventListenerContext().getBotContext().getReceivedMessagesCount().get(needURI));
-    if (getEventListenerContext().getBotContext().getSentMessagesCount().get(needURI)>0 || getEventListenerContext().getBotContext().getSentMessagesCount().get(needURI)>0){
       logger.debug("deactivating need {}", needURI);
 
             getEventListenerContext().getOwnerService().deactivate(needURI);
             //publish an event so other listeners can react
             getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(needURI));
 
-    } else {
-      logger.debug("need uri {} not controlled by this bot, not deactivating it.", needURI);
-    }
   }
 
 

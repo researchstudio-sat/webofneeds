@@ -17,12 +17,10 @@
 package won.bot.framework.bot.context;
 
 import won.bot.framework.bot.BotContext;
+import won.protocol.model.FacetType;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Straightforward BotContext implementation using a List and a Map.
@@ -30,53 +28,31 @@ import java.util.Map;
 public class InMemoryBotContext implements BotContext
 {
   private List<URI> needUris = new ArrayList<URI>();
-  private List<URI> groupUris = new ArrayList<URI>();
   private Map<String,URI> namedNeedUris = new HashMap<String, URI>();
-  private Map<URI, Integer> sentMessagesCount = new HashMap<URI,Integer>();
-  private Map<URI, Integer> receivedMessagesCount = new HashMap<URI,Integer>();
+  private Map<URI,FacetType> needUriTypeMap = new HashMap<>();
 
   @Override
   public List<URI> listNeedUris()
   {
-    return needUris;
+      List<URI> needList = new ArrayList<URI>();
+      needList.addAll(needUriTypeMap.keySet());
+      return needList;
+    //return needUris;
   }
 
-    @Override
-    public List<URI> listGroupUris() {
-        return groupUris;
-    }
-
-
-    @Override
-    public Map<URI, Integer> getSentMessagesCount() {
-        return sentMessagesCount;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Map<URI, Integer> getReceivedMessagesCount() {
-        return receivedMessagesCount;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void increaseSentMessagesCount(URI needURI) {
-
-        if (sentMessagesCount.containsKey(needURI)) {
-            int count = sentMessagesCount.get(needURI);
-            sentMessagesCount.put(needURI, count++);
-        }else{
-            sentMessagesCount.put(needURI,1);
+  @Override
+  public List<URI> listNeedUrisOfType(FacetType type) {
+    List<URI> uriListOfType = new ArrayList<URI>();
+    if (!needUriTypeMap.isEmpty())
+    {
+        Iterator it =  needUriTypeMap.entrySet().iterator();
+        for(Map.Entry<URI, FacetType> entry :needUriTypeMap.entrySet()){
+            if (entry.getValue().equals(type))
+                uriListOfType.add(entry.getKey());
         }
     }
-
-    @Override
-    public void increaseReceivedMessagesCount(URI needURI) {
-        if (receivedMessagesCount.containsKey(needURI)) {
-            int count = receivedMessagesCount.get(needURI);
-            receivedMessagesCount.put(needURI, count++);
-        }else{
-            receivedMessagesCount.put(needURI, 1);
-        }
-    }
+    return uriListOfType;
+  }
 
 
     @Override
@@ -84,9 +60,10 @@ public class InMemoryBotContext implements BotContext
   {
     if (needUris.contains(needURI))
         return needUris.contains(needURI);
-    else if (groupUris.contains(needURI))
-        return  groupUris.contains(needURI);
-    else return false;
+    else if (needUriTypeMap.containsKey(needURI))
+        return needUriTypeMap.containsKey(needURI);
+    else
+        return false;
   }
 
   /**
@@ -111,20 +88,15 @@ public class InMemoryBotContext implements BotContext
   {
     needUris.add(uri);
   }
-
-    @Override
-    public void rememberGroupUri(URI uri) {
-        groupUris.add(uri);
-    }
+  @Override
+  public void rememberNeedUriWithType(final URI uri, final FacetType type){
+      needUriTypeMap.put(uri, type);
+  }
 
     @Override
     public void forgetNeedUri(URI uri) {
         needUris.remove(uri);
-    }
-
-    @Override
-    public void forgetGroupUri(URI uri) {
-        groupUris.remove(uri);
+        needUriTypeMap.remove(uri);
     }
 
 

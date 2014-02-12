@@ -74,8 +74,6 @@ public class AutomaticMessageResponderListener extends BaseEventListener
           URI connectionUri = openEvent.getCon().getConnectionURI();
           try {
             countMessageAndUnsubscribeIfNecessary();
-            getEventListenerContext().getBotContext().increaseSentMessagesCount(openEvent.getCon().getNeedURI());
-            getEventListenerContext().getBotContext().increaseReceivedMessagesCount(openEvent.getCon().getRemoteNeedURI());
             getEventListenerContext().getOwnerService().textMessage(connectionUri, WonRdfUtils.MessageUtils.textMessage(createMessage()));
           } catch (Exception e) {
             logger.warn("could not send message via connection {}", connectionUri, e);
@@ -95,9 +93,7 @@ public class AutomaticMessageResponderListener extends BaseEventListener
         Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
         URI connectionUri = messageEvent.getCon().getConnectionURI();
         try {
-            getEventListenerContext().getBotContext().increaseSentMessagesCount(messageEvent.getCon().getNeedURI());
-            getEventListenerContext().getBotContext().increaseReceivedMessagesCount(messageEvent.getCon().getRemoteNeedURI());
-          getEventListenerContext().getOwnerService().textMessage(connectionUri, messageContent);
+            getEventListenerContext().getOwnerService().textMessage(connectionUri, messageContent);
           countMessageAndUnsubscribeIfNecessary();
         } catch (Exception e) {
           logger.warn("could not send message via connection {}", connectionUri, e);
