@@ -5,9 +5,6 @@ import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,8 +20,10 @@ public enum FacetType {
     CoordinatorFacet("CoordinatorFacet"),
     ParticipantFacet("ParticipantFacet"),
     BAPCCoordinatorFacet("BAPCCoordinatorFacet"),
-    BAPCParticipantFacet("BAPCParticipantFacet");
-
+    BAPCParticipantFacet("BAPCParticipantFacet"),
+    CommentFacet("CommentFacet"),
+    CommentModeratedFacet("CommentModeratedFacet"),
+    CommentUnrestrictedFacet("CommentUnrestrictedFacet");
 
     private static final Logger logger = LoggerFactory.getLogger(BasicNeedType.class);
 
@@ -53,6 +52,12 @@ public enum FacetType {
            return FacetType.BAPCCoordinatorFacet;
        else if(uri.equals(FacetType.BAPCParticipantFacet.getURI()))
             return FacetType.BAPCParticipantFacet;
+       else if(uri.equals(FacetType.CommentFacet.getURI()))
+         return FacetType.CommentFacet;
+       else if(uri.equals(FacetType.CommentModeratedFacet.getURI()))
+         return FacetType.CommentModeratedFacet;
+       else if(uri.equals(FacetType.CommentUnrestrictedFacet.getURI()))
+         return FacetType.CommentUnrestrictedFacet;
        else
            return null;
     }
