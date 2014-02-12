@@ -1,6 +1,5 @@
 package won.node.facet.businessactivity;
 
-import won.node.facet.impl.BAParticipantCompletionState;
 import won.node.facet.impl.WON_BA;
 
 import java.net.URI;

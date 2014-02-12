@@ -100,8 +100,13 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
 
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //check for facet types:
-        if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()))
+        System.out.println("daki Facet type:"+con.getTypeURI());
+        if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
+                con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()) ||
+                con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI())  ||
+                con.getTypeURI().equals(FacetType.BACCParticipantFacet.getURI()))
         {
+            System.out.println("Daki tu sam");
             Resource baseRes = message.getResource(message.getNsPrefixURI(""));
             StmtIterator stmtIterator = baseRes.listProperties(WON_BA.COORDINATION_MESSAGE);
             String coordinationMessage = stmtIterator.next().getObject().toString();
@@ -116,7 +121,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
             reg.get(con).textMessageFromNeed(con, message);
 
         }
-        else if(con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()))
+    /*    else if(con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()))
         {
             Resource baseRes = message.getResource(message.getNsPrefixURI(""));
             StmtIterator stmtIterator = baseRes.listProperties(WON_BA.COORDINATION_MESSAGE);
@@ -130,9 +135,10 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
 
             //invoke facet implementation
             reg.get(con).textMessageFromNeed(con, message);
-        }
+        } */
         else
         {
+            System.out.println("Daki nisam tu");
             Resource baseRes = message.getResource(message.getNsPrefixURI(""));
             StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
             String textMessage = stmtIterator.next().getObject().toString();

@@ -54,6 +54,8 @@
                 <entry key="#{T(won.protocol.model.FacetType).ParticipantFacet}" value-ref="participantFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).BAPCCoordinatorFacet}" value-ref="baPCCoordinatorFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).BAPCParticipantFacet}" value-ref="baPCParticipantFacetImplRef" />
+                <entry key="#{T(won.protocol.model.FacetType).BACCCoordinatorFacet}" value-ref="baCCCoordinatorFacetImplRef" />
+                <entry key="#{T(won.protocol.model.FacetType).BACCParticipantFacet}" value-ref="baCCParticipantFacetImplRef" />
             </map>
         </constructor-arg>
     </bean>
@@ -77,6 +79,8 @@
     <bean id="participantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ParticipantFacetImpl" />
     <bean id="baPCCoordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BAPCCoordinatorFacetImpl" />
     <bean id="baPCParticipantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BAPCParticipantFacetImpl" />
+    <bean id="baCCCoordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BACCCoordinatorFacetImpl" />
+    <bean id="baCCParticipantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BACCParticipantFacetImpl" />
 
 
 
