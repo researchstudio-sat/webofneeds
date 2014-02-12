@@ -12,7 +12,7 @@ import won.protocol.model.FacetType;
 public class CommentUnrestrictedFacet extends Facet {
   @Override
   public FacetType getFacetType() {
-    return null;
+    return FacetType.CommentUnrestrictedFacet;
   }
 
   @Override

@@ -14,7 +14,7 @@ import won.protocol.model.FacetType;
 public class CommentModeratedFacet extends Facet {
   @Override
   public FacetType getFacetType() {
-    return null;
+    return FacetType.CommentModeratedFacet;
   }
 
   @Override
