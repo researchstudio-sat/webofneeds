@@ -234,7 +234,7 @@ public enum BAEventType {
         return null;
     }
 
-    public boolean isBAPCParticipantEventType(final BAEventType event)
+    public static boolean isBAPCParticipantEventType(final BAEventType event)
     {
         boolean ret = false;
         if(event.equals(BAEventType.MESSAGE_COMPLETED) || event.equals(BAEventType.MESSAGE_EXIT)
@@ -245,9 +245,9 @@ public enum BAEventType {
         return ret;
     }
 
-    public boolean isBAPCCoordinatorEventType(final BAEventType event)
+    public static boolean isBAPCCoordinatorEventType(final BAEventType event)
     {
-        return !this.isBAPCParticipantEventType(event);
+        return !isBAPCParticipantEventType(event);
     }
 }
 

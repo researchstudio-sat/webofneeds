@@ -163,6 +163,34 @@ public class BAPCParticipantFacetImpl extends Facet{
                     logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+
+                    BAEventType resendEventType = state.getResendEvent();
+                    if(resendEventType!=null)
+                    {
+                        Model myContent = ModelFactory.createDefaultModel();
+                        myContent.setNsPrefix("","no:uri");
+                        Resource baseResource = myContent.createResource("no:uri");
+
+                        if(BAEventType.isBAPCParticipantEventType(resendEventType))
+                        {
+                            state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                            logger.info("Participant re-sends the previous message.");
+                            logger.info("Current state of the Participant: "+state.getURI().toString());
+                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
+                            logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+
+                            // eventType -> URI Resource
+                            Resource r = myContent.createResource(resendEventType.getURI().toString());
+                            baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
+                            //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
+                            needFacingConnectionClient.textMessage(con, myContent);
+                        }
+                        else
+                        {
+                            logger.info("The eventType: "+eventType.getURI().toString()+" can not be triggered by Participant.");
+                        }
+
+                    }
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
                 }

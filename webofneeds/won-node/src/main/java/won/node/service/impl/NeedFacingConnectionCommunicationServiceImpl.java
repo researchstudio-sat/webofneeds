@@ -138,7 +138,6 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
         } */
         else
         {
-            System.out.println("Daki nisam tu");
             Resource baseRes = message.getResource(message.getNsPrefixURI(""));
             StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
             String textMessage = stmtIterator.next().getObject().toString();

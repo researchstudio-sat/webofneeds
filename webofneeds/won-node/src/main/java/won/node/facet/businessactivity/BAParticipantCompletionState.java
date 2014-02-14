@@ -16,26 +16,31 @@ import java.net.URI;
 public enum BAParticipantCompletionState {
     SUGGESTED("Suggested"){
         public BAParticipantCompletionState transit(BAEventType msg){
+            resendEvent = null;
             return null;
         }
     },
     REQUEST_SENT("RequestSent"){
         public BAParticipantCompletionState transit(BAEventType msg){
+            resendEvent = null;
             return null;
         }
     },
     REQUEST_RECEIVED("RequestReceived"){
         public BAParticipantCompletionState transit(BAEventType msg){
+            resendEvent = null;
             return null;
         }
     },
     CONNECTED("Connected"){
         public BAParticipantCompletionState transit(BAEventType msg){
+            resendEvent = null;
             return null;
         }
     },
     ACTIVE("Active"){
         public BAParticipantCompletionState transit(BAEventType msg){
+            resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
                     return CANCELING;
@@ -54,6 +59,7 @@ public enum BAParticipantCompletionState {
     },
     CANCELING("Canceling"){
         public BAParticipantCompletionState transit(BAEventType msg){
+            resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
                     return CANCELING;
@@ -74,8 +80,10 @@ public enum BAParticipantCompletionState {
     },
     COMPLETED("Completed"){
         public BAParticipantCompletionState transit(BAEventType msg){
+            resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
+                    resendEvent = BAEventType.MESSAGE_COMPLETED;
                     return COMPLETED;
                 case MESSAGE_CLOSE:
                     return CLOSING;
@@ -90,6 +98,7 @@ public enum BAParticipantCompletionState {
     },
     CLOSING("Closing") {
         public BAParticipantCompletionState transit (BAEventType msg){
+            resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
                     return CLOSING;
@@ -98,6 +107,7 @@ public enum BAParticipantCompletionState {
                 case MESSAGE_CLOSED:
                     return ENDED;
                 case MESSAGE_COMPLETED:
+                    resendEvent = BAEventType.MESSAGE_CLOSE;
                     return CLOSING;
                 default:
                     return CLOSING;
@@ -106,6 +116,7 @@ public enum BAParticipantCompletionState {
     },
     COMPENSATING("Compensating"){
         public BAParticipantCompletionState transit (BAEventType msg){
+            resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
                     return COMPENSATING;
@@ -116,6 +127,7 @@ public enum BAParticipantCompletionState {
                 case MESSAGE_COMPENSATED:
                     return ENDED;
                 case MESSAGE_COMPLETED:
+                    resendEvent = BAEventType.MESSAGE_COMPENSATE;
                     return COMPENSATING;
                 default:
                     return COMPENSATING;
@@ -124,8 +136,10 @@ public enum BAParticipantCompletionState {
     },
     FAILING_ACTIVE_CANCELING("FailingActiveCanceling") {
         public BAParticipantCompletionState transit (BAEventType msg){
+            resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
+                    resendEvent = BAEventType.MESSAGE_FAIL;
                     return FAILING_ACTIVE_CANCELING;
                 case MESSAGE_FAILED:
                     return ENDED;
@@ -138,10 +152,12 @@ public enum BAParticipantCompletionState {
     },
     FAILING_COMPENSATING("FailingCompensating") {
         public BAParticipantCompletionState transit (BAEventType msg) {
+            resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
                     return FAILING_COMPENSATING;
                 case MESSAGE_COMPENSATE:
+                    resendEvent = BAEventType.MESSAGE_FAIL;
                     return FAILING_COMPENSATING;
                 case MESSAGE_FAILED:
                     return ENDED;
@@ -156,8 +172,10 @@ public enum BAParticipantCompletionState {
     },
     NOT_COMPLETING("NotCompleting"){
         public BAParticipantCompletionState transit (BAEventType msg) {
+            resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
+                    resendEvent = BAEventType.MESSAGE_CANNOTCOMPLETE;
                     return NOT_COMPLETING;
                 case MESSAGE_NOTCOMPLETED:
                     return ENDED;
@@ -170,8 +188,10 @@ public enum BAParticipantCompletionState {
     },
     EXITING("Exiting") {
         public BAParticipantCompletionState transit (BAEventType msg) {
+            resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
+                    resendEvent = BAEventType.MESSAGE_EXIT;
                     return EXITING;
                 case MESSAGE_EXITED:
                     return ENDED;
@@ -184,24 +204,22 @@ public enum BAParticipantCompletionState {
     },
     ENDED("Ended") {
         public BAParticipantCompletionState transit (BAEventType msg){
+            resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
-                    logger.info("send MESSAGE_CANCELED");
+                    resendEvent = BAEventType.MESSAGE_CANCELED;
                     return ENDED;
                 case MESSAGE_CLOSE:
-                    logger.info("send MESSAGE_CLOSED");
+                    resendEvent = BAEventType.MESSAGE_CLOSED;
                     return ENDED;
                 case MESSAGE_COMPENSATE:
-                    logger.info("send MESSAGE_COMPENSATED");
+                    resendEvent = BAEventType.MESSAGE_COMPENSATED;
                     return ENDED;
                 case MESSAGE_FAILED:
-                    logger.info("send Ignore");
                     return ENDED;
                 case MESSAGE_EXITED:
-                    logger.info("send Ignore");
                     return ENDED;
                 case MESSAGE_NOTCOMPLETED:
-                    logger.info("send Ignore");
                     return ENDED;
                 case MESSAGE_CANCELED:
                     return ENDED;
@@ -210,25 +228,24 @@ public enum BAParticipantCompletionState {
                 case MESSAGE_COMPENSATED:
                     return ENDED;
                 case MESSAGE_EXIT:
-                    logger.info("resend MESSAGE_EXITED");
+                    resendEvent = BAEventType.MESSAGE_EXITED;
                     return ENDED;
                 case MESSAGE_COMPLETED:
-                    logger.info("send Ignore");
                     return ENDED;
                 case MESSAGE_FAIL:
-                    logger.info("resend MESSAGE_FAILED");
+                    resendEvent = BAEventType.MESSAGE_FAILED;
                     return ENDED;
                 case MESSAGE_CANNOTCOMPLETE:
-                    logger.info("resend MESSAGE_NOT_COMPLETED");
+                    resendEvent = BAEventType.MESSAGE_NOTCOMPLETED;
                     return ENDED;
                 default:
-                    logger.info("Invalid State");
                     return ENDED;
             }
         }
     },
     CLOSED("Closed"){
         public BAParticipantCompletionState transit(BAEventType msg){
+            resendEvent = null;
             return null;
         }
     };
@@ -236,10 +253,15 @@ public enum BAParticipantCompletionState {
     private static final Logger logger = LoggerFactory.getLogger(BAParticipantCompletionState.class);
 
     private String name;
+    private static BAEventType resendEvent = null;
 
     private BAParticipantCompletionState(String name)
     {
         this.name = name;
+    }
+
+    public BAEventType getResendEvent(){
+        return  resendEvent;
     }
 
 
