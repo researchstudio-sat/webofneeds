@@ -43,16 +43,13 @@ public enum BACCState {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
-                    return CANCELING;
-
-
-
+                    return CANCELING_ACTIVE;
+                case MESSAGE_COMPLETE:
+                    return COMPLETING;
                 case MESSAGE_EXIT:
                     return EXITING;
-                case MESSAGE_COMPLETED:
-                    return COMPLETED;
                 case MESSAGE_FAIL:
-                    return FAILING_ACTIVE_CANCELING;
+                    return FAILING_ACTIVE_CANCELING_COMPLETING;
                 case MESSAGE_CANNOTCOMPLETE:
                     return NOT_COMPLETING;
                 default:
@@ -60,14 +57,38 @@ public enum BACCState {
             }
         }
     },
-    CANCELING("Canceling"){
+    CANCELING_ACTIVE("CancelingActive"){
         public BACCState transit(BACCEventType msg){
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
-                    return CANCELING;
+                    return CANCELING_ACTIVE;
+                case MESSAGE_COMPLETE:
+                    return CANCELING_ACTIVE;
+                case MESSAGE_EXIT:
+                    return EXITING;
                 case MESSAGE_FAIL:
-                    return FAILING_ACTIVE_CANCELING;
+                    return FAILING_ACTIVE_CANCELING_COMPLETING;
+                case MESSAGE_CANCELED:
+                    return ENDED;
+
+                case MESSAGE_CANNOTCOMPLETE:
+                    return NOT_COMPLETING;
+                default:
+                    return CANCELING_ACTIVE;
+            }
+        }
+    },
+    CANCELING_COMPLETING("CancelingActive"){
+        public BACCState transit(BACCEventType msg){
+            resendEvent = null;
+            switch (msg) {
+                case MESSAGE_CANCEL:
+                    return CANCELING_COMPLETING;
+                case MESSAGE_COMPLETE:
+                    return CANCELING_COMPLETING;
+                case MESSAGE_FAIL:
+                    return FAILING_ACTIVE_CANCELING_COMPLETING;
                 case MESSAGE_CANCELED:
                     return ENDED;
                 case MESSAGE_EXIT:
@@ -77,9 +98,31 @@ public enum BACCState {
                 case MESSAGE_CANNOTCOMPLETE:
                     return NOT_COMPLETING;
                 default:
-                    return CANCELING;
+                    return CANCELING_ACTIVE;
             }
         }
+    },
+    COMPLETING("Completing"){
+      public BACCState transit(BACCEventType msg)
+      {
+          resendEvent = null;
+          switch (msg) {
+              case MESSAGE_CANCEL:
+                  return CANCELING_COMPLETING;
+              case MESSAGE_COMPLETE:
+                  return COMPLETING;
+              case MESSAGE_EXIT:
+                  return EXITING;
+              case MESSAGE_COMPLETED:
+                  return COMPLETED;
+              case MESSAGE_FAIL:
+                  return FAILING_ACTIVE_CANCELING_COMPLETING;
+              case MESSAGE_CANNOTCOMPLETE:
+                  return NOT_COMPLETING;
+              default:
+                  return CANCELING_ACTIVE;
+          }
+      }
     },
     COMPLETED("Completed"){
         public BACCState transit(BACCEventType msg){
@@ -87,6 +130,8 @@ public enum BACCState {
             switch (msg) {
                 case MESSAGE_CANCEL:
                     resendEvent = BACCEventType.MESSAGE_COMPLETED;
+                    return COMPLETED;
+                case MESSAGE_COMPLETE:
                     return COMPLETED;
                 case MESSAGE_CLOSE:
                     return CLOSING;
@@ -105,12 +150,14 @@ public enum BACCState {
             switch (msg) {
                 case MESSAGE_CANCEL:
                     return CLOSING;
-                case MESSAGE_CLOSE:
+                case MESSAGE_COMPLETE:
                     return CLOSING;
                 case MESSAGE_CLOSED:
                     return ENDED;
                 case MESSAGE_COMPLETED:
                     resendEvent = BACCEventType.MESSAGE_CLOSE;
+                    return CLOSING;
+                case MESSAGE_CLOSE:
                     return CLOSING;
                 default:
                     return CLOSING;
@@ -122,6 +169,8 @@ public enum BACCState {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
+                    return COMPENSATING;
+                case MESSAGE_COMPLETE:
                     return COMPENSATING;
                 case MESSAGE_COMPENSATE:
                     return COMPENSATING;
@@ -137,19 +186,20 @@ public enum BACCState {
             }
         }
     },
-    FAILING_ACTIVE_CANCELING("FailingActiveCanceling") {
+    FAILING_ACTIVE_CANCELING_COMPLETING("FailingActiveCancelingCompleting") {
         public BACCState transit (BACCEventType msg){
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
                     resendEvent = BACCEventType.MESSAGE_FAIL;
-                    return FAILING_ACTIVE_CANCELING;
-                case MESSAGE_FAILED:
-                    return ENDED;
+                    return FAILING_ACTIVE_CANCELING_COMPLETING;
+                case MESSAGE_COMPLETE:
+                    resendEvent = BACCEventType.MESSAGE_FAIL;
+                    return FAILING_ACTIVE_CANCELING_COMPLETING;
                 case MESSAGE_FAIL:
-                    return FAILING_ACTIVE_CANCELING;
+                    return FAILING_ACTIVE_CANCELING_COMPLETING;
                 default:
-                    return FAILING_ACTIVE_CANCELING;
+                    return FAILING_ACTIVE_CANCELING_COMPLETING;
             }
         }
     },
@@ -159,15 +209,17 @@ public enum BACCState {
             switch (msg) {
                 case MESSAGE_CANCEL:
                     return FAILING_COMPENSATING;
+                case MESSAGE_COMPLETE:
+                    return FAILING_COMPENSATING;
                 case MESSAGE_COMPENSATE:
                     resendEvent = BACCEventType.MESSAGE_FAIL;
                     return FAILING_COMPENSATING;
-                case MESSAGE_FAILED:
-                    return ENDED;
                 case MESSAGE_FAIL:
                     return FAILING_COMPENSATING;
                 case MESSAGE_COMPLETED:
                     return FAILING_COMPENSATING;
+                case MESSAGE_FAILED:
+                    return ENDED;
                 default:
                     return FAILING_COMPENSATING;
             }
@@ -178,6 +230,9 @@ public enum BACCState {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
+                    resendEvent = BACCEventType.MESSAGE_CANNOTCOMPLETE;
+                    return NOT_COMPLETING;
+                case MESSAGE_COMPLETE:
                     resendEvent = BACCEventType.MESSAGE_CANNOTCOMPLETE;
                     return NOT_COMPLETING;
                 case MESSAGE_NOTCOMPLETED:
@@ -196,10 +251,12 @@ public enum BACCState {
                 case MESSAGE_CANCEL:
                     resendEvent = BACCEventType.MESSAGE_EXIT;
                     return EXITING;
-                case MESSAGE_EXITED:
-                    return ENDED;
+                case MESSAGE_COMPLETE:
+                    resendEvent = BACCEventType.MESSAGE_EXIT;
                 case MESSAGE_EXIT:
                     return EXITING;
+                case MESSAGE_EXITED:
+                    return ENDED;
                 default:
                     return EXITING;
             }
@@ -211,6 +268,9 @@ public enum BACCState {
             switch (msg) {
                 case MESSAGE_CANCEL:
                     resendEvent = BACCEventType.MESSAGE_CANCELED;
+                    return ENDED;
+                case MESSAGE_COMPLETE:
+                    resendEvent = BACCEventType.MESSAGE_FAIL;
                     return ENDED;
                 case MESSAGE_CLOSE:
                     resendEvent = BACCEventType.MESSAGE_CLOSED;
@@ -224,14 +284,14 @@ public enum BACCState {
                     return ENDED;
                 case MESSAGE_NOTCOMPLETED:
                     return ENDED;
+                case MESSAGE_EXIT:
+                    resendEvent = BACCEventType.MESSAGE_EXITED;
+                    return ENDED;
                 case MESSAGE_CANCELED:
                     return ENDED;
                 case MESSAGE_CLOSED:
                     return ENDED;
                 case MESSAGE_COMPENSATED:
-                    return ENDED;
-                case MESSAGE_EXIT:
-                    resendEvent = BACCEventType.MESSAGE_EXITED;
                     return ENDED;
                 case MESSAGE_COMPLETED:
                     return ENDED;
@@ -272,7 +332,9 @@ public enum BACCState {
     {
         switch (msg) {
             case MESSAGE_CANCEL:
-                return CANCELING;
+                return CANCELING_ACTIVE;
+            case MESSAGE_COMPLETE:
+                return COMPLETING;
             case MESSAGE_CLOSE:
                 return CLOSING;
             case MESSAGE_COMPENSATE:
@@ -288,7 +350,7 @@ public enum BACCState {
             case MESSAGE_COMPLETED:
                 return COMPLETED;
             case MESSAGE_FAIL:
-                return FAILING_ACTIVE_CANCELING;
+                return FAILING_ACTIVE_CANCELING_COMPLETING;
             case MESSAGE_CANNOTCOMPLETE:
                 return NOT_COMPLETING;
             case MESSAGE_CANCELED:
