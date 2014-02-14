@@ -330,6 +330,8 @@ public class NeedController
         logger.warn("caught ExcutionException", e);
     } catch (CamelConfigurationFailedException e) {
         logger.warn("caught CamelConfigurationFailedException",e);
+    } catch (Exception e) {
+        logger.warn("caught Exception",e);
     }
 
       return "noNeedFound";
@@ -349,8 +351,10 @@ public class NeedController
       }
     } catch (NoSuchNeedException e) {
       logger.warn("caught NoSuchNeedException:", e);
+    } catch (Exception e) {
+        logger.warn("caught Exception",e);
     }
-    return "redirect:/need/" + need.getId().toString();
+      return "redirect:/need/" + need.getId().toString();
     //return viewNeed(need.getId().toString(), model);
   }
 
@@ -380,6 +384,8 @@ public class NeedController
       logger.warn("caught ExecutionException",e);
     } catch (CamelConfigurationFailedException e) {
       logger.warn("caught CamelConfigurationFailedException");
+    } catch (Exception e) {
+        logger.warn("caught Exception",e);
     }
 
       return ret;
