@@ -4,10 +4,9 @@ import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.facet.businessactivity.BAEventType;
-import won.node.facet.businessactivity.BACoordinatorCompletionState;
-import won.node.facet.businessactivity.SimpleBACCStateManager;
-import won.node.facet.businessactivity.SimpleBAStateManager;
+import won.node.facet.businessactivity.coordinatorcompletion.BACCState;
+import won.node.facet.businessactivity.coordinatorcompletion.BACCEventType;
+import won.node.facet.businessactivity.coordinatorcompletion.SimpleBACCStateManager;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
@@ -33,7 +32,7 @@ public class BACCParticipantFacetImpl extends Facet{
 
     @Override
     public FacetType getFacetType() {
-        return FacetType.BAPCParticipantFacet;
+        return FacetType.BACCParticipantFacet;
     }
 
     // particiapant -> accept
@@ -47,7 +46,7 @@ public class BACCParticipantFacetImpl extends Facet{
                         needFacingConnectionClient.open(con, content);
                         //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
 
-                        stateManager.setStateForNeedUri(BACoordinatorCompletionState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
+                        stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
                         logger.info("Participant state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
                     } catch (WonProtocolException e) {
                         logger.debug("caught Exception:", e);
@@ -71,7 +70,7 @@ public class BACCParticipantFacetImpl extends Facet{
             public void run() {
                 try {
                     String messageForSending = new String();
-                    BAEventType eventType = null;
+                    BACCEventType eventType = null;
                     Model myContent = null;
                     Resource r = null;
 
@@ -88,12 +87,12 @@ public class BACCParticipantFacetImpl extends Facet{
                     Resource baseResource = myContent.createResource("no:uri");
 
                     // message -> eventType
-                    eventType = BAEventType.getCoordinationEventTypeFromString(messageForSending);
+                    eventType = BACCEventType.getCoordinationEventTypeFromString(messageForSending);
                     if((eventType!=null))
                     {
-                        if(eventType.isBAPCParticipantEventType(eventType))
+                        if(eventType.isBACCParticipantEventType(eventType))
                         {
-                            BACoordinatorCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                            BACCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                             logger.info("Current state of the Participant: "+state.getURI().toString());
                             stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
                             logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
@@ -144,14 +143,47 @@ public class BACCParticipantFacetImpl extends Facet{
                     String sCoordMsg = coordMsg.toString(); //URI
 
                     // URI -> eventType
-                    BAEventType eventType = BAEventType.getCoordinationEventTypeFromURI(sCoordMsg);
+                    BACCEventType eventType = BACCEventType.getCoordinationEventTypeFromURI(sCoordMsg);
 
-                    BACoordinatorCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                    BACCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                     logger.info("Current state of the Participant: "+state.getURI().toString());
                     stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
                     logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+
+
+
+                    BACCEventType resendEventType = state.getResendEvent();
+                    if(resendEventType!=null)
+                    {
+                        Model myContent = ModelFactory.createDefaultModel();
+                        myContent.setNsPrefix("","no:uri");
+                        Resource baseResource = myContent.createResource("no:uri");
+
+                        if(BACCEventType.isBACCParticipantEventType(resendEventType))
+                        {
+                            state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                            logger.info("Participant re-sends the previous message.");
+                            logger.info("Current state of the Participant: "+state.getURI().toString());
+                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
+                            logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+
+                            // eventType -> URI Resource
+                            Resource r = myContent.createResource(resendEventType.getURI().toString());
+                            baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
+                            needFacingConnectionClient.textMessage(con, myContent);
+                        }
+                        else
+                        {
+                            logger.info("The eventType: "+eventType.getURI().toString()+" can not be triggered by Participant.");
+                        }
+
+                    }
+
+
+
+
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
                 }

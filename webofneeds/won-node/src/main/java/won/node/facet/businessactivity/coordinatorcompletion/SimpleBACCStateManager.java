@@ -1,4 +1,4 @@
-package won.node.facet.businessactivity;
+package won.node.facet.businessactivity.coordinatorcompletion;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -11,9 +11,9 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class SimpleBACCStateManager  implements  BACCStateManager{
-    private HashMap<String, BACoordinatorCompletionState> map = new HashMap();
+    private HashMap<String, BACCState> map = new HashMap();
 
-    public BACoordinatorCompletionState getStateForNeedUri(URI ownerUri, URI needUri){
+    public BACCState getStateForNeedUri(URI ownerUri, URI needUri){
         return map.get(ownerUri.toString()+ needUri.toString());
     }
 
@@ -25,7 +25,7 @@ public class SimpleBACCStateManager  implements  BACCStateManager{
         }
     }
 
-    public void setStateForNeedUri(BACoordinatorCompletionState state, URI ownerUri, URI needUri)
+    public void setStateForNeedUri(BACCState state, URI ownerUri, URI needUri)
     {
         map.put(ownerUri.toString()+needUri.toString(), state);
     }

@@ -1,4 +1,4 @@
-package won.node.facet.businessactivity;
+package won.node.facet.businessactivity.coordinatorcompletion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,41 +9,44 @@ import java.net.URI;
 /**
  * Created with IntelliJ IDEA.
  * User: Danijel
- * Date: 30.1.14.
- * Time: 18.33
+ * Date: 6.2.14.
+ * Time: 15.53
  * To change this template use File | Settings | File Templates.
  */
-public enum BAParticipantCompletionState {
+public enum BACCState {
     SUGGESTED("Suggested"){
-        public BAParticipantCompletionState transit(BAEventType msg){
+        public BACCState transit(BACCEventType msg){
             resendEvent = null;
             return null;
         }
     },
     REQUEST_SENT("RequestSent"){
-        public BAParticipantCompletionState transit(BAEventType msg){
+        public BACCState transit(BACCEventType msg){
             resendEvent = null;
             return null;
         }
     },
     REQUEST_RECEIVED("RequestReceived"){
-        public BAParticipantCompletionState transit(BAEventType msg){
+        public BACCState transit(BACCEventType msg){
             resendEvent = null;
             return null;
         }
     },
     CONNECTED("Connected"){
-        public BAParticipantCompletionState transit(BAEventType msg){
+        public BACCState transit(BACCEventType msg){
             resendEvent = null;
             return null;
         }
     },
     ACTIVE("Active"){
-        public BAParticipantCompletionState transit(BAEventType msg){
+        public BACCState transit(BACCEventType msg){
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
                     return CANCELING;
+
+
+
                 case MESSAGE_EXIT:
                     return EXITING;
                 case MESSAGE_COMPLETED:
@@ -58,7 +61,7 @@ public enum BAParticipantCompletionState {
         }
     },
     CANCELING("Canceling"){
-        public BAParticipantCompletionState transit(BAEventType msg){
+        public BACCState transit(BACCEventType msg){
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -79,11 +82,11 @@ public enum BAParticipantCompletionState {
         }
     },
     COMPLETED("Completed"){
-        public BAParticipantCompletionState transit(BAEventType msg){
+        public BACCState transit(BACCEventType msg){
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
-                    resendEvent = BAEventType.MESSAGE_COMPLETED;
+                    resendEvent = BACCEventType.MESSAGE_COMPLETED;
                     return COMPLETED;
                 case MESSAGE_CLOSE:
                     return CLOSING;
@@ -97,7 +100,7 @@ public enum BAParticipantCompletionState {
         }
     },
     CLOSING("Closing") {
-        public BAParticipantCompletionState transit (BAEventType msg){
+        public BACCState transit (BACCEventType msg){
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -107,7 +110,7 @@ public enum BAParticipantCompletionState {
                 case MESSAGE_CLOSED:
                     return ENDED;
                 case MESSAGE_COMPLETED:
-                    resendEvent = BAEventType.MESSAGE_CLOSE;
+                    resendEvent = BACCEventType.MESSAGE_CLOSE;
                     return CLOSING;
                 default:
                     return CLOSING;
@@ -115,7 +118,7 @@ public enum BAParticipantCompletionState {
         }
     },
     COMPENSATING("Compensating"){
-        public BAParticipantCompletionState transit (BAEventType msg){
+        public BACCState transit (BACCEventType msg){
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -127,7 +130,7 @@ public enum BAParticipantCompletionState {
                 case MESSAGE_COMPENSATED:
                     return ENDED;
                 case MESSAGE_COMPLETED:
-                    resendEvent = BAEventType.MESSAGE_COMPENSATE;
+                    resendEvent = BACCEventType.MESSAGE_COMPENSATE;
                     return COMPENSATING;
                 default:
                     return COMPENSATING;
@@ -135,11 +138,11 @@ public enum BAParticipantCompletionState {
         }
     },
     FAILING_ACTIVE_CANCELING("FailingActiveCanceling") {
-        public BAParticipantCompletionState transit (BAEventType msg){
+        public BACCState transit (BACCEventType msg){
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
-                    resendEvent = BAEventType.MESSAGE_FAIL;
+                    resendEvent = BACCEventType.MESSAGE_FAIL;
                     return FAILING_ACTIVE_CANCELING;
                 case MESSAGE_FAILED:
                     return ENDED;
@@ -151,13 +154,13 @@ public enum BAParticipantCompletionState {
         }
     },
     FAILING_COMPENSATING("FailingCompensating") {
-        public BAParticipantCompletionState transit (BAEventType msg) {
+        public BACCState transit (BACCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
                     return FAILING_COMPENSATING;
                 case MESSAGE_COMPENSATE:
-                    resendEvent = BAEventType.MESSAGE_FAIL;
+                    resendEvent = BACCEventType.MESSAGE_FAIL;
                     return FAILING_COMPENSATING;
                 case MESSAGE_FAILED:
                     return ENDED;
@@ -171,11 +174,11 @@ public enum BAParticipantCompletionState {
         }
     },
     NOT_COMPLETING("NotCompleting"){
-        public BAParticipantCompletionState transit (BAEventType msg) {
+        public BACCState transit (BACCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
-                    resendEvent = BAEventType.MESSAGE_CANNOTCOMPLETE;
+                    resendEvent = BACCEventType.MESSAGE_CANNOTCOMPLETE;
                     return NOT_COMPLETING;
                 case MESSAGE_NOTCOMPLETED:
                     return ENDED;
@@ -187,11 +190,11 @@ public enum BAParticipantCompletionState {
         }
     },
     EXITING("Exiting") {
-        public BAParticipantCompletionState transit (BAEventType msg) {
+        public BACCState transit (BACCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
-                    resendEvent = BAEventType.MESSAGE_EXIT;
+                    resendEvent = BACCEventType.MESSAGE_EXIT;
                     return EXITING;
                 case MESSAGE_EXITED:
                     return ENDED;
@@ -203,17 +206,17 @@ public enum BAParticipantCompletionState {
         }
     },
     ENDED("Ended") {
-        public BAParticipantCompletionState transit (BAEventType msg){
+        public BACCState transit (BACCEventType msg){
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
-                    resendEvent = BAEventType.MESSAGE_CANCELED;
+                    resendEvent = BACCEventType.MESSAGE_CANCELED;
                     return ENDED;
                 case MESSAGE_CLOSE:
-                    resendEvent = BAEventType.MESSAGE_CLOSED;
+                    resendEvent = BACCEventType.MESSAGE_CLOSED;
                     return ENDED;
                 case MESSAGE_COMPENSATE:
-                    resendEvent = BAEventType.MESSAGE_COMPENSATED;
+                    resendEvent = BACCEventType.MESSAGE_COMPENSATED;
                     return ENDED;
                 case MESSAGE_FAILED:
                     return ENDED;
@@ -228,15 +231,15 @@ public enum BAParticipantCompletionState {
                 case MESSAGE_COMPENSATED:
                     return ENDED;
                 case MESSAGE_EXIT:
-                    resendEvent = BAEventType.MESSAGE_EXITED;
+                    resendEvent = BACCEventType.MESSAGE_EXITED;
                     return ENDED;
                 case MESSAGE_COMPLETED:
                     return ENDED;
                 case MESSAGE_FAIL:
-                    resendEvent = BAEventType.MESSAGE_FAILED;
+                    resendEvent = BACCEventType.MESSAGE_FAILED;
                     return ENDED;
                 case MESSAGE_CANNOTCOMPLETE:
-                    resendEvent = BAEventType.MESSAGE_NOTCOMPLETED;
+                    resendEvent = BACCEventType.MESSAGE_NOTCOMPLETED;
                     return ENDED;
                 default:
                     return ENDED;
@@ -244,28 +247,28 @@ public enum BAParticipantCompletionState {
         }
     },
     CLOSED("Closed"){
-        public BAParticipantCompletionState transit(BAEventType msg){
+        public BACCState transit(BACCEventType msg){
             resendEvent = null;
             return null;
         }
     };
 
-    private static final Logger logger = LoggerFactory.getLogger(BAParticipantCompletionState.class);
+    private static final Logger logger = LoggerFactory.getLogger(BACCState.class);
 
     private String name;
-    private static BAEventType resendEvent = null;
+    private static BACCEventType resendEvent = null;
 
-    private BAParticipantCompletionState(String name)
+    private BACCState(String name)
     {
         this.name = name;
     }
 
-    public BAEventType getResendEvent(){
+    public BACCEventType getResendEvent(){
         return  resendEvent;
     }
 
 
-    public static BAParticipantCompletionState create(BAEventType msg)
+    public static BACCState create(BACCEventType msg)
     {
         switch (msg) {
             case MESSAGE_CANCEL:
@@ -298,7 +301,7 @@ public enum BAParticipantCompletionState {
         throw new IllegalArgumentException("Connection creation failed: Wrong ConnectionEventType");
     }
 
-    public abstract BAParticipantCompletionState transit (BAEventType msg);
+    public abstract BACCState transit (BACCEventType msg);
 
     public URI getURI()
     {
@@ -312,9 +315,9 @@ public enum BAParticipantCompletionState {
      * @param fragment string to match
      * @return matched enum, null otherwise
      */
-    public static BAParticipantCompletionState parseString(final String fragment)
+    public static BACCState parseString(final String fragment)
     {
-        for (BAParticipantCompletionState state : values())
+        for (BACCState state : values())
             if (state.name.equals(fragment))
                 return state;
 

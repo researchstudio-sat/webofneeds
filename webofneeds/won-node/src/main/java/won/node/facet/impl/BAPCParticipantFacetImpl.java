@@ -3,30 +3,20 @@ package won.node.facet.impl;
 
 
 import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.rdf.model.*;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.facet.businessactivity.*;
+import won.node.facet.businessactivity.participantcompletion.BAPCEventType;
+import won.node.facet.businessactivity.participantcompletion.SimpleBAPCStateManager;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.vocabulary.WON;
 
-import won.node.facet.businessactivity.BAStateManager;
-import won.node.facet.businessactivity.SimpleBAStateManager;
-import won.node.facet.businessactivity.BAEventType;
-import won.node.facet.businessactivity.BAParticipantCompletionState;
+import won.node.facet.businessactivity.participantcompletion.BAPCState;
 
 
 import java.net.URI;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,7 +30,7 @@ public class BAPCParticipantFacetImpl extends Facet{
 
     @Autowired
     private ConnectionRepository connectionRepository;
-    private SimpleBAStateManager stateManager = new SimpleBAStateManager();
+    private SimpleBAPCStateManager stateManager = new SimpleBAPCStateManager();
 
     @Override
     public FacetType getFacetType() {
@@ -58,7 +48,7 @@ public class BAPCParticipantFacetImpl extends Facet{
                         needFacingConnectionClient.open(con, content);
                         //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
 
-                        stateManager.setStateForNeedUri(BAParticipantCompletionState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
+                        stateManager.setStateForNeedUri(BAPCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
                         logger.info("Participant state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
                     } catch (WonProtocolException e) {
                         logger.debug("caught Exception:", e);
@@ -82,7 +72,7 @@ public class BAPCParticipantFacetImpl extends Facet{
             public void run() {
                 try {
                     String messageForSending = new String();
-                    BAEventType eventType = null;
+                    BAPCEventType eventType = null;
                     Model myContent = null;
                     Resource r = null;
 
@@ -99,12 +89,12 @@ public class BAPCParticipantFacetImpl extends Facet{
                     Resource baseResource = myContent.createResource("no:uri");
 
                     // message -> eventType
-                    eventType = BAEventType.getCoordinationEventTypeFromString(messageForSending);
+                    eventType = BAPCEventType.getCoordinationEventTypeFromString(messageForSending);
                     if((eventType!=null))
                     {
                         if(eventType.isBAPCParticipantEventType(eventType))
                         {
-                            BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                            BAPCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                             logger.info("Current state of the Participant: "+state.getURI().toString());
                             stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
                             logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
@@ -155,23 +145,23 @@ public class BAPCParticipantFacetImpl extends Facet{
                     String sCoordMsg = coordMsg.toString(); //URI
 
                     // URI -> eventType
-                    BAEventType eventType = BAEventType.getCoordinationEventTypeFromURI(sCoordMsg);
+                    BAPCEventType eventType = BAPCEventType.getCoordinationEventTypeFromURI(sCoordMsg);
 
-                    BAParticipantCompletionState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                    BAPCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                     logger.info("Current state of the Participant: "+state.getURI().toString());
                     stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
                     logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
 
-                    BAEventType resendEventType = state.getResendEvent();
+                    BAPCEventType resendEventType = state.getResendEvent();
                     if(resendEventType!=null)
                     {
                         Model myContent = ModelFactory.createDefaultModel();
                         myContent.setNsPrefix("","no:uri");
                         Resource baseResource = myContent.createResource("no:uri");
 
-                        if(BAEventType.isBAPCParticipantEventType(resendEventType))
+                        if(BAPCEventType.isBAPCParticipantEventType(resendEventType))
                         {
                             state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                             logger.info("Participant re-sends the previous message.");
@@ -182,7 +172,6 @@ public class BAPCParticipantFacetImpl extends Facet{
                             // eventType -> URI Resource
                             Resource r = myContent.createResource(resendEventType.getURI().toString());
                             baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
-                            //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
                             needFacingConnectionClient.textMessage(con, myContent);
                         }
                         else

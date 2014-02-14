@@ -1,4 +1,4 @@
-package won.node.facet.businessactivity;
+package won.node.facet.businessactivity.participantcompletion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,15 +9,11 @@ import java.net.URI;
 /**
  * Created with IntelliJ IDEA.
  * User: Danijel
- * Date: 6.2.14.
- * Time: 15.53
+ * Date: 24.1.14.
+ * Time: 16.01
  * To change this template use File | Settings | File Templates.
  */
-public enum BACoordinatorCompletionState {
-    SUGGESTED("Suggested"),
-    REQUEST_SENT("RequestSent"),
-    REQUEST_RECEIVED("RequestReceived"),
-    CONNECTED("Connected"),
+public enum BAPCCoordinatorState {
     ACTIVE("Active"),
     CANCELING("Canceling"),
     COMPLETED("Completed"),
@@ -30,30 +26,18 @@ public enum BACoordinatorCompletionState {
     ENDED("Ended"),
     CLOSED("Closed");
 
-    private static final Logger logger = LoggerFactory.getLogger(BAParticipantCompletionState.class);
+    private static final Logger logger = LoggerFactory.getLogger(BAPCCoordinatorState.class);
 
     private String name;
 
-    private BACoordinatorCompletionState(String name)
+    private BAPCCoordinatorState(String name)
     {
         this.name = name;
     }
 
-    public static BACoordinatorCompletionState create(BAEventType msg)
+    public static BAPCCoordinatorState create(BAPCEventType msg)
     {
         switch (msg) {
-            case MESSAGE_CANCEL:
-                return CANCELING;
-            case MESSAGE_CLOSE:
-                return CLOSING;
-            case MESSAGE_COMPENSATE:
-                return COMPENSATING;
-            case MESSAGE_FAILED:
-                return ENDED;
-            case MESSAGE_EXITED:
-                return ENDED;
-            case MESSAGE_NOTCOMPLETED:
-                return ENDED;
             case MESSAGE_EXIT:
                 return EXITING;
             case MESSAGE_COMPLETED:
@@ -68,69 +52,69 @@ public enum BACoordinatorCompletionState {
                 return ENDED;
             case MESSAGE_COMPENSATED:
                 return ENDED;
+            case MESSAGE_CANCEL:
+                return CANCELING;
+            case MESSAGE_CLOSE:
+                return CLOSING;
+            case MESSAGE_COMPENSATE:
+                return COMPENSATING;
+            case MESSAGE_FAILED:
+                return ENDED;
+            case MESSAGE_EXITED:
+                return ENDED;
+            case MESSAGE_NOTCOMPLETED:
+                return ENDED;
         }
         throw new IllegalArgumentException("Connection creation failed: Wrong ConnectionEventType");
     }
 
-    public BACoordinatorCompletionState transit(BAEventType msg)
+    public BAPCCoordinatorState transit(BAPCEventType msg)
     {
         switch (this) {
             case ACTIVE:
                 switch (msg) {
                     case MESSAGE_CANCEL:
                         return CANCELING;
-                    case MESSAGE_EXIT:
-                        return EXITING;
-                    case MESSAGE_COMPLETED:
-                        return COMPLETED;
-                    case MESSAGE_FAIL:
-                        return FAILING_ACTIVE_CANCELING;
-                    case MESSAGE_CANNOTCOMPLETE:
-                        return NOT_COMPLETING;
                     default:
                         return ACTIVE;
                 }
             case CANCELING:
                 switch (msg) {
-                    case MESSAGE_CANCEL:
-                        return CANCELING;
-                    case MESSAGE_FAIL:
-                        return FAILING_ACTIVE_CANCELING;
-                    case MESSAGE_CANCELED:
-                        return ENDED;
                     case MESSAGE_EXIT:
                         return EXITING;
                     case MESSAGE_COMPLETED:
                         return COMPLETED;
+                    case MESSAGE_FAIL:
+                        return FAILING_ACTIVE_CANCELING;
                     case MESSAGE_CANNOTCOMPLETE:
                         return NOT_COMPLETING;
+                    case MESSAGE_CANCELED:
+                        return ENDED;
+                    case MESSAGE_CANCEL:
+                        return CANCELING;
                     default:
                         return CANCELING;
                 }
 
             case COMPLETED:
                 switch (msg) {
-                    case MESSAGE_CANCEL:
+                    case MESSAGE_COMPLETED:
                         return COMPLETED;
                     case MESSAGE_CLOSE:
                         return CLOSING;
                     case MESSAGE_COMPENSATE:
                         return COMPENSATING;
-                    case MESSAGE_COMPLETED:
-                        return COMPLETED;
                     default:
                         return COMPLETED;
                 }
 
             case CLOSING:
                 switch (msg) {
-                    case MESSAGE_CANCEL:
-                        return CLOSING;
-                    case MESSAGE_CLOSE:
+                    case MESSAGE_COMPLETED:
                         return CLOSING;
                     case MESSAGE_CLOSED:
                         return ENDED;
-                    case MESSAGE_COMPLETED:
+                    case MESSAGE_CLOSE:
                         return CLOSING;
                     default:
                         return CLOSING;
@@ -138,15 +122,13 @@ public enum BACoordinatorCompletionState {
 
             case COMPENSATING:
                 switch (msg) {
-                    case MESSAGE_CANCEL:
-                        return COMPENSATING;
-                    case MESSAGE_COMPENSATE:
+                    case MESSAGE_COMPLETED:
                         return COMPENSATING;
                     case MESSAGE_FAIL:
                         return FAILING_COMPENSATING;
                     case MESSAGE_COMPENSATED:
                         return ENDED;
-                    case MESSAGE_COMPLETED:
+                    case MESSAGE_COMPENSATE:
                         return COMPENSATING;
                     default:
                         return COMPENSATING;
@@ -154,82 +136,48 @@ public enum BACoordinatorCompletionState {
 
             case FAILING_ACTIVE_CANCELING:
                 switch (msg) {
-                    case MESSAGE_CANCEL:
+                    case MESSAGE_FAIL:
                         return FAILING_ACTIVE_CANCELING;
                     case MESSAGE_FAILED:
                         return ENDED;
-                    case MESSAGE_FAIL:
-                        return FAILING_ACTIVE_CANCELING;
                     default:
                         return FAILING_ACTIVE_CANCELING;
                 }
 
             case FAILING_COMPENSATING:
                 switch (msg) {
-                    case MESSAGE_CANCEL:
+                    case MESSAGE_COMPLETED:
                         return FAILING_COMPENSATING;
-                    case MESSAGE_COMPENSATE:
+                    case MESSAGE_FAIL:
                         return FAILING_COMPENSATING;
                     case MESSAGE_FAILED:
                         return ENDED;
-                    case MESSAGE_FAIL:
-                        return FAILING_COMPENSATING;
-                    case MESSAGE_COMPLETED:
-                        return FAILING_COMPENSATING;
                     default:
                         return FAILING_COMPENSATING;
                 }
 
             case NOT_COMPLETING:
                 switch (msg) {
-                    case MESSAGE_CANCEL:
+                    case MESSAGE_CANNOTCOMPLETE:
                         return NOT_COMPLETING;
                     case MESSAGE_NOTCOMPLETED:
                         return ENDED;
-                    case MESSAGE_CANNOTCOMPLETE:
-                        return NOT_COMPLETING;
                     default:
                         return NOT_COMPLETING;
                 }
 
             case EXITING:
                 switch (msg) {
-                    case MESSAGE_CANCEL:
+                    case MESSAGE_EXIT:
                         return EXITING;
                     case MESSAGE_EXITED:
                         return ENDED;
-                    case MESSAGE_EXIT:
-                        return EXITING;
                     default:
                         return EXITING;
                 }
 
             case ENDED:
                 switch (msg) {
-                    case MESSAGE_CANCEL:
-                        logger.info("send MESSAGE_CANCELED");
-                        return ENDED;
-                    case MESSAGE_CLOSE:
-                        logger.info("send MESSAGE_CLOSED");
-                        return ENDED;
-                    case MESSAGE_COMPENSATE:
-                        logger.info("send MESSAGE_COMPENSATED");
-                        return ENDED;
-                    case MESSAGE_FAILED:
-                        logger.info("send Ignore");
-                        return ENDED;
-                    case MESSAGE_EXITED:
-                        logger.info("send Ignore");
-                        return ENDED;
-                    case MESSAGE_NOTCOMPLETED:
-                        logger.info("send Ignore");
-                        return ENDED;
-                    case MESSAGE_CANCELED:
-                        return ENDED;
-                    case MESSAGE_CLOSED:
-                        return ENDED;
-                    case MESSAGE_COMPENSATED:
-                        return ENDED;
                     case MESSAGE_EXIT:
                         logger.info("resend MESSAGE_EXITED");
                         return ENDED;
@@ -241,6 +189,21 @@ public enum BACoordinatorCompletionState {
                         return ENDED;
                     case MESSAGE_CANNOTCOMPLETE:
                         logger.info("resend MESSAGE_NOT_COMPLETED");
+                        return ENDED;
+                    case MESSAGE_CANCELED:
+                        logger.info("send Ignore");
+                        return ENDED;
+                    case MESSAGE_CLOSED:
+                        logger.info("send Ignore");
+                        return ENDED;
+                    case MESSAGE_COMPENSATED:
+                        logger.info("send Ignore");
+                        return ENDED;
+                    case MESSAGE_FAILED:
+                        return ENDED;
+                    case MESSAGE_EXITED:
+                        return ENDED;
+                    case MESSAGE_NOTCOMPLETED:
                         return ENDED;
                     default:
                         logger.info("Invalid State");
@@ -262,18 +225,14 @@ public enum BACoordinatorCompletionState {
      * @param fragment string to match
      * @return matched enum, null otherwise
      */
-    public static BACoordinatorCompletionState parseString(final String fragment)
+    public static BAPCCoordinatorState parseString(final String fragment)
     {
-        for (BACoordinatorCompletionState state : values())
+        for (BAPCCoordinatorState state : values())
             if (state.name.equals(fragment))
                 return state;
 
         logger.warn("No enum could be matched for: {}", fragment);
         return null;
     }
-
-
-
 }
-
 

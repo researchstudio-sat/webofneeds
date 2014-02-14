@@ -1,4 +1,4 @@
-package won.node.facet.businessactivity;
+package won.node.facet.businessactivity.coordinatorcompletion;
 
 import java.net.URI;
 
@@ -10,7 +10,7 @@ import java.net.URI;
  * To change this template use File | Settings | File Templates.
  */
 public interface BACCStateManager {
-    public BACoordinatorCompletionState getStateForNeedUri(URI ownerUri, URI needUri);
+    public BACCState getStateForNeedUri(URI ownerUri, URI needUri);
     public void setupStateForNeedUri(URI needUri);
-    public void setStateForNeedUri(BACoordinatorCompletionState state, URI ownerUri, URI needURI);
+    public void setStateForNeedUri(BACCState state, URI ownerUri, URI needURI);
 }
