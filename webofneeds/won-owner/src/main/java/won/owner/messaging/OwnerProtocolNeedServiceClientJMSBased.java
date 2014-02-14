@@ -97,7 +97,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, CamelConfigurationFailedException {
 
         Map<String, Object> headerMap = new HashMap<>();
         headerMap.put("needURI", needURI.toString()) ;
@@ -110,6 +110,14 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         if (wonNodeList.size()>0){
             WonNode wonNode = wonNodeList.get(0);
             endpoint = wonNode.getOwnerProtocolEndpoint();
+            List<String> endpointList = new ArrayList<>();
+            endpointList.add(endpoint);
+            try {
+                camelContext.getComponent(wonNode.getBrokerComponent()).createEndpoint (endpoint);
+            } catch (Exception e) {
+                logger.info("adding component to camel context failed", e);
+            }
+            ownerProtocolActiveMQService.addRouteForEndpoint(camelContext,endpointList,wonNode.getStartingComponent());
         }else{
             try {
                 endpoint = ownerProtocolActiveMQService.configureCamelEndpointForNeed(needURI,startingEndpoint);

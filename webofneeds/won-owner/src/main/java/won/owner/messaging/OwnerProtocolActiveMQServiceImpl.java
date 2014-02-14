@@ -176,7 +176,8 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
 
 
         logger.info("adding component with component name {}",componentName);
-        brokerComponentMap.put(wonNodeURI,componentName);
+        if (!brokerComponentMap.containsKey(wonNodeURI))
+            brokerComponentMap.put(wonNodeURI,componentName);
         return componentName;
     }
     public String replaceEndpointNameWithOwnerApplicationId(String endpointName, String ownerApplicationId) throws Exception {
