@@ -98,6 +98,19 @@ public class WonRdfUtils
       Resource baseRes = RdfUtils.getBaseResource(content);
       baseRes.addProperty(WON.HAS_REMOTE_FACET, content.createResource(facetURI.toString()));
     }
+
+    /**
+     * Creates a model for connecting two facets.
+     * @return
+     */
+    public static Model createModelForConnect(URI facet, URI remoteFacet)
+    {
+      Model model = ModelFactory.createDefaultModel();
+      model.setNsPrefix("", "no:uri");
+      WonRdfUtils.FacetUtils.addFacet(model, facet);
+      WonRdfUtils.FacetUtils.addRemoteFacet(model, remoteFacet);
+      return model;
+    }
   }
 
 

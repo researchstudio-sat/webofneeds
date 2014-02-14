@@ -25,7 +25,6 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 /**
  * Created with IntelliJ IDEA.
@@ -66,6 +65,17 @@ public abstract class Facet {
 
   public abstract FacetType getFacetType();
 
+  /**
+   *
+   * This function is invoked when an owner sends an open message to a won node and usually executes registered facet specific code.
+   * It is used to open a connection which is identified by the connection object con. A rdf graph can be sent along with the request.
+   *
+   * @param con the connection object
+   * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
+   *                as well as the base URI of the graph will be attached to the resource identifying the event.
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
+   */
   public void openFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
     if (con.getRemoteConnectionURI() != null) {
@@ -83,6 +93,17 @@ public abstract class Facet {
     }
   }
 
+  /**
+   *
+   * This function is invoked when an owner sends a close message to a won node and usually executes registered facet specific code.
+   *It is used to close a connection which is identified by the connection object con. A rdf graph can be sent along with the request.
+   *
+   * @param con the connection object
+   * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
+   *                as well as the base URI of the graph will be attached to the resource identifying the event.
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
+   */
   public void closeFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
     if (con.getRemoteConnectionURI() != null) {
@@ -102,6 +123,16 @@ public abstract class Facet {
     }
   }
 
+  /**
+   * This function is invoked when an owner sends a text message to a won node and usually executes registered facet specific code.
+   * It is used to indicate the sending of a chat message with by the specified connection object con
+   * to the remote partner.
+   *
+   * @param con the connection object
+   * @param message  the chat message
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
+   */
   public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     final URI remoteConnectionURI = con.getRemoteConnectionURI();
     //inform the other side
@@ -118,6 +149,17 @@ public abstract class Facet {
     });
   }
 
+  /**
+   *
+   * This function is invoked when an won node sends an open message to another won node and usually executes registered facet specific code.
+   * It is used to open a connection which is identified by the connection object con. A rdf graph can be sent along with the request.
+   *
+   * @param con the connection object
+   * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
+   *                as well as the base URI of the graph will be attached to the resource identifying the event.
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
+   */
   public void openFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
     executorService.execute(new Runnable()
@@ -134,6 +176,17 @@ public abstract class Facet {
     });
   }
 
+  /**
+   *
+   * This function is invoked when an won node sends a close message to another won node and usually executes registered facet specific code.
+   * It is used to close a connection which is identified by the connection object con. A rdf graph can be sent along with the request.
+   *
+   * @param con the connection object
+   * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
+   *                as well as the base URI of the graph will be attached to the resource identifying the event.
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
+   */
   public void closeFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
     executorService.execute(new Runnable()
@@ -150,6 +203,16 @@ public abstract class Facet {
     });
   }
 
+  /**
+   * This function is invoked when a won node sends a text message to another won node and usually executes registered facet specific code.
+   * It is used to indicate the sending of a chat message with by the specified connection object con
+   * to the remote partner.
+   *
+   * @param con the connection object
+   * @param message  the chat message
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
+   */
   public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //send to the need side
     executorService.execute(new Runnable() {
@@ -163,7 +226,23 @@ public abstract class Facet {
       }
     });
   }
-
+  /**
+   * This function is invoked when a matcher sends a hint message to a won node and
+   * usually executes registered facet specific code.
+   * It notifies the need of a matching otherNeed with the specified match score. Originator
+   * identifies the entity making the call. Normally, originator is a matching service.
+   * A rdf graph can be sent along with the request.
+   *
+   * @param con the connection object
+   * @param score      match score between 0.0 (bad) and 1.0 (good). Implementations treat lower values as 0.0 and higher values as 1.0.
+   * @param originator an URI identifying the calling entity
+   * @param content (optional) an optional RDF graph containing more detailed information about the hint. The null releative URI ('<>') inside that graph,
+   *                as well as the base URI of the graph will be attached to the resource identifying the match event.
+   * @throws won.protocol.exception.NoSuchNeedException
+   *          if needURI is not a known need URI
+   * @throws won.protocol.exception.IllegalMessageForNeedStateException
+   *          if the need is not active
+   */
   public void hint(final Connection con, final double score, final URI originator, final Model content)
       throws NoSuchNeedException, IllegalMessageForNeedStateException {
 
@@ -186,6 +265,17 @@ public abstract class Facet {
     });
   }
 
+  /**
+   *
+   * This function is invoked when an won node sends an connect message to another won node and usually executes registered facet specific code.
+   * The connection is identified by the connection object con. A rdf graph can be sent along with the request.
+   *
+   * @param con the connection object
+   * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
+   *                as well as the base URI of the graph will be attached to the resource identifying the event.
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
+   */
   public void connectFromNeed(final Connection con, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
 
@@ -212,6 +302,17 @@ public abstract class Facet {
     });
   }
 
+  /**
+   *
+   * This function is invoked when an owner sends an open message to the won node and usually executes registered facet specific code.
+   * The connection is identified by the connection object con. A rdf graph can be sent along with the request.
+   *
+   * @param con the connection object
+   * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
+   *                as well as the base URI of the graph will be attached to the resource identifying the event.
+   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
+   */
   public void connectFromOwner(final Connection con, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
     final Model remoteFacetModel = changeHasRemoteFacetToHasFacet(content);

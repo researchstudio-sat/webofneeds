@@ -26,7 +26,7 @@
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-roundrobin.xml" />
     <import resource="classpath:spring/owner-jmsonly.xml" />
 
-    <bean id="needConsumerOwnerEmulateOncePerNode" class="won.bot.needconsumer.impl.OwnerEmulatingNeedConsumer" >
+    <bean id="needConsumerOwnerEmulateOncePerNode" class="won.bot.framework.component.needconsumer.impl.OwnerEmulatingNeedConsumer" >
         <property name="nodeURISource" ref="nodeUriSourceRoundRobin" />
         <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
         <property name="consumeOncePerNode" value="true" />
