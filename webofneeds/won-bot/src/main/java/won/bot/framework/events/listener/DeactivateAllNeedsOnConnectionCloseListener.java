@@ -41,7 +41,7 @@ public class DeactivateAllNeedsOnConnectionCloseListener extends BaseEventListen
   }
 
   @Override
-  public void doOnEvent(final Event event) throws NoSuchConnectionFault, NoSuchNeedException, IllegalMessageForConnectionStateFault {
+  public void doOnEvent(final Event event) throws Exception {
     if (! (event instanceof CloseFromOtherNeedEvent)) return;
     Connection con = ((CloseFromOtherNeedEvent) event).getCon();
     logger.debug("received close on connection {}, deactivating needs", con.getConnectionURI());
@@ -53,7 +53,7 @@ public class DeactivateAllNeedsOnConnectionCloseListener extends BaseEventListen
       getEventListenerContext().getEventBus().unsubscribe(CloseFromOtherNeedEvent.class, this);
   }
 
-  private void deactivateNeed(final URI needURI) throws NoSuchConnectionFault, NoSuchNeedException, IllegalMessageForConnectionStateFault {
+  private void deactivateNeed(final URI needURI) throws Exception {
       logger.debug("deactivating need {}", needURI);
 
             getEventListenerContext().getOwnerService().deactivate(needURI);
