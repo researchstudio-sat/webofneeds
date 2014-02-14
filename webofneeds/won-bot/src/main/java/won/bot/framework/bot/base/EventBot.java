@@ -27,6 +27,7 @@ import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
+import won.protocol.model.FacetType;
 import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 
@@ -112,7 +113,7 @@ public class EventBot extends TriggeredBot
   @Override
   public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception
   {
-    eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel));
+    eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel, FacetType.OwnerFacet));
   }
   @Override
   public void onNewGroupCreated(final URI groupURI, final URI wonNodeURI, final Model groupModel)

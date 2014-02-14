@@ -143,7 +143,7 @@ public class Create2NeedsShortConversationBotTest
       Assert.assertEquals(2, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
       //2 create need events
-        /*
+
       Assert.assertEquals(2, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
       //1 connect, 1 open
@@ -157,7 +157,7 @@ public class Create2NeedsShortConversationBotTest
       Assert.assertEquals(0, this.connectionCloser.getExceptionCount());
       //1 close (one sent, one received - but for sending we create no event)
       Assert.assertEquals(1, this.needDeactivator.getEventCount());
-      Assert.assertEquals(0, this.needDeactivator.getExceptionCount());  */
+      Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
       //2 needs deactivated
       Assert.assertEquals(2, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());

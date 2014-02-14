@@ -56,7 +56,6 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   public void onConnect(final Connection con, final Model content) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
-
         try {
           logger.info("onConnect called for connection {} ",con.getConnectionURI());
           getBotForNeedUri(con.getNeedURI()).onConnectFromOtherNeed(con, content);

@@ -29,8 +29,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import won.bot.framework.events.event.WorkDoneEvent;
 import won.bot.framework.events.listener.ExecuteOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
+import won.bot.impl.CommentBot;
 import won.bot.impl.Create2NeedsGroupingBot;
-import won.bot.impl.Create2NeedsShortConversationBot;
 
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
-public class Create2NeedsGroupingBotTest
+public class CommentBotTest
 {
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
@@ -73,7 +73,7 @@ public class Create2NeedsGroupingBotTest
    * @throws Exception
    */
   @Test
-  public void testCreate2NeedsGroupingBot() throws Exception
+  public void testCommentBot() throws Exception
   {
     //adding the bot to the bot manager will cause it to be initialized.
     //at that point, the trigger starts.
@@ -93,7 +93,7 @@ public class Create2NeedsGroupingBotTest
    * add a listener to its internal event bus and to access its listeners, which
    * record information during the run that we later check with asserts.
    */
-  public static class MyBot extends Create2NeedsGroupingBot
+  public static class MyBot extends CommentBot
   {
     /**
      * Used for synchronization with the @Test method: it should wait at the
@@ -140,23 +140,20 @@ public class Create2NeedsGroupingBotTest
      */
     public void executeAsserts()
     {
-      //2 act events
-      Assert.assertEquals(2, this.needCreator.getEventCount());
+      //1 act events
+      Assert.assertEquals(1, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
-      //2 create need events
-      Assert.assertEquals(2, this.groupFacetCreator.getEventCount());
-      Assert.assertEquals(0, this.groupFacetCreator.getExceptionCount());
-      //1 create group events
+      //1 create need events
+      Assert.assertEquals(1, this.commentFacetCreator.getEventCount());
+      Assert.assertEquals(0, this.commentFacetCreator.getExceptionCount());
+      //1 create comment events
       Assert.assertEquals(1, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
-      //2 connect, 2 open
-      Assert.assertEquals(4, this.autoOpener.getEventCount());
+      //1 connect, 1 open
+      Assert.assertEquals(2, this.autoOpener.getEventCount());
       Assert.assertEquals(0, this.autoOpener.getExceptionCount());
       //10 messages
-      Assert.assertEquals(4, this.autoResponder.getEventCount());
-      Assert.assertEquals(0, this.autoResponder.getExceptionCount());
-      //10 messages
-      Assert.assertEquals(4, this.connectionCloser.getEventCount());
+      Assert.assertEquals(2, this.connectionCloser.getEventCount());
       Assert.assertEquals(0, this.connectionCloser.getExceptionCount());
       //2 close (one sent, one received - but for sending we create no event)
 
@@ -165,7 +162,7 @@ public class Create2NeedsGroupingBotTest
 
 
       //4 NeedDeactivated events
-      Assert.assertEquals(5, this.workDoneSignaller.getEventCount());
+      Assert.assertEquals(2, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
       //TODO: there is more to check:

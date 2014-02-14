@@ -14,18 +14,18 @@
  *    limitations under the License.
  */
 
-package won.bot.integrationtest;
+package won.bot.framework.events.event;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-
+import won.bot.framework.events.Event;
+import won.protocol.model.FacetType;
 
 /**
- * Integration test.
+ * Base class for events.
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({Create2NeedsShortConversationBotTest.class,Create2NeedsGroupingBotTest.class,CommentBotTest.class})
-public class WonTestSuite
+public interface FacetEvent extends Event
 {
+  public FacetType getFacetType();
+
+
 
 }

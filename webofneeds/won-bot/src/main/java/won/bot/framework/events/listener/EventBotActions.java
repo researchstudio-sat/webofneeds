@@ -21,7 +21,9 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.bot.framework.component.needproducer.impl.CommentNeedProducer;
 import won.bot.framework.component.needproducer.impl.GroupNeedProducer;
+import won.bot.framework.events.event.CommentFacetCreatedEvent;
 import won.bot.framework.events.event.GroupFacetCreatedEvent;
 import won.bot.framework.events.event.NeedCreatedEvent;
 import won.bot.framework.events.event.WorkDoneEvent;
@@ -38,9 +40,9 @@ import java.util.List;
  */
 public class EventBotActions
 {
-  private static final Logger logger = LoggerFactory.getLogger(EventBotActions.class);
+    private static final Logger logger = LoggerFactory.getLogger(EventBotActions.class);
 
-  public static abstract class Action implements Runnable {
+    public static abstract class Action implements Runnable {
     private EventListenerContext eventListenerContext;
 
     private Action(){}
@@ -120,7 +122,6 @@ public class EventBotActions
       private URI localFacet;
       public ConnectTwoNeedsWithGroupAction (final EventListenerContext eventListenerContext, final URI remoteFacet, final URI localFacet)
       {
-
           super(eventListenerContext);
           this.remoteFacet = remoteFacet;
           this.localFacet = localFacet;
@@ -128,14 +129,16 @@ public class EventBotActions
 
       @Override
       protected void doRun() throws Exception {
-          List<URI> needs = getEventListenerContext().getBotContext().listNeedUrisOfType(FacetType.OwnerFacet);
-          List<URI> groups = getEventListenerContext().getBotContext().listNeedUrisOfType(FacetType.GroupFacet);
+
+          URI group = getEventListenerContext().getBotContext().getNeedByName(FacetType.GroupFacet.name());
+          List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
           for (int i = 0; i< needs.size();i++){
               try{
                   //TODO: duplicate code. see ConnectTwoNeedsAction
-                  getEventListenerContext().getOwnerService().connect(needs.get(i),groups.get(0),WonRdfUtils.FacetUtils.createModelForConnect(localFacet,remoteFacet));
+                  if (!needs.get(i).equals(group))
+                    getEventListenerContext().getOwnerService().connect(needs.get(i),group,WonRdfUtils.FacetUtils.createModelForConnect(localFacet,remoteFacet));
               } catch (Exception e) {
-                  logger.warn("could not connect {} and {}", new Object[]{needs.get(i), groups.get(0)}, e);
+                  logger.warn("could not connect {} and {}", new Object[]{needs.get(i), group}, e);
               }
 
           }
@@ -167,7 +170,7 @@ public class EventBotActions
                      try {
                          URI uri = futureNeedUri.get();
                          logger.info("group creation finished, new group URI is: {}", uri);
-                         getEventListenerContext().getBotContext().rememberNeedUriWithType(uri, FacetType.GroupFacet);
+                         getEventListenerContext().getBotContext().rememberNeedUriWithName(uri,FacetType.GroupFacet.name());
                          getEventListenerContext().getEventBus().publish(new GroupFacetCreatedEvent(uri, wonNodeUri, groupModel));
                      } catch (Exception e){
                          logger.warn("create group facet failed", e);
@@ -208,8 +211,7 @@ public class EventBotActions
               URI uri = futureNeedUri.get();
               logger.info("need creation finished, new need URI is: {}", uri);
               getEventListenerContext().getBotContext().rememberNeedUri(uri);
-              getEventListenerContext().getBotContext().rememberNeedUriWithType(uri,FacetType.OwnerFacet);
-              getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel));
+              getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel,FacetType.OwnerFacet));
             } catch (Exception e){
               logger.warn("createNeed failed", e);
             }

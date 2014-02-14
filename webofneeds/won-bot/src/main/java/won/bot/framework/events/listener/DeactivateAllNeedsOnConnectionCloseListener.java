@@ -18,6 +18,7 @@ package won.bot.framework.events.listener;
 
 import won.bot.framework.events.Event;
 import won.bot.framework.events.event.CloseFromOtherNeedEvent;
+import won.bot.framework.events.event.MessageFromOtherNeedEvent;
 import won.bot.framework.events.event.NeedDeactivatedEvent;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
@@ -48,9 +49,8 @@ public class DeactivateAllNeedsOnConnectionCloseListener extends BaseEventListen
     for (int i = 0; i<needUris.size();i++){
         logger.info("needUris size: "+needUris.size());
         deactivateNeed(needUris.get(i));
-        getEventListenerContext().getBotContext().forgetNeedUri(needUris.get(i));
     }
-    logger.debug("EVENT COUNT FOR EVENT TYPE "+event.getClass()+" is "+ getEventCount());
+      getEventListenerContext().getEventBus().unsubscribe(CloseFromOtherNeedEvent.class, this);
   }
 
   private void deactivateNeed(final URI needURI) throws NoSuchConnectionFault, NoSuchNeedException, IllegalMessageForConnectionStateFault {

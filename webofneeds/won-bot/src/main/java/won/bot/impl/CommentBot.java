@@ -27,14 +27,14 @@ import won.protocol.model.FacetType;
 /**
  *
  */
-public class Create2NeedsGroupingBot extends EventBot
+public class CommentBot extends EventBot
 {
 
-  private static final int NO_OF_NEEDS = 2;
+  private static final int NO_OF_NEEDS = 1;
   private static final int NO_OF_GROUPS = 1;
   private static final int NO_OF_MESSAGES = 4;
   private static final long MILLIS_BETWEEN_MESSAGES = 1000;
-  private NeedProducer groupProducer;
+  private NeedProducer commentProducer;
 
   //we use protected members so we can extend the class and
   //access the listeners for unit test assertions and stats
@@ -42,7 +42,7 @@ public class Create2NeedsGroupingBot extends EventBot
   //we use BaseEventListener as their types so we can access the generic
   //functionality offered by that class
   protected BaseEventListener needCreator;
-  protected BaseEventListener groupFacetCreator;
+  protected BaseEventListener commentFacetCreator;
   protected BaseEventListener needConnector;
   protected BaseEventListener autoOpener;
   protected BaseEventListener autoResponder;
@@ -55,7 +55,6 @@ public class Create2NeedsGroupingBot extends EventBot
   protected void initializeEventListeners()
   {
     EventListenerContext ctx = getEventListenerContext();
-
     EventBus bus = getEventBus();
 
     //create needs every trigger execution until 2 needs are created
@@ -66,49 +65,24 @@ public class Create2NeedsGroupingBot extends EventBot
     );
     bus.subscribe(ActEvent.class,this.needCreator);
 
+    //count until 1 need is created, then create a comment facet
+    this.commentFacetCreator = new CommenterListener(ctx);
+    bus.subscribe(NeedCreatedEvent.class, this.commentFacetCreator);
 
+    this.needConnector = new ConnectTwoNeedsListener(ctx,FacetType.CommentFacet.getURI(),FacetType.OwnerFacet.getURI());
+    bus.subscribe(CommentFacetCreatedEvent.class, this.needConnector);
 
-    //count until 2 needs were created, then create group facet
-    this.groupFacetCreator = new ExecuteOnceAfterNEventsListener(
-            ctx,
-            new EventBotActions.CreateGroupNeedAction(ctx),
-            NO_OF_NEEDS);
-    bus.subscribe(NeedCreatedEvent.class, this.groupFacetCreator);
-
-    this.needConnector = new ExecuteOnEventListener(ctx,
-        new EventBotActions.ConnectTwoNeedsWithGroupAction(ctx, FacetType.GroupFacet.getURI(),FacetType.OwnerFacet.getURI()),
-            NO_OF_GROUPS
-    );
-    bus.subscribe(GroupFacetCreatedEvent.class, this.needConnector);
-
-
-
-      //add a listener that is informed of the connect/open events and that auto-opens
-      //subscribe it to:
-      // * connect events - so it responds with open
-      // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
       this.autoOpener = new AutomaticConnectionOpenerListener(ctx);
       bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
       bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
-
-      //add a listener that auto-responds to messages by a message
-      //after 10 messages, it unsubscribes from all events
-      //subscribe it to:
-      // * message events - so it responds
-
-      // * open events - so it initiates the chain reaction of responses
-      this.autoResponder = new AutomaticMessageResponderListener(ctx, NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
-      bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);
-      bus.subscribe(MessageFromOtherNeedEvent.class, this.autoResponder);
-
-
       //add a listener that closes the connection after it has seen 10 messages
       this.connectionCloser = new DelegateOnceAfterNEventsListener(
               ctx,
-              NO_OF_MESSAGES,
+              2,
               new CloseConnectionListener(ctx));
-      bus.subscribe( MessageFromOtherNeedEvent.class, this.connectionCloser);
+      bus.subscribe( ConnectFromOtherNeedEvent.class, this.connectionCloser);
+      bus.subscribe(OpenFromOtherNeedEvent.class,this.connectionCloser);
 
       //add a listener that auto-responds to a close message with a deactivation of both needs.
       //subscribe it to:
@@ -120,14 +94,13 @@ public class Create2NeedsGroupingBot extends EventBot
       //framework that the bot's work is done
       this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
               ctx,
-              new EventBotActions.SignalWorkDoneAction(ctx), 2*(NO_OF_NEEDS+NO_OF_GROUPS)-1
+              new EventBotActions.SignalWorkDoneAction(ctx), 2
       );
       bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
-      bus.subscribe(CloseFromOtherNeedEvent.class,this.workDoneSignaller);
 
   }
-  @Qualifier("groupNeedDefaultProducer")
-  public void setGroupProducer(NeedProducer needProducer){
-     this.groupProducer = needProducer;
+  @Qualifier("commentNeedDefaultProducer")
+  public void setCommentProducer(NeedProducer needProducer){
+     this.commentProducer = needProducer;
   }
 }

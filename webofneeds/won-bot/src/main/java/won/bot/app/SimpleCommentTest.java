@@ -14,18 +14,23 @@
  *    limitations under the License.
  */
 
-package won.bot.integrationtest;
+package won.bot.app;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
-
-/**
- * Integration test.
- */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({Create2NeedsShortConversationBotTest.class,Create2NeedsGroupingBotTest.class,CommentBotTest.class})
-public class WonTestSuite
+public class SimpleCommentTest
 {
+
+  public static void main(String[] args) throws Exception {
+    SpringApplication app = new SpringApplication(
+        new Object[]{"classpath:/spring/app/simpleCommentTest.xml"}
+    );
+    ConfigurableApplicationContext applicationContext =  app.run(args);
+    Thread.sleep(5*60*1000);
+    app.exit(applicationContext);
+  }
+
+
 
 }

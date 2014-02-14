@@ -93,6 +93,13 @@
                         </bean>
                     </property>
                 </bean>
+                <bean id="commentNeedDefaultProducer" class="won.bot.framework.component.needproducer.impl.TemplateBasedNeedProducer">
+                    <property name="template" value="classpath:/default-templates/default-template-comment.ttl"/>
+                    <property name="wrappedProducer">
+                        <bean class="won.bot.framework.component.needproducer.impl.CommentNeedProducer">
+                        </bean>
+                    </property>
+                </bean>
             </set>
         </property>
     </bean>

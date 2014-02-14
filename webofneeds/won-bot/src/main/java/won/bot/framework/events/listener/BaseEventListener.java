@@ -84,7 +84,6 @@ public abstract class BaseEventListener implements EventListener
   private synchronized void countEvent(final Event event)
   {
     this.eventCount ++;
-    logger.info("COUNT OF EVENT "+event.getClass()+ " is "+eventCount);
   }
 
   protected abstract void doOnEvent(Event event) throws Exception;
