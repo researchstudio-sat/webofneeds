@@ -22,6 +22,7 @@ import won.bot.framework.events.event.MessageFromOtherNeedEvent;
 import won.bot.framework.events.event.NeedDeactivatedEvent;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
+import won.protocol.model.FacetType;
 import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
 import won.protocol.ws.fault.NoSuchConnectionFault;
 
@@ -45,11 +46,14 @@ public class DeactivateAllNeedsOnConnectionCloseListener extends BaseEventListen
     if (! (event instanceof CloseFromOtherNeedEvent)) return;
     Connection con = ((CloseFromOtherNeedEvent) event).getCon();
     logger.debug("received close on connection {}, deactivating needs", con.getConnectionURI());
-    List<URI> needUris = getEventListenerContext().getBotContext().listNeedUris();
-    for (int i = 0; i<needUris.size();i++){
-        logger.info("needUris size: "+needUris.size());
-        deactivateNeed(needUris.get(i));
-    }
+    URI group = getEventListenerContext().getBotContext().getNeedByName(FacetType.GroupFacet.name());
+    if (group!=null)
+        deactivateNeed(group);
+      List<URI> needUris = getEventListenerContext().getBotContext().listNeedUris();
+      for (int i = 0; i< needUris.size();i++){
+          deactivateNeed(needUris.get(i));
+      }
+
       getEventListenerContext().getEventBus().unsubscribe(CloseFromOtherNeedEvent.class, this);
   }
 

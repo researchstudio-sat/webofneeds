@@ -28,11 +28,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.*;
-import won.protocol.model.Facet;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
-import won.protocol.model.OwnerApplication;
+import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
+import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.OwnerApplicationRepository;
@@ -66,6 +64,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
   @Autowired
   private NeedRepository needRepository;
+    @Autowired
+    private ConnectionRepository connectionRepository;
 
     @Autowired
     FacetRepository facetRepository;
@@ -157,7 +157,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
         for (URI connURI : connectionURIs) {
 
             try {
-                ownerFacingConnectionCommunicationService.close(connURI, null);
+                if (!DataAccessUtils.loadConnection(connectionRepository,connURI).getState().equals(ConnectionState.CLOSED))
+                    ownerFacingConnectionCommunicationService.close(connURI, null);
             } catch (IllegalMessageForConnectionStateException e) {
                 logger.warn("wrong connection state",e);
             }

@@ -135,8 +135,11 @@ public class EventBotActions
           for (int i = 0; i< needs.size();i++){
               try{
                   //TODO: duplicate code. see ConnectTwoNeedsAction
-                  if (!needs.get(i).equals(group))
-                    getEventListenerContext().getOwnerService().connect(needs.get(i),group,WonRdfUtils.FacetUtils.createModelForConnect(localFacet,remoteFacet));
+                  if (!needs.get(i).equals(group)){
+                      logger.info("Bot: connect called for "+needs.get(i)+" and "+group);
+                      getEventListenerContext().getOwnerService().connect(needs.get(i),group,WonRdfUtils.FacetUtils.createModelForConnect(localFacet,remoteFacet));
+                  }
+
               } catch (Exception e) {
                   logger.warn("could not connect {} and {}", new Object[]{needs.get(i), group}, e);
               }
