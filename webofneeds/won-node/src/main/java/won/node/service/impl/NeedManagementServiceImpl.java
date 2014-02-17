@@ -153,6 +153,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
         need.setState(NeedState.INACTIVE);
         need = needRepository.saveAndFlush(need);
         //close all connections
+        //TODO: load only connections which are not in state closed!
         Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());
         for (URI connURI : connectionURIs) {
 
