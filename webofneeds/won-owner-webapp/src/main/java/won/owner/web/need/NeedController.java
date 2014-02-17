@@ -33,6 +33,8 @@ import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
+import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
+import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -54,7 +56,7 @@ public class NeedController
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  @Qualifier("ownerProtocolNeedServiceClient")
+  @Qualifier("default")
   private OwnerProtocolNeedServiceClientSide ownerService;
 
   @Autowired
@@ -327,15 +329,20 @@ public class NeedController
     } catch (ExecutionException e) {
         logger.warn("caught ExcutionException", e);
     } catch (CamelConfigurationFailedException e) {
+
         logger.warn("caught CameConfigurationException", e);  //To change body of catch statement use File | Settings | File Templates.
+
+        logger.warn("caught CamelConfigurationFailedException",e);
+    } catch (Exception e) {
+        logger.warn("caught Exception",e);
+
     }
 
       return "noNeedFound";
   }
 
   @RequestMapping(value = "/{needId}/toggle", method = RequestMethod.POST)
-  public String toggleNeed(@PathVariable String needId, Model model)
-  {
+  public String toggleNeed(@PathVariable String needId, Model model) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
     List<Need> needs = needRepository.findById(Long.valueOf(needId));
     if (needs.isEmpty())
       return "noNeedFound";
@@ -348,8 +355,10 @@ public class NeedController
       }
     } catch (NoSuchNeedException e) {
       logger.warn("caught NoSuchNeedException:", e);
+    } catch (Exception e) {
+        logger.warn("caught Exception",e);
     }
-    return "redirect:/need/" + need.getId().toString();
+      return "redirect:/need/" + need.getId().toString();
     //return viewNeed(need.getId().toString(), model);
   }
 
@@ -379,6 +388,9 @@ public class NeedController
       logger.warn("caught ExecutionException",e);
     } catch (CamelConfigurationFailedException e) {
         logger.warn("caught CamelConfigurationException", e); //To change body of catch statement use File | Settings | File Templates.
+      logger.warn("caught CamelConfigurationFailedException");
+    } catch (Exception e) {
+        logger.warn("caught Exception",e);
     }
 
       return ret;

@@ -27,6 +27,7 @@ import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
+import won.protocol.model.FacetType;
 import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 
@@ -93,6 +94,7 @@ public class EventBot extends TriggeredBot
   @Override
   public final void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
   {
+    logger.info("ON CLOSE");
     eventBus.publish(new CloseFromOtherNeedEvent(con, content));
   }
 
@@ -111,7 +113,12 @@ public class EventBot extends TriggeredBot
   @Override
   public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception
   {
-    eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel));
+    eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel, FacetType.OwnerFacet));
+  }
+  @Override
+  public void onNewGroupCreated(final URI groupURI, final URI wonNodeURI, final Model groupModel)
+  {
+    eventBus.publish(new GroupFacetCreatedEvent(groupURI, wonNodeURI, groupModel));
   }
 
 
@@ -165,7 +172,9 @@ public class EventBot extends TriggeredBot
   {
 
     public TaskScheduler getTaskScheduler() {
-      return EventBot.this.getTaskScheduler();
+
+        return EventBot.this.getTaskScheduler();
+
     }
 
     public NodeURISource getNodeURISource()
@@ -182,6 +191,7 @@ public class EventBot extends TriggeredBot
     {
       return EventBot.this.getNeedProducer();
     }
+
 
     public void cancelTrigger(){
       EventBot.this.cancelTrigger();

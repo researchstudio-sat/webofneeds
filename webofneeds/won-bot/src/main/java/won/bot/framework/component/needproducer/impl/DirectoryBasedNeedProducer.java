@@ -83,7 +83,12 @@ public class DirectoryBasedNeedProducer implements NeedProducer
     return readModelFromFileWithIndex(fileIndexToUse);
   }
 
-  private boolean isCurrentFileReadable()
+    @Override
+    public Model create(Class clazz) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    private boolean isCurrentFileReadable()
   {
     return this.files[this.fileIndex].isFile() && this.files[this.fileIndex].canRead();
   }

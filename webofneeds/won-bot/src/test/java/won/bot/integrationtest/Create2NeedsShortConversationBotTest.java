@@ -143,6 +143,7 @@ public class Create2NeedsShortConversationBotTest
       Assert.assertEquals(2, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
       //2 create need events
+
       Assert.assertEquals(2, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
       //1 connect, 1 open

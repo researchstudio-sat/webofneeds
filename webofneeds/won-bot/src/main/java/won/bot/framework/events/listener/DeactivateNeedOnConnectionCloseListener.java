@@ -41,8 +41,10 @@ public class DeactivateNeedOnConnectionCloseListener extends BaseEventListener
     if (! (event instanceof CloseFromOtherNeedEvent)) return;
     Connection con = ((CloseFromOtherNeedEvent) event).getCon();
     logger.debug("received close on connection {}, deactivating needs", con.getConnectionURI());
+
     deactivateNeedIfKnown(con.getNeedURI());
     deactivateNeedIfKnown(con.getRemoteNeedURI());
+      logger.debug("EVENT COUNT FOR EVENT TYPE "+event.getClass()+" is "+ getEventCount());
   }
 
   private void deactivateNeedIfKnown(final URI needURI) throws Exception
@@ -52,6 +54,7 @@ public class DeactivateNeedOnConnectionCloseListener extends BaseEventListener
       getEventListenerContext().getOwnerService().deactivate(needURI);
       //publish an event so other listeners can react
       getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(needURI));
+
     } else {
       logger.debug("need uri {} not controlled by this bot, not deactivating it.", needURI);
     }

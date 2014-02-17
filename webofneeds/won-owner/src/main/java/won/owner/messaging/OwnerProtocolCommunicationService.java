@@ -29,6 +29,7 @@ import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: syim
@@ -42,7 +43,7 @@ public class OwnerProtocolCommunicationService {
     @Autowired
     ConnectionRepository connectionRepository;
 
-    final String configureCamelEndpoint(String methodName, URI uri,ArrayList<WonNode> wonNodeList) throws NoSuchConnectionException, CamelConfigurationFailedException {
+    final String configureCamelEndpoint(String methodName, URI uri,List<WonNode> wonNodeList) throws NoSuchConnectionException, CamelConfigurationFailedException {
         String endpoint;
         URI brokerURI;
         String ownerProtocolQueueName;

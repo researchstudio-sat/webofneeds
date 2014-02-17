@@ -37,6 +37,13 @@ public abstract class AbstractCompositeNeedProducer implements NeedProducer
     if (delegate == null) return null; //we're exhausted
     return delegate.create();
   }
+  @Override
+  public Model create(Class clazz)
+  {
+      NeedProducer delegate = selectActiveNeedFactoryOfType(clazz);
+      if (delegate == null) return null;
+      return delegate.create();
+  }
 
   @Override
   public boolean isExhausted()
@@ -62,6 +69,8 @@ public abstract class AbstractCompositeNeedProducer implements NeedProducer
    * @return
    */
   protected abstract NeedProducer selectActiveNeedFactory();
+
+  protected abstract NeedProducer selectActiveNeedFactoryOfType(Class clazz);
   
   protected Set<NeedProducer> getNeedFactories(){
     return needFactories;
@@ -69,6 +78,7 @@ public abstract class AbstractCompositeNeedProducer implements NeedProducer
 
   public void setNeedFactories(final Set<NeedProducer> delegates)
   {
+
     this.needFactories = delegates;
   }
 

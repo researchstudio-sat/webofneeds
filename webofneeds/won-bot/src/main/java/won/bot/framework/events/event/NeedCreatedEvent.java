@@ -17,23 +17,26 @@
 package won.bot.framework.events.event;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import won.protocol.model.FacetType;
 
 import java.net.URI;
 
 /**
  *
  */
-public class NeedCreatedEvent extends BaseEvent
+public class NeedCreatedEvent extends BaseEvent implements FacetEvent
 {
   private final URI needUri;
   private final URI wonNodeUri;
   private final Model needModel;
+  private final FacetType facetType;
 
-  public NeedCreatedEvent(final URI needUri, final URI wonNodeUri, final Model needModel)
+  public NeedCreatedEvent(final URI needUri, final URI wonNodeUri, final Model needModel,final FacetType facetType)
   {
     this.needUri = needUri;
     this.wonNodeUri = wonNodeUri;
     this.needModel = needModel;
+    this.facetType = facetType;
   }
 
   public URI getNeedUri()
@@ -50,4 +53,9 @@ public class NeedCreatedEvent extends BaseEvent
   {
     return needModel;
   }
+
+    @Override
+    public FacetType getFacetType() {
+        return facetType;
+    }
 }

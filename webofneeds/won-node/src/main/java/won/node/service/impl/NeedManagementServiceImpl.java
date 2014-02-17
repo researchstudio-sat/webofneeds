@@ -27,14 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.protocol.exception.IllegalNeedContentException;
-import won.protocol.exception.NoSuchNeedException;
-import won.protocol.exception.WonProtocolException;
-import won.protocol.model.Facet;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
-import won.protocol.model.OwnerApplication;
+import won.protocol.exception.*;
+import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
+import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.OwnerApplicationRepository;
@@ -68,6 +64,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
   @Autowired
   private NeedRepository needRepository;
+    @Autowired
+    private ConnectionRepository connectionRepository;
 
     @Autowired
     FacetRepository facetRepository;
@@ -148,8 +146,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     }
 
     @Override
-    public void deactivate(final URI needURI) throws NoSuchNeedException
-    {
+    public void deactivate(final URI needURI) throws NoSuchNeedException,  NoSuchConnectionException {
         logger.info("DEACTIVATING need. needURI:{}",needURI);
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
         Need need = DataAccessUtils.loadNeed(needRepository, needURI);
@@ -158,11 +155,14 @@ public class NeedManagementServiceImpl implements NeedManagementService
         //close all connections
         Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());
         for (URI connURI : connectionURIs) {
+
             try {
-                ownerFacingConnectionCommunicationService.close(connURI, null);
-            } catch (WonProtocolException e) {
-                logger.warn("caught exception when trying to close connection", e);
+                if (!DataAccessUtils.loadConnection(connectionRepository,connURI).getState().equals(ConnectionState.CLOSED))
+                    ownerFacingConnectionCommunicationService.close(connURI, null);
+            } catch (IllegalMessageForConnectionStateException e) {
+                logger.warn("wrong connection state",e);
             }
+
         }
     }
 

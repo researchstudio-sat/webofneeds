@@ -25,7 +25,7 @@ import org.apache.camel.builder.RouteBuilder;
 public class OwnerProtocolStaticRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
-        from("activemq:queue:OwnerProtocol.in")
+        from("activemq:queue:OwnerProtocol.in?concurrentConsumers=5")
             .wireTap("bean:messagingService?method=inspectMessage")
             .choice()
             .when(header("methodName").isEqualTo("register"))

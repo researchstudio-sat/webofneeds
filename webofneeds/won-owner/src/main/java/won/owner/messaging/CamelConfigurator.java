@@ -69,23 +69,20 @@ public class CamelConfigurator implements CamelContextAware{
     protected CamelConfigurator() {
     }
 
-    final String configureCamelEndpointForNeed(URI needURI, URI brokerURI,String ownerProtocolQueueName) throws Exception {
+    public final String configureCamelEndpointForNeed(URI needURI, URI brokerURI,String ownerProtocolQueueName) throws Exception {
         Need need = needRepository.findByNeedURI(needURI).get(0);
         URI wonNodeURI = need.getWonNodeURI();
         return configureCamelEndpointForNodeURI(wonNodeURI, brokerURI,ownerProtocolQueueName);
 
     }
-    final String configureCamelEndpointForConnection(URI connectionURI, URI brokerURI, String ownerProtocolQueueName) throws Exception {
+    public final String configureCamelEndpointForConnection(URI connectionURI, URI brokerURI, String ownerProtocolQueueName) throws Exception {
 
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         URI needURI = con.getNeedURI();
         return configureCamelEndpointForNeed(needURI,brokerURI, ownerProtocolQueueName);
 
     }
-
-
-
-    final String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI,String ownerProtocolQueueName) throws CamelConfigurationFailedException {
+    public final String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI,String ownerProtocolQueueName) throws CamelConfigurationFailedException {
         //TODO: the linked data description of the won node must be at [NODE-URI]/resource
         // according to this code. This should be explicitly defined somewhere
 
@@ -160,9 +157,7 @@ public class CamelConfigurator implements CamelContextAware{
         String[] endpointSplit = endpointName.split(":");
         endpointSplit[0] = endpointSplit[0]+ownerApplicationId;
         endpointName = endpointSplit[0]+":"+endpointSplit[1]+":"+endpointSplit[2];
-
         //  endpointName = endpointName.replaceFirst(endpointName,endpointName+ownerApplicationId);
-
         camelContext.addEndpoint(endpointName, ep);
         return endpointName;
     }
@@ -170,9 +165,7 @@ public class CamelConfigurator implements CamelContextAware{
         ActiveMQComponent activeMQComponent = (ActiveMQComponent)camelContext.getComponent(componentName);
         camelContext.removeComponent(componentName);
         componentName = this.componentName+ownerApplicationId;
-
         camelContext.addComponent(componentName, activeMQComponent);
-
         return componentName;
     }
 

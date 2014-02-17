@@ -28,7 +28,7 @@ import won.protocol.util.DataAccessUtils;
 import java.net.URI;
 
 /**
- * User: LEIH-NB
+ * User: sbyim
  * Date: 28.01.14
  */
 public class ActiveMQServiceFactory {

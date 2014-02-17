@@ -44,7 +44,12 @@ public class TemplateBasedNeedProducer extends AbstractNeedProducerWrapper
     return wrapModel(getWrappedProducer().create());
   }
 
-  private Model wrapModel(final Model wrappedModel)
+    @Override
+    public Model create(Class clazz) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    private Model wrapModel(final Model wrappedModel)
   {
     if (this.templateModel != null) {
       return RdfUtils.mergeModelsCombiningBaseResource(wrappedModel, this.templateModel);

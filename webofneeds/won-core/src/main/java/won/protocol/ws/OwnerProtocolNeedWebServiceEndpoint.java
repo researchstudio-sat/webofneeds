@@ -50,7 +50,7 @@ public interface OwnerProtocolNeedWebServiceEndpoint
           throws NoSuchNeedFault, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault;
 
   @WebMethod
-  public void deactivate(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedFault;
+  public void deactivate(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedFault, NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 
   @WebMethod
   public void activate(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedFault;

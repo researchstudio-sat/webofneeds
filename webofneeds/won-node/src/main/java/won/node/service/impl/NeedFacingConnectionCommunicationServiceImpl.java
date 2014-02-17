@@ -81,7 +81,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Override
   public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("CLOSE received from the need side for connection {0} with content {1}", connectionURI, content);
+    logger.info("CLOSE received from the need side for connection {} with content {}", connectionURI, content);
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
 
     ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_CLOSE);
