@@ -19,6 +19,7 @@ import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
+
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -193,7 +194,20 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-        StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
+        StmtIterator stmtIterator = null;
+        boolean baFacetType = false;
+        if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
+                con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()) ||
+                con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI()) ||
+                con.getTypeURI().equals(FacetType.BACCParticipantFacet.getURI()))
+        {
+            baFacetType = true;
+            stmtIterator = baseRes.listProperties(WON.COORDINATION_MESSAGE);
+        }
+        else
+        {
+            stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
+        }
         String textMessage = null;
         while (stmtIterator.hasNext()){
             RDFNode obj = stmtIterator.nextStatement().getObject();
@@ -201,6 +215,11 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
                 textMessage = obj.asLiteral().getLexicalForm();
                 break;
             }
+            else
+                if(baFacetType)
+                    textMessage = this.getCoordinationMessage(obj.toString());
+                else
+                    textMessage = null;
         }
         if (textMessage == null){
             logger.debug("could not extract text message from RDF content of message");
@@ -217,5 +236,15 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //save in the db
         chatMessageRepository.saveAndFlush(chatMessage);
         ownerServiceCallback.onTextMessage(con, chatMessage, message);
+    }
+
+    //url -> Message
+    public String getCoordinationMessage(String s)
+    {
+        String msg = null;
+        msg = s.substring(s.lastIndexOf("#")+1);
+        msg = msg.toUpperCase();
+        msg = msg.substring(0,7)+"_"+msg.substring(7);
+        return msg;
     }
 }
