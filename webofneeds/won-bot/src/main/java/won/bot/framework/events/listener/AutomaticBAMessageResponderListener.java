@@ -2,7 +2,6 @@ package won.bot.framework.events.listener;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.Event;
-import won.bot.framework.events.event.MessageFromOtherNeedEvent;
 import won.bot.framework.events.event.OpenFromOtherNeedEvent;
 import won.bot.framework.events.event.BAStateChangeEvent;
 import won.protocol.model.ConnectionState;
@@ -107,8 +106,8 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
 
     private void unsubscribe()
     {
-        logger.debug("unsubscribing from MessageFromOtherNeedEvents");
-        getEventListenerContext().getEventBus().unsubscribe(MessageFromOtherNeedEvent.class, this);
+        logger.debug("unsubscribing from BAStateChangeEvent");
+        getEventListenerContext().getEventBus().unsubscribe(BAStateChangeEvent.class, this);
     }
 
     private String generateMessage(FacetType facetType)
@@ -139,6 +138,14 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
             list.add("MESSAGE_EXITED");
             list.add("MESSAGE_COMPENSATED"); //can not be sent by Coordinator
             list.add("MESSAGE_NOTVALID");
+        }
+        else if(facetType.equals(FacetType.BACCCoordinatorFacet))
+        {
+            //todo
+        }
+        else if(facetType.equals(FacetType.BACCParticipantFacet))
+        {
+            //todo
         }
         else
         {

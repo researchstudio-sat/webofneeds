@@ -41,7 +41,7 @@ public class BAPCBot extends EventBot {
         EventListenerContext ctx = getEventListenerContext();
         EventBus bus = getEventBus();
 
-        //create needs every trigger execution until 2 needs are created
+        //create needs every trigger execution until NO_OF_NEEDS are created
         this.needCreator = new ExecuteOnEventListener(
                 ctx,
                 new EventBotActions.CreateNeedAction(ctx),
@@ -50,7 +50,7 @@ public class BAPCBot extends EventBot {
         bus.subscribe(ActEvent.class,this.needCreator);
 
         //count until NO_OF_NEEDS were created, then
-        //   * connect the Cooridnator with Participants needs
+        //   * connect the Cooridnator with Participant needs
         this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
                 new EventBotActions.ConnectBANeedsAction(
                         ctx, NO_OF_NEEDS, FacetType.BAPCParticipantFacet.getURI(), FacetType.BAPCCoordinatorFacet.getURI()), NO_OF_NEEDS);

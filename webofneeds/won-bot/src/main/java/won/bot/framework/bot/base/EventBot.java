@@ -83,7 +83,9 @@ public class EventBot extends TriggeredBot
   public final void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final Model content) throws Exception
   {
       if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
-              con.getTypeURI().equals((FacetType.BAPCParticipantFacet.getURI()))   )
+              con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()) ||
+              con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI()) ||
+              con.getTypeURI().equals(FacetType.BACCParticipantFacet.getURI()))
           eventBus.publish(new BAStateChangeEvent(con, message, FacetType.getFacetType(con.getTypeURI()), content));
       else
         eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));

@@ -16,7 +16,7 @@ import won.protocol.model.FacetType;
  */
 
 
-public class BAStateChangeEvent implements Event
+public class BAStateChangeEvent extends BaseEvent
 {
     private final Connection con;
     private final ChatMessage message;
