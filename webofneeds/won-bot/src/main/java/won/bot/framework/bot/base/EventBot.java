@@ -27,6 +27,7 @@ import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
+import won.protocol.model.FacetType;
 import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 
@@ -81,7 +82,11 @@ public class EventBot extends TriggeredBot
   @Override
   public final void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final Model content) throws Exception
   {
-    eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));
+      if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
+              con.getTypeURI().equals((FacetType.BAPCParticipantFacet.getURI()))   )
+          eventBus.publish(new BAStateChangeEvent(con, message, FacetType.getFacetType(con.getTypeURI()), content));
+      else
+        eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));
   }
 
   @Override

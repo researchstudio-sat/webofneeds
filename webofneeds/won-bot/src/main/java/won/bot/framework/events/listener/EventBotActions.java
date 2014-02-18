@@ -113,7 +113,45 @@ public class EventBotActions
     }
   }
 
-  public static class CreateNeedAction extends Action {
+    /**
+     * Action connecting two needs on the specified facets. The need's URIs are obtained from
+     * the bot context. The first two URIs found there are used.
+     */
+    public static class ConnectBANeedsAction extends Action {
+        private int NO_OF_NEEDS;
+        private URI remoteFacet;
+        private URI localFacet;
+
+        public ConnectBANeedsAction(final EventListenerContext eventListenerContext, final int NO_OF_NEEDS, final URI remoteFacet, final URI localFacet)
+        {
+            super(eventListenerContext);
+            this.NO_OF_NEEDS = NO_OF_NEEDS;
+            this.remoteFacet = remoteFacet;
+            this.localFacet = localFacet;
+        }
+
+        @Override
+        public void doRun()
+        {
+            List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
+            for(int i=1;i<this.NO_OF_NEEDS;i++)
+            {
+             try {
+
+                 getEventListenerContext().getOwnerService().connect(needs.get(0), needs.get(i), WonRdfUtils.FacetUtils.createModelForConnect(localFacet, remoteFacet));
+             } catch (Exception e) {
+                 logger.warn("could not connect {} and {}", new Object[]{needs.get(0), needs.get(i)}, e);
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+    public static class CreateNeedAction extends Action {
     public CreateNeedAction(final EventListenerContext eventListenerContext)
     {
       super(eventListenerContext);
@@ -123,7 +161,7 @@ public class EventBotActions
     protected void doRun() throws Exception
     {
       if (getEventListenerContext().getNeedProducer().isExhausted()){
-        logger.info("bot's need procucer is exhausted.");
+        logger.info("bot's need producer is exhausted.");
         return;
       }
       final Model needModel = getEventListenerContext().getNeedProducer().create();
