@@ -134,11 +134,14 @@ public class EventBotActions
         public void doRun()
         {
             List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
-            try {
-                for(int i=1;i<this.NO_OF_NEEDS;i++)
-                getEventListenerContext().getOwnerService().connect(needs.get(0), needs.get(i), WonRdfUtils.FacetUtils.createModelForConnect(localFacet, remoteFacet));
-            } catch (Exception e) {
-                logger.warn("could not connect {} and {}", new Object[]{needs.get(0), needs.get(1)}, e);
+            for(int i=1;i<this.NO_OF_NEEDS;i++)
+            {
+             try {
+
+                 getEventListenerContext().getOwnerService().connect(needs.get(0), needs.get(i), WonRdfUtils.FacetUtils.createModelForConnect(localFacet, remoteFacet));
+             } catch (Exception e) {
+                 logger.warn("could not connect {} and {}", new Object[]{needs.get(0), needs.get(i)}, e);
+                }
             }
         }
     }

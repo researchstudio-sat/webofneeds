@@ -1,47 +1,42 @@
 package won.bot.framework.events.listener;
 
-
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import won.bot.framework.events.Event;
 import won.bot.framework.events.event.MessageFromOtherNeedEvent;
 import won.bot.framework.events.event.OpenFromOtherNeedEvent;
 import won.bot.framework.events.event.BAStateChangeEvent;
-//import won.bot.events.Event;
-import won.protocol.model.ConnectionEvent;
-import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.util.WonRdfUtils;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-
-
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Danijel
- * Date: 13.2.14.
- * Time: 10.36
+ * Date: 18.2.14.
+ * Time: 14.49
  * To change this template use File | Settings | File Templates.
  */
-public class BAPCMessageListener extends BaseEventListener {
+public class AutomaticBAMessageResponderListener extends BaseEventListener
+{
     private int targetNumberOfMessages = -1;
-    private int numberOfMessages = 0;
+    private int numberOfMessagesSent = 0;
     private long millisTimeoutBeforeReply = 1000;
     private Object monitor = new Object();
 
-    public BAPCMessageListener(final EventListenerContext context, final int targetNumberOfMessages, final long millisTimeoutBeforeReply)
+    public AutomaticBAMessageResponderListener(final EventListenerContext context, final int targetNumberOfMessages, final long millisTimeoutBeforeReply)
     {
         super(context);
         this.targetNumberOfMessages = targetNumberOfMessages;
+        this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
     }
-    public void onEvent(final Event event) throws Exception
+
+    @Override
+    public void doOnEvent(final Event event) throws Exception
     {
         if (event instanceof BAStateChangeEvent){
             handleMessageEvent((BAStateChangeEvent) event);
@@ -58,7 +53,9 @@ public class BAPCMessageListener extends BaseEventListener {
      */
     private void handleOpenEvent(final OpenFromOtherNeedEvent openEvent)
     {
+        logger.debug("got open event for need: {}, connection state is: {}", openEvent.getCon().getNeedURI(), openEvent.getCon().getState());
         if (openEvent.getCon().getState() == ConnectionState.CONNECTED){
+            logger.debug("replying to open with message");
             getEventListenerContext().getTaskScheduler().schedule(new Runnable()
             {
                 @Override
@@ -66,25 +63,25 @@ public class BAPCMessageListener extends BaseEventListener {
                 {
                     URI connectionUri = openEvent.getCon().getConnectionURI();
                     try {
-                        String outputMessage = "Open message";
-                        getEventListenerContext().getOwnerService().textMessage(connectionUri, WonRdfUtils.MessageUtils.textMessage(outputMessage));
-                    } catch (Exception e){
-                        logger.warn("could not send message via connection {}", connectionUri,e);
+                        countMessageAndUnsubscribeIfNecessary();
+                        String message = "Open message";
+                        getEventListenerContext().getOwnerService().textMessage(connectionUri, WonRdfUtils.MessageUtils.textMessage(message));
+                    } catch (Exception e) {
+                        logger.warn("could not send message via connection {}", connectionUri, e);
                     }
                 }
             }, new Date(System.currentTimeMillis() + millisTimeoutBeforeReply));
         }
     }
 
-    public void handleMessageEvent(final BAStateChangeEvent messageEvent){
+    private void handleMessageEvent(final BAStateChangeEvent messageEvent){
         logger.debug("got message '{}' for need: {}", messageEvent.getMessage().getMessage(), messageEvent.getCon().getNeedURI());
         getEventListenerContext().getTaskScheduler().schedule(new Runnable(){
             @Override
             public void run()
             {
-                String outputMessage = new String();
-                outputMessage = generateMessage(messageEvent.getFacetType());
-                Model messageContent = WonRdfUtils.MessageUtils.textMessage(outputMessage);
+                String message = generateMessage(messageEvent.getFacetType());
+                Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
                 URI connectionUri = messageEvent.getCon().getConnectionURI();
                 try {
                     getEventListenerContext().getOwnerService().textMessage(connectionUri, messageContent);
@@ -93,17 +90,25 @@ public class BAPCMessageListener extends BaseEventListener {
                     logger.warn("could not send message via connection {}", connectionUri, e);
                 }
             }
-        }, new Date(System.currentTimeMillis() + this.targetNumberOfMessages));
+        }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
     }
 
     private void countMessageAndUnsubscribeIfNecessary()
     {
         synchronized (monitor){
-            numberOfMessages++;
-            if (targetNumberOfMessages > 0 && targetNumberOfMessages >= numberOfMessages ){
+            numberOfMessagesSent++;
+            if (targetNumberOfMessages > 0 && numberOfMessagesSent >= targetNumberOfMessages){
                 unsubscribe();
             }
         }
+    }
+
+
+
+    private void unsubscribe()
+    {
+        logger.debug("unsubscribing from MessageFromOtherNeedEvents");
+        getEventListenerContext().getEventBus().unsubscribe(MessageFromOtherNeedEvent.class, this);
     }
 
     private String generateMessage(FacetType facetType)
@@ -140,21 +145,9 @@ public class BAPCMessageListener extends BaseEventListener {
             logger.info("FacetType is not supported!");
             return null;
         }
+
         index = randomGenerator.nextInt(list.size());
         message = list.get(index);
         return message;
     }
-
-
-    private void unsubscribe()
-    {
-        getEventListenerContext().getEventBus().unsubscribe(MessageFromOtherNeedEvent.class, this);
-    }
-
-
-    public void doOnEvent(final Event event) throws Exception
-    {
-       //DODAJ!!! daki
-    }
 }
-

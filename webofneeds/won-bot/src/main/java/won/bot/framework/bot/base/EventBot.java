@@ -84,8 +84,9 @@ public class EventBot extends TriggeredBot
   {
       if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
               con.getTypeURI().equals((FacetType.BAPCParticipantFacet.getURI()))   )
-          System.out.println("daki");
-      eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));
+          eventBus.publish(new BAStateChangeEvent(con, message, FacetType.getFacetType(con.getTypeURI()), content));
+      else
+        eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));
   }
 
   @Override
