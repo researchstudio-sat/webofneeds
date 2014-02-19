@@ -38,6 +38,7 @@ bin/setenv.*
 /needserver/repository
 /webofneeds/won-node/src/main/resources.lan/*
 /webofneeds/won-owner/src/main/resources.lan/*
+/webofneeds/won-matcher-solr/overlays/*
 
 #local config
 webofneeds/conf.local
