@@ -13,3 +13,19 @@
   ~    See the License for the specific language governing permissions and
   ~    limitations under the License.
   -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--
+       context that combines bot definitions with runner context
+    -->
+    <!-- the runner -->
+    <import resource="classpath:/spring/app/botRunner.xml" />
+    <!-- the bots to run -->
+    <import resource="classpath:/spring/bot/mailBaseSimpleReactiveBotBAPC.xml" />
+
+
+</beans>
