@@ -154,81 +154,20 @@ public class EventBotActions
     }
 
 
-    public static class ConnectTwoNeedsWithGroupAction extends Action {
-      private URI remoteFacet;
-      private URI localFacet;
-      public ConnectTwoNeedsWithGroupAction (final EventListenerContext eventListenerContext, final URI remoteFacet, final URI localFacet)
-      {
+
+  public static class CreateNeedAction extends Action {
+    private String uriListName;
+    public CreateNeedAction(final EventListenerContext eventListenerContext)
+    {
+      this(eventListenerContext, null);
+    }
+
+      public CreateNeedAction(EventListenerContext eventListenerContext, String uriListName) {
           super(eventListenerContext);
-          this.remoteFacet = remoteFacet;
-          this.localFacet = localFacet;
+          this.uriListName = uriListName;
       }
 
       @Override
-      protected void doRun() throws Exception {
-
-          URI group = getEventListenerContext().getBotContext().getNeedByName(FacetType.GroupFacet.name());
-          List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
-          for (int i = 0; i< needs.size();i++){
-              try{
-                  //TODO: duplicate code. see ConnectTwoNeedsAction
-                  if (!needs.get(i).equals(group)){
-                      logger.info("Bot: connect called for "+needs.get(i)+" and "+group);
-                      getEventListenerContext().getOwnerService().connect(needs.get(i),group,WonRdfUtils.FacetUtils.createModelForConnect(localFacet,remoteFacet));
-                  }
-
-              } catch (Exception e) {
-                  logger.warn("could not connect {} and {}", new Object[]{needs.get(i), group}, e);
-              }
-
-          }
-
-      }
-  }
-
-  public static class CreateGroupNeedAction extends Action{
-     public CreateGroupNeedAction(final EventListenerContext eventListenerContext){
-         super(eventListenerContext);
-     }
-
-     @Override
-      protected  void doRun() throws Exception{
-         if (getEventListenerContext().getNeedProducer().isExhausted()){
-             logger.info("group need bot's need procucer is exhausted.");
-             return;
-         }
-         final Model groupModel = getEventListenerContext().getNeedProducer().create(GroupNeedProducer.class);
-         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
-         final ListenableFuture<URI> futureNeedUri = getEventListenerContext().getOwnerService().createNeed(URI.create("we://dont.need.this/anymore"),groupModel,true,wonNodeUri);
-
-         futureNeedUri.addListener(new Runnable()
-         {
-             @Override
-             public void run()
-             {
-                 if (futureNeedUri.isDone()){
-                     try {
-                         URI uri = futureNeedUri.get();
-                         logger.info("group creation finished, new group URI is: {}", uri);
-                         getEventListenerContext().getBotContext().rememberNeedUriWithName(uri,FacetType.GroupFacet.name());
-                         getEventListenerContext().getEventBus().publish(new GroupFacetCreatedEvent(uri, wonNodeUri, groupModel));
-                     } catch (Exception e){
-                         logger.warn("create group facet failed", e);
-                     }
-                 }
-
-             }
-         }, getEventListenerContext().getExecutor());
-     }
-  }
-
-  public static class CreateNeedAction extends Action {
-    public CreateNeedAction(final EventListenerContext eventListenerContext)
-    {
-      super(eventListenerContext);
-    }
-
-    @Override
     protected void doRun() throws Exception
     {
         if (getEventListenerContext().getNeedProducer().isExhausted()){
@@ -250,8 +189,8 @@ public class EventBotActions
             try {
               URI uri = futureNeedUri.get();
               logger.info("need creation finished, new need URI is: {}", uri);
-              getEventListenerContext().getBotContext().rememberNeedUri(uri);
-              getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel,FacetType.OwnerFacet));
+                rememberInListIfNamePresent(getEventListenerContext(),uri,uriListName);
+                getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel,FacetType.OwnerFacet));
             } catch (Exception e){
               logger.warn("createNeed failed", e);
             }
@@ -259,6 +198,8 @@ public class EventBotActions
         }
       }, getEventListenerContext().getExecutor());
     }
+
+
   }
 
     public static class CreateNeedWithFacetsAction extends Action {
@@ -300,11 +241,7 @@ public class EventBotActions
                         try {
                             URI uri = futureNeedUri.get();
                             logger.info("need creation finished, new need URI is: {}", uri);
-                            if (uriListName != null && uriListName.trim().length() > 0){
-                                getEventListenerContext().getBotContext().appendToNamedNeedUriList(uri, uriListName);
-                            } else {
-                                getEventListenerContext().getBotContext().rememberNeedUri(uri);
-                            }
+                            rememberInListIfNamePresent(getEventListenerContext(),uri,uriListName);
                             getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel,null));
                         } catch (Exception e){
                             logger.warn("createNeed failed", e);
@@ -312,6 +249,14 @@ public class EventBotActions
                     }
                 }
             }, getEventListenerContext().getExecutor());
+        }
+    }
+
+    private static void rememberInListIfNamePresent(EventListenerContext ctx ,URI uri, String uriListName) {
+        if (uriListName != null && uriListName.trim().length() > 0){
+            ctx.getBotContext().appendToNamedNeedUriList(uri, uriListName);
+        } else {
+            ctx.getBotContext().rememberNeedUri(uri);
         }
     }
 }
