@@ -29,7 +29,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import won.bot.framework.events.event.WorkDoneEvent;
 import won.bot.framework.events.listener.ExecuteOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
-import won.bot.impl.BAPCBotBot;
+import won.bot.impl.BAPCBot;
 
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
