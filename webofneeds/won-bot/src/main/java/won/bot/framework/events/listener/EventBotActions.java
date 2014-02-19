@@ -21,6 +21,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.bot.framework.component.needproducer.impl.GroupNeedProducer;
+import won.bot.framework.events.event.GroupFacetCreatedEvent;
 import won.bot.framework.events.event.NeedCreatedEvent;
 import won.bot.framework.events.event.WorkDoneEvent;
 import won.protocol.model.FacetType;
@@ -303,7 +305,7 @@ public class EventBotActions
                             } else {
                                 getEventListenerContext().getBotContext().rememberNeedUri(uri);
                             }
-                            getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel));
+                            getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel,null));
                         } catch (Exception e){
                             logger.warn("createNeed failed", e);
                         }

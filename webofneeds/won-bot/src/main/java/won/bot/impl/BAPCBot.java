@@ -15,8 +15,8 @@ import won.protocol.model.FacetType;
  * To change this template use File | Settings | File Templates.
  */
 public class BAPCBot extends EventBot {
-    private static final int NO_OF_NEEDS = 5;
-    private static final int NO_OF_MESSAGES = 10;
+    private static final int NO_OF_NEEDS = 8;
+    private static final int NO_OF_MESSAGES = 20;
     private static final long MILLIS_BETWEEN_MESSAGES = 1000;
     private static final String URI_LIST_NAME_PARTICIPANT = "participants";
     private static final String URI_LIST_NAME_COORDINATOR = "coordinator";
