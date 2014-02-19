@@ -2,8 +2,8 @@ package won.bot.framework.events.listener;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.Event;
+import won.bot.framework.events.event.MessageFromOtherNeedEvent;
 import won.bot.framework.events.event.OpenFromOtherNeedEvent;
-import won.bot.framework.events.event.BAStateChangeEvent;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.util.WonRdfUtils;
@@ -37,8 +37,8 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
     @Override
     public void doOnEvent(final Event event) throws Exception
     {
-        if (event instanceof BAStateChangeEvent){
-            handleMessageEvent((BAStateChangeEvent) event);
+        if (event instanceof MessageFromOtherNeedEvent){
+            handleMessageEvent((MessageFromOtherNeedEvent) event);
         } else if (event instanceof OpenFromOtherNeedEvent) {
             handleOpenEvent((OpenFromOtherNeedEvent) event);
         }
@@ -73,13 +73,13 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
         }
     }
 
-    private void handleMessageEvent(final BAStateChangeEvent messageEvent){
+    private void handleMessageEvent(final MessageFromOtherNeedEvent messageEvent){
         logger.debug("got message '{}' for need: {}", messageEvent.getMessage().getMessage(), messageEvent.getCon().getNeedURI());
         getEventListenerContext().getTaskScheduler().schedule(new Runnable(){
             @Override
             public void run()
             {
-                String message = generateMessage(messageEvent.getFacetType());
+                String message = generateMessage(messageEvent.getCon().getTypeURI());
                 Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
                 URI connectionUri = messageEvent.getCon().getConnectionURI();
                 try {
@@ -106,17 +106,17 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
 
     private void unsubscribe()
     {
-        logger.debug("unsubscribing from BAStateChangeEvent");
-        getEventListenerContext().getEventBus().unsubscribe(BAStateChangeEvent.class, this);
+        logger.debug("unsubscribing from MessageFromOtherNeedEvent");
+        getEventListenerContext().getEventBus().unsubscribe(this);
     }
 
-    private String generateMessage(FacetType facetType)
+    private String generateMessage(URI facetType)
     {
         String message = new String();
         Random randomGenerator = null;
         int index = -1;
         ArrayList<String> list = new ArrayList<String>();
-        if (facetType.equals(FacetType.BAPCParticipantFacet))
+        if (facetType.equals(FacetType.BAPCParticipantFacet.getURI()))
         {
             list.add("MESSAGE_COMPLETED");
             list.add("MESSAGE_EXIT");
@@ -128,7 +128,7 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
             list.add("MESSAGE_NOTVALID");
 
         }
-        else if(facetType.equals(FacetType.BAPCCoordinatorFacet))
+        else if(facetType.equals(FacetType.BAPCCoordinatorFacet.getURI()))
         {
             list.add("MESSAGE_CANCEL");
             list.add("MESSAGE_CLOSE");
@@ -139,11 +139,11 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
             list.add("MESSAGE_COMPENSATED"); //can not be sent by Coordinator
             list.add("MESSAGE_NOTVALID");
         }
-        else if(facetType.equals(FacetType.BACCCoordinatorFacet))
+        else if(facetType.equals(FacetType.BACCCoordinatorFacet.getURI()))
         {
             //todo
         }
-        else if(facetType.equals(FacetType.BACCParticipantFacet))
+        else if(facetType.equals(FacetType.BACCParticipantFacet.getURI()))
         {
             //todo
         }

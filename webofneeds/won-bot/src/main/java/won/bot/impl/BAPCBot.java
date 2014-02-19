@@ -5,8 +5,6 @@ import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
 import won.protocol.model.FacetType;
-import won.protocol.util.WonRdfUtils;
-
 
 
 /**
@@ -20,13 +18,16 @@ public class BAPCBot extends EventBot {
     private static final int NO_OF_NEEDS = 5;
     private static final int NO_OF_MESSAGES = 10;
     private static final long MILLIS_BETWEEN_MESSAGES = 1000;
+    private static final String URI_LIST_NAME_PARTICIPANT = "participants";
+    private static final String URI_LIST_NAME_COORDINATOR = "coordinator";
 
     //we use protected members so we can extend the class and
     //access the listeners for unit test assertions and stats
     //
     //we use BaseEventListener as their types so we can access the generic
     //functionality offered by that class
-    protected BaseEventListener needCreator;
+    protected BaseEventListener participantNeedCreator;
+    protected BaseEventListener coordinatorNeedCreator;
     protected BaseEventListener needConnector;
     protected BaseEventListener autoOpener;
     protected BaseEventListener autoResponder;
@@ -41,18 +42,24 @@ public class BAPCBot extends EventBot {
         EventBus bus = getEventBus();
 
         //create needs every trigger execution until NO_OF_NEEDS are created
-        this.needCreator = new ExecuteOnEventListener(
+        this.participantNeedCreator = new ExecuteOnEventListener(
                 ctx,
-                new EventBotActions.CreateNeedAction(ctx),
-                NO_OF_NEEDS
+                new EventBotActions.CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_PARTICIPANT, FacetType.BAPCParticipantFacet.getURI()),
+                NO_OF_NEEDS - 1
         );
-        bus.subscribe(ActEvent.class,this.needCreator);
-
+        bus.subscribe(ActEvent.class,this.participantNeedCreator);
+        //create needs every trigger execution until NO_OF_NEEDS are created
+        this.coordinatorNeedCreator = new ExecuteOnEventListener(
+                ctx,
+                new EventBotActions.CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_COORDINATOR, FacetType.BAPCCoordinatorFacet.getURI()),
+                1
+        );
+        bus.subscribe(ActEvent.class,this.coordinatorNeedCreator);
         //count until NO_OF_NEEDS were created, then
         //   * connect the Coordinator with Participant needs
         this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
-                new EventBotActions.ConnectBANeedsAction(
-                        ctx, NO_OF_NEEDS, FacetType.BAPCParticipantFacet.getURI(), FacetType.BAPCCoordinatorFacet.getURI()), NO_OF_NEEDS);
+                new EventBotActions.ConnectFromListToListAction(
+                        ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT, FacetType.BAPCCoordinatorFacet.getURI(), FacetType.BAPCParticipantFacet.getURI()),NO_OF_NEEDS);
         bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
         //add a listener that is informed of the connect/open events and that auto-opens
@@ -70,14 +77,14 @@ public class BAPCBot extends EventBot {
         // * open events - so it initiates the chain reaction of responses
         this.autoResponder = new AutomaticBAMessageResponderListener(ctx, NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
         bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);
-        bus.subscribe(BAStateChangeEvent.class, this.autoResponder);
+        bus.subscribe(MessageFromOtherNeedEvent.class, this.autoResponder);
 
         //add a listener that closes the connection after it has seen NO_OF_MESSAGES messages
         this.connectionCloser = new DelegateOnceAfterNEventsListener(
                 ctx,
                 NO_OF_MESSAGES,
                 new CloseConnectionListener(ctx));
-        bus.subscribe(BAStateChangeEvent.class, this.connectionCloser);
+        bus.subscribe(MessageFromOtherNeedEvent.class, this.connectionCloser);
 
         //add a listener that auto-responds to a close message with a deactivation of both needs.
         //subscribe it to:

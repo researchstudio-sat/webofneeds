@@ -27,6 +27,8 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -117,30 +119,32 @@ public class EventBotActions
      * Action connecting two needs on the specified facets. The need's URIs are obtained from
      * the bot context. The first two URIs found there are used.
      */
-    public static class ConnectBANeedsAction extends Action {
-        private int NO_OF_NEEDS;
-        private URI remoteFacet;
-        private URI localFacet;
+    public static class ConnectFromListToListAction extends Action {
+        private String fromListName;
+        private String toListName;
+        private URI fromFacet;
+        private URI toFacet;
 
-        public ConnectBANeedsAction(final EventListenerContext eventListenerContext, final int NO_OF_NEEDS, final URI remoteFacet, final URI localFacet)
-        {
+        public ConnectFromListToListAction(EventListenerContext eventListenerContext, String fromListName, String toListName, URI fromFacet, URI toFacet) {
             super(eventListenerContext);
-            this.NO_OF_NEEDS = NO_OF_NEEDS;
-            this.remoteFacet = remoteFacet;
-            this.localFacet = localFacet;
+            this.fromListName = fromListName;
+            this.toListName = toListName;
+            this.fromFacet = fromFacet;
+            this.toFacet = toFacet;
         }
 
         @Override
         public void doRun()
         {
-            List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
-            for(int i=1;i<this.NO_OF_NEEDS;i++)
-            {
-             try {
-
-                 getEventListenerContext().getOwnerService().connect(needs.get(0), needs.get(i), WonRdfUtils.FacetUtils.createModelForConnect(localFacet, remoteFacet));
-             } catch (Exception e) {
-                 logger.warn("could not connect {} and {}", new Object[]{needs.get(0), needs.get(i)}, e);
+            List<URI> fromNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(fromListName);
+            List<URI> toNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(toListName);
+            for (URI fromUri: fromNeeds){
+                for (URI toUri:toNeeds) {
+                    try {
+                        getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createModelForConnect(fromFacet, toFacet));
+                    } catch (Exception e) {
+                        logger.warn("could not connect {} and {}", new Object[]{fromUri, toUri}, e);
+                    }
                 }
             }
         }
@@ -188,4 +192,58 @@ public class EventBotActions
       }, getEventListenerContext().getExecutor());
     }
   }
+
+    public static class CreateNeedWithFacetsAction extends Action {
+        private List<URI> facets;
+        private String uriListName;
+
+        public CreateNeedWithFacetsAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
+            super(eventListenerContext);
+            this.facets = Arrays.asList(facets);
+            this.uriListName = uriListName;
+        }
+
+        public CreateNeedWithFacetsAction(final EventListenerContext eventListenerContext, URI... facets)
+        {
+            this(eventListenerContext, null, facets);
+        }
+
+        @Override
+        protected void doRun() throws Exception
+        {
+            if (getEventListenerContext().getNeedProducer().isExhausted()){
+                logger.info("bot's need producer is exhausted.");
+                return;
+            }
+            final Model needModel = getEventListenerContext().getNeedProducer().create();
+            for (URI facetURI:facets){
+                WonRdfUtils.FacetUtils.addFacet(needModel,facetURI);
+            }
+            final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
+            logger.info("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
+            final ListenableFuture<URI> futureNeedUri = getEventListenerContext().getOwnerService().createNeed(URI.create("we://dont.need.this/anymore"), needModel, true, wonNodeUri);
+            //add a listener that adds the need URI to the botContext
+            futureNeedUri.addListener(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if (futureNeedUri.isDone()){
+                        try {
+                            URI uri = futureNeedUri.get();
+                            logger.info("need creation finished, new need URI is: {}", uri);
+                            if (uriListName != null && uriListName.trim().length() > 0){
+                                getEventListenerContext().getBotContext().appendToNamedNeedUriList(uri, uriListName);
+                            } else {
+                                getEventListenerContext().getBotContext().rememberNeedUri(uri);
+                            }
+                            getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel));
+                        } catch (Exception e){
+                            logger.warn("createNeed failed", e);
+                        }
+                    }
+                }
+            }, getEventListenerContext().getExecutor());
+        }
+    }
 }

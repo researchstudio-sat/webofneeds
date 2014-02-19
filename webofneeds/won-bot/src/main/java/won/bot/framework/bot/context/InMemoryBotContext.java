@@ -31,6 +31,7 @@ public class InMemoryBotContext implements BotContext
 {
   private List<URI> needUris = new ArrayList<URI>();
   private Map<String,URI> namedNeedUris = new HashMap<String, URI>();
+  private Map<String,List<URI>> namedNeedUriLists = new HashMap<String,List<URI>>();
 
   @Override
   public List<URI> listNeedUris()
@@ -81,4 +82,32 @@ public class InMemoryBotContext implements BotContext
     ret.addAll(namedNeedUris.keySet());
     return ret;
   }
+
+    @Override
+    public void rememberNamedNeedUriList(List<URI> uris, String name) {
+        this.namedNeedUriLists.put(name,uris);
+        for (URI uri:uris) {
+            if (!needUris.contains(uri)){
+                needUris.add(uri);
+            }
+        }
+    }
+
+    @Override
+    public void appendToNamedNeedUriList(URI uri, String name) {
+        if (!needUris.contains(uri)){
+            needUris.add(uri);
+        }
+        List<URI> uris = this.namedNeedUriLists.get(name);
+        if (uris == null) {
+            uris= new ArrayList<URI>();
+        }
+        uris.add(uri);
+        this.namedNeedUriLists.put(name, uris);
+    }
+
+    @Override
+    public List<URI> getNamedNeedUriList(String name) {
+        return this.namedNeedUriLists.get(name);
+    }
 }

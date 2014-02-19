@@ -50,6 +50,10 @@ public interface BotContext
    */
   public void rememberNeedUri(URI uri);
 
+  public void rememberNamedNeedUriList(List<URI> uris, String name);
+  public void appendToNamedNeedUriList(URI uri, String name);
+  public List<URI> getNamedNeedUriList(String name);
+
   /**
    * Fetch a need URI by its name. The URI must have been given a name previously.
    * @param name

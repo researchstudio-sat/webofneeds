@@ -29,7 +29,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import won.bot.framework.events.event.WorkDoneEvent;
 import won.bot.framework.events.listener.ExecuteOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
-import won.bot.impl.BAPCBotBot;
+import won.bot.impl.BAPCBot;
 
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
@@ -139,8 +139,11 @@ public class BAPCBotTest{
         public void executeAsserts()
         {
             //5 act events
-            Assert.assertEquals(5, this.needCreator.getEventCount());
-            Assert.assertEquals(0, this.needCreator.getExceptionCount());
+            Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
+            Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
+            //5 act events
+            Assert.assertEquals(4, this.participantNeedCreator.getEventCount());
+            Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
             //5 create need events
             Assert.assertEquals(4, this.needConnector.getEventCount());
             Assert.assertEquals(0, this.needConnector.getExceptionCount());
