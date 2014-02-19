@@ -30,6 +30,8 @@ public interface NeedProducer
    */
   public Model create();
 
+  public Model create(Class clazz);
+
   /**
    * Indicates that no more needs will be created by this factory.
    * @return

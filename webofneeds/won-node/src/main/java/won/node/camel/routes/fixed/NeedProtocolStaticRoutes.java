@@ -25,7 +25,7 @@ import org.apache.camel.builder.RouteBuilder;
 public class NeedProtocolStaticRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
-        from("activemq:queue:NeedProtocol.in")
+        from("activemq:queue:NeedProtocol.in?concurrentConsumers=5")
                 .choice()
                 .when(header("methodName").isEqualTo("connect"))
                 .to("log:Connect Incoming")

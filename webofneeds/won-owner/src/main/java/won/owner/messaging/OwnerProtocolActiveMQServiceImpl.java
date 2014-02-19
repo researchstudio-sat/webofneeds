@@ -19,6 +19,7 @@ package won.owner.messaging;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -109,7 +110,13 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         //TODO: the linked data description of the won node must be at [NODE-URI]/resource
         // according to this code. This should be explicitly defined somewhere
         URI resourceURI = URI.create(wonNodeURI.toString()+"/resource");
-        URI brokerURI = getActiveMQBrokerURIForNode(resourceURI);
+        URI brokerURI;
+        try {
+            brokerURI = getActiveMQBrokerURIForNode(resourceURI);
+        } catch(ClientHandlerException e){
+            logger.warn("not able to connect to {}",wonNodeURI);
+            throw new CamelConfigurationFailedException("",e);
+        }
 
         String tempComponentName = componentName;
         String tempStartingComponentName = startingComponent;
@@ -169,7 +176,8 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
 
 
         logger.info("adding component with component name {}",componentName);
-        brokerComponentMap.put(wonNodeURI,componentName);
+        if (!brokerComponentMap.containsKey(wonNodeURI))
+            brokerComponentMap.put(wonNodeURI,componentName);
         return componentName;
     }
     public String replaceEndpointNameWithOwnerApplicationId(String endpointName, String ownerApplicationId) throws Exception {

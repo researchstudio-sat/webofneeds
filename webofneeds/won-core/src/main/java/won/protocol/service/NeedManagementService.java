@@ -16,7 +16,9 @@
 
 package won.protocol.service;
 import com.hp.hpl.jena.rdf.model.Model;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.IllegalNeedContentException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 
 import java.net.URI;
@@ -54,5 +56,5 @@ public interface NeedManagementService
    * @param needURI
    * @throws NoSuchNeedException if needURI does not refer to an existing need
    */
-  public void deactivate(URI needURI) throws NoSuchNeedException;
+  public void deactivate(URI needURI) throws NoSuchNeedException, IllegalMessageForConnectionStateException, NoSuchConnectionException;
 }

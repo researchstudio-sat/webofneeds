@@ -14,20 +14,23 @@
  *    limitations under the License.
  */
 
-package won.node.camel.routes.fixed;
+package won.bot.app;
 
-import org.apache.camel.builder.RouteBuilder;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * User: LEIH-NB
- * Date: 19.11.13
- */
-public class OwnerProtocoDynamicRoutes extends RouteBuilder {
-    @Override
-    public void configure() throws Exception {
-        from("seda:OwnerProtocolOut?concurrentConsumers=5")
-                .to("bean:ownerProtocolOutgoingMessagesProcessor")
-                //.wireTap("bean:messagingService?method=inspectMessage")
-                .recipientList(header("ownerApplicationIDs"));
-    }
+public class Simple2NeedGroupingTest
+{
+
+  public static void main(String[] args) throws Exception {
+    SpringApplication app = new SpringApplication(
+        new Object[]{"classpath:/spring/app/simple2NeedGroupingTest.xml"}
+    );
+    ConfigurableApplicationContext applicationContext =  app.run(args);
+    Thread.sleep(5*60*1000);
+    app.exit(applicationContext);
+  }
+
+
+
 }

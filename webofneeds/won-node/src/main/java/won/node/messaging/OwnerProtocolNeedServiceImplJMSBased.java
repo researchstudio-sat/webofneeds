@@ -83,7 +83,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //OwnerProtocolN
     }
 
     public void deactivate(
-            @Header("needURI") String needURI) throws NoSuchNeedException{
+            @Header("needURI") String needURI) throws NoSuchNeedException, NoSuchConnectionException, IllegalMessageForConnectionStateException {
         logger.info("deactivateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
@@ -156,6 +156,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //OwnerProtocolN
     public void close(
             @Header("connectionURI")String connectionURI,
             @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
         URI connectionURIConvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(content);
         delegate.close(connectionURIConvert, contentConvert);

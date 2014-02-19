@@ -22,40 +22,38 @@ import won.protocol.model.FacetType;
 import java.net.URI;
 
 /**
- *
+ * User: LEIH-NB
+ * Date: 05.02.14
  */
-public class NeedCreatedEvent extends BaseEvent implements FacetEvent
-{
-  private final URI needUri;
-  private final URI wonNodeUri;
-  private final Model needModel;
-  private final FacetType facetType;
+public class CommentFacetCreatedEvent extends BaseEvent implements FacetEvent{
+    private URI commentFacetURI;
+    private URI wonNodeURI;
+    private Model model;
+    private final FacetType facetType = FacetType.CommentFacet;
 
-  public NeedCreatedEvent(final URI needUri, final URI wonNodeUri, final Model needModel,final FacetType facetType)
-  {
-    this.needUri = needUri;
-    this.wonNodeUri = wonNodeUri;
-    this.needModel = needModel;
-    this.facetType = facetType;
-  }
+    public CommentFacetCreatedEvent(URI groupFacetURI, URI wonNodeURI, Model model) {
+        this.commentFacetURI = groupFacetURI;
+        this.wonNodeURI = wonNodeURI;
+        this.model = model;
 
-  public URI getNeedUri()
-  {
-    return needUri;
-  }
+    }
 
-  public URI getWonNodeUri()
-  {
-    return wonNodeUri;
-  }
+    public URI getGroupFacetURI() {
+        return commentFacetURI;
+    }
 
-  public Model getNeedModel()
-  {
-    return needModel;
-  }
+    public URI getWonNodeURI() {
+        return wonNodeURI;
+    }
+
+    public Model getModel() {
+        return model;
+    }
 
     @Override
-    public FacetType getFacetType() {
+    public FacetType getFacetType(){
         return facetType;
     }
 }
+
+

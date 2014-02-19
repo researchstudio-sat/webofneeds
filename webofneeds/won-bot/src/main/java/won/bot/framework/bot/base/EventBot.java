@@ -94,6 +94,7 @@ public class EventBot extends TriggeredBot
   @Override
   public final void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
   {
+    logger.info("ON CLOSE");
     eventBus.publish(new CloseFromOtherNeedEvent(con, content));
   }
 
@@ -112,7 +113,12 @@ public class EventBot extends TriggeredBot
   @Override
   public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception
   {
-    eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel));
+    eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel, FacetType.OwnerFacet));
+  }
+  @Override
+  public void onNewGroupCreated(final URI groupURI, final URI wonNodeURI, final Model groupModel)
+  {
+    eventBus.publish(new GroupFacetCreatedEvent(groupURI, wonNodeURI, groupModel));
   }
 
 
@@ -183,6 +189,7 @@ public class EventBot extends TriggeredBot
     {
       return EventBot.this.getNeedProducer();
     }
+
 
     public void cancelTrigger(){
       EventBot.this.cancelTrigger();

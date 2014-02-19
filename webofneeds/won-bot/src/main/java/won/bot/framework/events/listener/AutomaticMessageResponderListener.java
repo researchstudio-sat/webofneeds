@@ -93,7 +93,7 @@ public class AutomaticMessageResponderListener extends BaseEventListener
         Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
         URI connectionUri = messageEvent.getCon().getConnectionURI();
         try {
-          getEventListenerContext().getOwnerService().textMessage(connectionUri, messageContent);
+            getEventListenerContext().getOwnerService().textMessage(connectionUri, messageContent);
           countMessageAndUnsubscribeIfNecessary();
         } catch (Exception e) {
           logger.warn("could not send message via connection {}", connectionUri, e);

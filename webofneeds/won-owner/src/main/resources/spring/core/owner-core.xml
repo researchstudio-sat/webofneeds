@@ -59,7 +59,7 @@
              That bean may be used to make clever decisions regarding the transport or just be hard-wired to
              use eg jms
          -->
-        <property name="delegate" ref="ownerProtocolNeedServiceClientDelegate" />
+        <property name="delegate" ref="ownerProtocolNeedServiceClientJMSBased" />
     </bean>
 
     <bean id="ownerProtocolNeedReadService" class="won.owner.protocol.impl.OwnerProtocolNeedReadServiceImpl">

@@ -42,7 +42,7 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
     @Override
     public void configure() throws Exception {
        for (int i = 0; i<endpoints.size();i++){
-           from(endpoints.get(i))
+           from(endpoints.get(i)+"?concurrentConsumers=5")
            .wireTap("bean:messagingService?method=inspectMessage")
            .choice()
                 .when(header("methodName").isEqualTo("connect"))
