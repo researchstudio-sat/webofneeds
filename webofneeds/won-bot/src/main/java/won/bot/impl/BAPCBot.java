@@ -7,8 +7,7 @@ import won.bot.framework.events.listener.*;
 import won.protocol.model.FacetType;
 import won.protocol.util.WonRdfUtils;
 
-import java.net.URI;
-import java.util.List;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,7 +49,7 @@ public class BAPCBot extends EventBot {
         bus.subscribe(ActEvent.class,this.needCreator);
 
         //count until NO_OF_NEEDS were created, then
-        //   * connect the Cooridnator with Participant needs
+        //   * connect the Coordinator with Participant needs
         this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
                 new EventBotActions.ConnectBANeedsAction(
                         ctx, NO_OF_NEEDS, FacetType.BAPCParticipantFacet.getURI(), FacetType.BAPCCoordinatorFacet.getURI()), NO_OF_NEEDS);
