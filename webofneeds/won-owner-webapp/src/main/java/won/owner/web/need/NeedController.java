@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.NeedPojo;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.IllegalNeedContentException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.*;
 import won.protocol.model.Facet;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
@@ -36,6 +33,8 @@ import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
+import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
+import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -57,7 +56,7 @@ public class NeedController
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  @Qualifier("ownerProtocolNeedServiceClient")
+  @Qualifier("default")
   private OwnerProtocolNeedServiceClientSide ownerService;
 
   @Autowired
@@ -329,14 +328,17 @@ public class NeedController
        logger.warn("caught InterruptedException", e);
     } catch (ExecutionException e) {
         logger.warn("caught ExcutionException", e);
+    } catch (CamelConfigurationFailedException e) {
+        logger.warn("caught CamelConfigurationFailedException",e);
+    } catch (Exception e) {
+        logger.warn("caught Exception",e);
     }
 
       return "noNeedFound";
   }
 
   @RequestMapping(value = "/{needId}/toggle", method = RequestMethod.POST)
-  public String toggleNeed(@PathVariable String needId, Model model)
-  {
+  public String toggleNeed(@PathVariable String needId, Model model) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
     List<Need> needs = needRepository.findById(Long.valueOf(needId));
     if (needs.isEmpty())
       return "noNeedFound";
@@ -349,8 +351,10 @@ public class NeedController
       }
     } catch (NoSuchNeedException e) {
       logger.warn("caught NoSuchNeedException:", e);
+    } catch (Exception e) {
+        logger.warn("caught Exception",e);
     }
-    return "redirect:/need/" + need.getId().toString();
+      return "redirect:/need/" + need.getId().toString();
     //return viewNeed(need.getId().toString(), model);
   }
 
@@ -378,6 +382,10 @@ public class NeedController
       logger.warn("caught InterruptedEception",e);
     } catch (ExecutionException e) {
       logger.warn("caught ExecutionException",e);
+    } catch (CamelConfigurationFailedException e) {
+      logger.warn("caught CamelConfigurationFailedException");
+    } catch (Exception e) {
+        logger.warn("caught Exception",e);
     }
 
       return ret;

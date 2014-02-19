@@ -19,6 +19,8 @@ import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
+import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
+import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import java.net.URI;
 import java.text.MessageFormat;
@@ -78,7 +80,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public void deactivate(URI needURI) throws NoSuchNeedException {
+    public void deactivate(URI needURI) throws Exception {
         logger.debug(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
 
         List<Need> needs = needRepository.findByNeedURI(needURI);
@@ -111,8 +113,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public void close(final URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
+    public void close(final URI connectionURI, Model content) throws Exception {
         if (logger.isDebugEnabled()) {
           logger.debug(MessageFormat.format("need-facing: CLOSE called for connection {0} with model {1}", connectionURI, StringUtils.abbreviate(RdfUtils.toString(content),200)));
         }
@@ -241,8 +242,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException
-    {
+    public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final Model content) throws Exception {
       if (logger.isDebugEnabled()) {
         logger.debug("need-facing: CONNECT called for need {}, other need {} and content {}", new Object[]{needURI, otherNeedURI, StringUtils.abbreviate(RdfUtils.toString(content),200)});
       }

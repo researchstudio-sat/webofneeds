@@ -14,13 +14,18 @@
  *    limitations under the License.
  */
 
-package won.owner.messaging;
+package won.bot.framework.events.event;
+
+import won.bot.framework.events.Event;
+import won.protocol.model.FacetType;
 
 /**
- * User: syim
- * Date: 27.01.14
+ * Base class for events.
  */
-public class OwnerProtocolCamelServiceImpl {
-    //public String addCamelComponentForWonNodeBroker
+public interface FacetEvent extends Event
+{
+  public FacetType getFacetType();
+
+
 
 }

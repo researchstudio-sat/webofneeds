@@ -105,6 +105,7 @@ public class BaseBot implements Bot
     return botContext;
   }
 
+  @Override public void onNewGroupCreated(final URI groupURI, final URI wonNodeURI, final Model groupModel){}
   @Override public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception{}
 
   @Override public void onConnectFromOtherNeed(Connection con, final Model content) throws Exception {}

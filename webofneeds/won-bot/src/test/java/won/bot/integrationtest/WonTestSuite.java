@@ -14,20 +14,18 @@
  *    limitations under the License.
  */
 
-package won.node.camel.routes.fixed;
+package won.bot.integrationtest;
 
-import org.apache.camel.builder.RouteBuilder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
 
 /**
- * User: LEIH-NB
- * Date: 19.11.13
+ * Integration test.
  */
-public class OwnerProtocoDynamicRoutes extends RouteBuilder {
-    @Override
-    public void configure() throws Exception {
-        from("seda:OwnerProtocolOut?concurrentConsumers=5")
-                .to("bean:ownerProtocolOutgoingMessagesProcessor")
-                //.wireTap("bean:messagingService?method=inspectMessage")
-                .recipientList(header("ownerApplicationIDs"));
-    }
+@RunWith(Suite.class)
+@Suite.SuiteClasses({Create2NeedsShortConversationBotTest.class,Create2NeedsGroupingBotTest.class,CommentBotTest.class})
+public class WonTestSuite
+{
+
 }

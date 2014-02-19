@@ -20,6 +20,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.context.ApplicationContextAware;
 import won.protocol.exception.*;
+import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
+import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
@@ -62,7 +64,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      * @param needURI
      * @throws NoSuchNeedException if needURI does not refer to an existing need
      */
-    public void deactivate(URI needURI) throws NoSuchNeedException;
+    public void deactivate(URI needURI) throws Exception;
 
     public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws Exception;
     /**
@@ -85,7 +87,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
      * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
      */
-    public void close(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+    public void close(URI connectionURI, Model content) throws Exception;
 
     /**
      * Sends a chat message via the local connection identified by the specified connectionURI
@@ -100,6 +102,6 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      */
     public void textMessage(URI connectionURI, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException;
+    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws Exception;
 
 }

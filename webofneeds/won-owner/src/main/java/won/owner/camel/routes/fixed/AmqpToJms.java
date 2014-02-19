@@ -26,7 +26,7 @@ import org.apache.camel.builder.RouteBuilder;
 public class AmqpToJms extends RouteBuilder{
     @Override
     public void configure(){
-        from("seda:outgoingMessages")
+        from("seda:outgoingMessages?concurrentConsumers=5")
                 //todo: broker endpoint negotiation shall be run here and not in the service client classes.
                 .wireTap("bean:messagingService?method=inspectMessage")
                 .recipientList(header("remoteBrokerEndpoint"));

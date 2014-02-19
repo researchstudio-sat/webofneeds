@@ -83,7 +83,7 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     }
 
    // @Override
-    public void deactivate(final URI needURI) throws NoSuchNeedException {
+    public void deactivate(final URI needURI) throws NoSuchNeedException, NoSuchConnectionException, IllegalMessageForConnectionStateException {
         this.needManagementService.deactivate(needURI);
     }
 

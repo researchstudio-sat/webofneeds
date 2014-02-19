@@ -66,7 +66,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   @Override
   public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("CLOSE received from the owner side for connection {0} with content {1}", connectionURI, content);
+    logger.info("CLOSE received from the owner side for connection {} with content {}", connectionURI, content);
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
 

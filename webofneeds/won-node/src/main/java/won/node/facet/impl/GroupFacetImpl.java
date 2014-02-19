@@ -34,7 +34,6 @@ public class GroupFacetImpl extends Facet {
 
     @Override
   public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info("SEND_TEXT_Message received with facet type GroupFacet from Need");
     List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
         ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
     for (final Connection c : cons) {

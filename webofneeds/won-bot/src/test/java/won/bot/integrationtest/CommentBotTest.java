@@ -29,7 +29,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import won.bot.framework.events.event.WorkDoneEvent;
 import won.bot.framework.events.listener.ExecuteOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
-import won.bot.impl.Create2NeedsShortConversationBot;
+import won.bot.impl.CommentBot;
+import won.bot.impl.Create2NeedsGroupingBot;
 
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
@@ -39,11 +40,11 @@ import java.util.concurrent.TimeUnit;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
-public class Create2NeedsShortConversationBotTest
+public class CommentBotTest
 {
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
-  private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 1000;
+  private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 2000;
 
   MyBot bot;
 
@@ -72,7 +73,7 @@ public class Create2NeedsShortConversationBotTest
    * @throws Exception
    */
   @Test
-  public void testCreate2NeedsShortConversationBot() throws Exception
+  public void testCommentBot() throws Exception
   {
     //adding the bot to the bot manager will cause it to be initialized.
     //at that point, the trigger starts.
@@ -92,7 +93,7 @@ public class Create2NeedsShortConversationBotTest
    * add a listener to its internal event bus and to access its listeners, which
    * record information during the run that we later check with asserts.
    */
-  public static class MyBot extends Create2NeedsShortConversationBot
+  public static class MyBot extends CommentBot
   {
     /**
      * Used for synchronization with the @Test method: it should wait at the
@@ -139,33 +140,35 @@ public class Create2NeedsShortConversationBotTest
      */
     public void executeAsserts()
     {
-      //2 act events
-      Assert.assertEquals(2, this.needCreator.getEventCount());
+      //1 act events
+      Assert.assertEquals(1, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
-      //2 create need events
-
-      Assert.assertEquals(2, this.needConnector.getEventCount());
+      //1 create need events
+      Assert.assertEquals(1, this.commentFacetCreator.getEventCount());
+      Assert.assertEquals(0, this.commentFacetCreator.getExceptionCount());
+      //1 create comment events
+      Assert.assertEquals(1, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
       //1 connect, 1 open
       Assert.assertEquals(2, this.autoOpener.getEventCount());
       Assert.assertEquals(0, this.autoOpener.getExceptionCount());
       //10 messages
-      Assert.assertEquals(10, this.autoResponder.getEventCount());
-      Assert.assertEquals(0, this.autoResponder.getExceptionCount());
-      //10 messages
-      Assert.assertEquals(10, this.connectionCloser.getEventCount());
+      Assert.assertEquals(2, this.connectionCloser.getEventCount());
       Assert.assertEquals(0, this.connectionCloser.getExceptionCount());
-      //1 close (one sent, one received - but for sending we create no event)
-      Assert.assertEquals(1, this.needDeactivator.getEventCount());
-      Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
-      //2 needs deactivated
+      //2 close (one sent, one received - but for sending we create no event)
+
+      Assert.assertEquals(1,this.allNeedsDeactivator.getEventCount());
+      Assert.assertEquals(0, this.allNeedsDeactivator.getExceptionCount());
+
+
+      //4 NeedDeactivated events
       Assert.assertEquals(2, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
       //TODO: there is more to check:
       //* what does the RDF look like?
       // --> pull it from the needURI/ConnectionURI and check contents
-      //* what does the database look like?
+      //* what does the database look like?      */
     }
 
   }

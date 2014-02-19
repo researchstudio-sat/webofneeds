@@ -43,7 +43,7 @@ public class SchedulerEventBusImpl implements EventBus
   @Override
   public <T extends Event> void publish(final T event)
   {
-    logger.debug("publishing event {}", event);
+    logger.info("publishing event {}", event);
     //get the list of listeners registered for the event
     List<EventListener> listeners = getEventListenersForEvent(event);
     if (listeners == null || listeners.size() == 0) {
@@ -58,7 +58,7 @@ public class SchedulerEventBusImpl implements EventBus
   @Override
   public <T extends Event> void subscribe(Class<T> clazz, final EventListener listener)
   {
-    logger.debug("subscribing listener for type {}", clazz);
+    logger.info("subscribing listener for type {}", clazz);
     synchronized (monitor) {
       //we want to synchronize so we don't accidentally add or remove listeners at the same time
       List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));
@@ -70,7 +70,7 @@ public class SchedulerEventBusImpl implements EventBus
   @Override
   public <T extends Event> void unsubscribe(Class<T> clazz, final EventListener listener)
   {
-    logger.debug("unsubscribing listener for type {}", clazz);
+    logger.info("unsubscribing listener for type {}", clazz);
     synchronized (monitor) {
       //we want to synchronize so we don't accidentally add or remove listeners at the same time
       List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));      newListenerList.remove(listener);
@@ -81,7 +81,7 @@ public class SchedulerEventBusImpl implements EventBus
   @Override
   public void unsubscribe(final EventListener listener)
   {
-    logger.debug("unsubscribing listener {} from all events", listener);
+    logger.info("unsubscribing listener {} from all events", listener);
     synchronized (monitor){
       for (Map.Entry<Class<? extends Event>, List<EventListener>> entry: listenerMap.entrySet()){
         List<EventListener> listeners = entry.getValue();

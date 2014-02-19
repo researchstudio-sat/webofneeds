@@ -112,12 +112,16 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     }
 
     @WebMethod
-    public void deactivate(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedFault {
+    public void deactivate(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedFault, NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         wireDependenciesLazily();
       try {
         ownerProtocolNeedService.deactivate(needURI);
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
+      } catch (NoSuchConnectionException e) {
+          throw NoSuchConnectionFault.fromException(e);
+      } catch (IllegalMessageForConnectionStateException e) {
+          throw IllegalMessageForConnectionStateFault.fromException(e);  //To change body of catch statement use File | Settings | File Templates.
       }
     }
 

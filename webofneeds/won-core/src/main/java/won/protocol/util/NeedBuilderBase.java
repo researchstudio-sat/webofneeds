@@ -68,6 +68,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   private String availableAtLocationRegion;
   private Model contentDescription;
 
+
   //pattern for finding hashtags in title and description
   private static final Pattern PATTERN_HASHTAG = Pattern.compile("#\\w+");
 

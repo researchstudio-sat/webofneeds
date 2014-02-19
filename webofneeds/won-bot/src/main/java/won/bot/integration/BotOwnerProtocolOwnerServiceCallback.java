@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.Bot;
+import won.bot.framework.bot.base.BaseBot;
 import won.bot.framework.manager.BotManager;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.model.ChatMessage;
@@ -29,6 +30,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
+            logger.info("onClose received for connection {} ",con);
           getBotForNeedUri(con.getNeedURI()).onCloseFromOtherNeed(con, content);
         } catch (Exception e) {
           logger.warn("error while handling onClose()",e);
@@ -55,6 +57,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
+          logger.info("onConnect called for connection {} ",con.getConnectionURI());
           getBotForNeedUri(con.getNeedURI()).onConnectFromOtherNeed(con, content);
         } catch (Exception e) {
           logger.warn("error while handling onConnect()",e);
@@ -81,6 +84,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
+          logger.info("onTextMessage for Connection {} ",con.getConnectionURI());
           getBotForNeedUri(con.getNeedURI()).onMessageFromOtherNeed(con, message, content);
         } catch (Exception e) {
           logger.warn("error while handling onTextMessage()",e);
