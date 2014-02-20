@@ -159,7 +159,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
             try {
                 Connection conn = DataAccessUtils.loadConnection(connectionRepository,connURI);
-                if (!conn.getState().equals(ConnectionState.CLOSED)&&!DataAccessUtils.loadConnection(connectionRepository, conn.getRemoteConnectionURI()).getState().equals(ConnectionState.CLOSED))
+                if (!conn.getState().equals(ConnectionState.CLOSED))
                     ownerFacingConnectionCommunicationService.close(connURI, null);
             } catch (IllegalMessageForConnectionStateException e) {
                 logger.warn("wrong connection state",e);

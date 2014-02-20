@@ -122,10 +122,9 @@ public class Create2NeedsGroupingBot extends EventBot
       //framework that the bot's work is done
       this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
               ctx,
-              new EventBotActions.SignalWorkDoneAction(ctx), 2*(NO_OF_NEEDS+NO_OF_GROUPS)-1
+              new EventBotActions.SignalWorkDoneAction(ctx), NO_OF_NEEDS+NO_OF_GROUPS
       );
       bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
-      bus.subscribe(CloseFromOtherNeedEvent.class,this.workDoneSignaller);
 
   }
 
