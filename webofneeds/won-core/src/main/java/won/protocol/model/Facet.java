@@ -8,6 +8,7 @@ package won.protocol.model;
  * To change this template use File | Settings | File Templates.
  */
 
+
 import javax.persistence.*;
 import java.net.URI;
 

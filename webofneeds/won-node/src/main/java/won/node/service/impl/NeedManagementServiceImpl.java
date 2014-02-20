@@ -146,7 +146,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     }
 
     @Override
-    public void deactivate(final URI needURI) throws NoSuchNeedException,  NoSuchConnectionException {
+    public void deactivate(final URI needURI) throws NoSuchNeedException, NoSuchConnectionException {
         logger.info("DEACTIVATING need. needURI:{}",needURI);
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
         Need need = DataAccessUtils.loadNeed(needRepository, needURI);
@@ -158,7 +158,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
         for (URI connURI : connectionURIs) {
 
             try {
-                if (!DataAccessUtils.loadConnection(connectionRepository,connURI).getState().equals(ConnectionState.CLOSED))
+                Connection conn = DataAccessUtils.loadConnection(connectionRepository,connURI);
+                if (!conn.getState().equals(ConnectionState.CLOSED)&&!DataAccessUtils.loadConnection(connectionRepository, conn.getRemoteConnectionURI()).getState().equals(ConnectionState.CLOSED))
                     ownerFacingConnectionCommunicationService.close(connURI, null);
             } catch (IllegalMessageForConnectionStateException e) {
                 logger.warn("wrong connection state",e);

@@ -257,9 +257,11 @@ public class NeedController
     model.addAttribute("active", need.getState() != NeedState.ACTIVE ? "activate" : "deactivate");
     model.addAttribute("needURI", need.getNeedURI());
     List<Facet> facets = facetRepository.findByNeedURI(need.getNeedURI());
-    model.addAttribute("command", new NeedPojo(facets));
 
-    LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
+          model.addAttribute("command", new NeedPojo(facets));
+
+
+      LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
     NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
     pojo.setState(need.getState());
 

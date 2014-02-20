@@ -23,7 +23,7 @@ public class FacetRegistry {
 
   private HashMap<FacetType, Facet> map;
 
-  public <T extends Facet>T get(Connection con) {
+  public <T extends Facet>T get(Connection con)  {
     return (T)get(FacetType.getFacetType(con.getTypeURI()));
   }
 

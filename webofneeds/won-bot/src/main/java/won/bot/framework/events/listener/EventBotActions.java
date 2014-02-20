@@ -32,6 +32,7 @@ import won.protocol.util.WonRdfUtils;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -139,17 +140,34 @@ public class EventBotActions
         @Override
         public void doRun()
         {
+
             List<URI> fromNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(fromListName);
             List<URI> toNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(toListName);
+
             for (URI fromUri: fromNeeds){
-                for (URI toUri:toNeeds) {
-                    try {
-                        getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createModelForConnect(fromFacet, toFacet));
-                    } catch (Exception e) {
-                        logger.warn("could not connect {} and {}", new Object[]{fromUri, toUri}, e);
+                URI toUri = null;
+                if (fromListName.equals(toListName)){
+                    int i = fromNeeds.indexOf(fromUri);
+                    if (i+1<=fromNeeds.size()){
+                       toUri = fromNeeds.get(i+1);
+                    }
+                } else{
+                    for (URI toUriTemp:toNeeds) {
+                        if (!fromUri.equals(toUriTemp)){
+
+                            toUri = toUriTemp;
+                        }
                     }
                 }
+                try {
+                    logger.info("connecting needs {} and {}",fromUri,toUri);
+                    getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createModelForConnect(fromFacet, toFacet));
+                } catch (Exception e) {
+                    logger.warn("could not connect {} and {}", new Object[]{fromUri, toUri}, e);
+                }
             }
+
+
         }
     }
 

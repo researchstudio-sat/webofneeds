@@ -94,8 +94,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
+    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         if (logger.isDebugEnabled()) {
           logger.debug(MessageFormat.format("need-facing: OPEN called for connection {0} with model {1}", connectionURI, StringUtils.abbreviate(RdfUtils.toString(content),200)));
         }
@@ -129,8 +128,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
     @Override
     public void textMessage(final URI connectionURI, final Model message)
-            throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         logger.debug("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
 
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);

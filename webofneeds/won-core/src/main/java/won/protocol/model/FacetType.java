@@ -43,7 +43,7 @@ public enum FacetType {
         return ret;
     }
 
-    public static FacetType getFacetType(URI uri) {
+    public static FacetType getFacetType(URI uri)  {
        if(uri.equals(FacetType.ControlFacet.getURI()))
         return FacetType.ControlFacet;
        else if(uri.equals(FacetType.GroupFacet.getURI()))
@@ -62,8 +62,15 @@ public enum FacetType {
            return FacetType.BACCCoordinatorFacet;
        else if(uri.equals(FacetType.BACCParticipantFacet.getURI()))
            return FacetType.BACCParticipantFacet;
-       else
+       else if (uri.equals(FacetType.CommentFacet.getURI()))
+           return FacetType.CommentFacet;
+       else if(uri.equals(FacetType.CommentModeratedFacet.getURI()))
+           return FacetType.CommentModeratedFacet;
+       else if(uri.equals(FacetType.CommentUnrestrictedFacet.getURI()))
+           return FacetType.CommentUnrestrictedFacet;
+       else{
            return null;
+       }
     }
 
     private String name;

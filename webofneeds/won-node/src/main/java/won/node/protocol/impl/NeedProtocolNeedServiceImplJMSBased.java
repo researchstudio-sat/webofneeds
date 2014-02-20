@@ -44,8 +44,7 @@ public class NeedProtocolNeedServiceImplJMSBased
     final Logger logger = LoggerFactory.getLogger(getClass());
 
   //@Consume(uri="bean:activemq:queue:WON.NeedProtocol.Connect.In")
-  public URI connect(@Header("needURI") final String needURI, @Header("otherNeedURI") final String otherNeedURI, @Header("otherConnectionURI") final String otherConnectionURI, @Header("content")final String content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
-  {
+  public URI connect(@Header("needURI") final String needURI, @Header("otherNeedURI") final String otherNeedURI, @Header("otherConnectionURI") final String otherConnectionURI, @Header("content")final String content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
        logger.info("NODE2: connect received for need {], otherNeed{},connectionURI {}, content {}");
        URI needURIConvert = URI.create(needURI);
        URI otherNeedURIConvert = URI.create(otherNeedURI);
@@ -62,8 +61,7 @@ public class NeedProtocolNeedServiceImplJMSBased
       delegate.open(connectionURIConvert, contentConvert);
   }
 
-  public void close(@Header("connectionURI")final String connectionURI,@Header("content") final String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void close(@Header("connectionURI")final String connectionURI,@Header("content") final String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
       logger.info("NODE2: close received for need {], otherNeed{},connectionURI {}, content {}");
       URI connectionURIConvert = URI.create(connectionURI);
@@ -71,8 +69,7 @@ public class NeedProtocolNeedServiceImplJMSBased
       delegate.close(connectionURIConvert, contentConvert);
   }
 
-  public void textMessage(@Header("connectionURI")final String connectionURI, @Header("content")final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void textMessage(@Header("connectionURI")final String connectionURI, @Header("content")final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
       logger.info("NODE2: text message received for connection {], message {}",connectionURI,message);
       URI connectionURIConvert = URI.create(connectionURI);
       Model messageConvert = RdfUtils.toModel(message);

@@ -37,8 +37,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   protected NeedFacingConnectionCommunicationServiceImpl connectionCommunicationService;
 
   @Override
-  public URI connect(final URI need, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
-  {
+  public URI connect(final URI need, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     return this.needFacingNeedCommunicationService.connect(need, otherNeedURI, otherConnectionURI, content);
   }
 
@@ -48,14 +47,12 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   }
 
   @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     connectionCommunicationService.close(connectionURI, content);
   }
 
   @Override
-  public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     connectionCommunicationService.textMessage(connectionURI, message);
   }
 

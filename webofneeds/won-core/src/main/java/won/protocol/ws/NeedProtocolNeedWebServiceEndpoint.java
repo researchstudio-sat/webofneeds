@@ -46,7 +46,7 @@ public interface NeedProtocolNeedWebServiceEndpoint
           @WebParam(name = "otherNeedURI") URI otherNeedURI,
           @WebParam(name = "otherConnectionURI") URI otherConnectionURI,
           @WebParam(name = "content") String content)
-        throws NoSuchNeedException, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault;
+          throws NoSuchNeedException, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault;
 
   @WebMethod
   void open(@WebParam(name = "connectionURI") URI connectionURI,

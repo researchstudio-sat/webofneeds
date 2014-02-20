@@ -147,7 +147,7 @@ public class CommentBotTest
       Assert.assertEquals(1, this.commentFacetCreator.getEventCount());
       Assert.assertEquals(0, this.commentFacetCreator.getExceptionCount());
       //1 create comment events
-      Assert.assertEquals(1, this.needConnector.getEventCount());
+      Assert.assertEquals(2, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
       //1 connect, 1 open
       Assert.assertEquals(2, this.autoOpener.getEventCount());

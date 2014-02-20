@@ -31,10 +31,7 @@ public class CommentBot extends EventBot
 {
 
   private static final int NO_OF_NEEDS = 1;
-  private static final int NO_OF_GROUPS = 1;
-  private static final int NO_OF_MESSAGES = 4;
-  private static final long MILLIS_BETWEEN_MESSAGES = 1000;
-  private NeedProducer commentProducer;
+
 
   //we use protected members so we can extend the class and
   //access the listeners for unit test assertions and stats
@@ -50,6 +47,8 @@ public class CommentBot extends EventBot
   protected BaseEventListener allNeedsDeactivator;
   protected BaseEventListener needDeactivator;
   protected BaseEventListener workDoneSignaller;
+    private static final String NAME_NEEDS = "needs";
+    private static final String NAME_COMMENTS = "comments";
 
   @Override
   protected void initializeEventListeners()
@@ -60,17 +59,21 @@ public class CommentBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ExecuteOnEventListener(
         ctx,
-        new EventBotActions.CreateNeedAction(ctx),
+        new EventBotActions.CreateNeedAction(ctx,NAME_NEEDS),
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class,this.needCreator);
 
     //count until 1 need is created, then create a comment facet
-    this.commentFacetCreator = new CommenterListener(ctx);
+    this.commentFacetCreator = new ExecuteOnEventListener(ctx,
+            new EventBotActions.CreateNeedWithFacetsAction(ctx,NAME_COMMENTS,FacetType.CommentFacet.getURI()),1) ;
     bus.subscribe(NeedCreatedEvent.class, this.commentFacetCreator);
 
-    this.needConnector = new ConnectTwoNeedsListener(ctx,FacetType.CommentFacet.getURI(),FacetType.OwnerFacet.getURI());
-    bus.subscribe(CommentFacetCreatedEvent.class, this.needConnector);
+    this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
+            new EventBotActions.ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_COMMENTS,  FacetType.OwnerFacet.getURI(),FacetType.CommentFacet.getURI()),
+            2
+    );
+    bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
       this.autoOpener = new AutomaticConnectionOpenerListener(ctx);
       bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
@@ -99,8 +102,5 @@ public class CommentBot extends EventBot
       bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
 
   }
-  @Qualifier("commentNeedDefaultProducer")
-  public void setCommentProducer(NeedProducer needProducer){
-     this.commentProducer = needProducer;
-  }
+
 }
