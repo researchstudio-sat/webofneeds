@@ -165,7 +165,7 @@ public class Create2NeedsGroupingBotTest
 
 
       //4 NeedDeactivated events
-      Assert.assertEquals(3, this.workDoneSignaller.getEventCount());
+      Assert.assertEquals(5, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
       //TODO: there is more to check:

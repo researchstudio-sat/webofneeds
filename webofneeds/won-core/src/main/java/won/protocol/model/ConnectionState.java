@@ -103,7 +103,7 @@ public enum ConnectionState
             return REQUEST_RECEIVED;
         }
     }
-    return this;
+    return this;   //none of the above applies: the state does not change
   }
 
   public URI getURI()

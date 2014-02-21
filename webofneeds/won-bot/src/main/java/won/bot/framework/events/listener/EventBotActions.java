@@ -148,7 +148,7 @@ public class EventBotActions
                 URI toUri = null;
                 if (fromListName.equals(toListName)){
                     int i = fromNeeds.indexOf(fromUri);
-                    if (i+1<=fromNeeds.size()){
+                    if (i+1<fromNeeds.size()){
                        toUri = fromNeeds.get(i+1);
                     }
                 } else{
