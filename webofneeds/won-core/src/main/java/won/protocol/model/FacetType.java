@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,11 +22,14 @@ public enum FacetType {
     GroupFacet("GroupFacet"),
     CoordinatorFacet("CoordinatorFacet"),
     ParticipantFacet("ParticipantFacet"),
-    BAPCCoordinatorFacet("BAPCCoordinatorFacet"),
-    BAPCParticipantFacet("BAPCParticipantFacet"),
     CommentFacet("CommentFacet"),
     CommentModeratedFacet("CommentModeratedFacet"),
-    CommentUnrestrictedFacet("CommentUnrestrictedFacet");
+    CommentUnrestrictedFacet("CommentUnrestrictedFacet"),
+    BAPCCoordinatorFacet("BAPCCoordinatorFacet"),
+    BAPCParticipantFacet("BAPCParticipantFacet"),
+    BACCCoordinatorFacet("BACCCoordinatorFacet"),
+    BACCParticipantFacet("BACCParticipantFacet");
+
 
     private static final Logger logger = LoggerFactory.getLogger(BasicNeedType.class);
 
@@ -37,7 +43,7 @@ public enum FacetType {
         return ret;
     }
 
-    public static FacetType getFacetType(URI uri) {
+    public static FacetType getFacetType(URI uri)  {
        if(uri.equals(FacetType.ControlFacet.getURI()))
         return FacetType.ControlFacet;
        else if(uri.equals(FacetType.GroupFacet.getURI()))
@@ -52,14 +58,19 @@ public enum FacetType {
            return FacetType.BAPCCoordinatorFacet;
        else if(uri.equals(FacetType.BAPCParticipantFacet.getURI()))
             return FacetType.BAPCParticipantFacet;
-       else if(uri.equals(FacetType.CommentFacet.getURI()))
-         return FacetType.CommentFacet;
+       else if(uri.equals(FacetType.BACCCoordinatorFacet.getURI()))
+           return FacetType.BACCCoordinatorFacet;
+       else if(uri.equals(FacetType.BACCParticipantFacet.getURI()))
+           return FacetType.BACCParticipantFacet;
+       else if (uri.equals(FacetType.CommentFacet.getURI()))
+           return FacetType.CommentFacet;
        else if(uri.equals(FacetType.CommentModeratedFacet.getURI()))
-         return FacetType.CommentModeratedFacet;
+           return FacetType.CommentModeratedFacet;
        else if(uri.equals(FacetType.CommentUnrestrictedFacet.getURI()))
-         return FacetType.CommentUnrestrictedFacet;
-       else
+           return FacetType.CommentUnrestrictedFacet;
+       else{
            return null;
+       }
     }
 
     private String name;

@@ -31,6 +31,8 @@ public class Create2NeedsShortConversationBot extends EventBot
   private static final int NO_OF_NEEDS = 2;
   private static final int NO_OF_MESSAGES = 10;
   private static final long MILLIS_BETWEEN_MESSAGES = 1000;
+    private static final String NAME_NEEDS = "needs";
+
 
   //we use protected members so we can extend the class and
   //access the listeners for unit test assertions and stats
@@ -54,19 +56,15 @@ public class Create2NeedsShortConversationBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ExecuteOnEventListener(
         ctx,
-        new EventBotActions.CreateNeedAction(ctx),
+        new EventBotActions.CreateNeedAction(ctx,NAME_NEEDS),
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class,this.needCreator);
 
-
-
-
     //count until 2 needs were created, then
     //   * connect the 2 needs
     this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
-        new EventBotActions.ConnectTwoNeedsAction(
-            ctx, FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI()), NO_OF_NEEDS);
+        new EventBotActions.ConnectFromListToListAction(ctx,NAME_NEEDS,NAME_NEEDS,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet.getURI()),NO_OF_NEEDS);
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
     //add a listener that is informed of the connect/open events and that auto-opens

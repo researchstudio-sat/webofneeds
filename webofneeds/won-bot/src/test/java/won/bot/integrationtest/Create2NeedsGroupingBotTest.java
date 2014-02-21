@@ -144,10 +144,10 @@ public class Create2NeedsGroupingBotTest
       Assert.assertEquals(2, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
       //2 create need events
-      Assert.assertEquals(2, this.groupFacetCreator.getEventCount());
+      Assert.assertEquals(3, this.groupFacetCreator.getEventCount());
       Assert.assertEquals(0, this.groupFacetCreator.getExceptionCount());
       //1 create group events
-      Assert.assertEquals(1, this.needConnector.getEventCount());
+      Assert.assertEquals(3, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
       //2 connect, 2 open
       Assert.assertEquals(4, this.autoOpener.getEventCount());

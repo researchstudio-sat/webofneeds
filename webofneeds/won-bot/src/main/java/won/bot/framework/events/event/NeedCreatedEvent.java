@@ -24,7 +24,7 @@ import java.net.URI;
 /**
  *
  */
-public class NeedCreatedEvent extends BaseEvent implements FacetEvent
+public class NeedCreatedEvent extends BaseEvent
 {
   private final URI needUri;
   private final URI wonNodeUri;
@@ -54,8 +54,4 @@ public class NeedCreatedEvent extends BaseEvent implements FacetEvent
     return needModel;
   }
 
-    @Override
-    public FacetType getFacetType() {
-        return facetType;
-    }
 }

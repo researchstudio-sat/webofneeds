@@ -58,8 +58,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
           @WebParam(name = "otherNeedURI") final URI otherNeedURI,
           @WebParam(name = "otherConnectionURI") final URI otherConnectionURI,
           @WebParam(name = "content") final String content)
-        throws NoSuchNeedException, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault
-  {
+          throws NoSuchNeedException, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault {
     wireDependenciesLazily();
     try {
       return needProtocolNeedService.connect(needURI, otherNeedURI, otherConnectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
@@ -73,8 +72,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
   @Override
   @WebMethod
   public void open(@WebParam(name = "connectionURI") final URI connectionURI,
-                   @WebParam(name = "content") final String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
-  {
+                   @WebParam(name = "content") final String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
       wireDependenciesLazily();
     try {
       needProtocolNeedService.open(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
@@ -88,8 +86,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
   @Override
   @WebMethod
   public void close(@WebParam(name = "connectionURI") final URI connectionURI,
-                    @WebParam(name = "content") final String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
-  {
+                    @WebParam(name = "content") final String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
     wireDependenciesLazily();
     try {
       needProtocolNeedService.close(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
@@ -104,8 +101,7 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
   @WebMethod
   public void textMessage(
           @WebParam(name = "connectionURI") final URI connectionURI,
-          @WebParam(name = "content") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
-  {
+          @WebParam(name = "content") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
     wireDependenciesLazily();
     try {
       Model messageConvert = RdfUtils.toModel(message);

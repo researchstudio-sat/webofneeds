@@ -43,8 +43,7 @@ public abstract class BaseEventListener implements EventListener
   }
 
   @Override
-  public final void onEvent(final Event event) throws Exception
-  {
+  public final void onEvent(final Event event) throws Exception{
     countEvent(event);
     long startTime = System.currentTimeMillis();
     try {

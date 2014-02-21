@@ -21,7 +21,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.component.needproducer.impl.CommentNeedProducer;
 import won.bot.framework.events.Event;
 import won.bot.framework.events.event.CommentFacetCreatedEvent;
-import won.bot.framework.events.event.FacetEvent;
 import won.protocol.model.FacetType;
 import won.protocol.util.WonRdfUtils;
 
@@ -44,8 +43,7 @@ public class ConnectTwoNeedsListener extends BaseEventListener
   }
 
   @Override
-  public void doOnEvent(final Event event) throws Exception
-  {
+  public void doOnEvent(final Event event) throws Exception {
 
       URI facet = getEventListenerContext().getBotContext().getNeedByName(FacetType.getFacetType(remoteFacet).name());
       List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();

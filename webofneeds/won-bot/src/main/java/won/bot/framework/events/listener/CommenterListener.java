@@ -22,7 +22,6 @@ import won.bot.framework.component.needproducer.impl.CommentNeedProducer;
 import won.bot.framework.events.Event;
 import won.bot.framework.events.event.CommentFacetCreatedEvent;
 import won.bot.framework.events.event.ConnectFromOtherNeedEvent;
-import won.bot.framework.events.event.FacetEvent;
 import won.bot.framework.events.event.OpenFromOtherNeedEvent;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
@@ -44,7 +43,6 @@ public class CommenterListener extends BaseEventListener
   @Override
   public void doOnEvent(final Event event) throws Exception
   {
-      final FacetEvent fEvent = (FacetEvent) event;
       if (getEventListenerContext().getNeedProducer().isExhausted()){
           logger.info("comment need bot's need producer is exhausted");
           return;

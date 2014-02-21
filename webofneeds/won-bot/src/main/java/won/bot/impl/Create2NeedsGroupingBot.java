@@ -34,7 +34,9 @@ public class Create2NeedsGroupingBot extends EventBot
   private static final int NO_OF_GROUPS = 1;
   private static final int NO_OF_MESSAGES = 4;
   private static final long MILLIS_BETWEEN_MESSAGES = 1000;
-  private NeedProducer groupProducer;
+    private static final String NAME_GROUPS = "groups";
+    private static final String NAME_GROUPMEMBERS = "groupmembers";
+
 
   //we use protected members so we can extend the class and
   //access the listeners for unit test assertions and stats
@@ -61,7 +63,7 @@ public class Create2NeedsGroupingBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ExecuteOnEventListener(
         ctx,
-        new EventBotActions.CreateNeedAction(ctx),
+        new EventBotActions.CreateNeedAction(ctx, NAME_GROUPMEMBERS),
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class,this.needCreator);
@@ -71,15 +73,15 @@ public class Create2NeedsGroupingBot extends EventBot
     //count until 2 needs were created, then create group facet
     this.groupFacetCreator = new ExecuteOnceAfterNEventsListener(
             ctx,
-            new EventBotActions.CreateGroupNeedAction(ctx),
+            new EventBotActions.CreateNeedWithFacetsAction(ctx, NAME_GROUPS, FacetType.GroupFacet.getURI()),
             NO_OF_NEEDS);
     bus.subscribe(NeedCreatedEvent.class, this.groupFacetCreator);
 
-    this.needConnector = new ExecuteOnEventListener(ctx,
-        new EventBotActions.ConnectTwoNeedsWithGroupAction(ctx, FacetType.GroupFacet.getURI(),FacetType.OwnerFacet.getURI()),
-            NO_OF_GROUPS
+    this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
+        new EventBotActions.ConnectFromListToListAction(ctx, NAME_GROUPMEMBERS, NAME_GROUPS,  FacetType.OwnerFacet.getURI(),FacetType.GroupFacet.getURI()),
+            NO_OF_NEEDS + 1
     );
-    bus.subscribe(GroupFacetCreatedEvent.class, this.needConnector);
+    bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
 
 
@@ -126,8 +128,5 @@ public class Create2NeedsGroupingBot extends EventBot
       bus.subscribe(CloseFromOtherNeedEvent.class,this.workDoneSignaller);
 
   }
-  @Qualifier("groupNeedDefaultProducer")
-  public void setGroupProducer(NeedProducer needProducer){
-     this.groupProducer = needProducer;
-  }
+
 }

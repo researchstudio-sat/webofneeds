@@ -25,7 +25,7 @@ import java.net.URI;
  * User: LEIH-NB
  * Date: 05.02.14
  */
-public class CommentFacetCreatedEvent extends BaseEvent implements FacetEvent{
+public class CommentFacetCreatedEvent extends BaseEvent {
     private URI commentFacetURI;
     private URI wonNodeURI;
     private Model model;
@@ -50,10 +50,7 @@ public class CommentFacetCreatedEvent extends BaseEvent implements FacetEvent{
         return model;
     }
 
-    @Override
-    public FacetType getFacetType(){
-        return facetType;
-    }
+
 }
 
 

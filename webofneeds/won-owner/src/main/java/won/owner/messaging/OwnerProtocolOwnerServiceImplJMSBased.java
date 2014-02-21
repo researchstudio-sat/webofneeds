@@ -124,16 +124,14 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
         delegate.open(URI.create(connectionURI), RdfUtils.toModel(content));
     }
 
-    public void close(@Header("connectionURI")final String connectionURI, @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
+    public void close(@Header("connectionURI")final String connectionURI, @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         logger.info("node-facing: CLOSE called for connection {}", connectionURI);
 
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         delegate.close(URI.create(connectionURI),RdfUtils.toModel(content));
     }
 
-    public void textMessage(@Header("connectionURI")final String connectionURI, @Header("message")final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
+    public void textMessage(@Header("connectionURI")final String connectionURI, @Header("message")final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
         logger.info("node-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");

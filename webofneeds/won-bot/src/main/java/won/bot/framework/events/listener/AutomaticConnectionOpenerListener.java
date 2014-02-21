@@ -34,8 +34,7 @@ public class AutomaticConnectionOpenerListener extends BaseEventListener
   }
 
   @Override
-  public void doOnEvent(final Event event) throws Exception
-  {
+  public void doOnEvent(final Event event) throws Exception {
     if (event instanceof ConnectFromOtherNeedEvent) {
       ConnectFromOtherNeedEvent connectEvent = (ConnectFromOtherNeedEvent) event;
       logger.debug("auto-replying to connect for connection {}", connectEvent.getCon().getConnectionURI());

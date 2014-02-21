@@ -30,12 +30,14 @@ public enum ConnectionEventType
 
   //close may always be called. It always closes the connnection.
   OWNER_CLOSE("OwnerClose", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
-          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED),
+          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
   PARTNER_CLOSE("PartnerClose", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
-          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED),
-
-  OWNER_OPEN("OwnerOpen", ConnectionState.REQUEST_RECEIVED, ConnectionState.SUGGESTED),
-  PARTNER_OPEN("PartnerOpen", ConnectionState.REQUEST_SENT, ConnectionState.SUGGESTED),
+          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
+    //open may always be called. It may re-open a connection, it does not change the state of connected connections
+  OWNER_OPEN("OwnerOpen", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
+          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
+  PARTNER_OPEN("PartnerOpen", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
+          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
 
   OWNER_MESSAGE("OwnerMessage", ConnectionState.CONNECTED),
   PARTNER_MESSAGE("PartnerMessage", ConnectionState.CONNECTED),

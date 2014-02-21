@@ -48,7 +48,7 @@ public class DeactivateAllNeedsOnConnectionCloseListener extends BaseEventListen
     logger.debug("received close on connection {}, deactivating needs", con.getConnectionURI());
     URI group = getEventListenerContext().getBotContext().getNeedByName(FacetType.GroupFacet.name());
     if (group!=null)
-        deactivateNeed(group);
+      deactivateNeed(group);
       List<URI> needUris = getEventListenerContext().getBotContext().listNeedUris();
       for (int i = 0; i< needUris.size();i++){
           deactivateNeed(needUris.get(i));

@@ -30,7 +30,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class WON_TX
 {
   public static final String BASE_URI = "http://purl.org/webofneeds/tx/model#";
-  public static final String DEFAULT_PREFIX= "won-tx";
+  public static final String DEFAULT_PREFIX= "won-ba";
 
   private static Model m = ModelFactory.createDefaultModel();
 
