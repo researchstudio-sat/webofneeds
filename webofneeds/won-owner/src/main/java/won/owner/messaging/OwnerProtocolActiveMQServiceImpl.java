@@ -57,7 +57,7 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  * User: sbyim
  * Date: 28.11.13
  */
-public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,OwnerProtocolActiveMQService {
+public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware{//OwnerProtocolActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private CamelContext camelContext;
     private String componentName;
@@ -76,12 +76,12 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
     @Autowired
     private NeedRepository needRepository;
 
-    @Override
+
     public String getOwnerProtocolQueueNameWithResource() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
+
     public String getOwnerProtocolQueueNameWithResource(URI resourceURI){
         String activeMQOwnerProtocolQueueName;
         try{
@@ -98,7 +98,7 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         return activeMQOwnerProtocolQueueName;
     }
 
-    @Override
+
     public URI getWonNodeURI() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -235,7 +235,7 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
     }
 
 
-    @Override
+
     public URI getBrokerURIForNode(URI nodeURI) {
         logger.debug("obtaining broker URI for node {}", nodeURI);
         String nodeInformationPath = nodeURI.toString();
@@ -256,7 +256,7 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         return activeMQEndpoint;
     }
 
-    @Override
+
     public URI getBrokerURI() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }

@@ -16,7 +16,10 @@
 
 package won.owner.messaging;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.MessageBrokerService;
 import won.protocol.model.Connection;
@@ -31,11 +34,13 @@ import java.net.URI;
  * User: sbyim
  * Date: 28.01.14
  */
-public class ActiveMQServiceFactory {
+public class ActiveMQServiceFactory implements ApplicationContextAware{
     @Autowired
     ConnectionRepository connectionRepository;
     @Autowired
     NeedRepository needRepository;
+
+    ApplicationContext ctx;
 
     public OwnerProtocolActiveMQServiceImplRefactoring createActiveMQService(String methodName,URI uri) throws NoSuchConnectionException {
         OwnerProtocolActiveMQServiceImplRefactoring messageBrokerService = null;
@@ -53,9 +58,14 @@ public class ActiveMQServiceFactory {
             wonNodeURI = need.getWonNodeURI();
 
         }
-        return new OwnerProtocolActiveMQServiceImplRefactoring(wonNodeURI);
+        ctx.getBean("activeMQService");
+
+        return new OwnerProtocolActiveMQServiceImplRefactoring();
     }
 
 
-
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.ctx = applicationContext;
+    }
 }

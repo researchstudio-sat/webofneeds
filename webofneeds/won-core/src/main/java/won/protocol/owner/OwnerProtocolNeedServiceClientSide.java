@@ -54,7 +54,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      * @param needURI
      * @throws won.protocol.exception.NoSuchNeedException if needURI does not refer to an existing need
      */
-    public void activate(URI needURI) throws NoSuchNeedException;
+    public void activate(URI needURI) throws Exception;
 
     /**
      * Deactivates the need object, closing all its established connections.
@@ -64,7 +64,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      */
     public void deactivate(URI needURI) throws NoSuchNeedException, Exception;
 
-    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws Exception;
+    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeUri) throws Exception;
     /**
      * Opens a connection identified by connectionURI. A rdf graph can be sent along with the request.
      *
@@ -74,7 +74,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      * @throws won.protocol.exception.NoSuchConnectionException if connectionURI does not refer to an existing connection
      * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
      */
-    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+    public void open(URI connectionURI, Model content) throws Exception;
 
     /**
      * Closes the connection identified by the specified URI.
@@ -98,7 +98,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
      * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
      */
-    public void textMessage(URI connectionURI, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+    public void textMessage(URI connectionURI, Model message) throws Exception;
 
     public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException, CamelConfigurationFailedException, Exception;
 

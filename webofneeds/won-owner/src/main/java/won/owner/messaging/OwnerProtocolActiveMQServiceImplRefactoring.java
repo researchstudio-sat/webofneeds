@@ -63,14 +63,9 @@ public class OwnerProtocolActiveMQServiceImplRefactoring implements OwnerProtoco
     private static final String PATH_BROKER_URI = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_BROKER_URI + ">";
     @Autowired
     private LinkedDataRestClient linkedDataRestClient;
-    private URI wonNodeURI;
-
-    public OwnerProtocolActiveMQServiceImplRefactoring(URI wonNodeURI){
-        this.wonNodeURI = wonNodeURI;
-    }
 
     @Override
-    public final String getOwnerProtocolQueueNameWithResource(){
+    public final String getOwnerProtocolQueueNameWithResource(URI wonNodeURI){
         String activeMQOwnerProtocolQueueName;
         try{
             Path path = PathParser.parse(PATH_OWNER_PROTOCOL_QUEUE_NAME, PrefixMapping.Standard);
@@ -86,12 +81,11 @@ public class OwnerProtocolActiveMQServiceImplRefactoring implements OwnerProtoco
     }
 
     //todo: rename this method to getBrokerURIForNode
-    public final URI getBrokerURI() {
+    public final URI getBrokerURI(URI wonNodeURI) {
         logger.debug("obtaining broker URI for node {}", wonNodeURI);
         String nodeInformationPath = wonNodeURI.toString();
         URI activeMQEndpoint = null;
         try{
-
             Path path = PathParser.parse(PATH_BROKER_URI, PrefixMapping.Standard);
             activeMQEndpoint = linkedDataRestClient.getURIPropertyForPropertyPath(URI.create(nodeInformationPath), path);
         } catch (UniformInterfaceException e){
@@ -104,22 +98,4 @@ public class OwnerProtocolActiveMQServiceImplRefactoring implements OwnerProtoco
         }
         return activeMQEndpoint;
     }
-    //todo: deprecated
-    @Override
-    public String getOwnerProtocolQueueNameWithResource(URI needURI) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-    //todo: deprecated
-    @Override
-    public URI getBrokerURIForNode(URI needURI) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-
-
-    @Override
-    public URI getWonNodeURI() {
-        return wonNodeURI;
-    }
-
 }

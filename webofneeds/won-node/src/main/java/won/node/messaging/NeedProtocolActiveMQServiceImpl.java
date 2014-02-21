@@ -108,7 +108,6 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
         return activeMQEndpoint;
     }
 
-    @Override
     public URI getBrokerURI() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -223,5 +222,10 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public URI getBrokerURI(URI wonNodeUri) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }
