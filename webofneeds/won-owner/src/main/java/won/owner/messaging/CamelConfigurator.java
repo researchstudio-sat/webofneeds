@@ -22,6 +22,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.Endpoint;
 import org.apache.camel.component.jms.JmsConfiguration;
+import org.apache.camel.impl.UriEndpointConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,28 +70,27 @@ public class CamelConfigurator implements CamelContextAware{
     protected CamelConfigurator() {
     }
 
-    public final String configureCamelEndpointForNeed(URI needURI, URI brokerURI,String ownerProtocolQueueName) throws Exception {
+    public synchronized final String configureCamelEndpointForNeed(URI needURI, URI brokerURI,String ownerProtocolQueueName) throws Exception {
         Need need = needRepository.findByNeedURI(needURI).get(0);
         URI wonNodeURI = need.getWonNodeURI();
         return configureCamelEndpointForNodeURI(wonNodeURI, brokerURI,ownerProtocolQueueName);
 
     }
-    public final String configureCamelEndpointForConnection(URI connectionURI, URI brokerURI, String ownerProtocolQueueName) throws Exception {
+    public synchronized final String configureCamelEndpointForConnection(URI connectionURI, URI brokerURI, String ownerProtocolQueueName) throws Exception {
 
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         URI needURI = con.getNeedURI();
         return configureCamelEndpointForNeed(needURI,brokerURI, ownerProtocolQueueName);
 
     }
-    public final String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI,String ownerProtocolQueueName) throws CamelConfigurationFailedException {
+    public synchronized final String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI,String ownerProtocolQueueName) throws CamelConfigurationFailedException {
         //TODO: the linked data description of the won node must be at [NODE-URI]/resource
         // according to this code. This should be explicitly defined somewhere
 
         String tempComponentName = addCamelComponentForWonNodeBroker(wonNodeURI,brokerURI,null);
-
+        //TODO: make this configurable
         String endpoint = tempComponentName+":queue:"+ownerProtocolQueueName;
         endpointMap.put(wonNodeURI,endpoint);
-
         List<String> endpointList = new ArrayList<>();
         endpointList.add(endpoint);
         logger.info("endpoint of wonNodeURI {} is {}",wonNodeURI,endpointMap.get(wonNodeURI));
@@ -98,7 +98,7 @@ public class CamelConfigurator implements CamelContextAware{
 
     }
     //todo: the method is activemq specific. refactor it to support other brokers.
-    public String addCamelComponentForWonNodeBroker(URI wonNodeURI, URI brokerURI,String ownerApplicationId){
+    public synchronized String addCamelComponentForWonNodeBroker(URI wonNodeURI, URI brokerURI,String ownerApplicationId){
         String componentName;
 
         if (ownerApplicationId==null){
@@ -126,7 +126,7 @@ public class CamelConfigurator implements CamelContextAware{
         return componentName;
     }
 
-    public void addRouteForEndpoint(URI wonNodeURI) throws CamelConfigurationFailedException {
+    public synchronized void addRouteForEndpoint(URI wonNodeURI) throws CamelConfigurationFailedException {
         /**
          * there can be only one route per endpoint. Thus, consuming endpoint of each route shall be unique.
          */
@@ -146,12 +146,14 @@ public class CamelConfigurator implements CamelContextAware{
         }
 
     }
-
+    public String getStartingEndpoint(URI wonNodeURI){
+        return startingComponentMap.get(wonNodeURI);
+    }
     public void setStartingEndpoint(URI wonNodeURI, String startingEndpoint) {
         startingComponentMap.put(wonNodeURI,startingEndpoint);
 
     }
-    public String replaceEndpointNameWithOwnerApplicationId(String endpointName, String ownerApplicationId) throws Exception {
+    public synchronized String replaceEndpointNameWithOwnerApplicationId(String endpointName, String ownerApplicationId) throws Exception {
         Endpoint ep = camelContext.getEndpoint(endpointName);
         camelContext.removeEndpoints(endpointName);
         String[] endpointSplit = endpointName.split(":");
@@ -161,7 +163,7 @@ public class CamelConfigurator implements CamelContextAware{
         camelContext.addEndpoint(endpointName, ep);
         return endpointName;
     }
-    public String replaceComponentNameWithOwnerApplicationId(String componentName, String ownerApplicationId){
+    public synchronized String replaceComponentNameWithOwnerApplicationId(String componentName, String ownerApplicationId){
         ActiveMQComponent activeMQComponent = (ActiveMQComponent)camelContext.getComponent(componentName);
         camelContext.removeComponent(componentName);
         componentName = this.componentName+ownerApplicationId;
@@ -176,6 +178,10 @@ public class CamelConfigurator implements CamelContextAware{
     @Override
     public CamelContext getCamelContext() {
         return camelContext;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getEndpoint(URI wonNodeUri){
+       return endpointMap.get(wonNodeUri);
     }
 
     public void setStartingComponent(String startingComponent) {

@@ -24,5 +24,7 @@ import java.net.URI;
  */
     public interface OwnerProtocolActiveMQService extends MessageBrokerService {
 
-    public String getOwnerProtocolQueueNameWithResource(URI needURI);
+    public String getOwnerProtocolQueueNameWithResource();
+    public String getOwnerProtocolQueueNameWithResource(URI wonNodeUri);
+    public URI getWonNodeURI();
 }

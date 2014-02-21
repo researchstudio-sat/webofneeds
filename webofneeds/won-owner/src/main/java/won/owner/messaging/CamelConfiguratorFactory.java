@@ -33,4 +33,5 @@ public class CamelConfiguratorFactory {
         }
         return camelConfigurator;
     }
+
 }

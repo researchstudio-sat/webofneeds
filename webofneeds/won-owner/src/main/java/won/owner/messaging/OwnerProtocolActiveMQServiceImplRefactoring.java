@@ -59,17 +59,17 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  */
 public class OwnerProtocolActiveMQServiceImplRefactoring implements OwnerProtocolActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    public static final String PATH_OWNER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME + ">";
+    private static final String PATH_OWNER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME + ">";
+    private static final String PATH_BROKER_URI = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_BROKER_URI + ">";
     @Autowired
     private LinkedDataRestClient linkedDataRestClient;
-    public static final String PATH_BROKER_URI = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_BROKER_URI + ">";
-
     private URI wonNodeURI;
 
     public OwnerProtocolActiveMQServiceImplRefactoring(URI wonNodeURI){
         this.wonNodeURI = wonNodeURI;
     }
-    //todo: rename this method to getOwnerProtocolQueueNameWithResource
+
+    @Override
     public final String getOwnerProtocolQueueNameWithResource(){
         String activeMQOwnerProtocolQueueName;
         try{
@@ -86,7 +86,7 @@ public class OwnerProtocolActiveMQServiceImplRefactoring implements OwnerProtoco
     }
 
     //todo: rename this method to getBrokerURIForNode
-    public final URI getBrokerURIForNode() {
+    public final URI getBrokerURI() {
         logger.debug("obtaining broker URI for node {}", wonNodeURI);
         String nodeInformationPath = wonNodeURI.toString();
         URI activeMQEndpoint = null;
@@ -115,6 +115,9 @@ public class OwnerProtocolActiveMQServiceImplRefactoring implements OwnerProtoco
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+
+
+    @Override
     public URI getWonNodeURI() {
         return wonNodeURI;
     }

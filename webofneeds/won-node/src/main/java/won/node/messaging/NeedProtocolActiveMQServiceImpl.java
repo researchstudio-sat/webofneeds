@@ -108,6 +108,11 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
         return activeMQEndpoint;
     }
 
+    @Override
+    public URI getBrokerURI() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public String getActiveMQNeedProtocolQueueNameForNeed(URI needURI){
         String activeMQNeedProtocolQueueName = null;
         try{

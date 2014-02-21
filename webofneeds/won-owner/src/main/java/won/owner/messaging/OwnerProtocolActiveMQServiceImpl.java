@@ -77,6 +77,11 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
     private NeedRepository needRepository;
 
     @Override
+    public String getOwnerProtocolQueueNameWithResource() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public String getOwnerProtocolQueueNameWithResource(URI resourceURI){
         String activeMQOwnerProtocolQueueName;
         try{
@@ -91,6 +96,11 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         }
 
         return activeMQOwnerProtocolQueueName;
+    }
+
+    @Override
+    public URI getWonNodeURI() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**
@@ -132,19 +142,16 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
 
 
         if (camelContext.getComponent(tempStartingComponentName)==null){
-            addRouteForEndpoint(camelContext,endpointList,tempStartingComponentName);
+            addRouteForEndpoint(camelContext, tempStartingComponentName);
         } else{
             if(camelContext.getRoute(endpointMap.get(wonNodeURI))==null)
             {
-                addRouteForEndpoint(camelContext, endpointList, tempStartingComponentName);
+                addRouteForEndpoint(camelContext, tempStartingComponentName);
             }
         }
-
         return brokerURI;
-
-
     }
-    public void addRouteForEndpoint(CamelContext camelContext, List<String> endpointList, String startingComponentName) throws CamelConfigurationFailedException {
+    public void addRouteForEndpoint(CamelContext camelContext, String startingComponentName) throws CamelConfigurationFailedException {
         OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext, startingComponentName);
         addRoutes(ownerProtocolRouteBuilder);
     }
@@ -247,6 +254,11 @@ public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware,Owner
         }
 
         return activeMQEndpoint;
+    }
+
+    @Override
+    public URI getBrokerURI() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void addRoutes(RouteBuilder route) throws CamelConfigurationFailedException {

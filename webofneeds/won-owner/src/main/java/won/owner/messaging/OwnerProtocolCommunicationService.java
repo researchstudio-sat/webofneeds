@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.MessageBrokerService;
+import won.protocol.jms.OwnerProtocolActiveMQService;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.WonNode;
@@ -36,40 +37,52 @@ import java.util.List;
  * Date: 27.01.14
  */
 public class OwnerProtocolCommunicationService {
-    @Autowired
-    CamelConfiguratorFactory camelConfiguratorFactory;
-    @Autowired
-    ActiveMQServiceFactory activeMQServiceFactory;
-    @Autowired
-    ConnectionRepository connectionRepository;
-
-    final String configureCamelEndpoint(String methodName, URI uri,List<WonNode> wonNodeList) throws NoSuchConnectionException, CamelConfigurationFailedException {
-        String endpoint;
-        URI brokerURI;
-        String ownerProtocolQueueName;
-        CamelConfigurator camelConfigurator = camelConfiguratorFactory.createCamelConfigurator(methodName);
-        if (wonNodeList.size()>0){
-            WonNode wonNode = wonNodeList.get(0);
-            String startingComponent = wonNode.getStartingComponent();
-            brokerURI = wonNode.getBrokerURI();
-            if (camelConfigurator.getCamelContext().getComponent(wonNodeList.get(0).getBrokerComponent())==null){
-                String brokerComponentName = camelConfigurator.addCamelComponentForWonNodeBroker(wonNode.getWonNodeURI(),brokerURI,wonNode.getOwnerApplicationID());
-            }
-
-            endpoint = wonNode.getOwnerProtocolEndpoint();
-        } else{
-            URI wonNodeURI;
-            OwnerProtocolActiveMQServiceImplRefactoring ownerProtocolActiveMQServiceImplRefactoring = activeMQServiceFactory.createActiveMQService(methodName,uri);
-            wonNodeURI=ownerProtocolActiveMQServiceImplRefactoring.getWonNodeURI();
-            brokerURI = ownerProtocolActiveMQServiceImplRefactoring.getBrokerURIForNode();
-            ownerProtocolQueueName = ownerProtocolActiveMQServiceImplRefactoring.getOwnerProtocolQueueNameWithResource();
-
-            endpoint = camelConfigurator.configureCamelEndpointForNodeURI(wonNodeURI,brokerURI,ownerProtocolQueueName);
-
-        }
-        return endpoint;
+    public CamelConfigurator getCamelConfigurator() {
+        return camelConfigurator;
     }
 
+    @Autowired
+    private CamelConfigurator camelConfigurator;
+    @Autowired
+    private ActiveMQServiceFactory activeMQServiceFactory;
+
+    public final synchronized CamelConfiguration configureCamelEndpoint(String methodName, URI uri, List<WonNode> wonNodeList) throws Exception {
+        CamelConfiguration camelConfiguration = new CamelConfiguration();
+        URI brokerURI;
+        String ownerProtocolQueueName;
+        //CamelConfigurator camelConfigurator = camelConfiguratorFactory.createCamelConfigurator(methodName);
+        OwnerProtocolActiveMQService activeMQService = activeMQServiceFactory.createActiveMQService(methodName,uri);
+
+        if (wonNodeList.size()>0){
+            WonNode wonNode = wonNodeList.get(0);
+            brokerURI = wonNode.getBrokerURI();
+            camelConfiguration.setEndpoint(wonNode.getOwnerProtocolEndpoint());
+            if (camelConfigurator.getCamelContext().getComponent(wonNodeList.get(0).getBrokerComponent())==null){
+                camelConfiguration.setBrokerComponentName(camelConfigurator.addCamelComponentForWonNodeBroker(wonNode.getWonNodeURI(),brokerURI,wonNode.getOwnerApplicationID()));
+                camelConfigurator.getCamelContext().getComponent(camelConfiguration.getBrokerComponentName()).createEndpoint(camelConfiguration.getEndpoint());
+                camelConfigurator.addRouteForEndpoint(wonNode.getWonNodeURI());
+            }
+        } else{
+            URI wonNodeURI = activeMQService.getWonNodeURI();
+            brokerURI = activeMQService.getBrokerURI();
+            camelConfiguration.setBrokerComponentName(camelConfigurator.addCamelComponentForWonNodeBroker(wonNodeURI,brokerURI,null));
+            ownerProtocolQueueName = activeMQService.getOwnerProtocolQueueNameWithResource();
+            camelConfiguration.setEndpoint(camelConfigurator.configureCamelEndpointForNodeURI(wonNodeURI, brokerURI, ownerProtocolQueueName));
+        }
+        return camelConfiguration;
+    }
+
+    public String replaceComponentNameWithOwnerApplicationId(CamelConfiguration camelConfiguration,String ownerApplicationId){
+        return camelConfigurator.replaceComponentNameWithOwnerApplicationId(camelConfiguration.getBrokerComponentName(),ownerApplicationId);
+    }
+
+    public String replaceEndpointNameWithOwnerApplicationId(CamelConfiguration camelConfiguration,String ownerApplicationId) throws Exception {
+        return camelConfigurator.replaceEndpointNameWithOwnerApplicationId(camelConfiguration.getEndpoint(),ownerApplicationId);
+    }
+    public URI getBrokerUri(URI wonNodeUri) throws NoSuchConnectionException {
+        OwnerProtocolActiveMQService activeMQService = activeMQServiceFactory.createActiveMQService("register",wonNodeUri);
+        return activeMQService.getBrokerURI();
+    };
     public void setActiveMQServiceFactory(ActiveMQServiceFactory activeMQServiceFactory) {
         this.activeMQServiceFactory = activeMQServiceFactory;
     }
