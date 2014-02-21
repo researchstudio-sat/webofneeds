@@ -70,19 +70,6 @@ public class CamelConfigurator implements CamelContextAware{
     protected CamelConfigurator() {
     }
 
-    public synchronized final String configureCamelEndpointForNeed(URI needURI, URI brokerURI,String ownerProtocolQueueName) throws Exception {
-        Need need = needRepository.findByNeedURI(needURI).get(0);
-        URI wonNodeURI = need.getWonNodeURI();
-        return configureCamelEndpointForNodeURI(wonNodeURI, brokerURI,ownerProtocolQueueName);
-
-    }
-    public synchronized final String configureCamelEndpointForConnection(URI connectionURI, URI brokerURI, String ownerProtocolQueueName) throws Exception {
-
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        URI needURI = con.getNeedURI();
-        return configureCamelEndpointForNeed(needURI,brokerURI, ownerProtocolQueueName);
-
-    }
     public synchronized final String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI,String ownerProtocolQueueName) throws CamelConfigurationFailedException {
         //TODO: the linked data description of the won node must be at [NODE-URI]/resource
         // according to this code. This should be explicitly defined somewhere
@@ -168,6 +155,7 @@ public class CamelConfigurator implements CamelContextAware{
         camelContext.removeComponent(componentName);
         componentName = this.componentName+ownerApplicationId;
         camelContext.addComponent(componentName, activeMQComponent);
+        logger.info("component name: "+componentName);
         return componentName;
     }
 

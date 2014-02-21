@@ -383,7 +383,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         /**
          * if owner application is not connected to any won node, register owner application to the node with wonNodeURI.
          */
-        CamelConfiguration camelConfiguration = ownerProtocolCommunicationService.configureCamelEndpoint(wonNodeUri,wonNodeList);
+       // CamelConfiguration camelConfiguration = ownerProtocolCommunicationService.configureCamelEndpoint(wonNodeUri,wonNodeList);
         if(wonNodeList.size()==0)  {
             //todo: methods of ownerProtocolActiveMQService might have some concurrency issues. this problem will be resolved in the future, and this code here shall be revisited then.
             ownerApplicationId = register(wonNodeUri);

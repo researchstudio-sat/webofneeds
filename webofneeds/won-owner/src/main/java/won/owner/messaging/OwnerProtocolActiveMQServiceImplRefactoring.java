@@ -21,35 +21,15 @@ import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.camel.component.ActiveMQComponent;
-import org.apache.camel.CamelContext;
-import org.apache.camel.CamelContextAware;
-import org.apache.camel.Endpoint;
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.jms.JmsConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.connection.CachingConnectionFactory;
-import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
-import won.protocol.exception.CamelConfigurationFailedException;
-import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.OwnerProtocolActiveMQService;
-import won.protocol.model.Connection;
-import won.protocol.model.Need;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WON;
 
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComponent;
 
@@ -65,11 +45,12 @@ public class OwnerProtocolActiveMQServiceImplRefactoring implements OwnerProtoco
     private LinkedDataRestClient linkedDataRestClient;
 
     @Override
-    public final String getOwnerProtocolQueueNameWithResource(URI wonNodeURI){
+    public final String getOwnerProtocolQueueNameWithResource(URI wonNodeUri){
         String activeMQOwnerProtocolQueueName;
+        wonNodeUri = URI.create(wonNodeUri.toString()+"/resource");
         try{
             Path path = PathParser.parse(PATH_OWNER_PROTOCOL_QUEUE_NAME, PrefixMapping.Standard);
-            activeMQOwnerProtocolQueueName = linkedDataRestClient.getStringPropertyForPropertyPath(wonNodeURI, path);
+            activeMQOwnerProtocolQueueName = linkedDataRestClient.getStringPropertyForPropertyPath(wonNodeUri, path);
         } catch (UniformInterfaceException e){
             ClientResponse response = e.getResponse();
             if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
@@ -81,9 +62,9 @@ public class OwnerProtocolActiveMQServiceImplRefactoring implements OwnerProtoco
     }
 
     //todo: rename this method to getBrokerURIForNode
-    public final URI getBrokerURI(URI wonNodeURI) {
-        logger.debug("obtaining broker URI for node {}", wonNodeURI);
-        String nodeInformationPath = wonNodeURI.toString();
+    public final URI getBrokerURI(URI wonNodeUri) {
+        logger.debug("obtaining broker URI for node {}", wonNodeUri);
+        String nodeInformationPath = URI.create(wonNodeUri.toString() + "/resource").toString();
         URI activeMQEndpoint = null;
         try{
             Path path = PathParser.parse(PATH_BROKER_URI, PrefixMapping.Standard);
@@ -91,7 +72,7 @@ public class OwnerProtocolActiveMQServiceImplRefactoring implements OwnerProtoco
         } catch (UniformInterfaceException e){
             ClientResponse response = e.getResponse();
             if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
-                logger.warn("BrokerURI not found for node URI:{]",wonNodeURI);
+                logger.warn("BrokerURI not found for node URI:{]", wonNodeUri);
                 return null;
             }
             else throw e;

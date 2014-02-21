@@ -78,8 +78,11 @@ public class OwnerProtocolCommunicationService {
 
             brokerURI = activeMQService.getBrokerURI(wonNodeUri);
             camelConfiguration.setBrokerComponentName(camelConfigurator.addCamelComponentForWonNodeBroker(wonNodeUri,brokerURI,null));
+
+            //TODO: brokerURI gets the node information already. so requesting node information again for queuename would be duplicate
             ownerProtocolQueueName = activeMQService.getOwnerProtocolQueueNameWithResource(wonNodeUri);
             camelConfiguration.setEndpoint(camelConfigurator.configureCamelEndpointForNodeURI(wonNodeUri, brokerURI, ownerProtocolQueueName));
+            camelConfigurator.addRouteForEndpoint(wonNodeUri);
         }
         return camelConfiguration;
     }
