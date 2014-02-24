@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.connection.CachingConnectionFactory;
+import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.model.Connection;
@@ -55,6 +56,8 @@ public class CamelConfigurator implements CamelContextAware{
     private NeedRepository needRepository;
     @Autowired
     private ConnectionRepository connectionRepository;
+    @Autowired
+    private BrokerComponentFactory brokerComponentFactory;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -65,6 +68,8 @@ public class CamelConfigurator implements CamelContextAware{
     private String startingComponent;
     private String componentName;
     private String defaultNodeURI;
+
+
 
 
     protected CamelConfigurator() {
@@ -84,6 +89,16 @@ public class CamelConfigurator implements CamelContextAware{
         return endpointList.get(0);
 
     }
+    public synchronized void addRemoteQueueListeners(List<String> endpoints) throws CamelConfigurationFailedException {
+        logger.info("length of endpoints {}", endpoints.size());
+        OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(camelContext, endpoints);
+        try {
+            camelContext.addRoutes(ownerApplicationListenerRouteBuilder);
+        } catch (Exception e) {
+            logger.debug("adding route to camel context failed", e);
+            throw new CamelConfigurationFailedException("adding route to camel context failed",e);
+        }
+    }
     //todo: the method is activemq specific. refactor it to support other brokers.
     public synchronized String addCamelComponentForWonNodeBroker(URI wonNodeURI, URI brokerURI,String ownerApplicationId){
         String componentName;
@@ -98,14 +113,10 @@ public class CamelConfigurator implements CamelContextAware{
         if(camelContext.getComponent(componentName,false)!=null){
             return componentName;
         }
-        ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURI);
-        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(activeMQConnectionFactory);
-        JmsConfiguration jmsConfiguration = new JmsConfiguration(cachingConnectionFactory);
-        ActiveMQComponent activeMQComponent = activeMQComponent();
 
-        activeMQComponent.setConfiguration(jmsConfiguration);
+        ActiveMQComponent activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerURI);
+
         camelContext.addComponent(componentName,activeMQComponent);
-
 
         logger.info("adding component with component name {}",componentName);
         if (!brokerComponentMap.containsKey(wonNodeURI))

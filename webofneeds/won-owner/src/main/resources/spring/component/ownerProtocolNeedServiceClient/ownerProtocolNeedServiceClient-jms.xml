@@ -41,6 +41,7 @@
     <bean id="activeMQService" class="won.owner.messaging.OwnerProtocolActiveMQServiceImplRefactoring">
     </bean>
 
+    <bean id="brokerComponentFactory" class="won.owner.messaging.BrokerComponentFactory"/>
 
     <bean id="ownerProtocolCommunicationService" class="won.owner.messaging.OwnerProtocolCommunicationService">
        <property name="activeMQService" ref="activeMQService"/>
@@ -50,6 +51,7 @@
     <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.messaging.OwnerProtocolNeedServiceClientJMSBased">
         <property name="messagingService" ref="messagingService"/>
         <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
+
         <!--property name="ownerProtocolActiveMQService" ref="activeMQService"/-->
     </bean>
 

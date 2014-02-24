@@ -65,10 +65,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //OwnerProtocolN
         Model contentconvert = RdfUtils.toModel(content);
 
         logger.info("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
-
         connectionURI = delegate.createNeed(ownerURIconvert, contentconvert, activate,ownerApplicationID );
-
-
         exchange.getOut().setBody(connectionURI);
 
        return connectionURI;

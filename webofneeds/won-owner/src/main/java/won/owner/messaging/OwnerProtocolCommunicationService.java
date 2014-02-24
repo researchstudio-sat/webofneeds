@@ -37,20 +37,9 @@ import java.util.List;
  * Date: 27.01.14
  */
 public class OwnerProtocolCommunicationService {
-    public CamelConfigurator getCamelConfigurator() {
-        return camelConfigurator;
-    }
+
     @Autowired
     private CamelConfigurator camelConfigurator;
-
-    public OwnerProtocolActiveMQService getActiveMQService() {
-        return activeMQService;
-    }
-
-    public void setActiveMQService(OwnerProtocolActiveMQService activeMQService) {
-        this.activeMQService = activeMQService;
-    }
-
     @Autowired
     private OwnerProtocolActiveMQService activeMQService;
     @Autowired
@@ -86,7 +75,7 @@ public class OwnerProtocolCommunicationService {
         }
         return camelConfiguration;
     }
-    public URI  getWonNodeUri(String methodName, URI uri) throws NoSuchConnectionException {
+    public synchronized URI  getWonNodeUri(String methodName, URI uri) throws NoSuchConnectionException {
 
         if (methodName.equals("connect")||methodName.equals("deactivate")||methodName.equals("activate")){
             Need need = needRepository.findByNeedURI(uri).get(0);
@@ -111,6 +100,14 @@ public class OwnerProtocolCommunicationService {
     public URI getBrokerUri(URI wonNodeUri) throws NoSuchConnectionException {
         return activeMQService.getBrokerURI(wonNodeUri);
     }
+    public OwnerProtocolActiveMQService getActiveMQService() {
+        return activeMQService;
+    }
 
-
+    public void setActiveMQService(OwnerProtocolActiveMQService activeMQService) {
+        this.activeMQService = activeMQService;
+    }
+    public CamelConfigurator getCamelConfigurator() {
+        return camelConfigurator;
+    }
 }

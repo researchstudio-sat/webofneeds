@@ -27,7 +27,6 @@ public class OwnerProtocoDynamicRoutes extends RouteBuilder {
     public void configure() throws Exception {
         from("seda:OwnerProtocolOut?concurrentConsumers=5")
                 .to("bean:ownerProtocolOutgoingMessagesProcessor")
-                //.wireTap("bean:messagingService?method=inspectMessage")
                 .recipientList(header("ownerApplicationIDs"));
     }
 }
