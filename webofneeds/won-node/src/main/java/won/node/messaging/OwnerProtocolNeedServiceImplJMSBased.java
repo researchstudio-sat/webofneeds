@@ -22,7 +22,7 @@ import java.util.List;
  * User: LEIH-NB
  * Date: 22.10.13
  */
-public class OwnerProtocolNeedServiceImplJMSBased{// implements //OwnerProtocolNeedService{ /*, WonMessageListener*/
+public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolNeedService{ /*, WonMessageListener*/
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired

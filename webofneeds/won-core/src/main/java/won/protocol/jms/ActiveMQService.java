@@ -22,9 +22,9 @@ import java.net.URI;
  * User: LEIH-NB
  * Date: 28.11.13
  */
-    public interface OwnerProtocolActiveMQService extends MessageBrokerService {
+    public interface ActiveMQService extends MessageBrokerService {
 
-    public String getOwnerProtocolQueueNameWithResource(URI wonNodeUri);
+    public String getProtocolQueueNameWithResource(URI resourceUri);
 
 
 }

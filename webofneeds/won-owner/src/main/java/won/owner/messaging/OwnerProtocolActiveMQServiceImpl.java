@@ -35,7 +35,6 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.jms.OwnerProtocolActiveMQService;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.repository.ConnectionRepository;
@@ -57,7 +56,7 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  * User: sbyim
  * Date: 28.11.13
  */
-public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware{//OwnerProtocolActiveMQService {
+public class OwnerProtocolActiveMQServiceImpl implements CamelContextAware{//ActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private CamelContext camelContext;
     private String componentName;

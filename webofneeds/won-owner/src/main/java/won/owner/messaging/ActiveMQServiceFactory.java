@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.jms.MessageBrokerService;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.repository.ConnectionRepository;
@@ -42,8 +41,8 @@ public class ActiveMQServiceFactory implements ApplicationContextAware{
 
     ApplicationContext ctx;
 
-    public OwnerProtocolActiveMQServiceImplRefactoring createActiveMQService(String methodName,URI uri) throws NoSuchConnectionException {
-        OwnerProtocolActiveMQServiceImplRefactoring messageBrokerService = null;
+    public ActiveMQServiceImplRefactoring createActiveMQService(String methodName,URI uri) throws NoSuchConnectionException {
+        ActiveMQServiceImplRefactoring messageBrokerService = null;
         URI wonNodeURI=null;
 
         if (methodName.equals("connect")||methodName.equals("deactivate")||methodName.equals("activate")){
@@ -60,7 +59,7 @@ public class ActiveMQServiceFactory implements ApplicationContextAware{
         }
         ctx.getBean("activeMQService");
 
-        return new OwnerProtocolActiveMQServiceImplRefactoring();
+        return new ActiveMQServiceImplRefactoring();
     }
 
 

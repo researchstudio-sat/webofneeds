@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Implementation of the OwnerProtocolNeedService to be used on the owner side. It contains the
+ * Implementation of the ownerProtocolNeedService to be used on the owner side. It contains the
  * required business logic to store state and delegates calls to an injected linked data
- * client and to an injected OwnerProtocolNeedService implementation.
+ * client and to an injected ownerProtocolNeedService implementation.
  * <p/>
  * User: Gabriel
  * Date: 03.12.12

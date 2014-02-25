@@ -17,11 +17,6 @@
 package won.node.messaging;
 
 import com.fasterxml.jackson.databind.util.LRUMap;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.path.PathParser;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
@@ -34,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import won.node.camel.routes.NeedProtocolDynamicRoutes;
+import won.protocol.jms.ActiveMQService;
 import won.protocol.jms.NeedProtocolActiveMQService;
 import won.protocol.model.Connection;
 import won.protocol.repository.ConnectionRepository;
@@ -41,7 +37,6 @@ import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WON;
 
-import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +56,16 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
     private CamelContext camelContext;
     private String componentName;
     private String endpoint;
+
+    public ActiveMQService getActiveMQService() {
+        return activeMQService;
+    }
+
+    public void setActiveMQService(ActiveMQService activeMQService) {
+        this.activeMQService = activeMQService;
+    }
+
+    private ActiveMQService activeMQService;
 
     private LRUMap<URI, String> knownBrokersByNeed = new LRUMap<URI, String>(10,1000);
     @Autowired
@@ -89,46 +94,9 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
     //todo: starting endpoint is currently only needed by ownerprotocol.
 
 
-
-
-    public URI getBrokerURIForNode(URI needURI){
-        URI activeMQEndpoint = null;
-        try{
-            logger.debug("fetching Broker URI for need {}", needURI);
-            Path path = PathParser.parse(PATH_BROKER_URI, PrefixMapping.Standard);
-            activeMQEndpoint = linkedDataRestClient.getURIPropertyForPropertyPath(needURI, path);
-        } catch (UniformInterfaceException e){
-            ClientResponse response = e.getResponse();
-            if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
-                return null;
-            }
-            else throw e;
-        }
-        logger.debug("fetched Broker URI for need {}: {}", needURI,activeMQEndpoint);
-        return activeMQEndpoint;
-    }
-
     public URI getBrokerURI() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
-
-    public String getActiveMQNeedProtocolQueueNameForNeed(URI needURI){
-        String activeMQNeedProtocolQueueName = null;
-        try{
-            logger.debug("fetching queue name for need {}", needURI);
-            Path path = PathParser.parse(PATH_NEED_PROTOCOL_QUEUE_NAME, PrefixMapping.Standard);
-            activeMQNeedProtocolQueueName = linkedDataRestClient.getStringPropertyForPropertyPath(needURI, path);
-        } catch (UniformInterfaceException e){
-            ClientResponse response = e.getResponse();
-            if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
-                return null;
-            }
-            else throw e;
-        }
-        logger.debug("fetched queue name for need {}: {}", needURI,activeMQNeedProtocolQueueName);
-        return activeMQNeedProtocolQueueName;
-    }
-
 
     /**
      *
@@ -146,17 +114,14 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
         logger.info("cached endpoint for need {},is {}", otherNeedURI, endpoint);
         if (endpoint != null){
             endpointList.add(endpoint);
-            // tempComponentName = tempComponentName+endpoint.replaceAll(":","_");
-            //ActiveMQConnectionFactory activemqConnectionFactory = (ActiveMQConnectionFactory) applicationContext.getBean("activemqConnectionFactory");
 
-            NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,endpointList,from);
-            addRoutes(needProtocolRouteBuilder);
+            addRouteForEndpoint(camelContext,from);
             return endpoint;
         }
         if (camelContext.getEndpoint(from)!=null){
             logger.debug("getting activemq brokerURI for node with otherneed URI {}",otherNeedURI);
-            URI remoteBrokerURI = getBrokerURIForNode(otherNeedURI);
-            URI ownBrokerURI = getBrokerURIForNode(needURI);
+            URI remoteBrokerURI = activeMQService.getBrokerURI(otherNeedURI);
+            URI ownBrokerURI = activeMQService.getBrokerURI(needURI);
             String tempComponentName = componentName;
 
 
@@ -166,31 +131,26 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
                  //TODO: -> registration for node-to-node messaging is not needed at the moment. 20131210
 
                 tempComponentName = componentName+remoteBrokerURI.toString().replaceAll("[/:]","");
-                //if (camelContext.getComponent(tempComponentName)==null)   {
                     if (camelContext.getComponent(tempComponentName)==null){
                         //TODO: check configuration of activemq component. e.g. using cachedConnectionFactory
                         ActiveMQComponent activeMQComponent = new ActiveMQComponent();
                         activeMQComponent.setAutoStartup(true);
                         activeMQComponent.setApplicationContext(applicationContext);
                         activeMQComponent.setCamelContext(camelContext);
-                        //camelContext.addComponent(tempComponentName,activeMQComponent(remoteBrokerURI.toString()+"?useLocalHost=false"));
 
                         camelContext.addComponent(tempComponentName,activeMQComponent(remoteBrokerURI.toString()+"?useLocalHost=false"));
                     }
 
-               // }
             }
 
-            //endpoint = tempComponentName+":queue:"+getActiveMQNeedProtocolQueueNameForNeed(needURI);
-            endpoint = tempComponentName+":queue:"+getActiveMQNeedProtocolQueueNameForNeed(needURI);
+            endpoint = tempComponentName+":queue:"+activeMQService.getProtocolQueueNameWithResource(needURI);
             logger.debug("created endpoint: {} for need {}", endpoint, otherNeedURI);
 
             endpointList.add(endpoint);
-           // tempComponentName = tempComponentName+endpoint.replaceAll(":","_");
             ActiveMQConnectionFactory activemqConnectionFactory = (ActiveMQConnectionFactory) applicationContext.getBean("activemqConnectionFactory");
 
-            NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,endpointList,from);
-            addRoutes(needProtocolRouteBuilder);
+            addRouteForEndpoint(camelContext,from);
+
             this.knownBrokersByNeed.put(otherNeedURI, endpoint);
             return endpoint;
         }  else {
@@ -198,6 +158,18 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
 
         }
     }
+
+    private void addRouteForEndpoint(CamelContext camelContext,String from) throws Exception {
+        NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext, from);
+        addRoutes(needProtocolRouteBuilder);
+    }
+
+    @Override
+    public String getActiveMQNeedProtocolQueueNameForNeed(URI needURI) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
     public String getCamelEndpointForConnection(URI connectionURI, String from) throws Exception {
         if (camelContext.getEndpoint(from)!=null){
             Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
@@ -225,7 +197,7 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
     }
 
     @Override
-    public URI getBrokerURI(URI wonNodeUri) {
+    public URI getBrokerURI(URI resourceUri) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

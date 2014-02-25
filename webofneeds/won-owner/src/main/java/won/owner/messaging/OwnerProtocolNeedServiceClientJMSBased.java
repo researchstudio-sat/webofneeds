@@ -18,8 +18,6 @@ package won.owner.messaging;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
-import org.apache.camel.CamelContext;
-import org.apache.camel.CamelContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -28,7 +26,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
 import won.protocol.model.WonNode;
@@ -85,7 +82,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
                     public void run() {
                         try {
                             String ownerApplicationId = register(defaultNodeURI);
-                            configureRemoteEndpointsForOwnerApplication(ownerApplicationId,ownerProtocolCommunicationService.getCamelConfigurator().getEndpoint(defaultNodeURI));
+                            configureRemoteEndpointsForOwnerApplication(ownerApplicationId,ownerProtocolCommunicationService.getOwnerProtocolCamelConfigurator().getEndpoint(defaultNodeURI));
 
                         } catch (Exception e) {
                             logger.warn("Could not register with default won node {}", defaultNodeURI,e);
@@ -194,7 +191,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         wonNode.setWonNodeURI(wonNodeURI);
         wonNode.setBrokerURI(ownerProtocolCommunicationService.getBrokerUri(wonNodeURI));
         wonNode.setBrokerComponent(camelConfiguration.getBrokerComponentName());
-        wonNode.setStartingComponent(ownerProtocolCommunicationService.getCamelConfigurator().getStartingEndpoint(wonNodeURI));
+        wonNode.setStartingComponent(ownerProtocolCommunicationService.getOwnerProtocolCamelConfigurator().getStartingEndpoint(wonNodeURI));
         logger.info("setting starting component {}", wonNode.getStartingComponent());
         return wonNode;
 
@@ -209,7 +206,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         Future<List<String>> futureResults =messagingService.sendInOutMessageGeneric(headerMap, headerMap, null, "seda:outgoingMessages");
         List<String> endpoints = futureResults.get();
 
-        ownerProtocolCommunicationService.getCamelConfigurator().addRemoteQueueListeners(endpoints);
+        ownerProtocolCommunicationService.getOwnerProtocolCamelConfigurator().addRemoteQueueListeners(endpoints);
         //TODO: some checks needed to assure that the application is configured correctly.
        //todo this method should return routes
     }
@@ -303,7 +300,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         if(wonNodeList.size()==0)  {
             //todo: methods of ownerProtocolActiveMQService might have some concurrency issues. this problem will be resolved in the future, and this code here shall be revisited then.
             ownerApplicationId = register(wonNodeUri);
-            configureRemoteEndpointsForOwnerApplication(ownerApplicationId,ownerProtocolCommunicationService.getCamelConfigurator().getEndpoint(wonNodeUri));
+            configureRemoteEndpointsForOwnerApplication(ownerApplicationId,ownerProtocolCommunicationService.getOwnerProtocolCamelConfigurator().getEndpoint(wonNodeUri));
             logger.info("registered ownerappID: "+ownerApplicationId);
             wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
         }

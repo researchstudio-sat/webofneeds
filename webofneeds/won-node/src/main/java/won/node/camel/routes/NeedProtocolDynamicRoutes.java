@@ -32,10 +32,8 @@ public class NeedProtocolDynamicRoutes extends RouteBuilder {
     private String routeID;
     private String from;
 
-    public NeedProtocolDynamicRoutes(CamelContext camelContext, List<String> endpoints, String from){
+    public NeedProtocolDynamicRoutes(CamelContext camelContext, String from){
         super(camelContext);
-        this.endpoints = endpoints;
-        this.routeID = routeID;
         this.from = from;
 
     }
