@@ -24,37 +24,10 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <!--
-         Load properties but ignore unresolvable properties so that
-         they are searched in other property configuerers defined in the context
-    -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <!--bean name="protocolCommunicationService" class="won.node.messaging.NeedProtocolCommunicationServiceImpl"/-->
-
-    <!-- bean id="needProtocolNeedServiceWSBased" class="won.node.protocol.impl.NeedProtocolNeedServiceImpl">
-        <property name="needFacingNeedCommunicationService" ref="needCommunicationService" /-->
-        <!-- the connection communication service injected here is need facing, not owner facing -->
-        <!--property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService" />
-        <qualifier value="needProtocolNeedService"/>
-    </bean-->
-
-
-
-
+    <bean name="ownerProtocolOwnerClientJMSBased" class="won.node.messaging.OwnerProtocolOwnerClientImplJMSBased">
+        <property name="clientFactory" ref="ownerProtocolOwnerWebServiceClientFactory" />
+        <property name="messagingService" ref="messagingService"/>
+    </bean>
 </beans>

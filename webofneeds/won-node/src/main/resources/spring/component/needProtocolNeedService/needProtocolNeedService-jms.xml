@@ -17,18 +17,13 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="ownerProtocolNeedServiceClient-jms.xml" />
-
-    <!--
-        set the "ownerProtocolNeedServiceClientDelegate", expected by the
-        "ownerProtocolNeedServiceClient" bean to the jms based version.
-     -->
-    <alias alias="ownerProtocolNeedServiceClientDelegate" name="ownerProtocolNeedServiceClientJMSBased" />
+    <bean id="needProtocolNeedServiceJMSBased" class="won.node.protocol.impl.NeedProtocolNeedServiceImplJMSBased">
+        <property name="needFacingNeedCommunicationService" ref="needCommunicationService"/>
+        <!-- the connection communication service injected here is need facing, not owner facing -->
+        <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService" />
+        <qualifier value="needProtocolNeedService"/>
+        <property name="delegate" ref="needProtocolNeedService"/>
+    </bean>
 </beans>

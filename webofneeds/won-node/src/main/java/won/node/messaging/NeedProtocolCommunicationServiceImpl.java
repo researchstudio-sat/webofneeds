@@ -43,15 +43,25 @@ public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommuni
         URI needBrokerUri = activeMQService.getBrokerEndpoint(needUri);
         URI otherNeedBrokerUri = activeMQService.getBrokerEndpoint(otherNeedUri);
 
-        if (needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(needBrokerUri)!=null){
-            camelConfiguration.setEndpoint(needProtocolCamelConfigurator.getEndpoint(needBrokerUri));
-            camelConfiguration.setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(needBrokerUri));
+        if (needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(otherNeedBrokerUri)!=null){
+            camelConfiguration.setEndpoint(needProtocolCamelConfigurator.getEndpoint(otherNeedBrokerUri));
+            camelConfiguration.setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(otherNeedBrokerUri));
             needProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,otherNeedBrokerUri);
         } else{
-            needProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(needUri);
-            camelConfiguration.setEndpoint(needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(needBrokerUri,needProtocolQueueName));
-            needProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,otherNeedBrokerUri);
-            camelConfiguration.setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(otherNeedBrokerUri));
+            URI resourceUri;
+            URI brokerUri;
+            if (needUri!=otherNeedUri){
+                resourceUri = otherNeedUri;
+                brokerUri = otherNeedBrokerUri;
+            }
+            else{
+                resourceUri = needUri;
+                brokerUri = needBrokerUri;
+            }
+            needProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
+            camelConfiguration.setEndpoint(needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(brokerUri,needProtocolQueueName));
+            needProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,brokerUri);
+            camelConfiguration.setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
         }
         return camelConfiguration;
     }

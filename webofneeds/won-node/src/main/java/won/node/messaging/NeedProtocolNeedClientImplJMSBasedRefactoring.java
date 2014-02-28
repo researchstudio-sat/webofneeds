@@ -88,7 +88,7 @@ public class NeedProtocolNeedClientImplJMSBasedRefactoring implements NeedProtoc
       //TODO: when shall be the remote won node unregistered?
       //TODO; shall be checked if the endpoint for the remote won node already exists. configuring remote endpoints for each message is inefficient
 
-      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(needUri,otherNeedUri,connectStartingEndpoint);
+      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(otherNeedUri,needUri,connectStartingEndpoint);
 
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
       logger.info("sending connect message to remoteBrokerEndpoint {}",camelConfiguration.getEndpoint());
@@ -146,11 +146,11 @@ public class NeedProtocolNeedClientImplJMSBasedRefactoring implements NeedProtoc
       headerMap.put("methodName","textMessage");
 
 
-          logger.info("retrieved endpoint for connection. Endpoint: {}", endpoint);
-      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),textMessageStartingEndpoint);
 
+      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),textMessageStartingEndpoint);
+      logger.info("retrieved endpoint for connection. Endpoint: {}", camelConfiguration.getEndpoint());
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-      logger.info("NeedProtocolNeedClientImpl: sending text message to remoteBrokerEndpoint: {}",endpoint);
+      logger.info("NeedProtocolNeedClientImpl: sending text message to remoteBrokerEndpoint: {}",camelConfiguration.getEndpoint());
       messagingService.sendInOnlyMessage(null,headerMap,null, textMessageStartingEndpoint );
 
   }

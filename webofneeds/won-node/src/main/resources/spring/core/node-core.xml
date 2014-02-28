@@ -2,17 +2,17 @@
 <!--
   ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
   ~
-  ~    Licensed under the Apache License, Version 2.0 (the "License");
-  ~    you may not use this file except in compliance with the License.
-  ~    You may obtain a copy of the License at
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
   ~
-  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~    http://www.apache.org/licenses/LICENSE-2.0
   ~
-  ~    Unless required by applicable law or agreed to in writing, software
-  ~    distributed under the License is distributed on an "AS IS" BASIS,
-  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~    See the License for the specific language governing permissions and
-  ~    limitations under the License.
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -23,165 +23,18 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-
     <!--
          Load properties but ignore unresolvable properties so that
-         they are searched in other property configuerers defined in the context
+         they are searched in other property configurers defined in the context
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
+    <!-- REST stuff -->
+    <context:component-scan base-package="won.protocol.rest">
+        <context:include-filter type="regex" expression="won.protocol.rest.*"/>
+    </context:component-scan>
 
-
-    <!--- Facet Registry -->
-    <bean id="facetImplRegistryRef" class="won.node.facet.impl.FacetRegistry" >
-        <property name="map" ref="facetMap" />
-    </bean>
-
-    <bean id="facetMap" class="java.util.HashMap">
-        <constructor-arg index="0" type="java.util.Map">
-            <map key-type="won.protocol.model.FacetType" value-type="won.node.facet.impl.Facet">
-                <entry key="#{T(won.protocol.model.FacetType).ControlFacet}" value-ref="controlFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).OwnerFacet}" value-ref="ownerFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).GroupFacet}" value-ref="groupFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).CoordinatorFacet}" value-ref="coordinatorFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).ParticipantFacet}" value-ref="participantFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).BAPCCoordinatorFacet}" value-ref="baPCCoordinatorFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).BAPCParticipantFacet}" value-ref="baPCParticipantFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).BACCCoordinatorFacet}" value-ref="baCCCoordinatorFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).BACCParticipantFacet}" value-ref="baCCParticipantFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).CommentFacet}" value-ref="commentFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).CommentUnrestrictedFacet}" value-ref="commentUnrestrictedFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).CommentModeratedFacet}" value-ref="commentModeratedFacetImplRef" />
-            </map>
-        </constructor-arg>
-    </bean>
-
-    <bean id="abstractFacetRef" abstract="true" class="won.node.facet.impl.Facet">
-        <property name="needProtocolNeedService" ref="needProtocolNeedClient" />
-        <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
-        <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
-        <property name="needFacingConnectionCommunicationService" ref="needFacingConnectionCommunicationService" />
-        <property name="needFacingConnectionClient" ref="needProtocolNeedClient" />
-        <property name="ownerFacingConnectionClient" ref="ownerProtocolOwnerClient" />
-        <property name="URIService" ref="uriService" />
-        <property name="executorService" ref="threadPoolExecutor" />
-        <property name="dataService" ref="dataServiceRef" />
-    </bean>
-
-    <bean id="controlFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ControlFacetImpl" />
-    <bean id="ownerFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.OwnerFacetImpl" />
-    <bean id="groupFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.GroupFacetImpl" />
-    <bean id="coordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CoordinatorFacetImpl" />
-    <bean id="participantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ParticipantFacetImpl" />
-    <bean id="baPCCoordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BAPCCoordinatorFacetImpl" />
-    <bean id="baPCParticipantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BAPCParticipantFacetImpl" />
-    <bean id="baCCCoordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BACCCoordinatorFacetImpl" />
-    <bean id="baCCParticipantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BACCParticipantFacetImpl" />
-    <bean id="commentUnrestrictedFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentUnrestrictedFacet" />
-    <bean id="commentModeratedFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentModeratedFacet" />
-    <bean id="commentFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentFacet" />
-
-
-
-    <!-- protocol-level services -->
-    <bean id="ownerProtocolNeedService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
-        <!-- the connection communication service injected here is owner facing -->
-        <property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
-        <!--property name="needCommunicationService" ref="needCommunicationServiceJMSBased" /-->
-        <property name="needCommunicationService" ref="needCommunicationService"/>
-        <property name="needInformationService" ref="needInformationService" />
-        <property name="needManagementService" ref="needManagementServiceJMSBased"/>
-    </bean>
-    <bean id="ownerProtocolNeedJMSService" class="won.node.messaging.OwnerProtocolNeedServiceImplJMSBased">
-        <!-- the connection communication service injected here 7s owner facing -->
-        <property name="delegate" ref="ownerProtocolNeedService" />
-        <!--property name="activeMQComponent" ref="activemqComponent" /-->
-        <property name="producerTemplate" ref="producerTemplate"/>
-        <!--property name="needManagementService" ref="needManagementServiceJMSBased"/-->
-        <property name="needCommunicationService" ref="needCommunicationService"/>
-        <property name="ownerManagementService" ref="ownerManagementService"/>
-        <!--property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService" /-->
-    </bean>
-
-    <bean id="needProtocolNeedServiceJMSBased" class="won.node.protocol.impl.NeedProtocolNeedServiceImplJMSBased">
-        <property name="needFacingNeedCommunicationService" ref="needCommunicationService"/>
-        <!-- the connection communication service injected here is need facing, not owner facing -->
-        <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService" />
-        <qualifier value="needProtocolNeedService"/>
-        <property name="delegate" ref="needProtocolNeedService"/>
-    </bean>
-    <bean id="needProtocolNeedService" class="won.node.protocol.impl.NeedProtocolNeedServiceImpl">
-        <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService"/>
-        <property name="needFacingNeedCommunicationService" ref="needCommunicationService"/>
-    </bean>
-
-    <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClient">
-         <property name="delegate" ref="ownerProtocolOwnerClientJMSBased"/>
-    </bean>
-    <bean name="ownerProtocolOwnerClientWSBased" class="won.node.ws.OwnerProtocolOwnerClientImplWSBased"></bean>
-    <bean name="ownerProtocolOwnerClientJMSBased" class="won.node.messaging.OwnerProtocolOwnerClientImplJMSBased">
-        <property name="clientFactory" ref="ownerProtocolOwnerWebServiceClientFactory" />
-        <property name="messagingService" ref="messagingService"/>
-    </bean>
-    <bean name="needProtocolNeedClient" class="won.node.protocol.impl.NeedProtocolNeedClient">
-        <property name="delegate" ref="needProtocolNeedClientJMSBased"/>
-    </bean>
-    <bean name="needProtocolNeedClientWSBased" class="won.node.ws.NeedProtocolNeedClientImplWSBased">
-        <property name="clientFactory" ref="needProtocolNeedWebServiceClientFactory" />
-    </bean>
-    <bean name="needProtocolNeedClientJMSBased" class="won.node.messaging.NeedProtocolNeedClientImplJMSBased">
-        <property name="messagingService" ref="messagingService"/>
-        <property name="needProtocolActiveMQService" ref="needProtocolActiveMQService"/>
-    </bean>
-
-    <bean id="matcherProtocolNeedService" class="won.node.protocol.impl.MatcherProtocolNeedServiceImpl">
-        <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
-    </bean>
-
-    <bean name="needProtocolActiveMQService" class="won.node.messaging.NeedProtocolActiveMQServiceImpl">
-        <property name="componentName" value="activemq"/>
-    </bean>
-
-
-    <bean id="needCommunicationService" class="won.node.service.impl.NeedCommunicationServiceImpl">
-        <property name="dataService" ref="dataServiceRef" />
-        <property name="reg" ref="facetImplRegistryRef" />
-
-    </bean>
-
-    <bean id="queueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/>
-
-    <bean id="needInformationService" class="won.node.service.impl.NeedInformationServiceImpl">
-        <property name="pageSize" value="${linkeddata.pagesize}" />
-        <property name="rdfStorage" ref="rdfStorageRef" />
-    </bean>
-
-
-    <bean id="needManagementServiceJMSBased" class="won.node.service.impl.NeedManagementServiceImpl">
-        <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
-        <property name="needInformationService" ref="needInformationService"/>
-        <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
-        <property name="URIService" ref="uriService" />
-        <property name="rdfStorage" ref="rdfStorageRef" />
-    </bean>
-
-    <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>
-
-    <bean id="needFacingConnectionCommunicationService"
-          class="won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl">
-        <property name="dataService" ref="dataServiceRef" />
-        <property name="reg" ref="facetImplRegistryRef" />
-    </bean>
-	<!-- TODO: rewiring and refactoring needed to support both JMS and WS based protocols and adapt to changes introduced by facets -->
-    <bean id="ownerFacingConnectionCommunicationService" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl">
-        <!-- property name="needFacingConnectionClient" ref="needProtocolNeedClientJMSBased" /-->
-        <!-- property name="executorService" ref="threadPoolExecutor" /-->
-        <!-- property name="rdfStorageService" ref="rdfStorageRef" /-->
-        <property name="dataService" ref="dataServiceRef" />
-        <property name="reg" ref="facetImplRegistryRef" />
-    </bean>
-
-    <bean id="ownerFacingConnectionCommunicationServiceJMSBased" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl"/>
+    <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
 
     <bean id="uriService" class="won.node.service.impl.URIService">
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
@@ -192,11 +45,21 @@
         <property name="generalURIPrefix" value="${uri.prefix}" />
     </bean>
 
-    <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
-        <property name="producerTemplate" ref="producerTemplate"/>
+    <!-- Model Mapper for RDF -->
+    <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
+    <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
+
+    <bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg value="30" type="int" index="0"/>
     </bean>
 
-    <bean id="QueueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/>
+    <bean id="threadPoolExecutor" class="java.util.concurrent.ThreadPoolExecutor" destroy-method="shutdown">
+        <constructor-arg value="10" index="0"/>
+        <constructor-arg value="15" index="1"/>
+        <constructor-arg value="1" index="2"/>
+        <constructor-arg value="MINUTES" index="3"/>
+        <constructor-arg ref="workqueue" index="4"/>
+    </bean>
 
     <bean id="linkedDataService" class="won.node.service.impl.LinkedDataServiceImpl">
         <property name="needInformationService" ref="needInformationService" />
@@ -215,30 +78,90 @@
         <property name="pageSize" value="${linkeddata.pagesize}" />
     </bean>
 
-    <bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">
-        <constructor-arg value="30" type="int" index="0"/>
+    <bean id="queueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/>
+
+    <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
+        <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
 
-    <bean id="threadPoolExecutor" class="java.util.concurrent.ThreadPoolExecutor" destroy-method="shutdown">
-        <constructor-arg value="10" index="0"/>
-        <constructor-arg value="15" index="1"/>
-        <constructor-arg value="1" index="2"/>
-        <constructor-arg value="MINUTES" index="3"/>
-        <constructor-arg ref="workqueue" index="4"/>
+    <!--bean id="QueueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/-->
+
+    <!--- DataAccessService -->
+    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessService" >
+        <property name="URIService" ref="uriService" />
+        <property name="rdfStorageService" ref="rdfStorageRef" />
     </bean>
 
-    <!-- REST stuff -->
-    <context:component-scan base-package="won.protocol.rest">
-        <context:include-filter type="regex" expression="won.protocol.rest.*"/>
-    </context:component-scan>
 
-    <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
+    <bean id="needInformationService" class="won.node.service.impl.NeedInformationServiceImpl">
+        <property name="pageSize" value="${linkeddata.pagesize}" />
+        <property name="rdfStorage" ref="rdfStorageRef" />
+    </bean>
 
-    <bean id="ownerProtocolOwnerWebServiceClientFactory" class="won.node.protocol.impl.OwnerProtocolOwnerClientFactory" />
+    <!--bean id="needManagementService" class="won.node.service.impl.NeedManagementServiceImpl">
+        <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
+        <property name="needInformationService" ref="needInformationService"/>
+        <property name="URIService" ref="uriService" />
+        <property name="rdfStorage" ref="rdfStorageRef" />
+    </bean-->
+    <bean id="needManagementServiceJMSBased" class="won.node.service.impl.NeedManagementServiceImpl">
+        <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
+        <property name="needInformationService" ref="needInformationService"/>
+        <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
+        <property name="URIService" ref="uriService" />
+        <property name="rdfStorage" ref="rdfStorageRef" />
+    </bean>
 
-    <bean id="needProtocolNeedWebServiceClientFactory" class="won.node.protocol.impl.NeedProtocolNeedClientFactory" />
+    <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>
 
-    <!-- Model Mapper for RDF -->
-    <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
-    <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
+
+    <bean id="needFacingConnectionCommunicationService"
+          class="won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl">
+        <property name="dataService" ref="dataServiceRef" />
+        <property name="reg" ref="facetImplRegistryRef" />
+    </bean>
+    <!-- TODO: rewiring and refactoring needed to support both JMS and WS based protocols and adapt to changes introduced by facets -->
+    <bean id="ownerFacingConnectionCommunicationService" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl">
+        <!-- property name="needFacingConnectionClient" ref="needProtocolNeedClientJMSBased" /-->
+        <!-- property name="executorService" ref="threadPoolExecutor" /-->
+        <!-- property name="rdfStorageService" ref="rdfStorageRef" /-->
+        <property name="dataService" ref="dataServiceRef" />
+        <property name="reg" ref="facetImplRegistryRef" />
+    </bean>
+
+    <!--bean id="ownerFacingConnectionCommunicationServiceJMSBased" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl"/-->
+
+    <bean id="needCommunicationService" class="won.node.service.impl.NeedCommunicationServiceImpl">
+        <property name="dataService" ref="dataServiceRef" />
+        <property name="reg" ref="facetImplRegistryRef" />
+
+    </bean>
+
+    <bean id="matcherProtocolNeedService" class="won.node.protocol.impl.MatcherProtocolNeedServiceImpl">
+        <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
+    </bean>
+
+    <!-- protocol-level services -->
+    <bean id="ownerProtocolNeedService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
+        <!-- the connection communication service injected here is owner facing -->
+        <property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
+        <!--property name="needCommunicationService" ref="needCommunicationServiceJMSBased" /-->
+        <property name="needCommunicationService" ref="needCommunicationService"/>
+        <property name="needInformationService" ref="needInformationService" />
+        <property name="needManagementService" ref="needManagementServiceJMSBased"/>
+    </bean>
+
+    <bean id="needProtocolNeedService" class="won.node.protocol.impl.NeedProtocolNeedServiceImpl">
+        <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService"/>
+        <property name="needFacingNeedCommunicationService" ref="needCommunicationService"/>
+    </bean>
+
+    <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClient">
+        <property name="delegate" ref="ownerProtocolOwnerClientJMSBased"/>
+    </bean>
+
+    <bean name="needProtocolNeedClient" class="won.node.protocol.impl.NeedProtocolNeedClient">
+        <property name="delegate" ref="needProtocolNeedClientJMSBasedRefactoring"/>
+    </bean>
+
 </beans>

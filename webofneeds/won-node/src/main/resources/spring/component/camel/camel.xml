@@ -14,16 +14,11 @@
                 http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.1.xsd
                 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
+    <!--
+         Load properties but ignore unresolvable properties so that
+         they are searched in other property configurers defined in the context
+    -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
-    <!-- Defines where to search for annotated components -->
-    <context:component-scan base-package="won.protocol.exception" />
-    <context:component-scan base-package="won.protocol.matcher" />
-    <context:component-scan base-package="won.protocol.model" />
-    <context:component-scan base-package="won.protocol.need" />
-    <context:component-scan base-package="won.protocol.owner" />
-    <context:component-scan base-package="won.protocol.repository" />
-    <context:component-scan base-package="won.protocol.service" />
-    <context:component-scan base-package="won.protocol.util" />
 
     <!-- Camel configuration -->
     <camel:camelContext id="wonNodeCamel">
@@ -34,8 +29,45 @@
         <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG" />
     </camel:camelContext>
 
+    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
+        <property name="sessionCacheSize" value="10"></property>
+    </bean>
+
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker1">
+        <!-- note: this URI does not need to be configurable via the
+        config file, it will be the same on any system -->
+        <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+    </bean>
+    <!-- Configuring Broker -->
+    <bean id="embeddedBroker1" class="org.apache.activemq.xbean.PooledBrokerFactoryBean">
+        <property name="config" value="classpath:spring/component/broker/activemq.xml"/>
+        <property name="start" value="true"/>
+    </bean>
+    <bean id="activeMQService" class="won.protocol.jms.ActiveMQServiceImpl">
+        <constructor-arg name="type" value="NeedProtocol"/>
+    </bean>
+    <bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
+
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <!-- note: this URI does not need to be configurable via the
+        config file, it will be the same on any system -->
+        <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/-->
+        <!--property name="connectionFactory" ref="cachedConnectionFactory"/-->
+    </bean>
+    <bean id="needProtocolCommunicationService" class="won.node.messaging.NeedProtocolCommunicationServiceImpl">
+
+    </bean>
+    <bean id="needProtocolActiveMQService" class="won.node.messaging.NeedProtocolActiveMQServiceImpl">
+        <property name="componentName" value="activemq"/>
+        <property name="activeMQService" ref="activeMQService"/>
+    </bean>
     <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor">
         <property name="queueManagementService" ref="queueManagementService"/>
+    </bean>
+
+    <bean name="needProtocolCamelConfigurator" class="won.node.messaging.NeedProtocolCamelConfiguratorImpl">
+        <property name="componentName" value="activemq"/>
     </bean>
 
 </beans>
