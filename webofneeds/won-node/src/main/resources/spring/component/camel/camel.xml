@@ -34,13 +34,13 @@
         <property name="sessionCacheSize" value="10"></property>
     </bean>
 
-    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker1">
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker">
         <!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
         <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
     </bean>
     <!-- Configuring Broker -->
-    <bean id="embeddedBroker1" class="org.apache.activemq.xbean.PooledBrokerFactoryBean">
+    <bean id="embeddedBroker" class="org.apache.activemq.xbean.PooledBrokerFactoryBean">
         <property name="config" value="classpath:spring/component/broker/activemq.xml"/>
         <property name="start" value="true"/>
     </bean>
@@ -58,10 +58,7 @@
     <bean id="needProtocolCommunicationService" class="won.node.messaging.NeedProtocolCommunicationServiceImpl">
 
     </bean>
-    <bean id="needProtocolActiveMQService" class="won.node.messaging.NeedProtocolActiveMQServiceImpl">
-        <property name="componentName" value="activemq"/>
-        <property name="activeMQService" ref="activeMQService"/>
-    </bean>
+
     <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor">
         <property name="queueManagementService" ref="queueManagementService"/>
     </bean>
@@ -69,5 +66,6 @@
     <bean name="needProtocolCamelConfigurator" class="won.node.messaging.NeedProtocolCamelConfiguratorImpl">
         <property name="componentName" value="activemq"/>
     </bean>
+
 
 </beans>

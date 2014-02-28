@@ -27,7 +27,6 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
 
     @Autowired
     private OwnerProtocolNeedService delegate;
-   // private ActiveMQComponent activeMQComponent;
 
     private OwnerManagementService ownerManagementService;
     @Autowired
