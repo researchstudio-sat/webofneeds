@@ -25,7 +25,7 @@ import java.net.URI;
 public interface MessageBrokerService {
 
 
-    public URI getBrokerURI(URI resourceUri);
+    public URI getBrokerEndpoint(URI resourceUri);
 
 
 }

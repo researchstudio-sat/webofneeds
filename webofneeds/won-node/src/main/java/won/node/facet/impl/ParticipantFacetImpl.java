@@ -78,6 +78,8 @@ public class ParticipantFacetImpl extends Facet {
                         needFacingConnectionClient.open(con, content);
                     } catch (WonProtocolException e) {
                         logger.debug("caught Exception:", e);
+                    } catch (Exception e) {
+                        logger.debug("caught Exception", e);
                     }
                 }
             });
@@ -98,6 +100,8 @@ public class ParticipantFacetImpl extends Facet {
                         needFacingConnectionClient.close(con, content);
                     } catch (WonProtocolException e) {
                         logger.warn("caught WonProtocolException:", e);
+                    } catch (Exception e) {
+                        logger.debug("caught Exception", e);
                     }
                 }
             });
@@ -233,6 +237,8 @@ public class ParticipantFacetImpl extends Facet {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 } catch (ExecutionException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (Exception e) {
+                    logger.debug("caught Exception",e);
                 }
             }
         });

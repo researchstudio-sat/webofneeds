@@ -49,14 +49,14 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   private NeedProtocolNeedClientFactory clientFactory;
 
   @Override
-  public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
 
     logger.info("need-facing: CONNECT called for other need {}, own need {}, own connection {}, and content {}",
-        new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
+        new Object[]{needUri, otherNeedUri, otherConnectionUri, content});
     try {
-      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForNeed(needURI);
-      URI result = proxy.connect(needURI, otherNeedURI, otherConnectionURI, RdfUtils.toString(content));
+      NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForNeed(needUri);
+      URI result = proxy.connect(needUri, otherNeedUri, otherConnectionUri, RdfUtils.toString(content));
       SettableFuture<URI> futureResult = SettableFuture.create();
       futureResult.set(result);
 

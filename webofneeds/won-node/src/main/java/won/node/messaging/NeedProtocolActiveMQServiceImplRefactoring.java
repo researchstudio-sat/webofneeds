@@ -22,12 +22,14 @@ import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.jms.JmsConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.jms.connection.CachingConnectionFactory;
 import won.node.camel.routes.NeedProtocolDynamicRoutes;
 import won.protocol.jms.ActiveMQService;
 import won.protocol.jms.NeedProtocolActiveMQService;
@@ -48,7 +50,7 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  * Date: 26.11.13
  */
 //TODO: devide this class into two classes, OwnerProtocolActiveMQServiceImpl and NeedProtocolActiveMQServiceImpl
-public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,CamelContextAware,NeedProtocolActiveMQService {
+public class NeedProtocolActiveMQServiceImplRefactoring implements ApplicationContextAware,CamelContextAware,NeedProtocolActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     public static final String PATH_BROKER_URI = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_BROKER_URI + ">";
     public static final String PATH_NEED_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME + ">";
@@ -100,8 +102,12 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
      * @param from
      * @throws Exception
      */
-    public synchronized String getCamelEndpointForNeed(URI needUri, URI otherNeedUri, String from) throws Exception {
+    public String getCamelEndpointForNeed(URI needUri, URI otherNeedUri, String from) throws Exception {
         logger.info("fetching camel endpoint for need {}, remote need {}, from {}", new Object[]{needUri, otherNeedUri, from});
+
+        URI ownNeedBrokerUri = getBrokerEndpoint(needUri);
+        URI otherNeedBrokerUri = getBrokerEndpoint(otherNeedUri);
+
         List<String> endpointList = new ArrayList<>();
 
         String endpoint = knownBrokersByNeed.get(otherNeedUri);
@@ -127,12 +133,18 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
                 tempComponentName = componentName+remoteBrokerURI.toString().replaceAll("[/:]","");
                     if (camelContext.getComponent(tempComponentName)==null){
                         //TODO: check configuration of activemq component. e.g. using cachedConnectionFactory
-                        ActiveMQComponent activeMQComponent = new ActiveMQComponent();
+                       /* ActiveMQComponent activeMQComponent = new ActiveMQComponent();
                         activeMQComponent.setAutoStartup(true);
                         activeMQComponent.setApplicationContext(applicationContext);
                         activeMQComponent.setCamelContext(camelContext);
 
-                        camelContext.addComponent(tempComponentName,activeMQComponent(remoteBrokerURI.toString()+"?useLocalHost=false"));
+                        camelContext.addComponent(tempComponentName,activeMQComponent(remoteBrokerURI.toString()+"?useLocalHost=false"));   */
+                        ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(remoteBrokerURI);
+                        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(activeMQConnectionFactory);
+                        JmsConfiguration jmsConfiguration = new JmsConfiguration(cachingConnectionFactory);
+                        ActiveMQComponent activeMQComponent = activeMQComponent();
+
+                        activeMQComponent.setConfiguration(jmsConfiguration);
                     }
 
             }
@@ -141,7 +153,6 @@ public class NeedProtocolActiveMQServiceImpl implements ApplicationContextAware,
             logger.debug("created endpoint: {} for need {}", endpoint, otherNeedUri);
 
             endpointList.add(endpoint);
-            ActiveMQConnectionFactory activemqConnectionFactory = (ActiveMQConnectionFactory) applicationContext.getBean("activemqConnectionFactory");
 
             addRouteForEndpoint(camelContext,from);
 

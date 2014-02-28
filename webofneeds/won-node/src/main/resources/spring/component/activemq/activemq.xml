@@ -1,175 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Licensed to the Apache Software Foundation (ASF) under one or more
-    contributor license agreements.  See the NOTICE file distributed with
-    this work for additional information regarding copyright ownership.
-    The ASF licenses this file to You under the Apache License, Version 2.0
-    (the "License"); you may not use this file except in compliance with
-    the License.  You may obtain a copy of the License at
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
 
-    http://www.apache.org/licenses/LICENSE-2.0
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation=
+               "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+                http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.1.xsd
+                http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
--->
-<!-- START SNIPPET: example -->
-
-<beans
-  xmlns="http://www.springframework.org/schema/beans"
-  xmlns:amq="http://activemq.apache.org/schema/core"
-  xmlns:context="http://www.springframework.org/schema/context"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-  http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
-  http://www.springframework.org/schema/context
-  http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-
-
-    <!--
-         Load properties but ignore unresolvable properties so that
-         they are searched in other property configuerers defined in the context
-    -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
+    <!-- Defines where to search for annotated components -->
+    <context:component-scan base-package="won.protocol.exception" />
+    <context:component-scan base-package="won.protocol.matcher" />
+    <context:component-scan base-package="won.protocol.model" />
+    <context:component-scan base-package="won.protocol.need" />
+    <context:component-scan base-package="won.protocol.owner" />
+    <context:component-scan base-package="won.protocol.repository" />
+    <context:component-scan base-package="won.protocol.service" />
+    <context:component-scan base-package="won.protocol.util" />
 
 
-    <!--
-        The <broker> element is used to configure the ActiveMQ broker.
-    -->
-    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="wonBroker" persistent="false" >
 
-        <!--
-            For better performances use VM cursor and small memory limit.
-            For more information, see:
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <!-- note: this URI does not need to be configurable via the
+        config file, it will be the same on any system -->
+        <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/-->
+        <!--property name="connectionFactory" ref="cachedConnectionFactory"/-->
+    </bean>
+    <!-- Configuring Broker -->
+    <bean id="embeddedBroker1" class="org.apache.activemq.xbean.PooledBrokerFactoryBean">
+        <property name="config" value="classpath:activemq.xml"/>
+        <property name="start" value="true"/>
 
-            http://activemq.apache.org/message-cursors.html
+    </bean>
 
-            Also, if your producer is "hanging", it's probably due to producer flow control.
-            For more information, see:
-            http://activemq.apache.org/producer-flow-control.html
-        -->
-        <!--destinations>
-            <queue physicalName="WON.CREATENEED"></queue>
-        </destinations-->
-        <destinationPolicy>
-            <policyMap>
-              <policyEntries>
-                <policyEntry topic=">" producerFlowControl="true">
-                    <!-- The constantPendingMessageLimitStrategy is used to prevent
-                         slow topic consumers to block producers and affect other consumers
-                         by limiting the number of messages that are retained
-                         For more information, see:
-
-                         http://activemq.apache.org/slow-consumer-handling.html
-
-                    -->
-                  <pendingMessageLimitStrategy>
-                    <constantPendingMessageLimitStrategy limit="1000"/>
-                  </pendingMessageLimitStrategy>
-                </policyEntry>
-                <policyEntry queue=">" producerFlowControl="true" memoryLimit="1mb">
-                  <!-- Use VM cursor for better latency
-                       For more information, see:
-
-                       http://activemq.apache.org/message-cursors.html
-
-                  <pendingQueuePolicy>
-                    <vmQueueCursor/>
-                  </pendingQueuePolicy>
-                  -->
-                </policyEntry>
-              </policyEntries>
-            </policyMap>
-        </destinationPolicy>
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker1">
+        <!-- note: this URI does not need to be configurable via the
+        config file, it will be the same on any system -->
+        <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+    </bean>
+    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
+        <property name="sessionCacheSize" value="10"></property>
+    </bean>
 
 
-        <!--
-            The managementContext is used to configure how ActiveMQ is exposed in
-            JMX. By default, ActiveMQ uses the MBean server that is started by
-            the JVM. For more information, see:
-
-            http://activemq.apache.org/jmx.html
-        -->
-        <managementContext>
-            <managementContext createConnector="false"/>
-        </managementContext>
-
-        <!--
-            Configure message persistence for the broker. The default persistence
-            mechanism is the KahaDB store (identified by the kahaDB tag).
-            For more information, see:
-
-            http://activemq.apache.org/persistence.html
-        -->
-        <!--persistenceAdapter>
-            <kahaDB directory="dataDirectory"/>
-        </persistenceAdapter-->
-
-
-          <!--
-            The systemUsage controls the maximum amount of space the broker will
-            use before slowing down producers. For more information, see:
-            http://activemq.apache.org/producer-flow-control.html
-            If using ActiveMQ embedded - the following limits could safely be used:
-
-        <systemUsage>
-            <systemUsage>
-                <memoryUsage>
-                    <memoryUsage limit="20 mb"/>
-                </memoryUsage>
-                <storeUsage>
-                    <storeUsage limit="1 gb"/>
-                </storeUsage>
-                <tempUsage>
-                    <tempUsage limit="100 mb"/>
-                </tempUsage>
-            </systemUsage>
-        </systemUsage>
-        -->
-          <systemUsage>
-            <systemUsage>
-                <memoryUsage>
-                    <memoryUsage limit="64 mb"/>
-                </memoryUsage>
-                <storeUsage>
-                    <storeUsage limit="100 gb"/>
-                </storeUsage>
-                <tempUsage>
-                    <tempUsage limit="50 gb"/>
-                </tempUsage>
-            </systemUsage>
-        </systemUsage>
-
-        <!--
-            The transport connectors expose ActiveMQ over a given protocol to
-            clients and other brokers. For more information, see:
-
-            http://activemq.apache.org/configuring-transports.html
-        -->
-        <transportConnectors>
-            <!-- DOS protection, limit concurrent connections to 1000 and frame size to 100MB -->
-            <!--transportConnector name="openwire" uri="tcp://localhost:62616?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/-->
-            <!--transportConnector name="amqp" uri="amqp://localhost:5672?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/-->
-            <transportConnector name="tcp" uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600" />
-        </transportConnectors>
-        <!--networkConnectors>
-            <networkConnector uri="static:(tcp://localhost:61617)" ></networkConnector>
-        </networkConnectors-->
-
-        <!-- destroy the spring context on shutdown to stop jetty -->
-        <shutdownHooks>
-            <bean xmlns="http://www.springframework.org/schema/beans" class="org.apache.activemq.hooks.SpringContextHook" />
-        </shutdownHooks>
-
-    </broker>
-
-    <!--
-        Enable web consoles, REST and Ajax APIs and demos
-
-        Take a look at ${ACTIVEMQ_HOME}/conf/jetty.xml for more details
-    -->
-    <!-- <import resource="jetty.xml"/>       -->
-
+    <bean id="needProtocolActiveMQService" class="won.node.messaging.NeedProtocolActiveMQServiceImpl">
+        <property name="componentName" value="activemq"/>
+        <property name="activeMQService" ref="activeMQService"/>
+    </bean>
+    <bean id="activeMQService" class="won.protocol.jms.ActiveMQServiceImpl">
+        <constructor-arg name="type" value="NeedProtocol"/>
+    </bean>
 </beans>
-<!-- END SNIPPET: example -->

@@ -1,4 +1,4 @@
-package won.owner.messaging;
+package won.protocol.jms;
 
 /**
  * User: LEIH-NB

@@ -16,6 +16,8 @@
 
 package won.owner.messaging;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
@@ -25,7 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
+import won.protocol.jms.BrokerComponentFactory;
 import won.protocol.jms.CamelConfigurator;
+import won.protocol.jms.OwnerProtocolCamelConfigurator;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 
@@ -41,7 +45,7 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  * User: LEIH-NB
  * Date: 28.01.14
  */
-public class OwnerProtocolCamelConfigurator implements CamelConfigurator {
+public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelConfigurator {
 
     private CamelContext camelContext;
 
@@ -54,9 +58,9 @@ public class OwnerProtocolCamelConfigurator implements CamelConfigurator {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Map<URI,String> endpointMap = new HashMap<>();
+    private BiMap<URI,String> endpointMap = HashBiMap.create();
     private Map<URI,String> startingComponentMap = new HashMap<>();
-    private Map<URI, String> brokerComponentMap = new HashMap<>();
+    private BiMap<URI, String> brokerComponentMap = HashBiMap.create();
 
     private String startingComponent;
     private String componentName;
@@ -65,7 +69,7 @@ public class OwnerProtocolCamelConfigurator implements CamelConfigurator {
 
 
 
-    protected OwnerProtocolCamelConfigurator() {
+    protected OwnerProtocolCamelConfiguratorImpl() {
     }
 
     @Override
@@ -121,7 +125,7 @@ public class OwnerProtocolCamelConfigurator implements CamelConfigurator {
     }
 
     @Override
-    public synchronized void addRouteForEndpoint(URI wonNodeURI) throws CamelConfigurationFailedException {
+    public synchronized void addRouteForEndpoint(String startingEndpoint,URI wonNodeURI) throws CamelConfigurationFailedException {
         /**
          * there can be only one route per endpoint. Thus, consuming endpoint of each route shall be unique.
          */
@@ -153,21 +157,28 @@ public class OwnerProtocolCamelConfigurator implements CamelConfigurator {
 
     public synchronized String replaceEndpointNameWithOwnerApplicationId(String endpointName, String ownerApplicationId) throws Exception {
         Endpoint ep = camelContext.getEndpoint(endpointName);
+        URI wonNodeUri = endpointMap.inverse().get(endpointName);
+
         camelContext.removeEndpoints(endpointName);
         String[] endpointSplit = endpointName.split(":");
         endpointSplit[0] = endpointSplit[0]+ownerApplicationId;
         endpointName = endpointSplit[0]+":"+endpointSplit[1]+":"+endpointSplit[2];
+
         //  endpointName = endpointName.replaceFirst(endpointName,endpointName+ownerApplicationId);
         camelContext.addEndpoint(endpointName, ep);
+        endpointMap.put(wonNodeUri,endpointName);
         return endpointName;
     }
 
     public synchronized String replaceComponentNameWithOwnerApplicationId(String componentName, String ownerApplicationId){
         ActiveMQComponent activeMQComponent = (ActiveMQComponent)camelContext.getComponent(componentName);
+        URI wonNodeUri = brokerComponentMap.inverse().get(componentName);
+
         camelContext.removeComponent(componentName);
         componentName = this.componentName+ownerApplicationId;
         camelContext.addComponent(componentName, activeMQComponent);
         logger.info("component name: "+componentName);
+        brokerComponentMap.put(wonNodeUri, componentName);
         return componentName;
     }
 
@@ -178,7 +189,7 @@ public class OwnerProtocolCamelConfigurator implements CamelConfigurator {
 
     @Override
     public CamelContext getCamelContext() {
-        return camelContext;  //To change body of implemented methods use File | Settings | File Templates.
+        return camelContext;
     }
 
     @Override
@@ -186,9 +197,21 @@ public class OwnerProtocolCamelConfigurator implements CamelConfigurator {
        return endpointMap.get(wonNodeUri);
     }
 
+    //TODO: not implemented yet
+    @Override
+    public String setupBrokerComponentName(URI brokerUri) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
     @Override
     public void setStartingComponent(String startingComponent) {
         this.startingComponent = startingComponent;
+    }
+
+    @Override
+    public String getBrokerComponent(URI resourceUri) {
+        return brokerComponentMap.get(resourceUri);
     }
 
     @Override

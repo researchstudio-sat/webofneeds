@@ -43,32 +43,29 @@ public class NeedProtocolNeedClient implements NeedProtocolNeedClientSide
   private NeedProtocolNeedClientSide delegate;
 
   @Override
-  public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
-  {
+  public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws Exception {
 
     logger.info("need-facing: CONNECT called for other need {}, own need {}, own connection {}, and content {}",
-        new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
-     return delegate.connect(needURI,otherNeedURI,otherConnectionURI,content);
+        new Object[]{needUri, otherNeedUri, otherConnectionUri, content});
+     return delegate.connect(needUri, otherNeedUri, otherConnectionUri,content);
 
   }
 
     @Override
-    public void open(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(final Connection connection, final Model content) throws Exception {
         logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connection));
         delegate.open(connection,content);
     }
 
   @Override
-  public void close(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void close(final Connection connection, final Model content) throws Exception {
     logger.info("need-facing: CLOSE called for connection {}", connection);
     delegate.close(connection,content);
 
   }
 
   @Override
-  public void textMessage(final Connection connection, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void textMessage(final Connection connection, final Model message) throws Exception {
     logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
     delegate.textMessage(connection, message);
 

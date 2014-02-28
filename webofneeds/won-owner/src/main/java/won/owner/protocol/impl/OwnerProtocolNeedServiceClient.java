@@ -100,7 +100,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
         if (cons.size() != 1)
             throw new NoSuchConnectionException(connectionURI);
 
-
         delegate.open(connectionURI, content);
 
         Connection con = cons.get(0);
@@ -178,7 +177,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public ListenableFuture<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeUri) throws Exception {
+    public synchronized ListenableFuture<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeUri) throws Exception {
         if (logger.isDebugEnabled()) {
           logger.debug("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
                 new Object[]{ownerURI, StringUtils.abbreviate(RdfUtils.toString(content),200), activate});

@@ -87,6 +87,8 @@ public abstract class Facet {
             //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
           } catch (WonProtocolException e) {
             logger.debug("caught Exception:", e);
+          } catch (Exception e) {
+             logger.debug("caught Exception",e);
           }
         }
       });
@@ -117,6 +119,8 @@ public abstract class Facet {
               //needFacingConnectionClient.close(con.getRemoteConnectionURI(), content);
           } catch (WonProtocolException e) {
             logger.warn("caught WonProtocolException:", e);
+          } catch (Exception e) {
+              logger.warn("caught Exception: ",e);
           }
         }
       });
@@ -144,6 +148,8 @@ public abstract class Facet {
          // needFacingConnectionClient.textMessage(remoteConnectionURI, message);
         } catch (WonProtocolException e) {
           logger.warn("caught WonProtocolException:", e);
+        } catch (Exception e) {
+            logger.warn("caught Exception: ",e);
         }
       }
     });
@@ -340,6 +346,8 @@ public abstract class Facet {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (ExecutionException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+            logger.warn("caught Excpetion: ",e);
         }
       }
     });

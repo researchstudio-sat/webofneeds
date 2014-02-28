@@ -63,7 +63,7 @@ public class ActiveMQServiceImplRefactoring implements ActiveMQService {
     }
 
     //todo: rename this method to getBrokerURIForNode
-    public final URI getBrokerURI(URI resourceUri) {
+    public final URI getBrokerEndpoint(URI resourceUri) {
         logger.debug("obtaining broker URI for node {}", resourceUri);
         String nodeInformationPath = URI.create(resourceUri.toString() + "/resource").toString();
         URI activeMQEndpoint = null;

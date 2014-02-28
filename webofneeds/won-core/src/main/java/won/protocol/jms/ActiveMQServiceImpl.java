@@ -24,7 +24,6 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.protocol.jms.ActiveMQService;
 import won.protocol.model.ProtocolType;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.vocabulary.WON;
@@ -87,7 +86,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
     }
 
     //todo: rename this method to getBrokerURIForNode
-    public final URI getBrokerURI(URI resourceUri) {
+    public final URI getBrokerEndpoint(URI resourceUri) {
         logger.debug("obtaining broker URI for node {}", resourceUri);
 
         String nodeInformationPath = URI.create(resourceUri.toString() + pathInformation).toString();
@@ -103,6 +102,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             }
             else throw e;
         }
+        logger.info("brokerUri {} for resourceUri {} ",activeMQEndpoint,resourceUri);
         return activeMQEndpoint;
     }
 }

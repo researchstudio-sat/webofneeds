@@ -12,18 +12,10 @@ import java.util.List;
  * Date: 24.02.14
  */
 public interface CamelConfigurator extends CamelContextAware {
-    String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName) throws CamelConfigurationFailedException;
-
-    void addRemoteQueueListeners(List<String> endpoints) throws CamelConfigurationFailedException;
 
     //todo: the method is activemq specific. refactor it to support other brokers.
-    String addCamelComponentForWonNodeBroker(URI wonNodeURI, URI brokerURI, String ownerApplicationId);
+    void addRouteForEndpoint(String startingEndpoint,URI wonNodeURI) throws CamelConfigurationFailedException;
 
-    void addRouteForEndpoint(URI wonNodeURI) throws CamelConfigurationFailedException;
-
-    String getStartingEndpoint(URI wonNodeURI);
-
-    void setStartingEndpoint(URI wonNodeURI, String startingEndpoint);
 
     void setCamelContext(CamelContext camelContext);
 
@@ -32,9 +24,6 @@ public interface CamelConfigurator extends CamelContextAware {
 
     String getEndpoint(URI wonNodeUri);
 
-    void setStartingComponent(String startingComponent);
+    public String setupBrokerComponentName(URI brokerUri);
 
-    void setComponentName(String componentName);
-
-    void setDefaultNodeURI(String defaultNodeURI);
 }

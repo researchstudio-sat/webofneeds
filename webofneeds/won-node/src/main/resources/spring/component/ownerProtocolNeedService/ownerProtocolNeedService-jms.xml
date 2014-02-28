@@ -30,6 +30,8 @@
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
+
+
     <bean id="ownerProtocolNeedJMSService" class="won.node.messaging.OwnerProtocolNeedServiceImplJMSBased">
         <!-- the connection communication service injected here 7s owner facing -->
         <property name="delegate" ref="ownerProtocolNeedService" />

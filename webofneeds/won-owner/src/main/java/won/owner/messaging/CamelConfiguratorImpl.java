@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
+import won.protocol.jms.BrokerComponentFactory;
 import won.protocol.jms.CamelConfigurator;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -39,6 +40,7 @@ import java.util.Map;
  * User: LEIH-NB
  * Date: 28.01.14
  */
+/*
 public class CamelConfiguratorImpl implements CamelConfigurator {
 
     private CamelContext camelContext;
@@ -123,6 +125,7 @@ public class CamelConfiguratorImpl implements CamelConfigurator {
         /**
          * there can be only one route per endpoint. Thus, consuming endpoint of each route shall be unique.
          */
+/*
         //todo: using replaceAll might result in security issues. change this.
         String tempStartingComponentName = startingComponent;
         tempStartingComponentName = tempStartingComponentName + endpointMap.get(wonNodeURI).replaceAll(":","_");
@@ -198,4 +201,4 @@ public class CamelConfiguratorImpl implements CamelConfigurator {
     public void setDefaultNodeURI(String defaultNodeURI) {
         this.defaultNodeURI = defaultNodeURI;
     }
-}
+}*/

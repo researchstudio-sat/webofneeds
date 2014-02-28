@@ -14,29 +14,19 @@
  *    limitations under the License.
  */
 
+package won.protocol.jms;
 
-package won.node.camel.routes.fixed;
-import org.apache.camel.builder.RouteBuilder;
+import won.protocol.exception.NoSuchConnectionException;
+
+import java.net.URI;
 
 /**
  * User: LEIH-NB
- * Date: 10.10.13
+ * Date: 25.02.14
  */
-public class AmqpToJms extends RouteBuilder{
-
-
-
-    @Override
-    public void configure(){
-        from("seda:OUTMSG")
-                .to("log:OUTMSG FROM NODE")
-                .choice()
-                .when(header("protocol").isEqualTo("OwnerProtocol"))
-                .to("log:OwnerProtocol FROM NODE")
-                .to("seda:OwnerProtocolOut")
-                .otherwise()
-                .to("log:No protocol defined in header");
-    }
-
+public interface OwnerProtocolCommunicationService extends ProtocolCommunicationService {
+    public CamelConfiguration configureCamelEndpoint(URI wonNodeUri) throws Exception;
+    public URI  getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException;
+    public URI  getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException;
 
 }

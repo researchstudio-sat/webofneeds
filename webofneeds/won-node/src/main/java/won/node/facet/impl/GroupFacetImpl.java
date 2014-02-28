@@ -47,6 +47,8 @@ public class GroupFacetImpl extends Facet {
               needFacingConnectionClient.textMessage(c, message);
             } catch (WonProtocolException e) {
               logger.warn("caught WonProtocolException:", e);
+            } catch (Exception e) {
+                logger.warn("caught Exception",e);
             }
           }
         });

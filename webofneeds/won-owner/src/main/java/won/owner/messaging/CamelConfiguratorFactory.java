@@ -16,12 +16,14 @@
 
 package won.owner.messaging;
 
+import won.protocol.jms.OwnerProtocolCamelConfigurator;
+
 /**
  * User: LEIH-NB
  * Date: 28.01.14
  */
 public class CamelConfiguratorFactory {
-    public OwnerProtocolCamelConfigurator createCamelConfigurator(String methodName){
+    /*public OwnerProtocolCamelConfigurator createCamelConfigurator(String methodName){
         OwnerProtocolCamelConfigurator ownerProtocolCamelConfigurator = null;
 
         if (methodName.equals("connect")||methodName.equals("deactivate")||methodName.equals("activate")){
@@ -32,6 +34,6 @@ public class CamelConfiguratorFactory {
             ownerProtocolCamelConfigurator = new OwnerProtocolCamelConfigurator();
         }
         return ownerProtocolCamelConfigurator;
-    }
+    }    */
 
 }

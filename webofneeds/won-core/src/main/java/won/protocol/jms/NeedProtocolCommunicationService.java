@@ -14,29 +14,14 @@
  *    limitations under the License.
  */
 
+package won.protocol.jms;
 
-package won.node.camel.routes.fixed;
-import org.apache.camel.builder.RouteBuilder;
+import java.net.URI;
 
 /**
  * User: LEIH-NB
- * Date: 10.10.13
+ * Date: 25.02.14
  */
-public class AmqpToJms extends RouteBuilder{
-
-
-
-    @Override
-    public void configure(){
-        from("seda:OUTMSG")
-                .to("log:OUTMSG FROM NODE")
-                .choice()
-                .when(header("protocol").isEqualTo("OwnerProtocol"))
-                .to("log:OwnerProtocol FROM NODE")
-                .to("seda:OwnerProtocolOut")
-                .otherwise()
-                .to("log:No protocol defined in header");
-    }
-
-
+public interface NeedProtocolCommunicationService extends ProtocolCommunicationService {
+    CamelConfiguration configureCamelEndpoint(URI needUri,URI otherNeedUri,String startingEndpoint) throws Exception;
 }

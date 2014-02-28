@@ -30,14 +30,14 @@ import java.net.URI;
 public interface NeedProtocolNeedClientSide   //extends ConnectionCommunicationService
 {
 
-  public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+  public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws Exception;
 
 
-  public void open(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void open(final Connection connection, final Model content) throws Exception;
 
-  public void close(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void close(final Connection connection, final Model content) throws Exception;
 
-  public void textMessage(final Connection connection, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void textMessage(final Connection connection, final Model message) throws Exception;
 
 
 

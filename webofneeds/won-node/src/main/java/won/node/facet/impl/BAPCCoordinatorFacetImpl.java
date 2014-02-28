@@ -115,6 +115,8 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     }
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
+                } catch (Exception e) {
+                    logger.warn("caught Exception;",e);
                 }
             }
         });
@@ -182,6 +184,8 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     }
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
+                } catch (Exception e) {
+                    logger.warn("caught Exception; ",e);
                 }
 
             }
