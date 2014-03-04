@@ -24,6 +24,8 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Iterator;
@@ -34,7 +36,7 @@ import java.util.Iterator;
  */
 public class LinkedDataRestClient
 {
-
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
    * Retrieves RDF for the specified resource URI.
@@ -45,6 +47,7 @@ public class LinkedDataRestClient
    * @return
    */
   public Model readResourceData(URI resourceURI){
+    logger.debug("fetching linked data resource: {}", resourceURI);
     ClientConfig cc = new DefaultClientConfig();
     cc.getProperties().put(
         ClientConfig.PROPERTY_FOLLOW_REDIRECTS, true);

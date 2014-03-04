@@ -19,11 +19,18 @@ package won.protocol.jms;
 import java.net.URI;
 
 /**
- * User: LEIH-NB
- * Date: 28.11.13
+ * Interface responsible for extracting the ActiveMQ queue name for
+ * connecting to a need via ActiveMQ from the linked data description
+ * of a need or WON node.
  */
-    public interface ActiveMQService extends MessageBrokerService {
+public interface ActiveMQService extends MessageBrokerService {
 
+    /**
+     * Extracts the ActiveMQ queue name for connecting via ActiveMQ to
+     * the need or WON node identified by the specified resourceUri.
+     * @param resourceUri
+     * @return
+     */
     public String getProtocolQueueNameWithResource(URI resourceUri);
 
 
