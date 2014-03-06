@@ -47,6 +47,7 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  */
 public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelConfigurator {
 
+
     private CamelContext camelContext;
 
     @Autowired

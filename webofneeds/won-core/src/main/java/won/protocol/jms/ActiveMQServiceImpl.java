@@ -97,7 +97,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
         } catch (UniformInterfaceException e){
             ClientResponse response = e.getResponse();
             if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
-                logger.warn("BrokerURI not found for node URI:{]", resourceUri);
+                logger.warn("BrokerURI not found for node URI:{}", resourceUri);
                 return null;
             }
             else throw e;

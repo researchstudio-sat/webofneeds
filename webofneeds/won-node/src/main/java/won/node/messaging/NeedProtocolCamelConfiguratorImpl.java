@@ -41,7 +41,6 @@ public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfi
     BiMap<URI,String> brokerComponentMap = HashBiMap.create();
 
 
-
     private String componentName;
     private final String localComponentName = "seda";
     private String vmComponentName;
@@ -77,6 +76,7 @@ public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfi
         ActiveMQComponent activeMQComponent;
         if (camelContext.getComponent(brokerComponentName)==null){
             activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri);
+            logger.info("adding activemqComponent for brokerUri {}",brokerUri);
             camelContext.addComponent(brokerComponentName,activeMQComponent);
         }
         brokerComponentMap.put(brokerUri,brokerComponentName);
@@ -85,7 +85,7 @@ public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfi
     @Override
     public void addRouteForEndpoint(String startingComponent,URI brokerUri) throws CamelConfigurationFailedException {
 
-        if (camelContext.getComponent(startingComponent)==null||camelContext.getRoute(endpointMap.get(brokerUri))==null){
+        if (camelContext.getComponent(startingComponent)==null||camelContext.getRoute(startingComponent)==null){
             NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,startingComponent);
             try {
                 camelContext.addRoutes(needProtocolRouteBuilder);

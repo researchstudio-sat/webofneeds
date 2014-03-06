@@ -145,7 +145,7 @@ public class EventBotActions
             List<URI> toNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(toListName);
 
             for (URI fromUri: fromNeeds){
-                URI toUri = null;
+                URI toUri =null;
                 if (fromListName.equals(toListName)){
                     int i = fromNeeds.indexOf(fromUri);
                     if (i+1<fromNeeds.size()){
@@ -160,10 +160,13 @@ public class EventBotActions
                     }
                 }
                 try {
-                    logger.info("connecting needs {} and {}",fromUri,toUri);
-                    getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createModelForConnect(fromFacet, toFacet));
+                    if (toUri!=null){
+                        logger.info("connecting needs {} and {}",fromUri,toUri);
+                        getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createModelForConnect(fromFacet, toFacet));
+                    }
+
                 } catch (Exception e) {
-                    logger.warn("could not connect {} and {}", new Object[]{fromUri, toUri}, e);
+                    e.printStackTrace();
                 }
             }
 

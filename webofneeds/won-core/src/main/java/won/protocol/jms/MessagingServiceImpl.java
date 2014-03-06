@@ -19,6 +19,7 @@ import java.util.Map;
  * Date: 04.11.13
  */
 public class MessagingServiceImpl<T> implements ApplicationContextAware,MessagingService,CamelContextAware {
+    private static final long DEFAULT_JMS_EXPIRATION_TIME = 0;
     private CamelContext camelContext;
     private ProducerTemplate producerTemplate;
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -33,7 +34,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
      * @param endpoint
      * @return
      */
-    public ListenableFuture sendInOutMessageGeneric(Map properties, Map headers, Object body, String endpoint){
+    public synchronized ListenableFuture sendInOutMessageGeneric(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
         //TODO: the method name shall be set in the header of the message.
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
@@ -43,10 +44,13 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
         }
         if (headers!=null)
             exchange.getIn().setHeaders(headers);
+        exchange.getIn().getHeaders().put("CamelJmsRequestTimeout",DEFAULT_JMS_EXPIRATION_TIME);
+        //exchange.setProperty("JMSExpiration",DEFAULT_JMS_EXPIRATION_TIME);
         exchange.getIn().setBody(body);
+
         exchange.setPattern(ExchangePattern.InOut);
         final SettableFuture<T> result = SettableFuture.create();
-        logger.debug("sending inout message");
+        logger.info("sending inout message");
         producerTemplate.asyncCallback(ep,exchange, new Synchronization() {
             @Override
             public void onComplete(Exchange exchange) {
@@ -92,7 +96,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
 
     }
 
-    public void sendInOnlyMessage(Map properties, Map headers, Object body, String endpoint){
+    public synchronized void sendInOnlyMessage(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
         if (properties!=null){

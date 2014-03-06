@@ -42,9 +42,12 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
   final Logger logger = LoggerFactory.getLogger(getClass());
 
     private MessagingService messagingService;
+    private static final String DEFAULT_ENDPOINT_OPTIONS = "";//"?disableTimeToLive=true";
+
 
     private CamelContext camelContext;
 
+    private String connectStartingEndpoint;
     private String openStartingEndpoint;
     private String closeStartingEndpoint;
     private String textMessageStartingEndpoint;
@@ -56,53 +59,53 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
   @Override
   public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws Exception {
 
+
+
+      //TODO: when shall be the remote won node unregistered?
+      //TODO; shall be checked if the endpoint for the remote won node already exists. configuring remote endpoints for each message is inefficient
+
+      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(otherNeedUri,needUri,connectStartingEndpoint);
+
       Map<String, String> headerMap = new HashMap<>();
-      String endpoint=null;
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("needURI", needUri.toString()) ;
       headerMap.put("otherNeedURI", otherNeedUri.toString());
       headerMap.put("otherConnectionURI", otherConnectionUri.toString()) ;
       headerMap.put("content",RdfUtils.toString(content));
       headerMap.put("methodName","connect");
-
-      Map<String, String> propertyMap = new HashMap<>();
-      //TODO: when shall be the remote won node unregistered?
-      //TODO; shall be checked if the endpoint for the remote won node already exists. configuring remote endpoints for each message is inefficient
-
-      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(otherNeedUri,needUri,connectStartingEndpoint);
-
-      headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
+      headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint()+DEFAULT_ENDPOINT_OPTIONS);
       logger.info("sending connect message to remoteBrokerEndpoint {}",camelConfiguration.getEndpoint());
-      return messagingService.sendInOutMessageGeneric(propertyMap,headerMap,null,connectStartingEndpoint);
+
+      return messagingService.sendInOutMessageGeneric(null,headerMap,null,connectStartingEndpoint);
   }
 
     public void open(final Connection connection, final Model content) throws Exception {
         logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connection));
 
+
+        CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),openStartingEndpoint);
+
         Map headerMap = new HashMap<String, String>();
-        String endpoint = null;
         headerMap.put("protocol","NeedProtocol");
         headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
         headerMap.put("content", RdfUtils.toString(content));
         headerMap.put("methodName","open");
-        CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),openStartingEndpoint);
-
         headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
+
         messagingService.sendInOnlyMessage(null,headerMap,null, openStartingEndpoint );
     }
 
 
   public void close(final Connection connection, final Model content) throws Exception {
       logger.info("need-facing: CLOSE called for connection {}", connection);
+
+      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),closeStartingEndpoint);
+
       Map headerMap = new HashMap<String, String>();
-      String endpoint = null;
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
       headerMap.put("content", RdfUtils.toString(content));
       headerMap.put("methodName","close");
-
-      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),closeStartingEndpoint);
-
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
 
       messagingService.sendInOnlyMessage(null,headerMap,null, closeStartingEndpoint ) ;
@@ -112,18 +115,19 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
   public void textMessage(final Connection connection, final Model message) throws Exception {
       logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
-      Map headerMap = new HashMap<String, String>();
-      String endpoint = null;
       String messageConvert = RdfUtils.toString(message);
-      headerMap.put("protocol","NeedProtocol");
-      headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
-      headerMap.put("content", messageConvert);
-      headerMap.put("methodName","textMessage");
+
 
 
 
       CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),textMessageStartingEndpoint);
       logger.info("retrieved endpoint for connection. Endpoint: {}", camelConfiguration.getEndpoint());
+
+      Map headerMap = new HashMap<String, String>();
+      headerMap.put("protocol","NeedProtocol");
+      headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
+      headerMap.put("content", messageConvert);
+      headerMap.put("methodName","textMessage");
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
       logger.info("NeedProtocolNeedClientImpl: sending text message to remoteBrokerEndpoint: {}",camelConfiguration.getEndpoint());
       messagingService.sendInOnlyMessage(null,headerMap,null, textMessageStartingEndpoint );
@@ -148,7 +152,6 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
         this.connectStartingEndpoint = connectStartingEndpoint;
     }
 
-    private String connectStartingEndpoint;
 
     public void setOpenStartingEndpoint(String openStartingEndpoint) {
         this.openStartingEndpoint = openStartingEndpoint;

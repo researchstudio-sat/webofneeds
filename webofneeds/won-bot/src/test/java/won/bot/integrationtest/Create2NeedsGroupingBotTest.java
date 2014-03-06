@@ -20,10 +20,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import won.bot.framework.events.event.WorkDoneEvent;
@@ -42,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 @ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
 public class Create2NeedsGroupingBotTest
 {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
   private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 2000;
@@ -75,6 +79,7 @@ public class Create2NeedsGroupingBotTest
   @Test
   public void testCreate2NeedsGroupingBot() throws Exception
   {
+    logger.info("starting test case testCreate2NeedsGroupingBot");
     //adding the bot to the bot manager will cause it to be initialized.
     //at that point, the trigger starts.
     botManager.addBot(this.bot);
@@ -85,6 +90,7 @@ public class Create2NeedsGroupingBotTest
     this.bot.getBarrier().await();
     //now check the results!
     this.bot.executeAsserts();
+    logger.info("finishing test case testCreate2NeedsGroupingBot");
   }
 
 

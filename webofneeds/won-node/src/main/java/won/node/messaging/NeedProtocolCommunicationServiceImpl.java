@@ -16,6 +16,9 @@
 
 package won.node.messaging;
 
+import org.apache.activemq.camel.component.ActiveMQComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.*;
@@ -35,8 +38,9 @@ public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommuni
     @Autowired
     private ActiveMQService activeMQService;
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public CamelConfiguration configureCamelEndpoint(URI needUri,URI otherNeedUri,String startingEndpoint) throws Exception {
+    public synchronized CamelConfiguration configureCamelEndpoint(URI needUri,URI otherNeedUri,String startingEndpoint) throws Exception {
         String needProtocolQueueName;
         CamelConfiguration camelConfiguration = new CamelConfiguration();
 
@@ -50,18 +54,20 @@ public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommuni
         } else{
             URI resourceUri;
             URI brokerUri;
-            if (needUri!=otherNeedUri){
-                resourceUri = otherNeedUri;
-                brokerUri = otherNeedBrokerUri;
-            }
-            else{
+            if (needBrokerUri.equals(otherNeedBrokerUri)){
                 resourceUri = needUri;
                 brokerUri = needBrokerUri;
+            } else {
+                resourceUri = otherNeedUri;
+                brokerUri = otherNeedBrokerUri;
             }
             needProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
             camelConfiguration.setEndpoint(needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(brokerUri,needProtocolQueueName));
             needProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,brokerUri);
             camelConfiguration.setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
+            ActiveMQComponent activeMQComponent = (ActiveMQComponent)needProtocolCamelConfigurator.getCamelContext().getComponent(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
+            logger.info("ActiveMQ Service Status : {}",activeMQComponent.getStatus().toString());
+            activeMQComponent.start();
         }
         return camelConfiguration;
     }

@@ -50,6 +50,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private boolean onApplicationRun = false;
     //private CamelContext camelContext;
+    private static final String DEFAULT_ENDPOINT_OPTIONS = "";// "?disableTimeToLive=true";
     private MessagingService messagingService;
     private URI defaultNodeURI;
     private ApplicationContext ownerApplicationContext;
@@ -99,9 +100,9 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
 
     @Override
     public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws Exception {
+        logger.debug("OwnerProtocol: sending connect for need {} and other need {} call to node", needURI, otherNeedURI);
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithNeedUri(needURI);
-
         CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
 
         Map<String, Object> headerMap = new HashMap<>();
@@ -109,7 +110,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("otherNeedURI", otherNeedURI.toString());
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","connect");
-        headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
+        headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint()+DEFAULT_ENDPOINT_OPTIONS);
 
         return messagingService.sendInOutMessageGeneric(null,headerMap,null,startingEndpoint);
     }
@@ -291,7 +292,6 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         }
         else{
             //todo refactor with register()
-            //camelContext.getComponent()
             ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
         }
         Map<String, Object> headerMap = new HashMap<>();

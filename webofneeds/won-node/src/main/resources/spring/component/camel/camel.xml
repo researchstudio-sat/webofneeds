@@ -34,7 +34,7 @@
         <property name="sessionCacheSize" value="10"></property>
     </bean>
 
-    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker">
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker" >
         <!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
         <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
@@ -49,11 +49,11 @@
     </bean>
     <bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
 
-    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent" >
         <!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
-        <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/-->
-        <!--property name="connectionFactory" ref="cachedConnectionFactory"/-->
+        <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+        <property name="connectionFactory" ref="cachedConnectionFactory"/>
     </bean>
     <bean id="needProtocolCommunicationService" class="won.node.messaging.NeedProtocolCommunicationServiceImpl">
 
