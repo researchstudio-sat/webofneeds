@@ -42,8 +42,6 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
   final Logger logger = LoggerFactory.getLogger(getClass());
 
     private MessagingService messagingService;
-    private static final String DEFAULT_ENDPOINT_OPTIONS = "";//"?disableTimeToLive=true";
-
 
     private CamelContext camelContext;
 
@@ -73,7 +71,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       headerMap.put("otherConnectionURI", otherConnectionUri.toString()) ;
       headerMap.put("content",RdfUtils.toString(content));
       headerMap.put("methodName","connect");
-      headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint()+DEFAULT_ENDPOINT_OPTIONS);
+      headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
       logger.info("sending connect message to remoteBrokerEndpoint {}",camelConfiguration.getEndpoint());
 
       return messagingService.sendInOutMessageGeneric(null,headerMap,null,connectStartingEndpoint);

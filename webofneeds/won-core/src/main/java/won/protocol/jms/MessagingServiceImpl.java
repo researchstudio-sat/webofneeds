@@ -44,7 +44,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
         }
         if (headers!=null)
             exchange.getIn().setHeaders(headers);
-        exchange.getIn().getHeaders().put("CamelJmsRequestTimeout",DEFAULT_JMS_EXPIRATION_TIME);
+        //exchange.getIn().getHeaders().put("CamelJmsRequestTimeout",DEFAULT_JMS_EXPIRATION_TIME);
         //exchange.setProperty("JMSExpiration",DEFAULT_JMS_EXPIRATION_TIME);
         exchange.getIn().setBody(body);
 
