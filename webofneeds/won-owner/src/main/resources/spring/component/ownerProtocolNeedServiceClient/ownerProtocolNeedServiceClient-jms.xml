@@ -36,10 +36,6 @@
         <property name="defaultNodeURI" value="${uri.prefix.node.default}"/>
     </bean>
 
-    <bean id="activeMQServiceFactory" class="won.owner.messaging.ActiveMQServiceFactory"></bean>
-
-    <bean id="activeMQService2" class="won.owner.messaging.ActiveMQServiceImplRefactoring">
-    </bean>
     <bean id="activeMQService" class="won.protocol.jms.ActiveMQServiceImpl">
         <constructor-arg name="type" value="OwnerProtocol"/>
     </bean>
