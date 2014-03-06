@@ -17,6 +17,6 @@ public class BAAtomicOutcomeFacetImpl extends Facet {
 
     @Override
     public FacetType getFacetType() {
-        return FacetType.BAAtomicOutcome;  //To change body of implemented methods use File | Settings | File Templates.
+        return FacetType.BAAtomicOutcomeFacet;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }
