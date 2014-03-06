@@ -115,9 +115,6 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
       String messageConvert = RdfUtils.toString(message);
 
-
-
-
       CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),textMessageStartingEndpoint);
       logger.info("retrieved endpoint for connection. Endpoint: {}", camelConfiguration.getEndpoint());
 

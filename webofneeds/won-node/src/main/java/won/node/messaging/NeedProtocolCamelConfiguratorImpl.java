@@ -29,30 +29,29 @@ import won.protocol.jms.BrokerComponentFactory;
 import won.protocol.jms.NeedProtocolCamelConfigurator;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: LEIH-NB
  * Date: 26.02.14
  */
 public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfigurator {
-    //Map<List<> List<URI>> endpointNeedMap;
-    BiMap<URI, String> endpointMap = HashBiMap.create();
-    BiMap<URI,String> brokerComponentMap = HashBiMap.create();
 
-
+    private BiMap<URI, String> endpointMap = HashBiMap.create();
+    private BiMap<URI,String> brokerComponentMap = HashBiMap.create();
     private String componentName;
     private final String localComponentName = "seda";
     private String vmComponentName;
     private CamelContext camelContext;
-
 
     @Autowired
     private BrokerComponentFactory brokerComponentFactory;
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName){
+    public synchronized String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName){
         String brokerComponentName = setupBrokerComponentName(brokerUri);
         addCamelComponentForWonNodeBroker(brokerUri, brokerComponentName);
         String endpoint = brokerComponentName+":queue:"+needProtocolQueueName;
@@ -62,7 +61,7 @@ public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfi
     }
 
     @Override
-    public String setupBrokerComponentName(URI brokerUri){
+    public synchronized String setupBrokerComponentName(URI brokerUri){
             return this.componentName+brokerUri.toString().replaceAll("[/:]","");
     }
     /**
@@ -71,7 +70,7 @@ public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfi
      * @return componentName
      */
     @Override
-    public void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName){
+    public synchronized void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName){
 
         ActiveMQComponent activeMQComponent;
         if (camelContext.getComponent(brokerComponentName)==null){
@@ -83,7 +82,7 @@ public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfi
     }
 
     @Override
-    public void addRouteForEndpoint(String startingComponent,URI brokerUri) throws CamelConfigurationFailedException {
+    public synchronized void addRouteForEndpoint(String startingComponent,URI brokerUri) throws CamelConfigurationFailedException {
 
         if (camelContext.getComponent(startingComponent)==null||camelContext.getRoute(startingComponent)==null){
             NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,startingComponent);
