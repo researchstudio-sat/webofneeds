@@ -19,6 +19,7 @@ import java.util.Map;
  * Date: 04.11.13
  */
 public class MessagingServiceImpl<T> implements ApplicationContextAware,MessagingService,CamelContextAware {
+    private static final long DEFAULT_JMS_EXPIRATION_TIME = 0;
     private CamelContext camelContext;
     private ProducerTemplate producerTemplate;
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -33,7 +34,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
      * @param endpoint
      * @return
      */
-    public ListenableFuture sendInOutMessageGeneric(Map properties, Map headers, Object body, String endpoint){
+    public synchronized ListenableFuture sendInOutMessageGeneric(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
         //TODO: the method name shall be set in the header of the message.
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
@@ -43,10 +44,13 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
         }
         if (headers!=null)
             exchange.getIn().setHeaders(headers);
+        //exchange.getIn().getHeaders().put("CamelJmsRequestTimeout",DEFAULT_JMS_EXPIRATION_TIME);
+        //exchange.setProperty("JMSExpiration",DEFAULT_JMS_EXPIRATION_TIME);
         exchange.getIn().setBody(body);
+
         exchange.setPattern(ExchangePattern.InOut);
         final SettableFuture<T> result = SettableFuture.create();
-        logger.debug("sending inout message");
+        logger.info("sending inout message");
         producerTemplate.asyncCallback(ep,exchange, new Synchronization() {
             @Override
             public void onComplete(Exchange exchange) {
@@ -59,10 +63,6 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
                 result.cancel(true);
             }
         });
-
-
-
-
         return result;
     }
 
@@ -71,33 +71,32 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
         inspectProperties(exchange);
         inspectHeaders(exchange);
         if(exchange.getIn().getBody()!=null)
-        logger.debug(exchange.getIn().getBody().toString());
+        logger.info(exchange.getIn().getBody().toString());
     }
     public void inspectProperties(Exchange exchange){
         Map properties = (Map) exchange.getProperties();
         Iterator iter =  properties.entrySet().iterator();
-        logger.debug("WIRETAP: properties size: "+properties.size());
+        logger.info("WIRETAP: properties size: "+properties.size());
         while(iter.hasNext()){
             Map.Entry pairs = (Map.Entry)iter.next();
-            logger.debug("key: "+pairs.getKey()+" value: "+pairs.getValue());
+            logger.info("key: "+pairs.getKey()+" value: "+pairs.getValue());
         }
 
     }
-
 
     public void inspectHeaders(Exchange exchange){
         Map headers = (Map) exchange.getIn().getHeaders();
         Iterator iter =  headers.entrySet().iterator();
-        logger.debug("WIRETAP: headers size: "+headers.size());
+        logger.info("WIRETAP: headers size: "+headers.size());
         while(iter.hasNext()){
             Map.Entry pairs = (Map.Entry)iter.next();
             if(pairs.getValue()!=null)
-                logger.debug("key: "+pairs.getKey()+" value: "+pairs.getValue());
+                logger.info("key: "+pairs.getKey()+" value: "+pairs.getValue());
         }
 
     }
 
-    public void sendInOnlyMessage(Map properties, Map headers, Object body, String endpoint){
+    public synchronized void sendInOnlyMessage(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
         if (properties!=null){

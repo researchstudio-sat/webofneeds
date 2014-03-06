@@ -50,21 +50,14 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
         logger.info(ownerApplications.get(0).getOwnerApplicationId());
         List<String> queueNames = convertToQueueName(ownerApplications,methodName);
         exchange.getIn().setHeader("ownerApplicationIDs",queueNames);
-
-
-
     }
     private List<String> convertToQueueName(List<OwnerApplication> ownerApplications,String methodName){
         List<String> ownerApplicationQueueNames = new ArrayList<>();
 
         for (int i =0;i<ownerApplications.size();i++){
-             logger.info("i: "+i);
-             logger.info("methodName: "+methodName);
-
              OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplications.get(i).getOwnerApplicationId()).get(i);
-
-            logger.info(queueManagementService.getEndpointsForOwnerApplication(ownerApplication.getOwnerApplicationId()).get(0));
-             logger.info("ownerApplicationID: "+ownerApplications.get(i).getOwnerApplicationId());
+             logger.debug(queueManagementService.getEndpointsForOwnerApplication(ownerApplication.getOwnerApplicationId()).get(0));
+             logger.debug("ownerApplicationID: "+ownerApplications.get(i).getOwnerApplicationId());
              ownerApplicationQueueNames.add(i, queueManagementService.getEndpointForMessage(methodName,ownerApplication.getOwnerApplicationId()));
 
         }

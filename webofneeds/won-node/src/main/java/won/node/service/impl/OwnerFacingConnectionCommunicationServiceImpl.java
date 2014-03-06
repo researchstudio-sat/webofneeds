@@ -49,8 +49,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   private URIService URIService;
 
   @Override
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.info("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
@@ -64,8 +63,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   }
 
   @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.info("CLOSE received from the owner side for connection {} with content {}", connectionURI, content);
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
@@ -78,7 +76,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     reg.get(con).closeFromOwner(con, content);
   }
   @Override
-    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException{
+    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         Resource baseRes = message.getResource(message.getNsPrefixURI(""));

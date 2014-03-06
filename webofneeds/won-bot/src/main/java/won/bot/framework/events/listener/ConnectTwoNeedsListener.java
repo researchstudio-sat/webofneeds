@@ -43,8 +43,7 @@ public class ConnectTwoNeedsListener extends BaseEventListener
   }
 
   @Override
-  public void doOnEvent(final Event event) throws Exception
-  {
+  public void doOnEvent(final Event event) throws Exception {
 
       URI facet = getEventListenerContext().getBotContext().getNeedByName(FacetType.getFacetType(remoteFacet).name());
       List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();

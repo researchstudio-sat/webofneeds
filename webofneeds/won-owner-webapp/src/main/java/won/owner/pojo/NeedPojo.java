@@ -67,7 +67,7 @@ public class NeedPojo
 
   }
 
-  public NeedPojo(List<Facet> facets) {
+  public NeedPojo(List<Facet> facets)  {
     needFacetURIs = new String[facets.size()];
     int i = 0;
 

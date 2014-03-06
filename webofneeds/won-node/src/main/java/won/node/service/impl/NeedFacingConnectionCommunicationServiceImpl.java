@@ -67,8 +67,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   private NeedRepository needRepository;
 
   @Override
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.info("OPEN received from the need side for connection {0} with content {1}", connectionURI, content);
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_OPEN);
@@ -82,8 +81,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   }
 
   @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.info("CLOSE received from the need side for connection {} with content {}", connectionURI, content);
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
 
@@ -95,8 +93,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     reg.get(con).closeFromNeed(con, content);
   }
     @Override
-    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
+    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //check for facet types:
@@ -120,21 +117,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
             reg.get(con).textMessageFromNeed(con, message);
 
         }
-    /*    else if(con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()))
-        {
-            Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-            StmtIterator stmtIterator = baseRes.listProperties(WON_BA.COORDINATION_MESSAGE);
-            String coordinationMessage = stmtIterator.next().getObject().toString();
-            dataService.saveChatMessage(con,coordinationMessage);
-            //create ConnectionEvent in Database
-            ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.OWNER_OPEN);
 
-            //create rdf content for the ConnectionEvent and save it to disk
-            dataService.saveAdditionalContentForEvent(message, con, event, null);
-
-            //invoke facet implementation
-            reg.get(con).textMessageFromNeed(con, message);
-        } */
         else
         {
             Resource baseRes = message.getResource(message.getNsPrefixURI(""));

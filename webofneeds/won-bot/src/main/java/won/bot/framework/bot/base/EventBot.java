@@ -173,7 +173,9 @@ public class EventBot extends TriggeredBot
   {
 
     public TaskScheduler getTaskScheduler() {
-      return EventBot.this.getTaskScheduler();
+
+        return EventBot.this.getTaskScheduler();
+
     }
 
     public NodeURISource getNodeURISource()

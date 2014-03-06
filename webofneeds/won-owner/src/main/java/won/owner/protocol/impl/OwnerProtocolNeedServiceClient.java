@@ -19,8 +19,6 @@ import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
-import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
-import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import java.net.URI;
 import java.text.MessageFormat;
@@ -29,9 +27,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Implementation of the OwnerProtocolNeedService to be used on the owner side. It contains the
+ * Implementation of the ownerProtocolNeedService to be used on the owner side. It contains the
  * required business logic to store state and delegates calls to an injected linked data
- * client and to an injected OwnerProtocolNeedService implementation.
+ * client and to an injected ownerProtocolNeedService implementation.
  * <p/>
  * User: Gabriel
  * Date: 03.12.12
@@ -68,7 +66,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     private OwnerProtocolNeedServiceClientSide delegate;
 
     @Override
-    public void activate(URI needURI) throws NoSuchNeedException {
+    public void activate(URI needURI) throws Exception {
         logger.debug("need-facing: ACTIVATE called for need {}", needURI);
         List<Need> needs = needRepository.findByNeedURI(needURI);
         if (needs.size() != 1)
@@ -94,15 +92,13 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
+    public void open(URI connectionURI, Model content) throws Exception {
         if (logger.isDebugEnabled()) {
           logger.debug(MessageFormat.format("need-facing: OPEN called for connection {0} with model {1}", connectionURI, StringUtils.abbreviate(RdfUtils.toString(content),200)));
         }
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
         if (cons.size() != 1)
             throw new NoSuchConnectionException(connectionURI);
-
 
         delegate.open(connectionURI, content);
 
@@ -129,8 +125,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
     @Override
     public void textMessage(final URI connectionURI, final Model message)
-            throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-    {
+            throws Exception {
         logger.debug("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
 
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
@@ -182,14 +177,14 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
-    public ListenableFuture<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeURI) throws Exception {
+    public synchronized ListenableFuture<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeUri) throws Exception {
         if (logger.isDebugEnabled()) {
           logger.debug("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
                 new Object[]{ownerURI, StringUtils.abbreviate(RdfUtils.toString(content),200), activate});
         }
 
 
-        final ListenableFuture<URI> uri = delegate.createNeed(ownerURI, content, activate, wonNodeURI);
+        final ListenableFuture<URI> uri = delegate.createNeed(ownerURI, content, activate, wonNodeUri);
         new Thread(
                 new Runnable() {
                     @Override
@@ -202,8 +197,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                             need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
                             need.setOwnerURI(ownerURI);
 
-                            if (wonNodeURI==null) need.setWonNodeURI(URI.create(wonNodeDefault));
-                            else need.setWonNodeURI(wonNodeURI);
+                            if (wonNodeUri ==null) need.setWonNodeURI(URI.create(wonNodeDefault));
+                            else need.setWonNodeURI(wonNodeUri);
                             needRepository.saveAndFlush(need);
                             needRepository.findByNeedURI(need.getNeedURI());
                             logger.debug("saving URI", need.getNeedURI().toString());

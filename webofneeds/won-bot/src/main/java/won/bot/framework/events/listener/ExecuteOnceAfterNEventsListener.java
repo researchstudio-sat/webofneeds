@@ -17,6 +17,7 @@
 package won.bot.framework.events.listener;
 
 import won.bot.framework.events.Event;
+import won.bot.framework.events.event.NeedCreatedEvent;
 
 /**
  * Counts how often it is called, offers to call a callback when a certain number is reached.
@@ -39,7 +40,10 @@ public class ExecuteOnceAfterNEventsListener extends BaseEventListener
   @Override
   public void doOnEvent(final Event event) throws Exception
   {
-    if (executed) return;
+    if (executed){
+        getEventListenerContext().getEventBus().unsubscribe(NeedCreatedEvent.class,this);
+        return;
+    }
     synchronized (monitor){
       count++;
       logger.debug("processing event {} of {}", count, targetCount);
@@ -50,4 +54,5 @@ public class ExecuteOnceAfterNEventsListener extends BaseEventListener
       }
     }
   }
+
 }

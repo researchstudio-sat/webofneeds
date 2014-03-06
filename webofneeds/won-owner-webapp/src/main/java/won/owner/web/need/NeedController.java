@@ -257,9 +257,11 @@ public class NeedController
     model.addAttribute("active", need.getState() != NeedState.ACTIVE ? "activate" : "deactivate");
     model.addAttribute("needURI", need.getNeedURI());
     List<Facet> facets = facetRepository.findByNeedURI(need.getNeedURI());
-    model.addAttribute("command", new NeedPojo(facets));
 
-    LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
+          model.addAttribute("command", new NeedPojo(facets));
+
+
+      LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
     NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
     pojo.setState(need.getState());
 
@@ -329,9 +331,13 @@ public class NeedController
     } catch (ExecutionException e) {
         logger.warn("caught ExcutionException", e);
     } catch (CamelConfigurationFailedException e) {
+
+        logger.warn("caught CameConfigurationException", e);  //To change body of catch statement use File | Settings | File Templates.
+
         logger.warn("caught CamelConfigurationFailedException",e);
     } catch (Exception e) {
         logger.warn("caught Exception",e);
+
     }
 
       return "noNeedFound";
@@ -383,6 +389,7 @@ public class NeedController
     } catch (ExecutionException e) {
       logger.warn("caught ExecutionException",e);
     } catch (CamelConfigurationFailedException e) {
+        logger.warn("caught CamelConfigurationException", e); //To change body of catch statement use File | Settings | File Templates.
       logger.warn("caught CamelConfigurationFailedException");
     } catch (Exception e) {
         logger.warn("caught Exception",e);

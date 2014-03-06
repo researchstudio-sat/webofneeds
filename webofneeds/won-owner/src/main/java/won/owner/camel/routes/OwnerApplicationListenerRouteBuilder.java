@@ -41,23 +41,23 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
 
     @Override
     public void configure() throws Exception {
-       for (int i = 0; i<endpoints.size();i++){
-           from(endpoints.get(i)+"?concurrentConsumers=5")
-           .wireTap("bean:messagingService?method=inspectMessage")
-           .choice()
-                .when(header("methodName").isEqualTo("connect"))
-                .to("log:OWNER CONNECT RECEIVED")
-                .to("bean:ownerProtocolOwnerServiceJMSBased?method=connect")
-                .when(header("methodName").isEqualTo("hint"))
-                .to("bean:ownerProtocolOwnerServiceJMSBased?method=hint")
-                .when(header("methodName").isEqualTo("textMessage"))
-                .to("bean:ownerProtocolOwnerServiceJMSBased?method=textMessage")
-                .when(header("methodName").isEqualTo("open"))
-                .to("bean:ownerProtocolOwnerServiceJMSBased?method=open")
-                .when(header("methodName").isEqualTo("close"))
-                .to("bean:ownerProtocolOwnerServiceJMSBased?method=close")
-                .otherwise()
-                .to("log:Message Type Not Supported");
+               for (int i = 0; i<endpoints.size();i++){
+                   from(endpoints.get(i)+"?concurrentConsumers=5")
+                           .wireTap("bean:messagingService?method=inspectMessage")
+                           .choice()
+                           .when(header("methodName").isEqualTo("connect"))
+                           .to("log:OWNER CONNECT RECEIVED")
+                           .to("bean:ownerProtocolOwnerServiceJMSBased?method=connect")
+                           .when(header("methodName").isEqualTo("hint"))
+                           .to("bean:ownerProtocolOwnerServiceJMSBased?method=hint")
+                           .when(header("methodName").isEqualTo("textMessage"))
+                           .to("bean:ownerProtocolOwnerServiceJMSBased?method=textMessage")
+                           .when(header("methodName").isEqualTo("open"))
+                           .to("bean:ownerProtocolOwnerServiceJMSBased?method=open")
+                           .when(header("methodName").isEqualTo("close"))
+                           .to("bean:ownerProtocolOwnerServiceJMSBased?method=close")
+                           .otherwise()
+                           .to("log:Message Type Not Supported");
        }
     }
 

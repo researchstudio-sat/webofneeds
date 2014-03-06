@@ -16,10 +16,7 @@
 
 package won.protocol.service;
 import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.IllegalNeedContentException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.*;
 
 import java.net.URI;
 

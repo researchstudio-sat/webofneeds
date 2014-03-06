@@ -48,8 +48,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     }
 
     @WebMethod
-    public void textMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "content") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
-    {
+    public void textMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "content") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         wireDependenciesLazily();
       try {
         Model messageConvert = RdfUtils.toModel(message);
@@ -97,8 +96,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     }
 
     @WebMethod
-    public URI connect(@WebParam(name = "needURI") final URI needURI, @WebParam(name = "otherNeedURI") final URI otherNeedURI, @WebParam(name = "content") final String content) throws NoSuchNeedFault, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault
-    {
+    public URI connect(@WebParam(name = "needURI") final URI needURI, @WebParam(name = "otherNeedURI") final URI otherNeedURI, @WebParam(name = "content") final String content) throws NoSuchNeedFault, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault {
         wireDependenciesLazily();
       try {
         return ownerProtocolNeedService.connect(needURI, otherNeedURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));

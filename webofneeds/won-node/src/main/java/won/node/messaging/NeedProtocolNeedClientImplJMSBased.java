@@ -1,17 +1,17 @@
 /*
  * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package won.node.messaging;
@@ -23,13 +23,9 @@ import org.apache.camel.CamelContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.protocol.impl.NeedProtocolNeedClientFactory;
-import won.protocol.exception.*;
-import won.protocol.jms.MessagingService;
-import won.protocol.jms.NeedProtocolActiveMQService;
+import won.protocol.jms.*;
 import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
-import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
@@ -49,117 +45,90 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
     private CamelContext camelContext;
 
-    @Autowired
-    private ConnectionRepository connectionRepository;
+    private String connectStartingEndpoint;
+    private String openStartingEndpoint;
+    private String closeStartingEndpoint;
+    private String textMessageStartingEndpoint;
 
     @Autowired
-    private NeedProtocolNeedClientFactory clientFactory;
-    private NeedProtocolActiveMQService needProtocolActiveMQService;
+    private NeedProtocolCommunicationService protocolCommunicationService;
 
     //TODO: debugging needed. when a established connection is closed then reconnected, both connections are in state "request sent"
   @Override
-  public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
-  {
-      Map<String, String> headerMap = new HashMap<>();
-      String endpoint=null;
-      headerMap.put("protocol","NeedProtocol");
-      headerMap.put("needURI", needURI.toString()) ;
-      headerMap.put("otherNeedURI", otherNeedURI.toString());
-      headerMap.put("otherConnectionURI", otherConnectionURI.toString()) ;
-      headerMap.put("content",RdfUtils.toString(content));
-      headerMap.put("methodName","connect");
+  public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws Exception {
 
-      Map<String, String> propertyMap = new HashMap<>();
+
+
       //TODO: when shall be the remote won node unregistered?
       //TODO; shall be checked if the endpoint for the remote won node already exists. configuring remote endpoints for each message is inefficient
-      try {
-           endpoint = needProtocolActiveMQService.getCamelEndpointForNeed(otherNeedURI, needURI, "seda:NeedProtocol.out.connect");
 
-      } catch (Exception e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-      }
+      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(otherNeedUri,needUri,connectStartingEndpoint);
 
-      headerMap.put("remoteBrokerEndpoint", endpoint);
-      logger.info("sending connect message to remoteBrokerEndpoint {}",endpoint);
-      return messagingService.sendInOutMessageGeneric(propertyMap,headerMap,null,"seda:NeedProtocol.out.connect");
+      Map<String, String> headerMap = new HashMap<>();
+      headerMap.put("protocol","NeedProtocol");
+      headerMap.put("needURI", needUri.toString()) ;
+      headerMap.put("otherNeedURI", otherNeedUri.toString());
+      headerMap.put("otherConnectionURI", otherConnectionUri.toString()) ;
+      headerMap.put("content",RdfUtils.toString(content));
+      headerMap.put("methodName","connect");
+      headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
+      logger.info("sending connect message to remoteBrokerEndpoint {}",camelConfiguration.getEndpoint());
 
-
-
+      return messagingService.sendInOutMessageGeneric(null,headerMap,null,connectStartingEndpoint);
   }
 
-    public void open(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(final Connection connection, final Model content) throws Exception {
         logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connection));
 
-       // Connection con = DataAccessUtils.loadConnection(connectionRepository, connection);
+
+        CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),openStartingEndpoint);
+
         Map headerMap = new HashMap<String, String>();
-        String endpoint = null;
         headerMap.put("protocol","NeedProtocol");
-        //remoteConnectionURI is the connectionURI on the other node.
         headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
         headerMap.put("content", RdfUtils.toString(content));
         headerMap.put("methodName","open");
+        headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
 
-
-        try {
-
-            endpoint = needProtocolActiveMQService.getCamelEndpointForConnection(connection.getConnectionURI(), "seda:NeedProtocol.out.open");
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-        headerMap.put("remoteBrokerEndpoint", endpoint);
-        messagingService.sendInOnlyMessage(null,headerMap,null, "seda:NeedProtocol.out.open" );
+        messagingService.sendInOnlyMessage(null,headerMap,null, openStartingEndpoint );
     }
 
 
-  public void close(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void close(final Connection connection, final Model content) throws Exception {
       logger.info("need-facing: CLOSE called for connection {}", connection);
-      //Connection con = DataAccessUtils.loadConnection(connectionRepository, connection);
+
+      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),closeStartingEndpoint);
+
       Map headerMap = new HashMap<String, String>();
-      String endpoint = null;
       headerMap.put("protocol","NeedProtocol");
-      //remoteConnectionURI is the connectionURI on the other node.
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
       headerMap.put("content", RdfUtils.toString(content));
       headerMap.put("methodName","close");
+      headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
 
-      try {
-
-          endpoint = needProtocolActiveMQService.getCamelEndpointForConnection(connection.getConnectionURI(), "seda:NeedProtocol.out.close");
-      } catch (Exception e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-      }
-      headerMap.put("remoteBrokerEndpoint", endpoint);
-
-      messagingService.sendInOnlyMessage(null,headerMap,null, "seda:NeedProtocol.out.close" ) ;
+      messagingService.sendInOnlyMessage(null,headerMap,null, closeStartingEndpoint ) ;
 
   }
 
 
-  public void textMessage(final Connection connection, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void textMessage(final Connection connection, final Model message) throws Exception {
       logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
-      //Connection con = DataAccessUtils.loadConnection(connectionRepository, connection);
-      Map headerMap = new HashMap<String, String>();
-      String endpoint = null;
       String messageConvert = RdfUtils.toString(message);
+
+
+
+
+      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),textMessageStartingEndpoint);
+      logger.info("retrieved endpoint for connection. Endpoint: {}", camelConfiguration.getEndpoint());
+
+      Map headerMap = new HashMap<String, String>();
       headerMap.put("protocol","NeedProtocol");
-      //remoteConnectionURI is the connectionURI on the other node.
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
       headerMap.put("content", messageConvert);
       headerMap.put("methodName","textMessage");
-
-      try {
-
-          endpoint = needProtocolActiveMQService.getCamelEndpointForConnection(connection.getConnectionURI(), "seda:NeedProtocol.out.textMessage");
-          logger.info("retrieved endpoint for connection. Endpoint: {}", endpoint);
-      } catch (Exception e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-      }
-      headerMap.put("remoteBrokerEndpoint", endpoint);
-      logger.info("NeedProtocolNeedClientImpl: sending text message to remoteBrokerEndpoint: {}",endpoint);
-      messagingService.sendInOnlyMessage(null,headerMap,null, "seda:NeedProtocol.out.textMessage" );
+      headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
+      logger.info("NeedProtocolNeedClientImpl: sending text message to remoteBrokerEndpoint: {}",camelConfiguration.getEndpoint());
+      messagingService.sendInOnlyMessage(null,headerMap,null, textMessageStartingEndpoint );
 
   }
 
@@ -169,16 +138,29 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
     }
 
 
-public CamelContext getCamelContext() {
+    public CamelContext getCamelContext() {
         return camelContext;
-}
+    }
 
-public void setCamelContext(CamelContext camelContext) {
+    public void setCamelContext(CamelContext camelContext) {
         this.camelContext = camelContext;
-}
+    }
 
-public void setNeedProtocolActiveMQService(NeedProtocolActiveMQService needProtocolActiveMQService) {
-        this.needProtocolActiveMQService = needProtocolActiveMQService;
-}
+    public void setConnectStartingEndpoint(String connectStartingEndpoint) {
+        this.connectStartingEndpoint = connectStartingEndpoint;
+    }
 
-        }
+
+    public void setOpenStartingEndpoint(String openStartingEndpoint) {
+        this.openStartingEndpoint = openStartingEndpoint;
+    }
+
+    public void setCloseStartingEndpoint(String closeStartingEndpoint) {
+        this.closeStartingEndpoint = closeStartingEndpoint;
+    }
+
+    public void setTextMessageStartingEndpoint(String textMessageStartingEndpoint) {
+        this.textMessageStartingEndpoint = textMessageStartingEndpoint;
+    }
+
+}

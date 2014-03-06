@@ -116,9 +116,9 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
     //@Override
-    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeURI) throws IllegalNeedContentException {
+    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeUri) throws IllegalNeedContentException {
         try {
-            OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(wonNodeURI);
+            OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(wonNodeUri);
             content.setNsPrefix("",ownerURI.toString());
             String modelAsString = RdfUtils.toString(content);
             URI result = proxy.createNeed(ownerURI, modelAsString , activate);

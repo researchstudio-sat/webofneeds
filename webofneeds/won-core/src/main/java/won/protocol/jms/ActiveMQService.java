@@ -15,17 +15,23 @@
  */
 
 package won.protocol.jms;
-import org.apache.camel.builder.RouteBuilder;
+
 import java.net.URI;
 
 /**
- * User: LEIH-NB
- * Date: 26.11.13
+ * Interface responsible for extracting the ActiveMQ queue name for
+ * connecting to a need via ActiveMQ from the linked data description
+ * of a need or WON node.
  */
-public interface ActiveMQService {
+public interface ActiveMQService extends MessageBrokerService {
 
-    public URI getActiveMQBrokerURIForNode(URI needURI);
-    public void addRoutes(RouteBuilder route) throws Exception;
+    /**
+     * Extracts the ActiveMQ queue name for connecting via ActiveMQ to
+     * the need or WON node identified by the specified resourceUri.
+     * @param resourceUri
+     * @return
+     */
+    public String getProtocolQueueNameWithResource(URI resourceUri);
+
 
 }
-

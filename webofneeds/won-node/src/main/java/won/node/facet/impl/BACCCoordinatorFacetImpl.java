@@ -110,6 +110,8 @@ public class BACCCoordinatorFacetImpl extends Facet {
                     }
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
+                } catch (Exception e) {
+                    logger.debug("caught Exception", e);
                 }
             }
         });
@@ -174,6 +176,8 @@ public class BACCCoordinatorFacetImpl extends Facet {
                     }
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
+                } catch (Exception e) {
+                    logger.debug("caught Exception",e);
                 }
 
             }

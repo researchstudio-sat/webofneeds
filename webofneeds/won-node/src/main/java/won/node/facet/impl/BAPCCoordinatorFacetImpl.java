@@ -55,7 +55,7 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     ownerFacingConnectionClient.open(con.getConnectionURI(), content);
 
                     stateManager.setStateForNeedUri(BAPCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
-                    logger.info("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                    logger.info("Coordinator state: " + stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
                 } catch (WonProtocolException e) {
                     logger.debug("caught Exception:", e);
                 }
@@ -122,6 +122,8 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     }
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
+                } catch (Exception e) {
+                    logger.warn("caught Exception;",e);
                 }
             }
         });
@@ -189,6 +191,8 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     }
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
+                } catch (Exception e) {
+                    logger.warn("caught Exception; ",e);
                 }
 
             }

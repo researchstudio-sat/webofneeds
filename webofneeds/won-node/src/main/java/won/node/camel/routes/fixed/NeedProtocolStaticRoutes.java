@@ -39,6 +39,7 @@ public class NeedProtocolStaticRoutes extends RouteBuilder {
                 .to("log:NeedProtocolRoutes TextMessage Incoming")
                 .to("bean:needProtocolNeedServiceJMSBased?method=textMessage")
                 .otherwise()
-                .to("log:Not supported");
+                .wireTap("bean:messagingService?method=inspectMessage")
+                .to("activemq:queue:ActiveMQ.NeedProtocol.In.DLQ");
     }
 }

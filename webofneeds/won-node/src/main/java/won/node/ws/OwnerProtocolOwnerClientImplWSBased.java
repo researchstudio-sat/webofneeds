@@ -90,8 +90,7 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
       }
     }
     @Override
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.info(MessageFormat.format("owner-facing: Open called for connection {0}", connectionURI));
 
     logger.info(MessageFormat.format("owner-facing: OPEN called for connection {0}", connectionURI));
@@ -111,8 +110,7 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
 
 
   @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}", connectionURI));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
@@ -129,8 +127,7 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
   }
 
   @Override
-  public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
+  public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.info(MessageFormat.format("owner-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);

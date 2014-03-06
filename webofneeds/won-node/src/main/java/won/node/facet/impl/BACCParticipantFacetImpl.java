@@ -50,6 +50,8 @@ public class BACCParticipantFacetImpl extends Facet{
                         logger.info("Participant state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
                     } catch (WonProtocolException e) {
                         logger.debug("caught Exception:", e);
+                    } catch (Exception e) {
+                        logger.debug("caught Exception:",e);
                     }
                 }
             });
@@ -115,6 +117,8 @@ public class BACCParticipantFacetImpl extends Facet{
                     }
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
+                } catch (Exception e) {
+                    logger.warn("caught Exception:",e);
                 }
             }
         });
@@ -186,6 +190,8 @@ public class BACCParticipantFacetImpl extends Facet{
 
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
+                } catch (Exception e) {
+                    logger.warn("caught Exception",e);
                 }
 
             }

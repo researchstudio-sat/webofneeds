@@ -22,12 +22,11 @@ import java.util.List;
  * User: LEIH-NB
  * Date: 22.10.13
  */
-public class OwnerProtocolNeedServiceImplJMSBased{// implements //OwnerProtocolNeedService{ /*, WonMessageListener*/
+public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolNeedService{ /*, WonMessageListener*/
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private OwnerProtocolNeedService delegate;
-   // private ActiveMQComponent activeMQComponent;
 
     private OwnerManagementService ownerManagementService;
     @Autowired
@@ -65,10 +64,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //OwnerProtocolN
         Model contentconvert = RdfUtils.toModel(content);
 
         logger.info("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
-
         connectionURI = delegate.createNeed(ownerURIconvert, contentconvert, activate,ownerApplicationID );
-
-
         exchange.getOut().setBody(connectionURI);
 
        return connectionURI;

@@ -22,9 +22,9 @@ import java.net.URI;
  * User: LEIH-NB
  * Date: 28.11.13
  */
-public interface NeedProtocolActiveMQService extends ActiveMQService {
+public interface NeedProtocolActiveMQService extends MessageBrokerService {
 
-    public String getCamelEndpointForNeed(URI needURI, URI otherNeedURI, String from) throws Exception;
+    public String getCamelEndpointForNeed(URI needUri, URI otherNeedUri, String from) throws Exception;
     public String getActiveMQNeedProtocolQueueNameForNeed(URI needURI);
     public String getCamelEndpointForConnection(URI connectionURI, String from) throws Exception;
 

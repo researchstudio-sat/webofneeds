@@ -35,8 +35,7 @@ public class CloseConnectionListener extends BaseEventListener
   }
 
   @Override
-  protected void doOnEvent(final Event event) throws Exception
-  {
+  protected void doOnEvent(final Event event) throws Exception {
     logger.debug("trying to close connection related to event {}", event);
     try {
       URI connectionURI = null;

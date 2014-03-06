@@ -16,17 +16,17 @@
 
 package won.protocol.jms;
 
+import won.protocol.exception.NoSuchConnectionException;
+
 import java.net.URI;
 
 /**
  * User: LEIH-NB
- * Date: 28.11.13
+ * Date: 25.02.14
  */
-public interface OwnerProtocolActiveMQService extends ActiveMQService{
-
-    public String getActiveMQOwnerProtocolQueueNameForNeed(URI needURI);
-    public URI configureCamelEndpointForNodeURI( URI wonNodeURI, String from) throws Exception;
-    public String configureCamelEndpointForConnection(URI connectionURI, String from) throws Exception;
-    public String configureCamelEndpointForNeed(URI needURI, String from) throws Exception;
+public interface OwnerProtocolCommunicationService extends ProtocolCommunicationService {
+    public CamelConfiguration configureCamelEndpoint(URI wonNodeUri) throws Exception;
+    public URI  getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException;
+    public URI  getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException;
 
 }

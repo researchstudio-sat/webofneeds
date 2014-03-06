@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+    <!--
+         Load properties but ignore unresolvable properties so that
+         they are searched in other property configurers defined in the context
+    -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
+
+    <!-- REST stuff -->
+    <context:component-scan base-package="won.protocol.rest">
+        <context:include-filter type="regex" expression="won.protocol.rest.*"/>
+    </context:component-scan>
+
+    <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
+
+    <bean id="uriService" class="won.node.service.impl.URIService">
+        <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
+        <property name="dataURIPrefix" value="${uri.prefix.data}" />
+        <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
+        <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
+        <property name="pageURIPrefix" value="${uri.prefix.page}" />
+        <property name="generalURIPrefix" value="${uri.prefix}" />
+    </bean>
+
+    <!-- Model Mapper for RDF -->
+    <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
+    <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
+
+    <bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg value="30" type="int" index="0"/>
+    </bean>
+
+    <bean id="threadPoolExecutor" class="java.util.concurrent.ThreadPoolExecutor" destroy-method="shutdown">
+        <constructor-arg value="10" index="0"/>
+        <constructor-arg value="15" index="1"/>
+        <constructor-arg value="1" index="2"/>
+        <constructor-arg value="MINUTES" index="3"/>
+        <constructor-arg ref="workqueue" index="4"/>
+    </bean>
+
+    <bean id="linkedDataService" class="won.node.service.impl.LinkedDataServiceImpl">
+        <property name="needInformationService" ref="needInformationService" />
+        <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
+        <property name="dataURIPrefix" value="${uri.prefix.data}" />
+        <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
+        <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
+        <property name="pageURIPrefix" value="${uri.prefix.page}" />
+        <property name="needProtocolEndpoint" value="${uri.protocol.need}" />
+        <property name="matcherProtocolEndpoint" value="${uri.protocol.matcher}" />
+        <property name="ownerProtocolEndpoint" value="${uri.protocol.owner}" />
+        <property name="activeMqEndpoint" value="${uri.protocol.activemq}" />
+        <property name="activeMqNeedProtcolQueueName" value="${activemq.queuename.need.incoming}" />
+        <property name="activeMqOwnerProtcolQueueName" value="${activemq.queuename.owner.incoming}" />
+        <property name="rdfStorage" ref="rdfStorageRef" />
+        <property name="pageSize" value="${linkeddata.pagesize}" />
+    </bean>
+
+    <bean id="queueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/>
+
+    <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
+        <property name="producerTemplate" ref="producerTemplate"/>
+    </bean>
+
+    <!--bean id="QueueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/-->
+
+    <!--- DataAccessService -->
+    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessService" >
+        <property name="URIService" ref="uriService" />
+        <property name="rdfStorageService" ref="rdfStorageRef" />
+    </bean>
+
+
+    <bean id="needInformationService" class="won.node.service.impl.NeedInformationServiceImpl">
+        <property name="pageSize" value="${linkeddata.pagesize}" />
+        <property name="rdfStorage" ref="rdfStorageRef" />
+    </bean>
+
+    <bean id="needManagementService" class="won.node.service.impl.NeedManagementServiceImpl">
+        <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
+        <property name="needInformationService" ref="needInformationService"/>
+        <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
+        <property name="URIService" ref="uriService" />
+        <property name="rdfStorage" ref="rdfStorageRef" />
+    </bean>
+
+    <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>
+
+    <bean id="needFacingConnectionCommunicationService"
+          class="won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl">
+        <property name="dataService" ref="dataServiceRef" />
+        <property name="reg" ref="facetImplRegistryRef" />
+    </bean>
+    <!-- TODO: rewiring and refactoring needed to support both JMS and WS based protocols and adapt to changes introduced by facets -->
+    <bean id="ownerFacingConnectionCommunicationService" class="won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl">
+        <!-- property name="needFacingConnectionClient" ref="needProtocolNeedClientJMSBased" /-->
+        <!-- property name="executorService" ref="threadPoolExecutor" /-->
+        <!-- property name="rdfStorageService" ref="rdfStorageRef" /-->
+        <property name="dataService" ref="dataServiceRef" />
+        <property name="reg" ref="facetImplRegistryRef" />
+    </bean>
+
+    <bean id="needCommunicationService" class="won.node.service.impl.NeedCommunicationServiceImpl">
+        <property name="dataService" ref="dataServiceRef" />
+        <property name="reg" ref="facetImplRegistryRef" />
+
+    </bean>
+
+    <bean id="matcherProtocolNeedService" class="won.node.protocol.impl.MatcherProtocolNeedServiceImpl">
+        <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
+    </bean>
+
+    <!-- protocol-level services -->
+    <bean id="ownerProtocolNeedService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
+        <!-- the connection communication service injected here is owner facing -->
+        <property name="connectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />
+        <!--property name="needCommunicationService" ref="needCommunicationServiceJMSBased" /-->
+        <property name="needCommunicationService" ref="needCommunicationService"/>
+        <property name="needInformationService" ref="needInformationService" />
+        <property name="needManagementService" ref="needManagementService"/>
+    </bean>
+
+    <bean id="needProtocolNeedService" class="won.node.protocol.impl.NeedProtocolNeedServiceImpl">
+        <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService"/>
+        <property name="needFacingNeedCommunicationService" ref="needCommunicationService"/>
+    </bean>
+
+    <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClient">
+        <property name="delegate" ref="ownerProtocolOwnerClientJMSBased"/>
+    </bean>
+
+    <bean name="needProtocolNeedClient" class="won.node.protocol.impl.NeedProtocolNeedClient">
+        <property name="delegate" ref="needProtocolNeedClientJMSBased"/>
+    </bean>
+
+</beans>

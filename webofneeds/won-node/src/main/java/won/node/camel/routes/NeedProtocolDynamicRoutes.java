@@ -32,10 +32,8 @@ public class NeedProtocolDynamicRoutes extends RouteBuilder {
     private String routeID;
     private String from;
 
-    public NeedProtocolDynamicRoutes(CamelContext camelContext, List<String> Endpoints, String from){
+    public NeedProtocolDynamicRoutes(CamelContext camelContext, String from){
         super(camelContext);
-        this.endpoints = endpoints;
-        this.routeID = routeID;
         this.from = from;
 
     }
@@ -45,6 +43,5 @@ public class NeedProtocolDynamicRoutes extends RouteBuilder {
                 .wireTap("bean:messagingService?method=inspectMessage")
                 .to("log:Dynamic Route FROM NODE")
                 .recipientList(header("remoteBrokerEndpoint"));
-
     }
 }

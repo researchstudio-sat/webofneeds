@@ -25,6 +25,8 @@ public class CommentUnrestrictedFacet extends Facet {
       e.printStackTrace();
     } catch (IllegalMessageForConnectionStateException e) {
       e.printStackTrace();
+    } catch (Exception e) {
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
 
     /* when connected change linked data*/

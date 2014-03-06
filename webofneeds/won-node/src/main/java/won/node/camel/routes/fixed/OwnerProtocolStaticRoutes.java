@@ -48,8 +48,12 @@ public class OwnerProtocolStaticRoutes extends RouteBuilder {
             .to("log:Route. Owner Protocol TextMessage Received")
             .to("bean:ownerProtocolNeedJMSService?method=textMessage")
             .when(header("methodName").isEqualTo("registerOwnerApplication"))
+            .to("log:Route. Owner Protocol Register Received")
             .to("bean:ownerProtocolNeedJMSService?method=registerOwnerApplication")
             .when(header("methodName").isEqualTo("getEndpointsForOwnerApplication"))
-            .to("bean:ownerProtocolNeedJMSService?method=getEndpointsForOwnerApplication");
+            .to("log:Route. Owner Protocol getEndpoints Received")
+            .to("bean:ownerProtocolNeedJMSService?method=getEndpointsForOwnerApplication")
+            .otherwise()
+            .to("bean:ownerProtocolNeedJMSService?method=close");
     }
 }
