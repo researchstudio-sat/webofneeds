@@ -295,7 +295,7 @@ public enum BAPCState {
             case MESSAGE_COMPENSATED:
                 return ENDED;
         }
-        throw new IllegalArgumentException("Connection creation failed: Wrong ConnectionEventType");
+        throw new IllegalArgumentException("The received message is not allowed.");
     }
 
     public abstract BAPCState transit (BAPCEventType msg);

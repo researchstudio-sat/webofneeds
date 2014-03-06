@@ -30,6 +30,7 @@ import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.repository.ConnectionRepository;
 
 import java.net.URI;
 import java.util.concurrent.Executor;
@@ -216,6 +217,7 @@ public class EventBot extends TriggeredBot
     public Executor getExecutor(){
       return EventBot.this.getExecutor();
     }
+
   }
 
 }

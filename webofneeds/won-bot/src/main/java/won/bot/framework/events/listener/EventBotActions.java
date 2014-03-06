@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import won.bot.framework.component.needproducer.impl.GroupNeedProducer;
 import won.bot.framework.events.event.GroupFacetCreatedEvent;
 import won.bot.framework.events.event.NeedCreatedEvent;
+import won.bot.framework.events.event.NeedDeactivatedEvent;
 import won.bot.framework.events.event.WorkDoneEvent;
 import won.protocol.model.FacetType;
 import won.protocol.util.RdfUtils;
@@ -249,6 +250,21 @@ public class EventBotActions
                     }
                 }
             }, getEventListenerContext().getExecutor());
+        }
+    }
+
+    public static class DeactivateAllNeedsAction extends Action {
+        public DeactivateAllNeedsAction(EventListenerContext eventListenerContext) {
+            super(eventListenerContext);
+        }
+
+        @Override
+        protected void doRun() throws Exception {
+            List<URI> toDeactivate = getEventListenerContext().getBotContext().listNeedUris();
+            for (URI uri: toDeactivate){
+                getEventListenerContext().getOwnerService().deactivate(uri);
+                getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
+            }
         }
     }
 

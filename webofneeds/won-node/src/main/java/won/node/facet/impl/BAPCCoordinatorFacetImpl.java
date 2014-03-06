@@ -14,11 +14,13 @@ import won.node.facet.businessactivity.participantcompletion.SimpleBAPCStateMana
 
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
 
 
 import java.net.URI;
+import java.util.List;
 
 
 /**
@@ -103,6 +105,11 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                             //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
 
                             needFacingConnectionClient.textMessage(con, myContent);
+
+                         //   List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getRemoteNeedURI(),
+                                   // ConnectionState.CONNECTED, FacetType.BAAtomicOutcome.getURI());
+
+
                         }
                         else
                         {

@@ -28,7 +28,8 @@ public enum FacetType {
     BAPCCoordinatorFacet("BAPCCoordinatorFacet"),
     BAPCParticipantFacet("BAPCParticipantFacet"),
     BACCCoordinatorFacet("BACCCoordinatorFacet"),
-    BACCParticipantFacet("BACCParticipantFacet");
+    BACCParticipantFacet("BACCParticipantFacet"),
+    BAAtomicOutcome("BAAtomicOutcome");
 
 
     private static final Logger logger = LoggerFactory.getLogger(BasicNeedType.class);
@@ -62,6 +63,8 @@ public enum FacetType {
            return FacetType.BACCCoordinatorFacet;
        else if(uri.equals(FacetType.BACCParticipantFacet.getURI()))
            return FacetType.BACCParticipantFacet;
+       else if(uri.equals(FacetType.BAAtomicOutcome.getURI()))
+           return FacetType.BAAtomicOutcome;
        else
            return null;
     }

@@ -4,7 +4,12 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
+import won.bot.framework.events.listener.baStateBots.BATestBotScript;
+import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.*;
 import won.protocol.model.FacetType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -15,11 +20,11 @@ import won.protocol.model.FacetType;
  * To change this template use File | Settings | File Templates.
  */
 public class BAPCBot extends EventBot {
-    private static final int NO_OF_NEEDS = 8;
-    private static final int NO_OF_MESSAGES = 20;
+    private static final int NO_OF_NEEDS = 9;
+    private static final int NO_OF_MESSAGES = 50;
     private static final long MILLIS_BETWEEN_MESSAGES = 1000;
-    private static final String URI_LIST_NAME_PARTICIPANT = "participants";
-    private static final String URI_LIST_NAME_COORDINATOR = "coordinator";
+    public static final String URI_LIST_NAME_PARTICIPANT = "participants";
+    public static final String URI_LIST_NAME_COORDINATOR = "coordinator";
 
     //we use protected members so we can extend the class and
     //access the listeners for unit test assertions and stats
@@ -31,7 +36,6 @@ public class BAPCBot extends EventBot {
     protected BaseEventListener needConnector;
     protected BaseEventListener autoOpener;
     protected BaseEventListener autoResponder;
-    protected BaseEventListener connectionCloser;
     protected BaseEventListener needDeactivator;
     protected BaseEventListener workDoneSignaller;
 
@@ -75,22 +79,38 @@ public class BAPCBot extends EventBot {
         //subscribe it to:
         // * message events - so it responds
         // * open events - so it initiates the chain reaction of responses
-        this.autoResponder = new AutomaticBAMessageResponderListener(ctx, NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
+        List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(NO_OF_NEEDS-1);
+
+
+//
+//
+//
+
+//        scripts.add(new BACCStateActiveCancelFailBot());
+
+
+
+
+
+
+        scripts.add(new BAPCStateExitBot());
+        scripts.add(new BAPCStateCompleteBot());
+        scripts.add(new BAPCStateCompensateBot());
+        scripts.add(new BAPCStateCompensateFailBot());
+        scripts.add(new BAPCStateActiveFailBot());
+        scripts.add(new BAPCStateActiveCancelBot());
+        scripts.add(new BAPCStateActiveCancelFailBot());
+        scripts.add(new BAPCStateActiveCannotCompleteBot());
+
+        this.autoResponder = new AutomaticBAMessageResponderListener(ctx, scripts, NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
         bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);
         bus.subscribe(MessageFromOtherNeedEvent.class, this.autoResponder);
 
-        //add a listener that closes the connection after it has seen NO_OF_MESSAGES messages
-        this.connectionCloser = new DelegateOnceAfterNEventsListener(
-                ctx,
-                NO_OF_MESSAGES,
-                new CloseConnectionListener(ctx));
-        bus.subscribe(MessageFromOtherNeedEvent.class, this.connectionCloser);
-
-        //add a listener that auto-responds to a close message with a deactivation of both needs.
-        //subscribe it to:
-        // * close events
-        this.needDeactivator = new DeactivateNeedOnConnectionCloseListener(ctx);
-        bus.subscribe(CloseFromOtherNeedEvent.class, this.needDeactivator);
+        //register a DeactivateAllNeedsAction to be executed
+        //when the internalWorkDoneEvent is seen
+        this.needDeactivator = new ExecuteOnEventListener(getEventListenerContext(), new
+                EventBotActions.DeactivateAllNeedsAction(getEventListenerContext()),1);
+        bus.subscribe(InternalWorkDoneEvent.class, needDeactivator);
 
         //add a listener that counts two NeedDeactivatedEvents and then tells the
         //framework that the bot's work is done
@@ -101,23 +121,4 @@ public class BAPCBot extends EventBot {
         bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

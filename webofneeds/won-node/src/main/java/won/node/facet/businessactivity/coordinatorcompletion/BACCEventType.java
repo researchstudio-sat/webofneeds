@@ -90,7 +90,7 @@ public enum BACCEventType {
             BACCState.NOT_COMPLETING, BACCState.EXITING,
             BACCState.ENDED))),
 
-    MESSAGE_CANNOTCOMPLETE("MessageComplete", new ArrayList<BACCState>(Arrays.asList(BACCState.ACTIVE,
+    MESSAGE_CANNOTCOMPLETE("MessageCanNotComplete", new ArrayList<BACCState>(Arrays.asList(BACCState.ACTIVE,
             BACCState.CANCELING_ACTIVE, BACCState.CANCELING_COMPLETING,
             BACCState.COMPLETING, BACCState.COMPLETED,
             BACCState.CLOSING, BACCState.COMPENSATING,

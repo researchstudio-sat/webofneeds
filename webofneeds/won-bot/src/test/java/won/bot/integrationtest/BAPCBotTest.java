@@ -138,29 +138,27 @@ public class BAPCBotTest{
          */
         public void executeAsserts()
         {
-            //5 act events
+            //Coordinator creator
             Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
             Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
-            //5 act events
-            Assert.assertEquals(4, this.participantNeedCreator.getEventCount());
+            //8 Participants creator
+            Assert.assertEquals(8, this.participantNeedCreator.getEventCount());
             Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
-            //5 create need events
-            Assert.assertEquals(4, this.needConnector.getEventCount());
+            //Coordinator - Participants connector
+            Assert.assertEquals(9, this.needConnector.getEventCount());
             Assert.assertEquals(0, this.needConnector.getExceptionCount());
-            //4 connect, 4 open
-            Assert.assertEquals(4, this.autoOpener.getEventCount());
+            //8 connect, 8 open
+            Assert.assertEquals(8+8, this.autoOpener.getEventCount());
             Assert.assertEquals(0, this.autoOpener.getExceptionCount());
-            //10 messages
-            Assert.assertEquals(10, this.autoResponder.getEventCount());
+            //messages
+            Assert.assertEquals(8+2+3+2+2+3+4+3+2, this.autoResponder.getEventCount());
             Assert.assertEquals(0, this.autoResponder.getExceptionCount());
-            //10 messages
-            Assert.assertEquals(10, this.connectionCloser.getEventCount());
-            Assert.assertEquals(0, this.connectionCloser.getExceptionCount());
-            //1 close (one sent, one received - but for sending we create no event)
+
             Assert.assertEquals(1, this.needDeactivator.getEventCount());
             Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
-            //2 needs deactivated
-            Assert.assertEquals(2, this.workDoneSignaller.getEventCount());
+
+            //9 needs deactivated
+            Assert.assertEquals(9, this.workDoneSignaller.getEventCount());
             Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
             //TODO: there is more to check:
