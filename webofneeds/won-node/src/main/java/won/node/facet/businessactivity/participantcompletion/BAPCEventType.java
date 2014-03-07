@@ -84,7 +84,7 @@ public enum BAPCEventType {
             BAPCState.NOT_COMPLETING, BAPCState.EXITING,
             BAPCState.ENDED))),
 
-    MESSAGE_CANNOTCOMPLETE("MessageComplete", new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE,
+    MESSAGE_CANNOTCOMPLETE("MessageCannotComplete", new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE,
             BAPCState.CANCELING,  BAPCState.COMPLETED,
             BAPCState.CLOSING, BAPCState.COMPENSATING,
             BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,

@@ -112,6 +112,7 @@ public class SchedulerEventBusImpl implements EventBus
             logger.debug("finished processing event {} on listener {}", event, listener);
           } catch (Exception e) {
             logger.warn("caught exception during execution of event {} on listener {}", new Object[]{event, listener}, e);
+            logger.warn("stacktrace:",e);
           }
         }
       }

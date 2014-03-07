@@ -311,4 +311,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.ownerApplicationContext = applicationContext;
     }
+
+
 }

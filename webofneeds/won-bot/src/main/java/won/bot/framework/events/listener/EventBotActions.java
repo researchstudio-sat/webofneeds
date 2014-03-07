@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import won.bot.framework.component.needproducer.impl.GroupNeedProducer;
 import won.bot.framework.events.event.GroupFacetCreatedEvent;
 import won.bot.framework.events.event.NeedCreatedEvent;
+import won.bot.framework.events.event.NeedDeactivatedEvent;
 import won.bot.framework.events.event.WorkDoneEvent;
 import won.protocol.model.FacetType;
 import won.protocol.util.RdfUtils;
@@ -143,34 +144,33 @@ public class EventBotActions
 
             List<URI> fromNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(fromListName);
             List<URI> toNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(toListName);
-
-            for (URI fromUri: fromNeeds){
-                URI toUri =null;
-                if (fromListName.equals(toListName)){
-                    int i = fromNeeds.indexOf(fromUri);
-                    if (i+1<fromNeeds.size()){
-                       toUri = fromNeeds.get(i+1);
-                    }
-                } else{
-                    for (URI toUriTemp:toNeeds) {
-                        if (!fromUri.equals(toUriTemp)){
-
-                            toUri = toUriTemp;
+            logger.debug("connecting {} needs from list {} to {} needs from list {}", new Object[]{fromNeeds.size(),fromListName, toNeeds.size(), toListName});
+            if (fromListName.equals(toListName)){
+                //only one connection per pair if from-list is to-list
+                for (int i = 0; i < fromNeeds.size();i++){
+                    URI fromUri = fromNeeds.get(i);
+                    for (int j = i +1; j < fromNeeds.size(); j++){
+                        URI toUri = fromNeeds.get(j);
+                        try {
+                            logger.info("connecting needs {} and {}",fromUri,toUri);
+                            getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createModelForConnect(fromFacet, toFacet));
+                        } catch (Exception e) {
+                            logger.warn("could not connect {} and {}", new Object[]{fromUri, toUri}, e);
                         }
                     }
                 }
-                try {
-                    if (toUri!=null){
-                        logger.info("connecting needs {} and {}",fromUri,toUri);
-                        getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createModelForConnect(fromFacet, toFacet));
+            } else {
+                for (URI fromUri: fromNeeds){
+                    for (URI toUri:toNeeds) {
+                        try{
+                            logger.info("connecting needs {} and {}",fromUri,toUri);
+                            getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createModelForConnect(fromFacet, toFacet));
+                        } catch (Exception e) {
+                            logger.warn("could not connect {} and {}", new Object[]{fromUri, toUri}, e);
+                        }
                     }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
-
-
         }
     }
 
@@ -270,6 +270,21 @@ public class EventBotActions
                     }
                 }
             }, getEventListenerContext().getExecutor());
+        }
+    }
+
+    public static class DeactivateAllNeedsAction extends Action {
+        public DeactivateAllNeedsAction(EventListenerContext eventListenerContext) {
+            super(eventListenerContext);
+        }
+
+        @Override
+        protected void doRun() throws Exception {
+            List<URI> toDeactivate = getEventListenerContext().getBotContext().listNeedUris();
+            for (URI uri: toDeactivate){
+                getEventListenerContext().getOwnerService().deactivate(uri);
+                getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
+            }
         }
     }
 

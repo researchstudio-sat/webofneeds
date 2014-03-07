@@ -1,19 +1,3 @@
-/*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package won.bot.integrationtest;
 
 import org.junit.Assert;
@@ -29,18 +13,23 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import won.bot.framework.events.event.WorkDoneEvent;
 import won.bot.framework.events.listener.ExecuteOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
-import won.bot.impl.BAPCBot;
+import won.bot.impl.BACCBot;
 
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Integration test.
+ * Created with IntelliJ IDEA.
+ * User: Danijel
+ * Date: 26.2.14.
+ * Time: 16.02
+ * To change this template use File | Settings | File Templates.
  */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
 
-public class BAPCBotTest{
+public class BACCBotTest {
     private static final int RUN_ONCE = 1;
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 1000;
@@ -72,7 +61,7 @@ public class BAPCBotTest{
      * @throws Exception
      */
     @Test
-    public void testBAPCBot() throws Exception
+    public void testBACCBot() throws Exception
     {
         //adding the bot to the bot manager will cause it to be initialized.
         //at that point, the trigger starts.
@@ -91,7 +80,7 @@ public class BAPCBotTest{
      * add a listener to its internal event bus and to access its listeners, which
      * record information during the run that we later check with asserts.
      */
-    public static class MyBot extends BAPCBot
+    public static class MyBot extends BACCBot
     {
         /**
          * Used for synchronization with the @Test method: it should wait at the
@@ -141,24 +130,24 @@ public class BAPCBotTest{
             //Coordinator creator
             Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
             Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
-            //8 Participants creator
-            Assert.assertEquals(8, this.participantNeedCreator.getEventCount());
+            //3 Participants creator
+            Assert.assertEquals(13, this.participantNeedCreator.getEventCount());
             Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
             //Coordinator - Participants connector
-            Assert.assertEquals(9, this.needConnector.getEventCount());
+            Assert.assertEquals(14, this.needConnector.getEventCount());
             Assert.assertEquals(0, this.needConnector.getExceptionCount());
-            //8 connect, 8 open
-            Assert.assertEquals(8+8, this.autoOpener.getEventCount());
+            //13 connect, 13 open
+            Assert.assertEquals(13+13, this.autoOpener.getEventCount());
             Assert.assertEquals(0, this.autoOpener.getExceptionCount());
             //messages
-            Assert.assertEquals(8+2+3+2+2+3+4+3+2, this.autoResponder.getEventCount());
+            Assert.assertEquals(13+2+3+2+2+4+5+4+3+4+3+3+3+2, this.autoResponder.getEventCount());
             Assert.assertEquals(0, this.autoResponder.getExceptionCount());
 
             Assert.assertEquals(1, this.needDeactivator.getEventCount());
             Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
 
-            //9 needs deactivated
-            Assert.assertEquals(9, this.workDoneSignaller.getEventCount());
+            //13 needs deactivated
+            Assert.assertEquals(14, this.workDoneSignaller.getEventCount());
             Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
             //TODO: there is more to check:
@@ -169,3 +158,4 @@ public class BAPCBotTest{
 
     }
 }
+

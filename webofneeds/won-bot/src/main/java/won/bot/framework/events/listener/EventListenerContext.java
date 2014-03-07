@@ -22,6 +22,8 @@ import won.bot.framework.events.EventBus;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.NeedRepository;
 
 import java.util.concurrent.Executor;
 
@@ -38,18 +40,18 @@ public interface EventListenerContext
   public TaskScheduler getTaskScheduler();
 
   /**
-   * Returns the bot's NodeURISource. Used to obtain WON node URIs.
+   * Returns the bot's NodeURISource. Used to obtain WON_BACC node URIs.
    * @return
    */
   public NodeURISource getNodeURISource();
 
   /**
-   * Returns the bot's owner service. Used to connect to WON nodes.
+   * Returns the bot's owner service. Used to connect to WON_BACC nodes.
    */
   public OwnerProtocolNeedServiceClientSide getOwnerService();
 
   /**
-   * Returns the bot's needProducer. Used to obtain an RDF model that can be sent to a WON node to create a new need.
+   * Returns the bot's needProducer. Used to obtain an RDF model that can be sent to a WON_BACC node to create a new need.
    * @return
    */
   public NeedProducer getNeedProducer();
@@ -82,4 +84,6 @@ public interface EventListenerContext
    * @return
    */
   public Executor getExecutor();
+
+
 }
