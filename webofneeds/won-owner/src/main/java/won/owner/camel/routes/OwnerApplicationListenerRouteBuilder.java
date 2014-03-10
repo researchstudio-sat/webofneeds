@@ -19,6 +19,7 @@ package won.owner.camel.routes;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 //TODO: This route builder should not be loaded on startup, but it's being loaded..
@@ -32,17 +33,23 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
 
 
     private List<String> endpoints;
+    private URI brokerUri;
 
-    public OwnerApplicationListenerRouteBuilder(CamelContext camelContext, List<String> endpoints) {
+    public OwnerApplicationListenerRouteBuilder(CamelContext camelContext, List<String> endpoints, URI remoteEndpoint) {
         super(camelContext);
         this.endpoints = endpoints;
+        this.brokerUri = remoteEndpoint;
     }
 
+    /**
+     *
+     * @throws Exception
+     */
 
     @Override
     public void configure() throws Exception {
                for (int i = 0; i<endpoints.size();i++){
-                   from(endpoints.get(i)+"?concurrentConsumers=5")
+                   from(endpoints.get(i)+"?concurrentConsumers=5").routeId("Node2OwnerRoute"+brokerUri)
                            .wireTap("bean:messagingService?method=inspectMessage")
                            .choice()
                            .when(header("methodName").isEqualTo("connect"))
@@ -53,6 +60,7 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
                            .when(header("methodName").isEqualTo("textMessage"))
                            .to("bean:ownerProtocolOwnerServiceJMSBased?method=textMessage")
                            .when(header("methodName").isEqualTo("open"))
+                           .to("log:OWNER OPEN RECEIVED")
                            .to("bean:ownerProtocolOwnerServiceJMSBased?method=open")
                            .when(header("methodName").isEqualTo("close"))
                            .to("bean:ownerProtocolOwnerServiceJMSBased?method=close")

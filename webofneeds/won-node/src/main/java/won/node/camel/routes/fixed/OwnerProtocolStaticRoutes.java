@@ -25,7 +25,7 @@ import org.apache.camel.builder.RouteBuilder;
 public class OwnerProtocolStaticRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
-        from("activemq:queue:OwnerProtocol.in?concurrentConsumers=5")
+        from("activemq:queue:OwnerProtocol.in?concurrentConsumers=5").routeId("Owner2NodeRoute")
             .wireTap("bean:messagingService?method=inspectMessage")
             .choice()
             .when(header("methodName").isEqualTo("register"))
@@ -45,13 +45,10 @@ public class OwnerProtocolStaticRoutes extends RouteBuilder {
             .when(header("methodName").isEqualTo("close"))
             .to("bean:ownerProtocolNeedJMSService?method=close")
             .when(header("methodName").isEqualTo("textMessage"))
-            .to("log:Route. Owner Protocol TextMessage Received")
             .to("bean:ownerProtocolNeedJMSService?method=textMessage")
             .when(header("methodName").isEqualTo("registerOwnerApplication"))
-            .to("log:Route. Owner Protocol Register Received")
             .to("bean:ownerProtocolNeedJMSService?method=registerOwnerApplication")
             .when(header("methodName").isEqualTo("getEndpointsForOwnerApplication"))
-            .to("log:Route. Owner Protocol getEndpoints Received")
             .to("bean:ownerProtocolNeedJMSService?method=getEndpointsForOwnerApplication")
             .otherwise()
             .to("bean:ownerProtocolNeedJMSService?method=close");

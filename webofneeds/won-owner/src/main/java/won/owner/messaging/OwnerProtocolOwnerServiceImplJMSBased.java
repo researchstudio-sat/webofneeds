@@ -70,34 +70,18 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
 
 
    // @Override
-    public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
+    public void hint(@Header("ownNeedUri") final String ownNeedURI, @Header("otherNeedUri")final String otherNeedURI,@Header("score") final String score, @Header("originatorUri")final String originatorURI, @Header("content")final String content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
         logger.info("node-facing: HINT called for own need {}, other need {}, with score {} from originator {} and content {}",
                 new Object[]{ownNeedURI, otherNeedURI, score, originatorURI, content});
 
         if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
         if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
-        if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
+        if (score == null) throw new IllegalArgumentException("score is not in [0,1]");
         if (originatorURI == null) throw new IllegalArgumentException("originator is not set");
         if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
 
+        delegate.hint(ownNeedURI,otherNeedURI,score,originatorURI,content);
 
-        //Load need (throws exception if not found)
-        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
-        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
-
-        List<Match> matches = matchRepository.findByFromNeedAndToNeedAndOriginator(ownNeedURI, otherNeedURI, originatorURI);
-        Match match = null;
-        if (matches.size() > 0){
-          match = matches.get(0);
-        } else {
-          //save match
-          match = new Match();
-          match.setFromNeed(ownNeedURI);
-          match.setToNeed(otherNeedURI);
-          match.setOriginator(originatorURI);
-        }
-        match.setScore(score);
-        matchRepository.saveAndFlush(match);
     }
 
     private boolean isNeedActive(final Need need) {

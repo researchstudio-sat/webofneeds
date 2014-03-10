@@ -56,8 +56,7 @@
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
     </bean>
     <bean id="needProtocolCommunicationService" class="won.node.messaging.NeedProtocolCommunicationServiceImpl">
-           <property name="defaultNodeBrokerEndpoint" value="${uri.protocol.activemq=tcp://${uri.host}:61616
-activemq.queuename.need.incoming=NeedProtocol.in}"
+
     </bean>
 
     <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor">

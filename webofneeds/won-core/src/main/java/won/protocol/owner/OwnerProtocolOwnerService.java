@@ -36,13 +36,15 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
 {
   /**
    * Informs the owner of a hint that has been received for the need.
+   *
    * @param ownNeedURI
    * @param otherNeedURI
    * @param score
    * @param originatorURI
+   * @param content
    * @throws NoSuchNeedException if ownNeedURI is not a known need URI
    */
-  public void hint(URI ownNeedURI, URI otherNeedURI, double score, URI originatorURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException;
+  public void hint(String ownNeedURI, String otherNeedURI, String score, String originatorURI, String content) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
   /**
    * Informs the owner of a connection initiated by the need identified by otherNeedURI to the

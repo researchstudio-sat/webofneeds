@@ -24,6 +24,7 @@ import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.QueueManagementService;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,20 +38,24 @@ public class QueueManagementServiceImpl implements QueueManagementService {
     private OwnerApplicationRepository ownerApplicationRepository;
 
     final Logger logger = LoggerFactory.getLogger(getClass());
+    private String defaultUriScheme;
+
 
     @Override
     public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication) {
 
         logger.info(ownerApplication.getOwnerApplicationId());
         List<String> queueNames = new ArrayList<>();
-        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol." + "connect" + ".Out."+ownerApplication.getOwnerApplicationId());
+        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol.Out."+ownerApplication.getOwnerApplicationId());
+        /*queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"connect"+".Out."+ownerApplication.getOwnerApplicationId());
         queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"hint"+".Out."+ownerApplication.getOwnerApplicationId());
         queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"textMessage"+".Out."+ownerApplication.getOwnerApplicationId());
         queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"open"+".Out."+ownerApplication.getOwnerApplicationId());
         queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"close"+".Out."+ownerApplication.getOwnerApplicationId());
+        */
         ownerApplication.setQueueNames(queueNames);
-        logger.info(ownerApplication.getQueueNames().get(0));
-        logger.info(ownerApplication.getQueueNames().get(1));
+        //logger.info(ownerApplication.getQueueNames().get(0));
+        //logger.info(ownerApplication.getQueueNames().get(1));
 
         return ownerApplication.getQueueNames();
     }
@@ -67,9 +72,12 @@ public class QueueManagementServiceImpl implements QueueManagementService {
                 endpoint = endpoint.replaceFirst(ownerApplicationID,"");
                 break;
             }
-
-
         }
+        if (endpoint.equals("")&&queueNames.size()==1){
+            endpoint=queueNames.get(0);
+            endpoint = endpoint.replaceFirst(ownerApplicationID,"");
+        }
+
 
         return  endpoint;
     }

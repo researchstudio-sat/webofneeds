@@ -37,7 +37,7 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     {
         wireDependenciesLazily();
       try {
-        ownerProtocolOwnerService.hint(ownNeedURI, otherNeedURI, score, originatorURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
+        ownerProtocolOwnerService.hint(ownNeedURI.toString(), otherNeedURI.toString(), String.valueOf(score), originatorURI.toString(), RdfUtils.readRdfSnippet(content, FileUtils.langTurtle).toString());
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (IllegalMessageForNeedStateException e) {

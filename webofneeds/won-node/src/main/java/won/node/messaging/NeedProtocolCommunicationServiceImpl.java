@@ -24,8 +24,6 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.*;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * User: syim
@@ -36,17 +34,7 @@ public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommuni
 
     @Autowired
     private NeedProtocolCamelConfigurator needProtocolCamelConfigurator;
-    private Map<URI,URI> needUriBrokerUriMap = new HashMap<>();
 
-    public URI getDefaultNodeBrokerEndpoint() {
-        return defaultNodeBrokerEndpoint;
-    }
-
-    public void setDefaultNodeBrokerEndpoint(URI defaultNodeBrokerEndpoint) {
-        this.defaultNodeBrokerEndpoint = defaultNodeBrokerEndpoint;
-    }
-
-    private URI defaultNodeBrokerEndpoint;
     @Autowired
     private ActiveMQService activeMQService;
 

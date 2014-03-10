@@ -145,7 +145,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
-        logger.info("sending activate message: "+ needURI.toString());
+        logger.info("sending activate message: " + needURI.toString());
 
     }
     /**
@@ -166,7 +166,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
 
         String ownerApplicationId = futureResults.get();
 
-        camelConfiguration.setBrokerComponentName(ownerProtocolCommunicationServiceImpl.replaceComponentNameWithOwnerApplicationId(camelConfiguration,ownerApplicationId));
+        camelConfiguration.setBrokerComponentName(ownerProtocolCommunicationServiceImpl.replaceComponentNameWithOwnerApplicationId(camelConfiguration, ownerApplicationId));
         camelConfiguration.setEndpoint(ownerProtocolCommunicationServiceImpl.replaceEndpointNameWithOwnerApplicationId(camelConfiguration,ownerApplicationId));
 
         logger.info("registered ownerappID: "+ownerApplicationId);
@@ -197,7 +197,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         Future<List<String>> futureResults =messagingService.sendInOutMessageGeneric(headerMap, headerMap, null, "seda:outgoingMessages");
         List<String> endpoints = futureResults.get();
 
-        ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator().addRemoteQueueListeners(endpoints);
+        ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator().addRemoteQueueListeners(endpoints,URI.create(remoteEndpoint));
         //TODO: some checks needed to assure that the application is configured correctly.
        //todo this method should return routes
     }

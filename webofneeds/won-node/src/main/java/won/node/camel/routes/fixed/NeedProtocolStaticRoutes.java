@@ -25,18 +25,15 @@ import org.apache.camel.builder.RouteBuilder;
 public class NeedProtocolStaticRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
-        from("activemq:queue:NeedProtocol.in?concurrentConsumers=5")
+        from("activemq:queue:NeedProtocol.in?concurrentConsumers=5").routeId("Node2NodeIncomingRoute")
                 .choice()
                 .when(header("methodName").isEqualTo("connect"))
-                .to("log:Connect Incoming")
                 .to("bean:needProtocolNeedServiceJMSBased?method=connect")
                 .when(header("methodName").isEqualTo("open"))
-                .to("log:log:NeedProtocolRoutes OpenConnection Incoming")
                 .to("bean:needProtocolNeedServiceJMSBased?method=open")
                 .when(header("methodName").isEqualTo("close"))
                 .to("bean:needProtocolNeedServiceJMSBased?method=close")
                 .when(header("methodName").isEqualTo("textMessage"))
-                .to("log:NeedProtocolRoutes TextMessage Incoming")
                 .to("bean:needProtocolNeedServiceJMSBased?method=textMessage")
                 .otherwise()
                 .wireTap("bean:messagingService?method=inspectMessage")

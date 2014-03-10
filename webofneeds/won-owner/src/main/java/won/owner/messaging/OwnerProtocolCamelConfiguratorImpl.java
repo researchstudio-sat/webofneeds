@@ -28,7 +28,6 @@ import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.BrokerComponentFactory;
-import won.protocol.jms.CamelConfigurator;
 import won.protocol.jms.OwnerProtocolCamelConfigurator;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -89,9 +88,9 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
 
     }
     @Override
-    public synchronized void addRemoteQueueListeners(List<String> endpoints) throws CamelConfigurationFailedException {
+    public synchronized void addRemoteQueueListeners(List<String> endpoints, URI remoteEndpoint) throws CamelConfigurationFailedException {
         logger.info("length of endpoints {}", endpoints.size());
-        OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(camelContext, endpoints);
+        OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(camelContext, endpoints, remoteEndpoint);
         try {
             camelContext.addRoutes(ownerApplicationListenerRouteBuilder);
         } catch (Exception e) {

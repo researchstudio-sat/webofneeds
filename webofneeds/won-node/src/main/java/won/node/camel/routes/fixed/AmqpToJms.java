@@ -28,11 +28,9 @@ public class AmqpToJms extends RouteBuilder{
 
     @Override
     public void configure(){
-        from("seda:OUTMSG")
-                .to("log:OUTMSG FROM NODE")
+        from("seda:OUTMSG").routeId("ProtocolSelectorRoute")
                 .choice()
                 .when(header("protocol").isEqualTo("OwnerProtocol"))
-                .to("log:OwnerProtocol FROM NODE")
                 .to("seda:OwnerProtocolOut")
                 .otherwise()
                 .to("log:No protocol defined in header");
