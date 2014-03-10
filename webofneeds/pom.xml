@@ -598,6 +598,12 @@
             <id>org.topbraid</id>
             <url>http://www.topquadrant.com/repository/spin/</url>
         </repository>
+        <!-- jboss repo used for javax.jms -->
+        <repository>
+            <id>repository.jboss.org-public</id>
+            <name>JBoss repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public</url>
+        </repository>
     </repositories>
 
     <properties>
@@ -630,7 +636,7 @@
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>
         <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
-        <com.github.jsonld-java.version>0.3-SNAPSHOT</com.github.jsonld-java.version>
+        <com.github.jsonld-java.version>0.3</com.github.jsonld-java.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
         <com.sun.xml.version>2.0EA3</com.sun.xml.version>
@@ -638,7 +644,6 @@
         <junit.version>4.11</junit.version>
         <org.apache.commons.email.version>1.3.1</org.apache.commons.email.version>
         <commons-io.version>2.4</commons-io.version>
-        <org.apache.jena.jsonld.version>0.0.1-SNAPSHOT</org.apache.jena.jsonld.version>
         <org.apache.jena.version>2.11.0</org.apache.jena.version>
         <org.hibernate.version>4.1.8.Final</org.hibernate.version>
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
