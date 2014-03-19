@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * Base class for bots containing basic services.
@@ -29,6 +30,7 @@ public abstract class BasicServiceBot extends BaseBot
   private NodeURISource nodeURISource;
   private NeedProducer needProducer;
   private OwnerProtocolNeedServiceClientSide ownerService;
+  private LinkedDataSource linkedDataSource;
 
   protected NodeURISource getNodeURISource()
   {
@@ -61,4 +63,7 @@ public abstract class BasicServiceBot extends BaseBot
     this.needProducer = needProducer;
   }
 
+  public LinkedDataSource getLinkedDataSource() { return linkedDataSource; }
+
+  public void setLinkedDataSource(final LinkedDataSource linkedDataSource) { this.linkedDataSource = linkedDataSource; }
 }

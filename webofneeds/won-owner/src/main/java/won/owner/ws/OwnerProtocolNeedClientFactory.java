@@ -7,6 +7,8 @@ import won.owner.service.impl.URIService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 import won.protocol.ws.AbstractClientFactory;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
@@ -26,14 +28,14 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private LinkedDataRestClient linkedDataRestClient;
+  private LinkedDataSource linkedDataSource;
 
   @Autowired
   private URIService uriService;
 
-  public void setLinkedDataRestClient(LinkedDataRestClient linkedDataRestClient)
+  public void setLinkedDataSource(final LinkedDataSource linkedDataSource)
   {
-    this.linkedDataRestClient = linkedDataRestClient;
+    this.linkedDataSource = linkedDataSource;
   }
 
   public void setUriService(final URIService uriService)
@@ -58,7 +60,10 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
 
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpointForNeed(URI needURI) throws NoSuchNeedException, MalformedURLException
   {
-    URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.HAS_OWNER_PROTOCOL_ENDPOINT);
+    URI needProtocolEndpoint = RdfUtils.getURIPropertyForResource(
+        linkedDataSource.getModelForResource(needURI),
+        needURI,
+        WON.HAS_OWNER_PROTOCOL_ENDPOINT);
     if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
 
     logger.debug("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
@@ -75,7 +80,10 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
 
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpointForConnection(URI connectionURI) throws NoSuchConnectionException, MalformedURLException
   {
-    URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.HAS_OWNER_PROTOCOL_ENDPOINT);
+    URI needProtocolEndpoint = RdfUtils.getURIPropertyForResource(
+        linkedDataSource.getModelForResource(connectionURI),
+        connectionURI,
+        WON.HAS_OWNER_PROTOCOL_ENDPOINT);
     if (needProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
 
     logger.debug("need protocol endpoint of connection {} is {}", connectionURI.toString(), needProtocolEndpoint.toString());

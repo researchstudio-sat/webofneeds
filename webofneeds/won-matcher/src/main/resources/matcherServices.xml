@@ -26,7 +26,11 @@
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
     </context:component-scan>-->
 
-    <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
+    <!-- TODO: move the definition of the linked data source to another context file so that this context
+        can share the linked data source with other modules.
+        -->
+    <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" />
+
     <bean id="clientFactory" class="won.matcher.protocol.impl.MatcherProtocolNeedClientFactory" />
     <!-- protocol-level services -->
 
@@ -35,7 +39,7 @@
     </bean>
 
     <bean id="matcherProtocolNeedClientFactory" class="won.matcher.protocol.impl.MatcherProtocolNeedClientFactory">
-        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
+        <property name="linkedDataSource" ref="linkedDataSource" />
     </bean>
 
 

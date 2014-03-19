@@ -18,12 +18,11 @@ package won.bot.framework.events.listener;
 
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.BotContext;
-import won.bot.framework.events.EventBus;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
+import won.bot.framework.events.EventBus;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 import java.util.concurrent.Executor;
 
@@ -85,5 +84,11 @@ public interface EventListenerContext
    */
   public Executor getExecutor();
 
+
+  /**
+   * Returns a linked data source.
+   * @return
+   */
+  public LinkedDataSource getLinkedDataSource();
 
 }

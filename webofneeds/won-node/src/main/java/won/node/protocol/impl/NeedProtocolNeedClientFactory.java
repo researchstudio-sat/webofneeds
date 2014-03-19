@@ -6,13 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.ws.NeedProtocolNeedWebServiceClient;
-import won.protocol.repository.NeedRepository;
-import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.repository.NeedRepository;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 import won.protocol.ws.AbstractClientFactory;
+import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 
 import javax.ws.rs.core.Response;
 import java.net.MalformedURLException;
@@ -27,12 +28,12 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private LinkedDataRestClient linkedDataRestClient;
+  private LinkedDataSource linkedDataSource;
   private NeedRepository needRepository;
 
-  public void setLinkedDataRestClient(final LinkedDataRestClient linkedDataRestClient)
+  public void setLinkedDataSource(final LinkedDataSource linkedDataSource)
   {
-    this.linkedDataRestClient = linkedDataRestClient;
+    this.linkedDataSource = linkedDataSource;
   }
 
   //TODO: switch from linkedDataRestClient to need and connection repositories?
@@ -57,7 +58,10 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
   {
     URI needProtocolEndpoint = null;
     try{
-      needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.HAS_NEED_PROTOCOL_ENDPOINT);
+      needProtocolEndpoint = RdfUtils.getURIPropertyForResource(
+          linkedDataSource.getModelForResource(needURI),
+          needURI,
+          WON.HAS_NEED_PROTOCOL_ENDPOINT);
     } catch (UniformInterfaceException e){
       ClientResponse response = e.getResponse();
       if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){

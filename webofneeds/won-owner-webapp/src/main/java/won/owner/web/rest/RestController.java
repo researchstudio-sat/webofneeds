@@ -28,6 +28,7 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
@@ -69,6 +70,9 @@ public class RestController
 
   @Autowired
   private DataReloadService dataReloadService;
+
+  @Autowired
+  private LinkedDataSource linkedDataSource;
 
   //TODO: this is a quick fix and the only reason for us to use commons-collections. Rework to use ehcache!
   private LRUMap cachedNeeds = new LRUMap(200, 1000);
@@ -133,9 +137,7 @@ public class RestController
     logger.info("Found need in DB: ");
     Need need = needs.get(0);
 
-
-    LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
-    NeedPojo fullNeed = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+    NeedPojo fullNeed = new NeedPojo(need.getNeedURI(), linkedDataSource.getModelForResource(need.getNeedURI()));
 
     //NeedPojo fullNeed = NeedFetcher.getNeedInfo(need);
 
@@ -158,7 +160,7 @@ public class RestController
         logger.debug("found {} needs for uri {} in repo", matchNeeds.size(), matchUri);
         logger.debug("matchUri:{}, needURi:{}", matchUri, matchNeeds.get(0));
         logger.debug("fetching need {} from WON node", matchUri);
-        matchedNeed = new NeedPojo(matchNeeds.get(0).getNeedURI(), linkedDataRestClient.readResourceData(matchNeeds.get(0).getNeedURI()));
+        matchedNeed = new NeedPojo(matchNeeds.get(0).getNeedURI(), linkedDataSource.getModelForResource(matchNeeds.get(0).getNeedURI()));
         //matchedNeed = new NeedPojo(matchUri, linkedDataRestClient.readResourceData(matchUri));
         //NeedPojo matchedNeed = NeedFetcher.getNeedInfo(matchNeeds.get(0));
         this.cachedNeeds.put(matchUri, matchedNeed);
@@ -202,12 +204,11 @@ public class RestController
 
     logger.info("Getting all needs: ");
 
-    LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
     List<NeedPojo> returnList = new ArrayList<NeedPojo>();
 
     Iterable<Need> needs = needRepository.findAll();
     for (Need need : needs) {
-      NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+      NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataSource.getModelForResource(need.getNeedURI()));
       needPojo.setNeedId(need.getId());
       returnList.add(needPojo);
     }
@@ -301,8 +302,7 @@ public class RestController
       List<Need> needs = needRepository.findByNeedURI(needURI);
 
 
-      LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
-      NeedPojo fullNeed = new NeedPojo(needURI, linkedDataRestClient.readResourceData(needs.get(0).getNeedURI()));
+      NeedPojo fullNeed = new NeedPojo(needURI, linkedDataSource.getModelForResource(needs.get(0).getNeedURI()));
       fullNeed.setNeedId(needs.get(0).getId());
 
       //NeedPojo fullNeed = NeedFetcher.getNeedInfo(needs.get(0));

@@ -14,6 +14,7 @@
 
     <import resource="classpath:/spring/core/node-core.xml" />
     <import resource="classpath:/spring/component/storage/storage.xml" />
+    <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml"/>
     <import resource="classpath:/spring/component/camel/camel.xml" />
     <import resource="classpath:/spring/component/facet/facet.xml" />
     <import resource="classpath:/spring/component/needProtocolNeedService/needProtocolNeedService-jms.xml" />

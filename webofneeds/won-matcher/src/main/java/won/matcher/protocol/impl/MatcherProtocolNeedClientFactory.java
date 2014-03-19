@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.matcher.ws.MatcherProtocolNeedWebServiceClient;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 import won.protocol.ws.AbstractClientFactory;
 import won.protocol.ws.MatcherProtocolNeedWebServiceEndpoint;
@@ -34,13 +36,17 @@ public class MatcherProtocolNeedClientFactory extends AbstractClientFactory<Matc
   }
 
   @Autowired
-  private LinkedDataRestClient linkedDataRestClient;
+  private LinkedDataSource linkedDataSource;
 
   public MatcherProtocolNeedWebServiceEndpoint getMatcherProtocolEndpointForNeed(URI needURI) throws NoSuchNeedException, MalformedURLException
   {
     //URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.HAS_MATCHER_PROTOCOL_ENDPOINT);
     Path propertyPath =  PathParser.parse(PATH_MATCHER_PROTOCOL_ENDPOINT,prefixMapping);
-    URI needProtocolEndpoint = linkedDataRestClient.getURIPropertyForPropertyPath(needURI, propertyPath);
+    URI needProtocolEndpoint = RdfUtils.getURIPropertyForPropertyPath(
+        linkedDataSource.getModelForResource(needURI),
+        needURI,
+        propertyPath
+      );
     if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
     logger.debug("need won.matcher.protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
 
@@ -55,8 +61,8 @@ public class MatcherProtocolNeedClientFactory extends AbstractClientFactory<Matc
     return client.getOwnerProtocolOwnerWebServiceEndpointPort();
   }
 
-  public void setLinkedDataRestClient(LinkedDataRestClient linkedDataRestClient)
+  public void setLinkedDataSource(final LinkedDataSource linkedDataSource)
   {
-    this.linkedDataRestClient = linkedDataRestClient;
+    this.linkedDataSource = linkedDataSource;
   }
 }

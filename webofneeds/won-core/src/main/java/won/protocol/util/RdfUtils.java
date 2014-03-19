@@ -1,8 +1,11 @@
 package won.protocol.util;
 
+import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
+import com.hp.hpl.jena.sparql.path.Path;
+import com.hp.hpl.jena.sparql.path.eval.PathEval;
 import com.hp.hpl.jena.util.FileUtils;
 import com.hp.hpl.jena.util.ResourceUtils;
 import org.apache.jena.riot.Lang;
@@ -19,6 +22,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -343,9 +347,97 @@ public class RdfUtils
     return readRdfSnippet(new StringReader(rdfAsString), rdfLanguage);
   }
 
+  /**
+   * Looks for the triple [resourceURI, property, X] in the model obtained by
+   * dereferencing the specified resourceURI and returns X as a URI.
+   * If multiple triples are found, only the object of the first one is returned.
+   * @param resourceURI
+   * @param property
+   * @return null if the model is empty or the property does not exist
+   * @throws  IllegalArgumentException if the node found by the path is not a URI
+   */
+  public static URI getURIPropertyForResource(final Model model, final URI resourceURI, Property property)
+  {
+    StmtIterator stmts = model.listStatements(
+        new SimpleSelector(model.createResource(resourceURI.toString()), property, (RDFNode) null));
+    //assume only one endpoint
+    if (!stmts.hasNext()) return null;
+    Statement stmt = stmts.next();
+    return URI.create(stmt.getObject().toString());
+  }
+
+  /**
+   * Looks for the triple [resourceURI, property, X] in the model obtained by
+   * dereferencing the specified resourceURI and returns X as a string.
+   * If multiple triples are found, only the object of the first one is returned.
+   * @param resourceURI
+   * @param property
+   * @return null if the model is empty or the property does not exist
+   */
+  public static String getStringPropertyForResource(final Model model, final URI resourceURI, Property property)
+  {
+    StmtIterator stmts = model.listStatements(
+        new SimpleSelector(model.createResource(resourceURI.toString()), property, (RDFNode) null));
+    //assume only one endpoint
+    if (!stmts.hasNext()) return null;
+    Statement stmt = stmts.next();
+    return stmt.getString();
+  }
+
+  /**
+   * Evaluates the path on the model obtained by dereferencing the specified resourceURI.
+   * If the path resolves to multiple resources, only the first one is returned.
+   * <br />
+   * <br />
+   * Note: For more information on property paths, see http://jena.sourceforge.net/ARQ/property_paths.html
+   * <br />
+   * To create a Path object for the path "rdf:type/rdfs:subClassOf*":
+   * <pre>
+   * Path path = PathParser.parse("rdf:type/rdfs:subClassOf*", PrefixMapping.Standard) ;
+   * </pre>
+   * @param resourceURI
+   * @param propertyPath
+   * @return null if the model is empty or the path does not resolve to a node
+   * @throws  IllegalArgumentException if the node found by the path is not a URI
+   */
+  public static URI getURIPropertyForPropertyPath(final Model model, final URI resourceURI, Path propertyPath)
+  {
+    Node result = getNodeForPropertyPath(model, resourceURI, propertyPath);
+    return URI.create(result.getURI());
+  }
+
+  /**
+   * Evaluates the path on the model obtained by dereferencing the specified resourceURI.
+   * If the path resolves to multiple resources, only the first one is returned.
+   * <br />
+   * <br />
+   * Note: For more information on property paths, see http://jena.sourceforge.net/ARQ/property_paths.html
+   * <br />
+   * To create a Path object for the path "rdf:type/rdfs:subClassOf*":
+   * <pre>
+   * Path path = PathParser.parse("rdf:type/rdfs:subClassOf*", PrefixMapping.Standard) ;
+   * </pre>
+   * @param resourceURI
+   * @param propertyPath
+   * @return null if the model is empty or the path does not resolve to a node
+   */
+  public static String getStringPropertyForPropertyPath(final Model model, final URI resourceURI, Path propertyPath)
+  {
+    Node result = getNodeForPropertyPath(model, resourceURI, propertyPath);
+    return result.getLiteralLexicalForm();
+  }
+
+
+  private static Node getNodeForPropertyPath(final Model model, URI resourceURI, Path propertyPath) {
+    Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(), propertyPath);
+    if (!result.hasNext()) return null;
+    return result.next();
+  }
+
 
   /**
    * Stores additional data if there is any in the specified model.
+   * TODO: Move to WonRdfUtils
    *
    * @param eventURI
    * @param content

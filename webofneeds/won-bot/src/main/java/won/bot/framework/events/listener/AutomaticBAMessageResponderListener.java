@@ -1,8 +1,6 @@
 package won.bot.framework.events.listener;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
@@ -13,13 +11,11 @@ import won.bot.framework.events.event.OpenFromOtherNeedEvent;
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.BATestScriptAction;
 import won.bot.framework.events.listener.baStateBots.SimpleScriptManager;
-import won.bot.framework.events.listener.baStateBots.WON_BA;
 import won.bot.impl.BACCBot;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
-import won.protocol.rest.LinkedDataRestClient;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -41,7 +37,7 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
     private List<BATestBotScript> scripts;
     private int finishedScripts;
     private Object monitor = new Object();
-    LinkedDataRestClient client = new LinkedDataRestClient();
+
     public AutomaticBAMessageResponderListener(final EventListenerContext context, final List<BATestBotScript> scripts, final int targetNumberOfMessages, final long millisTimeoutBeforeReply)
     {
         super(context);
@@ -157,7 +153,8 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
             connectionToSendMessageFrom = con.getConnectionURI();
         } else {
             Path propertyPath = PathParser.parse("<"+ WON.HAS_REMOTE_CONNECTION+">", PrefixMapping.Standard);
-            connectionToSendMessageFrom = client.getURIPropertyForPropertyPath(con.getConnectionURI(), propertyPath);
+            connectionToSendMessageFrom = RdfUtils.getURIPropertyForPropertyPath(
+                getEventListenerContext().getLinkedDataSource().getModelForResource(con.getConnectionURI()), con.getConnectionURI() , propertyPath);
             //TODO: also get BA state for participant/coordinator and compare to
             //state that the action says it should be in. If the state is different
             //throw an exception.

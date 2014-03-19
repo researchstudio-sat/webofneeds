@@ -19,18 +19,18 @@ package won.bot.framework.bot.base;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.BotContext;
-import won.bot.framework.events.event.*;
-import won.bot.framework.events.listener.EventListenerContext;
-import won.bot.framework.events.EventBus;
-import won.bot.framework.events.bus.SchedulerEventBusImpl;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
+import won.bot.framework.events.EventBus;
+import won.bot.framework.events.bus.SchedulerEventBusImpl;
+import won.bot.framework.events.event.*;
+import won.bot.framework.events.listener.EventListenerContext;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
-import won.protocol.repository.ConnectionRepository;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 import java.net.URI;
 import java.util.concurrent.Executor;
@@ -220,6 +220,11 @@ public class EventBot extends TriggeredBot
       return EventBot.this.getExecutor();
     }
 
+    @Override
+    public LinkedDataSource getLinkedDataSource()
+    {
+      return EventBot.this.getLinkedDataSource();
+    }
   }
 
 }
