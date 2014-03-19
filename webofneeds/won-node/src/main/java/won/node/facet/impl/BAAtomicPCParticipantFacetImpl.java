@@ -1,38 +1,32 @@
 package won.node.facet.impl;
 
-
-
 import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import won.node.facet.businessactivity.participantcompletion.BAPCEventType;
+import won.node.facet.businessactivity.participantcompletion.BAPCState;
 import won.node.facet.businessactivity.participantcompletion.SimpleBAPCStateManager;
-import won.protocol.exception.*;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
-import won.protocol.repository.ConnectionRepository;
-
-import won.node.facet.businessactivity.participantcompletion.BAPCState;
-
 
 import java.net.URI;
 
 /**
- * Created with IntelliJ IDEA.
  * User: Danijel
- * Date: 16.1.14.
- * Time: 16.30
- * To change this template use File | Settings | File Templates.
+ * Date: 19.3.14.
  */
-public class BAPCParticipantFacetImpl extends Facet{
+public class BAAtomicPCParticipantFacetImpl extends Facet {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private SimpleBAPCStateManager stateManager = new SimpleBAPCStateManager();
 
+
     @Override
     public FacetType getFacetType() {
-        return FacetType.BAPCParticipantFacet;
+        return FacetType.BAAtomicPCParticipantFacet;
     }
 
     // Participant -> accept
@@ -112,7 +106,7 @@ public class BAPCParticipantFacetImpl extends Facet{
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
                             baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
-
+                            //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
                             needFacingConnectionClient.textMessage(con, myContent);
                         }
                         else

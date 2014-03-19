@@ -34,4 +34,8 @@ public class SimpleBAPCStateManager implements BAPCStateManager {
        map.put(ownerUri.toString()+needUri.toString(), state);
     }
 
+    public boolean containsBAPCState(BAPCState state){
+        return map.containsValue(state);
+    }
+
 }

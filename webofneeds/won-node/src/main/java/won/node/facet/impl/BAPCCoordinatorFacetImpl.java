@@ -34,10 +34,6 @@ public class BAPCCoordinatorFacetImpl extends Facet {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private SimpleBAPCStateManager stateManager = new SimpleBAPCStateManager();
 
-
-    @Autowired
-    private ConnectionRepository connectionRepository;
-
     @Override
     public FacetType getFacetType() {
         return FacetType.BAPCCoordinatorFacet;
