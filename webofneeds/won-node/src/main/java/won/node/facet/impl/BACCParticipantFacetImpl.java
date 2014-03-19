@@ -44,8 +44,6 @@ public class BACCParticipantFacetImpl extends Facet{
                 public void run() {
                     try {
                         needFacingConnectionClient.open(con, content);
-                        //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
-
                         stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
                         logger.info("Participant state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
                     } catch (WonProtocolException e) {
@@ -59,12 +57,9 @@ public class BACCParticipantFacetImpl extends Facet{
     }
 
 
-
     // Participant sends message to Coordinator
     public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         final URI remoteConnectionURI = con.getRemoteConnectionURI();
-        // System.out.println("daki Poziva: "+"Participant textMessageFromOwner");
-
 
         //inform the other side
         executorService.execute(new Runnable() {
@@ -77,19 +72,32 @@ public class BACCParticipantFacetImpl extends Facet{
                     Resource r = null;
 
                     //message (event) for sending
-                    NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_BA.BASE_URI,"hasTextMessage"));
-                    //System.out.println("daki: Participant sends:"+message.toString());
 
-                    messageForSending = ni.toList().get(0).toString();
-                    messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
-                    logger.info("Participant sends: " + messageForSending);
+                    // message as TEXT
+                    NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_BA.BASE_URI,"hasTextMessage"));
+                    if(ni.hasNext())
+                    {
+                        messageForSending = ni.toList().get(0).toString();
+                        messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
+                        logger.info("Participant sends: " + messageForSending);
+                        eventType = BACCEventType.getCoordinationEventTypeFromString(messageForSending);
+                    }
+                    // message as MODEL
+                    else {
+                        ni = message.listObjectsOfProperty(message.getProperty(WON_BA.COORDINATION_MESSAGE.getURI().toString()));
+                        if(ni.hasNext())
+                        {
+                            String eventTypeURI = ni.toList().get(0).asResource().getURI().toString();
+                            eventType = BACCEventType.getBAEventTypeFromURI(eventTypeURI);
+                            logger.info("Participants sends the RDF:" );
+                        }
+                    }
 
                     myContent = ModelFactory.createDefaultModel();
                     myContent.setNsPrefix("","no:uri");
                     Resource baseResource = myContent.createResource("no:uri");
 
                     // message -> eventType
-                    eventType = BACCEventType.getCoordinationEventTypeFromString(messageForSending);
                     if((eventType!=null))
                     {
                         if(eventType.isBACCParticipantEventType(eventType))
@@ -102,7 +110,6 @@ public class BACCParticipantFacetImpl extends Facet{
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
                             baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
-                            //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
                             needFacingConnectionClient.textMessage(con, myContent);
                         }
                         else
@@ -147,7 +154,9 @@ public class BACCParticipantFacetImpl extends Facet{
                     String sCoordMsg = coordMsg.toString(); //URI
 
                     // URI -> eventType
-                    BACCEventType eventType = BACCEventType.getCoordinationEventTypeFromURI(sCoordMsg);
+                    //2 BACCEventType eventType = BACCEventType.getCoordinationEventTypeFromURI(sCoordMsg);
+                    BACCEventType eventType = BACCEventType.getBAEventTypeFromURI(sCoordMsg);
+
 
                     BACCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                     logger.info("Current state of the Participant: "+state.getURI().toString());
@@ -184,9 +193,6 @@ public class BACCParticipantFacetImpl extends Facet{
                         }
 
                     }
-
-
-
 
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);

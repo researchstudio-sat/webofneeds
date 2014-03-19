@@ -139,6 +139,23 @@ public enum BACCEventType {
         this.name = name;
     }
 
+    BACCEventType(String name){
+        this.name = name;
+        permittingPStates = new ArrayList<BACCState>();
+        permittingPStates.add(BACCState.ACTIVE);
+        permittingPStates.add(BACCState.CANCELING_ACTIVE);
+        permittingPStates.add(BACCState.CANCELING_COMPLETING);
+        permittingPStates.add(BACCState.COMPLETING);
+        permittingPStates.add(BACCState.COMPLETED);
+        permittingPStates.add(BACCState.CLOSING);
+        permittingPStates.add(BACCState.COMPENSATING);
+        permittingPStates.add(BACCState.FAILING_ACTIVE_CANCELING_COMPLETING);
+        permittingPStates.add(BACCState.FAILING_COMPENSATING);
+        permittingPStates.add(BACCState.NOT_COMPLETING);
+        permittingPStates.add(BACCState.EXITING);
+        permittingPStates.add(BACCState.ENDED);
+    }
+
     public boolean isMessageAllowed(BACCState stateToCheck){
         if (this.permittingPStates.contains(stateToCheck))
             return true;
@@ -152,6 +169,14 @@ public enum BACCEventType {
     }
 
     public BACCEventType getBAEventTypeFromURIParticipantInbound (String sURI)
+    {
+        for (BACCEventType eventType: BACCEventType.values()){
+            if (sURI.equals(eventType.getURI().toString())) return eventType;
+        }
+        return null;
+    }
+
+    public static BACCEventType getBAEventTypeFromURI (String sURI)
     {
         for (BACCEventType eventType: BACCEventType.values()){
             if (sURI.equals(eventType.getURI().toString())) return eventType;

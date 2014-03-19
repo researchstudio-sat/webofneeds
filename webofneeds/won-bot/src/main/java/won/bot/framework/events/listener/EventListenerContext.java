@@ -40,18 +40,18 @@ public interface EventListenerContext
   public TaskScheduler getTaskScheduler();
 
   /**
-   * Returns the bot's NodeURISource. Used to obtain WON_BACC node URIs.
+   * Returns the bot's NodeURISource. Used to obtain WON_BA node URIs.
    * @return
    */
   public NodeURISource getNodeURISource();
 
   /**
-   * Returns the bot's owner service. Used to connect to WON_BACC nodes.
+   * Returns the bot's owner service. Used to connect to WON_BA nodes.
    */
   public OwnerProtocolNeedServiceClientSide getOwnerService();
 
   /**
-   * Returns the bot's needProducer. Used to obtain an RDF model that can be sent to a WON_BACC node to create a new need.
+   * Returns the bot's needProducer. Used to obtain an RDF model that can be sent to a WON_BA node to create a new need.
    * @return
    */
   public NeedProducer getNeedProducer();

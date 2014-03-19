@@ -5,7 +5,8 @@ import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
-import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.*;
+import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.coordinationMessageAsTextBots.*;
+import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.coordinationMessageAsUriBots.*;
 import won.protocol.model.FacetType;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class BAPCBot extends EventBot {
-    private static final int NO_OF_NEEDS = 9;
+    private static final int NO_OF_NEEDS = 19;
     private static final int NO_OF_MESSAGES = 50;
     private static final long MILLIS_BETWEEN_MESSAGES = 1000;
     public static final String URI_LIST_NAME_PARTICIPANT = "participants";
@@ -81,18 +82,7 @@ public class BAPCBot extends EventBot {
         // * open events - so it initiates the chain reaction of responses
         List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(NO_OF_NEEDS-1);
 
-
-//
-//
-//
-
-//        scripts.add(new BACCStateActiveCancelFailBot());
-
-
-
-
-
-
+        //Coordination message is sent as TEXT
         scripts.add(new BAPCStateExitBot());
         scripts.add(new BAPCStateCompleteBot());
         scripts.add(new BAPCStateCompensateBot());
@@ -101,6 +91,20 @@ public class BAPCBot extends EventBot {
         scripts.add(new BAPCStateActiveCancelBot());
         scripts.add(new BAPCStateActiveCancelFailBot());
         scripts.add(new BAPCStateActiveCannotCompleteBot());
+
+        //Coordination message is sent as MODEL
+        scripts.add(new BAPCStateExitUriBot());
+        scripts.add(new BAPCStateCompleteUriBot());
+        scripts.add(new BAPCStateCompensateUriBot());
+        scripts.add(new BAPCStateCompensateFailUriBot());
+        scripts.add(new BAPCStateActiveFailUriBot());
+        scripts.add(new BAPCStateActiveCancelUriBot());
+        scripts.add(new BAPCStateActiveCancelFailUriBot());
+        scripts.add(new BAPCStateActiveCannotCompleteUriBot());
+
+        //with failures
+        scripts.add(new BAPCStateCompleteWithFailureUriBot());
+        scripts.add(new BAPCStateCompleteWithFailureBot());
 
         this.autoResponder = new AutomaticBAMessageResponderListener(ctx, scripts, NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
         bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);

@@ -80,18 +80,29 @@ public class BAPCParticipantFacetImpl extends Facet{
 
                     //message (event) for sending
                     NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_BA.BASE_URI,"hasTextMessage"));
-                    //System.out.println("daki: Participant sends:"+message.toString());
-
-                    messageForSending = ni.toList().get(0).toString();
-                    messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
-                    logger.info("Participant sends: " + messageForSending);
+                    if(ni.hasNext())
+                    {
+                        messageForSending = ni.toList().get(0).toString();
+                        messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
+                        logger.info("Participant sends: " + messageForSending);
+                        eventType = BAPCEventType.getCoordinationEventTypeFromString(messageForSending);
+                    }
+                    // message as MODEL
+                    else {
+                        ni = message.listObjectsOfProperty(message.getProperty(WON_BA.COORDINATION_MESSAGE.getURI().toString()));
+                        if(ni.hasNext())
+                        {
+                            String eventTypeURI = ni.toList().get(0).asResource().getURI().toString();
+                            eventType = BAPCEventType.getBAEventTypeFromURI(eventTypeURI);
+                            logger.info("Participants sends the RDF:" );
+                        }
+                    }
 
                     myContent = ModelFactory.createDefaultModel();
                     myContent.setNsPrefix("","no:uri");
                     Resource baseResource = myContent.createResource("no:uri");
 
                     // message -> eventType
-                    eventType = BAPCEventType.getCoordinationEventTypeFromString(messageForSending);
                     if((eventType!=null))
                     {
                         if(eventType.isBAPCParticipantEventType(eventType))
