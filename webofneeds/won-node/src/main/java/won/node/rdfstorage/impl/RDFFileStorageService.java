@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package won.node.service.impl;
+package won.node.rdfstorage.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileManager;
 import org.springframework.beans.factory.annotation.Value;
+import won.node.rdfstorage.RDFStorageService;
 import won.protocol.exception.RDFStorageException;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
@@ -33,13 +34,13 @@ import java.io.*;
  * Time: 11:24
  * To change this template use File | Settings | File Templates.
  */
-public class RDFFileStorageService implements RDFStorageService {
+public class RDFFileStorageService implements RDFStorageService
+{
 
     @Value ("${rdf.file.path}")
     private String path;
 
-    @Override
-    public void storeContent(String filename, Model graph) {
+    private void storeContent(String filename, Model graph) {
         FileOutputStream out = null;
 
         if(path.equals(""))
@@ -62,7 +63,6 @@ public class RDFFileStorageService implements RDFStorageService {
         }
     }
 
-    @Override
     public Model loadContent(String filename) {
         InputStream in = null;
         Model m;

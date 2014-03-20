@@ -65,7 +65,7 @@ public class AutomaticMessageResponderListener extends BaseEventListener
   {
     logger.debug("got open event for need: {}, connection state is: {}", openEvent.getCon().getNeedURI(), openEvent.getCon().getState());
     if (openEvent.getCon().getState() == ConnectionState.CONNECTED){
-      logger.debug("replying to open with message");
+      logger.debug("replying to open with message (delay: {} millis)", millisTimeoutBeforeReply);
       getEventListenerContext().getTaskScheduler().schedule(new Runnable()
       {
         @Override
@@ -92,6 +92,7 @@ public class AutomaticMessageResponderListener extends BaseEventListener
         String message = createMessage();
         Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
         URI connectionUri = messageEvent.getCon().getConnectionURI();
+        logger.debug("sending message " + message);
         try {
             getEventListenerContext().getOwnerService().textMessage(connectionUri, messageContent);
           countMessageAndUnsubscribeIfNecessary();
@@ -118,6 +119,7 @@ public class AutomaticMessageResponderListener extends BaseEventListener
     if (targetNumberOfMessages > 0){
       message += " of " + targetNumberOfMessages;
     }
+    message +=  "(delay: "+ millisTimeoutBeforeReply + " millis)";
     return message;
   }
 

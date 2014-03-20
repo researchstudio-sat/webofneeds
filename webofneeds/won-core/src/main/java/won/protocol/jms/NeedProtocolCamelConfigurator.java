@@ -17,11 +17,9 @@
 package won.protocol.jms;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.CamelContextAware;
 import won.protocol.exception.CamelConfigurationFailedException;
 
 import java.net.URI;
-import java.util.List;
 
 /**
  * User: LEIH-NB
@@ -32,7 +30,7 @@ public interface NeedProtocolCamelConfigurator extends CamelConfigurator {
     public String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName);
     public void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName);
 
-    void addRouteForEndpoint(String startingEndpoint, URI wonNodeURI) throws CamelConfigurationFailedException;
+    void addRouteForEndpoint(String startingEndpoint, final URI wonNodeURI) throws CamelConfigurationFailedException;
 
     void setCamelContext(CamelContext camelContext);
 

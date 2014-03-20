@@ -30,7 +30,7 @@ public class Create2NeedsShortConversationBot extends EventBot
 
   private static final int NO_OF_NEEDS = 2;
   private static final int NO_OF_MESSAGES = 10;
-  private static final long MILLIS_BETWEEN_MESSAGES = 1000;
+  private static final long MILLIS_BETWEEN_MESSAGES = 100;
     private static final String NAME_NEEDS = "needs";
 
 

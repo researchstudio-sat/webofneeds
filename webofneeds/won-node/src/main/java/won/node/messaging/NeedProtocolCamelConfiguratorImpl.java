@@ -29,7 +29,6 @@ import won.protocol.jms.BrokerComponentFactory;
 import won.protocol.jms.NeedProtocolCamelConfigurator;
 
 import java.net.URI;
-import java.util.List;
 
 /**
  * User: LEIH-NB
@@ -83,9 +82,9 @@ public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfi
     }
 
     @Override
-    public void addRouteForEndpoint(String startingComponent,URI brokerUri) throws CamelConfigurationFailedException {
+    public void addRouteForEndpoint(String startingComponent, final URI wonNodeURI) throws CamelConfigurationFailedException {
 
-        if (camelContext.getComponent(startingComponent)==null||camelContext.getRoute(startingComponent)==null){
+        if (camelContext.getRoute(startingComponent)==null){
             NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,startingComponent);
             try {
                 camelContext.addRoutes(needProtocolRouteBuilder);

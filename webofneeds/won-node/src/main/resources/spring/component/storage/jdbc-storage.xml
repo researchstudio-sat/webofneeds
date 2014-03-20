@@ -79,5 +79,5 @@
     <jpa:repositories base-package="won.protocol.repository" />
 
     <!--- RDF Storage -->
-    <bean id="rdfStorageRef" class="won.node.service.impl.RDFFileStorageService" />
+    <bean id="rdfStorageRef" class="won.node.rdfstorage.impl.RDFFileStorageService" />
 </beans>
