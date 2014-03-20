@@ -51,6 +51,8 @@ public class HintSender implements MatchProcessor
       logger.debug("hint failed: no need found with URI {}", e.getUnknownNeedURI());
     } catch (IllegalMessageForNeedStateException e) {
       logger.debug("hint failed: illegal state '{}' for hint to need {}", e.getNeedState(), e.getNeedURI());
+    } catch (Exception e) {
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
   }
 }

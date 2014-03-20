@@ -14,20 +14,15 @@
  *    limitations under the License.
  */
 
-package won.bot.app;
+package won.protocol.matcher;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+import won.protocol.service.MatcherFacingNeedCommunicationService;
 
-public class SimpleCommentTest
+/**
+ * User: fkleedorfer
+ * Date: 31.10.12
+ */
+public interface MatcherProtocolNeedServiceClientSide extends MatcherFacingNeedCommunicationService
 {
-
-  public static void main(String[] args) throws Exception {
-    SpringApplication app = new SpringApplication(
-        new Object[]{"classpath:/spring/app/simpleCommentTest.xml"}
-    );
-    ConfigurableApplicationContext applicationContext =  app.run(args);
-    Thread.sleep(5*60*1000);
-    app.exit(applicationContext);
-  }
+    void initializeDefault();
 }

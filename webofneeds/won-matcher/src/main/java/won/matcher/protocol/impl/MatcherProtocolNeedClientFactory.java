@@ -27,11 +27,6 @@ public class MatcherProtocolNeedClientFactory extends AbstractClientFactory<Matc
   private final String PATH_MATCHER_PROTOCOL_ENDPOINT = "won:supportsWonProtocolImpl/won:hasMatcherProtocolEndpoint";
   private final PrefixMapping prefixMapping;
 
-  public MatcherProtocolNeedClientFactory()
-  {
-    this.prefixMapping = new PrefixMappingImpl();
-    this.prefixMapping.setNsPrefix("won", WON.getURI());
-  }
 
   @Autowired
   private LinkedDataRestClient linkedDataRestClient;
@@ -59,4 +54,10 @@ public class MatcherProtocolNeedClientFactory extends AbstractClientFactory<Matc
   {
     this.linkedDataRestClient = linkedDataRestClient;
   }
+    public MatcherProtocolNeedClientFactory()
+    {
+        this.prefixMapping = new PrefixMappingImpl();
+        this.prefixMapping.setNsPrefix("won", WON.getURI());
+    }
+
 }

@@ -54,8 +54,12 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     private MessagingService messagingService;
     private URI defaultNodeURI;
     private ApplicationContext ownerApplicationContext;
+
+
+
+
     //todo: make this configurable
-    private String startingEndpoint ="seda:outgoingMessages";
+    private String startingEndpoint ;
 
 
 
@@ -314,6 +318,8 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.ownerApplicationContext = applicationContext;
     }
-
+    public void setStartingEndpoint(String startingEndpoint) {
+        this.startingEndpoint = startingEndpoint;
+    }
 
 }

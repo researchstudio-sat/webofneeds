@@ -14,20 +14,21 @@
  *    limitations under the License.
  */
 
-package won.bot.app;
+package won.node.camel.routes.fixed;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.apache.camel.builder.RouteBuilder;
 
-public class SimpleCommentTest
-{
-
-  public static void main(String[] args) throws Exception {
-    SpringApplication app = new SpringApplication(
-        new Object[]{"classpath:/spring/app/simpleCommentTest.xml"}
-    );
-    ConfigurableApplicationContext applicationContext =  app.run(args);
-    Thread.sleep(5*60*1000);
-    app.exit(applicationContext);
-  }
+/**
+ * User: LEIH-NB
+ * Date: 27.11.13
+ */
+public class MatcherProtocolStaticRoutes extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("activemq:queue:MatcherProtocol.in?concurrentConsumers=5").routeId("Matcher2NodeRoute")
+            .wireTap("bean:messagingService?method=inspectMessage")
+            .choice()
+            .when(header("methodName").isEqualTo("hint"))
+            .to("bean:matcherProtocolNeedJMSService?method=hint");
+    }
 }

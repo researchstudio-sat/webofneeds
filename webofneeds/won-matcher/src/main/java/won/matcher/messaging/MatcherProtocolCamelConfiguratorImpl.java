@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.node.messaging;
+package won.matcher.messaging;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -23,22 +23,20 @@ import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.camel.routes.NeedProtocolDynamicRoutes;
+//import won.node.camel.routes.NeedProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.BrokerComponentFactory;
+import won.protocol.jms.MatcherProtocolCamelConfigurator;
 import won.protocol.jms.NeedProtocolCamelConfigurator;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * User: LEIH-NB
  * Date: 26.02.14
  */
-public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfigurator {
-
+public class MatcherProtocolCamelConfiguratorImpl { }
+    /*
     private BiMap<URI, String> endpointMap = HashBiMap.create();
     private BiMap<URI,String> brokerComponentMap = HashBiMap.create();
     private String componentName;
@@ -68,7 +66,7 @@ public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfi
      *
      * @param brokerUri
      * @return componentName
-     */
+     */       /*
     @Override
     public synchronized void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName){
 
@@ -127,3 +125,4 @@ public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfi
 
 
 }
+           */

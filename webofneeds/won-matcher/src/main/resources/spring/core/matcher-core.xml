@@ -17,26 +17,42 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd">
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
     <!-- REST stuff
 
     <context:component-scan base-package="won.protocol.rest">
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
     </context:component-scan>-->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" ignore-unresolvable="true"/>
 
     <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
     <bean id="clientFactory" class="won.matcher.protocol.impl.MatcherProtocolNeedClientFactory" />
     <!-- protocol-level services -->
 
     <bean id="matcherProtocolNeedServiceClient" class="won.matcher.protocol.impl.MatcherProtocolNeedServiceClient">
-        <property name="clientFactory" ref="clientFactory" />
+        <property name="delegate" ref="matcherProtocolNeedServiceClientJMSBased" />
+    </bean>
+    <bean id="matcherProtocolNeedServiceWSBased" class="won.matcher.protocol.impl.MatcherProtocolNeedServiceClientWSBased">
+        <property name="clientFactory" ref="matcherProtocolNeedClientFactory"/>
+        <property name="linkedDataRestClient" ref="linkedDataRestClient"/>
     </bean>
 
     <bean id="matcherProtocolNeedClientFactory" class="won.matcher.protocol.impl.MatcherProtocolNeedClientFactory">
         <property name="linkedDataRestClient" ref="linkedDataRestClient" />
     </bean>
 
+    <bean id="matcherProtocolNeedServiceClientJMSBased"
+          class="won.matcher.protocol.impl.MatcherProtocolNeedServiceClientJMSBased"
+          init-method="initializeDefault">
+        <property name="messagingService" ref="messagingService"/>
+        <property name="matcherProtocolCommunicationService" ref="matcherProtocolCommunicationService"/>
+        <property name="startingEndpoint" value="seda:MatcherProtocol.Out.Hint"/>
+    </bean>
+    <bean id="matcherCLICommandLineRunner" class="won.matcher.cli.MatcherCLI"/>
 
 </beans>

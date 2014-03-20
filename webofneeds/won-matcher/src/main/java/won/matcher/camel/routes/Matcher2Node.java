@@ -14,20 +14,23 @@
  *    limitations under the License.
  */
 
-package won.bot.app;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+package won.matcher.camel.routes;
+import org.apache.camel.builder.RouteBuilder;
 
-public class SimpleCommentTest
-{
+/**
+ * User: LEIH-NB
+ * Date: 10.10.13
+ */
 
-  public static void main(String[] args) throws Exception {
-    SpringApplication app = new SpringApplication(
-        new Object[]{"classpath:/spring/app/simpleCommentTest.xml"}
-    );
-    ConfigurableApplicationContext applicationContext =  app.run(args);
-    Thread.sleep(5*60*1000);
-    app.exit(applicationContext);
-  }
+//TODO: change to asyncronous processing maybe
+public class Matcher2Node extends RouteBuilder{
+    @Override
+    public void configure(){
+        from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=5").routeId("Matcher2NodeRoute")
+                .wireTap("bean:messagingService?method=inspectMessage")
+                .recipientList(header("remoteBrokerEndpoint"));
+
+    }
+
 }

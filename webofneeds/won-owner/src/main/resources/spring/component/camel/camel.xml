@@ -44,11 +44,7 @@
         <!--property name="brokerURL" value="tcp://localhost:61616"/-->
         <!--property name="brokerURL" value="amqp://localhost:5672"/-->
     </bean>
-    <!--bean id="pooledConnectionFactory"
-          class="org.apache.activemq.pool.PooledConnectionFactory" init-method="start" destroy-method="stop">
-       <property name="createConnectionOnStartup" value="true" />
-        <property name="connectionFactory" ref="activemqConnectionFactory" />
-    </bean-->
+
 
     <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory" >
         <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>

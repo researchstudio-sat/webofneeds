@@ -74,6 +74,7 @@
         <property name="activeMqEndpoint" value="${uri.protocol.activemq}" />
         <property name="activeMqNeedProtcolQueueName" value="${activemq.queuename.need.incoming}" />
         <property name="activeMqOwnerProtcolQueueName" value="${activemq.queuename.owner.incoming}" />
+        <property name="activeMqMatcherPrtotocolQueueName" value="${activemq.queuename.matcher.incoming}"/>
         <property name="rdfStorage" ref="rdfStorageRef" />
         <property name="pageSize" value="${linkeddata.pagesize}" />
     </bean>
@@ -128,9 +129,7 @@
 
     </bean>
 
-    <bean id="matcherProtocolNeedService" class="won.node.protocol.impl.MatcherProtocolNeedServiceImpl">
-        <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
-    </bean>
+
 
     <!-- protocol-level services -->
     <bean id="ownerProtocolNeedService" class="won.node.protocol.impl.OwnerProtocolNeedServiceImpl">
@@ -141,7 +140,9 @@
         <property name="needInformationService" ref="needInformationService" />
         <property name="needManagementService" ref="needManagementService"/>
     </bean>
-
+    <bean id="matcherProtocolNeedService" class="won.node.protocol.impl.MatcherProtocolNeedServiceImpl">
+        <property name="matcherFacingNeedCommunicationService" ref="needCommunicationService" />
+    </bean>
     <bean id="needProtocolNeedService" class="won.node.protocol.impl.NeedProtocolNeedServiceImpl">
         <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService"/>
         <property name="needFacingNeedCommunicationService" ref="needCommunicationService"/>

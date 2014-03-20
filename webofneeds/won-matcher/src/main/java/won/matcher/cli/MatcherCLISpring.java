@@ -14,18 +14,20 @@
  *    limitations under the License.
  */
 
-package won.bot.app;
+package won.matcher.cli;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class SimpleCommentTest
+public class MatcherCLISpring
 {
-
+  private static org.slf4j.Logger logger = LoggerFactory.getLogger(MatcherCLI.class);
   public static void main(String[] args) throws Exception {
     SpringApplication app = new SpringApplication(
-        new Object[]{"classpath:/spring/app/simpleCommentTest.xml"}
+            new Object[]{"classpath:/spring/app/simpleMatcherCLI.xml"}
     );
+
     ConfigurableApplicationContext applicationContext =  app.run(args);
     Thread.sleep(5*60*1000);
     app.exit(applicationContext);

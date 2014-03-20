@@ -14,20 +14,18 @@
  *    limitations under the License.
  */
 
-package won.bot.app;
+package won.protocol.jms;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+import won.protocol.exception.NoSuchConnectionException;
 
-public class SimpleCommentTest
-{
+import java.net.URI;
 
-  public static void main(String[] args) throws Exception {
-    SpringApplication app = new SpringApplication(
-        new Object[]{"classpath:/spring/app/simpleCommentTest.xml"}
-    );
-    ConfigurableApplicationContext applicationContext =  app.run(args);
-    Thread.sleep(5*60*1000);
-    app.exit(applicationContext);
-  }
+/**
+ * User: LEIH-NB
+ * Date: 25.02.14
+ */
+public interface MatcherProtocolCommunicationService extends ProtocolCommunicationService {
+    public CamelConfiguration configureCamelEndpoint(URI needUri,String startingEndpoint) throws Exception;
+    public URI  getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException;
+
 }
