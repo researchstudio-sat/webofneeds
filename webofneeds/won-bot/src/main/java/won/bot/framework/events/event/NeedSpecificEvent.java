@@ -16,43 +16,12 @@
 
 package won.bot.framework.events.event;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.model.Connection;
-
 import java.net.URI;
 
 /**
+ * Interface for events that are need-specific.
  */
-public class ConnectFromOtherNeedEvent extends BaseEvent implements NeedSpecificEvent, ConnectionSpecificEvent
+public interface NeedSpecificEvent
 {
-  private final Connection con;
-  private final Model content;
-
-  public ConnectFromOtherNeedEvent(final Connection con, final Model content)
-  {
-    this.con = con;
-    this.content = content;
-  }
-
-  public Connection getCon()
-  {
-    return con;
-  }
-
-  public Model getContent()
-  {
-    return content;
-  }
-
-  @Override
-  public URI getConnectionURI()
-  {
-    return con.getConnectionURI();
-  }
-
-  @Override
-  public URI getNeedURI()
-  {
-    return con.getNeedURI();
-  }
+  public URI getNeedURI();
 }

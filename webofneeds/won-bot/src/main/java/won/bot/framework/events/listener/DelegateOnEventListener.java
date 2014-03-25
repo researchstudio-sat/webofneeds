@@ -14,45 +14,33 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event;
+package won.bot.framework.events.listener;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.model.Connection;
-
-import java.net.URI;
+import won.bot.framework.events.Event;
+import won.bot.framework.events.EventListener;
 
 /**
+ * Simple delegating listener.
  */
-public class ConnectFromOtherNeedEvent extends BaseEvent implements NeedSpecificEvent, ConnectionSpecificEvent
+public class DelegateOnEventListener extends BaseEventListener
 {
-  private final Connection con;
-  private final Model content;
+  private EventListener delegate;
 
-  public ConnectFromOtherNeedEvent(final Connection con, final Model content)
+  public DelegateOnEventListener(final EventListenerContext context, final EventListener delegate)
   {
-    this.con = con;
-    this.content = content;
+    super(context);
+    this.delegate = delegate;
   }
 
-  public Connection getCon()
+  public DelegateOnEventListener(final EventListenerContext context, final EventFilter eventFilter, final EventListener delegate)
   {
-    return con;
-  }
-
-  public Model getContent()
-  {
-    return content;
+    super(context, eventFilter);
+    this.delegate = delegate;
   }
 
   @Override
-  public URI getConnectionURI()
+  protected void doOnEvent(final Event event) throws Exception
   {
-    return con.getConnectionURI();
-  }
-
-  @Override
-  public URI getNeedURI()
-  {
-    return con.getNeedURI();
+    delegate.onEvent(event);
   }
 }

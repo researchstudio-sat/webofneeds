@@ -14,24 +14,15 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event;
-
-import java.net.URI;
+package won.bot.framework.events;
 
 /**
- *
+ * Interface to be implemented by listeners that need to know which event types they
+ * are subscribed to. The onSubscribe method will be called before the subscription, the onUnscubscribe
+ * methods will be called after the listener is unsubscribed.
  */
-public class NeedDeactivatedEvent extends BaseEvent implements NeedSpecificEvent
+public interface SubscriptionAware
 {
-  private URI needURI;
-
-  public NeedDeactivatedEvent(final URI needURI)
-  {
-    this.needURI = needURI;
-  }
-
-  public URI getNeedURI()
-  {
-    return needURI;
-  }
+  public <T extends Event> void onSubscribe(Class<T> event);
+  public <T extends Event> void onUnsubscribe(Class<T> event);
 }

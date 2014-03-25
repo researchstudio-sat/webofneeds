@@ -26,14 +26,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import won.bot.framework.events.event.WorkDoneEvent;
+import won.bot.framework.events.listener.BaseEventListener;
+import won.bot.framework.events.listener.CountingListener;
 import won.bot.framework.events.listener.ExecuteOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.Create2NeedsGroupingBot;
-import won.bot.impl.Create2NeedsShortConversationBot;
 
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +48,7 @@ public class Create2NeedsGroupingBotTest
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
-  private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 2000;
+  private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 1000;
 
   MyBot bot;
 
@@ -147,31 +147,32 @@ public class Create2NeedsGroupingBotTest
     public void executeAsserts()
     {
       //2 act events
-      Assert.assertEquals(2, this.needCreator.getEventCount());
-      Assert.assertEquals(0, this.needCreator.getExceptionCount());
+      Assert.assertEquals(NO_OF_GROUPMEMBERS, this.groupMemberCreator.getEventCount());
+      Assert.assertEquals(0, this.groupMemberCreator.getExceptionCount());
       //2 create need events
-      Assert.assertEquals(3, this.groupFacetCreator.getEventCount());
-      Assert.assertEquals(0, this.groupFacetCreator.getExceptionCount());
+      Assert.assertEquals(NO_OF_GROUPMEMBERS, this.groupCreator.getEventCount());
+      Assert.assertEquals(0, this.groupCreator.getExceptionCount());
       //1 create group events
-      Assert.assertEquals(3, this.needConnector.getEventCount());
+      Assert.assertEquals(NO_OF_GROUPMEMBERS+1, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
       //2 connect, 2 open
-      Assert.assertEquals(4, this.autoOpener.getEventCount());
+      Assert.assertEquals(NO_OF_GROUPMEMBERS*2, this.autoOpener.getEventCount());
       Assert.assertEquals(0, this.autoOpener.getExceptionCount());
-      //10 messages
-      Assert.assertEquals(4, this.autoResponder.getEventCount());
-      Assert.assertEquals(0, this.autoResponder.getExceptionCount());
-      //10 messages
-      Assert.assertEquals(4, this.connectionCloser.getEventCount());
-      Assert.assertEquals(0, this.connectionCloser.getExceptionCount());
-      //2 close (one sent, one received - but for sending we create no event)
-
-      Assert.assertEquals(1,this.allNeedsDeactivator.getEventCount());
-      Assert.assertEquals(0, this.allNeedsDeactivator.getExceptionCount());
-
-
+      //41 messages
+      Assert.assertEquals(NO_OF_GROUPMEMBERS, this.deactivator.getEventCount());
+      Assert.assertEquals(0, this.deactivator.getExceptionCount());
+      //check that the autoresponder creator was called
+      Assert.assertEquals(NO_OF_GROUPMEMBERS, this.autoResponderCreator.getEventCount());
+      Assert.assertEquals(0, this.autoResponderCreator.getExceptionCount());
+      //check that the autoresponders were created
+      Assert.assertEquals(NO_OF_GROUPMEMBERS, this.autoResponders.size());
+      //check that the autoresponders responded as they should
+      for (BaseEventListener autoResponder: this.autoResponders){
+        Assert.assertEquals(NO_OF_MESSAGES, ((CountingListener) autoResponder).getCount());
+        Assert.assertEquals(0, autoResponder.getExceptionCount());
+      }
       //4 NeedDeactivated events
-      Assert.assertEquals(5, this.workDoneSignaller.getEventCount());
+      Assert.assertEquals(NO_OF_GROUPMEMBERS, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
       //TODO: there is more to check:

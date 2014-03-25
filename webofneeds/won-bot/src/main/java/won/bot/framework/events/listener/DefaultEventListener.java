@@ -14,24 +14,20 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event;
-
-import java.net.URI;
+package won.bot.framework.events.listener;
 
 /**
- *
+ * Default listener for simple use in anonymous classes.
  */
-public class NeedDeactivatedEvent extends BaseEvent implements NeedSpecificEvent
+public abstract class DefaultEventListener extends BaseEventListener
 {
-  private URI needURI;
-
-  public NeedDeactivatedEvent(final URI needURI)
+  public DefaultEventListener(final EventListenerContext context)
   {
-    this.needURI = needURI;
+    super(context);
   }
 
-  public URI getNeedURI()
+  protected DefaultEventListener(final EventListenerContext context, final EventFilter eventFilter)
   {
-    return needURI;
+    super(context, eventFilter);
   }
 }

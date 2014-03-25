@@ -14,45 +14,30 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event;
+package won.bot.framework.events.listener.filter;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.model.Connection;
+import won.bot.framework.events.Event;
+import won.bot.framework.events.event.NeedSpecificEvent;
+import won.bot.framework.events.listener.EventListenerContext;
 
 import java.net.URI;
 
 /**
+ * Filter that accepts NeedSpecificEvents if their needURI is in the specified named list.
  */
-public class ConnectFromOtherNeedEvent extends BaseEvent implements NeedSpecificEvent, ConnectionSpecificEvent
+public class NeedUriInNamedListFilter extends AbstractNamedUriListFilter
 {
-  private final Connection con;
-  private final Model content;
-
-  public ConnectFromOtherNeedEvent(final Connection con, final Model content)
+  public NeedUriInNamedListFilter(final EventListenerContext context, final String listname)
   {
-    this.con = con;
-    this.content = content;
-  }
-
-  public Connection getCon()
-  {
-    return con;
-  }
-
-  public Model getContent()
-  {
-    return content;
+    super(context, listname);
   }
 
   @Override
-  public URI getConnectionURI()
+  protected URI getURIFromEvent(final Event event)
   {
-    return con.getConnectionURI();
-  }
-
-  @Override
-  public URI getNeedURI()
-  {
-    return con.getNeedURI();
+    if (event instanceof NeedSpecificEvent){
+      return ((NeedSpecificEvent)event).getNeedURI();
+    }
+    return null;
   }
 }

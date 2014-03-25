@@ -22,32 +22,31 @@ import won.bot.framework.events.EventListener;
 /**
  * Counts how often it is called, offers to call a callback when a certain number is reached.
  */
-public class DelegateOnceAfterNEventsListener extends BaseEventListener
+public class DelegateOnceAfterNEventsListener extends AbstractDoOnceAfterNEventsListener
 {
-  private int targetCount;
-  private int count = 0;
-  private Object monitor = new Object();
-  private boolean executed = false;
   private EventListener delegate;
 
-  public DelegateOnceAfterNEventsListener(final EventListenerContext context, int count, EventListener delegate)
+  public DelegateOnceAfterNEventsListener(final EventListenerContext context, EventListener delegate, int count)
   {
-    super(context);
-    this.targetCount = count;
+    super(context, count);
+    this.delegate = delegate;
+  }
+
+  public DelegateOnceAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount, final EventListener delegate)
+  {
+    super(context, eventFilter, targetCount);
     this.delegate = delegate;
   }
 
   @Override
-  public void doOnEvent(final Event event) throws Exception {
-    if (executed) return;
-    synchronized (monitor){
-      count++;
-      logger.debug("processing event {} of {}", count, targetCount);
-      if (!executed && count >= targetCount) {
-        logger.debug("forwarding event {} to delegate {}", event, delegate);
-        delegate.onEvent(event);
-        executed = true;
-      }
-    }
+  protected void unsubscribe()
+  {
+    getEventListenerContext().getEventBus().unsubscribe(this);
+  }
+
+  @Override
+  protected void doOnce(final Event event) throws Exception
+  {
+    delegate.onEvent(event);
   }
 }

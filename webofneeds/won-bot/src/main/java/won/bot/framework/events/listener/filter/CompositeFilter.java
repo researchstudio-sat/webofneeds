@@ -14,24 +14,14 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event;
+package won.bot.framework.events.listener.filter;
 
-import java.net.URI;
+import won.bot.framework.events.listener.EventFilter;
 
 /**
- *
+ * Interface for composite filters.
  */
-public class NeedDeactivatedEvent extends BaseEvent implements NeedSpecificEvent
+public interface CompositeFilter extends EventFilter
 {
-  private URI needURI;
-
-  public NeedDeactivatedEvent(final URI needURI)
-  {
-    this.needURI = needURI;
-  }
-
-  public URI getNeedURI()
-  {
-    return needURI;
-  }
+  void addFilter(EventFilter filter);
 }

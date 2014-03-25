@@ -14,24 +14,25 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event;
+package won.bot.framework.events.listener.filter;
 
-import java.net.URI;
+import won.bot.framework.events.listener.EventFilter;
+import won.bot.framework.events.listener.EventListenerContext;
 
 /**
- *
+ * Abstract base class for filters that need the event listener context for making their decision.
  */
-public class NeedDeactivatedEvent extends BaseEvent implements NeedSpecificEvent
+public abstract class EventListenerContextAwareFilter implements EventFilter
 {
-  private URI needURI;
+  private EventListenerContext context;
 
-  public NeedDeactivatedEvent(final URI needURI)
+  protected EventListenerContextAwareFilter(final EventListenerContext context)
   {
-    this.needURI = needURI;
+    this.context = context;
   }
 
-  public URI getNeedURI()
+  protected EventListenerContext getContext()
   {
-    return needURI;
+    return context;
   }
 }

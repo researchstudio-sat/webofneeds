@@ -14,45 +14,31 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event;
+package won.bot.framework.events.listener.filter;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.model.Connection;
-
-import java.net.URI;
+import won.bot.framework.events.Event;
+import won.bot.framework.events.EventListener;
+import won.bot.framework.events.event.FinishedEvent;
+import won.bot.framework.events.listener.EventFilter;
 
 /**
+ * Filter that only accepts a FinishedEvent for a specific listener.
  */
-public class ConnectFromOtherNeedEvent extends BaseEvent implements NeedSpecificEvent, ConnectionSpecificEvent
+public class FinishedEventFilter implements EventFilter
 {
-  private final Connection con;
-  private final Model content;
+  EventListener listener;
 
-  public ConnectFromOtherNeedEvent(final Connection con, final Model content)
+  public FinishedEventFilter(final EventListener listener)
   {
-    this.con = con;
-    this.content = content;
-  }
-
-  public Connection getCon()
-  {
-    return con;
-  }
-
-  public Model getContent()
-  {
-    return content;
+    this.listener = listener;
   }
 
   @Override
-  public URI getConnectionURI()
+  public boolean accept(final Event event)
   {
-    return con.getConnectionURI();
-  }
-
-  @Override
-  public URI getNeedURI()
-  {
-    return con.getNeedURI();
+    if (event instanceof FinishedEvent){
+      if ( ((FinishedEvent)event).getListener() == listener) return true;
+    }
+    return false;
   }
 }

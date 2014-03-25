@@ -19,6 +19,7 @@ package won.bot.framework.bot.base;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.BotContext;
+import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.events.EventBus;
@@ -65,6 +66,7 @@ import java.util.concurrent.Executor;
  *   <li>shutting down the trigger - an event bot may have a trigger that calls the bot's act() method regularly.</li>
  * </ul>
  *
+ * The bot will only react to onXX methods (i.e., create events and publish them on the internal event bus) if it is in lifecycle phase ACTIVE.
  *
  */
 public class EventBot extends TriggeredBot
@@ -77,51 +79,72 @@ public class EventBot extends TriggeredBot
   @Override
   public final void act() throws Exception
   {
-    eventBus.publish(new ActEvent());
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new ActEvent());
+    } else {
+      logger.debug("not publishing event for call to act() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
   }
 
   @Override
   public final void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final Model content) throws Exception
   {
-    eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));
+    } else {
+      logger.debug("not publishing event for call to onMessageFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
   }
 
   @Override
   public final void onHintFromMatcher(final Match match, final Model content) throws Exception
   {
-    eventBus.publish(new HintFromMatcherEvent(match, content));
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new HintFromMatcherEvent(match, content));
+    } else {
+      logger.debug("not publishing event for call to onHintFromMatcher() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
   }
 
   @Override
   public final void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
   {
-    logger.info("ON CLOSE");
-    eventBus.publish(new CloseFromOtherNeedEvent(con, content));
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new CloseFromOtherNeedEvent(con, content));
+    } else {
+      logger.debug("not publishing event for call to onClose() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
   }
 
   @Override
   public final void onOpenFromOtherNeed(final Connection con, final Model content) throws Exception
   {
-    eventBus.publish(new OpenFromOtherNeedEvent(con, content));
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new OpenFromOtherNeedEvent(con, content));
+    } else {
+      logger.debug("not publishing event for call to onOpenFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
   }
 
   @Override
   public final void onConnectFromOtherNeed(final Connection con, final Model content) throws Exception
   {
-    eventBus.publish(new ConnectFromOtherNeedEvent(con, content));
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new ConnectFromOtherNeedEvent(con, content));
+    } else {
+      logger.debug("not publishing event for call to onConnectFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
   }
 
   @Override
   public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception
   {
-    eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel, FacetType.OwnerFacet));
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel, FacetType.OwnerFacet));
+    } else {
+      logger.debug("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
   }
-  @Override
-  public void onNewGroupCreated(final URI groupURI, final URI wonNodeURI, final Model groupModel)
-  {
-    eventBus.publish(new GroupFacetCreatedEvent(groupURI, wonNodeURI, groupModel));
-  }
-
 
   /*
    * Override this method to initialize your event listeners. Will be called before
@@ -173,9 +196,7 @@ public class EventBot extends TriggeredBot
   {
 
     public TaskScheduler getTaskScheduler() {
-
-        return EventBot.this.getTaskScheduler();
-
+      return EventBot.this.getTaskScheduler();
     }
 
     public NodeURISource getNodeURISource()

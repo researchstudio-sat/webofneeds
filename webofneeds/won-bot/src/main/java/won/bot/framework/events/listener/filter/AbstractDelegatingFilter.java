@@ -14,45 +14,30 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event;
+package won.bot.framework.events.listener.filter;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.model.Connection;
-
-import java.net.URI;
+import won.bot.framework.events.listener.EventFilter;
 
 /**
+ * Abstract base class for delegating filters.
  */
-public class ConnectFromOtherNeedEvent extends BaseEvent implements NeedSpecificEvent, ConnectionSpecificEvent
+public abstract class AbstractDelegatingFilter implements DelegatingFilter
 {
-  private final Connection con;
-  private final Model content;
+  private EventFilter delegate;
 
-  public ConnectFromOtherNeedEvent(final Connection con, final Model content)
+  protected AbstractDelegatingFilter(final EventFilter delegate)
   {
-    this.con = con;
-    this.content = content;
+    this.delegate = delegate;
   }
 
-  public Connection getCon()
+  protected EventFilter getDelegate()
   {
-    return con;
-  }
-
-  public Model getContent()
-  {
-    return content;
+    return delegate;
   }
 
   @Override
-  public URI getConnectionURI()
+  public void setDelegate(final EventFilter delegate)
   {
-    return con.getConnectionURI();
-  }
-
-  @Override
-  public URI getNeedURI()
-  {
-    return con.getNeedURI();
+    this.delegate = delegate;
   }
 }

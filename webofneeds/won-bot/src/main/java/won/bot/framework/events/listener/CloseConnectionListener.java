@@ -17,9 +17,7 @@
 package won.bot.framework.events.listener;
 
 import won.bot.framework.events.Event;
-import won.bot.framework.events.event.ConnectFromOtherNeedEvent;
-import won.bot.framework.events.event.MessageFromOtherNeedEvent;
-import won.bot.framework.events.event.OpenFromOtherNeedEvent;
+import won.bot.framework.events.event.ConnectionSpecificEvent;
 
 import java.net.URI;
 
@@ -34,17 +32,18 @@ public class CloseConnectionListener extends BaseEventListener
     super(context);
   }
 
+  public CloseConnectionListener(final EventListenerContext context, final EventFilter eventFilter)
+  {
+    super(context, eventFilter);
+  }
+
   @Override
   protected void doOnEvent(final Event event) throws Exception {
     logger.debug("trying to close connection related to event {}", event);
     try {
       URI connectionURI = null;
-      if (event instanceof MessageFromOtherNeedEvent){
-        connectionURI = ((MessageFromOtherNeedEvent)event).getCon().getConnectionURI();
-      } else  if (event instanceof ConnectFromOtherNeedEvent){
-        connectionURI = ((ConnectFromOtherNeedEvent)event).getCon().getConnectionURI();
-      } else if (event instanceof OpenFromOtherNeedEvent) {
-        connectionURI = ((OpenFromOtherNeedEvent)event).getCon().getConnectionURI();
+      if (event instanceof ConnectionSpecificEvent){
+        connectionURI = ((ConnectionSpecificEvent)event).getConnectionURI();
       }
       logger.debug("Extracted connection uri {}", connectionURI);
       if (connectionURI != null) {

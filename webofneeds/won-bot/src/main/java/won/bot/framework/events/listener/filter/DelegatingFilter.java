@@ -14,24 +14,14 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event;
+package won.bot.framework.events.listener.filter;
 
-import java.net.URI;
+import won.bot.framework.events.listener.EventFilter;
 
 /**
- *
+ * Interface for delegating filters.
  */
-public class NeedDeactivatedEvent extends BaseEvent implements NeedSpecificEvent
+public interface DelegatingFilter extends EventFilter
 {
-  private URI needURI;
-
-  public NeedDeactivatedEvent(final URI needURI)
-  {
-    this.needURI = needURI;
-  }
-
-  public URI getNeedURI()
-  {
-    return needURI;
-  }
+  public void setDelegate(EventFilter delegate);
 }

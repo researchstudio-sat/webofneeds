@@ -45,6 +45,13 @@ public class PublishEventAfterNEventsListener<T extends Event> extends BaseEvent
     this.eventClassToPublish = eventClassToPublish;
   }
 
+  public PublishEventAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final Class<T> eventClassToPublish, final int targetCount)
+  {
+    super(context, eventFilter);
+    this.eventClassToPublish = eventClassToPublish;
+    this.targetCount = targetCount;
+  }
+
   @Override
   public void doOnEvent(final Event event) throws Exception
   {

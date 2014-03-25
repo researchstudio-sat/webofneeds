@@ -22,7 +22,7 @@ import java.util.List;
 public class BACCBot extends EventBot {
     private static final int NO_OF_NEEDS = 29;
     private static final int NO_OF_MESSAGES = 50;
-    private static final long MILLIS_BETWEEN_MESSAGES = 1000;
+    private static final long MILLIS_BETWEEN_MESSAGES = 100;
     public static final String URI_LIST_NAME_PARTICIPANT = "participants";
     public static final String URI_LIST_NAME_COORDINATOR = "coordinator";
 

@@ -31,29 +31,31 @@ import java.util.Date;
  * Can be configured to apply a timeout (non-blocking) before sending messages.
  * Can be configured to send a fixed number of messages and then unsubscribe from events.
  */
-public class AutomaticMessageResponderListener extends BaseEventListener
+public class AutomaticMessageResponderListener extends AbstractHandleFirstNEventsListener
 {
-  private int targetNumberOfMessages = -1;
-  private int numberOfMessagesSent = 0;
   private long millisTimeoutBeforeReply = 1000;
-  private Object monitor = new Object();
 
   public AutomaticMessageResponderListener(final EventListenerContext context, final int targetNumberOfMessages, final long millisTimeoutBeforeReply)
   {
-    super(context);
-    this.targetNumberOfMessages = targetNumberOfMessages;
+    super(context, targetNumberOfMessages);
     this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
   }
 
+  public AutomaticMessageResponderListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount, final long millisTimeoutBeforeReply)
+  {
+    super(context, eventFilter, targetCount);
+    this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
+  }
+
+
   @Override
-  public void doOnEvent(final Event event) throws Exception
+  protected void handleFirstNTimes(final Event event) throws Exception
   {
     if (event instanceof MessageFromOtherNeedEvent){
       handleMessageEvent((MessageFromOtherNeedEvent) event);
     } else if (event instanceof OpenFromOtherNeedEvent) {
       handleOpenEvent((OpenFromOtherNeedEvent) event);
     }
-
   }
 
   /**
@@ -73,7 +75,6 @@ public class AutomaticMessageResponderListener extends BaseEventListener
         {
           URI connectionUri = openEvent.getCon().getConnectionURI();
           try {
-            countMessageAndUnsubscribeIfNecessary();
             getEventListenerContext().getOwnerService().textMessage(connectionUri, WonRdfUtils.MessageUtils.textMessage(createMessage()));
           } catch (Exception e) {
             logger.warn("could not send message via connection {}", connectionUri, e);
@@ -85,7 +86,8 @@ public class AutomaticMessageResponderListener extends BaseEventListener
 
   private void handleMessageEvent(final MessageFromOtherNeedEvent messageEvent){
     logger.debug("got message '{}' for need: {}", messageEvent.getMessage().getMessage(), messageEvent.getCon().getNeedURI());
-    getEventListenerContext().getTaskScheduler().schedule(new Runnable(){
+    getEventListenerContext().getTaskScheduler().schedule(new Runnable()
+    {
       @Override
       public void run()
       {
@@ -94,8 +96,7 @@ public class AutomaticMessageResponderListener extends BaseEventListener
         URI connectionUri = messageEvent.getCon().getConnectionURI();
         logger.debug("sending message " + message);
         try {
-            getEventListenerContext().getOwnerService().textMessage(connectionUri, messageContent);
-          countMessageAndUnsubscribeIfNecessary();
+          getEventListenerContext().getOwnerService().textMessage(connectionUri, messageContent);
         } catch (Exception e) {
           logger.warn("could not send message via connection {}", connectionUri, e);
         }
@@ -103,29 +104,21 @@ public class AutomaticMessageResponderListener extends BaseEventListener
     }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
   }
 
-  private void countMessageAndUnsubscribeIfNecessary()
-  {
-    synchronized (monitor){
-      numberOfMessagesSent++;
-      if (targetNumberOfMessages > 0 && numberOfMessagesSent >= targetNumberOfMessages){
-        unsubscribe();
-      }
-    }
-  }
 
   private String createMessage()
   {
-    String message = "auto reply no " + (numberOfMessagesSent +1);
-    if (targetNumberOfMessages > 0){
-      message += " of " + targetNumberOfMessages;
+    String message = "auto reply no " + (getCount());
+    if (getTargetCount() > 0){
+      message += " of " + getTargetCount();
     }
     message +=  "(delay: "+ millisTimeoutBeforeReply + " millis)";
     return message;
   }
 
-  private void unsubscribe()
+  @Override
+  protected void unsubscribe()
   {
-    logger.debug("unsubscribing from MessageFromOtherNeedEvents");
+    logger.debug("unsubscribing from all events");
     getEventListenerContext().getEventBus().unsubscribe(this);
   }
 }

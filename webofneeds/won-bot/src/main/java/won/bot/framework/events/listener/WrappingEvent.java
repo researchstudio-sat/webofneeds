@@ -14,24 +14,15 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event;
+package won.bot.framework.events.listener;
 
-import java.net.URI;
+import won.bot.framework.events.Event;
 
 /**
- *
+ * User: fkleedorfer
+ * Date: 24.03.14
  */
-public class NeedDeactivatedEvent extends BaseEvent implements NeedSpecificEvent
+public interface WrappingEvent
 {
-  private URI needURI;
-
-  public NeedDeactivatedEvent(final URI needURI)
-  {
-    this.needURI = needURI;
-  }
-
-  public URI getNeedURI()
-  {
-    return needURI;
-  }
+  public Event getWrappedEvent();
 }

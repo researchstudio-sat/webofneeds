@@ -35,6 +35,11 @@ public class DeactivateNeedOnConnectionCloseListener extends BaseEventListener
     super(context);
   }
 
+  public DeactivateNeedOnConnectionCloseListener(final EventListenerContext context, final EventFilter eventFilter)
+  {
+    super(context, eventFilter);
+  }
+
   @Override
   public void doOnEvent(final Event event) throws Exception
   {
