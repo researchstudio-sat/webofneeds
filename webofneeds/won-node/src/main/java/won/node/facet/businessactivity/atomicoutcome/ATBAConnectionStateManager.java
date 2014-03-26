@@ -8,6 +8,7 @@ import java.net.URI;
  * Date: 20.3.14.
  */
 public interface ATBAConnectionStateManager {
+
     public ATConnectionState getStateForConnection(Connection con);
     public void setStateForConnection(URI stateUri, Connection con);
 }

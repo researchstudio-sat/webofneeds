@@ -15,6 +15,7 @@ public class ATConnectionState {
     private URI ownerStateUri;
 
 
+
     public ATConnectionState(Connection con, URI coordinatorStateUri) {
         this.con = con;
         this.ownerStateUri = coordinatorStateUri;

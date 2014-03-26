@@ -14,6 +14,7 @@ public class SimpleATBAConnectionStateManager implements ATBAConnectionStateMana
 
     private HashMap<String, ATConnectionState> map = new HashMap();
 
+
     public HashMap<String, ATConnectionState> getMap() {
         return map;
     }
