@@ -24,7 +24,7 @@ import java.net.URI;
 /**
  *
  */
-public class NeedCreatedEvent extends BaseEvent
+public class NeedCreatedEvent extends BaseEvent implements NeedSpecificEvent
 {
   private final URI needUri;
   private final URI wonNodeUri;
@@ -54,4 +54,9 @@ public class NeedCreatedEvent extends BaseEvent
     return needModel;
   }
 
+  @Override
+  public URI getNeedURI()
+  {
+    return needUri;
+  }
 }

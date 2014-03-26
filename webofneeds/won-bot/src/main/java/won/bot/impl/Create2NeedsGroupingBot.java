@@ -16,13 +16,16 @@
 
 package won.bot.impl;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.component.needproducer.NeedProducer;
+import won.bot.framework.events.Event;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
+import won.bot.framework.events.listener.filter.*;
 import won.protocol.model.FacetType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -30,12 +33,11 @@ import won.protocol.model.FacetType;
 public class Create2NeedsGroupingBot extends EventBot
 {
 
-  private static final int NO_OF_NEEDS = 2;
-  private static final int NO_OF_GROUPS = 1;
-  private static final int NO_OF_MESSAGES = 4;
-  private static final long MILLIS_BETWEEN_MESSAGES = 1000;
-    private static final String NAME_GROUPS = "groups";
-    private static final String NAME_GROUPMEMBERS = "groupmembers";
+  protected static final int NO_OF_GROUPMEMBERS = 5;
+  protected static final int NO_OF_MESSAGES = 10;
+  protected static final long MILLIS_BETWEEN_MESSAGES = 10;
+  protected static final String NAME_GROUPS = "groups";
+  protected static final String NAME_GROUPMEMBERS = "groupmembers";
 
 
   //we use protected members so we can extend the class and
@@ -43,90 +45,104 @@ public class Create2NeedsGroupingBot extends EventBot
   //
   //we use BaseEventListener as their types so we can access the generic
   //functionality offered by that class
-  protected BaseEventListener needCreator;
-  protected BaseEventListener groupFacetCreator;
+  protected BaseEventListener groupMemberCreator;
+  protected BaseEventListener groupCreator;
   protected BaseEventListener needConnector;
   protected BaseEventListener autoOpener;
-  protected BaseEventListener autoResponder;
-  protected BaseEventListener connectionCloser;
-  protected BaseEventListener allNeedsDeactivator;
-  protected BaseEventListener needDeactivator;
+  protected BaseEventListener autoResponderCreator;
+  protected BaseEventListener deactivator;
+  protected BaseEventListener conversationStarter;
   protected BaseEventListener workDoneSignaller;
+  protected List<BaseEventListener> autoResponders;
 
   @Override
   protected void initializeEventListeners()
   {
-    EventListenerContext ctx = getEventListenerContext();
+    final EventListenerContext ctx = getEventListenerContext();
 
     EventBus bus = getEventBus();
 
-    //create needs every trigger execution until 2 needs are created
-    this.needCreator = new ExecuteOnEventListener(
+    //create needs every trigger execution until N needs are created
+    this.groupMemberCreator = new ExecuteOnEventListener(
         ctx,
         new EventBotActions.CreateNeedAction(ctx, NAME_GROUPMEMBERS),
-        NO_OF_NEEDS
+        NO_OF_GROUPMEMBERS
     );
-    bus.subscribe(ActEvent.class,this.needCreator);
+    bus.subscribe(ActEvent.class,this.groupMemberCreator);
+
+    //for each created need (in the group), add a listener that will auto-respond to messages directed at that need
+    //create a filter that only accepts events for needs in the group:
+    NeedUriInNamedListFilter groupMemberFilter = new NeedUriInNamedListFilter(ctx, NAME_GROUPMEMBERS);
+    //remember the auto-responders in a list
+    this.autoResponders = new ArrayList<BaseEventListener>();
+    //make a composite filter, with one filter for each autoResponder that wait for the FinishedEvents the responders emit.
+    //that filter will be used to shut down all needs after all the autoResponders have finished.
+    final OrFilter mainAutoResponderFilter = new OrFilter();
+    //listen to NeedCreatedEvents
+    this.autoResponderCreator = new DelegateOnEventListener(ctx, groupMemberFilter, new DefaultEventListener(ctx)
+    {
+      @Override
+      protected void doOnEvent(final Event event) throws Exception
+      {
+        //create a listener that automatically answers messages, only for that need URI
+        AutomaticMessageResponderListener listener = new AutomaticMessageResponderListener(
+            ctx, NeedUriEventFilter.forEvent(event), NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
+        //subscribe to the message events
+        getEventBus().subscribe(MessageFromOtherNeedEvent.class, listener);
+        //remember the listener for later
+        autoResponders.add(listener);
+        //add a filter that will wait for the FinishedEvent emitted by that listener
+        //wrap it in an acceptonce filter to make extra sure we count each listener only once.
+        mainAutoResponderFilter.addFilter(
+            new AcceptOnceFilter(
+                new FinishedEventFilter(listener)));
+      }
+    });
+    getEventBus().subscribe(NeedCreatedEvent.class, this.autoResponderCreator);
 
 
 
-    //count until 2 needs were created, then create group facet
-    this.groupFacetCreator = new ExecuteOnceAfterNEventsListener(
-            ctx,
-            new EventBotActions.CreateNeedWithFacetsAction(ctx, NAME_GROUPS, FacetType.GroupFacet.getURI()),
-            NO_OF_NEEDS);
-    bus.subscribe(NeedCreatedEvent.class, this.groupFacetCreator);
+    //count until N needs were created, then create need with group facet (the others will connect to that facet)
+    this.groupCreator = new ExecuteOnceAfterNEventsListener(
+        ctx,
+        new EventBotActions.CreateNeedWithFacetsAction(ctx, NAME_GROUPS, FacetType.GroupFacet.getURI()),
+        NO_OF_GROUPMEMBERS);
+    bus.subscribe(NeedCreatedEvent.class, this.groupCreator);
 
+    //wait for N+1 needCreatedEvents, then connect the members with the group facet of the third need
     this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
         new EventBotActions.ConnectFromListToListAction(ctx, NAME_GROUPMEMBERS, NAME_GROUPS,  FacetType.OwnerFacet.getURI(),FacetType.GroupFacet.getURI()),
-            NO_OF_NEEDS + 1
+            NO_OF_GROUPMEMBERS + 1
     );
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
+    //add a listener that is informed of the connect/open events and that auto-opens
+    //subscribe it to:
+    // * connect events - so it responds with open
+    // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
+    this.autoOpener = new AutomaticConnectionOpenerListener(ctx);
+    bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
+    bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
+    //now, once all connections have been opened, make 1 bot send a message to the group, the subsequent listener will cause let wild chatting to begin
+    this.conversationStarter = new DelegateOnceAfterNEventsListener(ctx,
+        new AutomaticMessageResponderListener(ctx,1,MILLIS_BETWEEN_MESSAGES), NO_OF_GROUPMEMBERS
+    );
+    bus.subscribe(OpenFromOtherNeedEvent.class, this.conversationStarter);
 
-      //add a listener that is informed of the connect/open events and that auto-opens
-      //subscribe it to:
-      // * connect events - so it responds with open
-      // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
-      this.autoOpener = new AutomaticConnectionOpenerListener(ctx);
-      bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
-      bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
+    //add a listener that deactivates the need with the group facet after it has seen all the groupmembers' FinishedEvents
+    this.deactivator = new ExecuteOnceAfterNEventsListener(
+        ctx, mainAutoResponderFilter,
+        NO_OF_GROUPMEMBERS,
+        new EventBotActions.DeactivateAllNeedsOfGroupAction(ctx, NAME_GROUPS));
+    bus.subscribe( FinishedEvent.class, this.deactivator);
 
-
-      //add a listener that auto-responds to messages by a message
-      //after 10 messages, it unsubscribes from all events
-      //subscribe it to:
-      // * message events - so it responds
-
-      // * open events - so it initiates the chain reaction of responses
-      this.autoResponder = new AutomaticMessageResponderListener(ctx, NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
-      bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);
-      bus.subscribe(MessageFromOtherNeedEvent.class, this.autoResponder);
-
-
-      //add a listener that closes the connection after it has seen 10 messages
-      this.connectionCloser = new DelegateOnceAfterNEventsListener(
-              ctx,
-              NO_OF_MESSAGES,
-              new CloseConnectionListener(ctx));
-      bus.subscribe( MessageFromOtherNeedEvent.class, this.connectionCloser);
-
-      //add a listener that auto-responds to a close message with a deactivation of both needs.
-      //subscribe it to:
-      // * close events
-      this.allNeedsDeactivator = new DeactivateAllNeedsOnConnectionCloseListener(ctx);
-      bus.subscribe(CloseFromOtherNeedEvent.class, this.allNeedsDeactivator);
-
-      //add a listener that counts two NeedDeactivatedEvents and then tells the
-      //framework that the bot's work is done
-      this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
-              ctx,
-              new EventBotActions.SignalWorkDoneAction(ctx), 2*(NO_OF_NEEDS+NO_OF_GROUPS)-1
-      );
-      bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
-      bus.subscribe(CloseFromOtherNeedEvent.class,this.workDoneSignaller);
-
+    //When the group facet need is deactivated, all connections are closed. wait for the close events and signal work done.
+    this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
+            ctx,
+            new EventBotActions.SignalWorkDoneAction(ctx), NO_OF_GROUPMEMBERS
+    );
+    bus.subscribe(CloseFromOtherNeedEvent.class, this.workDoneSignaller);
   }
 
 }

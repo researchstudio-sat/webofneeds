@@ -2,6 +2,7 @@ package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.node.rdfstorage.RDFStorageService;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.repository.*;

@@ -21,8 +21,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.component.needproducer.impl.GroupNeedProducer;
-import won.bot.framework.events.event.GroupFacetCreatedEvent;
 import won.bot.framework.events.event.NeedCreatedEvent;
 import won.bot.framework.events.event.NeedDeactivatedEvent;
 import won.bot.framework.events.event.WorkDoneEvent;
@@ -32,8 +30,6 @@ import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -287,6 +283,25 @@ public class EventBotActions
             }
         }
     }
+
+  public static class DeactivateAllNeedsOfGroupAction extends Action {
+    private String groupName;
+    public DeactivateAllNeedsOfGroupAction(EventListenerContext eventListenerContext, String groupName) {
+      super(eventListenerContext);
+      this.groupName = groupName;
+    }
+
+    @Override
+    protected void doRun() throws Exception {
+      List<URI> toDeactivate = getEventListenerContext().getBotContext().getNamedNeedUriList(groupName);
+      for (URI uri: toDeactivate){
+        getEventListenerContext().getOwnerService().deactivate(uri);
+        getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
+      }
+    }
+  }
+
+
 
     private static void rememberInListIfNamePresent(EventListenerContext ctx ,URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0){

@@ -41,6 +41,13 @@ public class ExecuteOnEventListener extends BaseEventListener
     this.timesToRun = timesToRun;
   }
 
+  public ExecuteOnEventListener(final EventListenerContext context, final EventFilter eventFilter, final int timesToRun, final Runnable task)
+  {
+    super(context, eventFilter);
+    this.timesToRun = timesToRun;
+    this.task = task;
+  }
+
   @Override
   public void doOnEvent(final Event event) throws Exception
   {

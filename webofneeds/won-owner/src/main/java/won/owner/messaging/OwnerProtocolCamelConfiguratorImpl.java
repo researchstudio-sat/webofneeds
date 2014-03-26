@@ -28,7 +28,6 @@ import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.BrokerComponentFactory;
-import won.protocol.jms.CamelConfigurator;
 import won.protocol.jms.OwnerProtocolCamelConfigurator;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -126,7 +125,7 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     }
 
     @Override
-    public synchronized void addRouteForEndpoint(String startingEndpoint,URI wonNodeURI) throws CamelConfigurationFailedException {
+    public synchronized void addRouteForEndpoint(String startingEndpoint, final URI wonNodeURI) throws CamelConfigurationFailedException {
         /**
          * there can be only one route per endpoint. Thus, consuming endpoint of each route shall be unique.
          */

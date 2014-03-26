@@ -17,42 +17,35 @@
 package won.bot.framework.events.listener;
 
 import won.bot.framework.events.Event;
-import won.bot.framework.events.event.NeedCreatedEvent;
 
 /**
  * Counts how often it is called, offers to call a callback when a certain number is reached.
  */
-public class ExecuteOnceAfterNEventsListener extends BaseEventListener
+public class ExecuteOnceAfterNEventsListener extends AbstractDoOnceAfterNEventsListener
 {
-  private int targetCount;
-  private int count = 0;
-  private Object monitor = new Object();
-  private boolean executed = false;
   private Runnable task;
 
   public ExecuteOnceAfterNEventsListener(final EventListenerContext context, Runnable task, int count)
   {
-    super(context);
-    this.targetCount = count;
+    super(context, count);
+    this.task = task;
+  }
+
+  public ExecuteOnceAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount, final Runnable task)
+  {
+    super(context, eventFilter, targetCount);
     this.task = task;
   }
 
   @Override
-  public void doOnEvent(final Event event) throws Exception
+  protected void unsubscribe()
   {
-    if (executed){
-        getEventListenerContext().getEventBus().unsubscribe(NeedCreatedEvent.class,this);
-        return;
-    }
-    synchronized (monitor){
-      count++;
-      logger.debug("processing event {} of {}", count, targetCount);
-      if (!executed && count >= targetCount) {
-        logger.debug("scheduling task ");
-        getEventListenerContext().getExecutor().execute(task);
-        executed = true;
-      }
-    }
+    getEventListenerContext().getEventBus().unsubscribe(this);
   }
 
+  @Override
+  protected void doOnce(Event event)
+  {
+    getEventListenerContext().getExecutor().execute(task);
+  }
 }

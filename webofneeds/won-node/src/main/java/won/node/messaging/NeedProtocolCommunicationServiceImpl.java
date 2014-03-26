@@ -43,15 +43,20 @@ public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommuni
     public synchronized CamelConfiguration configureCamelEndpoint(URI needUri,URI otherNeedUri,String startingEndpoint) throws Exception {
         String needProtocolQueueName;
         CamelConfiguration camelConfiguration = new CamelConfiguration();
-
+        logger.debug("ensuring camel is configured for local need {}, remote need {} and starting endpoint {}",new Object[]{needUri, otherNeedUri, startingEndpoint});
         URI needBrokerUri = activeMQService.getBrokerEndpoint(needUri);
         URI otherNeedBrokerUri = activeMQService.getBrokerEndpoint(otherNeedUri);
 
         if (needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(otherNeedBrokerUri)!=null){
+            logger.debug("broker component name is already known");
             camelConfiguration.setEndpoint(needProtocolCamelConfigurator.getEndpoint(otherNeedBrokerUri));
             camelConfiguration.setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(otherNeedBrokerUri));
-            needProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,otherNeedBrokerUri);
+            //HINT: we may have to handle routes that were shut down automatically after a timeout here...
+            logger.debug("setting up the route if necessary");
+            needProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint, otherNeedBrokerUri);
+            logger.debug("done setting up the route");
         } else{
+            logger.debug("broker component name unknown - setting up a new component for the remote broker");
             URI resourceUri;
             URI brokerUri;
             if (needBrokerUri.equals(otherNeedBrokerUri)){
@@ -63,7 +68,7 @@ public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommuni
             }
             needProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
             camelConfiguration.setEndpoint(needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(brokerUri,needProtocolQueueName));
-            needProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,brokerUri);
+            needProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint, otherNeedBrokerUri);
             camelConfiguration.setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
             ActiveMQComponent activeMQComponent = (ActiveMQComponent)needProtocolCamelConfigurator.getCamelContext().getComponent(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
             logger.info("ActiveMQ Service Status : {}",activeMQComponent.getStatus().toString());

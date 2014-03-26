@@ -31,7 +31,6 @@ import java.net.URI;
 public interface Bot
 {
   public boolean knowsNeedURI(URI needURI);
-  public void onNewGroupCreated(final URI groupURI, final URI wonNodeURI, final Model groupModel);
   public void onConnectFromOtherNeed(Connection con, final Model content) throws Exception;
   public void onOpenFromOtherNeed(Connection con, final Model content) throws Exception;
   public void onCloseFromOtherNeed(Connection con, final Model content) throws Exception;

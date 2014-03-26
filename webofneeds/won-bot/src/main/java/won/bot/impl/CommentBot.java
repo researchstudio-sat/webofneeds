@@ -16,9 +16,7 @@
 
 package won.bot.impl;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
@@ -82,8 +80,8 @@ public class CommentBot extends EventBot
       //add a listener that closes the connection after it has seen 10 messages
       this.connectionCloser = new DelegateOnceAfterNEventsListener(
               ctx,
-              2,
-              new CloseConnectionListener(ctx));
+          new CloseConnectionListener(ctx), 2
+      );
       bus.subscribe( ConnectFromOtherNeedEvent.class, this.connectionCloser);
       bus.subscribe(OpenFromOtherNeedEvent.class,this.connectionCloser);
 

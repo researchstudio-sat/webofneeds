@@ -13,7 +13,8 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
     <import resource="classpath:/spring/core/node-core.xml" />
-    <import resource="classpath:/spring/component/storage/storage.xml" />
+    <import resource="classpath:/spring/component/storage/jdbc-storage.xml" />
+    <import resource="classpath:/spring/component/storage/inmemory-rdf-storage.xml" />
     <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml"/>
     <import resource="classpath:/spring/component/camel/camel.xml" />
     <import resource="classpath:/spring/component/facet/facet.xml" />

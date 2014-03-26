@@ -30,7 +30,7 @@ public class Create2NeedsShortConversationBot extends EventBot
 
   private static final int NO_OF_NEEDS = 2;
   private static final int NO_OF_MESSAGES = 10;
-  private static final long MILLIS_BETWEEN_MESSAGES = 1000;
+  private static final long MILLIS_BETWEEN_MESSAGES = 100;
     private static final String NAME_NEEDS = "needs";
 
 
@@ -87,8 +87,8 @@ public class Create2NeedsShortConversationBot extends EventBot
     //add a listener that closes the connection after it has seen 10 messages
     this.connectionCloser = new DelegateOnceAfterNEventsListener(
         ctx,
-        NO_OF_MESSAGES,
-        new CloseConnectionListener(ctx));
+        new CloseConnectionListener(ctx), NO_OF_MESSAGES
+    );
     bus.subscribe( MessageFromOtherNeedEvent.class, this.connectionCloser);
 
     //add a listener that auto-responds to a close message with a deactivation of both needs.

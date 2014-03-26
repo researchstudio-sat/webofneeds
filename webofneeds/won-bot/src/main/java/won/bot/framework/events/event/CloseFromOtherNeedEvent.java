@@ -19,10 +19,12 @@ package won.bot.framework.events.event;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.model.Connection;
 
+import java.net.URI;
+
 /**
  *
  */
-public class CloseFromOtherNeedEvent extends BaseEvent
+public class CloseFromOtherNeedEvent extends BaseEvent implements NeedSpecificEvent, ConnectionSpecificEvent
 {
   private final Connection con;
   private final Model content;
@@ -43,4 +45,15 @@ public class CloseFromOtherNeedEvent extends BaseEvent
     return content;
   }
 
+  @Override
+  public URI getConnectionURI()
+  {
+    return con.getConnectionURI();
+  }
+
+  @Override
+  public URI getNeedURI()
+  {
+    return con.getNeedURI();
+  }
 }
