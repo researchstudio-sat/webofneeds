@@ -1,4 +1,4 @@
-package won.node.facet.businessactivity.atomicOutcome;
+package won.node.facet.businessactivity.atomicoutcome;
 
 import won.protocol.model.Connection;
 import java.net.URI;
