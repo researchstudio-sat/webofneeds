@@ -55,7 +55,7 @@ public class BAAtomicCCCoordinatorFacetImpl extends Facet {
                 } catch (WonProtocolException e) {
                     logger.debug("caught Exception:", e);
                 }
-                // adding Participant is possible only in the first phase
+                // adding Participants is possible only in the first phase
                 if(firstPhase)  //add a new Participant (first phase in progress)
                 {
                     stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
@@ -223,7 +223,7 @@ public class BAAtomicCCCoordinatorFacetImpl extends Facet {
 
                     // atomic outcome
                     // if one of the Participants votes NO (either EXIT or Fail or CannnotComplete is received)
-                    //ACITVE -> (message: CANCEL) -> CANCELING
+                    //ACTITVE, COMPLETING -> (message: CANCEL) -> CANCELING
                     //COMPLETED -> (message: COMPENSATE) -> COMPENSATING
 
                     if(firstPhase && (eventType.getURI().toString().equals(WON_BA.MESSAGE_EXIT.getURI().toString())) ||
@@ -279,24 +279,7 @@ public class BAAtomicCCCoordinatorFacetImpl extends Facet {
                         }
                     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    BACCEventType resendEventType = state.getResendEvent();
+                  BACCEventType resendEventType = state.getResendEvent();
                     if(resendEventType!=null)
                     {
                         Model myContent = ModelFactory.createDefaultModel();
