@@ -1,4 +1,4 @@
-package won.node.facet.businessactivity.atomicoutcome;
+package won.node.facet.businessactivity.atomic;
 
 
 import won.protocol.model.Connection;

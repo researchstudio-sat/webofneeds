@@ -4,7 +4,7 @@ import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.facet.businessactivity.atomicoutcome.ATConnectionState;
+import won.node.facet.businessactivity.atomic.ATConnectionState;
 import won.node.facet.businessactivity.participantcompletion.BAPCEventType;
 import won.node.facet.businessactivity.participantcompletion.BAPCState;
 import won.node.facet.businessactivity.participantcompletion.SimpleBAPCStateManager;
@@ -14,7 +14,7 @@ import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
-import won.node.facet.businessactivity.atomicoutcome.SimpleATBAConnectionStateManager;
+import won.node.facet.businessactivity.atomic.SimpleATBAConnectionStateManager;
 
 import java.net.URI;
 import java.util.Iterator;
