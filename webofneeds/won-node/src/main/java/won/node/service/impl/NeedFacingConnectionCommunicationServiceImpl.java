@@ -103,7 +103,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
                 con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI())  ||
                 con.getTypeURI().equals(FacetType.BACCParticipantFacet.getURI()) ||
                 con.getTypeURI().equals(FacetType.BAAtomicPCCoordinatorFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BAAtomicPCParticipantFacet.getURI()))
+                con.getTypeURI().equals(FacetType.BAAtomicCCCoordinatorFacet.getURI()))
         {
             Resource baseRes = message.getResource(message.getNsPrefixURI(""));
             StmtIterator stmtIterator = baseRes.listProperties(WON_BA.COORDINATION_MESSAGE);

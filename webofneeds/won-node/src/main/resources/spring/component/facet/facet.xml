@@ -63,8 +63,7 @@
                 <entry key="#{T(won.protocol.model.FacetType).BACCCoordinatorFacet}" value-ref="baCCCoordinatorFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).BACCParticipantFacet}" value-ref="baCCParticipantFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).BAAtomicPCCoordinatorFacet}" value-ref="baAtomicPCCoordinatorFacetImplRef" />
-                <entry key="#{T(won.protocol.model.FacetType).BAAtomicPCParticipantFacet}" value-ref="baAtomicPCParticipantFacetImplRef" />
-
+                <entry key="#{T(won.protocol.model.FacetType).BAAtomicCCCoordinatorFacet}" value-ref="baAtomicCCCoordinatorFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).CommentFacet}" value-ref="commentFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).CommentUnrestrictedFacet}" value-ref="commentUnrestrictedFacetImplRef" />
                 <entry key="#{T(won.protocol.model.FacetType).CommentModeratedFacet}" value-ref="commentModeratedFacetImplRef" />
@@ -94,7 +93,7 @@
     <bean id="baCCCoordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BACCCoordinatorFacetImpl" />
     <bean id="baCCParticipantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BACCParticipantFacetImpl" />
     <bean id="baAtomicPCCoordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BAAtomicPCCoordinatorFacetImpl" />
-    <bean id="baAtomicPCParticipantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BAAtomicPCParticipantFacetImpl" />
+    <bean id="baAtomicCCCoordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.BAAtomicCCCoordinatorFacetImpl" />
     <bean id="commentUnrestrictedFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentUnrestrictedFacet" />
     <bean id="commentModeratedFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentModeratedFacet" />
     <bean id="commentFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentFacet" />

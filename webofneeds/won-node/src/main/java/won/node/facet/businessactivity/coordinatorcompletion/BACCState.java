@@ -71,7 +71,6 @@ public enum BACCState {
                     return FAILING_ACTIVE_CANCELING_COMPLETING;
                 case MESSAGE_CANCELED:
                     return ENDED;
-
                 case MESSAGE_CANNOTCOMPLETE:
                     return NOT_COMPLETING;
                 default:
