@@ -11,13 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -28,7 +26,8 @@ import java.util.concurrent.Future;
  * Time: 19.19
  * To change this template use File | Settings | File Templates.
  */
-public class ParticipantFacetImpl extends Facet {
+public class ParticipantFacetImpl extends AbstractFacet
+{
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired

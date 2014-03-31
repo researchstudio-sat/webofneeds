@@ -29,7 +29,7 @@ public class TriggeredBot extends ScheduledActionBot
   private ScheduledFuture scheduledExecution;
 
   @Override
-  protected final void doInitialize()
+  protected void doInitialize()
   {
     doInitializeCustom();
     this.scheduledExecution = getTaskScheduler().schedule(new Runnable()
@@ -60,7 +60,7 @@ public class TriggeredBot extends ScheduledActionBot
   protected void doInitializeCustom() {};
 
   @Override
-  protected final void doShutdown()
+  protected void doShutdown()
   {
     this.scheduledExecution.cancel(true);
     doShutdownCustom();

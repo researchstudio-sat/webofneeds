@@ -40,13 +40,13 @@ public class BaseBot implements Bot
   private boolean workDone = false;
 
   @Override
-  public final boolean knowsNeedURI(final URI needURI)
+  public boolean knowsNeedURI(final URI needURI)
   {
     return this.botContext.isNeedKnown(needURI);
   }
 
   @Override
-  public final synchronized void initialize() throws Exception
+  public synchronized void initialize() throws Exception
   {
     if (!this.lifecyclePhase.isDown()) return;
     this.lifecyclePhase = BotLifecyclePhase.STARTING_UP;
@@ -58,7 +58,7 @@ public class BaseBot implements Bot
 
 
   @Override
-  public final synchronized void shutdown() throws Exception
+  public synchronized void shutdown() throws Exception
   {
     if (!this.lifecyclePhase.isActive()) return;
     this.lifecyclePhase = BotLifecyclePhase.SHUTTING_DOWN;
@@ -95,12 +95,12 @@ public class BaseBot implements Bot
     return this.lifecyclePhase;
   }
 
-  public final void setBotContext(final BotContext botContext)
+  public void setBotContext(final BotContext botContext)
   {
     this.botContext = botContext;
   }
 
-  protected final BotContext getBotContext()
+  protected BotContext getBotContext()
   {
     return botContext;
   }
@@ -120,7 +120,7 @@ public class BaseBot implements Bot
   @Override public void act() throws Exception
   {}
 
-  private final void createDefaultBotContextIfNecessary()
+  private void createDefaultBotContextIfNecessary()
   {
     if (this.botContext == null) {
       this.botContext = new InMemoryBotContext();

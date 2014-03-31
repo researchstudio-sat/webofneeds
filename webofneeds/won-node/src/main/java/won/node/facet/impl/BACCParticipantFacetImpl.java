@@ -23,7 +23,8 @@ import java.net.URI;
  * Time: 15.32
  * To change this template use File | Settings | File Templates.
  */
-public class BACCParticipantFacetImpl extends Facet{
+public class BACCParticipantFacetImpl extends AbstractFacet
+{
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired

@@ -52,6 +52,8 @@ public class AutomaticConnectionOpenerListener extends BaseEventListener
       if (openEvent.getCon().getState() == ConnectionState.REQUEST_RECEIVED) {
         logger.debug("auto-replying to open for connection {}", openEvent.getCon().getConnectionURI());
         getEventListenerContext().getOwnerService().open(openEvent.getCon().getConnectionURI(), null);
+      } else {
+        logger.debug("not auto-replying to open event with open as connection state is {}, not REQUEST_RECEIVED",openEvent.getCon().getState() );
       }
       return;
     }

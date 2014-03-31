@@ -4,6 +4,7 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
+import won.bot.framework.events.listener.action.*;
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.coordinationMessageAsTextBots.*;
 import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.coordinationMessageAsUriBots.*;
@@ -49,22 +50,22 @@ public class BAPCBot extends EventBot {
         //create needs every trigger execution until NO_OF_NEEDS are created
         this.participantNeedCreator = new ExecuteOnEventListener(
                 ctx,
-                new EventBotActions.CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_PARTICIPANT, FacetType.BAPCParticipantFacet.getURI()),
+                new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_PARTICIPANT, FacetType.BAPCParticipantFacet.getURI()),
                 NO_OF_NEEDS - 1
         );
         bus.subscribe(ActEvent.class,this.participantNeedCreator);
         //create needs every trigger execution until NO_OF_NEEDS are created
         this.coordinatorNeedCreator = new ExecuteOnEventListener(
                 ctx,
-                new EventBotActions.CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_COORDINATOR, FacetType.BAPCCoordinatorFacet.getURI()),
+                new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_COORDINATOR, FacetType.BAPCCoordinatorFacet.getURI()),
                 1
         );
         bus.subscribe(ActEvent.class,this.coordinatorNeedCreator);
         //count until NO_OF_NEEDS were created, then
         //   * connect the Coordinator with Participant needs
         this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
-                new EventBotActions.ConnectFromListToListAction(
-                        ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT, FacetType.BAPCCoordinatorFacet.getURI(), FacetType.BAPCParticipantFacet.getURI()),NO_OF_NEEDS);
+                new ConnectFromListToListAction(
+                        ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT, FacetType.BAPCCoordinatorFacet.getURI(), FacetType.BAPCParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES),NO_OF_NEEDS);
         bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
         //add a listener that is informed of the connect/open events and that auto-opens
@@ -113,14 +114,14 @@ public class BAPCBot extends EventBot {
         //register a DeactivateAllNeedsAction to be executed
         //when the internalWorkDoneEvent is seen
         this.needDeactivator = new ExecuteOnEventListener(getEventListenerContext(), new
-                EventBotActions.DeactivateAllNeedsAction(getEventListenerContext()),1);
+            DeactivateAllNeedsAction(getEventListenerContext()),1);
         bus.subscribe(InternalWorkDoneEvent.class, needDeactivator);
 
         //add a listener that counts two NeedDeactivatedEvents and then tells the
         //framework that the bot's work is done
         this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
                 ctx,
-                new EventBotActions.SignalWorkDoneAction(ctx), NO_OF_NEEDS
+                new SignalWorkDoneAction(ctx), NO_OF_NEEDS
         );
         bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
     }

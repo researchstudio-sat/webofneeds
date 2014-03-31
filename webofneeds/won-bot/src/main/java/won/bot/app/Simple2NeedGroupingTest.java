@@ -28,6 +28,7 @@ public class Simple2NeedGroupingTest
     );
     ConfigurableApplicationContext applicationContext =  app.run(args);
     Thread.sleep(5*60*1000);
+
     app.exit(applicationContext);
   }
 

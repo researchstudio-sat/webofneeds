@@ -62,7 +62,10 @@ public class CommentBotTest
   @Before
   public void before(){
     //create a bot instance and auto-wire it
-    this.bot = (MyBot) applicationContext.getAutowireCapableBeanFactory().autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+    AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
+    this.bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+    Object botBean = beanFactory.initializeBean(this.bot, "mybot");
+    this.bot = (MyBot) botBean;
     //the bot also needs a trigger so its act() method is called regularly.
     // (there is no trigger bean in the context)
     PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);

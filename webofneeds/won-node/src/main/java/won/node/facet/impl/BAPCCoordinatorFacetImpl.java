@@ -5,7 +5,6 @@ package won.node.facet.impl;
 import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import won.node.facet.businessactivity.participantcompletion.BAPCEventType;
 import won.node.facet.businessactivity.participantcompletion.BAPCState;
@@ -14,13 +13,10 @@ import won.node.facet.businessactivity.participantcompletion.SimpleBAPCStateMana
 
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
-import won.protocol.repository.ConnectionRepository;
 
 
 import java.net.URI;
-import java.util.List;
 
 
 /**
@@ -30,7 +26,8 @@ import java.util.List;
  * Time: 16.39
  * To change this template use File | Settings | File Templates.
  */
-public class BAPCCoordinatorFacetImpl extends Facet {
+public class BAPCCoordinatorFacetImpl extends AbstractFacet
+{
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private SimpleBAPCStateManager stateManager = new SimpleBAPCStateManager();
 

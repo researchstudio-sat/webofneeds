@@ -114,23 +114,23 @@ public class NeedManagementServiceImpl implements NeedManagementService
   }
     @Override
     public void authorizeOwnerApplicationForNeed(final String ownerApplicationID, URI needURI){
-        logger.info("AUTHORIZING owner application. needURI:{}, OwnerApplicationId:{}",needURI, ownerApplicationID);
+        logger.debug("AUTHORIZING owner application. needURI:{}, OwnerApplicationId:{}",needURI, ownerApplicationID);
         Need need = needRepository.findByNeedURI(needURI).get(0);
         List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
         if(ownerApplications.size()>0)  {
-            OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID).get(0);
-            List<OwnerApplication> authorizedApplications = new ArrayList<>();
+            logger.debug("owner application is already known");
+            OwnerApplication ownerApplication = ownerApplications.get(0);
+            List<OwnerApplication> authorizedApplications = need.getAuthorizedApplications();
             authorizedApplications.add(ownerApplication);
             need.setAuthorizedApplications(authorizedApplications);
-        }
-
-        else{
+        } else {
+            logger.debug("owner application is new - creating");
             List<OwnerApplication> ownerApplicationList = new ArrayList<>();
             OwnerApplication ownerApplication = new OwnerApplication();
             ownerApplication.setOwnerApplicationId(ownerApplicationID);
             ownerApplicationList.add(ownerApplication);
             need.setAuthorizedApplications(ownerApplicationList);
-            logger.info("setting OwnerApp ID: "+ownerApplicationList.get(0));
+            logger.debug("setting OwnerApp ID: "+ownerApplicationList.get(0));
         }
         need = needRepository.saveAndFlush(need);
     }

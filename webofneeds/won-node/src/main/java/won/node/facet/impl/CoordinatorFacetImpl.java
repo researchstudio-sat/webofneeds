@@ -25,7 +25,8 @@ import java.util.concurrent.Future;
  * Time: 19.20
  * To change this template use File | Settings | File Templates.
  */
-public class CoordinatorFacetImpl extends Facet {
+public class CoordinatorFacetImpl extends AbstractFacet
+{
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired

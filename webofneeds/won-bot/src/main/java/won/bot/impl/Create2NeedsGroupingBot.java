@@ -21,6 +21,7 @@ import won.bot.framework.events.Event;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
+import won.bot.framework.events.listener.action.*;
 import won.bot.framework.events.listener.filter.*;
 import won.protocol.model.FacetType;
 
@@ -33,8 +34,8 @@ import java.util.List;
 public class Create2NeedsGroupingBot extends EventBot
 {
 
-  protected static final int NO_OF_GROUPMEMBERS = 5;
-  protected static final int NO_OF_MESSAGES = 10;
+  protected static final int NO_OF_GROUPMEMBERS = 6;
+  protected static final int NO_OF_MESSAGES = 5;
   protected static final long MILLIS_BETWEEN_MESSAGES = 10;
   protected static final String NAME_GROUPS = "groups";
   protected static final String NAME_GROUPMEMBERS = "groupmembers";
@@ -65,7 +66,7 @@ public class Create2NeedsGroupingBot extends EventBot
     //create needs every trigger execution until N needs are created
     this.groupMemberCreator = new ExecuteOnEventListener(
         ctx,
-        new EventBotActions.CreateNeedAction(ctx, NAME_GROUPMEMBERS),
+        new CreateNeedAction(ctx, NAME_GROUPMEMBERS),
         NO_OF_GROUPMEMBERS
     );
     bus.subscribe(ActEvent.class,this.groupMemberCreator);
@@ -105,13 +106,13 @@ public class Create2NeedsGroupingBot extends EventBot
     //count until N needs were created, then create need with group facet (the others will connect to that facet)
     this.groupCreator = new ExecuteOnceAfterNEventsListener(
         ctx,
-        new EventBotActions.CreateNeedWithFacetsAction(ctx, NAME_GROUPS, FacetType.GroupFacet.getURI()),
+        new CreateNeedWithFacetsAction(ctx, NAME_GROUPS, FacetType.GroupFacet.getURI()),
         NO_OF_GROUPMEMBERS);
     bus.subscribe(NeedCreatedEvent.class, this.groupCreator);
 
     //wait for N+1 needCreatedEvents, then connect the members with the group facet of the third need
     this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
-        new EventBotActions.ConnectFromListToListAction(ctx, NAME_GROUPMEMBERS, NAME_GROUPS,  FacetType.OwnerFacet.getURI(),FacetType.GroupFacet.getURI()),
+        new ConnectFromListToListAction(ctx, NAME_GROUPMEMBERS, NAME_GROUPS,  FacetType.OwnerFacet.getURI(),FacetType.GroupFacet.getURI(), MILLIS_BETWEEN_MESSAGES),
             NO_OF_GROUPMEMBERS + 1
     );
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
@@ -130,17 +131,18 @@ public class Create2NeedsGroupingBot extends EventBot
     );
     bus.subscribe(OpenFromOtherNeedEvent.class, this.conversationStarter);
 
+
     //add a listener that deactivates the need with the group facet after it has seen all the groupmembers' FinishedEvents
     this.deactivator = new ExecuteOnceAfterNEventsListener(
         ctx, mainAutoResponderFilter,
         NO_OF_GROUPMEMBERS,
-        new EventBotActions.DeactivateAllNeedsOfGroupAction(ctx, NAME_GROUPS));
+        new DeactivateAllNeedsOfGroupAction(ctx, NAME_GROUPS));
     bus.subscribe( FinishedEvent.class, this.deactivator);
 
     //When the group facet need is deactivated, all connections are closed. wait for the close events and signal work done.
     this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
             ctx,
-            new EventBotActions.SignalWorkDoneAction(ctx), NO_OF_GROUPMEMBERS
+            new SignalWorkDoneAction(ctx), NO_OF_GROUPMEMBERS
     );
     bus.subscribe(CloseFromOtherNeedEvent.class, this.workDoneSignaller);
   }

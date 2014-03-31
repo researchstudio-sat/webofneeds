@@ -20,6 +20,7 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
+import won.bot.framework.events.listener.action.*;
 import won.protocol.model.FacetType;
 
 /**
@@ -29,6 +30,7 @@ public class CommentBot extends EventBot
 {
 
   private static final int NO_OF_NEEDS = 1;
+  private static final long MILLIS_BETWEEN_MESSAGES = 10;
 
 
   //we use protected members so we can extend the class and
@@ -45,8 +47,8 @@ public class CommentBot extends EventBot
   protected BaseEventListener allNeedsDeactivator;
   protected BaseEventListener needDeactivator;
   protected BaseEventListener workDoneSignaller;
-    private static final String NAME_NEEDS = "needs";
-    private static final String NAME_COMMENTS = "comments";
+  private static final String NAME_NEEDS = "needs";
+  private static final String NAME_COMMENTS = "comments";
 
   @Override
   protected void initializeEventListeners()
@@ -57,18 +59,18 @@ public class CommentBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ExecuteOnEventListener(
         ctx,
-        new EventBotActions.CreateNeedAction(ctx,NAME_NEEDS),
+        new CreateNeedAction(ctx,NAME_NEEDS),
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class,this.needCreator);
 
     //count until 1 need is created, then create a comment facet
     this.commentFacetCreator = new ExecuteOnEventListener(ctx,
-            new EventBotActions.CreateNeedWithFacetsAction(ctx,NAME_COMMENTS,FacetType.CommentFacet.getURI()),1) ;
+            new CreateNeedWithFacetsAction(ctx,NAME_COMMENTS,FacetType.CommentFacet.getURI()),1) ;
     bus.subscribe(NeedCreatedEvent.class, this.commentFacetCreator);
 
     this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
-            new EventBotActions.ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_COMMENTS,  FacetType.OwnerFacet.getURI(),FacetType.CommentFacet.getURI()),
+            new ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_COMMENTS,  FacetType.OwnerFacet.getURI(),FacetType.CommentFacet.getURI(),MILLIS_BETWEEN_MESSAGES),
             2
     );
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
@@ -95,7 +97,7 @@ public class CommentBot extends EventBot
       //framework that the bot's work is done
       this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
               ctx,
-              new EventBotActions.SignalWorkDoneAction(ctx), 2
+              new SignalWorkDoneAction(ctx), 2
       );
       bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
 

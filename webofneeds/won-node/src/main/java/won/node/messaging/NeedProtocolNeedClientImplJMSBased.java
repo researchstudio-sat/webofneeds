@@ -78,7 +78,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
   }
 
     public void open(final Connection connection, final Model content) throws Exception {
-        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connection));
+        logger.info(MessageFormat.format("need-facing: OPEN called for connection {}", connection));
 
 
         CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),openStartingEndpoint);

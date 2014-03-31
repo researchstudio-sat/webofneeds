@@ -23,7 +23,8 @@ import java.net.URI;
  * Time: 15.36
  * To change this template use File | Settings | File Templates.
  */
-public class BACCCoordinatorFacetImpl extends Facet {
+public class BACCCoordinatorFacetImpl extends AbstractFacet
+{
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private SimpleBACCStateManager stateManager = new SimpleBACCStateManager();
 

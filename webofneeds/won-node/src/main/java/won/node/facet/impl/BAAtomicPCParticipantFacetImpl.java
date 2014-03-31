@@ -18,7 +18,8 @@ import java.net.URI;
  * User: Danijel
  * Date: 19.3.14.
  */
-public class BAAtomicPCParticipantFacetImpl extends Facet {
+public class BAAtomicPCParticipantFacetImpl extends AbstractFacet
+{
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private SimpleBAPCStateManager stateManager = new SimpleBAPCStateManager();

@@ -49,7 +49,7 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
         count++;
       }
       if (count <= targetCount) {
-        logger.debug("processing event {} of {}", count, targetCount);
+        logger.debug("processing event {} of {} (event: {})", new Object[]{count, targetCount, event});
         logger.debug("calling handleFirstNTimes");
         doRun = true;
       }

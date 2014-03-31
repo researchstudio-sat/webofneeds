@@ -21,7 +21,8 @@ import java.util.List;
  * Time: 18:42
  * To change this template use File | Settings | File Templates.
  */
-public class GroupFacetImpl extends Facet {
+public class GroupFacetImpl extends AbstractFacet
+{
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired

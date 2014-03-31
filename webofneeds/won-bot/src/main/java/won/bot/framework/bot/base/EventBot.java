@@ -77,7 +77,7 @@ public class EventBot extends TriggeredBot
 
 
   @Override
-  public final void act() throws Exception
+  public void act() throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new ActEvent());
@@ -87,7 +87,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public final void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final Model content) throws Exception
+  public void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final Model content) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));
@@ -97,7 +97,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public final void onHintFromMatcher(final Match match, final Model content) throws Exception
+  public void onHintFromMatcher(final Match match, final Model content) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new HintFromMatcherEvent(match, content));
@@ -107,7 +107,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public final void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new CloseFromOtherNeedEvent(con, content));
@@ -117,7 +117,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public final void onOpenFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onOpenFromOtherNeed(final Connection con, final Model content) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new OpenFromOtherNeedEvent(con, content));
@@ -127,7 +127,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public final void onConnectFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onConnectFromOtherNeed(final Connection con, final Model content) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new ConnectFromOtherNeedEvent(con, content));
@@ -137,7 +137,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception
+  public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel, FacetType.OwnerFacet));
@@ -164,16 +164,24 @@ public class EventBot extends TriggeredBot
   }
 
 
+  /**
+   * Init method used to create the event bus and allow event listeners to register. Do not override!
+   * It not final to allow for CGLIB autoproxying.
+   */
   @Override
-  protected final void doInitializeCustom()
+  protected void doInitializeCustom()
   {
     this.eventBus = new SchedulerEventBusImpl(getTaskScheduler());
     initializeEventListeners();
-    eventBus.publish(new InitializeEvent());
+    this.eventBus.publish(new InitializeEvent());
   }
 
+  /**
+   * Init method used to shut down the event bus and allow event listeners shut down. Do not override!
+   * It not final to allow for CGLIB autoproxying.
+   */
   @Override
-  protected final void doShutdownCustom()
+  protected void doShutdownCustom()
   {
     eventBus.publish(new ShutdownEvent());
     shutdownEventListeners();

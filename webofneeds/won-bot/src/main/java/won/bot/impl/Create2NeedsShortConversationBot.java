@@ -20,6 +20,9 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
+import won.bot.framework.events.listener.action.ConnectFromListToListAction;
+import won.bot.framework.events.listener.action.CreateNeedAction;
+import won.bot.framework.events.listener.action.SignalWorkDoneAction;
 import won.protocol.model.FacetType;
 
 /**
@@ -56,7 +59,7 @@ public class Create2NeedsShortConversationBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ExecuteOnEventListener(
         ctx,
-        new EventBotActions.CreateNeedAction(ctx,NAME_NEEDS),
+        new CreateNeedAction(ctx,NAME_NEEDS),
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class,this.needCreator);
@@ -64,7 +67,7 @@ public class Create2NeedsShortConversationBot extends EventBot
     //count until 2 needs were created, then
     //   * connect the 2 needs
     this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
-        new EventBotActions.ConnectFromListToListAction(ctx,NAME_NEEDS,NAME_NEEDS,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet.getURI()),NO_OF_NEEDS);
+        new ConnectFromListToListAction(ctx,NAME_NEEDS,NAME_NEEDS,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES),NO_OF_NEEDS);
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
     //add a listener that is informed of the connect/open events and that auto-opens
@@ -101,7 +104,7 @@ public class Create2NeedsShortConversationBot extends EventBot
     //framework that the bot's work is done
     this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
         ctx,
-        new EventBotActions.SignalWorkDoneAction(ctx), NO_OF_NEEDS
+        new SignalWorkDoneAction(ctx), NO_OF_NEEDS
     );
     bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
   }
