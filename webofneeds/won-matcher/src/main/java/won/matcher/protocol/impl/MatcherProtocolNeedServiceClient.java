@@ -19,20 +19,10 @@ package won.matcher.protocol.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
-import won.protocol.rest.LinkedDataRestClient;
-import won.protocol.util.RdfUtils;
-import won.protocol.ws.MatcherProtocolNeedWebServiceEndpoint;
-import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
-import won.protocol.ws.fault.NoSuchNeedFault;
+import won.protocol.model.FacetType;
+import won.protocol.util.WonRdfUtils;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 
 /**
@@ -40,25 +30,28 @@ import java.net.URI;
  * Date: 12.02.13
  * Time: 17:26
  */
-public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServiceClientSide
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  MatcherProtocolNeedServiceClientSide delegate;
+public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServiceClientSide {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content)
-          throws Exception {
+    MatcherProtocolNeedServiceClientSide delegate;
+
+    public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content)
+            throws Exception {
         logger.info("need-facing: HINT called for needURI {} and otherNeed {} " +
                 "with score {} from originator {}.", new Object[]{needURI, otherNeed, score, originator});
-        delegate.hint(needURI, otherNeed, score, originator, content);
-  }
+        Model facetModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI());
+        delegate.hint(needURI, otherNeed, score, originator, facetModel);
+    }
 
 
     public void initializeDefault() {
-     //   delegate = new MatcherProtocolNeedServiceClientJMSBased();
+        //   delegate = new MatcherProtocolNeedServiceClientJMSBased();
         delegate.initializeDefault();
     }
+
 
     public void setDelegate(MatcherProtocolNeedServiceClientSide delegate) {
         this.delegate = delegate;
     }
+
 }

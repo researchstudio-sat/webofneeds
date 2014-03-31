@@ -25,22 +25,23 @@
         <camel:endpoint id="needMessageQueue" uri="activemq:WON.MSG" pattern="InOut"></camel:endpoint>
     </camel:camelContext>
 
-    <bean id="activeMQService" class="won.protocol.jms.ActiveMQServiceImpl">
+    <bean id="matcherActiveMQService" class="won.protocol.jms.ActiveMQServiceImpl">
         <constructor-arg name="type" value="MatcherProtocol"/>
     </bean>
 
     <bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
 
-    <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
+    <!--bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl"-->
         <!-- expects to find a bean named "producerTemplate", which is exposed through camel -->
-        <property name="producerTemplate" ref="producerTemplate"/>
-    </bean>
+        <!--property name="producerTemplate" ref="producerTemplate"/>
+    </bean-->
 
     <bean id="matcherProtocolCommunicationService" class="won.matcher.protocol.impl.MatcherProtocolCommunicationServiceImpl">
-
+        <property name="matcherActiveMQService" ref="matcherActiveMQService"/>
     </bean>
-    <bean id="matcherProtocolCamelConfigurator" class="won.protocol.jms.NeedProtocolCamelConfiguratorImpl">
+    <bean id="matcherProtocolCamelConfigurator" class="won.protocol.jms.NeedBasedCamelConfiguratorImpl">
         <property name="componentName" value="activemq"/>
+        <property name="camelContext" ref = "wonMatcherCamel"/>
     </bean>
 
 

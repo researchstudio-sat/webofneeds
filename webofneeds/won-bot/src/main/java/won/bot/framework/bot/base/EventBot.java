@@ -25,6 +25,7 @@ import won.bot.framework.events.EventBus;
 import won.bot.framework.events.bus.SchedulerEventBusImpl;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
+import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
@@ -95,7 +96,6 @@ public class EventBot extends TriggeredBot
   @Override
   public final void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
   {
-    logger.info("ON CLOSE");
     eventBus.publish(new CloseFromOtherNeedEvent(con, content));
   }
 
@@ -187,6 +187,11 @@ public class EventBot extends TriggeredBot
     {
       return EventBot.this.getOwnerService();
     }
+
+    public MatcherProtocolNeedServiceClientSide getMatcherService(){
+        return EventBot.this.getMatcherService();
+    }
+
 
     public NeedProducer getNeedProducer()
     {

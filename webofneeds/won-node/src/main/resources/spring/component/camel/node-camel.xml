@@ -63,7 +63,7 @@
         <property name="queueManagementService" ref="queueManagementService"/>
     </bean>
 
-    <bean name="needProtocolCamelConfigurator" class="won.protocol.jms.NeedProtocolCamelConfiguratorImpl">
+    <bean name="needProtocolCamelConfigurator" class="won.node.messaging.NeedProtocolCamelConfiguratorImpl">
         <property name="componentName" value="activemq"/>
     </bean>
 

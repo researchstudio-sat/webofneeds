@@ -21,8 +21,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.component.needproducer.impl.GroupNeedProducer;
-import won.bot.framework.events.event.GroupFacetCreatedEvent;
 import won.bot.framework.events.event.NeedCreatedEvent;
 import won.bot.framework.events.event.NeedDeactivatedEvent;
 import won.bot.framework.events.event.WorkDoneEvent;
@@ -32,8 +30,6 @@ import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -113,7 +109,7 @@ public class EventBotActions
     {
       List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
       try {
-        getEventListenerContext().getOwnerService().connect(needs.get(0), needs.get(1), WonRdfUtils.FacetUtils.createModelForConnect(localFacet, remoteFacet));
+        getEventListenerContext().getOwnerService().connect(needs.get(0), needs.get(1), WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(localFacet, remoteFacet));
       } catch (Exception e) {
         logger.warn("could not connect {} and {}", new Object[]{needs.get(0), needs.get(1)}, e);
       }
@@ -129,6 +125,7 @@ public class EventBotActions
         private String toListName;
         private URI fromFacet;
         private URI toFacet;
+
 
         public ConnectFromListToListAction(EventListenerContext eventListenerContext, String fromListName, String toListName, URI fromFacet, URI toFacet) {
             super(eventListenerContext);
@@ -153,7 +150,7 @@ public class EventBotActions
                         URI toUri = fromNeeds.get(j);
                         try {
                             logger.info("connecting needs {} and {}",fromUri,toUri);
-                            getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createModelForConnect(fromFacet, toFacet));
+                            getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet));
                         } catch (Exception e) {
                             logger.warn("could not connect {} and {}", new Object[]{fromUri, toUri}, e);
                         }
@@ -164,7 +161,7 @@ public class EventBotActions
                     for (URI toUri:toNeeds) {
                         try{
                             logger.info("connecting needs {} and {}",fromUri,toUri);
-                            getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createModelForConnect(fromFacet, toFacet));
+                            getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet));
                         } catch (Exception e) {
                             logger.warn("could not connect {} and {}", new Object[]{fromUri, toUri}, e);
                         }
@@ -174,6 +171,23 @@ public class EventBotActions
         }
     }
 
+  public static class MatchNeedsAction extends Action{
+      public MatchNeedsAction(final EventListenerContext eventListenerContext)
+      {
+         super(eventListenerContext);
+      }
+
+      @Override
+      protected void doRun() throws Exception{
+           List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
+           URI need1 = needs.get(0);
+           URI need2 = needs.get(1);
+           logger.info("matching needs {} and {}",need1,need2);
+           logger.info("getEventListnerContext():"+getEventListenerContext());
+           logger.info("getMatcherService(): "+getEventListenerContext().getMatcherService());
+           getEventListenerContext().getMatcherService().hint(need1,need2,1.0,URI.create("http://localhost:8080/matcher"),null);
+      }
+  }
 
 
   public static class CreateNeedAction extends Action {

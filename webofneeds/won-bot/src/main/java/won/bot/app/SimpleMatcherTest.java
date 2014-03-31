@@ -14,25 +14,23 @@
  *    limitations under the License.
  */
 
-package won.bot.integrationtest;
+package won.bot.app;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * Integration test.
+ * User: LEIH-NB
+ * Date: 20.03.14
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses(
-        {Create2NeedsShortConversationBotTest.class,
-                Create2NeedsGroupingBotTest.class,
-                CommentBotTest.class,
-                BACCBotTest.class,
-                BAPCBotTest.class,
-                MatcherBotTest.class
-        })
-public class WonTestSuite
-{
+public class SimpleMatcherTest {
+    public static void main(String[] args) throws Exception {
+        SpringApplication app = new SpringApplication(
+                new Object[]{"classpath:/spring/app/simpleMatcherTest.xml"}
+        );
+        ConfigurableApplicationContext applicationContext =  app.run(args);
+        Thread.sleep(5*60*1000);
+        app.exit(applicationContext);
+    }
 
 }

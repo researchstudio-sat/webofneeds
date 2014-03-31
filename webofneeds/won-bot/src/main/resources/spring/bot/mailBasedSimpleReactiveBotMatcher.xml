@@ -20,14 +20,15 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <import resource="classpath:spring/component/needproducer/needproducer-mails.xml"/>
-    <import resource="classpath:spring/component/nodeurisource/nodeurisource-roundrobin.xml"/>
+    <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
 
     <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.MatcherProtocolBot">
         <property name="taskScheduler" ref="taskScheduler" />
         <property name="needProducer" ref="needProducerFromMails" />
-        <property name="nodeURISource" ref="nodeUriSourceRoundRobin" />
+        <property name="nodeURISource" ref="nodeUriSourceRandom" />
         <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
         <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
+        <property name="matcherService" ref="matcherProtocolNeedServiceClient"/>
         <property name="trigger">
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">
                 <constructor-arg name="period" value="2000" />

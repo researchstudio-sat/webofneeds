@@ -37,7 +37,7 @@ import java.util.Map;
  * User: LEIH-NB
  * Date: 26.02.14
  */
-public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfigurator {
+public class NeedBasedCamelConfiguratorImpl implements NeedProtocolCamelConfigurator {
 
     private BiMap<URI, String> endpointMap = HashBiMap.create();
     private BiMap<URI,String> brokerComponentMap = HashBiMap.create();
@@ -82,16 +82,8 @@ public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfi
     }
 
     @Override
-    public synchronized void addRouteForEndpoint(String startingComponent,URI brokerUri) throws CamelConfigurationFailedException {
-        /*
-        if (camelContext.getComponent(startingComponent)==null||camelContext.getRoute(startingComponent)==null){
-            NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,startingComponent);
-            try {
-                camelContext.addRoutes(needProtocolRouteBuilder);
-            } catch (Exception e) {
-                throw new CamelConfigurationFailedException("adding route to camel context failed",e);
-            }
-        }           */
+    public void addRouteForEndpoint(String startingEndpoint, URI wonNodeURI) throws CamelConfigurationFailedException {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

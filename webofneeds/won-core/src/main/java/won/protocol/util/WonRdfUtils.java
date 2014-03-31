@@ -103,14 +103,16 @@ public class WonRdfUtils
      * Creates a model for connecting two facets.
      * @return
      */
-    public static Model createModelForConnect(URI facet, URI remoteFacet)
+    public static Model createFacetModelForHintOrConnect(URI facet, URI remoteFacet)
     {
       Model model = ModelFactory.createDefaultModel();
-      model.setNsPrefix("", "no:uri");
+      Resource baseResource = RdfUtils.findOrCreateBaseResource(model);
       WonRdfUtils.FacetUtils.addFacet(model, facet);
       WonRdfUtils.FacetUtils.addRemoteFacet(model, remoteFacet);
+      logger.debug("facet model contains these facets: from:{} to:{}", facet, remoteFacet);
       return model;
     }
+
   }
 
 

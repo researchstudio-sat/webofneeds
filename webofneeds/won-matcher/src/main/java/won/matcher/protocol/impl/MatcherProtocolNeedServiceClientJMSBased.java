@@ -71,6 +71,7 @@ public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocol
         headerMap.put("originator",originator.toString());
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("remoteBrokerEndpoint", endpoint);
+        headerMap.put("methodName","hint");
 
         messagingService.sendInOnlyMessage(null, headerMap,null,startingEndpoint );
   }

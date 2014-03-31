@@ -31,28 +31,11 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" ignore-unresolvable="true"/>
 
     <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
-    <bean id="clientFactory" class="won.matcher.protocol.impl.MatcherProtocolNeedClientFactory" />
     <!-- protocol-level services -->
-
-    <bean id="matcherProtocolNeedServiceClient" class="won.matcher.protocol.impl.MatcherProtocolNeedServiceClient">
-        <property name="delegate" ref="matcherProtocolNeedServiceClientJMSBased" />
+    <bean id="matcherMessagingService" class="won.protocol.jms.MessagingServiceImpl">
+        <property name="camelContext" ref="wonMatcherCamel" />
+        <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
-    <bean id="matcherProtocolNeedServiceWSBased" class="won.matcher.protocol.impl.MatcherProtocolNeedServiceClientWSBased">
-        <property name="clientFactory" ref="matcherProtocolNeedClientFactory"/>
-        <property name="linkedDataRestClient" ref="linkedDataRestClient"/>
-    </bean>
-
-    <bean id="matcherProtocolNeedClientFactory" class="won.matcher.protocol.impl.MatcherProtocolNeedClientFactory">
-        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
-    </bean>
-
-    <bean id="matcherProtocolNeedServiceClientJMSBased"
-          class="won.matcher.protocol.impl.MatcherProtocolNeedServiceClientJMSBased"
-          init-method="initializeDefault">
-        <property name="messagingService" ref="messagingService"/>
-        <property name="matcherProtocolCommunicationService" ref="matcherProtocolCommunicationService"/>
-        <property name="startingEndpoint" value="seda:MatcherProtocol.Out.Hint"/>
-    </bean>
-    <bean id="matcherCLICommandLineRunner" class="won.matcher.cli.MatcherCLI"/>
+    <bean id="needProtocolCamelConfigurator" class="won.protocol.jms.NeedBasedCamelConfiguratorImpl"/>
 
 </beans>

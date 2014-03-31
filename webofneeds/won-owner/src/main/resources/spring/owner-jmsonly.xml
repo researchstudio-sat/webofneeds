@@ -14,7 +14,7 @@
 
     <import resource="classpath:/spring/core/owner-core.xml" />
     <import resource="classpath:/spring/component/storage/storage.xml" />
-    <import resource="classpath:/spring/component/camel/camel.xml" />
+    <import resource="classpath:/spring/component/camel/owner-camel.xml" />
     <import resource="classpath:/spring/component/ownerProtocolNeedServiceClient/ownerProtocolNeedServiceClient-jmsonly.xml" />
 
 </beans>
