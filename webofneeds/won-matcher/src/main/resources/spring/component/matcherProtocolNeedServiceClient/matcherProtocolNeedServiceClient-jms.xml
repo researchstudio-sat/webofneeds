@@ -36,10 +36,8 @@
     </bean>
     <bean id="matcherProtocolNeedServiceWSBased" class="won.matcher.protocol.impl.MatcherProtocolNeedServiceClientWSBased">
         <property name="clientFactory" ref="matcherProtocolNeedClientFactory"/>
-        <property name="linkedDataRestClient" ref="linkedDataRestClient"/>
     </bean>
     <bean id="matcherProtocolNeedClientFactory" class="won.matcher.protocol.impl.MatcherProtocolNeedClientFactory">
-        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
     </bean>
 
 </beans>

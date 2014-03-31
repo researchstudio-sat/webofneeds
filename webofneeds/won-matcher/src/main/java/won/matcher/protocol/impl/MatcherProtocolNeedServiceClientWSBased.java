@@ -52,13 +52,9 @@ public class MatcherProtocolNeedServiceClientWSBased implements MatcherProtocolN
     this.clientFactory = clientFactory;
   }
 
-  public void setLinkedDataRestClient(final LinkedDataRestClient linkedDataRestClient)
-  {
-    clientFactory.setLinkedDataRestClient(linkedDataRestClient);
+  public void initializeDefault() {
+        clientFactory = new MatcherProtocolNeedClientFactory();
+       // clientFactory.setLinkedDataRestClient(new LinkedDataRestClient());
   }
 
-  public void initializeDefault() {
-    clientFactory = new MatcherProtocolNeedClientFactory();
-    clientFactory.setLinkedDataRestClient(new LinkedDataRestClient());
-  }
 }
