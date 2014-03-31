@@ -4,8 +4,9 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
-import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.*;
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.*;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationnMessageAsTextBots.*;
 import won.protocol.model.FacetType;
 
 import java.util.ArrayList;
@@ -19,9 +20,9 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class BACCBot extends EventBot {
-    private static final int NO_OF_NEEDS = 14;
+    private static final int NO_OF_NEEDS = 29;
     private static final int NO_OF_MESSAGES = 50;
-    private static final long MILLIS_BETWEEN_MESSAGES = 1000;
+    private static final long MILLIS_BETWEEN_MESSAGES = 100;
     public static final String URI_LIST_NAME_PARTICIPANT = "participants";
     public static final String URI_LIST_NAME_COORDINATOR = "coordinator";
 
@@ -79,6 +80,8 @@ public class BACCBot extends EventBot {
         // * message events - so it responds
         // * open events - so it initiates the chain reaction of responses
         List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(NO_OF_NEEDS-1);
+
+        //Coordination message is sent as TEXT
         scripts.add(new BACCStateExitBot());
         scripts.add(new BACCStateCompensateBot());
         scripts.add(new BACCStateCompleteBot());
@@ -92,6 +95,28 @@ public class BACCBot extends EventBot {
         scripts.add(new BACCStateActiveCannotCompleteBot());
         scripts.add(new BACCStateActiveFailBot());
         scripts.add(new BACCStateCompleteCannotCompleteBot());
+
+
+        //Coordination message is sent as MODEL
+        scripts.add(new BACCStateExitUriBot());
+        scripts.add(new BACCStateCompensateUriBot());
+        scripts.add(new BACCStateCompleteUriBot());
+        scripts.add(new BACCStateCompensateFailUriBot());
+        scripts.add(new BACCStateCompleteFailUriBot());
+        scripts.add(new BACCStateCompleteCancelUriBot());
+        scripts.add(new BACCStateCompleteCancelFailUriBot());
+        scripts.add(new BACCStateActiveCancelUriBot());
+        scripts.add(new BACCStateActiveCancelFailUriBot());
+        scripts.add(new BACCStateCompleteExitUriBot());
+        scripts.add(new BACCStateActiveCannotCompleteUriBot());
+        scripts.add(new BACCStateActiveFailUriBot());
+        scripts.add(new BACCStateCompleteCannotCompleteUriBot());
+
+
+        // with failures
+        scripts.add(new BACCStateCompleteWithFailuresUriBot());
+        scripts.add(new BACCStateCompleteWithFailuresBot());
+
         this.autoResponder = new AutomaticBAMessageResponderListener(ctx, scripts, NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
         bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);
         bus.subscribe(MessageFromOtherNeedEvent.class, this.autoResponder);

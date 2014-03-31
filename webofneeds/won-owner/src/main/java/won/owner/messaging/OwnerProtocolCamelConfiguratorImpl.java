@@ -125,7 +125,7 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     }
 
     @Override
-    public synchronized void addRouteForEndpoint(String startingEndpoint,URI wonNodeURI) throws CamelConfigurationFailedException {
+    public synchronized void addRouteForEndpoint(String startingEndpoint, final URI wonNodeURI) throws CamelConfigurationFailedException {
         /**
          * there can be only one route per endpoint. Thus, consuming endpoint of each route shall be unique.
          */

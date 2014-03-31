@@ -36,6 +36,7 @@ public class WON
   public static final String BASE_URI = "http://purl.org/webofneeds/model#";
 
 
+
     private static Model m = ModelFactory.createDefaultModel();
 
 
@@ -62,6 +63,7 @@ public class WON
 
   public static final Resource TEXT_MESSAGE = m.createResource(BASE_URI + "TextMessage");
   public static final Property HAS_TEXT_MESSAGE = m.createProperty(BASE_URI + "hasTextMessage");
+  public static final Resource MESSAGE = m.createResource(BASE_URI + "Message");
 
   public static final Resource NEED_CONTENT = m.createResource(BASE_URI + "NeedContent");
   public static final Property HAS_TEXT_DESCRIPTION = m.createProperty(BASE_URI, "hasTextDescription");

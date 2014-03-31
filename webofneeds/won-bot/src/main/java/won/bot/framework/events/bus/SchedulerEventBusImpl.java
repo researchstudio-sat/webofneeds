@@ -22,6 +22,7 @@ import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.events.Event;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.EventListener;
+import won.bot.framework.events.SubscriptionAware;
 
 import java.util.*;
 
@@ -58,23 +59,26 @@ public class SchedulerEventBusImpl implements EventBus
   @Override
   public <T extends Event> void subscribe(Class<T> clazz, final EventListener listener)
   {
-    logger.info("subscribing listener for type {}", clazz);
+    logger.info("subscribing listener {} for type {}", listener, clazz);
     synchronized (monitor) {
       //we want to synchronize so we don't accidentally add or remove listeners at the same time
       List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));
       newListenerList.add(listener);
       this.listenerMap.put(clazz, Collections.unmodifiableList(newListenerList));
+      callOnSubscribeIfApplicable(listener, clazz);
     }
   }
+
 
   @Override
   public <T extends Event> void unsubscribe(Class<T> clazz, final EventListener listener)
   {
-    logger.info("unsubscribing listener for type {}", clazz);
+    logger.info("unsubscribing listener {} for type {}", listener, clazz);
     synchronized (monitor) {
       //we want to synchronize so we don't accidentally add or remove listeners at the same time
       List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));      newListenerList.remove(listener);
       this.listenerMap.put(clazz, Collections.unmodifiableList(newListenerList));
+      callOnUnsubscribeIfApplicable(listener, clazz);
     }
   }
 
@@ -84,6 +88,7 @@ public class SchedulerEventBusImpl implements EventBus
     logger.info("unsubscribing listener {} from all events", listener);
     synchronized (monitor){
       for (Map.Entry<Class<? extends Event>, List<EventListener>> entry: listenerMap.entrySet()){
+        boolean unsubscribed = false; //remember if we had to unsubscribe the listener for the current event type
         List<EventListener> listeners = entry.getValue();
         if (listeners == null ) continue;
         listeners = copyOrCreateList(listeners);
@@ -92,9 +97,14 @@ public class SchedulerEventBusImpl implements EventBus
           EventListener subscribedListener = it.next();
           if (subscribedListener.equals(listener)) {
             it.remove();
+            unsubscribed = true;
           }
         }
         entry.setValue(listeners);
+        if (unsubscribed){
+          //if we had to unssubscribe the listener, we may have to call its onUnsubscribe method
+          callOnUnsubscribeIfApplicable(listener, entry.getKey());
+        }
       }
     }
   }
@@ -132,6 +142,20 @@ public class SchedulerEventBusImpl implements EventBus
     List<EventListener> newListenerList = new ArrayList<EventListener>(listenerList.size()+1);
     newListenerList.addAll(listenerList);
     return newListenerList;
+  }
+
+  private <T extends Event> void callOnSubscribeIfApplicable(final EventListener listener, final Class<T> clazz)
+  {
+    if (listener instanceof  SubscriptionAware){
+      ((SubscriptionAware) listener).onSubscribe(clazz);
+    }
+  }
+
+  private <T extends Event> void callOnUnsubscribeIfApplicable(final EventListener listener, final Class<T> clazz)
+  {
+    if (listener instanceof  SubscriptionAware){
+      ((SubscriptionAware) listener).onUnsubscribe(clazz);
+    }
   }
 
 

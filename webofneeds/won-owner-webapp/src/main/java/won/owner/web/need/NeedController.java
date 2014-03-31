@@ -31,6 +31,7 @@ import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
@@ -76,6 +77,9 @@ public class NeedController
 
   @Autowired
   private DataReloadService dataReloadService;
+
+  @Autowired
+  private LinkedDataSource linkedDataSource;
 
   public void setDataReloadService(DataReloadService dataReloadService)
   {
@@ -261,8 +265,8 @@ public class NeedController
           model.addAttribute("command", new NeedPojo(facets));
 
 
-      LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
-    NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+
+    NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataSource.getModelForResource(need.getNeedURI()));
     pojo.setState(need.getState());
 
     model.addAttribute("pojo", pojo);

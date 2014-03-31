@@ -33,6 +33,11 @@ public class AutomaticConnectionOpenerListener extends BaseEventListener
     super(context);
   }
 
+  public AutomaticConnectionOpenerListener(final EventListenerContext context, final EventFilter eventFilter)
+  {
+    super(context, eventFilter);
+  }
+
   @Override
   public void doOnEvent(final Event event) throws Exception {
     if (event instanceof ConnectFromOtherNeedEvent) {

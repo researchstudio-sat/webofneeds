@@ -14,7 +14,7 @@ import java.util.List;
 public interface CamelConfigurator extends CamelContextAware {
 
     //todo: the method is activemq specific. refactor it to support other brokers.
-    void addRouteForEndpoint(String startingEndpoint,URI wonNodeURI) throws CamelConfigurationFailedException;
+    void addRouteForEndpoint(String startingEndpoint, final URI wonNodeURI) throws CamelConfigurationFailedException;
 
 
     void setCamelContext(CamelContext camelContext);

@@ -16,8 +16,6 @@
 
 package won.protocol.jms;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.CamelContextAware;
 import won.protocol.exception.CamelConfigurationFailedException;
 
 import java.net.URI;
@@ -32,7 +30,7 @@ public interface OwnerProtocolCamelConfigurator extends CamelConfigurator {
 
     void addRemoteQueueListeners(List<String> endpoints, URI remoteEndpoint) throws CamelConfigurationFailedException;
 
-    void addRouteForEndpoint(String startingEndpoint, URI wonNodeURI) throws CamelConfigurationFailedException;
+    void addRouteForEndpoint(String startingEndpoint, final URI wonNodeURI) throws CamelConfigurationFailedException;
 
     String getStartingEndpoint(URI wonNodeURI);
 

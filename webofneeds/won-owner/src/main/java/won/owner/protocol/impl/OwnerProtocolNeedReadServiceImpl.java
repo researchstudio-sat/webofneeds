@@ -6,7 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.service.impl.URIService;
-import won.protocol.exception.*;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
@@ -18,7 +19,10 @@ import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.NeedModelMapper;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
+
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +44,8 @@ public class OwnerProtocolNeedReadServiceImpl implements OwnerProtocolNeedReadSe
     private URIService uriService;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private LinkedDataRestClient linkedDataRestClient;
+    @Autowired
+    private LinkedDataSource linkedDataSource;
 
     @Autowired
     private NeedRepository needRepository;
@@ -127,10 +132,13 @@ public class OwnerProtocolNeedReadServiceImpl implements OwnerProtocolNeedReadSe
     @Override
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException {
         logger.debug("need-facing: READ_CONNECTION_CONTENT called for connection {}", connectionURI);
-        URI connectionProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(connectionURI, WON.HAS_OWNER_PROTOCOL_ENDPOINT);
+        URI connectionProtocolEndpoint = RdfUtils.getURIPropertyForResource(
+            linkedDataSource.getModelForResource(connectionURI),
+            connectionURI,
+            WON.HAS_OWNER_PROTOCOL_ENDPOINT);
         if (connectionProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
 
-        return linkedDataRestClient.readResourceData(URI.create(connectionProtocolEndpoint.toString()));
+        return linkedDataSource.getModelForResource(URI.create(connectionProtocolEndpoint.toString()));
     }
     private Collection<URI> getHardcodedCollectionResource(URI needURI, String res) throws NoSuchNeedException {
         Model mUris = getHardcodedNeedResource(needURI, res);
@@ -156,22 +164,22 @@ public class OwnerProtocolNeedReadServiceImpl implements OwnerProtocolNeedReadSe
 
     private Model getHardcodedNeedResource(URI needURI, String res) throws NoSuchNeedException {
         if (res.equals(""))
-            return linkedDataRestClient.readResourceData(needURI);
+            return linkedDataSource.getModelForResource(needURI);
         else
-            return linkedDataRestClient.readResourceData(URI.create(needURI.toString() + res));
+            return linkedDataSource.getModelForResource(URI.create(needURI.toString() + res));
     }
 
     private Model getHardcodedResource(String res) {
-        return linkedDataRestClient.readResourceData(
-                URI.create(this.uriService.getDefaultOwnerProtocolNeedServiceEndpointURI().toString() + res));
+        return linkedDataSource.getModelForResource(
+            URI.create(this.uriService.getDefaultOwnerProtocolNeedServiceEndpointURI().toString() + res));
     }
 
-    public void setLinkedDataRestClient(LinkedDataRestClient linkedDataRestClient) {
-        this.linkedDataRestClient = linkedDataRestClient;
-    }
+  public void setLinkedDataSource(final LinkedDataSource linkedDataSource)
+  {
+    this.linkedDataSource = linkedDataSource;
+  }
 
-
-    public void setUriService(final URIService uriService) {
+  public void setUriService(final URIService uriService) {
         this.uriService = uriService;
     }
 

@@ -1,5 +1,6 @@
 package won.bot.framework.events.listener;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
@@ -14,8 +15,7 @@ import won.bot.impl.BACCBot;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
-import won.protocol.rest.LinkedDataRestClient;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -37,7 +37,7 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
     private List<BATestBotScript> scripts;
     private int finishedScripts;
     private Object monitor = new Object();
-    LinkedDataRestClient client = new LinkedDataRestClient();
+
     public AutomaticBAMessageResponderListener(final EventListenerContext context, final List<BATestBotScript> scripts, final int targetNumberOfMessages, final long millisTimeoutBeforeReply)
     {
         super(context);
@@ -71,15 +71,18 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
         logger.debug("replying to open with message");
         //register a WS-BA state machine for this need-need combination:
         boolean weAreOnCoordinatorSide = areWeOnCoordinatorSide(openEvent.getCon());
+        logger.info("Are we on Coordinator side? "+weAreOnCoordinatorSide);
         BATestBotScript script = setupStateMachine(openEvent, weAreOnCoordinatorSide);
         //now, get the action from the state machine and make the right need send the message
         if (isScriptFinished(script)) return;
         BATestScriptAction action = script.getNextAction();
 
+
       //  logger.info("State of the sender before sending: {} ", action.getStateOfSenderBeforeSending());
         //decide from which need to send the initial WS-BA protocol message
         URI connectionToSendMessageFrom = determineConnectionToSendFrom(openEvent.getCon(), weAreOnCoordinatorSide, action);
-        sendMessageFromConnection(action, connectionToSendMessageFrom);
+        //2 sendMessageFromConnection(action, connectionToSendMessageFrom);
+        sendModelFromConnection(action, connectionToSendMessageFrom);
     }
 
     private boolean isScriptFinished(BATestBotScript script) {
@@ -104,7 +107,7 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
 
     private void sendMessageFromConnection(final BATestScriptAction action, URI connectionToSendMessageFrom) {
 
-        final String message = action.getMessageToBeSent();
+        final Model message = action.getMessageToBeSent();
         final URI senderURI = connectionToSendMessageFrom;
         getEventListenerContext().getTaskScheduler().schedule(new Runnable()
         {
@@ -112,13 +115,35 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
             public void run()
             {
                 try {
-                    getEventListenerContext().getOwnerService().textMessage(senderURI, WonRdfUtils.MessageUtils.textMessage(message));
                     logger.info("State of the sender before sending: {} ", action.getStateOfSenderBeforeSending());
                 } catch (Exception e) {
                     logger.warn("could not send message via connection {}", senderURI, e);
                 }
          }
                     }, new Date(System.currentTimeMillis() + millisTimeoutBeforeReply));
+    }
+
+
+    private void sendModelFromConnection(final BATestScriptAction action, URI connectionToSendMessageFrom) {
+
+        final Model myContent = action.getMessageToBeSent();
+
+
+        logger.info("Sent RDF: "+myContent);
+        final URI senderURI = connectionToSendMessageFrom;
+        getEventListenerContext().getTaskScheduler().schedule(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try {
+                    getEventListenerContext().getOwnerService().textMessage(senderURI, myContent);
+                    logger.info("State of the sender before sending: {} ", action.getStateOfSenderBeforeSending());
+                } catch (Exception e) {
+                    logger.warn("could not send message via connection {}", senderURI, e);
+                }
+            }
+        }, new Date(System.currentTimeMillis() + millisTimeoutBeforeReply));
     }
 
     private URI determineConnectionToSendFrom(Connection con, boolean weAreOnCoordinatorSide, BATestScriptAction action) {
@@ -128,7 +153,8 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
             connectionToSendMessageFrom = con.getConnectionURI();
         } else {
             Path propertyPath = PathParser.parse("<"+ WON.HAS_REMOTE_CONNECTION+">", PrefixMapping.Standard);
-            connectionToSendMessageFrom = client.getURIPropertyForPropertyPath(con.getConnectionURI(), propertyPath);
+            connectionToSendMessageFrom = RdfUtils.getURIPropertyForPropertyPath(
+                getEventListenerContext().getLinkedDataSource().getModelForResource(con.getConnectionURI()), con.getConnectionURI() , propertyPath);
             //TODO: also get BA state for participant/coordinator and compare to
             //state that the action says it should be in. If the state is different
             //throw an exception.
@@ -184,7 +210,8 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
 
         //decide from which need to send the initial WS-BA protocol message
         URI connectionToSendMessageFrom = determineConnectionToSendFrom(messageEvent.getCon(), weAreOnCoordinatorSide, action);
-        sendMessageFromConnection(action, connectionToSendMessageFrom);
+     //2   sendMessageFromConnection(action, connectionToSendMessageFrom);
+        sendModelFromConnection(action, connectionToSendMessageFrom);
     }
 
  /*   private void unsubscribe()

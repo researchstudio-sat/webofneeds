@@ -34,10 +34,6 @@ public class BAPCCoordinatorFacetImpl extends Facet {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private SimpleBAPCStateManager stateManager = new SimpleBAPCStateManager();
 
-
-    @Autowired
-    private ConnectionRepository connectionRepository;
-
     @Override
     public FacetType getFacetType() {
         return FacetType.BAPCCoordinatorFacet;
@@ -76,20 +72,38 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     Model myContent = null;
                     Resource r = null;
 
-                    //message (event) for sending
-                    NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_BA.BASE_URI,"hasTextMessage"));
-                    //System.out.println("daki: Participant sends:"+message.toString());
 
-                    messageForSending = ni.toList().get(0).toString();
-                    messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
-                    logger.info("Cooridnator sends: " + messageForSending);
+                    //message (event) for sending
+
+                    //message as TEXT
+                    NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_BA.BASE_URI,"hasTextMessage"));
+                    if (ni.hasNext())
+                    {
+                        messageForSending = ni.toList().get(0).toString();
+                        messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
+                        eventType = BAPCEventType.getCoordinationEventTypeFromString(messageForSending);
+                        logger.info("Coordinator sends the text message: {}", eventType.getURI());
+                    }
+                    //message as MODEL
+                    else {
+                        ni = message.listObjectsOfProperty(message.getProperty(WON_BA.COORDINATION_MESSAGE.getURI().toString()));
+                        if(ni.hasNext())
+                        {
+                            String eventTypeURI = ni.toList().get(0).asResource().getURI().toString();
+                            eventType = BAPCEventType.getBAEventTypeFromURI(eventTypeURI);
+                            logger.info("Coordinator sends the RDF: {}", eventType.getURI());
+                        }
+                        else
+                        {
+                            logger.info("Message {} does not contain a proper content.", message.toString());
+                            return;
+                        }
+                    }
 
                     myContent = ModelFactory.createDefaultModel();
                     myContent.setNsPrefix("","no:uri");
                     Resource baseResource = myContent.createResource("no:uri");
 
-                    // message -> eventType
-                    eventType = BAPCEventType.getCoordinationEventTypeFromString(messageForSending);
                     if((eventType!=null))
                     {
                         if(BAPCEventType.isBAPCCoordinatorEventType(eventType))
@@ -102,14 +116,7 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
                             baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
-                            //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
-
                             needFacingConnectionClient.textMessage(con, myContent);
-
-                         //   List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getRemoteNeedURI(),
-                                   // ConnectionState.CONNECTED, FacetType.BAAtomicOutcome.getURI());
-
-
                         }
                         else
                         {
@@ -160,8 +167,6 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
-                    System.out.println("daki Nesto");
-
 
                     BAPCEventType resendEventType = state.getResendEvent();
                     if(resendEventType!=null)

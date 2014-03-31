@@ -302,6 +302,25 @@ public class EventBotActions
         }
     }
 
+  public static class DeactivateAllNeedsOfGroupAction extends Action {
+    private String groupName;
+    public DeactivateAllNeedsOfGroupAction(EventListenerContext eventListenerContext, String groupName) {
+      super(eventListenerContext);
+      this.groupName = groupName;
+    }
+
+    @Override
+    protected void doRun() throws Exception {
+      List<URI> toDeactivate = getEventListenerContext().getBotContext().getNamedNeedUriList(groupName);
+      for (URI uri: toDeactivate){
+        getEventListenerContext().getOwnerService().deactivate(uri);
+        getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
+      }
+    }
+  }
+
+
+
     private static void rememberInListIfNamePresent(EventListenerContext ctx ,URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0){
             ctx.getBotContext().appendToNamedNeedUriList(uri, uriListName);

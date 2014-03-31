@@ -18,13 +18,12 @@ package won.bot.framework.events.listener;
 
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.BotContext;
-import won.bot.framework.events.EventBus;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.bot.framework.events.EventBus;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 import java.util.concurrent.Executor;
 
@@ -41,22 +40,23 @@ public interface EventListenerContext
   public TaskScheduler getTaskScheduler();
 
   /**
-   * Returns the bot's NodeURISource. Used to obtain WON_BACC node URIs.
+   * Returns the bot's NodeURISource. Used to obtain WON_BA node URIs.
    * @return
    */
   public NodeURISource getNodeURISource();
 
   /**
-   * Returns the bot's owner service. Used to connect to WON_BACC nodes.
+   * Returns the bot's owner service. Used to connect to WON_BA nodes.
    */
   public OwnerProtocolNeedServiceClientSide getOwnerService();
 
-    /**
-     * Returns the bot's matcher service.
-     */
-  public MatcherProtocolNeedServiceClientSide getMatcherService();
   /**
-   * Returns the bot's needProducer. Used to obtain an RDF model that can be sent to a WON_BACC node to create a new need.
+   * Returns the bot's matcher service
+   */
+  public MatcherProtocolNeedServiceClientSide getMatcherService();
+  
+  /**
+   * Returns the bot's needProducer. Used to obtain an RDF model that can be sent to a WON_BA node to create a new need.
    * @return
    */
   public NeedProducer getNeedProducer();
@@ -90,5 +90,11 @@ public interface EventListenerContext
    */
   public Executor getExecutor();
 
+
+  /**
+   * Returns a linked data source.
+   * @return
+   */
+  public LinkedDataSource getLinkedDataSource();
 
 }

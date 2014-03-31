@@ -18,13 +18,9 @@ package won.bot.framework.events.listener;
 
 import won.bot.framework.events.Event;
 import won.bot.framework.events.event.CloseFromOtherNeedEvent;
-import won.bot.framework.events.event.MessageFromOtherNeedEvent;
 import won.bot.framework.events.event.NeedDeactivatedEvent;
-import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
-import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
-import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import java.net.URI;
 import java.util.List;
@@ -39,6 +35,11 @@ public class DeactivateAllNeedsOnConnectionCloseListener extends BaseEventListen
   public DeactivateAllNeedsOnConnectionCloseListener(final EventListenerContext context)
   {
     super(context);
+  }
+
+  public DeactivateAllNeedsOnConnectionCloseListener(final EventListenerContext context, final EventFilter eventFilter)
+  {
+    super(context, eventFilter);
   }
 
   @Override

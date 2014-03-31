@@ -43,10 +43,10 @@ public class WON_BA {
     public static final Resource MESSAGE_FAIL = m.createResource(BASE_URI + "MessageFail");
     public static final Resource MESSAGE_CANNOTCOMPLETE= m.createResource(BASE_URI + "MessageCanNotComplete");
     public static final Resource MESSAGE_CANCELED = m.createResource(BASE_URI + "MessageCanceled");
-    public static final Resource MESSAGE_CLOSED = m.createResource(BASE_URI + "MessageClose");
+    public static final Resource MESSAGE_CLOSED = m.createResource(BASE_URI + "MessageClosed");
     public static final Resource MESSAGE_COMPENSATED = m.createResource(BASE_URI + "MessageCompensated");
 
-
+    public static final Resource STATE_CLOSING = m.createResource(BASE_URI + "Closing");
 
 
     /** returns the URI for this schema

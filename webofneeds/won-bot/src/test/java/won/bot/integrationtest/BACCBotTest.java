@@ -31,8 +31,8 @@ import java.util.concurrent.TimeUnit;
 
 public class BACCBotTest {
     private static final int RUN_ONCE = 1;
-    private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
-    private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 1000;
+    private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
+    private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
 
     MyBot bot;
 
@@ -130,24 +130,24 @@ public class BACCBotTest {
             //Coordinator creator
             Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
             Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
-            //3 Participants creator
-            Assert.assertEquals(13, this.participantNeedCreator.getEventCount());
+            //28 Participants creator
+            Assert.assertEquals(28, this.participantNeedCreator.getEventCount());
             Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
             //Coordinator - Participants connector
-            Assert.assertEquals(14, this.needConnector.getEventCount());
+            Assert.assertEquals(29, this.needConnector.getEventCount());
             Assert.assertEquals(0, this.needConnector.getExceptionCount());
             //13 connect, 13 open
-            Assert.assertEquals(13+13, this.autoOpener.getEventCount());
+            Assert.assertEquals(2*(14+14), this.autoOpener.getEventCount());
             Assert.assertEquals(0, this.autoOpener.getExceptionCount());
             //messages
-            Assert.assertEquals(13+2+3+2+2+4+5+4+3+4+3+3+3+2, this.autoResponder.getEventCount());
+            Assert.assertEquals(2*(14+2+3+2+2+4+5+4+3+4+3+3+3+2+9), this.autoResponder.getEventCount());
             Assert.assertEquals(0, this.autoResponder.getExceptionCount());
 
             Assert.assertEquals(1, this.needDeactivator.getEventCount());
             Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
 
-            //13 needs deactivated
-            Assert.assertEquals(14, this.workDoneSignaller.getEventCount());
+            //29 needs deactivated
+            Assert.assertEquals(29, this.workDoneSignaller.getEventCount());
             Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
             //TODO: there is more to check:

@@ -19,12 +19,12 @@ package won.bot.framework.component.nodeurisource;
 import java.net.URI;
 
 /**
- * Interface that is used to obtain a WON_BACC node URI.
+ * Interface that is used to obtain a WON_BA node URI.
  */
 public interface NodeURISource
 {
   /**
-   * Returns a WON_BACC node's URI. Must point to the URI that, when dereferenced, yields the RDF description of the WON_BACC node.
+   * Returns a WON_BA node's URI. Must point to the URI that, when dereferenced, yields the RDF description of the WON_BA node.
    * @return
    */
   public URI getNodeURI();

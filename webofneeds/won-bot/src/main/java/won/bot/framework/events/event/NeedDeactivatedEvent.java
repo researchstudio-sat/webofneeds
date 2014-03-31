@@ -21,7 +21,7 @@ import java.net.URI;
 /**
  *
  */
-public class NeedDeactivatedEvent extends BaseEvent
+public class NeedDeactivatedEvent extends BaseEvent implements NeedSpecificEvent
 {
   private URI needURI;
 

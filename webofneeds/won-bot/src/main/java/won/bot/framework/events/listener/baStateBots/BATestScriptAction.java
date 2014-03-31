@@ -1,5 +1,10 @@
 package won.bot.framework.events.listener.baStateBots;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+import won.protocol.util.WonRdfUtils;
+
 import java.net.URI;
 
 /**
@@ -11,13 +16,32 @@ import java.net.URI;
  */
 public class BATestScriptAction {
     private boolean senderIsParticipant;
-    private String messageToBeSent;
+    private Model messageToBeSent;
     private URI stateOfSenderBeforeSending;
 
+    /**
+     * Constructor that will cause the script to send text messages.
+     * @param senderIsParticipant
+     * @param messageToBeSent
+     * @param stateOfSenderBeforeSending
+     */
     public BATestScriptAction(boolean senderIsParticipant, String messageToBeSent, URI stateOfSenderBeforeSending) {
         this.senderIsParticipant = senderIsParticipant;
-        this.messageToBeSent = messageToBeSent;
+        this.messageToBeSent = WonRdfUtils.MessageUtils.textMessage(messageToBeSent);
         this.stateOfSenderBeforeSending = stateOfSenderBeforeSending;
+    }
+
+    /**
+     * Constructor that will cause the script to send won:coordinationMessage with the given URI as object.
+     * @param senderIsParticipant
+     * @param coordinationMessageUriToBeSent
+     * @param stateOfSenderBeforeSending
+     */
+    public BATestScriptAction(boolean senderIsParticipant, URI coordinationMessageUriToBeSent,URI stateOfSenderBeforeSending) {
+        this.senderIsParticipant = senderIsParticipant;
+        this.stateOfSenderBeforeSending = stateOfSenderBeforeSending;
+        System.out.println(("daki Dodaj: "+coordinationMessageUriToBeSent.toString()));
+        this.messageToBeSent = WonRdfUtils.MessageUtils.genericMessage(WON_BA.COORDINATION_MESSAGE, new ResourceImpl(coordinationMessageUriToBeSent.toString()));
     }
 
     public boolean isSenderIsParticipant() {
@@ -28,7 +52,7 @@ public class BATestScriptAction {
         return ! isSenderIsParticipant();
     }
 
-    public String getMessageToBeSent() {
+    public Model getMessageToBeSent() {
         return messageToBeSent;
     }
 

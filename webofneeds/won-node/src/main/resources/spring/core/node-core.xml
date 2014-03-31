@@ -34,8 +34,6 @@
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
     </context:component-scan>
 
-    <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClient" />
-
     <bean id="uriService" class="won.node.service.impl.URIService">
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
         <property name="dataURIPrefix" value="${uri.prefix.data}" />

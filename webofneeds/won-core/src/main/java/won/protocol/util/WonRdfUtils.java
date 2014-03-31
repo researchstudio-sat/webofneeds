@@ -2,6 +2,8 @@ package won.protocol.util;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.rdf.model.impl.PropertyImpl;
+import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +26,32 @@ public class WonRdfUtils
      * @return
      */
     public static Model textMessage(String message) {
-      com.hp.hpl.jena.rdf.model.Model messageModel = ModelFactory.createDefaultModel();
-      messageModel.setNsPrefix("", "no:uri");
+      Model messageModel = createModelWithBaseResource();
       Resource baseRes = messageModel.createResource(messageModel.getNsPrefixURI(""));
       baseRes.addProperty(RDF.type, WON.TEXT_MESSAGE);
       baseRes.addProperty(WON.HAS_TEXT_MESSAGE,message, XSDDatatype.XSDstring);
       return messageModel;
     }
+
+      /**
+       * Creates an RDF model containing a generic message.
+       * @return
+       */
+      public static Model genericMessage(URI predicate, URI object) {
+        return genericMessage(new PropertyImpl(predicate.toString()), new ResourceImpl(object.toString()));
+      }
+
+      /**
+       * Creates an RDF model containing a generic message.
+       * @return
+       */
+      public static Model genericMessage(Property predicate, Resource object) {
+          Model messageModel = createModelWithBaseResource();
+          Resource baseRes = RdfUtils.getBaseResource(messageModel);
+          baseRes.addProperty(RDF.type, WON.MESSAGE);
+          baseRes.addProperty(predicate, object);
+          return messageModel;
+      }
   }
 
   public static class FacetUtils {
@@ -114,6 +135,13 @@ public class WonRdfUtils
     }
 
   }
+
+    private static Model createModelWithBaseResource() {
+        Model model = ModelFactory.createDefaultModel();
+        model.setNsPrefix("", "no:uri");
+        model.createResource(model.getNsPrefixURI(""));
+        return model;
+    }
 
 
 }

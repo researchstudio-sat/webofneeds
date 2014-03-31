@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.events.Event;
 import won.bot.framework.events.EventListener;
+import won.bot.framework.events.event.FinishedEvent;
 
 /**
  * Base class for event listeners
@@ -31,6 +32,7 @@ public abstract class BaseEventListener implements EventListener
   private int eventCount = 0;
   private int exceptionCount = 0;
   private long millisExecuting = 0;
+  private EventFilter eventFilter = null;
 
   /**
    * Constructor is private so that subclasses must implement the one-arg constructor.
@@ -42,8 +44,18 @@ public abstract class BaseEventListener implements EventListener
     this.context = context;
   }
 
+  protected BaseEventListener(final EventListenerContext context, final EventFilter eventFilter)
+  {
+    this(context);
+    this.eventFilter = eventFilter;
+  }
+
   @Override
   public final void onEvent(final Event event) throws Exception{
+    if (!shouldHandleEvent(event)){
+      //allow for ignoring events. Such event are not counted.
+      return;
+    }
     countEvent(event);
     long startTime = System.currentTimeMillis();
     try {
@@ -54,6 +66,15 @@ public abstract class BaseEventListener implements EventListener
     } finally {
       noteTimeExecuting(startTime);
     }
+  }
+
+  /**
+   * Publishes an event indicating that the listener is finished. Useful for chaining listeners.
+   * Only use when this is really the case.
+   */
+  protected void publishFinishedEvent()
+  {
+    getEventListenerContext().getEventBus().publish(new FinishedEvent(this));
   }
 
   public long getMillisExecuting()
@@ -89,5 +110,16 @@ public abstract class BaseEventListener implements EventListener
 
   protected EventListenerContext getEventListenerContext(){
     return context;
+  }
+
+  /**
+   * Determines whether the given event should be processed or ignored. If it is ignored,
+   * it is not counted and does not influence the listener's behavior. The default implementation
+   * accepts all events.
+   * @param event
+   * @return
+   */
+  protected final boolean shouldHandleEvent(final Event event){
+    return eventFilter == null ? true : eventFilter.accept(event);
   }
 }

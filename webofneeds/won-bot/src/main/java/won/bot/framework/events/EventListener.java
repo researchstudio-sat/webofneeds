@@ -23,5 +23,4 @@ package won.bot.framework.events;
 public interface EventListener
 {
   public void onEvent(Event event) throws Exception;
-
 }

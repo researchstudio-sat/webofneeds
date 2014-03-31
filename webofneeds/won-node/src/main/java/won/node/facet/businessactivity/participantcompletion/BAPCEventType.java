@@ -84,7 +84,7 @@ public enum BAPCEventType {
             BAPCState.NOT_COMPLETING, BAPCState.EXITING,
             BAPCState.ENDED))),
 
-    MESSAGE_CANNOTCOMPLETE("MessageCannotComplete", new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE,
+    MESSAGE_CANNOTCOMPLETE("MessageCanNotComplete", new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE,
             BAPCState.CANCELING,  BAPCState.COMPLETED,
             BAPCState.CLOSING, BAPCState.COMPENSATING,
             BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
@@ -134,6 +134,15 @@ public enum BAPCEventType {
     }
 
     public BAPCEventType getBAEventTypeFromURIParticipantInbound (String sURI)
+    {
+        for (BAPCEventType eventType: BAPCEventType.values()){
+            if (sURI.equals(eventType.getURI().toString())) return eventType;
+        }
+        return null;
+    }
+
+
+    public static BAPCEventType getBAEventTypeFromURI (String sURI)
     {
         for (BAPCEventType eventType: BAPCEventType.values()){
             if (sURI.equals(eventType.getURI().toString())) return eventType;
