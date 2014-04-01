@@ -34,8 +34,8 @@ import java.util.List;
 public class Create2NeedsGroupingBot extends EventBot
 {
 
-  protected static final int NO_OF_GROUPMEMBERS = 20;
-  protected static final int NO_OF_MESSAGES = 10;
+  protected static final int NO_OF_GROUPMEMBERS = 40;
+  protected static final int NO_OF_MESSAGES = 5;
   protected static final long MILLIS_BETWEEN_MESSAGES = 10;
   protected static final String NAME_GROUPS = "groups";
   protected static final String NAME_GROUPMEMBERS = "groupmembers";

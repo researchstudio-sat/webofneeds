@@ -17,35 +17,27 @@
 package won.bot.framework.events.listener.action;
 
 import won.bot.framework.events.listener.EventListenerContext;
-import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 import java.util.List;
 
 /**
- * EventBotAction connecting two needs on the specified facets. The need's URIs are obtained from
- * the bot context. The first two URIs found there are used.
+ * EventBotAction that sends a hint message to the first need in the context to the second.
  */
-public class ConnectTwoNeedsAction extends EventBotAction
-{
-  private URI remoteFacet;
-  private URI localFacet;
-
-  public ConnectTwoNeedsAction(final EventListenerContext eventListenerContext, final URI remoteFacet, final URI localFacet)
+public class MatchNeedsAction extends EventBotAction {
+  public MatchNeedsAction(final EventListenerContext eventListenerContext)
   {
     super(eventListenerContext);
-    this.remoteFacet = remoteFacet;
-    this.localFacet = localFacet;
   }
 
   @Override
-  public void doRun()
-  {
+  protected void doRun() throws Exception{
     List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
-    try {
-      getEventListenerContext().getOwnerService().connect(needs.get(0), needs.get(1), WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(localFacet, remoteFacet));
-    } catch (Exception e) {
-      logger.warn("could not connect {} and {}", new Object[]{needs.get(0), needs.get(1)}, e);
-    }
+    URI need1 = needs.get(0);
+    URI need2 = needs.get(1);
+    logger.info("matching needs {} and {}",need1,need2);
+    logger.info("getEventListnerContext():"+getEventListenerContext());
+    logger.info("getMatcherService(): "+getEventListenerContext().getMatcherService());
+    getEventListenerContext().getMatcherService().hint(need1,need2,1.0, URI.create("http://localhost:8080/matcher"),null);
   }
 }

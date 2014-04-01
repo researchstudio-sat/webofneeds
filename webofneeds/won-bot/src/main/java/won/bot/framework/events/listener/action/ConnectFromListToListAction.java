@@ -90,7 +90,7 @@ public class ConnectFromListToListAction extends EventBotAction
       {
         try {
           logger.info("connecting needs {} and {}",fromUri,toUri);
-          getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createModelForConnect(fromFacet, toFacet));
+          getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet));
         } catch (Exception e) {
           logger.info("could not connect {} and {}", fromUri, toUri);
           logger.info("caught exception", e);

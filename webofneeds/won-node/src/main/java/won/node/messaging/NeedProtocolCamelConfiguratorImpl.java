@@ -16,16 +16,8 @@
 
 package won.node.messaging;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import org.apache.activemq.camel.component.ActiveMQComponent;
-import org.apache.camel.CamelContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import won.node.camel.routes.NeedProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
-import won.protocol.jms.BrokerComponentFactory;
 import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
 
 import java.net.URI;
@@ -38,22 +30,16 @@ import java.net.URI;
  */
 public class NeedProtocolCamelConfiguratorImpl extends NeedBasedCamelConfiguratorImpl {
 
-
     @Override
     public synchronized void addRouteForEndpoint(String startingComponent,URI brokerUri) throws CamelConfigurationFailedException {
-
-        if (getCamelContext().getComponent(startingComponent)==null||getCamelContext().getRoute(startingComponent)==null){
-            NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(getCamelContext(),startingComponent);
-            try {
-                getCamelContext().addRoutes(needProtocolRouteBuilder);
-            } catch (Exception e) {
-                throw new CamelConfigurationFailedException("adding route to camel context failed",e);
-            }
+      if (getCamelContext().getRoute(startingComponent)==null){
+        NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(getCamelContext(),startingComponent);
+        try {
+          getCamelContext().addRoutes(needProtocolRouteBuilder);
+        } catch (Exception e) {
+          throw new CamelConfigurationFailedException("adding route to camel context failed",e);
         }
+      }
     }
-
-
-
-
 
 }

@@ -18,9 +18,14 @@ package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventBus;
-import won.bot.framework.events.event.*;
+import won.bot.framework.events.event.ActEvent;
+import won.bot.framework.events.event.HintFromMatcherEvent;
+import won.bot.framework.events.event.NeedCreatedEvent;
+import won.bot.framework.events.event.NeedDeactivatedEvent;
 import won.bot.framework.events.listener.*;
-import won.protocol.model.FacetType;
+import won.bot.framework.events.listener.action.CreateNeedAction;
+import won.bot.framework.events.listener.action.MatchNeedsAction;
+import won.bot.framework.events.listener.action.SignalWorkDoneAction;
 
 /**
  *
@@ -51,14 +56,14 @@ public class MatcherProtocolBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ExecuteOnEventListener(
         ctx,
-        new EventBotActions.CreateNeedAction(ctx,NAME_NEEDS),
+        new CreateNeedAction(ctx,NAME_NEEDS),
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class,this.needCreator);
 
     this.matcher = new ExecuteOnceAfterNEventsListener(
             ctx,
-            new EventBotActions.MatchNeedsAction(ctx),
+            new MatchNeedsAction(ctx),
             NO_OF_NEEDS);
     //count until 1 need is created, then create a comment facet
     bus.subscribe(NeedCreatedEvent.class, this.matcher);
@@ -68,7 +73,7 @@ public class MatcherProtocolBot extends EventBot
 
       this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
               ctx,
-              new EventBotActions.SignalWorkDoneAction(ctx), 2
+              new SignalWorkDoneAction(ctx), 2
       );
       bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
 

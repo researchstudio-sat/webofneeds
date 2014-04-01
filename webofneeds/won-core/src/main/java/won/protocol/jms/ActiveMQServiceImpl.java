@@ -112,7 +112,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             }
             else throw e;
         }
-        logger.info("brokerUri {} for resourceUri {} ",activeMQEndpoint,resourceUri);
+        logger.debug("brokerUri {} for resourceUri {} ",activeMQEndpoint,resourceUri);
         return activeMQEndpoint;
     }
 
