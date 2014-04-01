@@ -26,6 +26,7 @@ import won.bot.framework.events.EventBus;
 import won.bot.framework.events.bus.SchedulerEventBusImpl;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.EventListenerContext;
+import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
@@ -216,6 +217,11 @@ public class EventBot extends TriggeredBot
     {
       return EventBot.this.getOwnerService();
     }
+
+    public MatcherProtocolNeedServiceClientSide getMatcherService(){
+        return EventBot.this.getMatcherService();
+    }
+
 
     public NeedProducer getNeedProducer()
     {

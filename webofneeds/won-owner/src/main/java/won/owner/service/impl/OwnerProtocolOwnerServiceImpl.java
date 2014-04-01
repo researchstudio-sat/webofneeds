@@ -54,35 +54,37 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     //TODO: refactor this to use DataAccessService
 
     @Override
-    public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
+    public void hint(final String ownNeedURI, final String otherNeedURI, final String score, final String originatorURI, final String content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
         logger.info("node-facing: HINT called for own need {}, other need {}, with score {} from originator {} and content {}",
                 new Object[]{ownNeedURI, otherNeedURI, score, originatorURI, content});
 
-        if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
-        if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
-        if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
-        if (originatorURI == null) throw new IllegalArgumentException("originator is not set");
-        if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
+        URI ownNeedUriConvert = URI.create(ownNeedURI);
+        URI otherNeedUriConvert = URI.create(otherNeedURI);
+        double scoreConvert = Double.valueOf(score);
+        URI originatorUriConvert = URI.create(originatorURI);
+        Model contentConvert = RdfUtils.toModel(content);
+
+        if (scoreConvert < 0 || scoreConvert > 1) throw new IllegalArgumentException("score is not in [0,1]");
 
 
         //Load need (throws exception if not found)
-        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
-        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
+        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedUriConvert);
+        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedUriConvert, ConnectionEventType.MATCHER_HINT.name(), need.getState());
 
-        List<Match> matches = matchRepository.findByFromNeedAndToNeedAndOriginator(ownNeedURI, otherNeedURI, originatorURI);
+        List<Match> matches = matchRepository.findByFromNeedAndToNeedAndOriginator(ownNeedUriConvert, otherNeedUriConvert, originatorUriConvert);
         Match match = null;
         if (matches.size() > 0){
           match = matches.get(0);
         } else {
           //save match
           match = new Match();
-          match.setFromNeed(ownNeedURI);
-          match.setToNeed(otherNeedURI);
-          match.setOriginator(originatorURI);
+          match.setFromNeed(ownNeedUriConvert);
+          match.setToNeed(otherNeedUriConvert);
+          match.setOriginator(originatorUriConvert);
         }
-        match.setScore(score);
+        match.setScore(scoreConvert);
         matchRepository.saveAndFlush(match);
-        ownerServiceCallback.onHint(match, content);
+        ownerServiceCallback.onHint(match, contentConvert);
     }
 
     private boolean isNeedActive(final Need need) {

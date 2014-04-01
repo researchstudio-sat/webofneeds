@@ -40,6 +40,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final String PATH_OWNER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME + ">";
     private static final String PATH_NEED_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME + ">";
+    private static final String PATH_MATCHER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME + ">";
     private static final String PATH_BROKER_URI = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_BROKER_URI + ">";
     private String queueNamePath;
     private ProtocolType protocolType;
@@ -59,6 +60,8 @@ public class ActiveMQServiceImpl implements ActiveMQService {
                 pathInformation = "";
                 break;
             case MatcherProtocol:
+                queueNamePath = PATH_MATCHER_PROTOCOL_QUEUE_NAME;
+                pathInformation = "";
                 break;
 
         }

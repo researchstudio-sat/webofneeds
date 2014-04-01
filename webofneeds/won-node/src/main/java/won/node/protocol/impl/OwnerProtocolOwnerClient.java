@@ -47,10 +47,10 @@ public class OwnerProtocolOwnerClient implements OwnerProtocolOwnerServiceClient
     private ConnectionRepository connectionRepository;
 
     @Override
-  public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
+  public void hint(final URI ownNeedUri, final URI otherNeedUri, final double score, final URI originatorUri, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    logger.info(MessageFormat.format("owner-facing: HINT_RECEIVED called for own need {0}, other need {1}, with score {2} from originator {3} and content {4}", ownNeedURI, otherNeedURI, score, originatorURI, content));
-    delegate.hint(ownNeedURI,otherNeedURI,score,originatorURI,content);
+    logger.info(MessageFormat.format("owner-facing: HINT_RECEIVED called for own need {0}, other need {1}, with score {2} from originator {3} and content {4}", ownNeedUri, otherNeedUri, score, originatorUri, content));
+    delegate.hint(ownNeedUri, otherNeedUri,score, originatorUri,content);
   }
 
 

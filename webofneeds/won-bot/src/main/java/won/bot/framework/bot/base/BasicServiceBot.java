@@ -16,9 +16,11 @@
 
 package won.bot.framework.bot.base;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
+import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
@@ -30,6 +32,7 @@ public abstract class BasicServiceBot extends BaseBot
   private NodeURISource nodeURISource;
   private NeedProducer needProducer;
   private OwnerProtocolNeedServiceClientSide ownerService;
+  private MatcherProtocolNeedServiceClientSide matcherService;
   private LinkedDataSource linkedDataSource;
 
   protected NodeURISource getNodeURISource()
@@ -47,10 +50,19 @@ public abstract class BasicServiceBot extends BaseBot
     return ownerService;
   }
 
+  protected MatcherProtocolNeedServiceClientSide getMatcherService(){
+      return matcherService;
+  }
+
   @Qualifier("default")
   public void setOwnerService(final OwnerProtocolNeedServiceClientSide ownerService)
   {
     this.ownerService = ownerService;
+  }
+
+  @Qualifier("default")
+  public void setMatcherService(final MatcherProtocolNeedServiceClientSide matcherService){
+      this.matcherService = matcherService;
   }
 
   protected NeedProducer getNeedProducer()

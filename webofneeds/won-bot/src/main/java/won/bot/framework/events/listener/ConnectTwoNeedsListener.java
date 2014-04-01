@@ -16,11 +16,7 @@
 
 package won.bot.framework.events.listener;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.hp.hpl.jena.rdf.model.Model;
-import won.bot.framework.component.needproducer.impl.CommentNeedProducer;
 import won.bot.framework.events.Event;
-import won.bot.framework.events.event.CommentFacetCreatedEvent;
 import won.protocol.model.FacetType;
 import won.protocol.util.WonRdfUtils;
 
@@ -51,7 +47,7 @@ public class ConnectTwoNeedsListener extends BaseEventListener
           try{
               //TODO: duplicate code. see ConnectTwoNeedsAction
               if (!needs.get(i).equals(facet)){
-                  getEventListenerContext().getOwnerService().connect(needs.get(i),facet, WonRdfUtils.FacetUtils.createModelForConnect(localFacet,remoteFacet));
+                  getEventListenerContext().getOwnerService().connect(needs.get(i),facet, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(localFacet, remoteFacet));
               }
 
           } catch (Exception e) {

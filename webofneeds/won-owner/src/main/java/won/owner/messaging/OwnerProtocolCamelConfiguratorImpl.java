@@ -88,9 +88,9 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
 
     }
     @Override
-    public synchronized void addRemoteQueueListeners(List<String> endpoints) throws CamelConfigurationFailedException {
+    public synchronized void addRemoteQueueListeners(List<String> endpoints, URI remoteEndpoint) throws CamelConfigurationFailedException {
         logger.info("length of endpoints {}", endpoints.size());
-        OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(camelContext, endpoints);
+        OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(camelContext, endpoints, remoteEndpoint);
         try {
             camelContext.addRoutes(ownerApplicationListenerRouteBuilder);
         } catch (Exception e) {

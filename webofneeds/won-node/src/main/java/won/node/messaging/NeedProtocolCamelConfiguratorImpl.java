@@ -26,100 +26,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.node.camel.routes.NeedProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.BrokerComponentFactory;
-import won.protocol.jms.NeedProtocolCamelConfigurator;
+import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
 
 import java.net.URI;
+
+//import won.node.camel.routes.NeedProtocolDynamicRoutes;
 
 /**
  * User: LEIH-NB
  * Date: 26.02.14
  */
-public class NeedProtocolCamelConfiguratorImpl implements NeedProtocolCamelConfigurator {
-    //Map<List<> List<URI>> endpointNeedMap;
-    BiMap<URI, String> endpointMap = HashBiMap.create();
-    BiMap<URI,String> brokerComponentMap = HashBiMap.create();
+public class NeedProtocolCamelConfiguratorImpl extends NeedBasedCamelConfiguratorImpl {
 
-
-    private String componentName;
-    private final String localComponentName = "seda";
-    private String vmComponentName;
-    private CamelContext camelContext;
-
-
-    @Autowired
-    private BrokerComponentFactory brokerComponentFactory;
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName){
-        String brokerComponentName = setupBrokerComponentName(brokerUri);
-        addCamelComponentForWonNodeBroker(brokerUri, brokerComponentName);
-        String endpoint = brokerComponentName+":queue:"+needProtocolQueueName;
-        endpointMap.put(brokerUri,endpoint);
-        logger.info("endpoint of wonNodeURI {} is {}",brokerUri,endpointMap.get(brokerUri));
-        return endpoint;
-    }
+    public synchronized void addRouteForEndpoint(String startingComponent,URI brokerUri) throws CamelConfigurationFailedException {
 
-    @Override
-    public String setupBrokerComponentName(URI brokerUri){
-            return this.componentName+brokerUri.toString().replaceAll("[/:]","");
-    }
-    /**
-     *
-     * @param brokerUri
-     * @return componentName
-     */
-    @Override
-    public void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName){
-
-        ActiveMQComponent activeMQComponent;
-        if (camelContext.getComponent(brokerComponentName)==null){
-            activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri);
-            logger.info("adding activemqComponent for brokerUri {}",brokerUri);
-            camelContext.addComponent(brokerComponentName,activeMQComponent);
-        }
-        brokerComponentMap.put(brokerUri,brokerComponentName);
-    }
-
-    @Override
-    public void addRouteForEndpoint(String startingComponent, final URI wonNodeURI) throws CamelConfigurationFailedException {
-
-        if (camelContext.getRoute(startingComponent)==null){
-            NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,startingComponent);
+        if (getCamelContext().getComponent(startingComponent)==null||getCamelContext().getRoute(startingComponent)==null){
+            NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(getCamelContext(),startingComponent);
             try {
-                camelContext.addRoutes(needProtocolRouteBuilder);
+                getCamelContext().addRoutes(needProtocolRouteBuilder);
             } catch (Exception e) {
                 throw new CamelConfigurationFailedException("adding route to camel context failed",e);
             }
         }
-    }
-
-    @Override
-    public void setCamelContext(CamelContext camelContext) {
-        this.camelContext=camelContext;
-    }
-
-    @Override
-    public CamelContext getCamelContext() {
-        return this.camelContext;
-    }
-
-
-    @Override
-    public String getEndpoint(URI brokerUri) {
-        return  endpointMap.get(brokerUri);
-    }
-    public void setComponentName(String componentName) {
-        this.componentName = componentName;
-    }
-
-    public String getComponentName() {
-        return componentName;
-    }
-
-    @Override
-    public String getBrokerComponentNameWithBrokerUri(URI brokerUri){
-        return brokerComponentMap.get(brokerUri);
     }
 
 

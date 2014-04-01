@@ -43,7 +43,6 @@ public class NeedProtocolNeedServiceImplJMSBased
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
-  //@Consume(uri="bean:activemq:queue:WON.NeedProtocol.Connect.In")
   public URI connect(@Header("needURI") final String needURI, @Header("otherNeedURI") final String otherNeedURI, @Header("otherConnectionURI") final String otherConnectionURI, @Header("content")final String content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
        logger.info("NODE2: connect received for need {], otherNeed{},connectionURI {}, content {}");
        URI needURIConvert = URI.create(needURI);

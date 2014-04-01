@@ -18,7 +18,6 @@ package won.matcher;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -37,9 +36,7 @@ import won.matcher.query.*;
 import won.matcher.query.rdf.TriplesQueryFactory;
 import won.matcher.service.ScoreTransformer;
 import won.protocol.solr.SolrFields;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -269,19 +266,10 @@ public class Matcher
     logger.debug("'to' need {} has facet {}", toDocUri, toFacetURI);
     if (toFacetURI == null ) return null;
     //for now, just use the first facets for matching. TODO: implement a clever strategy here
-    Model facetModel = createFacetModel(fromFacetURI, toFacetURI);
+    Model facetModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacetURI, toFacetURI);
     return facetModel;
   }
 
-  private Model createFacetModel(URI fromFacetURI, URI toFacetURI) {
-    logger.debug("creating an rdf model with the facet information to use in the hint message");
-    Model facetModel = ModelFactory.createDefaultModel();
-    Resource baseResource = RdfUtils.findOrCreateBaseResource(facetModel);
-    baseResource.addProperty(WON.HAS_FACET, facetModel.getResource(fromFacetURI.toString()));
-    baseResource.addProperty(WON.HAS_REMOTE_FACET, facetModel.getResource(toFacetURI.toString()));
-    logger.debug("facet model contains these facets: from:{} to:{}", fromFacetURI, toFacetURI);
-    return facetModel;
-  }
 
   /**
    * Fetches the ntriples content from the solr index and builds a jena Model from it.

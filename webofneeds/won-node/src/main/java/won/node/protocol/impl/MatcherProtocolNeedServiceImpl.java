@@ -36,7 +36,7 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
   private MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService;
 
   @Override
-  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
+  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator, Model content) throws Exception {
     matcherFacingNeedCommunicationService.hint(needURI, otherNeed, score, originator, content);
   }
 

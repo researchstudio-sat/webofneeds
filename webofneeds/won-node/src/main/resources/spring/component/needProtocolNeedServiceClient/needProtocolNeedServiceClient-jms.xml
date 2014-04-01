@@ -21,10 +21,10 @@
 
     <bean name="needProtocolNeedClientJMSBased" class="won.node.messaging.NeedProtocolNeedClientImplJMSBased">
         <property name="messagingService" ref="messagingService"/>
-        <property name="connectStartingEndpoint" value="seda:NeedProtocol.out.connect"/>
-        <property name="openStartingEndpoint" value="seda:NeedProtocol.out.open"/>
-        <property name="closeStartingEndpoint" value="seda:NeedProtocol.out.close"/>
-        <property name="textMessageStartingEndpoint" value="seda:NeedProtocol.out.textMessage"/>
+        <property name="connectStartingEndpoint" value="seda:NeedProtocol.Out.connect"/>
+        <property name="openStartingEndpoint" value="seda:NeedProtocol.Out.open"/>
+        <property name="closeStartingEndpoint" value="seda:NeedProtocol.Out.close"/>
+        <property name="textMessageStartingEndpoint" value="seda:NeedProtocol.Out.textMessage"/>
         <!--property name="protocolCommunicationService" ref="protocolCommunicationService"/-->
     </bean>
 </beans>

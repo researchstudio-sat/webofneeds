@@ -29,7 +29,8 @@ import org.junit.runners.Suite;
                 Create2NeedsGroupingBotTest.class,
                 CommentBotTest.class,
                 BACCBotTest.class,
-                BAPCBotTest.class
+                BAPCBotTest.class,
+                MatcherBotTest.class
         })
 public class WonTestSuite
 {

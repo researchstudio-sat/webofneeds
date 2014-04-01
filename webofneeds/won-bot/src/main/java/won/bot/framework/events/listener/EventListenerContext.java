@@ -20,6 +20,7 @@ import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.BotContext;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
+import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.bot.framework.events.EventBus;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -49,6 +50,11 @@ public interface EventListenerContext
    */
   public OwnerProtocolNeedServiceClientSide getOwnerService();
 
+  /**
+   * Returns the bot's matcher service
+   */
+  public MatcherProtocolNeedServiceClientSide getMatcherService();
+  
   /**
    * Returns the bot's needProducer. Used to obtain an RDF model that can be sent to a WON_BA node to create a new need.
    * @return
