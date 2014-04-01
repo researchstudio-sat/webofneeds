@@ -1,7 +1,6 @@
 package won.protocol.exception;
 
 import java.net.URI;
-import java.text.MessageFormat;
 
 /**
  * User: LEIH-NB
@@ -18,7 +17,7 @@ public class NoSuchOwnerApplicationException extends WonProtocolException {
 
     public NoSuchOwnerApplicationException()
     {
-        super(MessageFormat.format("owner application not found on this server.", null));
+        super("owner application not found on this server.");
 
     }
 }

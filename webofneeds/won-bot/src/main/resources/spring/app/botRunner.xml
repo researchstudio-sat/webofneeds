@@ -26,6 +26,7 @@
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/bot.properties" ignore-unresolvable="true"/>
     <import resource="classpath:/spring/component/monitoring/bot-monitoring-jmx.xml" />  <!-- this has to be before bot-monitoring.xml -->
+    <import resource="classpath:/spring/component/ehcache/bot-ehcache.xml" />
     <import resource="classpath:/spring/component/scheduling/scheduling.xml" />
     <import resource="classpath:/spring/component/ownerProtocolOwnerServiceHandler/ownerProtocolOwnerServiceHandler.xml" />
     <import resource="classpath:/spring/component/botManager/botManager.xml" />

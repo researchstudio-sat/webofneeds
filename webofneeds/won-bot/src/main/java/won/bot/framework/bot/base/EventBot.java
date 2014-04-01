@@ -82,7 +82,7 @@ public class EventBot extends TriggeredBot
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new ActEvent());
     } else {
-      logger.debug("not publishing event for call to act() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to act() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
@@ -92,7 +92,7 @@ public class EventBot extends TriggeredBot
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));
     } else {
-      logger.debug("not publishing event for call to onMessageFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onMessageFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
@@ -102,7 +102,7 @@ public class EventBot extends TriggeredBot
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new HintFromMatcherEvent(match, content));
     } else {
-      logger.debug("not publishing event for call to onHintFromMatcher() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onHintFromMatcher() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
@@ -112,7 +112,7 @@ public class EventBot extends TriggeredBot
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new CloseFromOtherNeedEvent(con, content));
     } else {
-      logger.debug("not publishing event for call to onClose() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onClose() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
@@ -122,7 +122,7 @@ public class EventBot extends TriggeredBot
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new OpenFromOtherNeedEvent(con, content));
     } else {
-      logger.debug("not publishing event for call to onOpenFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onOpenFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
@@ -132,7 +132,7 @@ public class EventBot extends TriggeredBot
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new ConnectFromOtherNeedEvent(con, content));
     } else {
-      logger.debug("not publishing event for call to onConnectFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onConnectFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
@@ -142,7 +142,7 @@ public class EventBot extends TriggeredBot
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel, FacetType.OwnerFacet));
     } else {
-      logger.debug("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 

@@ -23,13 +23,14 @@ import org.apache.camel.CamelContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.protocol.jms.*;
+import won.protocol.jms.CamelConfiguration;
+import won.protocol.jms.MessagingService;
+import won.protocol.jms.NeedProtocolCommunicationService;
 import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,7 +79,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
   }
 
     public void open(final Connection connection, final Model content) throws Exception {
-        logger.info(MessageFormat.format("need-facing: OPEN called for connection {}", connection));
+        logger.info("need-facing: OPEN called for connection {}", connection);
 
 
         CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),openStartingEndpoint);

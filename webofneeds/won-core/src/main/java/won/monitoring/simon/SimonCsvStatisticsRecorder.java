@@ -64,7 +64,7 @@ public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder
   }
 
   private static String[] header = new String[] { "Name", "Type", "Counter", "Total", "Min",
-    "Max", "StdDev", "FirstUsage", "LastUsage","LastReset", "Note" };
+    "Max", "Mean", "StdDev", "FirstUsage", "LastUsage","LastReset", "Note" };
 
 
   @Override

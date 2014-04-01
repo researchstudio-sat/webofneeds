@@ -83,7 +83,7 @@ public abstract class AbstractFacet implements Facet
           try {
               needFacingConnectionClient.open(con, content);
           } catch (Exception e) {
-             logger.debug("caught Exception in openFromOwner",e);
+             logger.warn("caught Exception in openFromOwner",e);
           }
         }
       });
@@ -168,7 +168,7 @@ public abstract class AbstractFacet implements Facet
         try {
           ownerFacingConnectionClient.open(con.getConnectionURI(), content);
         } catch (Exception e) {
-          logger.debug("caught Exception in openFromNeed:", e);
+          logger.warn("caught Exception in openFromNeed:", e);
         }
       }
     });

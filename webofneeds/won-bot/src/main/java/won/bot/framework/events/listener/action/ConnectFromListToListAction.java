@@ -83,6 +83,7 @@ public class ConnectFromListToListAction extends EventBotAction
 
   private void performConnect(final URI fromUri, final URI toUri, final Date when) throws Exception
   {
+    logger.info("scheduling connection message for date {}",when);
     getEventListenerContext().getTaskScheduler().schedule(new Runnable()
     {
       public void run()

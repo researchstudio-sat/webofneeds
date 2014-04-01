@@ -16,41 +16,71 @@
 
 package won.protocol.util.linkeddata;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
+import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 import won.protocol.rest.LinkedDataRestClient;
 
 import java.net.URI;
+import java.text.MessageFormat;
 
 /**
  * LinkedDataSource implementation that uses an in-memory jena Dataset for caching.
  */
-public class CachingLinkedDataSource implements LinkedDataSource
+public class CachingLinkedDataSource implements LinkedDataSource, InitializingBean
 {
+  private static final String CACHE_NAME = "linkedDataCache";
   private final Logger logger = LoggerFactory.getLogger(getClass());
+  @Autowired
+  private EhCacheCacheManager cacheManager;
+  private Ehcache cache;
 
   //In-memory dataset for caching linked data.
-  private Dataset dataset = DatasetFactory.createMem();
 
-  //client for accessing linked data.
-  private LinkedDataRestClient linkedDataClient = new LinkedDataRestClient();
 
   public Model getModelForResource(URI resource){
-    logger.debug("retrieving model for URI {}", resource);
-
-    if (dataset.containsNamedModel(resource.toString())){
-      logger.debug("returning cached instance of model for URI {}", resource);
-      return dataset.getNamedModel(resource.toString());
-    } else {
-      logger.debug("model not in cache for URI {}", resource);
-      Model model = linkedDataClient.readResourceData(resource);
-      logger.debug("fetched model for URI {}", resource);
-      dataset.addNamedModel(resource.toString(), model);
-      return model;
-    }
+    Element element = cache.get(resource);
+    Object model = element.getObjectValue();
+    if (model instanceof Model) return (Model) model;
+    throw new IllegalStateException(
+        new MessageFormat("The underlying linkedDataCache should only contain Models, but we got a {0} for URI {1}")
+            .format(new Object[]{model.getClass(), resource}));
   }
 
+  @Override
+  public void afterPropertiesSet() throws Exception
+  {
+    Ehcache baseCache = cacheManager.getCacheManager().getCache(CACHE_NAME);
+    this.cache = new SelfPopulatingCache(baseCache, new LinkedDataCacheEntryFactory());
+  }
+
+  public void setCacheManager(final EhCacheCacheManager cacheManager)
+  {
+    this.cacheManager = cacheManager;
+  }
+
+  private class LinkedDataCacheEntryFactory implements CacheEntryFactory {
+    //client for accessing linked data.
+    private LinkedDataRestClient linkedDataClient = new LinkedDataRestClient();
+
+    private LinkedDataCacheEntryFactory(){}
+
+    @Override
+    public Object createEntry(final Object key) throws Exception
+    {
+      if (key instanceof URI) {
+        logger.debug("fetching linked data for URI {}", key);
+        return linkedDataClient.readResourceData((URI) key);
+      } else {
+        throw new IllegalArgumentException("this cache only resolves URIs to Models");
+      }
+    }
+  }
 }
