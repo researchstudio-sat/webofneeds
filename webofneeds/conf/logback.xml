@@ -24,7 +24,15 @@
     </encoder>
   </appender>
 
-  <root level="debug">
-    <appender-ref ref="STDOUT" />
-  </root>
+    <!-- START MSGTRACE: set the following to DEBUG to trace messages through the system (high level) -->
+    <logger name="won.node.protocol.impl.NeedProtocolNeedClient" level="DEBUG"/>
+    <logger name="won.node.protocol.impl.NeedProtocolNeedServiceImpl" level="DEBUG"/>
+    <logger name="won.node.protocol.impl.OwnerProtocolOwnerClient" level="DEBUG"/>
+    <logger name="won.owner.protocol.impl.OwnerProtocolNeedServiceClient" level="DEBUG"/>
+    <!-- END MSGTRACE -->
+
+
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+    </root>
 </configuration>
