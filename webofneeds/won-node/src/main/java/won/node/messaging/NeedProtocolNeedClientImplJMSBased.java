@@ -73,61 +73,44 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       headerMap.put("content",RdfUtils.toString(content));
       headerMap.put("methodName","connect");
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-      logger.info("sending connect message to remoteBrokerEndpoint {}",camelConfiguration.getEndpoint());
 
       return messagingService.sendInOutMessageGeneric(null,headerMap,null,connectStartingEndpoint);
   }
 
     public void open(final Connection connection, final Model content) throws Exception {
-        logger.info("need-facing: OPEN called for connection {}", connection);
-
-
         CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),openStartingEndpoint);
-
         Map headerMap = new HashMap<String, String>();
         headerMap.put("protocol","NeedProtocol");
         headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
         headerMap.put("content", RdfUtils.toString(content));
         headerMap.put("methodName","open");
         headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-
         messagingService.sendInOnlyMessage(null,headerMap,null, openStartingEndpoint );
     }
 
 
   public void close(final Connection connection, final Model content) throws Exception {
-      logger.info("need-facing: CLOSE called for connection {}", connection);
-
       CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),closeStartingEndpoint);
-
       Map headerMap = new HashMap<String, String>();
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
       headerMap.put("content", RdfUtils.toString(content));
       headerMap.put("methodName","close");
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-
       messagingService.sendInOnlyMessage(null,headerMap,null, closeStartingEndpoint ) ;
-
   }
 
 
   public void textMessage(final Connection connection, final Model message) throws Exception {
-      logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
       String messageConvert = RdfUtils.toString(message);
-
       CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),textMessageStartingEndpoint);
-      logger.info("retrieved endpoint for connection. Endpoint: {}", camelConfiguration.getEndpoint());
-
       Map headerMap = new HashMap<String, String>();
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
       headerMap.put("content", messageConvert);
       headerMap.put("methodName","textMessage");
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-      logger.info("NeedProtocolNeedClientImpl: sending text message to remoteBrokerEndpoint: {}",camelConfiguration.getEndpoint());
       messagingService.sendInOnlyMessage(null,headerMap,null, textMessageStartingEndpoint );
-
   }
 
 

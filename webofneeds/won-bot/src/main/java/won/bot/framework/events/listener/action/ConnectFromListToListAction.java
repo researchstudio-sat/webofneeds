@@ -83,17 +83,17 @@ public class ConnectFromListToListAction extends EventBotAction
 
   private void performConnect(final URI fromUri, final URI toUri, final Date when) throws Exception
   {
-    logger.info("scheduling connection message for date {}",when);
+    logger.debug("scheduling connection message for date {}",when);
     getEventListenerContext().getTaskScheduler().schedule(new Runnable()
     {
       public void run()
       {
         try {
-          logger.info("connecting needs {} and {}",fromUri,toUri);
+          logger.debug("connecting needs {} and {}",fromUri,toUri);
           getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet));
         } catch (Exception e) {
-          logger.info("could not connect {} and {}", fromUri, toUri);
-          logger.info("caught exception", e);
+          logger.warn("could not connect {} and {}", fromUri, toUri);
+          logger.warn("caught exception", e);
         }
       }
     }, when);

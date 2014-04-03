@@ -21,12 +21,10 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
 
 import java.net.URI;
-import java.text.MessageFormat;
 
 /**
  * User: fkleedorfer
@@ -45,28 +43,28 @@ public class NeedProtocolNeedClient implements NeedProtocolNeedClientSide
   @Override
   public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws Exception {
 
-    logger.info("need-facing: CONNECT called for other need {}, own need {}, own connection {}, and content {}",
+    logger.debug("need to need: CONNECT called for other need {}, own need {}, own connection {}, and content {}",
         new Object[]{needUri, otherNeedUri, otherConnectionUri, content});
      return delegate.connect(needUri, otherNeedUri, otherConnectionUri,content);
 
   }
 
     @Override
-    public void open(final Connection connection, final Model content) throws Exception {
-        logger.info(MessageFormat.format("need-facing: OPEN called for connection {0}", connection));
-        delegate.open(connection,content);
-    }
+  public void open(final Connection connection, final Model content) throws Exception {
+      logger.debug("need to need: OPEN called for connection {}", connection);
+      delegate.open(connection,content);
+  }
 
   @Override
   public void close(final Connection connection, final Model content) throws Exception {
-    logger.info("need-facing: CLOSE called for connection {}", connection);
+    logger.debug("need to need: CLOSE called for connection {}", connection);
     delegate.close(connection,content);
 
   }
 
   @Override
   public void textMessage(final Connection connection, final Model message) throws Exception {
-    logger.info("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
+    logger.debug("need to need: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
     delegate.textMessage(connection, message);
 
   }

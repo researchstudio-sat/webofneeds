@@ -40,6 +40,18 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
     this.targetCount = targetCount;
   }
 
+  protected AbstractHandleFirstNEventsListener(final EventListenerContext context, final String name, final int targetCount)
+  {
+    super(context, name);
+    this.targetCount = targetCount;
+  }
+
+  protected AbstractHandleFirstNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount)
+  {
+    super(context, name, eventFilter);
+    this.targetCount = targetCount;
+  }
+
   @Override
   public void doOnEvent(final Event event) throws Exception
   {
@@ -96,5 +108,16 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
   public boolean isFinished()
   {
     return finished;
+  }
+
+  @Override
+  public String toString()
+  {
+    return getClass().getSimpleName() +
+        "{name='" + name +
+        ", count=" + count +
+        ",targetCount=" + targetCount +
+        ", finished=" + finished +
+        '}';
   }
 }

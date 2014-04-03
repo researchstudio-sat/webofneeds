@@ -69,36 +69,25 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
 
   @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info("OPEN received from the need side for connection {0} with content {1}", connectionURI, content);
-
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_OPEN);
-
     ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_OPEN);
-
     dataService.saveAdditionalContentForEvent(content, con, event);
-
     //invoke facet implementation
     reg.get(con).openFromNeed(con, content);
   }
 
   @Override
   public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info("CLOSE received from the need side for connection {} with content {}", connectionURI, content);
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
-
     ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_CLOSE);
-
     dataService.saveAdditionalContentForEvent(content, con, event);
-
     //invoke facet implementation
     reg.get(con).closeFromNeed(con, content);
   }
     @Override
     public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //check for facet types:
-
         if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
                 con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()) ||
                 con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI())  ||
@@ -112,15 +101,11 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
             dataService.saveChatMessage(con,coordinationMessage);
             //create ConnectionEvent in Database
             ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.OWNER_OPEN);
-
             //create rdf content for the ConnectionEvent and save it to disk
             dataService.saveAdditionalContentForEvent(message, con, event, null);
-
             //invoke facet implementation
             reg.get(con).textMessageFromNeed(con, message);
-
         }
-
         else
         {
             Resource baseRes = message.getResource(message.getNsPrefixURI(""));

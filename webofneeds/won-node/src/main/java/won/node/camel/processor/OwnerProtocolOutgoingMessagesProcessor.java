@@ -16,15 +16,14 @@
 
 package won.node.camel.processor;
 
-import org.apache.activemq.network.NetworkConnector;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
-import won.protocol.service.OwnerManagementService;
 import won.protocol.service.QueueManagementService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,12 +41,12 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        logger.info("processing messages for dynamic recipients generation");
+        logger.debug("processing messages for dynamic recipients generation");
         Map headers = exchange.getIn().getHeaders();
         Map properties = exchange.getProperties();
         List<OwnerApplication> ownerApplications = (List<OwnerApplication>)headers.get("ownerApplications");
         String methodName =headers.get("methodName").toString();
-        logger.info(ownerApplications.get(0).getOwnerApplicationId());
+        logger.debug(ownerApplications.get(0).getOwnerApplicationId());
         List<String> queueNames = convertToQueueName(ownerApplications,methodName);
         exchange.getIn().setHeader("ownerApplicationIDs",queueNames);
     }

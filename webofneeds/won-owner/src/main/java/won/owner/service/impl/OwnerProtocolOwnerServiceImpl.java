@@ -55,7 +55,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
     @Override
     public void hint(final String ownNeedURI, final String otherNeedURI, final String score, final String originatorURI, final String content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
-        logger.info("node-facing: HINT called for own need {}, other need {}, with score {} from originator {} and content {}",
+        logger.debug("owner from need: HINT called for own need {}, other need {}, with score {} from originator {} and content {}",
                 new Object[]{ownNeedURI, otherNeedURI, score, originatorURI, content});
 
         URI ownNeedUriConvert = URI.create(ownNeedURI);
@@ -101,7 +101,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         URI otherNeedURIConvert = URI.create(otherNeedURI);
         URI ownConnectionURIConvert = URI.create(ownConnectionURI);
         Model contentConvert = RdfUtils.toModel(content);
-        logger.info("node-facing: CONNECTION_REQUESTED called for own need {}, other need {}, own connection {} and content ''{}''", new Object[]{ownNeedURI,otherNeedURI,ownConnectionURI, content});
+        logger.debug("owner from need: CONNECT called for own need {}, other need {}, own connection {} and content {}", new Object[]{ownNeedURI,otherNeedURI,ownConnectionURI, content});
         if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
         if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
         if (ownConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
@@ -160,7 +160,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
     @Override
     public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        logger.info("node-facing: OPEN called for connection {} with content {}.", connectionURI, content);
+        logger.debug("owner from need: OPEN called for connection {} with content {}.", connectionURI, content);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
         //load connection, checking if it exists
@@ -175,7 +175,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     @Override
     public void close(final URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.info("node-facing: CLOSE called for connection {}", connectionURI);
+        logger.debug("owner from need: CLOSE called for connection {}", connectionURI);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
         //load connection, checking if it exists
@@ -190,7 +190,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     @Override
     public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.info("node-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
+        logger.debug("owner from need: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         if (message == null) throw new IllegalArgumentException("message is not set");
         //load connection, checking if it exists

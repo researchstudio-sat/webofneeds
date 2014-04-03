@@ -33,7 +33,6 @@ import won.protocol.ws.fault.*;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.text.MessageFormat;
 
 public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerServiceClientSide
 {
@@ -54,7 +53,6 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
     @Override
   public void hint(final URI ownNeedUri, final URI otherNeedUri, final double score, final URI originatorUri, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    logger.info(MessageFormat.format("owner-facing: HINT_RECEIVED called for own need {0}, other need {1}, with score {2} from originator {3} and content {4}", ownNeedUri, otherNeedUri, score, originatorUri, content));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(ownNeedUri);
       StringWriter sw = new StringWriter();
@@ -73,7 +71,6 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
     @Override
     public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
-      logger.info(MessageFormat.format("owner-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, own connection {2} and message ''{3}''", ownNeedURI, otherNeedURI, ownConnectionURI, content));
       try {
         OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(ownNeedURI);
         StringWriter sw = new StringWriter();
@@ -91,9 +88,6 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
     }
     @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info(MessageFormat.format("owner-facing: Open called for connection {0}", connectionURI));
-
-    logger.info(MessageFormat.format("owner-facing: OPEN called for connection {0}", connectionURI));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
       proxy.open(connectionURI, RdfUtils.toString(content));
@@ -111,7 +105,6 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
 
   @Override
   public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}", connectionURI));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
       proxy.close(connectionURI, RdfUtils.toString(content));
@@ -128,7 +121,6 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
 
   @Override
   public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info(MessageFormat.format("owner-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
       String messageConvert = RdfUtils.toString(message);

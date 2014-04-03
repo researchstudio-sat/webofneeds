@@ -18,33 +18,33 @@ package won.bot.framework.events.bus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.events.Event;
 import won.bot.framework.events.EventBus;
 import won.bot.framework.events.EventListener;
 import won.bot.framework.events.SubscriptionAware;
 
 import java.util.*;
+import java.util.concurrent.Executor;
 
 /**
  *
  */
-public class SchedulerEventBusImpl implements EventBus
+public class AsyncEventBusImpl implements EventBus
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private HashMap<Class<? extends Event>,List<EventListener>> listenerMap = new HashMap<>();
-  private TaskScheduler taskScheduler;
+  private Executor executor;
   private Object monitor = new Object();
 
-  public SchedulerEventBusImpl(final TaskScheduler taskScheduler)
+  public AsyncEventBusImpl(final Executor executor)
   {
-    this.taskScheduler = taskScheduler;
+    this.executor = executor;
   }
 
   @Override
   public <T extends Event> void publish(final T event)
   {
-    logger.info("publishing event {}", event);
+    logger.debug("publishing event {}", event);
     //get the list of listeners registered for the event
     List<EventListener> listeners = getEventListenersForEvent(event);
     if (listeners == null || listeners.size() == 0) {
@@ -59,7 +59,7 @@ public class SchedulerEventBusImpl implements EventBus
   @Override
   public <T extends Event> void subscribe(Class<T> clazz, final EventListener listener)
   {
-    logger.info("subscribing listener {} for type {}", listener, clazz);
+    logger.debug("subscribing listener {} for type {}", listener, clazz);
     synchronized (monitor) {
       //we want to synchronize so we don't accidentally add or remove listeners at the same time
       List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));
@@ -73,7 +73,7 @@ public class SchedulerEventBusImpl implements EventBus
   @Override
   public <T extends Event> void unsubscribe(Class<T> clazz, final EventListener listener)
   {
-    logger.info("unsubscribing listener {} for type {}", listener, clazz);
+    logger.debug("unsubscribing listener {} for type {}", listener, clazz);
     synchronized (monitor) {
       //we want to synchronize so we don't accidentally add or remove listeners at the same time
       List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));      newListenerList.remove(listener);
@@ -85,7 +85,7 @@ public class SchedulerEventBusImpl implements EventBus
   @Override
   public void unsubscribe(final EventListener listener)
   {
-    logger.info("unsubscribing listener {} from all events", listener);
+    logger.debug("unsubscribing listener {} from all events", listener);
     synchronized (monitor){
       for (Map.Entry<Class<? extends Event>, List<EventListener>> entry: listenerMap.entrySet()){
         boolean unsubscribed = false; //remember if we had to unsubscribe the listener for the current event type
@@ -111,22 +111,22 @@ public class SchedulerEventBusImpl implements EventBus
 
   private void callEventListeners(final List<EventListener> listeners, final Event event)
   {
-    this.taskScheduler.schedule(new Runnable(){
+    if (listeners == null || listeners.isEmpty()) return;
+    this.executor.execute(new Runnable(){
       @Override
       public void run()
       {
+        logger.debug("processing event {} with {} listeners", event, listeners.size());
         for (EventListener listener : listeners) {
           try {
-            logger.debug("processing event {} on listener {}", event, listener);
             listener.onEvent(event);
-            logger.debug("finished processing event {} on listener {}", event, listener);
           } catch (Exception e) {
             logger.warn("caught exception during execution of event {} on listener {}", new Object[]{event, listener}, e);
             logger.warn("stacktrace:",e);
           }
         }
       }
-    }, new Date());
+    });
   }
 
   private List<EventListener> getEventListenersForEvent(final Event event)

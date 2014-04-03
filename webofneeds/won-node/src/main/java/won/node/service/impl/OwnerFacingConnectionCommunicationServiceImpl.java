@@ -16,15 +16,19 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.facet.impl.FacetRegistry;
-import won.node.facet.impl.WON_BA;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.model.*;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionEvent;
+import won.protocol.model.ConnectionEventType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
@@ -50,7 +54,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
   @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
+    logger.debug("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
 
@@ -107,7 +111,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
         //invoke facet implementation
         reg.get(con).textMessageFromOwner(con, message);
-        //todo: the method shall return an object that informs the owner that processing the message on the node side was done successfully.
+        //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.
         //return con.getConnectionURI();
 
 
@@ -117,7 +121,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   @Override
   public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
-    logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
+    logger.debug("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
     Connection con = dataService.saveChatMessage(connectionURI,message);
 
     //invoke facet implementation

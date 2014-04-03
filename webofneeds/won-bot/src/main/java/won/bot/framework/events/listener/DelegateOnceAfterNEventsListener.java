@@ -26,15 +26,27 @@ public class DelegateOnceAfterNEventsListener extends AbstractDoOnceAfterNEvents
 {
   private EventListener delegate;
 
-  public DelegateOnceAfterNEventsListener(final EventListenerContext context, EventListener delegate, int count)
+  public DelegateOnceAfterNEventsListener(final EventListenerContext context, int targetCount, EventListener delegate)
   {
-    super(context, count);
+    super(context, targetCount);
     this.delegate = delegate;
   }
 
   public DelegateOnceAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount, final EventListener delegate)
   {
     super(context, eventFilter, targetCount);
+    this.delegate = delegate;
+  }
+
+  public DelegateOnceAfterNEventsListener(final EventListenerContext context, final String name, final int targetCount, final EventListener delegate)
+  {
+    super(context, name, targetCount);
+    this.delegate = delegate;
+  }
+
+  public DelegateOnceAfterNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount, final EventListener delegate)
+  {
+    super(context, name, eventFilter, targetCount);
     this.delegate = delegate;
   }
 
@@ -48,5 +60,13 @@ public class DelegateOnceAfterNEventsListener extends AbstractDoOnceAfterNEvents
   protected void doOnce(final Event event) throws Exception
   {
     delegate.onEvent(event);
+  }
+
+  @Override
+  public String toString()
+  {
+    return "DelegateOnceAfterNEventsListener{" +
+        "delegate=" + delegate +
+        '}';
   }
 }

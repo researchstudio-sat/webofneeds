@@ -159,11 +159,11 @@ public class Create2NeedsGroupingBotTest
       Assert.assertEquals(NO_OF_GROUPMEMBERS+1, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
       //2 connect, 2 open
-      Assert.assertEquals(NO_OF_GROUPMEMBERS*2, this.autoOpener.getEventCount());
+      Assert.assertEquals(NO_OF_GROUPMEMBERS, this.autoOpener.getEventCount());
       Assert.assertEquals(0, this.autoOpener.getExceptionCount());
       //41 messages
-      Assert.assertEquals(NO_OF_GROUPMEMBERS, this.deactivator.getEventCount());
-      Assert.assertEquals(0, this.deactivator.getExceptionCount());
+      Assert.assertEquals(NO_OF_GROUPMEMBERS*2, this.messagesDoneListener.getEventCount());
+      Assert.assertEquals(0, this.messagesDoneListener.getExceptionCount());
       //check that the autoresponder creator was called
       Assert.assertEquals(NO_OF_GROUPMEMBERS, this.autoResponderCreator.getEventCount());
       Assert.assertEquals(0, this.autoResponderCreator.getExceptionCount());

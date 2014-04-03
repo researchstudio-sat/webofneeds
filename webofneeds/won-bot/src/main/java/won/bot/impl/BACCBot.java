@@ -63,8 +63,8 @@ public class BACCBot extends EventBot {
         //count until NO_OF_NEEDS were created, then
         //   * connect the Coordinator with Participant needs
         this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
-                new ConnectFromListToListAction(
-                        ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT, FacetType.BACCCoordinatorFacet.getURI(), FacetType.BACCParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES),NO_OF_NEEDS);
+            NO_OF_NEEDS, new ConnectFromListToListAction(
+                        ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT, FacetType.BACCCoordinatorFacet.getURI(), FacetType.BACCParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES));
         bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
         //add a listener that is informed of the connect/open events and that auto-opens
@@ -132,7 +132,7 @@ public class BACCBot extends EventBot {
         //framework that the bot's work is done
         this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
                 ctx,
-                new SignalWorkDoneAction(ctx), NO_OF_NEEDS
+            NO_OF_NEEDS, new SignalWorkDoneAction(ctx)
         );
         bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
     }

@@ -81,7 +81,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
 
         if (!onApplicationRun){
-            logger.info("registering owner application on application event");
+            logger.debug("registering owner application on application event");
             try {
                 new Thread(){
                     @Override
@@ -96,7 +96,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
                     }
                 }.start();
             } catch (Exception e) {
-                logger.info("registering ownerapplication on the node {} failed",defaultNodeURI);
+                logger.warn("registering ownerapplication on the node {} failed",defaultNodeURI);
             }
             onApplicationRun = true;
         }
@@ -106,7 +106,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws Exception {
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithNeedUri(needURI);
-        logger.info("OwnerProtocol: sending connect for need {} and other need {} call to node", needURI, otherNeedURI);
+        logger.debug("OwnerProtocol: sending connect for need {} and other need {} call to node", needURI, otherNeedURI);
         CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
 
         Map<String, Object> headerMap = new HashMap<>();
@@ -132,7 +132,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
-        logger.info("sending deactivate message: " + needURI.toString());
+        logger.debug("sending deactivate message: " + needURI.toString());
     }
 
     @Override
@@ -149,7 +149,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
-        logger.info("sending activate message: " + needURI.toString());
+        logger.debug("sending activate message: " + needURI.toString());
 
     }
     /**
@@ -159,7 +159,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
      * @throws Exception
      */
     public synchronized  String register(URI wonNodeURI) throws Exception {
-        logger.info("WON NODE: "+wonNodeURI);
+        logger.debug("WON NODE: "+wonNodeURI);
 
         CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeURI);
 
@@ -173,7 +173,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         camelConfiguration.setBrokerComponentName(ownerProtocolCommunicationServiceImpl.replaceComponentNameWithOwnerApplicationId(camelConfiguration, ownerApplicationId));
         camelConfiguration.setEndpoint(ownerProtocolCommunicationServiceImpl.replaceEndpointNameWithOwnerApplicationId(camelConfiguration,ownerApplicationId));
 
-        logger.info("registered ownerappID: "+ownerApplicationId);
+        logger.debug("registered ownerappID: "+ownerApplicationId);
         WonNode wonNode = storeWonNode(ownerApplicationId,camelConfiguration,wonNodeURI);
         wonNodeRepository.saveAndFlush(wonNode);
 
@@ -187,7 +187,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         wonNode.setBrokerURI(ownerProtocolCommunicationServiceImpl.getBrokerUri(wonNodeURI));
         wonNode.setBrokerComponent(camelConfiguration.getBrokerComponentName());
         wonNode.setStartingComponent(ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator().getStartingEndpoint(wonNodeURI));
-        logger.info("setting starting component {}", wonNode.getStartingComponent());
+        logger.debug("setting starting component {}", wonNode.getStartingComponent());
         return wonNode;
 
     }
@@ -291,7 +291,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
             //todo: methods of ownerProtocolActiveMQService might have some concurrency issues. this problem will be resolved in the future, and this code here shall be revisited then.
             ownerApplicationId = register(wonNodeUri);
             configureRemoteEndpointsForOwnerApplication(ownerApplicationId, ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator().getEndpoint(wonNodeUri));
-            logger.info("registered ownerappID: "+ownerApplicationId);
+            logger.debug("registered ownerappID: "+ownerApplicationId);
             wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
         }
         else{

@@ -70,8 +70,7 @@ public class CommentBot extends EventBot
     bus.subscribe(NeedCreatedEvent.class, this.commentFacetCreator);
 
     this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
-            new ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_COMMENTS,  FacetType.OwnerFacet.getURI(),FacetType.CommentFacet.getURI(),MILLIS_BETWEEN_MESSAGES),
-            2
+        2, new ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_COMMENTS,  FacetType.OwnerFacet.getURI(),FacetType.CommentFacet.getURI(),MILLIS_BETWEEN_MESSAGES)
     );
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
@@ -82,7 +81,7 @@ public class CommentBot extends EventBot
       //add a listener that closes the connection after it has seen 10 messages
       this.connectionCloser = new DelegateOnceAfterNEventsListener(
               ctx,
-          new CloseConnectionListener(ctx), 2
+          2, new CloseConnectionListener(ctx)
       );
       bus.subscribe( ConnectFromOtherNeedEvent.class, this.connectionCloser);
       bus.subscribe(OpenFromOtherNeedEvent.class,this.connectionCloser);
@@ -97,7 +96,7 @@ public class CommentBot extends EventBot
       //framework that the bot's work is done
       this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
               ctx,
-              new SignalWorkDoneAction(ctx), 2
+          2, new SignalWorkDoneAction(ctx)
       );
       bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
 

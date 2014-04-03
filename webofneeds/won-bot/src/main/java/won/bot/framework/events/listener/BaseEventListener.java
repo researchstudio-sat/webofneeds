@@ -33,6 +33,7 @@ public abstract class BaseEventListener implements EventListener
   private int exceptionCount = 0;
   private long millisExecuting = 0;
   private EventFilter eventFilter = null;
+  protected String name = getClass().getSimpleName();
 
   /**
    * Constructor is private so that subclasses must implement the one-arg constructor.
@@ -48,6 +49,18 @@ public abstract class BaseEventListener implements EventListener
   {
     this(context);
     this.eventFilter = eventFilter;
+  }
+
+  protected BaseEventListener(final EventListenerContext context, final String name)
+  {
+    this(context);
+    this.name = name;
+  }
+
+  protected BaseEventListener(final EventListenerContext context, final String name, final EventFilter eventFilter)
+  {
+    this(context,eventFilter);
+    this.name = name;
   }
 
   @Override
@@ -121,5 +134,16 @@ public abstract class BaseEventListener implements EventListener
    */
   protected final boolean shouldHandleEvent(final Event event){
     return eventFilter == null ? true : eventFilter.accept(event);
+  }
+
+
+
+  @Override
+  public String toString()
+  {
+    return getClass().getSimpleName()+"{" +
+        "name='" + name + '\'' +
+        ", eventCount=" + eventCount +
+        '}';
   }
 }

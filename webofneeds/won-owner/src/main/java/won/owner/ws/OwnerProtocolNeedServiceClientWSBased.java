@@ -61,7 +61,6 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
 
     //@Override
     public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
             proxy.open(connectionURI, RdfUtils.toString(content));
@@ -123,7 +122,6 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
             String modelAsString = RdfUtils.toString(content);
             URI result = proxy.createNeed(ownerURI, modelAsString , activate);
             SettableFuture<URI> futureResult = SettableFuture.create();
-
             futureResult.set(result);
             return  futureResult;
         } catch (MalformedURLException e) {

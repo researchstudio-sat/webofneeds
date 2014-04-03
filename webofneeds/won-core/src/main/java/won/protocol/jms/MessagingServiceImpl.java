@@ -50,7 +50,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
 
         exchange.setPattern(ExchangePattern.InOut);
         final SettableFuture<T> result = SettableFuture.create();
-        logger.info("sending inout message");
+        logger.debug("sending inout message");
         producerTemplate.asyncCallback(ep,exchange, new Synchronization() {
             @Override
             public void onComplete(Exchange exchange) {
@@ -60,7 +60,10 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
 
             @Override
             public void onFailure(Exchange exchange) {
-                result.cancel(true);
+              if (exchange.getException() != null){
+                logger.warn("caught exception while sending jms message", exchange.getException());
+              }
+              result.cancel(true);
             }
         });
         return result;
@@ -116,6 +119,9 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
 
         exchange.getIn().setBody(body);
         producerTemplate.send(ep, exchange);
+        if (exchange.getException() != null){
+          logger.warn("caught exception while sending jms message", exchange.getException());
+        }
     }
     @Override
     public void setCamelContext(CamelContext camelContext) {

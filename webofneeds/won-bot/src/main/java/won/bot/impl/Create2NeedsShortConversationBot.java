@@ -67,7 +67,7 @@ public class Create2NeedsShortConversationBot extends EventBot
     //count until 2 needs were created, then
     //   * connect the 2 needs
     this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
-        new ConnectFromListToListAction(ctx,NAME_NEEDS,NAME_NEEDS,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES),NO_OF_NEEDS);
+        NO_OF_NEEDS, new ConnectFromListToListAction(ctx,NAME_NEEDS,NAME_NEEDS,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
     //add a listener that is informed of the connect/open events and that auto-opens
@@ -90,7 +90,7 @@ public class Create2NeedsShortConversationBot extends EventBot
     //add a listener that closes the connection after it has seen 10 messages
     this.connectionCloser = new DelegateOnceAfterNEventsListener(
         ctx,
-        new CloseConnectionListener(ctx), NO_OF_MESSAGES
+        NO_OF_MESSAGES, new CloseConnectionListener(ctx)
     );
     bus.subscribe( MessageFromOtherNeedEvent.class, this.connectionCloser);
 
@@ -104,7 +104,7 @@ public class Create2NeedsShortConversationBot extends EventBot
     //framework that the bot's work is done
     this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
         ctx,
-        new SignalWorkDoneAction(ctx), NO_OF_NEEDS
+        NO_OF_NEEDS, new SignalWorkDoneAction(ctx)
     );
     bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
   }

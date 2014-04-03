@@ -630,7 +630,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
     <cache name="linkedDataCache" maxEntriesLocalHeap="1000" maxEntriesLocalDisk="1000" eternal="false"
            diskSpoolBufferSizeMB="20" timeToIdleSeconds="300" timeToLiveSeconds="1200" memoryStoreEvictionPolicy="LFU"
            transactionalMode="off">
-        <persistence strategy="localTempSwap"/>
+        <!--persistence strategy="localTempSwap"/--> <!--deactivate until we know how to serialize the Models in ehcache -->
     </cache>
 
 

@@ -63,8 +63,8 @@ public class MatcherProtocolBot extends EventBot
 
     this.matcher = new ExecuteOnceAfterNEventsListener(
             ctx,
-            new MatchNeedsAction(ctx),
-            NO_OF_NEEDS);
+        NO_OF_NEEDS, new MatchNeedsAction(ctx)
+    );
     //count until 1 need is created, then create a comment facet
     bus.subscribe(NeedCreatedEvent.class, this.matcher);
 
@@ -73,7 +73,7 @@ public class MatcherProtocolBot extends EventBot
 
       this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
               ctx,
-              new SignalWorkDoneAction(ctx), 2
+          2, new SignalWorkDoneAction(ctx)
       );
       bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
 

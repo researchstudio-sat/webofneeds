@@ -52,6 +52,20 @@ public class PublishEventAfterNEventsListener<T extends Event> extends BaseEvent
     this.targetCount = targetCount;
   }
 
+  public PublishEventAfterNEventsListener(final EventListenerContext context, final String name, final int targetCount, final Class<T> eventClassToPublish)
+  {
+    super(context, name);
+    this.targetCount = targetCount;
+    this.eventClassToPublish = eventClassToPublish;
+  }
+
+  public PublishEventAfterNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount, final Class<T> eventClassToPublish)
+  {
+    super(context, name, eventFilter);
+    this.targetCount = targetCount;
+    this.eventClassToPublish = eventClassToPublish;
+  }
+
   @Override
   public void doOnEvent(final Event event) throws Exception
   {
@@ -74,5 +88,15 @@ public class PublishEventAfterNEventsListener<T extends Event> extends BaseEvent
     Constructor<T> constructor = this.eventClassToPublish.getConstructor(EventListenerContext.class);
     T event = constructor.newInstance(getEventListenerContext());
     getEventListenerContext().getEventBus().publish(event);
+  }
+
+  @Override
+  public String toString()
+  {
+    return getClass().getSimpleName() +
+        "{name='" + name +
+        ", count=" + count +
+        ",targetCount=" + targetCount +
+        '}';
   }
 }

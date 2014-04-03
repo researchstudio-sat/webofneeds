@@ -31,6 +31,9 @@
     <logger name="won.owner.protocol.impl.OwnerProtocolNeedServiceClient" level="DEBUG"/>
     <!-- END MSGTRACE -->
 
+    <!-- SET to DEBUG to see bot events -->
+    <logger name="won.bot.framework.events.bus.AsyncEventBusImpl" level="DEBUG" />
+
 
     <root level="debug">
         <appender-ref ref="STDOUT"/>

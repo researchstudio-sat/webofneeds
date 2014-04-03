@@ -19,34 +19,28 @@ package won.bot.framework.events.listener;
 import won.bot.framework.events.Event;
 
 /**
- * Counts how often it is called, offers to call a callback when a certain number is reached.
+ * Listener that waits for N events, then publishes a FinishedEvent.
  */
-public class ExecuteOnceAfterNEventsListener extends AbstractDoOnceAfterNEventsListener
+public class WaitForNEventsListener extends AbstractDoOnceAfterNEventsListener
 {
-  private Runnable task;
-
-  public ExecuteOnceAfterNEventsListener(final EventListenerContext context, int targetCount, Runnable task)
+  public WaitForNEventsListener(final EventListenerContext context, final int targetCount)
   {
     super(context, targetCount);
-    this.task = task;
   }
 
-  public ExecuteOnceAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount, final Runnable task)
+  public WaitForNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount)
   {
     super(context, eventFilter, targetCount);
-    this.task = task;
   }
 
-  public ExecuteOnceAfterNEventsListener(final EventListenerContext context, final String name, final int targetCount, final Runnable task)
+  public WaitForNEventsListener(final EventListenerContext context, final String name, final int targetCount)
   {
     super(context, name, targetCount);
-    this.task = task;
   }
 
-  public ExecuteOnceAfterNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount, final Runnable task)
+  public WaitForNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount)
   {
     super(context, name, eventFilter, targetCount);
-    this.task = task;
   }
 
   @Override
@@ -56,8 +50,9 @@ public class ExecuteOnceAfterNEventsListener extends AbstractDoOnceAfterNEventsL
   }
 
   @Override
-  protected void doOnce(Event event)
+  protected void doOnce(final Event event) throws Exception
   {
-    getEventListenerContext().getExecutor().execute(task);
+    //do nothing. the super implementation will publish a FinishedEvent.
   }
+
 }

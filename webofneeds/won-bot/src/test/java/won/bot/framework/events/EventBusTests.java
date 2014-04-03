@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import won.bot.framework.events.bus.SchedulerEventBusImpl;
+import won.bot.framework.events.bus.AsyncEventBusImpl;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -49,7 +49,7 @@ public class EventBusTests
   @Test
   public void testEventBusSimpleCase() throws InterruptedException
   {
-    SchedulerEventBusImpl bus = new SchedulerEventBusImpl(this.taskScheduler);
+    AsyncEventBusImpl bus = new AsyncEventBusImpl(this.taskScheduler);
     CountDownLatch countDownLatch = new CountDownLatch(9);
     bus.subscribe(TestEventA.class, new ListenerA(countDownLatch));
     bus.subscribe(TestEventB.class, new ListenerB(countDownLatch));

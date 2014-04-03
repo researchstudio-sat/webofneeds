@@ -47,6 +47,8 @@
 
     <bean id="ownerProtocolOwnerServiceJMSBased" class="won.owner.messaging.OwnerProtocolOwnerServiceImplJMSBased"></bean>
 
+    <bean id="executor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor" />
+
     <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
         <!-- used to distinguish different implementations when auto-wiring -->
         <!-- see http://docs.spring.io/spring/docs/3.0.0.M3/reference/html/ch04s11.html -->

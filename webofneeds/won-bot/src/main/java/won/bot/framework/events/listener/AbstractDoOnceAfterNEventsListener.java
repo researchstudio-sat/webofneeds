@@ -20,6 +20,7 @@ import won.bot.framework.events.Event;
 
 /**
  * Counts how often it is called, offers to call a callback when a certain number is reached.
+ * After the target count of events is reached, a FinishedEvent is published. This allows for chaining listeners.
  */
 public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListener implements CountingListener
 {
@@ -37,6 +38,18 @@ public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListen
   protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount)
   {
     super(context, eventFilter);
+    this.targetCount = targetCount;
+  }
+
+  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name, final int targetCount)
+  {
+    super(context, name);
+    this.targetCount = targetCount;
+  }
+
+  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount)
+  {
+    super(context, name, eventFilter);
     this.targetCount = targetCount;
   }
 
@@ -83,5 +96,16 @@ public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListen
   public boolean isFinished()
   {
     return finished;
+  }
+
+  @Override
+  public String toString()
+  {
+    return getClass().getSimpleName() +
+        "{name='" + name +
+        ", count=" + count +
+        ",targetCount=" + targetCount +
+        ", finished=" + finished +
+        '}';
   }
 }

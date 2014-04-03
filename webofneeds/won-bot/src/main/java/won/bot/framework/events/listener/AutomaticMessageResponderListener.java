@@ -17,10 +17,8 @@
 package won.bot.framework.events.listener;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import won.bot.framework.events.event.MessageFromOtherNeedEvent;
-import won.bot.framework.events.event.OpenFromOtherNeedEvent;
 import won.bot.framework.events.Event;
-import won.protocol.model.ConnectionState;
+import won.bot.framework.events.event.ConnectionSpecificEvent;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -47,45 +45,27 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
     this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
   }
 
+  public AutomaticMessageResponderListener(final EventListenerContext context, final String name, final int targetCount, final long millisTimeoutBeforeReply)
+  {
+    super(context, name, targetCount);
+    this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
+  }
+
+  public AutomaticMessageResponderListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount, final long millisTimeoutBeforeReply)
+  {
+    super(context, name, eventFilter, targetCount);
+    this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
+  }
 
   @Override
   protected void handleFirstNTimes(final Event event) throws Exception
   {
-    if (event instanceof MessageFromOtherNeedEvent){
-      handleMessageEvent((MessageFromOtherNeedEvent) event);
-    } else if (event instanceof OpenFromOtherNeedEvent) {
-      handleOpenEvent((OpenFromOtherNeedEvent) event);
+    if (event instanceof ConnectionSpecificEvent){
+      handleMessageEvent((ConnectionSpecificEvent) event);
     }
   }
 
-  /**
-   * React to open event by sending a message.
-   *
-   * @param openEvent
-   */
-  private void handleOpenEvent(final OpenFromOtherNeedEvent openEvent)
-  {
-    logger.debug("got open event for need: {}, connection state is: {}", openEvent.getCon().getNeedURI(), openEvent.getCon().getState());
-    if (openEvent.getCon().getState() == ConnectionState.CONNECTED){
-      logger.debug("replying to open with message (delay: {} millis)", millisTimeoutBeforeReply);
-      getEventListenerContext().getTaskScheduler().schedule(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          URI connectionUri = openEvent.getCon().getConnectionURI();
-          try {
-            getEventListenerContext().getOwnerService().textMessage(connectionUri, WonRdfUtils.MessageUtils.textMessage(createMessage()));
-          } catch (Exception e) {
-            logger.warn("could not send message via connection {}", connectionUri, e);
-          }
-        }
-      }, new Date(System.currentTimeMillis() + millisTimeoutBeforeReply));
-    }
-  }
-
-  private void handleMessageEvent(final MessageFromOtherNeedEvent messageEvent){
-    logger.debug("got message '{}' for need: {}", messageEvent.getMessage().getMessage(), messageEvent.getCon().getNeedURI());
+  private void handleMessageEvent(final ConnectionSpecificEvent messageEvent){
     getEventListenerContext().getTaskScheduler().schedule(new Runnable()
     {
       @Override
@@ -93,7 +73,7 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
       {
         String message = createMessage();
         Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
-        URI connectionUri = messageEvent.getCon().getConnectionURI();
+        URI connectionUri = messageEvent.getConnectionURI();
         logger.debug("sending message " + message);
         try {
           getEventListenerContext().getOwnerService().textMessage(connectionUri, messageContent);
@@ -103,7 +83,6 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
       }
     }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
   }
-
 
   private String createMessage()
   {

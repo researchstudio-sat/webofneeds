@@ -23,7 +23,7 @@ import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.events.EventBus;
-import won.bot.framework.events.bus.SchedulerEventBusImpl;
+import won.bot.framework.events.bus.AsyncEventBusImpl;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.EventListenerContext;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
@@ -172,7 +172,7 @@ public class EventBot extends TriggeredBot
   @Override
   protected void doInitializeCustom()
   {
-    this.eventBus = new SchedulerEventBusImpl(getTaskScheduler());
+    this.eventBus = new AsyncEventBusImpl(getExecutor());
     initializeEventListeners();
     this.eventBus.publish(new InitializeEvent());
   }

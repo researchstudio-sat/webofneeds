@@ -31,13 +31,9 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
-import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
-import won.protocol.ws.fault.*;
 
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +57,6 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
     @Override
   public void hint(final URI ownNeedUri, final URI otherNeedUri, final double score, final URI originatorUri, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    logger.info(MessageFormat.format("owner-facing: HINT_RECEIVED called for own need {0}, other need {1}, with score {2} from originator {3} and content {4}", ownNeedUri, otherNeedUri, score, originatorUri, content));
    /* try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(ownNeedUri);
 
@@ -97,7 +92,6 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
     @Override
     public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
-        logger.info(MessageFormat.format("owner-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, own connection {2} and message ''{3}''", ownNeedURI, otherNeedURI, ownConnectionURI, content));
         StringWriter sw = new StringWriter();
         content.write(sw, "TTL");
 
@@ -109,7 +103,6 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
        // Need otherNeed = needs2.get(0);
         List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
 
-        logger.info(ownerApplications.get(0).getOwnerApplicationId());
         headerMap.put("ownNeedURI", ownNeedURI.toString()) ;
         headerMap.put("otherNeedURI", otherNeedURI.toString());
         headerMap.put("ownConnectionURI", ownConnectionURI.toString()) ;
@@ -121,20 +114,16 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
         headerMap.put("protocol","OwnerProtocol");
         headerMap.put("methodName", "connect");
         messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
-
-
     }
 
     @Override
     public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.info(MessageFormat.format("owner-facing: OPEN called for connection {0}", connectionURI));
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         URI needURI = con.getNeedURI();
         Need need = needRepository.findByNeedURI(needURI).get(0);
         List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
         Map headerMap = new HashMap<String, String>();
-        logger.info(ownerApplicationList.get(0).getOwnerApplicationId());
         headerMap.put("connectionURI", connectionURI.toString()) ;
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("ownerApplications", ownerApplicationList);
@@ -146,13 +135,11 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
     @Override
     public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}", connectionURI));
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         URI needURI = con.getNeedURI();
         Need need = needRepository.findByNeedURI(needURI).get(0);
         List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
         Map headerMap = new HashMap<String, String>();
-        logger.info(ownerApplicationList.get(0).getOwnerApplicationId());
         headerMap.put("connectionURI", connectionURI.toString()) ;
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("ownerApplications", ownerApplicationList);
@@ -164,21 +151,18 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
     @Override
     public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.info(MessageFormat.format("owner-facing: TEXTMESSAGE_REQUESTED called for connectionURI {0}, message {1}", connectionURI,message));
         String messageConvert = RdfUtils.toString(message);
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         URI needURI = con.getNeedURI();
         Need need = needRepository.findByNeedURI(needURI).get(0);
         List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
         Map headerMap = new HashMap<String, String>();
-        logger.info(ownerApplicationList.get(0).getOwnerApplicationId());
         headerMap.put("connectionURI", connectionURI.toString()) ;
         headerMap.put("message",messageConvert);
         headerMap.put("ownerApplications", ownerApplicationList);
         headerMap.put("protocol","OwnerProtocol");
         headerMap.put("methodName", "textMessage");
         messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
-
     }
   public void setClientFactory(final OwnerProtocolOwnerClientFactory clientFactory)
   {

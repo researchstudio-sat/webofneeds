@@ -52,11 +52,11 @@
     </bean>
 
     <bean id="threadPoolExecutor" class="java.util.concurrent.ThreadPoolExecutor" destroy-method="shutdown">
-        <constructor-arg value="10" index="0"/>
-        <constructor-arg value="15" index="1"/>
-        <constructor-arg value="1" index="2"/>
-        <constructor-arg value="MINUTES" index="3"/>
-        <constructor-arg ref="workqueue" index="4"/>
+        <constructor-arg value="10" index="0"/> <!-- core pool size -->
+        <constructor-arg value="25" index="1"/> <!-- max pool size -->
+        <constructor-arg value="1" index="2"/> <!-- keepalive time for unused threads -->
+        <constructor-arg value="MINUTES" index="3"/> <!-- time unit -->
+        <constructor-arg ref="workqueue" index="4"/> <!-- worker queue-->
     </bean>
 
     <bean id="linkedDataService" class="won.node.service.impl.LinkedDataServiceImpl">

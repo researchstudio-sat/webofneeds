@@ -47,13 +47,13 @@ public class CreateNeedAction extends EventBotAction
   protected void doRun() throws Exception
   {
       if (getEventListenerContext().getNeedProducer().isExhausted()){
-          logger.info("bot's need procucer is exhausted.");
+          logger.debug("bot's need procucer is exhausted.");
           return;
       }
     final Model needModel = getEventListenerContext().getNeedProducer().create();
 
     final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
-    logger.info("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
+    logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
     final ListenableFuture<URI> futureNeedUri = getEventListenerContext().getOwnerService().createNeed(URI.create("we://dont.need.this/anymore"), needModel, true, wonNodeUri);
     //add a listener that adds the need URI to the botContext
     futureNeedUri.addListener(new Runnable()
@@ -64,7 +64,7 @@ public class CreateNeedAction extends EventBotAction
         if (futureNeedUri.isDone()){
           try {
             URI uri = futureNeedUri.get();
-            logger.info("need creation finished, new need URI is: {}", uri);
+            logger.debug("need creation finished, new need URI is: {}", uri);
               EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), uri, uriListName);
               getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel, FacetType.OwnerFacet));
           } catch (Exception e){
