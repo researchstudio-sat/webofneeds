@@ -34,7 +34,7 @@
     </bean>
 
     <bean id="monitoringStatsRecorderTask" class="won.monitoring.MonitoringStatisticsRecorderTask">
-        <property name="resetMonitorAfterRecording" value="true"/>
+        <property name="resetMonitorAfterRecording" value="${monitoring.reset.after.output}"/>
         <property name="monitoringResetter">
             <bean class="won.monitoring.simon.SimonResetter" />
         </property>
