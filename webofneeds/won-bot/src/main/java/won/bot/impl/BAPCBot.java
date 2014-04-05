@@ -8,6 +8,7 @@ import won.bot.framework.events.listener.action.*;
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.coordinationMessageAsTextBots.*;
 import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.coordinationMessageAsUriBots.*;
+import won.bot.framework.events.listener.filter.FinishedEventFilter;
 import won.protocol.model.FacetType;
 
 import java.util.ArrayList;
@@ -22,11 +23,11 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class BAPCBot extends EventBot {
-    private static final int NO_OF_NEEDS = 19;
-    private static final int NO_OF_MESSAGES = 50;
-    private static final long MILLIS_BETWEEN_MESSAGES = 1000;
-    public static final String URI_LIST_NAME_PARTICIPANT = "participants";
-    public static final String URI_LIST_NAME_COORDINATOR = "coordinator";
+  protected static final int NO_OF_NEEDS = 19;
+  protected static final int NO_OF_MESSAGES = 50;
+  protected static final long MILLIS_BETWEEN_MESSAGES = 10;
+  public static final String URI_LIST_NAME_PARTICIPANT = "participants";
+  public static final String URI_LIST_NAME_COORDINATOR = "coordinator";
 
     //we use protected members so we can extend the class and
     //access the listeners for unit test assertions and stats
@@ -47,7 +48,7 @@ public class BAPCBot extends EventBot {
         EventListenerContext ctx = getEventListenerContext();
         EventBus bus = getEventBus();
 
-        //create needs every trigger execution until NO_OF_NEEDS are created
+      //create needs every trigger execution until NO_OF_NEEDS are created
         this.participantNeedCreator = new ExecuteOnEventListener(
                 ctx,
                 new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_PARTICIPANT, FacetType.BAPCParticipantFacet.getURI()),
@@ -107,23 +108,27 @@ public class BAPCBot extends EventBot {
         scripts.add(new BAPCStateCompleteWithFailureUriBot());
         scripts.add(new BAPCStateCompleteWithFailureBot());
 
-        this.autoResponder = new AutomaticBAMessageResponderListener(ctx, scripts, NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
+        this.autoResponder = new AutomaticBAMessageResponderListener(ctx, scripts, MILLIS_BETWEEN_MESSAGES);
         bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);
         bus.subscribe(MessageFromOtherNeedEvent.class, this.autoResponder);
 
-        //register a DeactivateAllNeedsAction to be executed
-        //when the internalWorkDoneEvent is seen
-        this.needDeactivator = new ExecuteOnEventListener(getEventListenerContext(), new
-            DeactivateAllNeedsAction(getEventListenerContext()),1);
-        bus.subscribe(InternalWorkDoneEvent.class, needDeactivator);
+      //register a DeactivateAllNeedsAction to be executed
+      //when the FinishedEvent of the autoResponder is seen
+      this.needDeactivator = new ExecuteOnEventListener(getEventListenerContext(),
+                                                        new FinishedEventFilter(autoResponder),
+                                                        new DeactivateAllNeedsOfGroupAction(getEventListenerContext(),
+                                                                                            URI_LIST_NAME_PARTICIPANT), 1
+      );
+      bus.subscribe(FinishedEvent.class, needDeactivator);
 
-        //add a listener that counts two NeedDeactivatedEvents and then tells the
-        //framework that the bot's work is done
-        this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
-                ctx,
-            NO_OF_NEEDS, new SignalWorkDoneAction(ctx)
-        );
-        bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
+
+      //add a listener that counts two NeedDeactivatedEvents and then tells the
+      //framework that the bot's work is done
+      this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
+              ctx, "workDoneSignaller",
+          NO_OF_NEEDS-1, new SignalWorkDoneAction(ctx)
+      );
+      bus.subscribe(CloseFromOtherNeedEvent.class, this.workDoneSignaller);
     }
 }
 

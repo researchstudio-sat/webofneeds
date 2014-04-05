@@ -41,7 +41,7 @@ public class ExecuteOnEventListener extends BaseEventListener
     this.timesToRun = timesToRun;
   }
 
-  public ExecuteOnEventListener(final EventListenerContext context, final EventFilter eventFilter, final int timesToRun, final Runnable task)
+  public ExecuteOnEventListener(final EventListenerContext context, final EventFilter eventFilter, final Runnable task, final int timesToRun)
   {
     super(context, eventFilter);
     this.timesToRun = timesToRun;
@@ -76,6 +76,7 @@ public class ExecuteOnEventListener extends BaseEventListener
         logger.debug("scheduling task, execution no {} (last time)", timesRun);
         getEventListenerContext().getEventBus().unsubscribe(this);
         getEventListenerContext().getExecutor().execute(task);
+        publishFinishedEvent();
       }
     }
   }

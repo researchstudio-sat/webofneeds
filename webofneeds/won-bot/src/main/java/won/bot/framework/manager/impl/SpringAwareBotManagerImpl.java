@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
@@ -35,7 +36,9 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Applica
   @Override
   public void onApplicationEvent(final ApplicationEvent event)
   {
-    if (event instanceof ContextStartedEvent){
+    logger.info("processing application event {}", event);
+    if (event instanceof ContextStartedEvent || event instanceof ContextRefreshedEvent){
+      logger.info("context started or refreshed: searching for bots in spring context");
       try {
         findAndRegisterBots();
       } catch (Exception e) {
@@ -112,10 +115,9 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Applica
   private void findBotsInContextAndInitialize()
   {
     Map<String, Bot> bots = this.applicationContext.getBeansOfType(Bot.class);
-    this.setBots(bots.values());
     for (Bot bot: bots.values()) {
       try {
-        initializeBotIfNecessary(bot);
+        addBot(bot);
       } catch (Exception e){
         logger.warn("could not initialize bot {}", bot, e);
       }

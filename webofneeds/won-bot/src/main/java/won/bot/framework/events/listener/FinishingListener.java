@@ -16,15 +16,12 @@
 
 package won.bot.framework.events.listener;
 
+import won.bot.framework.events.EventListener;
+
 /**
- * User: fkleedorfer
- * Date: 24.03.14
+ * Listener that finishes at some point.
  */
-public interface CountingListener extends FinishingListener
+public interface FinishingListener extends EventListener
 {
-
-  int getTargetCount();
-
-  int getCount();
-
+  public boolean isFinished();
 }

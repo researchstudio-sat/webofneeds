@@ -135,23 +135,17 @@ public class BACCBotTest {
             Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
             Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
             //28 Participants creator
-            Assert.assertEquals(28, this.participantNeedCreator.getEventCount());
+            Assert.assertEquals(NO_OF_NEEDS-1, this.participantNeedCreator.getEventCount());
             Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
             //Coordinator - Participants connector
-            Assert.assertEquals(29, this.needConnector.getEventCount());
+            Assert.assertEquals(NO_OF_NEEDS, this.needConnector.getEventCount());
             Assert.assertEquals(0, this.needConnector.getExceptionCount());
-            //13 connect, 13 open
-            Assert.assertEquals(2*(14+14), this.autoOpener.getEventCount());
-            Assert.assertEquals(0, this.autoOpener.getExceptionCount());
-            //messages
-            Assert.assertEquals(2*(14+2+3+2+2+4+5+4+3+4+3+3+3+2+9), this.autoResponder.getEventCount());
-            Assert.assertEquals(0, this.autoResponder.getExceptionCount());
 
-            Assert.assertEquals(1, this.needDeactivator.getEventCount());
-            Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
+            Assert.assertEquals(NO_OF_NEEDS-1, this.scriptsDoneListener.getEventCount());
+            Assert.assertEquals(0, this.scriptsDoneListener.getExceptionCount());
 
             //29 needs deactivated
-            Assert.assertEquals(29, this.workDoneSignaller.getEventCount());
+            Assert.assertEquals(NO_OF_NEEDS-1, this.workDoneSignaller.getEventCount());
             Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
             //TODO: there is more to check:

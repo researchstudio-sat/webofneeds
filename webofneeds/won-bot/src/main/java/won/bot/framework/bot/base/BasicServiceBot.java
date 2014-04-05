@@ -33,6 +33,7 @@ public abstract class BasicServiceBot extends BaseBot
   private NeedProducer needProducer;
   private OwnerProtocolNeedServiceClientSide ownerService;
   private MatcherProtocolNeedServiceClientSide matcherService;
+
   private LinkedDataSource linkedDataSource;
 
   protected NodeURISource getNodeURISource()
@@ -40,6 +41,8 @@ public abstract class BasicServiceBot extends BaseBot
     return nodeURISource;
   }
 
+  @Qualifier("default")
+  @Autowired(required = true)
   public void setNodeURISource(final NodeURISource nodeURISource)
   {
     this.nodeURISource = nodeURISource;
@@ -55,12 +58,14 @@ public abstract class BasicServiceBot extends BaseBot
   }
 
   @Qualifier("default")
+  @Autowired(required = true)
   public void setOwnerService(final OwnerProtocolNeedServiceClientSide ownerService)
   {
     this.ownerService = ownerService;
   }
 
   @Qualifier("default")
+  @Autowired(required = true)
   public void setMatcherService(final MatcherProtocolNeedServiceClientSide matcherService){
       this.matcherService = matcherService;
   }
@@ -70,6 +75,8 @@ public abstract class BasicServiceBot extends BaseBot
     return needProducer;
   }
 
+  @Qualifier("default")
+  @Autowired(required = true)
   public void setNeedProducer(final NeedProducer needProducer)
   {
     this.needProducer = needProducer;
@@ -77,5 +84,7 @@ public abstract class BasicServiceBot extends BaseBot
 
   public LinkedDataSource getLinkedDataSource() { return linkedDataSource; }
 
+  @Qualifier("default")
+  @Autowired(required = true)
   public void setLinkedDataSource(final LinkedDataSource linkedDataSource) { this.linkedDataSource = linkedDataSource; }
 }

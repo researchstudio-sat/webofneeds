@@ -34,17 +34,28 @@ public class ConnectFromListToListAction extends EventBotAction
       private URI fromFacet;
       private URI toFacet;
       private long millisBetweenCalls;
+      private ConnectHook connectHook;
 
-      public ConnectFromListToListAction(EventListenerContext eventListenerContext, String fromListName, String toListName, URI fromFacet, URI toFacet, final long millisBetweenCalls) {
-          super(eventListenerContext);
-          this.fromListName = fromListName;
-          this.toListName = toListName;
-          this.fromFacet = fromFacet;
-          this.toFacet = toFacet;
-          this.millisBetweenCalls = millisBetweenCalls;
-      }
+  public ConnectFromListToListAction(EventListenerContext eventListenerContext, String fromListName, String toListName, URI fromFacet, URI toFacet, final long millisBetweenCalls) {
+      super(eventListenerContext);
+      this.fromListName = fromListName;
+      this.toListName = toListName;
+      this.fromFacet = fromFacet;
+      this.toFacet = toFacet;
+      this.millisBetweenCalls = millisBetweenCalls;
+  }
 
-      @Override
+  public ConnectFromListToListAction(final EventListenerContext eventListenerContext, final String fromListName, final String toListName, final URI fromFacet, final URI toFacet, final long millisBetweenCalls, final ConnectHook connectHook) {
+    super(eventListenerContext);
+    this.fromListName = fromListName;
+    this.toListName = toListName;
+    this.fromFacet = fromFacet;
+    this.toFacet = toFacet;
+    this.millisBetweenCalls = millisBetweenCalls;
+    this.connectHook = connectHook;
+  }
+
+  @Override
       public void doRun()
       {
 
@@ -90,6 +101,9 @@ public class ConnectFromListToListAction extends EventBotAction
       {
         try {
           logger.debug("connecting needs {} and {}",fromUri,toUri);
+          if (connectHook != null){
+            connectHook.onConnect(fromUri, toUri);
+          }
           getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet));
         } catch (Exception e) {
           logger.warn("could not connect {} and {}", fromUri, toUri);
@@ -97,5 +111,9 @@ public class ConnectFromListToListAction extends EventBotAction
         }
       }
     }, when);
+  }
+
+  public static abstract class ConnectHook{
+    public abstract void onConnect(URI fromNeedURI, URI toNeedURI);
   }
 }

@@ -69,6 +69,10 @@ public abstract class BaseEventListener implements EventListener
       //allow for ignoring events. Such event are not counted.
       return;
     }
+    if (logger.isDebugEnabled()){
+      logger.debug("handling event {} with listener {}",event, this);
+    }
+
     countEvent(event);
     long startTime = System.currentTimeMillis();
     try {

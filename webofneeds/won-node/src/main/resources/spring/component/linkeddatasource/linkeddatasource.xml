@@ -23,6 +23,6 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-
+    <!-- requires ehcache -->
     <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" />
 </beans>

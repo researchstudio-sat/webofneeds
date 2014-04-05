@@ -38,18 +38,13 @@ public class TemplateBasedNeedProducer extends AbstractNeedProducerWrapper
   private boolean initialized = false;
 
   @Override
-  public Model create()
+  public synchronized Model create()
   {
     initializeLazily();
     return wrapModel(getWrappedProducer().create());
   }
 
-    @Override
-    public Model create(Class clazz) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    private Model wrapModel(final Model wrappedModel)
+  private Model wrapModel(final Model wrappedModel)
   {
     if (this.templateModel != null) {
       return RdfUtils.mergeModelsCombiningBaseResource(wrappedModel, this.templateModel);

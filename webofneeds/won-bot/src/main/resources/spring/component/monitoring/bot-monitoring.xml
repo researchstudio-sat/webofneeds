@@ -30,8 +30,9 @@
     <bean id="monitoringInterceptor" class="org.javasimon.spring.MonitoringInterceptor"/>
 
     <aop:config proxy-target-class="true">
-        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.bot.framework.bot.base.EventBot.*(..))"/>
-        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.bot.framework.events.listener.action.*.*(..))"/>
+        <!--aop:advisor advice-ref="monitoringInterceptor
+        " pointcut="execution(* won.bot.framework.bot.base.EventBot.*(..))"/>
+        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.bot.framework.events.listener.action.*.*(..))"/-->
     </aop:config>
 
 

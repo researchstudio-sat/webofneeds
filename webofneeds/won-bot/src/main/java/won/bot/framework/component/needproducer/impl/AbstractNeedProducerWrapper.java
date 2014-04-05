@@ -34,13 +34,13 @@ public abstract class AbstractNeedProducerWrapper implements NeedProducerWrapper
   }
 
   @Override
-  public boolean isExhausted()
+  public synchronized boolean isExhausted()
   {
     return wrappedProducer.isExhausted();
   }
 
   @Override
-  public Model create()
+  public synchronized Model create()
   {
     return wrappedProducer.create();
   }

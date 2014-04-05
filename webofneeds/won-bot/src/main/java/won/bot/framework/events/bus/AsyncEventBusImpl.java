@@ -121,7 +121,7 @@ public class AsyncEventBusImpl implements EventBus
           try {
             listener.onEvent(event);
           } catch (Exception e) {
-            logger.warn("caught exception during execution of event {} on listener {}", new Object[]{event, listener}, e);
+            logger.warn("caught exception during execution of event {} on listener {}", event, listener);
             logger.warn("stacktrace:",e);
           }
         }

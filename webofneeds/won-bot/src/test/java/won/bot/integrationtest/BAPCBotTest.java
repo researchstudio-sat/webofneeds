@@ -42,8 +42,8 @@ import java.util.concurrent.TimeUnit;
 
 public class BAPCBotTest{
     private static final int RUN_ONCE = 1;
-    private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
-    private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 1000;
+    private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
+    private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
 
     MyBot bot;
 
@@ -161,7 +161,7 @@ public class BAPCBotTest{
             Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
 
             //19 needs deactivated
-            Assert.assertEquals(19, this.workDoneSignaller.getEventCount());
+            Assert.assertEquals(NO_OF_NEEDS-1, this.workDoneSignaller.getEventCount());
             Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
             //TODO: there is more to check:

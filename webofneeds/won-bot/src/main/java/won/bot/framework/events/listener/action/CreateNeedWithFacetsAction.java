@@ -40,6 +40,10 @@ public class CreateNeedWithFacetsAction extends EventBotAction
             return;
         }
         final Model needModel = getEventListenerContext().getNeedProducer().create();
+        if (needModel == null){
+          logger.warn("needproducer failed to produce a need model, aborting need creation");
+          return;
+        }
         for (URI facetURI:facets){
             WonRdfUtils.FacetUtils.addFacet(needModel,facetURI);
         }

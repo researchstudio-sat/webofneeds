@@ -41,7 +41,7 @@ public class MailFileNeedProducer implements FileBasedNeedProducer
 
 
   @Override
-  public Model readNeedFromFile(final File file) throws IOException
+  public  synchronized Model readNeedFromFile(final File file) throws IOException
   {
     logger.debug("processing as mail file: {} ", file);
     FileInputStream fis = new FileInputStream(file);

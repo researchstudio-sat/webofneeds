@@ -1,11 +1,7 @@
 package won.bot.framework.events.listener;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.path.PathParser;
 import won.bot.framework.events.Event;
-import won.bot.framework.events.event.InternalWorkDoneEvent;
 import won.bot.framework.events.event.MessageFromOtherNeedEvent;
 import won.bot.framework.events.event.OpenFromOtherNeedEvent;
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
@@ -15,8 +11,7 @@ import won.bot.impl.BACCBot;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
-import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.WON;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import java.net.URI;
 import java.util.Date;
@@ -30,19 +25,17 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class AutomaticBAMessageResponderListener extends BaseEventListener {
-    private int targetNumberOfMessages = -1;
-    private int numberOfMessagesSent = 0;
     private long millisTimeoutBeforeReply = 1000;
     private SimpleScriptManager scriptManager = new SimpleScriptManager();
     private List<BATestBotScript> scripts;
     private int finishedScripts;
+    private int messagesSentAndNotReceived = 0;
     private Object monitor = new Object();
 
-    public AutomaticBAMessageResponderListener(final EventListenerContext context, final List<BATestBotScript> scripts, final int targetNumberOfMessages, final long millisTimeoutBeforeReply)
+    public AutomaticBAMessageResponderListener(final EventListenerContext context, final List<BATestBotScript> scripts, final long millisTimeoutBeforeReply)
     {
         super(context);
         this.scripts = scripts;
-        this.targetNumberOfMessages = targetNumberOfMessages;
         this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
     }
 
@@ -54,10 +47,16 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
         } else if (event instanceof OpenFromOtherNeedEvent) {
             handleOpenEvent((OpenFromOtherNeedEvent) event);
         }
-
     }
 
-    /**
+  @Override
+  public String toString() {
+    return "AutomaticBAMessageResponderListener{" +
+      "finishedScripts=" + finishedScripts + "/" +scripts.size() +
+      '}';
+  }
+
+  /**
      * React to open event by sending a message.
      *
      * @param openEvent
@@ -98,30 +97,15 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
 
     private void publishFinishedEventIfFinished() {
         synchronized (monitor){
-            if (this.finishedScripts == this.scripts.size()){
-                InternalWorkDoneEvent finishedEvent = new InternalWorkDoneEvent();
-                getEventListenerContext().getEventBus().publish(finishedEvent);
+            logger.debug("finished scripts: {}/{}, messages sent and not received {}", new Object[]{finishedScripts,
+                                                                                                    scripts.size(),
+                                                                                                    messagesSentAndNotReceived});
+            if (this.finishedScripts == this.scripts.size() && messagesSentAndNotReceived == 0){
+                publishFinishedEvent();
             }
         }
     }
 
-    private void sendMessageFromConnection(final BATestScriptAction action, URI connectionToSendMessageFrom) {
-
-        final Model message = action.getMessageToBeSent();
-        final URI senderURI = connectionToSendMessageFrom;
-        getEventListenerContext().getTaskScheduler().schedule(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try {
-                    logger.info("State of the sender before sending: {} ", action.getStateOfSenderBeforeSending());
-                } catch (Exception e) {
-                    logger.warn("could not send message via connection {}", senderURI, e);
-                }
-         }
-                    }, new Date(System.currentTimeMillis() + millisTimeoutBeforeReply));
-    }
 
 
     private void sendModelFromConnection(final BATestScriptAction action, URI connectionToSendMessageFrom) {
@@ -147,22 +131,23 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
     }
 
     private URI determineConnectionToSendFrom(Connection con, boolean weAreOnCoordinatorSide, BATestScriptAction action) {
+      assert con != null : "Connection must not be null";
+      assert action != null : "Action must not be null";
         URI connectionToSendMessageFrom = null;
         if (weAreOnCoordinatorSide && action.isSenderIsCoordinator()
                 || !weAreOnCoordinatorSide && action.isSenderIsParticipant()){
             connectionToSendMessageFrom = con.getConnectionURI();
         } else {
-            Path propertyPath = PathParser.parse("<"+ WON.HAS_REMOTE_CONNECTION+">", PrefixMapping.Standard);
-            connectionToSendMessageFrom = RdfUtils.getURIPropertyForPropertyPath(
-                getEventListenerContext().getLinkedDataSource().getModelForResource(con.getConnectionURI()), con.getConnectionURI() , propertyPath);
-            //TODO: also get BA state for participant/coordinator and compare to
-            //state that the action says it should be in. If the state is different
-            //throw an exception.
+          connectionToSendMessageFrom = WonLinkedDataUtils.getRemoteConnectionURIforConnectionURI(con
+            .getConnectionURI(), getEventListenerContext().getLinkedDataSource());
+          //TODO: also get BA state for participant/coordinator and compare to
+          //state that the action says it should be in. If the state is different
+          //throw an exception.
         }
-        logger.debug("Are we on Coordinator side?"+weAreOnCoordinatorSide);
-        logger.debug("Input connection:"+con);
-        logger.debug("Return connection:"+connectionToSendMessageFrom);
-        return connectionToSendMessageFrom;
+      logger.debug("Are we on Coordinator side?" + weAreOnCoordinatorSide);
+      logger.debug("Input connection:" + con);
+      logger.debug("Return connection:" + connectionToSendMessageFrom);
+      return connectionToSendMessageFrom;
     }
 
     private BATestBotScript setupStateMachine(OpenFromOtherNeedEvent openEvent, boolean weAreOnCoordinatorSide) {
