@@ -17,10 +17,13 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.EventBus;
-import won.bot.framework.events.event.*;
+import won.bot.framework.events.bus.EventBus;
+import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.action.impl.*;
+import won.bot.framework.events.event.impl.*;
 import won.bot.framework.events.listener.*;
-import won.bot.framework.events.listener.action.*;
+import won.bot.framework.events.listener.impl.ActionOnEventListener;
+import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
 import won.protocol.model.FacetType;
 
 /**
@@ -57,7 +60,7 @@ public class CommentBot extends EventBot
     EventBus bus = getEventBus();
 
     //create needs every trigger execution until 2 needs are created
-    this.needCreator = new ExecuteOnEventListener(
+    this.needCreator = new ActionOnEventListener(
         ctx,
         new CreateNeedAction(ctx,NAME_NEEDS),
         NO_OF_NEEDS
@@ -65,23 +68,23 @@ public class CommentBot extends EventBot
     bus.subscribe(ActEvent.class,this.needCreator);
 
     //count until 1 need is created, then create a comment facet
-    this.commentFacetCreator = new ExecuteOnEventListener(ctx,
+    this.commentFacetCreator = new ActionOnEventListener(ctx,
             new CreateNeedWithFacetsAction(ctx,NAME_COMMENTS,FacetType.CommentFacet.getURI()),1) ;
     bus.subscribe(NeedCreatedEvent.class, this.commentFacetCreator);
 
-    this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
+    this.needConnector = new ActionOnceAfterNEventsListener(ctx,
         2, new ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_COMMENTS,  FacetType.OwnerFacet.getURI(),FacetType.CommentFacet.getURI(),MILLIS_BETWEEN_MESSAGES)
     );
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
-      this.autoOpener = new AutomaticConnectionOpenerListener(ctx);
+      this.autoOpener = new ActionOnEventListener(ctx,new OpenConnectionAction(ctx));
       bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
       bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
       //add a listener that closes the connection after it has seen 10 messages
-      this.connectionCloser = new DelegateOnceAfterNEventsListener(
+      this.connectionCloser = new ActionOnceAfterNEventsListener(
               ctx,
-          2, new CloseConnectionListener(ctx)
+          2, new CloseConnectionAction(ctx)
       );
       bus.subscribe( ConnectFromOtherNeedEvent.class, this.connectionCloser);
       bus.subscribe(OpenFromOtherNeedEvent.class,this.connectionCloser);
@@ -89,12 +92,12 @@ public class CommentBot extends EventBot
       //add a listener that auto-responds to a close message with a deactivation of both needs.
       //subscribe it to:
       // * close events
-      this.allNeedsDeactivator = new DeactivateAllNeedsOnConnectionCloseListener(ctx);
+      this.allNeedsDeactivator = new ActionOnEventListener(ctx,new DeactivateAllNeedsAction(ctx),1);
       bus.subscribe(CloseFromOtherNeedEvent.class, this.allNeedsDeactivator);
 
       //add a listener that counts two NeedDeactivatedEvents and then tells the
       //framework that the bot's work is done
-      this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
+      this.workDoneSignaller = new ActionOnceAfterNEventsListener(
               ctx,
           2, new SignalWorkDoneAction(ctx)
       );

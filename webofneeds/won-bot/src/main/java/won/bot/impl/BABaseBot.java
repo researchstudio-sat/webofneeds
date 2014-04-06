@@ -17,21 +17,21 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.EventBus;
-import won.bot.framework.events.event.*;
+import won.bot.framework.events.bus.EventBus;
+import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.listener.impl.ActionOnEventListener;
+import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
 import won.bot.framework.events.listener.BaseEventListener;
-import won.bot.framework.events.listener.EventListenerContext;
-import won.bot.framework.events.listener.ExecuteOnEventListener;
-import won.bot.framework.events.listener.ExecuteOnceAfterNEventsListener;
-import won.bot.framework.events.listener.action.ConnectFromListToListAction;
-import won.bot.framework.events.listener.action.CreateNeedWithFacetsAction;
-import won.bot.framework.events.listener.action.DeactivateAllNeedsOfGroupAction;
-import won.bot.framework.events.listener.action.SignalWorkDoneAction;
+import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.action.impl.ConnectFromListToListAction;
+import won.bot.framework.events.action.impl.CreateNeedWithFacetsAction;
+import won.bot.framework.events.action.impl.DeactivateAllNeedsOfGroupAction;
+import won.bot.framework.events.action.impl.SignalWorkDoneAction;
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.BATestScriptListener;
-import won.bot.framework.events.listener.filter.AcceptOnceFilter;
-import won.bot.framework.events.listener.filter.FinishedEventFilter;
-import won.bot.framework.events.listener.filter.OrFilter;
+import won.bot.framework.events.filter.impl.AcceptOnceFilter;
+import won.bot.framework.events.filter.impl.FinishedEventFilter;
+import won.bot.framework.events.filter.impl.OrFilter;
 import won.protocol.model.FacetType;
 
 import java.net.URI;
@@ -77,7 +77,7 @@ public abstract class BABaseBot extends EventBot
     final EventBus bus = getEventBus();
 
     //create needs every trigger execution until noOfNeeds are created
-    this.participantNeedCreator = new ExecuteOnEventListener(
+    this.participantNeedCreator = new ActionOnEventListener(
       ctx, "participantCreator",
       new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_PARTICIPANT, FacetType.BACCParticipantFacet.getURI()),
       noOfNeeds - 1
@@ -85,7 +85,7 @@ public abstract class BABaseBot extends EventBot
     bus.subscribe(ActEvent.class, this.participantNeedCreator);
 
     //when done, create one coordinator need
-    this.coordinatorNeedCreator = new ExecuteOnEventListener(
+    this.coordinatorNeedCreator = new ActionOnEventListener(
       ctx, "coordinatorCreator", new FinishedEventFilter(participantNeedCreator),
       new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_COORDINATOR, FacetType.BACCCoordinatorFacet.getURI()),
       1
@@ -121,7 +121,7 @@ public abstract class BABaseBot extends EventBot
     };
 
     //when done, connect the participants to the coordinator
-    this.needConnector = new ExecuteOnceAfterNEventsListener(
+    this.needConnector = new ActionOnceAfterNEventsListener(
       ctx, "needConnector", noOfNeeds,
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
         FacetType.BACCCoordinatorFacet.getURI(), FacetType.BACCParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES,
@@ -130,14 +130,14 @@ public abstract class BABaseBot extends EventBot
 
 
     //for each group member, there are 2 listeners waiting for messages. when they are all finished, we're done.
-    this.scriptsDoneListener = new ExecuteOnceAfterNEventsListener(
+    this.scriptsDoneListener = new ActionOnceAfterNEventsListener(
       ctx, "scriptsDoneListener", mainScriptListenerFilter,
       noOfNeeds - 1,
       new DeactivateAllNeedsOfGroupAction(ctx, URI_LIST_NAME_PARTICIPANT));
     bus.subscribe(FinishedEvent.class, this.scriptsDoneListener);
 
     //When the needs are deactivated, all connections are closed. wait for the close events and signal work done.
-    this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
+    this.workDoneSignaller = new ActionOnceAfterNEventsListener(
       ctx, "workDoneSignaller",
       noOfNeeds - 1, new SignalWorkDoneAction(ctx)
     );

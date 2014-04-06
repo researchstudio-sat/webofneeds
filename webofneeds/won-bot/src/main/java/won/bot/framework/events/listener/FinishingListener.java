@@ -16,8 +16,6 @@
 
 package won.bot.framework.events.listener;
 
-import won.bot.framework.events.EventListener;
-
 /**
  * Listener that finishes at some point.
  */

@@ -17,15 +17,19 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.EventBus;
-import won.bot.framework.events.event.ActEvent;
-import won.bot.framework.events.event.HintFromMatcherEvent;
-import won.bot.framework.events.event.NeedCreatedEvent;
-import won.bot.framework.events.event.NeedDeactivatedEvent;
+import won.bot.framework.events.bus.EventBus;
+import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.impl.ActEvent;
+import won.bot.framework.events.event.impl.HintFromMatcherEvent;
+import won.bot.framework.events.event.impl.NeedCreatedEvent;
+import won.bot.framework.events.event.impl.NeedDeactivatedEvent;
 import won.bot.framework.events.listener.*;
-import won.bot.framework.events.listener.action.CreateNeedAction;
-import won.bot.framework.events.listener.action.MatchNeedsAction;
-import won.bot.framework.events.listener.action.SignalWorkDoneAction;
+import won.bot.framework.events.action.impl.CreateNeedAction;
+import won.bot.framework.events.action.impl.DeactivateAllNeedsAction;
+import won.bot.framework.events.action.impl.MatchNeedsAction;
+import won.bot.framework.events.action.impl.SignalWorkDoneAction;
+import won.bot.framework.events.listener.impl.ActionOnEventListener;
+import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
 
 /**
  *
@@ -54,28 +58,28 @@ public class MatcherProtocolBot extends EventBot
     EventBus bus = getEventBus();
 
     //create needs every trigger execution until 2 needs are created
-    this.needCreator = new ExecuteOnEventListener(
+    this.needCreator = new ActionOnEventListener(
         ctx,
         new CreateNeedAction(ctx,NAME_NEEDS),
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class,this.needCreator);
 
-    this.matcher = new ExecuteOnceAfterNEventsListener(
+    this.matcher = new ActionOnceAfterNEventsListener(
             ctx,
         NO_OF_NEEDS, new MatchNeedsAction(ctx)
     );
     //count until 1 need is created, then create a comment facet
     bus.subscribe(NeedCreatedEvent.class, this.matcher);
 
-     this.allNeedsDeactivator = new DeactivateAllNeedsOnHintListener(ctx);
-     bus.subscribe(HintFromMatcherEvent.class, this.allNeedsDeactivator);
+   this.allNeedsDeactivator = new ActionOnEventListener(ctx, new DeactivateAllNeedsAction(ctx), 1);
+   bus.subscribe(HintFromMatcherEvent.class, this.allNeedsDeactivator);
 
-      this.workDoneSignaller = new ExecuteOnceAfterNEventsListener(
-              ctx,
-          2, new SignalWorkDoneAction(ctx)
-      );
-      bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
+  this.workDoneSignaller = new ActionOnceAfterNEventsListener(
+          ctx,
+      2, new SignalWorkDoneAction(ctx)
+  );
+  bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
 
   }
 

@@ -16,7 +16,9 @@
 
 package won.bot.framework.events.listener;
 
-import won.bot.framework.events.Event;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.filter.EventFilter;
 
 /**
  * Base class for listeners that eventually stop listening. When the decision is made to finish,

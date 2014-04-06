@@ -16,14 +16,14 @@
 
 package won.bot.framework.events.listener.baStateBots;
 
-import won.bot.framework.events.Event;
-import won.bot.framework.events.event.ConnectFromOtherNeedEvent;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.impl.ConnectFromOtherNeedEvent;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
 import won.bot.framework.events.event.NeedSpecificEvent;
+import won.bot.framework.events.filter.impl.*;
 import won.bot.framework.events.listener.AbstractFinishingListener;
-import won.bot.framework.events.listener.EventFilter;
-import won.bot.framework.events.listener.EventListenerContext;
-import won.bot.framework.events.listener.filter.*;
+import won.bot.framework.events.filter.EventFilter;
+import won.bot.framework.events.EventListenerContext;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import java.net.URI;

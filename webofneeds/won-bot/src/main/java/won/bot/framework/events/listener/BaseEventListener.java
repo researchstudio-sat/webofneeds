@@ -18,9 +18,10 @@ package won.bot.framework.events.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.events.Event;
-import won.bot.framework.events.EventListener;
-import won.bot.framework.events.event.FinishedEvent;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.impl.FinishedEvent;
+import won.bot.framework.events.filter.EventFilter;
 
 /**
  * Base class for event listeners

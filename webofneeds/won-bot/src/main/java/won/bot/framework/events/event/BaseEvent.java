@@ -16,8 +16,6 @@
 
 package won.bot.framework.events.event;
 
-import won.bot.framework.events.Event;
-
 /**
  * Base class for events.
  */

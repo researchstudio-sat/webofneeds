@@ -16,6 +16,9 @@
 
 package won.bot.framework.events.listener;
 
+import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.filter.EventFilter;
+
 /**
  * Default listener for simple use in anonymous classes.
  */

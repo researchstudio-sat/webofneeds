@@ -16,7 +16,9 @@
 
 package won.bot.framework.events.listener;
 
-import won.bot.framework.events.Event;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.filter.EventFilter;
 
 /**
  * Counts how often it is called, offers to call a callback when a certain number is reached.

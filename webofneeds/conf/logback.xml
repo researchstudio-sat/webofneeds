@@ -40,7 +40,7 @@
     <!-- END MSGTRACE -->
 
     <!-- SET to DEBUG to see bot events -->
-    <logger name="won.bot.framework.events.bus.AsyncEventBusImpl" level="INFO"/>
+    <logger name="won.bot.framework.events.bus.impl.AsyncEventBusImpl" level="INFO"/>
     <!-- SET to DEBUG to see bot event listeners -->
     <logger name="won.bot.framework.events.listener" level="INFO"/>
 

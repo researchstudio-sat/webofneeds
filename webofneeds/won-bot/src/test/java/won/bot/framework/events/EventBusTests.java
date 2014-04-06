@@ -22,7 +22,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import won.bot.framework.events.bus.AsyncEventBusImpl;
+import won.bot.framework.events.bus.impl.AsyncEventBusImpl;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.listener.EventListener;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -63,7 +65,8 @@ public class EventBusTests
     countDownLatch.await();
   }
 
-  private class TestEventA implements Event{
+  private class TestEventA implements Event
+  {
     @Override
     public String toString()
     {
@@ -79,7 +82,8 @@ public class EventBusTests
     }
   }
 
-  private class ListenerA implements EventListener{
+  private class ListenerA implements EventListener
+  {
     private final CountDownLatch countDownLatch;
 
     public ListenerA(final CountDownLatch countDownLatch)

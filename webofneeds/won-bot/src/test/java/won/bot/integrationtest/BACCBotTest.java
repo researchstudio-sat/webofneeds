@@ -10,8 +10,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import won.bot.framework.events.event.WorkDoneEvent;
-import won.bot.framework.events.listener.ExecuteOnEventListener;
+import won.bot.framework.events.event.impl.WorkDoneEvent;
+import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.BACCBot;
 
@@ -106,19 +106,10 @@ public class BACCBotTest {
             //now, add a listener to the WorkDoneEvent.
             //its only purpose is to trip the CyclicBarrier instance that
             // the test method is waiting on
-            getEventBus().subscribe(WorkDoneEvent.class, new ExecuteOnEventListener(getEventListenerContext(), new Runnable(){
-                @Override
-                public void run()
-                {
-                    try {
-                        //together with the barrier.await() in the @Test method, this trips the barrier
-                        //and both threads continue.
-                        barrier.await();
-                    } catch (Exception e) {
-                        logger.warn("caught exception while waiting on barrier", e);
-                    }
-                }
-            }, RUN_ONCE));
+          getEventBus().subscribe(WorkDoneEvent.class,
+            new ActionOnEventListener(
+              getEventListenerContext(),
+              new TripBarrierAction(getEventListenerContext(), barrier)));
         }
 
         public CyclicBarrier getBarrier()
