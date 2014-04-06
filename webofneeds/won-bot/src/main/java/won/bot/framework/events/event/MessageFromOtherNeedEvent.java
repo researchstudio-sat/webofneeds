@@ -20,48 +20,25 @@ import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 
-import java.net.URI;
-
 /**
  *
  */
-public class MessageFromOtherNeedEvent extends BaseEvent implements NeedSpecificEvent, ConnectionSpecificEvent
+public class MessageFromOtherNeedEvent extends BaseNeedAndConnectionSpecificEvent
 {
-  private final Connection con;
   private final ChatMessage message;
   private final Model content;
 
-  public MessageFromOtherNeedEvent(final Connection con, final ChatMessage message, final Model content)
-  {
-    this.con = con;
+  public MessageFromOtherNeedEvent(final Connection con, final ChatMessage message, final Model content) {
+    super(con);
     this.message = message;
     this.content = content;
   }
 
-  public Connection getCon()
-  {
-    return con;
-  }
-
-  public ChatMessage getMessage()
-  {
+  public ChatMessage getMessage() {
     return message;
   }
 
-  public Model getContent()
-  {
+  public Model getContent() {
     return content;
-  }
-
-  @Override
-  public URI getConnectionURI()
-  {
-    return con.getConnectionURI();
-  }
-
-  @Override
-  public URI getNeedURI()
-  {
-    return con.getNeedURI();
   }
 }

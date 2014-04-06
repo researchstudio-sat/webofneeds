@@ -35,6 +35,18 @@ public class WonLinkedDataUtils
   private static final Logger logger = LoggerFactory.getLogger(WonLinkedDataUtils.class);
 
   public static URI getRemoteConnectionURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+    Model model = getModelForResource(connectionURI, linkedDataSource);
+    Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_CONNECTION + ">", PrefixMapping.Standard);
+    return RdfUtils.getURIPropertyForPropertyPath(model, connectionURI, propertyPath);
+  }
+
+  public static URI getRemoteNeedURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+    Model model = getModelForResource(connectionURI, linkedDataSource);
+    Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_NEED + ">", PrefixMapping.Standard);
+    return RdfUtils.getURIPropertyForPropertyPath(model, connectionURI, propertyPath);
+  }
+
+  public static Model getModelForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     assert connectionURI != null : "connection URI must not be null";
     Model model = null;
@@ -43,7 +55,7 @@ public class WonLinkedDataUtils
     if (model == null) {
       throw new IllegalStateException("failed to load model for Connection " + connectionURI);
     }
-    Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_CONNECTION + ">", PrefixMapping.Standard);
-    return RdfUtils.getURIPropertyForPropertyPath(model, connectionURI, propertyPath);
+    return model;
   }
+
 }

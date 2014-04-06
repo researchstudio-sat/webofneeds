@@ -30,7 +30,7 @@ public abstract class AbstractDelegatingFilter implements DelegatingFilter
     this.delegate = delegate;
   }
 
-  protected EventFilter getDelegate()
+  public EventFilter getDelegate()
   {
     return delegate;
   }
@@ -40,4 +40,6 @@ public abstract class AbstractDelegatingFilter implements DelegatingFilter
   {
     this.delegate = delegate;
   }
+
+
 }

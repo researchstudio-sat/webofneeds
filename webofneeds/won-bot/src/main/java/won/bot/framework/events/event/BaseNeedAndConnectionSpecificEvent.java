@@ -16,36 +16,50 @@
 
 package won.bot.framework.events.event;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.model.FacetType;
+import won.protocol.model.Connection;
 
 import java.net.URI;
 
 /**
  *
  */
-public class NeedCreatedEvent extends BaseNeedSpecificEvent
+public abstract class BaseNeedAndConnectionSpecificEvent extends BaseEvent implements NeedSpecificEvent,
+  ConnectionSpecificEvent
 {
-  private final URI wonNodeUri;
-  private final Model needModel;
-  private final FacetType facetType;
+  private final Connection con;
 
-  public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Model needModel, final FacetType facetType) {
-    super(needURI);
-    this.wonNodeUri = wonNodeUri;
-    this.needModel = needModel;
-    this.facetType = facetType;
-  }
-
-  public URI getWonNodeUri()
+  public BaseNeedAndConnectionSpecificEvent(final Connection con)
   {
-    return wonNodeUri;
+    this.con = con;
   }
 
-  public Model getNeedModel()
+  public Connection getCon()
   {
-    return needModel;
+    return con;
   }
 
+  @Override
+  public URI getConnectionURI()
+  {
+    return con.getConnectionURI();
+  }
 
+  @Override
+  public URI getNeedURI()
+  {
+    return con.getNeedURI();
+  }
+
+  @Override
+  public URI getRemoteNeedURI() {
+    return con.getRemoteNeedURI();
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName()+ "{" +
+      "needURI=" + getNeedURI() +
+      ", connectionURI=" + getConnectionURI() +
+      '}';
+  }
 }

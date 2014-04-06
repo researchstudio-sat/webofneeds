@@ -24,4 +24,5 @@ import won.bot.framework.events.listener.EventFilter;
 public interface DelegatingFilter extends EventFilter
 {
   public void setDelegate(EventFilter delegate);
+  public EventFilter getDelegate();
 }

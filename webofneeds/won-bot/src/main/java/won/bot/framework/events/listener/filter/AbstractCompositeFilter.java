@@ -18,6 +18,7 @@ package won.bot.framework.events.listener.filter;
 
 import won.bot.framework.events.listener.EventFilter;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,8 +47,18 @@ public abstract class AbstractCompositeFilter implements CompositeFilter
     this.filters = newList;
   }
 
-  protected List<EventFilter> getFilters()
+  /**
+   * Returns a shallow copy of the filters.
+   */
+  public List<EventFilter> getFilters()
   {
-    return filters;
+    ArrayList<EventFilter> copy = new ArrayList<>(filters.size());
+    copy.addAll(filters);
+    return copy;
+  }
+
+  @Override
+  public synchronized void setFilters(final List<EventFilter> filters) {
+    this.filters = filters;
   }
 }

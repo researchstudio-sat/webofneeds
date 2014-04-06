@@ -27,7 +27,7 @@ public class OrFilter extends AbstractCompositeFilter
 {
 
   @Override
-  public boolean accept(final Event event)
+  public synchronized boolean accept(final Event event)
   {
     for (EventFilter filter: getFilters()){
       if (filter.accept(event)) return true;

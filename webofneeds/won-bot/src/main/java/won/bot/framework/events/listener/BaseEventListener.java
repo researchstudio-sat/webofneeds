@@ -32,7 +32,7 @@ public abstract class BaseEventListener implements EventListener
   private int eventCount = 0;
   private int exceptionCount = 0;
   private long millisExecuting = 0;
-  private EventFilter eventFilter = null;
+  protected EventFilter eventFilter = null;
   protected String name = getClass().getSimpleName();
 
   /**
@@ -77,8 +77,9 @@ public abstract class BaseEventListener implements EventListener
     long startTime = System.currentTimeMillis();
     try {
       doOnEvent(event);
-    } catch (Exception e) {
-      countException(e);
+    } catch (Throwable e) {
+      logger.warn("caught throwable", e);
+      countThrowable(e);
       throw e;
     } finally {
       noteTimeExecuting(startTime);
@@ -109,7 +110,7 @@ public abstract class BaseEventListener implements EventListener
     return eventCount;
   }
 
-  protected synchronized void countException(final Exception e){
+  protected synchronized void countThrowable(final Throwable e){
     this.exceptionCount ++;
    }
 

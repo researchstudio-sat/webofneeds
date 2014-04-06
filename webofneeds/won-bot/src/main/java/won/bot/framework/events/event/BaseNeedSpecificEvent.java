@@ -21,10 +21,23 @@ import java.net.URI;
 /**
  *
  */
-public class NeedDeactivatedEvent extends BaseNeedSpecificEvent
+public abstract class BaseNeedSpecificEvent extends BaseEvent implements NeedSpecificEvent
 {
-  public NeedDeactivatedEvent(final URI needURI) {
-    super(needURI);
+  private final URI needURI;
+
+  protected BaseNeedSpecificEvent(final URI needURI) {
+    this.needURI = needURI;
   }
 
+  @Override
+  public URI getNeedURI() {
+    return needURI;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName()+ "{" +
+      "needURI=" + getNeedURI() +
+      '}';
+  }
 }
