@@ -127,7 +127,6 @@ public class WON
   public static final Resource EVENT_TYPE_PARTNER_MESSAGE = m.createResource(ConnectionEventType.PARTNER_MESSAGE.getURI().toString());
   public static final Resource EVENT_TYPE_OWNER_MESSAGE = m.createResource(ConnectionEventType.OWNER_MESSAGE.getURI().toString());
   public static final Resource EVENT_TYPE_HINT = m.createResource(ConnectionEventType.MATCHER_HINT.getURI().toString());
-  public static final Resource EVENT_TYPE_CHAT_MESSAGE = m.createResource(ConnectionEventType.CHAT_MESSAGE.getURI().toString());
 
   public static final Resource BASIC_NEED_TYPE_DO_TOGETHER = m.createResource(BasicNeedType.DO_TOGETHER.getURI().toString());
   public static final Resource BASIC_NEED_TYPE_SUPPLY = m.createResource(BasicNeedType.SUPPLY.getURI().toString());
@@ -221,8 +220,6 @@ public class WON
         return EVENT_TYPE_OWNER_MESSAGE;
       case PARTNER_MESSAGE:
         return EVENT_TYPE_PARTNER_MESSAGE;
-      case CHAT_MESSAGE:
-            return EVENT_TYPE_CHAT_MESSAGE;
       default:
         throw new IllegalStateException("No such case specified for " + type.name());
     }

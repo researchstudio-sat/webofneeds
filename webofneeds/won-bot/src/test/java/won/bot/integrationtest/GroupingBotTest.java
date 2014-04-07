@@ -80,7 +80,7 @@ public class GroupingBotTest
    * @throws Exception
    */
   @Test
-  public void testCreate2NeedsGroupingBot() throws Exception
+  public void testGroupingBot() throws Exception
   {
     logger.info("starting test case testCreate2NeedsGroupingBot");
     //adding the bot to the bot manager will cause it to be initialized.

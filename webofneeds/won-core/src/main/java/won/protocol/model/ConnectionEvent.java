@@ -96,7 +96,7 @@ public class ConnectionEvent
   @Override
   public String toString()
   {
-    return "Need{" +
+    return "Event{" +
         "id=" + id +
         ", type=" + type +
         ", creationDate=" + creationDate +

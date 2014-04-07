@@ -99,7 +99,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     //so we have to check if the event we're seeing is really about the connection we're interested in
     //it could be about another connection of one of the two needs.
     synchronized (filterChangeMonitor) {
-      if (!bothConnectionURIsAreKnown()){
+      if (!bothConnectionURIsAreKnown()) {
         if (! isConnectionURIKnown(connectionURI)) {
           //we haven't checked the connectionURI before
           //we have to check if the connectionURI is relevant

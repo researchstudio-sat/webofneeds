@@ -80,7 +80,7 @@ public class ConversationBotTest
    * @throws Exception
    */
   @Test
-  public void testCreate2NeedsShortConversationBot() throws Exception
+  public void testConversationBot() throws Exception
   {
     logger.info("starting test case testCreate2NeedsShortConversationBot");
     //adding the bot to the bot manager will cause it to be initialized.
