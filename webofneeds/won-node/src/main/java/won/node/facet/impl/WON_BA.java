@@ -52,8 +52,8 @@ public class WON_BA {
     public static final Resource STATE_CANCELING = m.createResource(BASE_URI + "Canceling");
     public static final Resource STATE_COMPENSATING = m.createResource(BASE_URI + "Compensating");
     public static final Resource STATE_COMPLETING = m.createResource(BASE_URI + "Completing");
-
-
+    public static final Resource STATE_CANCELING_ACTIVE = m.createResource(BASE_URI + "CancelingActive");
+    public static final Resource STATE_CANCELING_COMPLETING = m.createResource(BASE_URI + "CancelingCompleting");
 
     /** returns the URI for this schema
      * @return the URI for this schema

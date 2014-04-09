@@ -4,8 +4,6 @@ import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.facet.businessactivity.atomic.ATConnectionState;
-import won.node.facet.businessactivity.atomic.SimpleATBAConnectionStateManager;
 import won.node.facet.businessactivity.coordinatorcompletion.BACCEventType;
 import won.node.facet.businessactivity.coordinatorcompletion.BACCState;
 import won.node.facet.businessactivity.coordinatorcompletion.SimpleBACCStateManager;
@@ -13,12 +11,15 @@ import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
+
 
 /**
  * User: Danijel
@@ -27,8 +28,6 @@ import java.util.Map;
 public class BAAtomicCCCoordinatorFacetImpl extends Facet {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private SimpleBACCStateManager stateManager = new SimpleBACCStateManager();
-    private SimpleATBAConnectionStateManager connectionManager = new SimpleATBAConnectionStateManager();
-    private Boolean firstPhase = true;
 
     @Autowired
     private ConnectionRepository connectionRepository;
@@ -49,18 +48,19 @@ public class BAAtomicCCCoordinatorFacetImpl extends Facet {
             {
                 try {
                     ownerFacingConnectionClient.open(con.getConnectionURI(), content);
-
                     stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
                     logger.info("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                    logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
                 } catch (WonProtocolException e) {
                     logger.debug("caught Exception:", e);
                 }
+
                 // adding Participants is possible only in the first phase
-                if(firstPhase)  //add a new Participant (first phase in progress)
+                if(isCoordinatorInFirstPhase(con))  //add a new Participant (first phase in progress)
                 {
                     stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
-                    connectionManager.setStateForConnection(BACCState.ACTIVE.getURI(), con);
                     logger.info("Coordinator state: " + stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                    logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
                 }
                 else  // second phase in progress, new participants can not be added anymore
                 {
@@ -128,39 +128,47 @@ public class BAAtomicCCCoordinatorFacetImpl extends Facet {
                     {
                         if(eventType.isBACCCoordinatorEventType(eventType))
                         {
-                            if(firstPhase && eventType.getURI().toString().equals(WON_BA.MESSAGE_CLOSE.getURI().toString()))
+                            if(isCoordinatorInFirstPhase(con) && eventType.getURI().toString().equals(WON_BA.MESSAGE_CLOSE.getURI().toString()))
                             {
-                                //check whether all connections are in the state Completed (all participant voted with YES)
-                                // if yes -> send message and firstPhase = false;
-                                // if no -> wait for other participants to respond with Completed
-                                if(canFirstPhaseFinish())
+                                //check whether all connections are in the state COMPLETED (all participant voted with YES)
+                                // if yes -> send message and firstPhase is ended;
+                                // if no -> wait for other participants to vote
+                                if(canFirstPhaseFinish(con))
                                 {
                                     BACCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                                     logger.info("Current state of the Coordinator: "+state.getURI().toString());
-                                    stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                                    connectionManager.setStateForConnection(state.transit(eventType).getURI(), con);
+                                    logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
+
+                                    state = state.transit(eventType);
+                                    state.setPhase(BACCState.PhaseIndicator.SECOND); //Second phase is starting!
+                                    stateManager.setStateForNeedUri(state, con.getNeedURI(), con.getRemoteNeedURI());
                                     logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                                    logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
 
                                     // eventType -> URI Resource
                                     r = myContent.createResource(eventType.getURI().toString());
                                     baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
                                     needFacingConnectionClient.textMessage(con, myContent);
 
-                                    firstPhase = false;
+
                                 }
                                 else
                                 {
                                     logger.info("Not all votes are received from Participants!");
                                 }
-                                //TODO
                             }
                             else
                             {
                                 BACCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                                BACCState newState = null;
                                 logger.info("Current state of the Coordinator: "+state.getURI().toString());
-                                stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                                connectionManager.setStateForConnection(state.transit(eventType).getURI(), con);
+                                logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
+
+                                newState = state.transit(eventType);
+                                newState.setPhase(state.getPhase()); //propagate phase, it would be better to have this global!!!
+                                stateManager.setStateForNeedUri(newState, con.getNeedURI(), con.getRemoteNeedURI());
                                 logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                                logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
 
                                 // eventType -> URI Resource
                                 r = myContent.createResource(eventType.getURI().toString());
@@ -213,73 +221,96 @@ public class BAAtomicCCCoordinatorFacetImpl extends Facet {
 
                     BACCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
                     logger.info("Current state of the Coordinator: "+state.getURI().toString());
-                    stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                    connectionManager.setStateForConnection(state.transit(eventType).getURI(), con);
-                    logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
-
-                    ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
-
 
 
                     // atomic outcome
-                    // if one of the Participants votes NO (either EXIT or Fail or CannnotComplete is received)
+                    // if one of the Participants votes NO (either EXIT or FAIL or CANNOTCOMPLETE is received)
                     //ACTITVE, COMPLETING -> (message: CANCEL) -> CANCELING
                     //COMPLETED -> (message: COMPENSATE) -> COMPENSATING
-
-                    if(firstPhase && (eventType.getURI().toString().equals(WON_BA.MESSAGE_EXIT.getURI().toString())) ||
+                    if(isCoordinatorInFirstPhase(con) && (eventType.getURI().toString().equals(WON_BA.MESSAGE_EXIT.getURI().toString())) ||
                             eventType.getURI().toString().equals(WON_BA.MESSAGE_FAIL.getURI().toString()) ||
                             eventType.getURI().toString().equals(WON_BA.MESSAGE_CANNOTCOMPLETE.getURI().toString()))
                     {
+                        state = state.transit(eventType);
+                        state.setPhase(BACCState.PhaseIndicator.SECOND); // The second phase is beginning
+                        stateManager.setStateForNeedUri(state, con.getNeedURI(), con.getRemoteNeedURI());
+                        logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                        logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
+
+                        ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+
                         logger.info("Vote: NO ({})", eventType.getURI().toString());
-                        firstPhase = false; //new Participants can not be added anymore
+                        //new Participants can not be added anymore
                         Model myContent = ModelFactory.createDefaultModel();
                         myContent.setNsPrefix("","no:uri");
                         Resource baseResource = myContent.createResource("no:uri");
 
                         //list all Coordinator-Participant State Machines
-                        Iterator<Map.Entry<String,ATConnectionState>> mapIt = connectionManager.getMap().entrySet().iterator();
-                        while (mapIt.hasNext())
-                        {
-                            ATConnectionState atConnectionState = mapIt.next().getValue();
+                        List<Connection> listOfCons = getAllCoordinatorParticipantConnections(con);
+                        URI ownerUri = null;
+                        URI needUri = null;
 
-                            //process Active state
-                            if(atConnectionState.getOwnerStateUri().toString().equals(WON_BA.STATE_ACTIVE.getURI().toString()) ||
-                                    atConnectionState.getOwnerStateUri().toString().equals(WON_BA.STATE_COMPLETING.getURI().toString()))
+                        for(Connection tmpCon : listOfCons)
+                        {
+                            ownerUri = tmpCon.getNeedURI();
+                            needUri = tmpCon.getRemoteNeedURI();
+
+                            //process ACTIVE states and COMPLETING states
+                            if(stateManager.getStateForNeedUri(ownerUri, needUri).getURI().toString().equals(WON_BA.STATE_ACTIVE.getURI().toString()) ||
+                                    stateManager.getStateForNeedUri(ownerUri, needUri).getURI().toString().equals(WON_BA.STATE_COMPLETING.getURI().toString()))
                             {
                                 // Send MESSAGE_CANCEL to Participant
-                                state = stateManager.getStateForNeedUri(atConnectionState.getCon().getNeedURI(), atConnectionState.getCon().getRemoteNeedURI());  //must be Active
+                                state = stateManager.getStateForNeedUri(ownerUri, needUri);  //must be Active
                                 logger.info("Current state of the Coordinator must be either ACTIVE or COMPLETING: "+state.getURI().toString());
+                                logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
                                 eventType = BACCEventType.getBAEventTypeFromURI(WON_BA.MESSAGE_CANCEL.getURI().toString());
-                                stateManager.setStateForNeedUri(state.transit(eventType), atConnectionState.getCon().getNeedURI(), atConnectionState.getCon().getRemoteNeedURI());
-                                logger.info("New state of the Coordinator must be CANCELING:"+stateManager.getStateForNeedUri(atConnectionState.getCon().getNeedURI(), atConnectionState.getCon().getRemoteNeedURI()));
-                                connectionManager.setStateForConnection(URI.create(WON_BA.STATE_CANCELING.getURI().toString()), atConnectionState.getCon());
+
+                                state = state.transit(eventType);       //propagate the phase, it is better to have this global
+                                state.setPhase(BACCState.PhaseIndicator.SECOND);
+                                stateManager.setStateForNeedUri(state, ownerUri, needUri);
+                                logger.info("New state of the Coordinator must be CANCELING:"+stateManager.getStateForNeedUri(ownerUri, needUri));
+                                logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
 
                                 Resource r = myContent.createResource(BACCEventType.MESSAGE_CANCEL.getURI().toString());
                                 baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
-                                needFacingConnectionClient.textMessage(atConnectionState.getCon(), myContent);
+                                needFacingConnectionClient.textMessage(tmpCon, myContent);
                                 baseResource.removeAll(WON_BA.COORDINATION_MESSAGE) ;
                             }
                             //process COMPLETED state
-                            else if(atConnectionState.getOwnerStateUri().toString().equals(WON_BA.STATE_COMPLETED.getURI().toString()))
+                            else if(stateManager.getStateForNeedUri(ownerUri, needUri).getURI().toString().equals(WON_BA.STATE_COMPLETED.getURI().toString()))
                             {
 
                                 // Send MESSAGE_COMPENSATE to Participant
-                                state = stateManager.getStateForNeedUri(atConnectionState.getCon().getNeedURI(), atConnectionState.getCon().getRemoteNeedURI());  //must be Active
+                                state = stateManager.getStateForNeedUri(ownerUri, needUri);  //must be Active
                                 logger.info("Current state of the Coordinator must be COMPLETED. The state is: {}", state.getURI().toString());
+                                logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
                                 eventType = BACCEventType.getBAEventTypeFromURI(WON_BA.MESSAGE_COMPENSATE.getURI().toString());
-                                stateManager.setStateForNeedUri(state.transit(eventType), atConnectionState.getCon().getNeedURI(), atConnectionState.getCon().getRemoteNeedURI());
-                                logger.info("New state of the Coordinator must be COMPENSATING. The state is: {}", stateManager.getStateForNeedUri(atConnectionState.getCon().getNeedURI(), atConnectionState.getCon().getRemoteNeedURI()));
-                                connectionManager.setStateForConnection(URI.create(WON_BA.STATE_COMPENSATING.getURI().toString()), atConnectionState.getCon());
+
+                                state = state.transit(eventType);       //propagate the phase, it is better to have this global
+                                state.setPhase(BACCState.PhaseIndicator.SECOND);
+                                stateManager.setStateForNeedUri(state, ownerUri, needUri);
+                                logger.info("New state of the Coordinator must be COMPENSATING. The state is: {}", stateManager.getStateForNeedUri(ownerUri, needUri));
+                                logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
 
                                 Resource r = myContent.createResource(BACCEventType.MESSAGE_COMPENSATE.getURI().toString());
                                 baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
-                                needFacingConnectionClient.textMessage(atConnectionState.getCon(), myContent);
+                                needFacingConnectionClient.textMessage(tmpCon, myContent);
                                 baseResource.removeAll(WON_BA.COORDINATION_MESSAGE) ;
                             }
                         }
                     }
+                    else
+                    {
+                        BACCState newState = state.transit(eventType);   //propagate the phase, it is better to have this global
+                        newState.setPhase(state.getPhase());
+                        stateManager.setStateForNeedUri(newState, con.getNeedURI(), con.getRemoteNeedURI());
+                        logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                        logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
 
-                  BACCEventType resendEventType = state.getResendEvent();
+                        ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+                    }
+
+                    BACCEventType resendEventType = state.getResendEvent();
                     if(resendEventType!=null)
                     {
                         Model myContent = ModelFactory.createDefaultModel();
@@ -289,11 +320,15 @@ public class BAAtomicCCCoordinatorFacetImpl extends Facet {
                         if(BACCEventType.isBACCCoordinatorEventType(resendEventType))
                         {
                             state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                            BACCState newState = null;
                             logger.info("Coordinator re-sends the previous message.");
                             logger.info("Current state of the Coordinator: "+state.getURI().toString());
-                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                            connectionManager.setStateForConnection(state.transit(eventType).getURI(), con);
+
+                            newState = state.transit(eventType);  //propagate the phase, it is better to have this global
+                            newState.setPhase(state.getPhase());
+                            stateManager.setStateForNeedUri(newState, con.getNeedURI(), con.getRemoteNeedURI());
                             logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                            logger.info("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
 
                             // eventType -> URI Resource
                             Resource r = myContent.createResource(resendEventType.getURI().toString());
@@ -315,20 +350,46 @@ public class BAAtomicCCCoordinatorFacetImpl extends Facet {
         });
     }
 
-    private boolean canFirstPhaseFinish()
-    {
-        boolean ret = true;
 
-        Iterator<Map.Entry<String,ATConnectionState>> mapIt = connectionManager.getMap().entrySet().iterator();
-        //is there any Coordinator  - Participant state machine in State != Completed
-        while (mapIt.hasNext())
+    private boolean canFirstPhaseFinish(Connection con)
+    {
+        List<Connection> listOfCons = getAllCoordinatorParticipantConnections(con);
+
+        URI ownerUri = null;
+        URI needUri = null;
+        URI currentStateUri = null;
+        for(Connection tmpCon: listOfCons)
         {
-            ATConnectionState atConnectionState = mapIt.next().getValue();
-            if(ret && !atConnectionState.getOwnerStateUri().toString().equals(WON_BA.STATE_COMPLETED.getURI().toString()))
-            {
-                ret = false;
-            }
+            ownerUri = tmpCon.getNeedURI();
+            needUri = tmpCon.getRemoteNeedURI();
+            currentStateUri = stateManager.getStateForNeedUri(ownerUri, needUri).getURI();
+            if(currentStateUri.toString().equals(WON_BA.STATE_ACTIVE.getURI().toString()) ||
+                currentStateUri.toString().equals(WON_BA.STATE_COMPLETING.getURI().toString()))
+                return false;
         }
-        return ret;
+        return true;
     }
+
+    private List<Connection> getAllCoordinatorParticipantConnections(Connection con){
+        List<Connection> listOfCons = connectionRepository.findByNeedURIAndStateAndTypeURI
+                (con.getNeedURI(), ConnectionState.CONNECTED, FacetType.BAAtomicCCCoordinatorFacet.getURI());
+        return listOfCons;
+    }
+
+    private boolean isCoordinatorInFirstPhase(Connection con)
+    {
+        List<Connection> listOfCons = getAllCoordinatorParticipantConnections(con);
+        URI ownerUri, needUri;
+        BACCState currentState;
+        for(Connection c: listOfCons)
+        {
+            ownerUri = c.getNeedURI();
+            needUri = c.getRemoteNeedURI();
+            currentState = stateManager.getStateForNeedUri(ownerUri, needUri);
+            if(currentState.getPhase()== BACCState.PhaseIndicator.SECOND)
+                return false;
+        }
+        return true;
+    }
+
 }
