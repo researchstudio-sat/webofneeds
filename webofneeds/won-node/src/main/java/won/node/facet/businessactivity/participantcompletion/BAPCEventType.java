@@ -19,7 +19,7 @@ import java.util.Arrays;
 public enum BAPCEventType {
     //in general, be permissive about messages where possible. Don't care about duplicate messages
 
-    //close may always be called. It always closes the connnection.
+    //close may always be called. It always closes the connection.
     ///
     MESSAGE_CANCEL("MessageCancel", new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE,
             BAPCState.CANCELING,  BAPCState.COMPLETED,

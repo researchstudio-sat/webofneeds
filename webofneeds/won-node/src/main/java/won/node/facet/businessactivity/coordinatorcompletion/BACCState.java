@@ -14,31 +14,6 @@ import java.net.URI;
  * To change this template use File | Settings | File Templates.
  */
 public enum BACCState {
-
-    SUGGESTED("Suggested", PhaseIndicator.FIRST){
-        public BACCState transit(BACCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
-    REQUEST_SENT("RequestSent", PhaseIndicator.FIRST){
-        public BACCState transit(BACCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
-    REQUEST_RECEIVED("RequestReceived", PhaseIndicator.FIRST){
-        public BACCState transit(BACCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
-    CONNECTED("Connected", PhaseIndicator.FIRST){
-        public BACCState transit(BACCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
     ACTIVE("Active", PhaseIndicator.FIRST){
         public BACCState transit(BACCEventType msg){
             resendEvent = null;
@@ -379,11 +354,11 @@ public enum BACCState {
         return URI.create(WON.BASE_URI + name);
     }
 
-    public PhaseIndicator getPhase() {
+    public PhaseIndicator getPhaseIndicator() {
         return phase;
     }
 
-    public void setPhase (PhaseIndicator phase) {
+    public void setPhaseIndicator (PhaseIndicator phase) {
         this.phase = phase;
     }
 

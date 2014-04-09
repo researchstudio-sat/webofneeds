@@ -1,8 +1,8 @@
 package won.bot.impl;
 
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.*;
 import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.*;
-import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationnMessageAsTextBots.*;
 
 import java.util.ArrayList;
 import java.util.List;
