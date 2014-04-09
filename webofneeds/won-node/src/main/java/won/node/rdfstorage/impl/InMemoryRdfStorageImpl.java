@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import won.node.rdfstorage.RDFStorageService;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
+import won.protocol.util.RdfUtils;
 
 /**
  * Simple in-memory RDF storage for testing/benchmarking purposes.
@@ -43,7 +44,7 @@ public class InMemoryRdfStorageImpl implements RDFStorageService
   @Override
   public Model loadContent(final Need need)
   {
-    return dataset.getNamedModel(need.getNeedURI().toString());
+    return RdfUtils.cloneModel(dataset.getNamedModel(need.getNeedURI().toString()));
   }
 
   @Override
@@ -55,7 +56,7 @@ public class InMemoryRdfStorageImpl implements RDFStorageService
   @Override
   public Model loadContent(final ConnectionEvent event)
   {
-    return dataset.getNamedModel(createEventURI(event));
+    return RdfUtils.cloneModel(dataset.getNamedModel(createEventURI(event)));
   }
 
   /**
