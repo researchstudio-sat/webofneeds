@@ -42,8 +42,7 @@ import java.net.URI;
 
 
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ *
  */
 public class OwnerFacingConnectionCommunicationServiceImpl implements ConnectionCommunicationService
 {
@@ -61,7 +60,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
 
-    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.OWNER_OPEN);
+    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_OPEN);
 
     dataService.saveAdditionalContentForEvent(content, con, event);
 
@@ -75,7 +74,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
 
-    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.OWNER_CLOSE);
+    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_CLOSE);
 
     dataService.saveAdditionalContentForEvent(content, con, event);
 
@@ -106,7 +105,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
         dataService.saveChatMessage(con,textMessage);
         //create ConnectionEvent in Database
 
-        ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.OWNER_MESSAGE);
+        ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), connectionURI, ConnectionEventType.OWNER_MESSAGE);
         Resource eventNode = message.createResource(this.URIService.createEventURI(con, event).toString());
         RdfUtils.replaceBaseResource(message, eventNode);
         //create rdf content for the ConnectionEvent and save it to disk
