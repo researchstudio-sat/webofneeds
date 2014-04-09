@@ -5,22 +5,19 @@ import won.bot.framework.events.EventBus;
 import won.bot.framework.events.event.*;
 import won.bot.framework.events.listener.*;
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
-import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.*;
-import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.*;
+
+
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicCoordinationMessageAsTextBots.*;
 import won.protocol.model.FacetType;
 
 import java.util.ArrayList;
 import java.util.List;
-
 /**
- * Created with IntelliJ IDEA.
  * User: Danijel
- * Date: 26.2.14.
- * Time: 15.15
- * To change this template use File | Settings | File Templates.
+ * Date: 2.4.14.
  */
-public class BACCBot extends EventBot {
-    private static final int NO_OF_NEEDS = 29;
+public class BAAtomicCCBot extends EventBot {
+    private static final int NO_OF_NEEDS = 5;
     private static final int NO_OF_MESSAGES = 50;
     private static final long MILLIS_BETWEEN_MESSAGES = 100;
     public static final String URI_LIST_NAME_PARTICIPANT = "participants";
@@ -55,7 +52,7 @@ public class BACCBot extends EventBot {
         //create needs every trigger execution until coordinator need is created
         this.coordinatorNeedCreator = new ExecuteOnEventListener(
                 ctx,
-                new EventBotActions.CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_COORDINATOR, FacetType.BACCCoordinatorFacet.getURI()),
+                new EventBotActions.CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_COORDINATOR, FacetType.BAAtomicCCCoordinatorFacet.getURI()),
                 1
         );
         bus.subscribe(ActEvent.class,this.coordinatorNeedCreator);
@@ -63,7 +60,7 @@ public class BACCBot extends EventBot {
         //   * connect the Coordinator with Participant needs
         this.needConnector = new ExecuteOnceAfterNEventsListener(ctx,
                 new EventBotActions.ConnectFromListToListAction(
-                        ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT, FacetType.BACCCoordinatorFacet.getURI(), FacetType.BACCParticipantFacet.getURI()),NO_OF_NEEDS);
+                        ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT, FacetType.BAAtomicCCCoordinatorFacet.getURI(), FacetType.BACCParticipantFacet.getURI()),NO_OF_NEEDS);
         bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
         //add a listener that is informed of the connect/open events and that auto-opens
@@ -81,41 +78,24 @@ public class BACCBot extends EventBot {
         // * open events - so it initiates the chain reaction of responses
         List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(NO_OF_NEEDS-1);
 
-        //Coordination message is sent as TEXT
-        scripts.add(new BACCStateExitBot());
-        scripts.add(new BACCStateCompensateBot());
-        scripts.add(new BACCStateCompleteBot());
-        scripts.add(new BACCStateCompensateFailBot());
-        scripts.add(new BACCStateCompleteFailBot());
-        scripts.add(new BACCStateCompleteCancelBot());
-        scripts.add(new BACCStateCompleteCancelFailBot());
-        scripts.add(new BACCStateActiveCancelBot());
-        scripts.add(new BACCStateActiveCancelFailBot());
-        scripts.add(new BACCStateCompleteExitBot());
-        scripts.add(new BACCStateActiveCannotCompleteBot());
-        scripts.add(new BACCStateActiveFailBot());
-        scripts.add(new BACCStateCompleteCannotCompleteBot());
+//        ACTIVE -> Exit
+//        scripts.add(new BAAtomicCCStateActiveExiting());
+//        scripts.add(new BAAtomicCCStateCompleted());
+//        scripts.add(new BAAtomicCCStateCompleting());
+//        scripts.add(new BAAtomicCCStateActive());
 
+//        ACTIVE -> Fail
+//        scripts.add(new BAAtomicCCStateActiveFailing());
+//        scripts.add(new BAAtomicCCStateCompleted());
+//        scripts.add(new BAAtomicCCStateCompleting());
+//        scripts.add(new BAAtomicCCStateActive());
 
-        //Coordination message is sent as MODEL
-        scripts.add(new BACCStateExitUriBot());
-        scripts.add(new BACCStateCompensateUriBot());
-        scripts.add(new BACCStateCompleteUriBot());
-        scripts.add(new BACCStateCompensateFailUriBot());
-        scripts.add(new BACCStateCompleteFailUriBot());
-        scripts.add(new BACCStateCompleteCancelUriBot());
-        scripts.add(new BACCStateCompleteCancelFailUriBot());
-        scripts.add(new BACCStateActiveCancelUriBot());
-        scripts.add(new BACCStateActiveCancelFailUriBot());
-        scripts.add(new BACCStateCompleteExitUriBot());
-        scripts.add(new BACCStateActiveCannotCompleteUriBot());
-        scripts.add(new BACCStateActiveFailUriBot());
-        scripts.add(new BACCStateCompleteCannotCompleteUriBot());
+//         ACTIVE -> NotCompleting
+//        scripts.add(new BAAtomicCCStateActiveNotCompleting());
+//        scripts.add(new BAAtomicCCStateCompleted());
+//        scripts.add(new BAAtomicCCStateCompleting());
+//        scripts.add(new BAAtomicCCStateActive());
 
-
-        // with failures
-        scripts.add(new BACCStateCompleteWithFailuresUriBot());
-        scripts.add(new BACCStateCompleteWithFailuresBot());
 
         this.autoResponder = new AutomaticBAMessageResponderListener(ctx, scripts, NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
         bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);
@@ -124,7 +104,7 @@ public class BACCBot extends EventBot {
         //register a DeactivateAllNeedsAction to be executed
         //when the internalWorkDoneEvent is seen
         this.needDeactivator = new ExecuteOnEventListener(getEventListenerContext(), new
-        EventBotActions.DeactivateAllNeedsAction(getEventListenerContext()),1);
+                EventBotActions.DeactivateAllNeedsAction(getEventListenerContext()),1);
         bus.subscribe(InternalWorkDoneEvent.class, needDeactivator);
 
         //add a listener that counts two NeedDeactivatedEvents and then tells the

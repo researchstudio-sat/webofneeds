@@ -1,4 +1,4 @@
-package won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationnMessageAsTextBots;
+package won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots;
 
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.BATestScriptAction;

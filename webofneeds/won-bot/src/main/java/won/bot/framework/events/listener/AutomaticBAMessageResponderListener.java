@@ -192,7 +192,8 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener {
     }
 
     private boolean areWeOnCoordinatorSide(Connection con) {
-        return (con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI()) || con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()));
+        return (con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI()) || con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
+        con.getTypeURI().equals(FacetType.BAAtomicCCCoordinatorFacet.getURI()) || con.getTypeURI().equals(FacetType.BAAtomicPCCoordinatorFacet.getURI()));
     }
 
     private void handleMessageEvent(final MessageFromOtherNeedEvent messageEvent){
