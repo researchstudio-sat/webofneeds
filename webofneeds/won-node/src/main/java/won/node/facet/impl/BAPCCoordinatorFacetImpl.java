@@ -5,7 +5,6 @@ package won.node.facet.impl;
 import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import won.node.facet.businessactivity.participantcompletion.BAPCEventType;
 import won.node.facet.businessactivity.participantcompletion.BAPCState;
@@ -14,13 +13,10 @@ import won.node.facet.businessactivity.participantcompletion.SimpleBAPCStateMana
 
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
-import won.protocol.repository.ConnectionRepository;
 
 
 import java.net.URI;
-import java.util.List;
 
 
 /**
@@ -30,7 +26,8 @@ import java.util.List;
  * Time: 16.39
  * To change this template use File | Settings | File Templates.
  */
-public class BAPCCoordinatorFacetImpl extends Facet {
+public class BAPCCoordinatorFacetImpl extends AbstractFacet
+{
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private SimpleBAPCStateManager stateManager = new SimpleBAPCStateManager();
 
@@ -51,9 +48,9 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     ownerFacingConnectionClient.open(con.getConnectionURI(), content);
 
                     stateManager.setStateForNeedUri(BAPCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
-                    logger.info("Coordinator state: " + stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                    logger.debug("Coordinator state: " + stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
                 } catch (WonProtocolException e) {
-                    logger.debug("caught Exception:", e);
+                    logger.warn("caught Exception:", e);
                 }
             }
         });
@@ -82,7 +79,7 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                         messageForSending = ni.toList().get(0).toString();
                         messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
                         eventType = BAPCEventType.getCoordinationEventTypeFromString(messageForSending);
-                        logger.info("Coordinator sends the text message: {}", eventType.getURI());
+                        logger.debug("Coordinator sends the text message: {}", eventType.getURI());
                     }
                     //message as MODEL
                     else {
@@ -91,11 +88,11 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                         {
                             String eventTypeURI = ni.toList().get(0).asResource().getURI().toString();
                             eventType = BAPCEventType.getBAEventTypeFromURI(eventTypeURI);
-                            logger.info("Coordinator sends the RDF: {}", eventType.getURI());
+                            logger.debug("Coordinator sends the RDF: {}", eventType.getURI());
                         }
                         else
                         {
-                            logger.info("Message {} does not contain a proper content.", message.toString());
+                            logger.debug("Message {} does not contain a proper content.", message.toString());
                             return;
                         }
                     }
@@ -109,9 +106,9 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                         if(BAPCEventType.isBAPCCoordinatorEventType(eventType))
                         {
                             BAPCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
-                            logger.info("Current state of the Coordinator: "+state.getURI().toString());
+                            logger.debug("Current state of the Coordinator: "+state.getURI().toString());
                             stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                            logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                            logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
@@ -120,12 +117,12 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                         }
                         else
                         {
-                            logger.info("The eventType: "+eventType.getURI().toString()+" can not be triggered by Coordinator.");
+                            logger.debug("The eventType: "+eventType.getURI().toString()+" can not be triggered by Coordinator.");
                         }
                     }
                     else
                     {
-                        logger.info("The event type denoted by "+messageForSending+" is not allowed.");
+                        logger.debug("The event type denoted by "+messageForSending+" is not allowed.");
                     }
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
@@ -143,15 +140,15 @@ public class BAPCCoordinatorFacetImpl extends Facet {
             @Override
             public void run() {
                 try {
-                    logger.info("Received message from Participant: " + message.toString());
+                    logger.debug("Received message from Participant: " + message.toString());
                     NodeIterator it = message.listObjectsOfProperty(WON_BA.COORDINATION_MESSAGE);
                     if (!it.hasNext()) {
-                        logger.info("message did not contain a won-ba:coordinationMessage");
+                        logger.debug("message did not contain a won-ba:coordinationMessage");
                         return;
                     }
                     RDFNode coordMsgNode = it.nextNode();
                     if (!coordMsgNode.isURIResource()){
-                        logger.info("message did not contain a won-ba:coordinationMessage URI");
+                        logger.debug("message did not contain a won-ba:coordinationMessage URI");
                         return;
                     }
 
@@ -162,9 +159,9 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                     BAPCEventType eventType = BAPCEventType.getCoordinationEventTypeFromURI(sCoordMsg);
 
                     BAPCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
-                    logger.info("Current state of the Coordinator: "+state.getURI().toString());
+                    logger.debug("Current state of the Coordinator: "+state.getURI().toString());
                     stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                    logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                    logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
 
@@ -178,10 +175,10 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                         if(BAPCEventType.isBAPCCoordinatorEventType(resendEventType))
                         {
                             state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
-                            logger.info("Coordinator re-sends the previous message.");
-                            logger.info("Current state of the Coordinator: "+state.getURI().toString());
+                            logger.debug("Coordinator re-sends the previous message.");
+                            logger.debug("Current state of the Coordinator: "+state.getURI().toString());
                             stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                            logger.info("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                            logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
 
                             // eventType -> URI Resource
                             Resource r = myContent.createResource(resendEventType.getURI().toString());
@@ -191,7 +188,7 @@ public class BAPCCoordinatorFacetImpl extends Facet {
                         }
                         else
                         {
-                            logger.info("The eventType: "+eventType.getURI().toString()+" can not be triggered by Participant.");
+                            logger.debug("The eventType: "+eventType.getURI().toString()+" can not be triggered by Participant.");
                         }
                     }
                 } catch (WonProtocolException e) {

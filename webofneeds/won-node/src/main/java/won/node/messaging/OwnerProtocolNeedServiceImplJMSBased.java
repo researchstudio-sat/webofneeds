@@ -40,13 +40,14 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
 
     public List<String> getEndpointsForOwnerApplication(
             @Header("ownerApplicationID") String ownerApplicationID, Exchange exchange){
-        logger.info("get endpoints: message received");
+        logger.debug("get endpoints: message received");
         List<String> endpoints = queueManagementService.getEndpointsForOwnerApplication(ownerApplicationID);
         return endpoints;
     }
+
     public String registerOwnerApplication(
             Exchange exchange) throws IllegalNeedContentException, JMSException {
-        logger.info("register: message received");
+        logger.debug("register: message received");
         String ownerApplicationId = ownerManagementService.registerOwnerApplication();
 
         return ownerApplicationId;
@@ -63,7 +64,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
         URI ownerURIconvert = URI.create(ownerURI);
         Model contentconvert = RdfUtils.toModel(content);
 
-        logger.info("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
+        logger.debug("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
         connectionURI = delegate.createNeed(ownerURIconvert, contentconvert, activate,ownerApplicationID );
         exchange.getOut().setBody(connectionURI);
 
@@ -72,7 +73,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
 
     public void activate(
             @Header("needURI") String needURI) throws NoSuchNeedException {
-        logger.info("activateNeed: message received: {}", needURI);
+        logger.debug("activateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
         delegate.activate(needURIconvert);
@@ -80,7 +81,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
 
     public void deactivate(
             @Header("needURI") String needURI) throws NoSuchNeedException, NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        logger.info("deactivateNeed: message received: {}", needURI);
+        logger.debug("deactivateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
         delegate.deactivate(needURIconvert);
@@ -170,7 +171,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
             @Header("needURI") String needURI,
             @Header("otherNeedURI") String otherNeedURI,
             @Header("content") String content, Exchange exchange) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-        logger.info("connectNeed: message received: {}", content);
+        logger.debug("connectNeed: message received: {}", content);
 
         URI result = null;
         URI needURIConvert = URI.create(needURI);

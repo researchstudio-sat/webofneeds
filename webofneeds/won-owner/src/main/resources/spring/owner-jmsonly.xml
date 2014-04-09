@@ -13,9 +13,10 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/owner.properties" ignore-unresolvable="true"/>
 
     <import resource="classpath:/spring/core/owner-core.xml" />
+    <import resource="classpath:/spring/component/ehcache/owner-ehcache.xml" />
     <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml" />
     <import resource="classpath:/spring/component/storage/storage.xml" />
-    <import resource="classpath:/spring/component/camel/camel.xml" />
+    <import resource="classpath:/spring/component/camel/owner-camel.xml" />
     <import resource="classpath:/spring/component/ownerProtocolNeedServiceClient/ownerProtocolNeedServiceClient-jmsonly.xml" />
 
 </beans>

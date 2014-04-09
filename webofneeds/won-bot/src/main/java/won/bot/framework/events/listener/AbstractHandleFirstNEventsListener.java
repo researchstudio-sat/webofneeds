@@ -16,7 +16,9 @@
 
 package won.bot.framework.events.listener;
 
-import won.bot.framework.events.Event;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.filter.EventFilter;
 
 /**
  * Counts how often it is called, offers to call a callback when a certain number is reached.
@@ -40,6 +42,18 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
     this.targetCount = targetCount;
   }
 
+  protected AbstractHandleFirstNEventsListener(final EventListenerContext context, final String name, final int targetCount)
+  {
+    super(context, name);
+    this.targetCount = targetCount;
+  }
+
+  protected AbstractHandleFirstNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount)
+  {
+    super(context, name, eventFilter);
+    this.targetCount = targetCount;
+  }
+
   @Override
   public void doOnEvent(final Event event) throws Exception
   {
@@ -49,7 +63,7 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
         count++;
       }
       if (count <= targetCount) {
-        logger.debug("processing event {} of {}", count, targetCount);
+        logger.debug("processing event {} of {} (event: {})", new Object[]{count, targetCount, event});
         logger.debug("calling handleFirstNTimes");
         doRun = true;
       }
@@ -96,5 +110,16 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
   public boolean isFinished()
   {
     return finished;
+  }
+
+  @Override
+  public String toString()
+  {
+    return getClass().getSimpleName() +
+        "{name='" + name +
+        ", count=" + count +
+        ",targetCount=" + targetCount +
+        ", finished=" + finished +
+        '}';
   }
 }

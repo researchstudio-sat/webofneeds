@@ -76,7 +76,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Override
   public URI createNeed(final URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException
   {
-    logger.info("CREATING need. OwnerURI:{}, OwnerApplicationId:{}",ownerURI, ownerApplicationID);
+    logger.debug("CREATING need. OwnerURI:{}, OwnerApplicationId:{}",ownerURI, ownerApplicationID);
     if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
     Need need = new Need();
     need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
@@ -114,23 +114,23 @@ public class NeedManagementServiceImpl implements NeedManagementService
   }
     @Override
     public void authorizeOwnerApplicationForNeed(final String ownerApplicationID, URI needURI){
-        logger.info("AUTHORIZING owner application. needURI:{}, OwnerApplicationId:{}",needURI, ownerApplicationID);
+        logger.debug("AUTHORIZING owner application. needURI:{}, OwnerApplicationId:{}",needURI, ownerApplicationID);
         Need need = needRepository.findByNeedURI(needURI).get(0);
         List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
         if(ownerApplications.size()>0)  {
-            OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID).get(0);
-            List<OwnerApplication> authorizedApplications = new ArrayList<>();
+            logger.debug("owner application is already known");
+            OwnerApplication ownerApplication = ownerApplications.get(0);
+            List<OwnerApplication> authorizedApplications = need.getAuthorizedApplications();
             authorizedApplications.add(ownerApplication);
             need.setAuthorizedApplications(authorizedApplications);
-        }
-
-        else{
+        } else {
+            logger.debug("owner application is new - creating");
             List<OwnerApplication> ownerApplicationList = new ArrayList<>();
             OwnerApplication ownerApplication = new OwnerApplication();
             ownerApplication.setOwnerApplicationId(ownerApplicationID);
             ownerApplicationList.add(ownerApplication);
             need.setAuthorizedApplications(ownerApplicationList);
-            logger.info("setting OwnerApp ID: "+ownerApplicationList.get(0));
+            logger.debug("setting OwnerApp ID: "+ownerApplicationList.get(0));
         }
         need = needRepository.saveAndFlush(need);
     }
@@ -138,17 +138,17 @@ public class NeedManagementServiceImpl implements NeedManagementService
     @Override
     public void activate(final URI needURI) throws NoSuchNeedException
     {
-        logger.info("ACTIVATING need. needURI:{}",needURI);
+        logger.debug("ACTIVATING need. needURI:{}",needURI);
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
         Need need = DataAccessUtils.loadNeed(needRepository, needURI);
         need.setState(NeedState.ACTIVE);
-        logger.info("Setting Need State: "+ need.getState());
+        logger.debug("Setting Need State: "+ need.getState());
         needRepository.saveAndFlush(need);
     }
 
     @Override
     public void deactivate(final URI needURI) throws NoSuchNeedException, NoSuchConnectionException {
-        logger.info("DEACTIVATING need. needURI:{}",needURI);
+        logger.debug("DEACTIVATING need. needURI:{}",needURI);
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
         Need need = DataAccessUtils.loadNeed(needRepository, needURI);
         need.setState(NeedState.INACTIVE);

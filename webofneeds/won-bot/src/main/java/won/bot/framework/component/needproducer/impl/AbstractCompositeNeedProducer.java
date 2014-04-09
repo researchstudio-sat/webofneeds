@@ -17,6 +17,8 @@
 package won.bot.framework.component.needproducer.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.component.needproducer.NeedProducer;
 
 import java.util.HashSet;
@@ -29,24 +31,22 @@ import java.util.Set;
 public abstract class AbstractCompositeNeedProducer implements NeedProducer
 {
   private Set<NeedProducer> needFactories = new HashSet<NeedProducer>();
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
-  public Model create()
+  public synchronized Model create()
   {
+    logger.debug("starting to produce a need model");
     NeedProducer delegate = selectNonExhaustedNeedFactory();
-    if (delegate == null) return null; //we're exhausted
+    if (delegate == null) {
+      logger.warn("cannot produce a need model - all need factories are exhausted");
+      return null; //we're exhausted
+    }
     return delegate.create();
   }
-  @Override
-  public Model create(Class clazz)
-  {
-      NeedProducer delegate = selectActiveNeedFactoryOfType(clazz);
-      if (delegate == null) return null;
-      return delegate.create();
-  }
 
   @Override
-  public boolean isExhausted()
+  public synchronized boolean isExhausted()
   {
     return selectNonExhaustedNeedFactory() == null;
   }

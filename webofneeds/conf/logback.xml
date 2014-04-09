@@ -16,15 +16,38 @@
 
 <configuration debug="true" scan="true" scanPeriod="30 seconds">
 
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <!-- encoders are assigned the type
-         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-    </encoder>
-  </appender>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="won.bot" level="INFO"/>
+    <logger name="won.bot.framework.bot" level="INFO"/>
+    <logger name="won.bot.framework.component.needconsumer" level="INFO"/>
+    <logger name="org.springframework.aop" level="INFO"/>
+    <logger name="won.bot.framework.events.listener" level="INFO"/>
+    <!-- set to DEBUG to get monitoring stats in the log file -->
+    <logger name="won.monitoring" level="INFO"/>
 
-  <root level="debug">
-    <appender-ref ref="STDOUT" />
-  </root>
+    <!-- START MSGTRACE: set the following to DEBUG to trace messages through the system (high level) -->
+    <logger name="won.node.protocol.impl.NeedProtocolNeedClient" level="INFO"/>
+    <logger name="won.node.protocol.impl.NeedProtocolNeedServiceImpl" level="INFO"/>
+    <logger name="won.node.protocol.impl.OwnerProtocolOwnerClient" level="INFO"/>
+    <logger name="won.owner.protocol.impl.OwnerProtocolNeedServiceClient" level="INFO"/>
+    <logger name="won.owner.messaging.OwnerProtocolOwnerServiceImpl" level="INFO"/>
+    <!-- END MSGTRACE -->
+
+    <!-- SET to DEBUG to see bot events -->
+    <logger name="won.bot.framework.events.bus.impl.AsyncEventBusImpl" level="INFO"/>
+    <!-- SET to DEBUG to see bot event listeners -->
+    <logger name="won.bot.framework.events.listener" level="INFO"/>
+
+    <!-- SET to DEBUG to see more info about need creation -->
+    <logger name="won.bot.framework.component.needproducer" level="INFO"/>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+    </root>
 </configuration>

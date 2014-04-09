@@ -25,11 +25,12 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses(
-        {Create2NeedsShortConversationBotTest.class,
-                Create2NeedsGroupingBotTest.class,
+        {ConversationBotTest.class,
+                GroupingBotTest.class,
                 CommentBotTest.class,
                 BACCBotTest.class,
-                BAPCBotTest.class
+                BAPCBotTest.class,
+                MatcherBotTest.class
         })
 public class WonTestSuite
 {

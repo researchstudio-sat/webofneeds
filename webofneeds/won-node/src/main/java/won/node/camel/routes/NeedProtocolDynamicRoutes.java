@@ -41,7 +41,6 @@ public class NeedProtocolDynamicRoutes extends RouteBuilder {
     public void configure() throws Exception {
         from(from).routeId(from)
                 .wireTap("bean:messagingService?method=inspectMessage")
-                .to("log:Dynamic Route FROM NODE")
                 .recipientList(header("remoteBrokerEndpoint"));
     }
 }

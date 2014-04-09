@@ -54,35 +54,37 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     //TODO: refactor this to use DataAccessService
 
     @Override
-    public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
-        logger.info("node-facing: HINT called for own need {}, other need {}, with score {} from originator {} and content {}",
+    public void hint(final String ownNeedURI, final String otherNeedURI, final String score, final String originatorURI, final String content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
+        logger.debug("owner from need: HINT called for own need {}, other need {}, with score {} from originator {} and content {}",
                 new Object[]{ownNeedURI, otherNeedURI, score, originatorURI, content});
 
-        if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
-        if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
-        if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
-        if (originatorURI == null) throw new IllegalArgumentException("originator is not set");
-        if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
+        URI ownNeedUriConvert = URI.create(ownNeedURI);
+        URI otherNeedUriConvert = URI.create(otherNeedURI);
+        double scoreConvert = Double.valueOf(score);
+        URI originatorUriConvert = URI.create(originatorURI);
+        Model contentConvert = RdfUtils.toModel(content);
+
+        if (scoreConvert < 0 || scoreConvert > 1) throw new IllegalArgumentException("score is not in [0,1]");
 
 
         //Load need (throws exception if not found)
-        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
-        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
+        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedUriConvert);
+        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedUriConvert, ConnectionEventType.MATCHER_HINT.name(), need.getState());
 
-        List<Match> matches = matchRepository.findByFromNeedAndToNeedAndOriginator(ownNeedURI, otherNeedURI, originatorURI);
+        List<Match> matches = matchRepository.findByFromNeedAndToNeedAndOriginator(ownNeedUriConvert, otherNeedUriConvert, originatorUriConvert);
         Match match = null;
         if (matches.size() > 0){
           match = matches.get(0);
         } else {
           //save match
           match = new Match();
-          match.setFromNeed(ownNeedURI);
-          match.setToNeed(otherNeedURI);
-          match.setOriginator(originatorURI);
+          match.setFromNeed(ownNeedUriConvert);
+          match.setToNeed(otherNeedUriConvert);
+          match.setOriginator(originatorUriConvert);
         }
-        match.setScore(score);
+        match.setScore(scoreConvert);
         matchRepository.saveAndFlush(match);
-        ownerServiceCallback.onHint(match, content);
+        ownerServiceCallback.onHint(match, contentConvert);
     }
 
     private boolean isNeedActive(final Need need) {
@@ -99,7 +101,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         URI otherNeedURIConvert = URI.create(otherNeedURI);
         URI ownConnectionURIConvert = URI.create(ownConnectionURI);
         Model contentConvert = RdfUtils.toModel(content);
-        logger.info("node-facing: CONNECTION_REQUESTED called for own need {}, other need {}, own connection {} and content ''{}''", new Object[]{ownNeedURI,otherNeedURI,ownConnectionURI, content});
+        logger.debug("owner from need: CONNECT called for own need {}, other need {}, own connection {} and content {}", new Object[]{ownNeedURI,otherNeedURI,ownConnectionURI, content});
         if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
         if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
         if (ownConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
@@ -158,7 +160,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
     @Override
     public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        logger.info("node-facing: OPEN called for connection {} with content {}.", connectionURI, content);
+        logger.debug("owner from need: OPEN called for connection {} with content {}.", connectionURI, content);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
         //load connection, checking if it exists
@@ -173,7 +175,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     @Override
     public void close(final URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.info("node-facing: CLOSE called for connection {}", connectionURI);
+        logger.debug("owner from need: CLOSE called for connection {}", connectionURI);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
         //load connection, checking if it exists
@@ -188,7 +190,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     @Override
     public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        logger.info("node-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
+        logger.debug("owner from need: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         if (message == null) throw new IllegalArgumentException("message is not set");
         //load connection, checking if it exists

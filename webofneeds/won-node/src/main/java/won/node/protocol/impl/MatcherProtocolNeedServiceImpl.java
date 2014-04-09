@@ -17,9 +17,9 @@
 package won.node.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 
@@ -33,10 +33,12 @@ import java.net.URI;
 @Service
 public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedService
 {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   private MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService;
 
   @Override
-  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
+  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator, Model content) throws Exception {
+    logger.debug("need from matcher: HINT received for need {} referring to need {} with score {} from originator {} and content {}", new Object[]{needURI, otherNeed, score, originator, content});
     matcherFacingNeedCommunicationService.hint(needURI, otherNeed, score, originator, content);
   }
 

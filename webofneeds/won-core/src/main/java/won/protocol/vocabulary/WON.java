@@ -47,6 +47,8 @@ public class WON
 
   public static final Property HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,"hasActiveMQNeedProtocolQueueName");
   public static final Property HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,"hasActiveMQOwnerProtocolQueueName");
+  public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,"hasActiveMQMatcherProtocolQueueName");
+
   public static final Property EMBED_SPIN_ASK = m.createProperty(BASE_URI, "embedSpinAsk");
 
   public static final Property SUPPORTS_WON_PROTOCOL_IMPL = m.createProperty(BASE_URI + "supportsWonProtocolImpl");
@@ -125,7 +127,6 @@ public class WON
   public static final Resource EVENT_TYPE_PARTNER_MESSAGE = m.createResource(ConnectionEventType.PARTNER_MESSAGE.getURI().toString());
   public static final Resource EVENT_TYPE_OWNER_MESSAGE = m.createResource(ConnectionEventType.OWNER_MESSAGE.getURI().toString());
   public static final Resource EVENT_TYPE_HINT = m.createResource(ConnectionEventType.MATCHER_HINT.getURI().toString());
-  public static final Resource EVENT_TYPE_CHAT_MESSAGE = m.createResource(ConnectionEventType.CHAT_MESSAGE.getURI().toString());
 
   public static final Resource BASIC_NEED_TYPE_DO_TOGETHER = m.createResource(BasicNeedType.DO_TOGETHER.getURI().toString());
   public static final Resource BASIC_NEED_TYPE_SUPPLY = m.createResource(BasicNeedType.SUPPLY.getURI().toString());
@@ -219,8 +220,6 @@ public class WON
         return EVENT_TYPE_OWNER_MESSAGE;
       case PARTNER_MESSAGE:
         return EVENT_TYPE_PARTNER_MESSAGE;
-      case CHAT_MESSAGE:
-            return EVENT_TYPE_CHAT_MESSAGE;
       default:
         throw new IllegalStateException("No such case specified for " + type.name());
     }

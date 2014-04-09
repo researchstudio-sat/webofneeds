@@ -22,10 +22,11 @@ import won.bot.framework.bot.BotContext;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
-import won.bot.framework.events.EventBus;
-import won.bot.framework.events.bus.SchedulerEventBusImpl;
-import won.bot.framework.events.event.*;
-import won.bot.framework.events.listener.EventListenerContext;
+import won.bot.framework.events.bus.EventBus;
+import won.bot.framework.events.bus.impl.AsyncEventBusImpl;
+import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.impl.*;
+import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
@@ -77,72 +78,72 @@ public class EventBot extends TriggeredBot
 
 
   @Override
-  public final void act() throws Exception
+  public void act() throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new ActEvent());
     } else {
-      logger.debug("not publishing event for call to act() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to act() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public final void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final Model content) throws Exception
+  public void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final Model content) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));
     } else {
-      logger.debug("not publishing event for call to onMessageFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onMessageFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public final void onHintFromMatcher(final Match match, final Model content) throws Exception
+  public void onHintFromMatcher(final Match match, final Model content) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new HintFromMatcherEvent(match, content));
     } else {
-      logger.debug("not publishing event for call to onHintFromMatcher() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onHintFromMatcher() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public final void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new CloseFromOtherNeedEvent(con, content));
     } else {
-      logger.debug("not publishing event for call to onClose() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onClose() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public final void onOpenFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onOpenFromOtherNeed(final Connection con, final Model content) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new OpenFromOtherNeedEvent(con, content));
     } else {
-      logger.debug("not publishing event for call to onOpenFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onOpenFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public final void onConnectFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onConnectFromOtherNeed(final Connection con, final Model content) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new ConnectFromOtherNeedEvent(con, content));
     } else {
-      logger.debug("not publishing event for call to onConnectFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onConnectFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception
+  public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel, FacetType.OwnerFacet));
     } else {
-      logger.debug("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
@@ -164,16 +165,24 @@ public class EventBot extends TriggeredBot
   }
 
 
+  /**
+   * Init method used to create the event bus and allow event listeners to register. Do not override!
+   * It not final to allow for CGLIB autoproxying.
+   */
   @Override
-  protected final void doInitializeCustom()
+  protected void doInitializeCustom()
   {
-    this.eventBus = new SchedulerEventBusImpl(getTaskScheduler());
+    this.eventBus = new AsyncEventBusImpl(getExecutor());
     initializeEventListeners();
-    eventBus.publish(new InitializeEvent());
+    this.eventBus.publish(new InitializeEvent());
   }
 
+  /**
+   * Init method used to shut down the event bus and allow event listeners shut down. Do not override!
+   * It not final to allow for CGLIB autoproxying.
+   */
   @Override
-  protected final void doShutdownCustom()
+  protected void doShutdownCustom()
   {
     eventBus.publish(new ShutdownEvent());
     shutdownEventListeners();
@@ -208,6 +217,11 @@ public class EventBot extends TriggeredBot
     {
       return EventBot.this.getOwnerService();
     }
+
+    public MatcherProtocolNeedServiceClientSide getMatcherService(){
+        return EventBot.this.getMatcherService();
+    }
+
 
     public NeedProducer getNeedProducer()
     {

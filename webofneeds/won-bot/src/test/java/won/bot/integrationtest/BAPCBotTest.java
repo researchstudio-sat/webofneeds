@@ -26,8 +26,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import won.bot.framework.events.event.WorkDoneEvent;
-import won.bot.framework.events.listener.ExecuteOnEventListener;
+import won.bot.framework.events.event.impl.WorkDoneEvent;
+import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.BAPCBot;
 
@@ -42,8 +42,8 @@ import java.util.concurrent.TimeUnit;
 
 public class BAPCBotTest{
     private static final int RUN_ONCE = 1;
-    private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
-    private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 1000;
+    private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
+    private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
 
     MyBot bot;
 
@@ -58,13 +58,16 @@ public class BAPCBotTest{
      */
     @Before
     public void before(){
-        //create a bot instance and auto-wire it
-        this.bot = (MyBot) applicationContext.getAutowireCapableBeanFactory().autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-        //the bot also needs a trigger so its act() method is called regularly.
-        // (there is no trigger bean in the context)
-        PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-        trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
-        this.bot.setTrigger(trigger);
+      //create a bot instance and auto-wire it
+      AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
+      this.bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+      Object botBean = beanFactory.initializeBean(this.bot, "mybot");
+      this.bot = (MyBot) botBean;
+      //the bot also needs a trigger so its act() method is called regularly.
+      // (there is no trigger bean in the context)
+      PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+      trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
+      this.bot.setTrigger(trigger);
     }
 
     /**
@@ -113,19 +116,10 @@ public class BAPCBotTest{
             //now, add a listener to the WorkDoneEvent.
             //its only purpose is to trip the CyclicBarrier instance that
             // the test method is waiting on
-            getEventBus().subscribe(WorkDoneEvent.class, new ExecuteOnEventListener(getEventListenerContext(), new Runnable(){
-                @Override
-                public void run()
-                {
-                    try {
-                        //together with the barrier.await() in the @Test method, this trips the barrier
-                        //and both threads continue.
-                        barrier.await();
-                    } catch (Exception e) {
-                        logger.warn("caught exception while waiting on barrier", e);
-                    }
-                }
-            }, RUN_ONCE));
+          getEventBus().subscribe(WorkDoneEvent.class,
+            new ActionOnEventListener(
+              getEventListenerContext(),
+              new TripBarrierAction(getEventListenerContext(), barrier)));
         }
 
         public CyclicBarrier getBarrier()
@@ -138,30 +132,25 @@ public class BAPCBotTest{
          */
         public void executeAsserts()
         {
-            //Coordinator creator
-            Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
-            Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
-            //9+9Participants creator
-            Assert.assertEquals(2*9, this.participantNeedCreator.getEventCount());
-            Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
-            //Coordinator - Participants connector
-            Assert.assertEquals(19, this.needConnector.getEventCount());
-            Assert.assertEquals(0, this.needConnector.getExceptionCount());
-            //8 connect, 8 open
-            Assert.assertEquals(2*(9+9), this.autoOpener.getEventCount());
-            Assert.assertEquals(0, this.autoOpener.getExceptionCount());
-            //messages
-            Assert.assertEquals(2*(9+2+3+2+2+3+4+3+2+13), this.autoResponder.getEventCount());
-            Assert.assertEquals(0, this.autoResponder.getExceptionCount());
+          //Coordinator creator
+          Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
+          Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
+          //28 Participants creator
+          Assert.assertEquals(noOfNeeds-1, this.participantNeedCreator.getEventCount());
+          Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
+          //Coordinator - Participants connector
+          Assert.assertEquals(noOfNeeds, this.needConnector.getEventCount());
+          Assert.assertEquals(0, this.needConnector.getExceptionCount());
 
-            Assert.assertEquals(1, this.needDeactivator.getEventCount());
-            Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
+          Assert.assertEquals(noOfNeeds-1, this.scriptsDoneListener.getEventCount());
+          Assert.assertEquals(0, this.scriptsDoneListener.getExceptionCount());
 
-            //19 needs deactivated
-            Assert.assertEquals(19, this.workDoneSignaller.getEventCount());
-            Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
+          //29 needs deactivated
+          Assert.assertEquals(noOfNeeds-1, this.workDoneSignaller.getEventCount());
+          Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
-            //TODO: there is more to check:
+
+          //TODO: there is more to check:
             //* what does the RDF look like?
             // --> pull it from the needURI/ConnectionURI and check contents
             //* what does the database look like?

@@ -3,16 +3,10 @@ package won.matcher.protocol.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchNeedException;
-import won.protocol.matcher.MatcherProtocolNeedService;
-import won.protocol.util.RdfUtils;
-import won.protocol.ws.MatcherProtocolNeedWebServiceEndpoint;
-import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
-import won.protocol.ws.fault.NoSuchNeedFault;
+import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.protocol.model.FacetType;
+import won.protocol.util.WonRdfUtils;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 
 /**
@@ -20,37 +14,28 @@ import java.net.URI;
  * Date: 12.02.13
  * Time: 17:26
  */
-public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedService
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServiceClientSide {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
-  private MatcherProtocolNeedClientFactory clientFactory;
+    MatcherProtocolNeedServiceClientSide delegate;
 
-  @Override
-  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content)
-            throws NoSuchNeedException, IllegalMessageForNeedStateException
-  {
+    public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content)
+            throws Exception {
         logger.info("need-facing: HINT called for needURI {} and otherNeed {} " +
                 "with score {} from originator {}.", new Object[]{needURI, otherNeed, score, originator});
-    try {
-      MatcherProtocolNeedWebServiceEndpoint proxy = clientFactory.getMatcherProtocolEndpointForNeed(needURI);
-
-      proxy.hint(needURI, otherNeed, score, originator, RdfUtils.toString(content));
-    } catch (MalformedURLException e) {
-      logger.warn("caught MalformedURLException:", e);
-    } catch (NoSuchNeedFault noSuchNeedFault) {
-      throw NoSuchNeedFault.toException(noSuchNeedFault);
-    } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
-      throw IllegalMessageForNeedStateFault.toException(illegalMessageForNeedStateFault);
+        Model facetModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI());
+        delegate.hint(needURI, otherNeed, score, originator, facetModel);
     }
-  }
 
-  public void setClientFactory(final MatcherProtocolNeedClientFactory clientFactory)
-  {
-    this.clientFactory = clientFactory;
-  }
 
-  public void initializeDefault() {
-  }
+    public void initializeDefault() {
+        //   delegate = new MatcherProtocolNeedServiceClientJMSBased();
+        delegate.initializeDefault();
+    }
+
+
+    public void setDelegate(MatcherProtocolNeedServiceClientSide delegate) {
+        this.delegate = delegate;
+    }
+
 }

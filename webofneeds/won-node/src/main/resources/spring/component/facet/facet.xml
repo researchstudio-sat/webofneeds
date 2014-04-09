@@ -71,7 +71,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="abstractFacetRef" abstract="true" class="won.node.facet.impl.Facet">
+    <bean id="abstractFacetRef" abstract="true" >
         <property name="needProtocolNeedService" ref="needProtocolNeedClient" />
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
         <property name="ownerFacingConnectionCommunicationService" ref="ownerFacingConnectionCommunicationService" />

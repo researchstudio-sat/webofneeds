@@ -30,7 +30,4 @@ public class SimpleCommentTest
     Thread.sleep(5*60*1000);
     app.exit(applicationContext);
   }
-
-
-
 }

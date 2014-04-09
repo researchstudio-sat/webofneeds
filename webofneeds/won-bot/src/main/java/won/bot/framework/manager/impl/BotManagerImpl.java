@@ -41,6 +41,7 @@ public class BotManagerImpl implements BotManager
   @Override
   public void addBot(Bot bot) {
     synchronized (getMonitor()) {
+      if (bots.contains(bot)) return;
       initializeBotIfNecessary(bot);
       this.bots.add(bot);
     }

@@ -19,12 +19,14 @@ package won.node.service.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.facet.impl.FacetRegistry;
-
+import won.node.facet.impl.WON_BA;
 import won.node.rdfstorage.RDFStorageService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
@@ -35,9 +37,10 @@ import won.protocol.model.FacetType;
 import won.protocol.repository.*;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
-import won.node.facet.impl.WON_BA;
 
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
 
@@ -66,39 +69,33 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   private OwnerApplicationRepository ownerApplicationRepository;
   @Autowired
   private NeedRepository needRepository;
+  @Autowired
+  private URIService uriService;
 
   @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info("OPEN received from the need side for connection {0} with content {1}", connectionURI, content);
-
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_OPEN);
-
     ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_OPEN);
-
     dataService.saveAdditionalContentForEvent(content, con, event);
-
     //invoke facet implementation
     reg.get(con).openFromNeed(con, content);
   }
 
   @Override
   public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info("CLOSE received from the need side for connection {} with content {}", connectionURI, content);
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
-
     ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_CLOSE);
-
     dataService.saveAdditionalContentForEvent(content, con, event);
-
     //invoke facet implementation
     reg.get(con).closeFromNeed(con, content);
   }
     @Override
     public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        String textMessage = null;
+        //TODO: messages should be saved with RDF content, not with text content. If this was the case,
+        // the IF below isn't required.
         //check for facet types:
-
         if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
                 con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()) ||
                 con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI())  ||
@@ -108,35 +105,31 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
         {
             Resource baseRes = message.getResource(message.getNsPrefixURI(""));
             StmtIterator stmtIterator = baseRes.listProperties(WON_BA.COORDINATION_MESSAGE);
-            String coordinationMessage = stmtIterator.next().getObject().toString();
-            dataService.saveChatMessage(con,coordinationMessage);
-            //create ConnectionEvent in Database
-            ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.OWNER_OPEN);
-
-            //create rdf content for the ConnectionEvent and save it to disk
-            dataService.saveAdditionalContentForEvent(message, con, event, null);
-
-            //invoke facet implementation
-            reg.get(con).textMessageFromNeed(con, message);
-
+            textMessage = stmtIterator.next().getObject().toString();
+        } else {
+          Resource baseRes = message.getResource(message.getNsPrefixURI(""));
+          StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
+          textMessage = stmtIterator.next().getObject().toString();
         }
-
-        else
-        {
-            Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-            StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
-            String textMessage = stmtIterator.next().getObject().toString();
-            dataService.saveChatMessage(con,textMessage);
-            //create ConnectionEvent in Database
-            ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.OWNER_OPEN);
-
-            //create rdf content for the ConnectionEvent and save it to disk
-            dataService.saveAdditionalContentForEvent(message, con, event, null);
-
-            //invoke facet implementation
-            reg.get(con).textMessageFromNeed(con, message);
+        dataService.saveChatMessage(con,textMessage);
+        //create ConnectionEvent in Database
+        ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_MESSAGE);
+        replaceBaseURIWithEventURI(message, con, event);
+        //create rdf content for the ConnectionEvent and save it to disk
+        dataService.saveAdditionalContentForEvent(message, con, event, null);
+        if (logger.isDebugEnabled()){
+          StringWriter writer = new StringWriter();
+          RDFDataMgr.write(writer, message, Lang.TTL);
+          logger.debug("message after saving:\n{}",writer.toString());
         }
+        //invoke facet implementation
+        reg.get(con).textMessageFromNeed(con, message);
     }
+
+  private void replaceBaseURIWithEventURI(final Model message, final Connection con, final ConnectionEvent event) {
+    Resource eventNode = message.createResource(uriService.createEventURI(con, event).toString());
+    RdfUtils.replaceBaseResource(message, eventNode);
+  }
   /*
   @Override
   public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException

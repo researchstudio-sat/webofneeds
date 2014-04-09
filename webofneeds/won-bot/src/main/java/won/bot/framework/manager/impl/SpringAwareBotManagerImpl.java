@@ -2,11 +2,14 @@ package won.bot.framework.manager.impl;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import won.bot.framework.bot.Bot;
@@ -21,7 +24,7 @@ import java.util.Map;
  * If the checkWorkDoneTrigger is not null, all bots will regularly be checked if all work is done. If so, the
  * spring context will be shut down.
  */
-public class SpringAwareBotManagerImpl extends BotManagerImpl implements InitializingBean, ApplicationContextAware, DisposableBean
+public class SpringAwareBotManagerImpl extends BotManagerImpl implements ApplicationContextAware, DisposableBean, ApplicationListener
 {
 
   private ApplicationContext applicationContext;
@@ -30,21 +33,27 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Initial
   private TaskScheduler taskScheduler;
 
 
+  @Override
+  public void onApplicationEvent(final ApplicationEvent event)
+  {
+    logger.info("processing application event {}", event);
+    if (event instanceof ContextStartedEvent || event instanceof ContextRefreshedEvent){
+      logger.info("context started or refreshed: searching for bots in spring context");
+      try {
+        findAndRegisterBots();
+      } catch (Exception e) {
+        logger.warn("Error registering bots", e);
+      }
+    }
+  }
 
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
     this.applicationContext = applicationContext;
   }
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    logger.info("starting up bot manager");
-    synchronized (getMonitor()) {
-      findBotsInContextAndInitialize();
-    }
-    registerCheckWorkDoneTrigger();
-    logger.info("bot manager startup complete");
-  }
+
+
 
 
   @Override
@@ -67,6 +76,15 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Initial
       }
     }
     logger.info("bot manager shutdown complete");
+  }
+
+  private void findAndRegisterBots() throws Exception {
+    logger.info("starting up bot manager");
+    synchronized (getMonitor()) {
+      findBotsInContextAndInitialize();
+    }
+    registerCheckWorkDoneTrigger();
+    logger.info("bot manager startup complete");
   }
 
   public void setCheckWorkDoneTrigger(final Trigger checkWorkDoneTrigger)
@@ -97,10 +115,9 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Initial
   private void findBotsInContextAndInitialize()
   {
     Map<String, Bot> bots = this.applicationContext.getBeansOfType(Bot.class);
-    this.setBots(bots.values());
     for (Bot bot: bots.values()) {
       try {
-        initializeBotIfNecessary(bot);
+        addBot(bot);
       } catch (Exception e){
         logger.warn("could not initialize bot {}", bot, e);
       }

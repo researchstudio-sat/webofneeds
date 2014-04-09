@@ -23,8 +23,8 @@ public class FacetRegistry {
 
   private HashMap<FacetType, Facet> map;
 
-  public <T extends Facet>T get(Connection con)  {
-    return (T)get(FacetType.getFacetType(con.getTypeURI()));
+  public Facet get(Connection con)  {
+    return get(FacetType.getFacetType(con.getTypeURI()));
   }
 
   public Facet get(URI connectionURI) throws NoSuchConnectionException {

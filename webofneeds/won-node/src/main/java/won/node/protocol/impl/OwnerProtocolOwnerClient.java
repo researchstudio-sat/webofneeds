@@ -27,7 +27,6 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 
 import java.net.URI;
-import java.text.MessageFormat;
 
 public class OwnerProtocolOwnerClient implements OwnerProtocolOwnerServiceClientSide
 {
@@ -47,40 +46,37 @@ public class OwnerProtocolOwnerClient implements OwnerProtocolOwnerServiceClient
     private ConnectionRepository connectionRepository;
 
     @Override
-  public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
+  public void hint(final URI ownNeedUri, final URI otherNeedUri, final double score, final URI originatorUri, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-    logger.info(MessageFormat.format("owner-facing: HINT_RECEIVED called for own need {0}, other need {1}, with score {2} from originator {3} and content {4}", ownNeedURI, otherNeedURI, score, originatorURI, content));
-    delegate.hint(ownNeedURI,otherNeedURI,score,originatorURI,content);
+    logger.debug("need to owner: HINT for own need {}, other need {}, score {} from originator {}, content {}", new Object[]{ownNeedUri, otherNeedUri, score, originatorUri, content});
+    delegate.hint(ownNeedUri, otherNeedUri,score, originatorUri,content);
   }
 
 
-    @Override
-    public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
-    {
-      logger.info(MessageFormat.format("ownerww-facing: CONNECTION_REQUESTED called for own need {0}, other need {1}, own connection {2} and message ''{3}''", ownNeedURI, otherNeedURI, ownConnectionURI, content));
-      delegate.connect(ownNeedURI,otherNeedURI,ownConnectionURI,content);
+  @Override
+  public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
+  {
+    logger.debug("need to owner: CONNECT for own need {}, other need {}, own connection {} and content {}'", new Object[]{ownNeedURI, otherNeedURI, ownConnectionURI, content});
+    delegate.connect(ownNeedURI,otherNeedURI,ownConnectionURI,content);
+  }
+  @Override
 
-    }
-    @Override
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info(MessageFormat.format("owner-facing: Open called for connection {0}", connectionURI));
+    logger.debug("need to owner: OPEN for connection {}", connectionURI);
     delegate.open(connectionURI,content);
-
   }
 
 
   @Override
   public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info(MessageFormat.format("owner-facing: CLOSE called for connection {0}", connectionURI));
+    logger.debug("need to owner: CLOSE for connection {}", connectionURI);
     delegate.close(connectionURI,content);
-
   }
 
   @Override
   public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.info(MessageFormat.format("owner-facing: SEND_TEXT_MESSAGE called for connection {0} with message {1}", connectionURI, message));
+    logger.debug("need to owner: MESSAGE for connection {} with message {}", connectionURI, message);
     delegate.textMessage(connectionURI,message);
-
   }
 
   public void setClientFactory(final OwnerProtocolOwnerClientFactory clientFactory)

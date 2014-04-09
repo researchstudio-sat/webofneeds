@@ -20,12 +20,11 @@ package won.bot.framework.events.listener;
  * User: fkleedorfer
  * Date: 24.03.14
  */
-public interface CountingListener
+public interface CountingListener extends FinishingListener
 {
 
   int getTargetCount();
 
   int getCount();
 
-  boolean isFinished();
 }

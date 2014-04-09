@@ -70,34 +70,15 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
 
 
    // @Override
-    public void hint(final URI ownNeedURI, final URI otherNeedURI, final double score, final URI originatorURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
-        logger.info("node-facing: HINT called for own need {}, other need {}, with score {} from originator {} and content {}",
-                new Object[]{ownNeedURI, otherNeedURI, score, originatorURI, content});
-
+    public void hint(@Header("ownNeedUri") final String ownNeedURI, @Header("otherNeedUri")final String otherNeedURI,@Header("score") final String score, @Header("originatorUri")final String originatorURI, @Header("content")final String content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
         if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
         if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
-        if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
+        if (score == null) throw new IllegalArgumentException("score is not in [0,1]");
         if (originatorURI == null) throw new IllegalArgumentException("originator is not set");
         if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
-
-
-        //Load need (throws exception if not found)
-        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
-        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedURI, ConnectionEventType.MATCHER_HINT.name(), need.getState());
-
-        List<Match> matches = matchRepository.findByFromNeedAndToNeedAndOriginator(ownNeedURI, otherNeedURI, originatorURI);
-        Match match = null;
-        if (matches.size() > 0){
-          match = matches.get(0);
-        } else {
-          //save match
-          match = new Match();
-          match.setFromNeed(ownNeedURI);
-          match.setToNeed(otherNeedURI);
-          match.setOriginator(originatorURI);
-        }
-        match.setScore(score);
-        matchRepository.saveAndFlush(match);
+        logger.debug("owner from need (jms): HINT called for own need {}, other need {}, with score {} from originator {} and content {}",
+          new Object[]{ownNeedURI, otherNeedURI, score, originatorURI, content});
+        delegate.hint(ownNeedURI,otherNeedURI,score,originatorURI,content);
     }
 
     private boolean isNeedActive(final Need need) {
@@ -107,35 +88,30 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
     public void connect(@Header("ownNeedURI") final String ownNeedURI, @Header("otherNeedURI")final String otherNeedURI, @Header("ownConnectionURI")final String ownConnectionURI,
                         @Header("content")final String content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
-
-        logger.info("node-facing: CONNECTION_REQUESTED called for own need {}, other need {}, own connection {} and content ''{}''", new Object[]{ownNeedURI,otherNeedURI,ownConnectionURI, content});
-        if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
-        if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
-        if (ownConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
-        if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
-
-        delegate.connect(ownNeedURI,otherNeedURI,ownConnectionURI,content);
-
+      if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
+      if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
+      if (ownConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
+      if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
+      logger.debug("owner from need (jms): CONNECT called for own need {}, other need {}, own connection {} and content {}", new Object[]{ownNeedURI,otherNeedURI,ownConnectionURI, content});
+      delegate.connect(ownNeedURI,otherNeedURI,ownConnectionURI,content);
     }
 
     public void open(@Header("connectionURI")String connectionURI, @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        logger.info("node-facing: OPEN called for connection {} with content {}.", connectionURI, RdfUtils.toModel(content));
-        if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-        delegate.open(URI.create(connectionURI), RdfUtils.toModel(content));
+      if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+      logger.debug("owner from need (jms): OPEN called for connection {} with content {}.", connectionURI, content);
+      delegate.open(URI.create(connectionURI), RdfUtils.toModel(content));
     }
 
     public void close(@Header("connectionURI")final String connectionURI, @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        logger.info("node-facing: CLOSE called for connection {}", connectionURI);
-
-        if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-        delegate.close(URI.create(connectionURI),RdfUtils.toModel(content));
+      if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+      logger.debug("owner from need (jms): CLOSE called for connection {}", connectionURI);
+      delegate.close(URI.create(connectionURI),RdfUtils.toModel(content));
     }
 
     public void textMessage(@Header("connectionURI")final String connectionURI, @Header("message")final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-
-        logger.info("node-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         if (message == null) throw new IllegalArgumentException("message is not set");
+        logger.debug("owner from need (jms): SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         Model messageConvert = RdfUtils.toModel(message);
         delegate.textMessage(URI.create(connectionURI),messageConvert);
     }

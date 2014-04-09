@@ -16,10 +16,13 @@
 
 package won.bot.framework.events.listener;
 
-import won.bot.framework.events.Event;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.filter.EventFilter;
 
 /**
  * Counts how often it is called, offers to call a callback when a certain number is reached.
+ * After the target count of events is reached, a FinishedEvent is published. This allows for chaining listeners.
  */
 public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListener implements CountingListener
 {
@@ -40,6 +43,18 @@ public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListen
     this.targetCount = targetCount;
   }
 
+  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name, final int targetCount)
+  {
+    super(context, name);
+    this.targetCount = targetCount;
+  }
+
+  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount)
+  {
+    super(context, name, eventFilter);
+    this.targetCount = targetCount;
+  }
+
   @Override
   public void doOnEvent(final Event event) throws Exception
   {
@@ -48,9 +63,9 @@ public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListen
       if (finished){
         return;
       }
+      logger.debug("processing event {} of {} (event: {})", new Object[]{count, targetCount, event});
       count++;
       if (count >= targetCount) {
-        logger.debug("processing event {} of {}", count, targetCount);
         logger.debug("calling doOnce");
         doRun = true;
       }
@@ -83,5 +98,16 @@ public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListen
   public boolean isFinished()
   {
     return finished;
+  }
+
+  @Override
+  public String toString()
+  {
+    return getClass().getSimpleName() +
+        "{name='" + name +
+        ", count=" + count +
+        ",targetCount=" + targetCount +
+        ", finished=" + finished +
+        '}';
   }
 }

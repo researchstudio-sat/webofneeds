@@ -10,8 +10,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import won.bot.framework.events.event.WorkDoneEvent;
-import won.bot.framework.events.listener.ExecuteOnEventListener;
+import won.bot.framework.events.event.impl.WorkDoneEvent;
+import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.BACCBot;
 
@@ -47,13 +47,17 @@ public class BACCBotTest {
      */
     @Before
     public void before(){
-        //create a bot instance and auto-wire it
-        this.bot = (MyBot) applicationContext.getAutowireCapableBeanFactory().autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-        //the bot also needs a trigger so its act() method is called regularly.
-        // (there is no trigger bean in the context)
-        PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-        trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
-        this.bot.setTrigger(trigger);
+      //create a bot instance and auto-wire it
+      //create a bot instance and auto-wire it
+      AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
+      this.bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+      Object botBean = beanFactory.initializeBean(this.bot, "mybot");
+      this.bot = (MyBot) botBean;
+      //the bot also needs a trigger so its act() method is called regularly.
+      // (there is no trigger bean in the context)
+      PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+      trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
+      this.bot.setTrigger(trigger);
     }
 
     /**
@@ -102,19 +106,10 @@ public class BACCBotTest {
             //now, add a listener to the WorkDoneEvent.
             //its only purpose is to trip the CyclicBarrier instance that
             // the test method is waiting on
-            getEventBus().subscribe(WorkDoneEvent.class, new ExecuteOnEventListener(getEventListenerContext(), new Runnable(){
-                @Override
-                public void run()
-                {
-                    try {
-                        //together with the barrier.await() in the @Test method, this trips the barrier
-                        //and both threads continue.
-                        barrier.await();
-                    } catch (Exception e) {
-                        logger.warn("caught exception while waiting on barrier", e);
-                    }
-                }
-            }, RUN_ONCE));
+          getEventBus().subscribe(WorkDoneEvent.class,
+            new ActionOnEventListener(
+              getEventListenerContext(),
+              new TripBarrierAction(getEventListenerContext(), barrier)));
         }
 
         public CyclicBarrier getBarrier()
@@ -131,23 +126,17 @@ public class BACCBotTest {
             Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
             Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
             //28 Participants creator
-            Assert.assertEquals(28, this.participantNeedCreator.getEventCount());
+            Assert.assertEquals(noOfNeeds-1, this.participantNeedCreator.getEventCount());
             Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
             //Coordinator - Participants connector
-            Assert.assertEquals(29, this.needConnector.getEventCount());
+            Assert.assertEquals(noOfNeeds, this.needConnector.getEventCount());
             Assert.assertEquals(0, this.needConnector.getExceptionCount());
-            //13 connect, 13 open
-            Assert.assertEquals(2*(14+14), this.autoOpener.getEventCount());
-            Assert.assertEquals(0, this.autoOpener.getExceptionCount());
-            //messages
-            Assert.assertEquals(2*(14+2+3+2+2+4+5+4+3+4+3+3+3+2+9), this.autoResponder.getEventCount());
-            Assert.assertEquals(0, this.autoResponder.getExceptionCount());
 
-            Assert.assertEquals(1, this.needDeactivator.getEventCount());
-            Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
+            Assert.assertEquals(noOfNeeds-1, this.scriptsDoneListener.getEventCount());
+            Assert.assertEquals(0, this.scriptsDoneListener.getExceptionCount());
 
             //29 needs deactivated
-            Assert.assertEquals(29, this.workDoneSignaller.getEventCount());
+            Assert.assertEquals(noOfNeeds-1, this.workDoneSignaller.getEventCount());
             Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
             //TODO: there is more to check:

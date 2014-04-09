@@ -50,7 +50,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
 
         exchange.setPattern(ExchangePattern.InOut);
         final SettableFuture<T> result = SettableFuture.create();
-        logger.info("sending inout message");
+        logger.debug("sending inout message");
         producerTemplate.asyncCallback(ep,exchange, new Synchronization() {
             @Override
             public void onComplete(Exchange exchange) {
@@ -60,7 +60,10 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
 
             @Override
             public void onFailure(Exchange exchange) {
-                result.cancel(true);
+              if (exchange.getException() != null){
+                logger.warn("caught exception while sending jms message", exchange.getException());
+              }
+              result.cancel(true);
             }
         });
         return result;
@@ -68,32 +71,38 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
 
     @Override
     public void inspectMessage(Exchange exchange) {
+        if (!logger.isDebugEnabled()) {
+          return;
+        }
         inspectProperties(exchange);
         inspectHeaders(exchange);
-        if(exchange.getIn().getBody()!=null)
-        logger.info(exchange.getIn().getBody().toString());
+        if(exchange.getIn().getBody()!=null) {
+          logger.debug(exchange.getIn().getBody().toString());
+        }
     }
     public void inspectProperties(Exchange exchange){
         Map properties = (Map) exchange.getProperties();
         Iterator iter =  properties.entrySet().iterator();
-        logger.info("WIRETAP: properties size: "+properties.size());
-        while(iter.hasNext()){
+        if (logger.isDebugEnabled()){
+          logger.debug("WIRETAP: properties size: "+properties.size());
+          while(iter.hasNext()){
             Map.Entry pairs = (Map.Entry)iter.next();
-            logger.info("key: "+pairs.getKey()+" value: "+pairs.getValue());
+            logger.debug("key: "+pairs.getKey()+" value: "+pairs.getValue());
+          }
         }
-
     }
 
     public void inspectHeaders(Exchange exchange){
         Map headers = (Map) exchange.getIn().getHeaders();
         Iterator iter =  headers.entrySet().iterator();
-        logger.info("WIRETAP: headers size: "+headers.size());
-        while(iter.hasNext()){
-            Map.Entry pairs = (Map.Entry)iter.next();
-            if(pairs.getValue()!=null)
-                logger.info("key: "+pairs.getKey()+" value: "+pairs.getValue());
+        if (logger.isDebugEnabled()) {
+          logger.debug("WIRETAP: headers size: "+headers.size());
+          while(iter.hasNext()){
+              Map.Entry pairs = (Map.Entry)iter.next();
+              if(pairs.getValue()!=null)
+                  logger.debug("key: "+pairs.getKey()+" value: "+pairs.getValue());
+          }
         }
-
     }
 
     public synchronized void sendInOnlyMessage(Map properties, Map headers, Object body, String endpoint){
@@ -110,6 +119,9 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
 
         exchange.getIn().setBody(body);
         producerTemplate.send(ep, exchange);
+        if (exchange.getException() != null){
+          logger.warn("caught exception while sending jms message", exchange.getException());
+        }
     }
     @Override
     public void setCamelContext(CamelContext camelContext) {

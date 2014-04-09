@@ -10,7 +10,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import won.protocol.exception.*;
+import won.protocol.exception.ConnectionAlreadyExistsException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ChatMessageRepository;
@@ -21,10 +23,10 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 /**
  * Implementation of the ownerProtocolNeedService to be used on the owner side. It contains the
@@ -61,13 +63,15 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     @Autowired
     private NeedRepository needRepository;
 
+    @Autowired
+    private Executor executor;
 
     //ref=ownerProtocolNeedServiceClientJMSBased
     private OwnerProtocolNeedServiceClientSide delegate;
 
     @Override
     public void activate(URI needURI) throws Exception {
-        logger.debug("need-facing: ACTIVATE called for need {}", needURI);
+        logger.debug("owner to need: ACTIVATE called for need {}", needURI);
         List<Need> needs = needRepository.findByNeedURI(needURI);
         if (needs.size() != 1)
             throw new NoSuchNeedException(needURI);
@@ -79,7 +83,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
     @Override
     public void deactivate(URI needURI) throws Exception {
-        logger.debug(MessageFormat.format("need-facing: DEACTIVATE called for need {0}", needURI));
+        logger.debug("owner to need: DEACTIVATE called for need {}", needURI);
 
         List<Need> needs = needRepository.findByNeedURI(needURI);
         if (needs.size() != 1)
@@ -94,7 +98,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     @Override
     public void open(URI connectionURI, Model content) throws Exception {
         if (logger.isDebugEnabled()) {
-          logger.debug(MessageFormat.format("need-facing: OPEN called for connection {0} with model {1}", connectionURI, StringUtils.abbreviate(RdfUtils.toString(content),200)));
+          logger.debug("owner to need: OPEN called for connection {} with content {}", connectionURI, StringUtils.abbreviate(RdfUtils.toString(content), 200));
         }
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
         if (cons.size() != 1)
@@ -111,7 +115,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     @Override
     public void close(final URI connectionURI, Model content) throws Exception {
         if (logger.isDebugEnabled()) {
-          logger.debug(MessageFormat.format("need-facing: CLOSE called for connection {0} with model {1}", connectionURI, StringUtils.abbreviate(RdfUtils.toString(content),200)));
+          logger.debug("owner to need: CLOSE called for connection {} with model {}", connectionURI, StringUtils.abbreviate(RdfUtils.toString(content), 200));
         }
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
         if (cons.size() != 1)
@@ -126,7 +130,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     @Override
     public void textMessage(final URI connectionURI, final Model message)
             throws Exception {
-        logger.debug("need-facing: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
+        logger.debug("owner to need: MESSAGE called for connection {} with message {}", connectionURI, message);
 
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
         if (cons.isEmpty())
@@ -179,13 +183,13 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     @Override
     public synchronized ListenableFuture<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeUri) throws Exception {
         if (logger.isDebugEnabled()) {
-          logger.debug("need-facing: CREATE_NEED called for need {}, with content {} and activate {}",
-                new Object[]{ownerURI, StringUtils.abbreviate(RdfUtils.toString(content),200), activate});
+          logger.debug("owner to need: CREATE_NEED called for owner URI {}, activate {}, with content {}",
+                new Object[]{ownerURI, activate, StringUtils.abbreviate(RdfUtils.toString(content),200)});
         }
 
 
         final ListenableFuture<URI> uri = delegate.createNeed(ownerURI, content, activate, wonNodeUri);
-        new Thread(
+        executor.execute(
                 new Runnable() {
                     @Override
                     public void run() {
@@ -201,7 +205,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                             else need.setWonNodeURI(wonNodeUri);
                             needRepository.saveAndFlush(need);
                             needRepository.findByNeedURI(need.getNeedURI());
-                            logger.debug("saving URI", need.getNeedURI().toString());
 
                             ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
                             if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
@@ -229,17 +232,14 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
                     }
                 }
-        ).start();
-
-
-
+        );
         return uri;
     }
 
     @Override
     public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final Model content) throws Exception {
       if (logger.isDebugEnabled()) {
-        logger.debug("need-facing: CONNECT called for need {}, other need {} and content {}", new Object[]{needURI, otherNeedURI, StringUtils.abbreviate(RdfUtils.toString(content),200)});
+        logger.debug("owner to need: CONNECT called for need {}, other need {} and content {}", new Object[]{needURI, otherNeedURI, StringUtils.abbreviate(RdfUtils.toString(content),200)});
       }
 
             final ListenableFuture<URI> uri = delegate.connect(needURI, otherNeedURI, content);
@@ -263,9 +263,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                         }
                 }
             }  else {
-                //TODO: run in a thread pool!
-                    new Thread(
-                            new Runnable() {
+                    executor.execute(new Runnable() {
                                 @Override
                                 public void run() {
 
@@ -290,7 +288,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
                                 }
                             }
-                    ).start();
+                    );
 
                 }
 

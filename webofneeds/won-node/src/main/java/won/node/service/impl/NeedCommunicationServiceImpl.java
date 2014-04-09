@@ -89,7 +89,6 @@ public class NeedCommunicationServiceImpl implements
 
   @Override
   public void hint(final URI needURI, final URI otherNeedURI, final double score, final URI originator, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException {
-    logger.info("HINT received for need {} referring to need {} with score {} from originator {} and content {}", new Object[]{needURI, otherNeedURI, score, originator, content});
     if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
     if (originator == null) throw new IllegalArgumentException("originator is not set");
 
@@ -122,8 +121,6 @@ public class NeedCommunicationServiceImpl implements
 
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    logger.info("CONNECT received for need {} referring to need {} with content {}", new Object[]{needURI, otherNeedURI, content});
-
     //create Connection in Database
     Connection con =  dataService.createConnection(needURI, otherNeedURI, null, content, ConnectionState.REQUEST_SENT, ConnectionEventType.OWNER_OPEN);
 

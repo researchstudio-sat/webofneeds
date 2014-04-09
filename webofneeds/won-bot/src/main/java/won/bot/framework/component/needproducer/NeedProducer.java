@@ -21,6 +21,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 /**
  * Interface for producing needs. The needs produced must be suitable as the 'model'
  * argument to the createNeed protocol method (i.e., don't have a URI, and only contain user-definable data).
+ *
+ * Note: Implementations must be thread-safe.
  */
 public interface NeedProducer
 {
@@ -29,8 +31,6 @@ public interface NeedProducer
    * @return a model or null
    */
   public Model create();
-
-  public Model create(Class clazz);
 
   /**
    * Indicates that no more needs will be created by this factory.

@@ -333,6 +333,12 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
                 <version>${org.hibernate.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.ibm.icu</groupId>
+                        <artifactId>icu4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -403,6 +409,24 @@
                 <scope>test</scope>
             </dependency>
 
+            <!-- Simon Monitoring stuff -->
+            <dependency>
+                <groupId>org.javasimon</groupId>
+                <artifactId>javasimon-core</artifactId>
+                <version>${org.javasimon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javasimon</groupId>
+                <artifactId>javasimon-spring</artifactId>
+                <version>${org.javasimon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javasimon</groupId>
+                <artifactId>javasimon-console-embed</artifactId>
+                <version>${org.javasimon.version}</version>
+            </dependency>
+
+
             <!-- UTILS -->
             <dependency>
                 <groupId>commons-collections</groupId>
@@ -420,6 +444,11 @@
                 <version>${commons-io.version}</version>
             </dependency>
             <dependency>
+                <groupId>net.sf.supercsv</groupId>
+                <artifactId>super-csv</artifactId>
+                <version>${net.sf.supercsv.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>1.7.3</version>
@@ -429,6 +458,20 @@
                 <artifactId>quartz</artifactId>
                 <version>${org.quartz-scheduler.version}</version>
             </dependency>
+            <!-- CACHING -->
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache-core</artifactId>
+                <version>${net.sf.ehcache.version}</version>
+            </dependency>
+
+            <!-- ASPECTJ -->
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+
 
             <!-- SPRING-BOOT -->
             <dependency>
@@ -462,16 +505,12 @@
                 <scope>test</scope>
             </dependency>
 
-
+            <!-- used for testing solr -->
             <dependency>
                 <artifactId>solr-solrj</artifactId>
                 <groupId>org.apache.solr</groupId>
                 <version>${solr.version}</version>
             </dependency>
-
-
-            <!-- END: used for testing solr -->
-
         </dependencies>
     </dependencyManagement>
 
@@ -623,6 +662,7 @@
         <dependencies.scope>compile</dependencies.scope>
 
         <!-- versions for various dependencies -->
+        <aspectj.version>1.5.4</aspectj.version>
         <commons-collections.version>3.2.1</commons-collections.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <solr.version>3.5.0</solr.version>
@@ -643,9 +683,11 @@
         <com.sun.xml.ws.version>2.2.8-promoted-b146</com.sun.xml.ws.version>
         <junit.version>4.11</junit.version>
         <org.apache.commons.email.version>1.3.1</org.apache.commons.email.version>
+        <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
         <commons-io.version>2.4</commons-io.version>
         <org.apache.jena.version>2.11.0</org.apache.jena.version>
         <org.hibernate.version>4.1.8.Final</org.hibernate.version>
+        <org.javasimon.version>3.4.0</org.javasimon.version>
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
         <org.springframework.boot.version>0.5.0.M5</org.springframework.boot.version>
         <org.springframework.data.commons.version>1.4.0.RELEASE</org.springframework.data.commons.version>
@@ -659,6 +701,7 @@
         <jrebel.version>1.1.3</jrebel.version>
         <wagon.version>1.0-beta-3</wagon.version>
         <assembly.version>2.2</assembly.version>
+        <net.sf.supercsv.version>2.1.0</net.sf.supercsv.version>
     </properties>
 
     <profiles>

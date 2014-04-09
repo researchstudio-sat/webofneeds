@@ -54,7 +54,7 @@ public class DirectoryBasedNeedProducer implements NeedProducer
 
 
   @Override
-  public Model create()
+  public synchronized Model create()
   {
     //lazy init
     initializeLazily();
@@ -83,12 +83,7 @@ public class DirectoryBasedNeedProducer implements NeedProducer
     return readModelFromFileWithIndex(fileIndexToUse);
   }
 
-    @Override
-    public Model create(Class clazz) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    private boolean isCurrentFileReadable()
+  private boolean isCurrentFileReadable()
   {
     return this.files[this.fileIndex].isFile() && this.files[this.fileIndex].canRead();
   }
@@ -152,7 +147,7 @@ public class DirectoryBasedNeedProducer implements NeedProducer
     if (this.initialized) return;
     this.initialized = true;
     if (this.directory == null){
-      logger.info("No directory specified for DirectoryBasedNeedProducer, not reading any data.");
+      logger.warn("No directory specified for DirectoryBasedNeedProducer, not reading any data.");
       return;
     }
     logger.debug("Initializing DirectoryBasedNeedProducer from directory {}", this.directory);

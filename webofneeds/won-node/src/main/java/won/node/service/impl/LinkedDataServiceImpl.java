@@ -79,13 +79,11 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   private NeedInformationService needInformationService;
 
-    public void setActiveMqEndpoint(String activeMqEndpoint) {
-        this.activeMqEndpoint = activeMqEndpoint;
-    }
 
     private String activeMqEndpoint;
     private String activeMqNeedProtcolQueueName;
     private String activeMqOwnerProtcolQueueName;
+    private String activeMqMatcherPrtotocolQueueName;
 
 
     public Model listNeedURIs(final int page)
@@ -182,8 +180,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
       blankNodeActiveMq
               .addProperty(RDF.type, WON.WON_OVER_ACTIVE_MQ)
               .addProperty(WON.HAS_BROKER_URI, model.createResource(this.activeMqEndpoint))
-          .addProperty(WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME,this.activeMqOwnerProtcolQueueName,XSDDatatype.XSDstring)
+              .addProperty(WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME,this.activeMqOwnerProtcolQueueName,XSDDatatype.XSDstring)
               .addProperty(WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME,this.activeMqNeedProtcolQueueName,XSDDatatype.XSDstring)
+              .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME,this.activeMqMatcherPrtotocolQueueName,XSDDatatype.XSDstring)
+
       ;
       Resource blankNodeSoapWs = model.createResource();
       res.addProperty(WON.SUPPORTS_WON_PROTOCOL_IMPL, blankNodeSoapWs);
@@ -212,7 +212,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     //create event container and attach it to the member
     Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
     connectionMember.addProperty(WON.HAS_EVENT_CONTAINER,eventContainer);
-    eventContainer.addProperty(WON.HAS_REMOTE_NEED,model.createResource(connection.getRemoteNeedURI().toString()));
+    connectionMember.addProperty(WON.HAS_REMOTE_NEED,model.createResource(connection.getRemoteNeedURI().toString()));
 
     //add event members and attach them
     for (ConnectionEvent e : events) {
@@ -362,4 +362,11 @@ public class LinkedDataServiceImpl implements LinkedDataService
     public void setActiveMqNeedProtcolQueueName(String activeMqNeedProtcolQueueName) {
         this.activeMqNeedProtcolQueueName = activeMqNeedProtcolQueueName;
     }
+    public void setActiveMqMatcherPrtotocolQueueName(String activeMqMatcherPrtotocolQueueName) {
+        this.activeMqMatcherPrtotocolQueueName = activeMqMatcherPrtotocolQueueName;
+    }
+    public void setActiveMqEndpoint(String activeMqEndpoint) {
+        this.activeMqEndpoint = activeMqEndpoint;
+    }
+
 }

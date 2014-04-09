@@ -18,9 +18,10 @@ package won.bot.framework.events.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.events.Event;
-import won.bot.framework.events.EventListener;
-import won.bot.framework.events.event.FinishedEvent;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.impl.FinishedEvent;
+import won.bot.framework.events.filter.EventFilter;
 
 /**
  * Base class for event listeners
@@ -32,7 +33,8 @@ public abstract class BaseEventListener implements EventListener
   private int eventCount = 0;
   private int exceptionCount = 0;
   private long millisExecuting = 0;
-  private EventFilter eventFilter = null;
+  protected EventFilter eventFilter = null;
+  protected String name = getClass().getSimpleName();
 
   /**
    * Constructor is private so that subclasses must implement the one-arg constructor.
@@ -50,18 +52,35 @@ public abstract class BaseEventListener implements EventListener
     this.eventFilter = eventFilter;
   }
 
+  protected BaseEventListener(final EventListenerContext context, final String name)
+  {
+    this(context);
+    this.name = name;
+  }
+
+  protected BaseEventListener(final EventListenerContext context, final String name, final EventFilter eventFilter)
+  {
+    this(context,eventFilter);
+    this.name = name;
+  }
+
   @Override
   public final void onEvent(final Event event) throws Exception{
     if (!shouldHandleEvent(event)){
       //allow for ignoring events. Such event are not counted.
       return;
     }
+    if (logger.isDebugEnabled()){
+      logger.debug("handling event {} with listener {}",event, this);
+    }
+
     countEvent(event);
     long startTime = System.currentTimeMillis();
     try {
       doOnEvent(event);
-    } catch (Exception e) {
-      countException(e);
+    } catch (Throwable e) {
+      logger.warn("caught throwable", e);
+      countThrowable(e);
       throw e;
     } finally {
       noteTimeExecuting(startTime);
@@ -92,7 +111,7 @@ public abstract class BaseEventListener implements EventListener
     return eventCount;
   }
 
-  protected synchronized void countException(final Exception e){
+  protected synchronized void countThrowable(final Throwable e){
     this.exceptionCount ++;
    }
 
@@ -121,5 +140,16 @@ public abstract class BaseEventListener implements EventListener
    */
   protected final boolean shouldHandleEvent(final Event event){
     return eventFilter == null ? true : eventFilter.accept(event);
+  }
+
+
+
+  @Override
+  public String toString()
+  {
+    return getClass().getSimpleName()+"{" +
+        "name='" + name + '\'' +
+        ", eventCount=" + eventCount +
+        '}';
   }
 }
