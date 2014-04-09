@@ -106,7 +106,7 @@ public class NeedCommunicationServiceImpl implements
       }
       con = dataService.createConnection(needURI, otherNeedURI, null, content, ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT);
     } catch (ConnectionAlreadyExistsException e) {
-      logger.info("could not create connection", e);
+      logger.warn("could not create connection", e);
     }
 
     //create ConnectionEvent in Database
@@ -140,7 +140,7 @@ public class NeedCommunicationServiceImpl implements
 
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    logger.info("CONNECT received for need {} referring to need {} (connection {}) with content '{}'", new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
+    logger.debug("CONNECT received for need {} referring to need {} (connection {}) with content '{}'", new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
     if (otherConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
 
     //create Connection in Database
