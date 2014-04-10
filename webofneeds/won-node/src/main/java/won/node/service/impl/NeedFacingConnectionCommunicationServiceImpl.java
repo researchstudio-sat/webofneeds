@@ -60,8 +60,6 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Autowired
   private ConnectionRepository connectionRepository;
   @Autowired
-  private ChatMessageRepository chatMessageRepository;
-  @Autowired
   private EventRepository eventRepository;
   @Autowired
   private RDFStorageService rdfStorageService;
@@ -93,25 +91,6 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         String textMessage = null;
-        //TODO: messages should be saved with RDF content, not with text content. If this was the case,
-        // the IF below isn't required.
-        //check for facet types:
-        if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI())  ||
-                con.getTypeURI().equals(FacetType.BACCParticipantFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BAAtomicPCCoordinatorFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BAAtomicPCParticipantFacet.getURI()))
-        {
-            Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-            StmtIterator stmtIterator = baseRes.listProperties(WON_BA.COORDINATION_MESSAGE);
-            textMessage = stmtIterator.next().getObject().toString();
-        } else {
-          Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-          StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
-          textMessage = stmtIterator.next().getObject().toString();
-        }
-        dataService.saveChatMessage(con,textMessage);
         //create ConnectionEvent in Database
         ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_MESSAGE);
         replaceBaseURIWithEventURI(message, con, event);

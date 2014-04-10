@@ -23,8 +23,6 @@ public class DataAccessService {
   private URIService URIService;
 
   @Autowired
-  private ChatMessageRepository chatMessageRepository;
-  @Autowired
   private NeedRepository needRepository;
   @Autowired
   private ConnectionRepository connectionRepository;
@@ -186,21 +184,7 @@ public class DataAccessService {
     return connectionRepository.saveAndFlush(con);
   }
 
-  public Connection saveChatMessage(Connection con, String message) throws NoSuchConnectionException {          //load connection, checking if it exists
-    if (con == null) throw new IllegalArgumentException("connectionURI is not set");
-    if (message == null) throw new IllegalArgumentException("message is not set");
 
-    //construct chatMessage object to store in the db
-    ChatMessage chatMessage = new ChatMessage();
-    chatMessage.setCreationDate(new Date());
-    chatMessage.setLocalConnectionURI(con.getConnectionURI());
-    chatMessage.setMessage(message);
-    chatMessage.setOriginatorURI(con.getNeedURI());
-    //save in the db
-    chatMessageRepository.saveAndFlush(chatMessage);
-
-    return con;
-  }
 
   public void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event) {
     saveAdditionalContentForEvent(content, con, event, null);

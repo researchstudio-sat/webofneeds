@@ -17,9 +17,7 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
@@ -35,7 +33,6 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.WON;
 
 import java.io.StringWriter;
 import java.net.URI;
@@ -85,24 +82,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-        StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
 
-        //TODO: security? stability? use the first property we find - what if there are more?
-        String textMessage = null;
-        while (stmtIterator.hasNext()){
-            RDFNode obj = stmtIterator.nextStatement().getObject();
-            if (obj.isLiteral()) {
-                textMessage = obj.asLiteral().getLexicalForm();
-                break;
-            }
-        }
-        if (textMessage == null){
-            logger.debug("could not extract text message from RDF content of message");
-            textMessage = "[could not extract text message]";
-        }
-
-        dataService.saveChatMessage(con,textMessage);
         //create ConnectionEvent in Database
 
         ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), connectionURI, ConnectionEventType.OWNER_MESSAGE);
