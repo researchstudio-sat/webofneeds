@@ -132,7 +132,6 @@ public abstract class AbstractFacet implements Facet
    */
   @Override
   public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    final URI remoteConnectionURI = con.getRemoteConnectionURI();
     //inform the other side
     executorService.execute(new Runnable() {
       @Override

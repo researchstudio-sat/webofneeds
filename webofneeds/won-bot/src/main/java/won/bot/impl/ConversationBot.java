@@ -68,7 +68,7 @@ public class ConversationBot extends EventBot
 
     //count until 2 needs were created, then
     //   * connect the 2 needs
-    this.needConnector = new ActionOnceAfterNEventsListener(ctx,
+    this.needConnector = new ActionOnceAfterNEventsListener(ctx,"needConnector",
         NO_OF_NEEDS, new ConnectFromListToListAction(ctx,NAME_NEEDS,NAME_NEEDS,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
