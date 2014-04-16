@@ -104,9 +104,7 @@ public class OwnerProtocolNeedReadServiceImpl implements OwnerProtocolNeedReadSe
     @Override
     public Need readNeed(URI needURI) throws NoSuchNeedException {
         logger.debug("need-facing: READ_NEED called for need {}", needURI);
-
         Need n = needModelMapper.fromModel(readNeedContent(needURI));
-        n.setOwnerURI(uriService.getOwnerProtocolOwnerServiceEndpointURI());
         return n;
     }
 
@@ -132,13 +130,7 @@ public class OwnerProtocolNeedReadServiceImpl implements OwnerProtocolNeedReadSe
     @Override
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException {
         logger.debug("need-facing: READ_CONNECTION_CONTENT called for connection {}", connectionURI);
-        URI connectionProtocolEndpoint = RdfUtils.getURIPropertyForResource(
-            linkedDataSource.getModelForResource(connectionURI),
-            connectionURI,
-            WON.HAS_OWNER_PROTOCOL_ENDPOINT);
-        if (connectionProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
-
-        return linkedDataSource.getModelForResource(URI.create(connectionProtocolEndpoint.toString()));
+        return linkedDataSource.getModelForResource(connectionURI);
     }
     private Collection<URI> getHardcodedCollectionResource(URI needURI, String res) throws NoSuchNeedException {
         Model mUris = getHardcodedNeedResource(needURI, res);

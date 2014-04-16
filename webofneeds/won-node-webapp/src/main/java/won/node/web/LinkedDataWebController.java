@@ -36,7 +36,6 @@ import won.protocol.util.HTTP;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -160,11 +159,10 @@ public class LinkedDataWebController
 
     @RequestMapping("${uri.path.page}")
     public String showNodeInformationPage(
-            @RequestParam(defaultValue="-1") int page,
             HttpServletRequest request,
             Model model,
             HttpServletResponse response) {
-        com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.showNodeInformation(page);
+        com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.getNodeModel();
         model.addAttribute("rdfModel", rdfModel);
         model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
         model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
@@ -320,13 +318,11 @@ public class LinkedDataWebController
     public ResponseEntity<com.hp.hpl.jena.rdf.model.Model> readNode(
             HttpServletRequest request) {
         logger.debug("readNode() called");
-        URI nodedUri = URI.create(this.nodeResourceURIPrefix);
-
-            com.hp.hpl.jena.rdf.model.Model model = linkedDataService.getNodeModel();
-            //TODO: need information does change over time. The immutable need information should never expire, the mutable should
-            HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), nodedUri));
-            return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(model, headers, HttpStatus.OK);
-
+        URI nodeUri = URI.create(this.nodeResourceURIPrefix);
+        com.hp.hpl.jena.rdf.model.Model model = linkedDataService.getNodeModel();
+        //TODO: need information does change over time. The immutable need information should never expire, the mutable should
+        HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), nodeUri));
+        return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(model, headers, HttpStatus.OK);
     }
 
   @RequestMapping(

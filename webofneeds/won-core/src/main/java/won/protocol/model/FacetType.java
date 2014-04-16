@@ -5,9 +5,6 @@ import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,7 +14,6 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public enum FacetType {
-    ControlFacet("ControlFacet"),
     OwnerFacet("OwnerFacet"),
     GroupFacet("GroupFacet"),
     CoordinatorFacet("CoordinatorFacet"),
@@ -25,6 +21,7 @@ public enum FacetType {
     CommentFacet("CommentFacet"),
     CommentModeratedFacet("CommentModeratedFacet"),
     CommentUnrestrictedFacet("CommentUnrestrictedFacet"),
+    ControlFacet("ControlFacet"),
     BAPCCoordinatorFacet("BAPCCoordinatorFacet"),
     BAPCParticipantFacet("BAPCParticipantFacet"),
     BACCCoordinatorFacet("BACCCoordinatorFacet"),

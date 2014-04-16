@@ -37,10 +37,11 @@ public class WON
 
 
 
-    private static Model m = ModelFactory.createDefaultModel();
+  private static Model m = ModelFactory.createDefaultModel();
 
 
   public static final Resource NEED = m.createResource(BASE_URI + "Need");
+  public static final Property HAS_WON_NODE = m.createProperty(BASE_URI, "hasWonNode");
   public static final Property HAS_NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasNeedProtocolEndpoint");
   public static final Property HAS_MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasMatcherProtocolEndpoint");
   public static final Property HAS_OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasOwnerProtocolEndpoint");
@@ -64,6 +65,12 @@ public class WON
   public static final Resource TEXT_MESSAGE = m.createResource(BASE_URI + "TextMessage");
   public static final Property HAS_TEXT_MESSAGE = m.createProperty(BASE_URI + "hasTextMessage");
   public static final Resource MESSAGE = m.createResource(BASE_URI + "Message");
+  public static final Property HAS_FEEDBACK = m.createProperty(BASE_URI, "hasFeedback");
+  //used to express which URI the feedback relates to
+  public static final Property FOR_RESOURCE = m.createProperty(BASE_URI, "forResource");
+  public static final Property HAS_BINARY_RATING = m.createProperty(BASE_URI, "hasBinaryRating");
+  public static final Resource GOOD = m.createResource(BASE_URI + "Good");
+  public static final Resource BAD = m.createResource(BASE_URI+"Bad");
 
   public static final Resource NEED_CONTENT = m.createResource(BASE_URI + "NeedContent");
   public static final Property HAS_TEXT_DESCRIPTION = m.createProperty(BASE_URI, "hasTextDescription");

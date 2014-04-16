@@ -38,15 +38,15 @@ public class ConnectionModelMapper implements ModelMapper<Connection>
   {
     Connection connection = new Connection();
 
-    Resource connectionRes = model.getResource(WON.CONNECTION.toString());
+    Resource connectionRes = RdfUtils.getBaseResource(model);
     connection.setConnectionURI(URI.create(connectionRes.getURI()));
 
     URI connectionStateURI = URI.create(connectionRes.getProperty(WON.HAS_CONNECTION_STATE).getResource().getURI());
     connection.setState(ConnectionState.parseString(connectionStateURI.getFragment()));
-
     connection.setRemoteConnectionURI(URI.create(connectionRes.getProperty(WON.HAS_REMOTE_CONNECTION).getResource().getURI()));
-
     connection.setNeedURI(URI.create(connectionRes.getProperty(WON.BELONGS_TO_NEED).getResource().getURI()));
+    connection.setRemoteNeedURI(URI.create(connectionRes.getProperty(WON.HAS_REMOTE_NEED).getResource().getURI()));
+    connection.setTypeURI(URI.create(connectionRes.getProperty(WON.HAS_FACET).getResource().getURI()));
 
     return connection;
   }

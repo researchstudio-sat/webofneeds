@@ -16,8 +16,8 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.graph.TripleBoundary;
+import com.hp.hpl.jena.rdf.model.*;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
@@ -33,9 +33,12 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WON;
 
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -52,12 +55,14 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   private URIService URIService;
 
   @Override
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void open(final URI connectionURI, final Model content)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
 
-    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_OPEN);
+    ConnectionEvent event = dataService
+      .createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_OPEN);
 
     dataService.saveAdditionalContentForEvent(content, con, event);
 
@@ -66,60 +71,129 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   }
 
   @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void close(final URI connectionURI, final Model content)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("CLOSE received from the owner side for connection {} with content {}", connectionURI, content);
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
 
-    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_CLOSE);
+    ConnectionEvent event = dataService
+      .createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_CLOSE);
 
     dataService.saveAdditionalContentForEvent(content, con, event);
 
     //invoke facet implementation
     reg.get(con).closeFromOwner(con, content);
   }
+
   @Override
-    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void textMessage(final URI connectionURI, final Model message)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
 
-        //create ConnectionEvent in Database
+    //create ConnectionEvent in Database
 
-        ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), connectionURI, ConnectionEventType.OWNER_MESSAGE);
-        Resource eventNode = message.createResource(this.URIService.createEventURI(con, event).toString());
-        RdfUtils.replaceBaseResource(message, eventNode);
-        //create rdf content for the ConnectionEvent and save it to disk
-        dataService.saveAdditionalContentForEvent(message, con, event);
-        if (logger.isDebugEnabled()){
-          StringWriter writer = new StringWriter();
-          RDFDataMgr.write(writer, message, Lang.TTL);
-          logger.debug("message after saving:\n{}",writer.toString());
-        }
-        //invoke facet implementation
-        reg.get(con).textMessageFromOwner(con, message);
-        //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.
-        //return con.getConnectionURI();
-
-
+    ConnectionEvent event = dataService
+      .createConnectionEvent(con.getConnectionURI(), connectionURI, ConnectionEventType.OWNER_MESSAGE);
+    Resource eventNode = message.createResource(this.URIService.createEventURI(con, event).toString());
+    RdfUtils.replaceBaseResource(message, eventNode);
+    //create rdf content for the ConnectionEvent and save it to disk
+    dataService.saveAdditionalContentForEvent(message, con, event);
+    if (logger.isDebugEnabled()) {
+      StringWriter writer = new StringWriter();
+      RDFDataMgr.write(writer, message, Lang.TTL);
+      logger.debug("message after saving:\n{}", writer.toString());
     }
+    boolean feedbackWasPresent = processFeedbackMessage(con, message);
 
-    /*
-  @Override
-  public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.debug("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
-    Connection con = dataService.saveChatMessage(connectionURI,message);
-
-    //invoke facet implementation
-    reg.get(con).textMessageFromOwner(con, message);
-
+    if (! feedbackWasPresent) {
+      //a feedback message is not forwarded to the remote connection, and facets cannot react to it.
+      //invoke facet implementation
+      reg.get(con).textMessageFromOwner(con, message);
+    }
+      //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.
+      //return con.getConnectionURI();
   }
-     */
+
+  /*
+@Override
+public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+{
+  logger.debug("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
+  Connection con = dataService.saveChatMessage(connectionURI,message);
+
+  //invoke facet implementation
+  reg.get(con).textMessageFromOwner(con, message);
+
+}
+   */
   public void setReg(FacetRegistry reg) {
     this.reg = reg;
   }
 
   public void setDataService(DataAccessService dataService) {
     this.dataService = dataService;
+  }
+
+  /**
+   * Finds feedback in the message, processes it and removes it from the message.
+   *
+   * @param con
+   * @param message
+   * @return true if feedback was present, false otherwise
+   */
+  private boolean processFeedbackMessage(final Connection con, final Model message) {
+    assert con != null : "connection must not be null";
+    assert message != null : "message must not be null";
+    boolean feedbackWasPresent = false;
+    Resource baseResource = RdfUtils.getBaseResource(message);
+    List<Resource> resourcesToRemove = new LinkedList<Resource>();
+    StmtIterator stmtIterator = baseResource.listProperties(WON.HAS_FEEDBACK);
+    //iterate over feedback nodes, find which resources there is feedback about,
+    //and add the feedback to the resource's description
+    while (stmtIterator.hasNext()) {
+      feedbackWasPresent = true;
+      final Statement stmt = stmtIterator.nextStatement();
+      processFeedback(baseResource, resourcesToRemove, stmt.getObject());
+    }
+    if (feedbackWasPresent) {
+      removeResourcesWithSubgraphs(message, resourcesToRemove);
+    }
+    return feedbackWasPresent;
+  }
+
+  private void processFeedback(final Resource baseResource, final List<Resource> resourcesToRemove,
+    final RDFNode feedbackNode) {
+    if (!feedbackNode.isResource()) {
+      logger.warn("feedback node is not a resource, cannot process feedback in message {}", baseResource);
+      return;
+    }
+    final Resource feedbackRes = (Resource) feedbackNode;
+    final Statement forResourceStmt = feedbackRes.getProperty(WON.FOR_RESOURCE);
+    final RDFNode forResourceNode = forResourceStmt.getObject();
+    if (!forResourceNode.isResource()) {
+      logger.warn("for_resource node is not a resource, cannot process feedback in message {}", baseResource);
+      return;
+    }
+    final Resource forResource = forResourceNode.asResource();
+    if (!dataService.addFeedback(URI.create(forResource.getURI().toString()), feedbackRes)) {
+      logger.warn("failed to add feedback to resource {}", baseResource);
+    }
+    resourcesToRemove.add(feedbackRes);
+  }
+
+  private void removeResourcesWithSubgraphs(final Model model, final List<Resource> resourcesToRemove) {
+    logger.debug("removing feedback from message");
+    ModelExtract extract = new ModelExtract(new StatementTripleBoundary(TripleBoundary.stopNowhere));
+    for (Resource resourceToRemove : resourcesToRemove) {
+      logger.debug("removing resource {}", resourcesToRemove);
+      Model modelToRemove = extract.extract(resourceToRemove, model);
+      model.remove(modelToRemove);
+      logger.debug("removed subgraph");
+      //additionally, remove the triples linking to the resourceToRemove
+      logger.debug("removing statements linking to subgraph");
+      model.remove(model.listStatements((Resource) null, (Property) null, (RDFNode) resourceToRemove));
+    }
   }
 }

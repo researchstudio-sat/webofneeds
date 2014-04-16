@@ -16,6 +16,7 @@ import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -87,6 +88,14 @@ public class NeedPojo
       URI uri = URI.create(basicNeedStat.getResource().getURI());
       basicNeedType = BasicNeedType.parseString(uri.getFragment());
     }
+
+    StmtIterator facetIter = need.listProperties(WON.HAS_FACET);
+    List<String> facets = new ArrayList<String>(10);
+    while(facetIter.hasNext()) {
+      Statement stmt = facetIter.nextStatement();
+      facets.add(stmt.getObject().toString());
+    }
+    this.needFacetURIs = facets.toArray(new String[facets.size()]);
 
     Statement needContentStatement = need.getProperty(WON.HAS_CONTENT);
     if (needContentStatement != null) {
@@ -187,8 +196,6 @@ public class NeedPojo
   }
 
   public String[] getFacetURIs() {
-      for(String s : facetURIs)
-         System.out.println(s);
       return facetURIs;
   }
 

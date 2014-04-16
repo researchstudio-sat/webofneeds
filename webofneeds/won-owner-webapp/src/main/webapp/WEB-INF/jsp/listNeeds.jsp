@@ -30,6 +30,10 @@
             <td><a href="/owner/need/${need.id}">view</a></td>
         </tr>
     </c:forEach>
+    <form method="POST" action="/owner/need/import">
+        Need URI to import:
+        <input type="text" name="needURI" size="40"/>
+    </form>
 </table>
 </body>
 </html>

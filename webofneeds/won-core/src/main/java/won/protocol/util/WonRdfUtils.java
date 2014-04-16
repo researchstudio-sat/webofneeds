@@ -33,25 +33,43 @@ public class WonRdfUtils
       return messageModel;
     }
 
-      /**
-       * Creates an RDF model containing a generic message.
-       * @return
-       */
-      public static Model genericMessage(URI predicate, URI object) {
-        return genericMessage(new PropertyImpl(predicate.toString()), new ResourceImpl(object.toString()));
-      }
+    /**
+     * Creates an RDF model containing a generic message.
+     *
+     * @return
+     */
+    public static Model genericMessage(URI predicate, URI object) {
+      return genericMessage(new PropertyImpl(predicate.toString()), new ResourceImpl(object.toString()));
+    }
 
-      /**
-       * Creates an RDF model containing a generic message.
-       * @return
-       */
-      public static Model genericMessage(Property predicate, Resource object) {
-          Model messageModel = createModelWithBaseResource();
-          Resource baseRes = RdfUtils.getBaseResource(messageModel);
-          baseRes.addProperty(RDF.type, WON.MESSAGE);
-          baseRes.addProperty(predicate, object);
-          return messageModel;
-      }
+    /**
+     * Creates an RDF model containing a generic message.
+     *
+     * @return
+     */
+    public static Model genericMessage(Property predicate, Resource object) {
+      Model messageModel = createModelWithBaseResource();
+      Resource baseRes = RdfUtils.getBaseResource(messageModel);
+      baseRes.addProperty(RDF.type, WON.MESSAGE);
+      baseRes.addProperty(predicate, object);
+      return messageModel;
+    }
+
+    /**
+     * Creates an RDF model containing a feedback message referring to the specified resource
+     * that is either positive or negative.
+     * @return
+     */
+    public static Model binaryFeedbackMessage(URI forResource, boolean isFeedbackPositive) {
+      Model messageModel = createModelWithBaseResource();
+      Resource baseRes = RdfUtils.getBaseResource(messageModel);
+      Resource feedbackNode = messageModel.createResource();
+      baseRes.addProperty(WON.HAS_FEEDBACK, feedbackNode);
+      feedbackNode.addProperty(WON.HAS_BINARY_RATING, isFeedbackPositive ? WON.GOOD : WON.BAD);
+      feedbackNode.addProperty(WON.FOR_RESOURCE, messageModel.createResource(forResource.toString()));
+      return messageModel;
+    }
+
   }
 
   public static class FacetUtils {

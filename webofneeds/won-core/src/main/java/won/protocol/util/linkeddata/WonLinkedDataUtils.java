@@ -26,6 +26,7 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.Iterator;
 
 /**
  * Utilitiy functions for common linked data lookups.
@@ -56,6 +57,39 @@ public class WonLinkedDataUtils
       throw new IllegalStateException("failed to load model for Connection " + connectionURI);
     }
     return model;
+  }
+
+  public static Iterator<Model> getModelForURIs(final Iterator<URI> uriIterator, final LinkedDataSource linkedDataSource) {
+    return new ModelFetchingIterator(uriIterator, linkedDataSource);
+  }
+
+  /**
+   * Iterator implementation that fetches linked data lazily for the specified iterator of URIs.
+   */
+  private static class ModelFetchingIterator implements Iterator<Model> {
+    private Iterator<URI> uriIterator = null;
+    private LinkedDataSource linkedDataSource = null;
+
+    private ModelFetchingIterator(final Iterator<URI> uriIterator, final LinkedDataSource linkedDataSource) {
+      this.uriIterator = uriIterator;
+      this.linkedDataSource = linkedDataSource;
+    }
+
+    @Override
+    public Model next() {
+      URI uri = uriIterator.next();
+      return linkedDataSource.getModelForResource(uri);
+    }
+
+    @Override
+    public boolean hasNext() {
+      return uriIterator.hasNext();
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException("this iterator cannot remove");
+    }
   }
 
 }

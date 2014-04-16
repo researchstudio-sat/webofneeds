@@ -424,6 +424,7 @@ public class RdfUtils
   public static URI getURIPropertyForPropertyPath(final Model model, final URI resourceURI, Path propertyPath)
   {
     Node result = getNodeForPropertyPath(model, resourceURI, propertyPath);
+    if (result == null) return null;
     return URI.create(result.getURI());
   }
 
@@ -445,6 +446,9 @@ public class RdfUtils
   public static String getStringPropertyForPropertyPath(final Model model, final URI resourceURI, Path propertyPath)
   {
     Node result = getNodeForPropertyPath(model, resourceURI, propertyPath);
+    if (result == null) {
+      return null;
+    }
     return result.getLiteralLexicalForm();
   }
 

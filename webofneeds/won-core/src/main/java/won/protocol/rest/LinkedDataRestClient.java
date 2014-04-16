@@ -57,7 +57,11 @@ public class LinkedDataRestClient
     //TODO: improve error handling
     //If a ClientHandlerException is thrown here complaining that it can't read a Model with MIME media type text/html,
     //it was probably the wrong resourceURI
-    return r.accept(RDFMediaType.APPLICATION_RDF_XML).get(Model.class);
+    Model result = r.accept(RDFMediaType.APPLICATION_RDF_XML).get(Model.class);
+    if (logger.isDebugEnabled()) {
+      logger.debug("fetched model with {} statements for resource {}",result.size(), resourceURI);
+    }
+    return result;
   }
 
     /**

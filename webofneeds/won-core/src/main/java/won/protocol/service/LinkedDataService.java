@@ -74,5 +74,4 @@ public interface LinkedDataService
    */
   public Model listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException;
 
-    public Model showNodeInformation(final int page);
 }

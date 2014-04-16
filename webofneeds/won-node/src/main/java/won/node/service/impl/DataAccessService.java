@@ -1,24 +1,33 @@
 package won.node.service.impl;
 
+import com.hp.hpl.jena.graph.TripleBoundary;
 import com.hp.hpl.jena.rdf.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.rdfstorage.RDFStorageService;
 import won.protocol.exception.*;
 import won.protocol.model.*;
-import won.protocol.repository.*;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.EventRepository;
+import won.protocol.repository.FacetRepository;
+import won.protocol.repository.NeedRepository;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User: gabriel
  * Date: 06/11/13
  */
 public class DataAccessService {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   private RDFStorageService rdfStorageService;
   private URIService URIService;
 
@@ -184,7 +193,36 @@ public class DataAccessService {
     return connectionRepository.saveAndFlush(con);
   }
 
+  /**
+   * Adds feedback, represented by the subgraph reachable from feedback, to the RDF description of the
+   * item identified by forResource
+   * @param forResource
+   * @param feedback
+   * @return true if feedback could be added false otherwise
+   */
+  public boolean addFeedback(final URI forResource, final Resource feedback){
+    //TODO: concurrent modifications to the model for this resource result in side-effects.
+    //think about locking.
+    logger.debug("adding feedback to resource {}", forResource);
+    Model model = rdfStorageService.loadContent(forResource);
+    if (model == null) {
+      logger.debug("could not add feedback to resource {}: no such resource found", forResource );
+      return false;
+    }
+    Resource mainRes = model.getResource(forResource.toString());
+    if (mainRes == null){
+      logger.debug("could not add feedback to resource {}: resource not found in model");
+      return false;
+    }
 
+    mainRes.addProperty(WON.HAS_FEEDBACK, feedback);
+    ModelExtract extract = new ModelExtract(new StatementTripleBoundary(TripleBoundary.stopNowhere));
+    model.add(extract.extract(feedback, feedback.getModel()));
+    logger.debug("done adding feedback for resource {}, storing...", forResource);
+    rdfStorageService.storeContent(forResource, model);
+    logger.debug("stored feedback");
+    return true;
+  }
 
   public void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event) {
     saveAdditionalContentForEvent(content, con, event, null);

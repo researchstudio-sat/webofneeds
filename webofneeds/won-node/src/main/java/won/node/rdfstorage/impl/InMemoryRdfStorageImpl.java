@@ -26,6 +26,8 @@ import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.util.RdfUtils;
 
+import java.net.URI;
+
 /**
  * Simple in-memory RDF storage for testing/benchmarking purposes.
  */
@@ -44,7 +46,8 @@ public class InMemoryRdfStorageImpl implements RDFStorageService
   @Override
   public Model loadContent(final Need need)
   {
-    return RdfUtils.cloneModel(dataset.getNamedModel(need.getNeedURI().toString()));
+    Model ret = dataset.getNamedModel(need.getNeedURI().toString());
+    return ret == null ? null : RdfUtils.cloneModel(ret);
   }
 
   @Override
@@ -56,7 +59,19 @@ public class InMemoryRdfStorageImpl implements RDFStorageService
   @Override
   public Model loadContent(final ConnectionEvent event)
   {
-    return RdfUtils.cloneModel(dataset.getNamedModel(createEventURI(event)));
+    Model ret = dataset.getNamedModel(createEventURI(event));
+    return ret == null ? null : RdfUtils.cloneModel(ret);
+  }
+
+  @Override
+  public void storeContent(final URI resourceURI, final Model model) {
+    dataset.addNamedModel(resourceURI.toString(), model);
+  }
+
+  @Override
+  public Model loadContent(final URI resourceURI) {
+    Model ret = dataset.getNamedModel(resourceURI.toString());
+    return ret == null ? null: RdfUtils.cloneModel(ret);
   }
 
   /**

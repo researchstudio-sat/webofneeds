@@ -107,15 +107,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
     return model;
   }
-    public Model showNodeInformation(final int page)
-    {
-        Model model = ModelFactory.createDefaultModel();
-        setNsPrefixes(model);
-        Resource showNodePageResource = null;
-        showNodePageResource = model.createResource(this.resourceURIPrefix);
-        addProtocolEndpoints(model, showNodePageResource);
-        return model;
-    }
 
   public Model listConnectionURIs(final int page)
   {
@@ -158,18 +149,19 @@ public class LinkedDataServiceImpl implements LinkedDataService
     // add connections
     Resource connectionsContainer = model.createResource(need.getNeedURI().toString() + "/connections/", LDP.CONTAINER);
     model.add(model.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
-
+    // add WON node link
+    needResource.addProperty(WON.HAS_WON_NODE, model.createResource(this.resourceURIPrefix));
 
     return model;
   }
     public Model getNodeModel()
     {
-        Model model = ModelFactory.createDefaultModel();
-        setNsPrefixes(model);
-        Resource showNodePageResource = null;
-        showNodePageResource = model.createResource(this.resourceURIPrefix);
-        addProtocolEndpoints(model, showNodePageResource);
-        return model;
+      Model model = ModelFactory.createDefaultModel();
+      setNsPrefixes(model);
+      Resource showNodePageResource = null;
+      showNodePageResource = model.createResource(this.resourceURIPrefix);
+      addProtocolEndpoints(model, showNodePageResource);
+      return model;
     }
 
   //TODO: protocol endpoint specification in RDF model needs refactoring!
@@ -205,14 +197,16 @@ public class LinkedDataServiceImpl implements LinkedDataService
     model.setNsPrefix("",connection.getConnectionURI().toString());
 
     //create connection member
-    Resource connectionMember = model.getResource(connection.getConnectionURI().toString());
+    Resource connectionResource = model.getResource(connection.getConnectionURI().toString());
 
-    addProtocolEndpoints(model, connectionMember);
+    // add WON node link
+    connectionResource.addProperty(WON.HAS_WON_NODE, model.createResource(this.resourceURIPrefix));
 
     //create event container and attach it to the member
     Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
-    connectionMember.addProperty(WON.HAS_EVENT_CONTAINER,eventContainer);
-    connectionMember.addProperty(WON.HAS_REMOTE_NEED,model.createResource(connection.getRemoteNeedURI().toString()));
+    connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
+    connectionResource.addProperty(WON.HAS_REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
+    addAdditionalData(model, connection.getConnectionURI(), connectionResource);
 
     //add event members and attach them
     for (ConnectionEvent e : events) {
@@ -223,18 +217,23 @@ public class LinkedDataServiceImpl implements LinkedDataService
       if (e.getCreationDate() != null)
         eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.toLiteral(e.getCreationDate(), model));
 
-      Model additionalDataModel = rdfStorage.loadContent(e);
-      if (additionalDataModel != null && additionalDataModel.size() > 0) {
-        Resource additionalData = additionalDataModel.createResource();
-        //TODO: check if the statement below is now necessary
-        //RdfUtils.replaceBaseResource(additionalDataModel, additionalData);
-        model.add(model.createStatement(eventMember, WON.HAS_ADDITIONAL_DATA, additionalData));
-        model.add(additionalDataModel);
-      }
+      addAdditionalData(model, this.uriService.createEventURI(connection,e), eventMember);
       model.add(model.createStatement(eventContainer, RDFS.member, eventMember));
     }
 
+
     return model;
+  }
+
+  private void addAdditionalData(final Model model, URI resourceToLoad, final Resource targetResource) {
+    Model additionalDataModel = rdfStorage.loadContent(resourceToLoad);
+    if (additionalDataModel != null && additionalDataModel.size() > 0) {
+      Resource additionalData = additionalDataModel.createResource();
+      //TODO: check if the statement below is now necessary
+      //RdfUtils.replaceBaseResource(additionalDataModel, additionalData);
+      model.add(model.createStatement(targetResource, WON.HAS_ADDITIONAL_DATA, additionalData));
+      model.add(additionalDataModel);
+    }
   }
 
   public Model listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException

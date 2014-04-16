@@ -166,7 +166,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
+        con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
         //save in the db
         connectionRepository.saveAndFlush(con);
         ownerServiceCallback.onOpen(con, content);
@@ -181,7 +181,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         //set new state and save in the db
-        con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
+        con.setState(con.getState().transit(ConnectionEventType.PARTNER_CLOSE));
         //save in the db
         connectionRepository.saveAndFlush(con);
         ownerServiceCallback.onClose(con, content);
