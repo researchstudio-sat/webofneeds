@@ -117,6 +117,9 @@ public class BaseBot implements Bot
 
   @Override public void onMessageFromOtherNeed(Connection con, ChatMessage message, final Model content) throws Exception {}
 
+  @Override
+  public void onNewNeedCreatedNotificationForMatcher(final URI needURI, final Model needModel){}
+
   @Override public void act() throws Exception
   {}
 

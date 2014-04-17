@@ -34,6 +34,7 @@ public abstract class BasicServiceBot extends BaseBot
   private OwnerProtocolNeedServiceClientSide ownerService;
   private MatcherProtocolNeedServiceClientSide matcherService;
 
+
   private LinkedDataSource linkedDataSource;
 
   protected NodeURISource getNodeURISource()

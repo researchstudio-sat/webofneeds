@@ -18,14 +18,14 @@
 
     <camel:camelContext id="wonMatcherCamel">
         <camel:packageScan>
-            <camel:package>won.matcher.camel.routes</camel:package>
+            <camel:package>won.matcher.camel.routes.fixed</camel:package>
         </camel:packageScan>
         <camel:template id="producerTemplate" defaultEndpoint="direct:OUTMSG1"/>
         <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG"/>
         <camel:endpoint id="needMessageQueue" uri="activemq:WON.MSG" pattern="InOut"></camel:endpoint>
     </camel:camelContext>
 
-    <bean id="matcherActiveMQService" class="won.protocol.jms.ActiveMQServiceImpl">
+    <bean id="matcherActiveMQService" class="won.protocol.jms.MatcherActiveMQServiceImpl">
         <constructor-arg name="type" value="MatcherProtocol"/>
     </bean>
 
@@ -36,10 +36,11 @@
         <!--property name="producerTemplate" ref="producerTemplate"/>
     </bean-->
 
-    <bean id="matcherProtocolCommunicationService" class="won.matcher.protocol.impl.MatcherProtocolCommunicationServiceImpl">
+    <!--bean id="matcherProtocolCommunicationService"
+    class="won.matcher.protocol.impl.MatcherProtocolCommunicationServiceImpl">
         <property name="matcherActiveMQService" ref="matcherActiveMQService"/>
-    </bean>
-    <bean id="matcherProtocolCamelConfigurator" class="won.protocol.jms.NeedBasedCamelConfiguratorImpl">
+    </bean-->
+    <bean id="matcherProtocolCamelConfigurator" class="won.matcher.messaging.MatcherProtocolCamelConfiguratorImpl">
         <property name="componentName" value="activemq"/>
         <property name="camelContext" ref = "wonMatcherCamel"/>
     </bean>

@@ -40,7 +40,7 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     private OwnerFacingConnectionCommunicationServiceImpl connectionCommunicationService;
     private NeedManagementService needManagementService;
     private NeedInformationService needInformationService;
-    private OwnerManagementService ownerManagementService;
+    private ApplicationManagementService ownerManagementService;
 
     @Autowired
     private OwnerApplicationRepository ownerApplicationRepository;

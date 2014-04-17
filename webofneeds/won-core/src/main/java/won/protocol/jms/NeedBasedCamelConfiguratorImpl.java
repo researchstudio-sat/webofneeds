@@ -23,15 +23,11 @@ import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-//import won.node.camel.routes.NeedProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
-import won.protocol.jms.BrokerComponentFactory;
-import won.protocol.jms.NeedProtocolCamelConfigurator;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+//import won.node.camel.routes.NeedProtocolDynamicRoutes;
 
 /**
  * User: LEIH-NB
@@ -53,7 +49,9 @@ public class NeedBasedCamelConfiguratorImpl implements NeedProtocolCamelConfigur
     @Override
     public synchronized String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName){
         String brokerComponentName = setupBrokerComponentName(brokerUri);
-        addCamelComponentForWonNodeBroker(brokerUri, brokerComponentName);
+        if (!brokerComponentName.contains("brokerUri")){
+          addCamelComponentForWonNodeBroker(brokerUri, brokerComponentName);
+        }
         String endpoint = brokerComponentName+":queue:"+needProtocolQueueName;
         endpointMap.put(brokerUri,endpoint);
         logger.info("endpoint of wonNodeURI {} is {}",brokerUri,endpointMap.get(brokerUri));
@@ -77,6 +75,11 @@ public class NeedBasedCamelConfiguratorImpl implements NeedProtocolCamelConfigur
             activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri);
             logger.info("adding activemqComponent for brokerUri {}",brokerUri);
             camelContext.addComponent(brokerComponentName,activeMQComponent);
+          try {
+            activeMQComponent.start();
+          } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+          }
         }
         brokerComponentMap.put(brokerUri,brokerComponentName);
     }

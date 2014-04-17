@@ -80,11 +80,13 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private NeedInformationService needInformationService;
 
 
-    private String activeMqEndpoint;
-    private String activeMqNeedProtcolQueueName;
-    private String activeMqOwnerProtcolQueueName;
-    private String activeMqMatcherPrtotocolQueueName;
-
+  private String activeMqEndpoint;
+  private String activeMqNeedProtcolQueueName;
+  private String activeMqOwnerProtcolQueueName;
+  private String activeMqMatcherPrtotocolQueueName;
+  private String activeMqMatcherProtocolTopicNameNeedCreated;
+  private String activeMqMatcherProtocolTopicNameNeedActivated;
+  private String activeMqMatcherProtocolTopicNameNeedDeactivated;
 
     public Model listNeedURIs(final int page)
   {
@@ -175,7 +177,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
               .addProperty(WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME,this.activeMqOwnerProtcolQueueName,XSDDatatype.XSDstring)
               .addProperty(WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME,this.activeMqNeedProtcolQueueName,XSDDatatype.XSDstring)
               .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME,this.activeMqMatcherPrtotocolQueueName,XSDDatatype.XSDstring)
-
+              .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME,
+                           this.activeMqMatcherProtocolTopicNameNeedActivated,XSDDatatype.XSDstring)
+              .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME,this.activeMqMatcherProtocolTopicNameNeedDeactivated,XSDDatatype.XSDstring)
+              .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME,this.activeMqMatcherProtocolTopicNameNeedCreated,XSDDatatype.XSDstring)
       ;
       Resource blankNodeSoapWs = model.createResource();
       res.addProperty(WON.SUPPORTS_WON_PROTOCOL_IMPL, blankNodeSoapWs);
@@ -354,18 +359,29 @@ public class LinkedDataServiceImpl implements LinkedDataService
     this.pageSize = pageSize;
   }
 
-    public void setActiveMqOwnerProtcolQueueName(String activeMqOwnerProtcolQueueName) {
-        this.activeMqOwnerProtcolQueueName = activeMqOwnerProtcolQueueName;
-    }
+  public void setActiveMqOwnerProtcolQueueName(String activeMqOwnerProtcolQueueName) {
+      this.activeMqOwnerProtcolQueueName = activeMqOwnerProtcolQueueName;
+  }
 
-    public void setActiveMqNeedProtcolQueueName(String activeMqNeedProtcolQueueName) {
-        this.activeMqNeedProtcolQueueName = activeMqNeedProtcolQueueName;
-    }
-    public void setActiveMqMatcherPrtotocolQueueName(String activeMqMatcherPrtotocolQueueName) {
-        this.activeMqMatcherPrtotocolQueueName = activeMqMatcherPrtotocolQueueName;
-    }
-    public void setActiveMqEndpoint(String activeMqEndpoint) {
-        this.activeMqEndpoint = activeMqEndpoint;
-    }
+  public void setActiveMqNeedProtcolQueueName(String activeMqNeedProtcolQueueName) {
+      this.activeMqNeedProtcolQueueName = activeMqNeedProtcolQueueName;
+  }
+  public void setActiveMqMatcherPrtotocolQueueName(String activeMqMatcherPrtotocolQueueName) {
+      this.activeMqMatcherPrtotocolQueueName = activeMqMatcherPrtotocolQueueName;
+  }
+  public void setActiveMqEndpoint(String activeMqEndpoint) {
+      this.activeMqEndpoint = activeMqEndpoint;
+  }
 
+  public void setActiveMqMatcherProtocolTopicNameNeedCreated(final String activeMqMatcherProtocolTopicNameNeedCreated) {
+    this.activeMqMatcherProtocolTopicNameNeedCreated = activeMqMatcherProtocolTopicNameNeedCreated;
+  }
+
+  public void setActiveMqMatcherProtocolTopicNameNeedActivated(final String activeMqMatcherProtocolTopicNameNeedActivated) {
+    this.activeMqMatcherProtocolTopicNameNeedActivated = activeMqMatcherProtocolTopicNameNeedActivated;
+  }
+
+  public void setActiveMqMatcherProtocolTopicNameNeedDeactivated(final String activeMqMatcherProtocolTopicNameNeedDeactivated) {
+    this.activeMqMatcherProtocolTopicNameNeedDeactivated = activeMqMatcherProtocolTopicNameNeedDeactivated;
+  }
 }

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.node.rdfstorage.RDFStorageService;
 import won.protocol.exception.*;
 import won.protocol.model.*;
@@ -57,6 +58,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
   private OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService;
+
+  private MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient;
   //used to close connections when a need is deactivated
   private OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
   private NeedInformationService needInformationService;
@@ -110,6 +113,9 @@ public class NeedManagementServiceImpl implements NeedManagementService
     } while(stmtIterator.hasNext());
 
     authorizeOwnerApplicationForNeed(ownerApplicationID,need.getNeedURI());
+
+    matcherProtocolMatcherClient.needCreated(need.getNeedURI(),content);
+
     return need.getNeedURI();
   }
     @Override
@@ -138,12 +144,15 @@ public class NeedManagementServiceImpl implements NeedManagementService
     @Override
     public void activate(final URI needURI) throws NoSuchNeedException
     {
-        logger.debug("ACTIVATING need. needURI:{}",needURI);
-        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-        Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-        need.setState(NeedState.ACTIVE);
-        logger.debug("Setting Need State: "+ need.getState());
-        needRepository.saveAndFlush(need);
+      logger.debug("ACTIVATING need. needURI:{}",needURI);
+      if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+      Need need = DataAccessUtils.loadNeed(needRepository, needURI);
+      need.setState(NeedState.ACTIVE);
+      logger.debug("Setting Need State: "+ need.getState());
+      needRepository.saveAndFlush(need);
+
+      matcherProtocolMatcherClient.needActivated(need.getNeedURI());
+
     }
 
     @Override
@@ -167,6 +176,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
             }
 
         }
+      matcherProtocolMatcherClient.needDeactivated(need.getNeedURI());
     }
 
     private boolean isNeedActive(final Need need)
@@ -208,4 +218,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     public void setOwnerApplicationRepository(OwnerApplicationRepository ownerApplicationRepository) {
         this.ownerApplicationRepository = ownerApplicationRepository;
     }
+  public void setMatcherProtocolMatcherClient(final MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient) {
+    this.matcherProtocolMatcherClient = matcherProtocolMatcherClient;
+  }
 }

@@ -16,16 +16,13 @@
 
 package won.node.messaging;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import won.protocol.matcher.MatcherProtocolNeedService;
-import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.util.RdfUtils;
 
-import javax.jws.WebMethod;
 import java.net.URI;
 
 /**

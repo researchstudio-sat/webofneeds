@@ -28,7 +28,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
     @Autowired
     private OwnerProtocolNeedService delegate;
 
-    private OwnerManagementService ownerManagementService;
+    private ApplicationManagementService ownerManagementService;
     @Autowired
     private QueueManagementService queueManagementService;
 
@@ -196,7 +196,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
         this.needCommunicationService = needCommunicationService;
     }
 
-    public void setOwnerManagementService(OwnerManagementService ownerManagementService) {
+    public void setOwnerManagementService(ApplicationManagementService ownerManagementService) {
         this.ownerManagementService = ownerManagementService;
     }
 }

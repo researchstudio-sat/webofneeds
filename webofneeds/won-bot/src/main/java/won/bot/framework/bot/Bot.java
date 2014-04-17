@@ -36,6 +36,8 @@ public interface Bot
   public void onCloseFromOtherNeed(Connection con, final Model content) throws Exception;
   public void onHintFromMatcher(Match match, final Model content) throws Exception;
   public void onMessageFromOtherNeed(Connection con, ChatMessage message, final Model content) throws Exception;
+
+  public void onNewNeedCreatedNotificationForMatcher(final URI needURI, final  Model needModel);
   /**
    * Override this to be informed whenever the bot has created a new need successfully.
    * @param needUri

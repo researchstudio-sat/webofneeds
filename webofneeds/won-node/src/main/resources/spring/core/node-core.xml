@@ -73,6 +73,12 @@
         <property name="activeMqNeedProtcolQueueName" value="${activemq.queuename.need.incoming}" />
         <property name="activeMqOwnerProtcolQueueName" value="${activemq.queuename.owner.incoming}" />
         <property name="activeMqMatcherPrtotocolQueueName" value="${activemq.queuename.matcher.incoming}"/>
+        <property name="activeMqMatcherProtocolTopicNameNeedActivated"
+                  value="${activemq.matcher.outgoing.topicname.need.activated}"/>
+        <property name="activeMqMatcherProtocolTopicNameNeedCreated"
+                  value="${activemq.matcher.outgoing.topicname.need.created}"/>
+        <property name="activeMqMatcherProtocolTopicNameNeedDeactivated"
+                  value="${activemq.matcher.outgoing.topicname.need.deactivated}"/>
         <property name="rdfStorage" ref="rdfStorageRef" />
         <property name="pageSize" value="${linkeddata.pagesize}" />
     </bean>
@@ -103,6 +109,7 @@
         <property name="ownerProtocolOwnerService" ref="ownerProtocolOwnerClient" />
         <property name="URIService" ref="uriService" />
         <property name="rdfStorage" ref="rdfStorageRef" />
+        <property name="matcherProtocolMatcherClient" ref="matcherProtocolMatcherClientJMSBased"></property>
     </bean>
 
     <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>

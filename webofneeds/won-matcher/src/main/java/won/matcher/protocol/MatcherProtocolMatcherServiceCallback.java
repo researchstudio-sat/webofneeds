@@ -14,23 +14,19 @@
  *    limitations under the License.
  */
 
+package won.matcher.protocol;
 
-package won.matcher.camel.routes;
-import org.apache.camel.builder.RouteBuilder;
+import com.hp.hpl.jena.rdf.model.Model;
+
+import java.net.URI;
 
 /**
- * User: LEIH-NB
- * Date: 10.10.13
+ * User: fkleedorfer
+ * Date: 21.01.14
  */
-
-//TODO: change to asyncronous processing maybe
-public class Matcher2Node extends RouteBuilder{
-    @Override
-    public void configure(){
-        from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=5").routeId("Matcher2NodeRoute")
-                .wireTap("bean:messagingService?method=inspectMessage")
-                .recipientList(header("remoteBrokerEndpoint"));
-
-    }
-
+public interface MatcherProtocolMatcherServiceCallback
+{
+  void onNewNeed(URI needURI, Model content);
+  void onNeedActivated(URI needURI);
+  void onNeedDeactivated(URI needURI);
 }

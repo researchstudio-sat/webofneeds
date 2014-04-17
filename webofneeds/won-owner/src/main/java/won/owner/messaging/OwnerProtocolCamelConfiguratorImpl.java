@@ -38,8 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComponent;
-
 /**
  * User: LEIH-NB
  * Date: 28.01.14
@@ -65,9 +63,6 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     private String startingComponent;
     private String componentName;
     private String defaultNodeURI;
-
-
-
 
     protected OwnerProtocolCamelConfiguratorImpl() {
     }

@@ -30,6 +30,13 @@
     </context:component-scan>-->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" ignore-unresolvable="true"/>
 
-    <bean id="matcherProtocolCommunicationService" class="won.matcher.protocol.impl.MatcherProtocolCommunicationServiceImpl"/>
-    <bean id="needProtocolCamelConfigurator" class="won.protocol.jms.NeedBasedCamelConfiguratorImpl"/>
+    <bean id="matcherProtocolCommunicationService" class="won.matcher.protocol.impl.MatcherProtocolCommunicationServiceImpl">
+        <property name="activeMQService" ref="matcherActiveMQService"/>
+        <property name="matcherProtocolCamelConfigurator" ref="matcherProtocolCamelConfigurator"/>
+        <property name="componentName" value="activemq"></property>
+    </bean>
+    <!--bean id="needProtocolCamelConfigurator" class="won.matcher.messaging.MatcherProtocolCamelConfiguratorImpl"/-->
+    <bean id="matcherActiveMQService" class="won.protocol.jms.MatcherActiveMQServiceImpl">
+        <constructor-arg name="type" value="MatcherProtocol"/>
+    </bean>
 </beans>

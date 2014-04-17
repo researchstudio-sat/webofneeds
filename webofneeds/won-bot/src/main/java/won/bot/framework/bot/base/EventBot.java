@@ -146,6 +146,16 @@ public class EventBot extends TriggeredBot
       logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
+  @Override
+  public void onNewNeedCreatedNotificationForMatcher(final URI needUri, final Model needModel)
+  {
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new NeedCreatedEventForMatcher(needUri, needModel));
+    } else {
+      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
+  }
+
 
   /*
    * Override this method to initialize your event listeners. Will be called before

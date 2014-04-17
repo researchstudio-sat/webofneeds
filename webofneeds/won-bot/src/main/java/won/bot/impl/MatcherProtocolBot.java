@@ -17,17 +17,11 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.event.impl.ActEvent;
-import won.bot.framework.events.event.impl.HintFromMatcherEvent;
-import won.bot.framework.events.event.impl.NeedCreatedEvent;
-import won.bot.framework.events.event.impl.NeedDeactivatedEvent;
-import won.bot.framework.events.listener.*;
-import won.bot.framework.events.action.impl.CreateNeedAction;
-import won.bot.framework.events.action.impl.DeactivateAllNeedsAction;
-import won.bot.framework.events.action.impl.MatchNeedsAction;
-import won.bot.framework.events.action.impl.SignalWorkDoneAction;
+import won.bot.framework.events.action.impl.*;
+import won.bot.framework.events.bus.EventBus;
+import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
 
@@ -49,6 +43,7 @@ public class MatcherProtocolBot extends EventBot
   protected BaseEventListener matcher;
   protected BaseEventListener allNeedsDeactivator;
   protected BaseEventListener workDoneSignaller;
+  protected BaseEventListener matcherNotifier;
     private static final String NAME_NEEDS = "needs";
 
   @Override
@@ -64,6 +59,9 @@ public class MatcherProtocolBot extends EventBot
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class,this.needCreator);
+
+    this.matcherNotifier = new ActionOnEventListener(ctx, new DummyAction(ctx),1);
+    bus.subscribe(NeedCreatedEventForMatcher.class,matcherNotifier);
 
     this.matcher = new ActionOnceAfterNEventsListener(
             ctx,
