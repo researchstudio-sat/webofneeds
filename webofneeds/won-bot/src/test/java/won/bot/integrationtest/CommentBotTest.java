@@ -91,7 +91,7 @@ public class CommentBotTest
     this.bot.getBarrier().await();
     //now check the results!
     this.bot.executeAsserts();
-    logger.info("finishing test case testCommentBot");
+    logger.info("finishing test case testMatcherBot");
   }
 
 

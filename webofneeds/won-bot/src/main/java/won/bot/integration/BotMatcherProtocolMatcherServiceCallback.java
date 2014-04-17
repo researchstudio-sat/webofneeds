@@ -65,7 +65,7 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
           getBotForNeedUri(needURI).onNewNeedCreatedNotificationForMatcher(needURI, content);
       //    getBotForNeedUri(needURI.getNeedURI()).onMessageFromOtherNeed(con, message, content);
         } catch (Exception e) {
-          logger.warn("error while handling onTextMessage()",e);
+          logger.warn("error while handling onNewNeed()",e);
         }
       }
     }, new Date());
