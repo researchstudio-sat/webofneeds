@@ -20,7 +20,7 @@ public class BotManagerImpl implements BotManager
   private Object monitor = new Object();
 
   @Override
-  public Bot getBot(URI needUri) {
+  public Bot getBotForNeedURI(URI needUri) {
     //try the botByUri map
     {
       Bot bot = botByUri.get(needUri);

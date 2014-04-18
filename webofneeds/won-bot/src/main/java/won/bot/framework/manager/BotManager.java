@@ -10,7 +10,8 @@ import java.util.Collection;
  */
 public interface BotManager
 {
-  public Bot getBot(URI needUri);
+  public Bot getBotForNeedURI(URI needUri);
+  //public List<Bot> getBotsForNodeURI(URI nodeUri);
   public void addBot(Bot bot);
 
   /**

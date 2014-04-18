@@ -48,7 +48,7 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
 
 
   private Bot getBotForNeedUri(URI needUri) {
-    Bot bot = botManager.getBot(needUri);
+    Bot bot = botManager.getBotForNeedURI(needUri);
     if (bot == null) throw new IllegalStateException("No bot registered for uri " + needUri);
     if (!bot.getLifecyclePhase().isActive()) {
       throw new IllegalStateException("bot responsible for need " + needUri + " is not active (lifecycle phase is: " +bot.getLifecyclePhase()+")");
@@ -73,11 +73,31 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
 
   @Override
   public void onNeedActivated(final URI needURI) {
-    //To change body of implemented methods use File | Settings | File Templates.
+    taskScheduler.schedule(new Runnable(){
+      public void run(){
+        try {
+          logger.debug("onNeedActivated for need {} ",needURI.toString());
+          getBotForNeedUri(needURI).onNeedActivatedNotificationForMatcher(needURI);
+          //    getBotForNeedUri(needURI.getNeedURI()).onMessageFromOtherNeed(con, message, content);
+        } catch (Exception e) {
+          logger.warn("error while handling onNeedActivated()",e);
+        }
+      }
+    }, new Date());
   }
 
   @Override
   public void onNeedDeactivated(final URI needURI) {
-    //To change body of implemented methods use File | Settings | File Templates.
+    taskScheduler.schedule(new Runnable(){
+      public void run(){
+        try {
+          logger.debug("onNeedDeactivated for need {} ",needURI.toString());
+          getBotForNeedUri(needURI).onNeedDeactivatedNotificationForMatcher(needURI);
+          //    getBotForNeedUri(needURI.getNeedURI()).onMessageFromOtherNeed(con, message, content);
+        } catch (Exception e) {
+          logger.warn("error while handling onNeedDeactivated()",e);
+        }
+      }
+    }, new Date());
   }
 }

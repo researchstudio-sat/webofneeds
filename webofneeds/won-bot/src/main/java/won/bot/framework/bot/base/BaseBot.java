@@ -120,6 +120,12 @@ public class BaseBot implements Bot
   @Override
   public void onNewNeedCreatedNotificationForMatcher(final URI needURI, final Model needModel){}
 
+  @Override
+  public void onNeedActivatedNotificationForMatcher(final URI needURI) {}
+
+  @Override
+  public void onNeedDeactivatedNotificationForMatcher(final URI needURI) {}
+
   @Override public void act() throws Exception
   {}
 

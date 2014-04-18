@@ -138,15 +138,21 @@ public class MatcherBotTest
       //1 act events
       Assert.assertEquals(2, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
+
+      Assert.assertEquals(4, this.matcherNotifier.getEventCount());
+      Assert.assertEquals(0, this.matcherNotifier.getExceptionCount());
+
       //1 create need events
       Assert.assertEquals(2, this.matcher.getEventCount());
       Assert.assertEquals(0, this.matcher.getExceptionCount());
+
+
 
       Assert.assertEquals(1,this.allNeedsDeactivator.getEventCount());
       Assert.assertEquals(0, this.allNeedsDeactivator.getExceptionCount());
 
       //4 NeedDeactivated events
-      Assert.assertEquals(2, this.workDoneSignaller.getEventCount());
+      Assert.assertEquals(4, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
       //TODO: there is more to check:

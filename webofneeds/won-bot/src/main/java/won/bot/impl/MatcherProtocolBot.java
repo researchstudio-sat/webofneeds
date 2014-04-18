@@ -60,8 +60,9 @@ public class MatcherProtocolBot extends EventBot
     );
     bus.subscribe(ActEvent.class,this.needCreator);
 
-    this.matcherNotifier = new ActionOnEventListener(ctx, new DummyAction(ctx),1);
+    this.matcherNotifier = new ActionOnceAfterNEventsListener(ctx,4,new DummyAction(ctx));
     bus.subscribe(NeedCreatedEventForMatcher.class,matcherNotifier);
+    bus.subscribe(NeedCreatedEvent.class,matcherNotifier);
 
     this.matcher = new ActionOnceAfterNEventsListener(
             ctx,
@@ -75,9 +76,10 @@ public class MatcherProtocolBot extends EventBot
 
   this.workDoneSignaller = new ActionOnceAfterNEventsListener(
           ctx,
-      2, new SignalWorkDoneAction(ctx)
+      4, new SignalWorkDoneAction(ctx)
   );
   bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
+  bus.subscribe(NeedDeactivatedEventForMatcher.class, this.workDoneSignaller);
 
   }
 
