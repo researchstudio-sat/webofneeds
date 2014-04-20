@@ -3,12 +3,15 @@ package won.matcher.solr;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.SolrEventListener;
 import org.apache.solr.search.SolrIndexSearcher;
+import org.apache.xbean.spring.context.ClassPathXmlApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import won.matcher.Matcher;
 import won.matcher.processor.HintSender;
 import won.matcher.service.ScoreTransformer;
 import won.protocol.Config;
+import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +30,7 @@ public class UpdateListener implements SolrEventListener
 
   private DocumentStorage documentStorage;
   private URI originatorURI;
+  private MatcherProtocolNeedServiceClientSide client;
 
   @Override
   public void init(NamedList namedList)
@@ -51,6 +55,31 @@ public class UpdateListener implements SolrEventListener
     } catch (Exception e){
       logger.error("could not generate macher uri from property file {}", PROPERTY_FILE_NAME, e);
     }
+    logger.debug("loading spring context for WON matcher protocol client");
+    try {
+      //we need to replace the classloader spring uses, otherwise it doesn't find our xml config
+      final ClassLoader myClassLoader = this.getClass().getClassLoader();
+      ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext
+        ("classpath:/spring/matcher-wsonly.xml"){
+        protected void initBeanDefinitionReader(XmlBeanDefinitionReader reader) {
+          super.initBeanDefinitionReader(reader);
+          reader.setBeanClassLoader(myClassLoader);
+          setClassLoader(myClassLoader);
+        }
+      };
+
+      //setup matcher client
+      this.client = (MatcherProtocolNeedServiceClientSide) ctx.getBean("matcherProtocolNeedServiceClient");
+      this.client.initializeDefault();
+    } catch (Exception e) {
+      logger.warn("could not set up matcher client",e);
+    }
+  }
+
+  public static void main(String... args){
+    UpdateListener listener = new UpdateListener();
+    listener.init(new NamedList());
+    System.out.println("updateListener:" + listener);
   }
 
   @Override
@@ -65,7 +94,7 @@ public class UpdateListener implements SolrEventListener
     logger.debug("newSearcher called");
 
     Matcher matcher = new Matcher(solrIndexSearcher, new ScoreTransformer(), this.originatorURI);
-    matcher.addMatchProcessor(new HintSender());
+    matcher.addMatchProcessor(new HintSender(this.client));
 
     while (documentStorage.hasNext())
       try {

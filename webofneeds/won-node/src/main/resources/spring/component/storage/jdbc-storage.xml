@@ -36,15 +36,7 @@
     <context:annotation-config />
 
     <!-- Defines where to search for annotated components -->
-    <!-- TODO: we may only need the model package here. Try that. -->
-    <context:component-scan base-package="won.protocol.exception" />
-    <context:component-scan base-package="won.protocol.matcher" />
-    <context:component-scan base-package="won.protocol.model" />
-    <context:component-scan base-package="won.protocol.need" />
-    <context:component-scan base-package="won.protocol.owner" />
-    <context:component-scan base-package="won.protocol.repository" />
-    <context:component-scan base-package="won.protocol.service" />
-    <context:component-scan base-package="won.protocol.util" />
+    <context:component-scan base-package="won.node.protocol.impl" />
 
 
     <!-- Database connection -->
@@ -58,7 +50,6 @@
     <!-- Hibernate is used as JPA vendor-->
     <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
         <property name="generateDdl" value="true" /> <!-- Automatically create tables for the entity classes. Don't do this in production! -->
-        <property name="showSql" value="false" /> <!-- Set this to true for analyzing SQL queries -->
     </bean>
 
     <!-- Entity manager -->
@@ -66,18 +57,38 @@
         <property name="dataSource" ref="dataSource" />
         <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
         <property name="packagesToScan" value="won.protocol.model" />
+        <!--
+        The custom JpaDialect can be used to set the flush mode manually. Shouldn't be needed,
+        but it's a neat trick :)
+        <property name="jpaDialect">
+           <bean class="won.protocol.util.hibernate.FlushModeSettingHibernateJpaDialect">
+               <property name="flushMode" value="ALWAYS" />
+           </bean>
+        </property>
+        -->
+        <property name="jpaPropertyMap">
+            <map>
+                <!-- here's the right place to configure query caching and 2nd level cache -->
+                <entry key="hibernate.cache.use_minimal_puts" value="true" />
+                <entry key="hibernate.show_sql" value="false" />
+            </map>
+        </property>
     </bean>
+    <!--
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="exposeTransactionAwareSessionFactory" value="true" />
+        <property name="useTransactionAwareDataSource" value="true"/>
+        <property name="jtaTransactionManager" ref="transactionManager" />
+    </bean>
+    -->
 
     <!-- Configure transaction management -->
-    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="entityManagerFactory" />
-    </bean>
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" />
 
     <tx:annotation-driven transaction-manager="transactionManager" />
 
     <!-- Defines where repositories are placed -->
     <jpa:repositories base-package="won.protocol.repository" />
 
-    <!--- RDF Storage -->
-    <bean id="rdfStorageRef" class="won.node.rdfstorage.impl.RDFFileStorageService" />
 </beans>

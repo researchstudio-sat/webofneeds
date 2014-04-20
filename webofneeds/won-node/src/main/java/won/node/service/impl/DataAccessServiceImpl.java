@@ -26,7 +26,8 @@ import java.util.List;
  * User: gabriel
  * Date: 06/11/13
  */
-public class DataAccessService {
+public class DataAccessServiceImpl implements won.node.service.DataAccessService
+{
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private RDFStorageService rdfStorageService;
   private URIService URIService;
@@ -83,10 +84,10 @@ public class DataAccessService {
       con.setRemoteConnectionURI(otherConnectionURI);
       con.setTypeURI(facetURI);
       //save connection (this creates a new id)
-      con = connectionRepository.saveAndFlush(con);
+      con = connectionRepository.save(con);
       //create and set new uri
       con.setConnectionURI(URIService.createConnectionURI(con));
-      con = connectionRepository.saveAndFlush(con);
+      con = connectionRepository.save(con);
 
       //TODO: do we save the connection content? where? as a chat content?
     }
@@ -94,6 +95,7 @@ public class DataAccessService {
     return con;
   }
 
+  @Override
   public Collection<URI> getSupportedFacets(URI needUri) throws NoSuchNeedException
   {
     List<URI> ret = new LinkedList<URI>();
@@ -117,6 +119,7 @@ public class DataAccessService {
    * @param content
    * @return
    */
+  @Override
   public URI getFacet(Model content) {
     return WonRdfUtils.FacetUtils.getFacet(content);
   }
@@ -126,11 +129,13 @@ public class DataAccessService {
    * @param content
    * @param facetURI
    */
+  @Override
   public void addFacet(final Model content, final URI facetURI)
   {
     WonRdfUtils.FacetUtils.addFacet(content, facetURI);
   }
 
+  @Override
   public Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
       throws ConnectionAlreadyExistsException {
     Connection con = null;
@@ -162,24 +167,26 @@ public class DataAccessService {
       }*/ else {
         //TODO: Move this to the transition() - Method in ConnectionState
         con.setState(con.getState().transit(eventType));
-        con = connectionRepository.saveAndFlush(con);
+        con = connectionRepository.save(con);
       }
     }
 
     return con;
   }
 
+  @Override
   public ConnectionEvent createConnectionEvent(final URI connectionURI, final URI originator,
-                                                final ConnectionEventType connectionEventType) {
+    final ConnectionEventType connectionEventType) {
     ConnectionEvent event = new ConnectionEvent();
     event.setConnectionURI(connectionURI);
     event.setType(connectionEventType);
     event.setOriginatorUri(originator);
-    eventRepository.saveAndFlush(event);
+    eventRepository.save(event);
 
     return event;
   }
 
+  @Override
   public Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
@@ -190,7 +197,7 @@ public class DataAccessService {
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
-    return connectionRepository.saveAndFlush(con);
+    return connectionRepository.save(con);
   }
 
   /**
@@ -200,6 +207,7 @@ public class DataAccessService {
    * @param feedback
    * @return true if feedback could be added false otherwise
    */
+  @Override
   public boolean addFeedback(final URI forResource, final Resource feedback){
     //TODO: concurrent modifications to the model for this resource result in side-effects.
     //think about locking.
@@ -224,12 +232,14 @@ public class DataAccessService {
     return true;
   }
 
+  @Override
   public void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event) {
     saveAdditionalContentForEvent(content, con, event, null);
   }
 
+  @Override
   public void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event,
-                                            final Double score) {
+    final Double score) {
     rdfStorageService.storeContent(event,
         RdfUtils.createContentForEvent(
             this.URIService.createEventURI(con, event), content, con, event, score));
@@ -248,9 +258,10 @@ public class DataAccessService {
     }
     */
 
+    @Override
     public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {
     con.setRemoteConnectionURI(remoteConnectionURI);
-    connectionRepository.saveAndFlush(con);
+    connectionRepository.save(con);
   }
 
   private boolean isNeedActive(final Need need) {
@@ -275,10 +286,12 @@ public class DataAccessService {
     return con.getState().transit(msg);
   }
 
+  @Override
   public void setURIService(URIService URIService) {
     this.URIService = URIService;
   }
 
+  @Override
   public void setRdfStorageService(RDFStorageService rdfStorageService) {
     this.rdfStorageService = rdfStorageService;
   }

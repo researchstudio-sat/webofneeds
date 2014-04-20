@@ -627,10 +627,10 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
     disk cache, which in this configuration will go to wherever java.io.tmp is
     defined on your system. On a standard Linux system this will be /tmp"
     -->
-    <cache name="linkedDataCache" maxEntriesLocalHeap="1000" maxEntriesLocalDisk="1000" eternal="false"
-           diskSpoolBufferSizeMB="20" timeToIdleSeconds="300" timeToLiveSeconds="1200" memoryStoreEvictionPolicy="LFU"
+    <cache name="linkedDataCache" overflowToDisk="false" diskPersistent="false" eternal="false"
+           maxBytesLocalHeap="5000000" timeToIdleSeconds="300" timeToLiveSeconds="1200" memoryStoreEvictionPolicy="LFU"
            transactionalMode="off">
-        <!--persistence strategy="localTempSwap"/--> <!--deactivate until we know how to serialize the Models in ehcache -->
+        <!--persistence strategy="localTempSwap"/--> <!-- we disable persistent cache until we find out how to serialize a model in ehcache -->
     </cache>
 
 

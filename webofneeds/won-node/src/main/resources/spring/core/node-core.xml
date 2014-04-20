@@ -75,6 +75,7 @@
         <property name="activeMqMatcherPrtotocolQueueName" value="${activemq.queuename.matcher.incoming}"/>
         <property name="rdfStorage" ref="rdfStorageRef" />
         <property name="pageSize" value="${linkeddata.pagesize}" />
+        <property name="uriService" ref="uriService" />
     </bean>
 
     <bean id="queueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/>
@@ -86,7 +87,7 @@
     <!--bean id="QueueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/-->
 
     <!--- DataAccessService -->
-    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessService" >
+    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessServiceImpl" >
         <property name="URIService" ref="uriService" />
         <property name="rdfStorageService" ref="rdfStorageRef" />
     </bean>

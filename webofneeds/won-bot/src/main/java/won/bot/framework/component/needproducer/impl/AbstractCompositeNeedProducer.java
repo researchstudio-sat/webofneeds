@@ -70,8 +70,6 @@ public abstract class AbstractCompositeNeedProducer implements NeedProducer
    */
   protected abstract NeedProducer selectActiveNeedFactory();
 
-  protected abstract NeedProducer selectActiveNeedFactoryOfType(Class clazz);
-  
   protected Set<NeedProducer> getNeedFactories(){
     return needFactories;
   }

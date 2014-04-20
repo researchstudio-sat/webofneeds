@@ -8,6 +8,7 @@ import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.util.DataAccessUtils;
 import won.protocol.ws.AbstractClientFactory;
 import won.protocol.ws.OwnerProtocolOwnerWebServiceEndpoint;
 
@@ -38,7 +39,7 @@ public class OwnerProtocolOwnerClientFactory extends AbstractClientFactory<Owner
 
   public OwnerProtocolOwnerWebServiceEndpoint getOwnerProtocolEndpointForNeed(URI needURI) throws NoSuchNeedException, MalformedURLException
   {
-    Need owner = needRepository.findByNeedURI(needURI).get(0);
+    Need owner = DataAccessUtils.loadNeed(needRepository, needURI);
     URI ownerWsdlUri = URI.create(owner.getOwnerURI().toString() + "?wsdl");
 
     OwnerProtocolOwnerWebServiceClient client = getCachedClient(ownerWsdlUri);
@@ -54,7 +55,7 @@ public class OwnerProtocolOwnerClientFactory extends AbstractClientFactory<Owner
   public OwnerProtocolOwnerWebServiceEndpoint getOwnerProtocolEndpointForConnection(URI connectionURI) throws NoSuchConnectionException, MalformedURLException,
       NoSuchNeedException
   {
-    Connection connection = connectionRepository.findByConnectionURI(connectionURI).get(0);
+    Connection connection = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     URI needUri = connection.getNeedURI();
 
     return getOwnerProtocolEndpointForNeed(needUri);

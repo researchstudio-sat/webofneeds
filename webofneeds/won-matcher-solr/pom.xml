@@ -194,8 +194,8 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <!--excludeScope>provided</excludeScope-->
                             <includeGroupIds>${project.groupId}</includeGroupIds>
@@ -210,8 +210,8 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <includeGroupIds>${project.groupId}</includeGroupIds>
                             <includeScope>test</includeScope> <!-- should select all required project artifacts irrespective of scope -->

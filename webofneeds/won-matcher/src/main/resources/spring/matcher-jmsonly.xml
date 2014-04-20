@@ -32,6 +32,7 @@
     <import resource="classpath:/spring/core/matcher-core.xml" />
     <import resource="classpath:/spring/component/storage/storage.xml" />
     <import resource="classpath:/spring/component/services/matcher-services.xml"/>
+    <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml" />
 
 
 

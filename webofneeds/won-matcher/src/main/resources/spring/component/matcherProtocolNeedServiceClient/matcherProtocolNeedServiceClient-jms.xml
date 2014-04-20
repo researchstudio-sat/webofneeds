@@ -23,6 +23,8 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <!-- expects a bean matcherMessagingService -->
     <bean id="matcherProtocolNeedServiceClientJMSBased"
           class="won.matcher.protocol.impl.MatcherProtocolNeedServiceClientJMSBased"
           init-method="initializeDefault">
@@ -30,14 +32,10 @@
         <property name="matcherProtocolCommunicationService" ref="matcherProtocolCommunicationService"/>
         <property name="startingEndpoint" value="seda:MatcherProtocol.Out.Hint"/>
     </bean>
+
     <bean id="matcherProtocolNeedServiceClient" class="won.matcher.protocol.impl.MatcherProtocolNeedServiceClient">
         <property name="delegate" ref="matcherProtocolNeedServiceClientJMSBased" />
         <qualifier value="default" />
-    </bean>
-    <bean id="matcherProtocolNeedServiceWSBased" class="won.matcher.protocol.impl.MatcherProtocolNeedServiceClientWSBased">
-        <property name="clientFactory" ref="matcherProtocolNeedClientFactory"/>
-    </bean>
-    <bean id="matcherProtocolNeedClientFactory" class="won.matcher.protocol.impl.MatcherProtocolNeedClientFactory">
     </bean>
 
 </beans>

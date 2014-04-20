@@ -22,17 +22,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
-import won.protocol.model.ConnectionEventType;
-import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.*;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
-import java.util.List;
 
 
 /**

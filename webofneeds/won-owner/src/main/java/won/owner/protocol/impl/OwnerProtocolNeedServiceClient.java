@@ -78,7 +78,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
         delegate.activate(needURI);
         Need need = needs.get(0);
         need.setState(NeedState.ACTIVE);
-        needRepository.saveAndFlush(need);
+        needRepository.save(need);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
         delegate.deactivate(needURI);
         Need need = needs.get(0);
         need.setState(NeedState.INACTIVE);
-        needRepository.saveAndFlush(need);
+        needRepository.save(need);
 
     }
 
@@ -108,7 +108,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
         Connection con = cons.get(0);
         con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
-        connectionRepository.saveAndFlush(con);
+        connectionRepository.save(con);
 
     }
 
@@ -123,7 +123,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
         delegate.close(connectionURI, content);
         Connection con = cons.get(0);
         con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
-        connectionRepository.saveAndFlush(con);
+        connectionRepository.save(con);
 
     }
 
@@ -163,7 +163,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
         chatMessage.setOriginatorURI(con.getNeedURI());
 
         //save in the db
-        chatMessageRepository.saveAndFlush(chatMessage);
+        chatMessageRepository.save(chatMessage);
 
 
     }
@@ -203,7 +203,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
                             if (wonNodeUri ==null) need.setWonNodeURI(URI.create(wonNodeDefault));
                             else need.setWonNodeURI(wonNodeUri);
-                            needRepository.saveAndFlush(need);
+                            needRepository.save(need);
                             needRepository.findByNeedURI(need.getNeedURI());
 
                             ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
@@ -259,7 +259,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                             throw new ConnectionAlreadyExistsException(conn.getConnectionURI(), needURI, otherNeedURI);
                         } else {
                             conn.setState(conn.getState().transit(ConnectionEventType.OWNER_OPEN));
-                            connectionRepository.saveAndFlush(conn);
+                            connectionRepository.save(conn);
                         }
                 }
             }  else {
@@ -276,7 +276,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
                                         con.setTypeURI(facetURI);
                                         con.setRemoteNeedURI(otherNeedURI);
                                         con.setConnectionURI(uri.get());
-                                        connectionRepository.saveAndFlush(con);
+                                        connectionRepository.save(con);
 
 
 

@@ -16,12 +16,9 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.ConnectionModelMapper;
 import won.protocol.util.NeedModelMapper;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;

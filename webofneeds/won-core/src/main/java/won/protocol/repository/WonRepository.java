@@ -16,6 +16,7 @@
 
 package won.protocol.repository;
 
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.List;
  * Time: 17:05
  * To change this template use File | Settings | File Templates.
  */
+@NoRepositoryBean
 public interface WonRepository<M> extends PagingAndSortingRepository<M, Long> {
     List<M> findById(Long id);
 

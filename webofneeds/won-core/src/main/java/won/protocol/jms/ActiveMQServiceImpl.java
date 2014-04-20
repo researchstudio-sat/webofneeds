@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.model.ProtocolType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 
 import javax.ws.rs.core.Response;
@@ -86,32 +87,11 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             }
             logger.debug("could not to get queue name from resource {}, trying to obtain won node URI",
               resourceUri);
-            //we didnt't get the queue name. Check if the model contains a triple <baseuri> won:hasWonNode
-            // <wonNode> and get the information from there.
-            Resource baseResource = RdfUtils.getBaseResource(resourceModel);
-            StmtIterator wonNodeStatementIterator = baseResource.listProperties(WON.HAS_WON_NODE);
-            if (! wonNodeStatementIterator.hasNext()){
-              //no won:hasWonNode triple found. we can't do anything.
-              logger.warn("no queue name found for protocol type {} on resource {}", protocolType,resourceUri);
-              return null;
-            }
-            Statement stmt = wonNodeStatementIterator.nextStatement();
-            RDFNode wonNodeNode = stmt.getObject();
-            if (!wonNodeNode.isResource()) {
-              logger.warn("resource {} links to won node {} which is not a resource",
-                resourceUri,
-                wonNodeNode );
-              return null;
-            }
-            URI wonNodeUri = URI.create(wonNodeNode.asResource().getURI().toString());
-            logger.debug("obtained WON node URI: {}",wonNodeUri);
-            if (wonNodeStatementIterator.hasNext()) {
-              logger.warn("multiple WON node URIs found for resource {}, using first one: {} ", resourceUri, wonNodeUri );
-            }
+            URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceModel);
             resourceModel = linkedDataSource.getModelForResource(wonNodeUri);
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(
               resourceModel,
-              resourceUri,
+              wonNodeUri,
               path);
             //now, even if it's null, we return the result.
             logger.debug("returning queue name {}",activeMQOwnerProtocolQueueName);
@@ -149,30 +129,11 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             resourceUri);
           //we didnt't get the queue name. Check if the model contains a triple <baseuri> won:hasWonNode
           // <wonNode> and get the information from there.
-          Resource baseResource = RdfUtils.getBaseResource(resourceModel);
-          StmtIterator wonNodeStatementIterator = baseResource.listProperties(WON.HAS_WON_NODE);
-          if (! wonNodeStatementIterator.hasNext()){
-            //no won:hasWonNode triple found. we can't do anything.
-            logger.warn("no broker URI found for resource {}", resourceUri);
-            return null;
-          }
-          Statement stmt = wonNodeStatementIterator.nextStatement();
-          RDFNode wonNodeNode = stmt.getObject();
-          if (!wonNodeNode.isResource()) {
-            logger.warn("resource {} links to won node {} which is not a resource",
-              resourceUri,
-              wonNodeNode );
-              return null;
-          }
-          URI wonNodeUri = URI.create(wonNodeNode.asResource().getURI().toString());
-          logger.debug("obtained WON node URI: {}",wonNodeUri);
-          if (wonNodeStatementIterator.hasNext()) {
-            logger.warn("multiple WON node URIs found for resource {}, using first one: {} ", resourceUri, wonNodeUri );
-          }
-          resourceModel = linkedDataSource.getModelForResource(resourceUri);
+          URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceModel);
+          resourceModel = linkedDataSource.getModelForResource(wonNodeUri);
           activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(
             resourceModel,
-            resourceUri,
+            wonNodeUri,
             path);
         } catch (UniformInterfaceException e){
             ClientResponse response = e.getResponse();
