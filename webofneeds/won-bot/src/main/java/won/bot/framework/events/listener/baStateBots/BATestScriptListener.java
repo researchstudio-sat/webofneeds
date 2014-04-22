@@ -132,9 +132,11 @@ public class BATestScriptListener extends AbstractFinishingListener
       //if there is an action, execute it.
       BATestScriptAction action = this.script.getNextAction();
       URI fromCon = getConnectionToSendFrom(action.isSenderIsCoordinator());
-      sendMessage(action, fromCon, new Date(System.currentTimeMillis() + millisBetweenMessages));
-      synchronized (countMonitor){
-        this.messagesInFlight++;
+      if (!action.isNopAction()){
+        sendMessage(action, fromCon, new Date(System.currentTimeMillis() + millisBetweenMessages));
+        synchronized (countMonitor){
+          this.messagesInFlight++;
+        }
       }
     }
     //in any case: remember that we processed a message. Especially important for the message sent
@@ -235,7 +237,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     }
   }
 
-  private void updateFilterForBothConnectionURIs() {
+  public void updateFilterForBothConnectionURIs() {
     OrFilter filter = new OrFilter();
     filter.addFilter(new ConnectionUriEventFilter(this.coordinatorSideConnectionURI));
     filter.addFilter(new ConnectionUriEventFilter(this.participantSideConnectionURI));
@@ -251,6 +253,30 @@ public class BATestScriptListener extends AbstractFinishingListener
     assert connectionURI != null : "connectionURI must not be null";
     return connectionURI.equals(this.coordinatorSideConnectionURI) || connectionURI.equals(this
       .participantSideConnectionURI);
+  }
+
+  public URI getCoordinatorURI() {
+    return coordinatorURI;
+  }
+
+  public URI getParticipantURI() {
+    return participantURI;
+  }
+
+  public URI getCoordinatorSideConnectionURI() {
+    return coordinatorSideConnectionURI;
+  }
+
+  public URI getParticipantSideConnectionURI() {
+    return participantSideConnectionURI;
+  }
+
+  public void setCoordinatorSideConnectionURI(final URI coordinatorSideConnectionURI) {
+    this.coordinatorSideConnectionURI = coordinatorSideConnectionURI;
+  }
+
+  public void setParticipantSideConnectionURI(final URI participantSideConnectionURI) {
+    this.participantSideConnectionURI = participantSideConnectionURI;
   }
 
   @Override

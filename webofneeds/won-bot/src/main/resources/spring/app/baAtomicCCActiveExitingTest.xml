@@ -25,7 +25,7 @@
     <!-- the runner -->
     <import resource="classpath:/spring/app/botRunner.xml" />
     <!-- the bots to run -->
-    <import resource="classpath:/spring/bot/mailBaseSimpleReactiveBotBAAtomicCC.xml" />
+    <import resource="classpath:/spring/bot/mailBaseSimpleReactiveBotBAAtomicCCActiveExiting.xml" />
 
 
 </beans>

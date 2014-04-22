@@ -226,7 +226,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractFacet{
           logger.debug("Current state of the Coordinator: "+state.getURI().toString());
 
 
-          // atomic outcome
+          // atomicBots outcome
           // if one of the Participants votes NO (either EXIT or FAIL or CANNOTCOMPLETE is received)
           //ACTITVE  -> (message: CANCEL) -> CANCELING
           //COMPLETED -> (message: COMPENSATE) -> COMPENSATING

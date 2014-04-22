@@ -3,6 +3,7 @@ package won.bot.impl;
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.coordinationMessageAsTextBots.*;
 import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.coordinationMessageAsUriBots.*;
+import won.protocol.model.FacetType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,15 @@ import java.util.List;
 public class BAPCBot extends BABaseBot {
 
 
+  @Override
+  protected FacetType getParticipantFacetType() {
+    return FacetType.BAPCParticipantFacet;
+  }
+
+  @Override
+  protected FacetType getCoordinatorFacetType() {
+    return FacetType.BAPCCoordinatorFacet;
+  }
   @Override
   protected List<BATestBotScript> getScripts() {
     //add a listener that auto-responds to messages by a message

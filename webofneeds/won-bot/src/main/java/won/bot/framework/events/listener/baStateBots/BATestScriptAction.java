@@ -1,7 +1,6 @@
 package won.bot.framework.events.listener.baStateBots;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import won.protocol.util.WonRdfUtils;
 
@@ -57,5 +56,9 @@ public class BATestScriptAction {
 
     public URI getStateOfSenderBeforeSending() {
         return stateOfSenderBeforeSending;
+    }
+
+    public boolean isNopAction(){
+      return false;
     }
 }

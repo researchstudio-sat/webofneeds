@@ -71,6 +71,8 @@ public abstract class BABaseBot extends EventBot
     this.testScriptListeners = new ArrayList<BATestScriptListener>(noOfNeeds);
   }
 
+  protected abstract FacetType getParticipantFacetType();
+  protected abstract FacetType getCoordinatorFacetType();
   @Override
   protected void initializeEventListeners() {
     final EventListenerContext ctx = getEventListenerContext();
@@ -79,7 +81,7 @@ public abstract class BABaseBot extends EventBot
     //create needs every trigger execution until noOfNeeds are created
     this.participantNeedCreator = new ActionOnEventListener(
       ctx, "participantCreator",
-      new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_PARTICIPANT, FacetType.BACCParticipantFacet.getURI()),
+      new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_PARTICIPANT, getParticipantFacetType().getURI()),
       noOfNeeds - 1
     );
     bus.subscribe(ActEvent.class, this.participantNeedCreator);
@@ -87,7 +89,7 @@ public abstract class BABaseBot extends EventBot
     //when done, create one coordinator need
     this.coordinatorNeedCreator = new ActionOnEventListener(
       ctx, "coordinatorCreator", new FinishedEventFilter(participantNeedCreator),
-      new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_COORDINATOR, FacetType.BACCCoordinatorFacet.getURI()),
+      new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_COORDINATOR, getCoordinatorFacetType().getURI()),
       1
     );
     bus.subscribe(FinishedEvent.class, this.coordinatorNeedCreator);
@@ -113,7 +115,7 @@ public abstract class BABaseBot extends EventBot
         bus.subscribe(OpenFromOtherNeedEvent.class, testScriptListener);
         bus.subscribe(MessageFromOtherNeedEvent.class, testScriptListener);
         //add a filter that will wait for the FinishedEvent emitted by that listener
-        //wrap it in an acceptonce filter to make extra sure we count each listener only once.
+        //wrap it in an acceptance filter to make extra sure we count each listener only once.
         mainScriptListenerFilter.addFilter(
           new AcceptOnceFilter(
             new FinishedEventFilter(testScriptListener)));
@@ -124,7 +126,7 @@ public abstract class BABaseBot extends EventBot
     this.needConnector = new ActionOnceAfterNEventsListener(
       ctx, "needConnector", noOfNeeds,
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
-        FacetType.BACCCoordinatorFacet.getURI(), FacetType.BACCParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES,
+        getCoordinatorFacetType().getURI(), getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
         scriptConnectHook));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 

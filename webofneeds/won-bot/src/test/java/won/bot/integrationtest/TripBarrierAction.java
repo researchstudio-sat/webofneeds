@@ -37,7 +37,7 @@ public class TripBarrierAction extends BaseEventBotAction
   @Override
   protected void doRun(final Event event) throws Exception {
     try {
-      //together with the barrier.await() in the @Test method, this trips the barrier
+      //together with the barrier.await() in the @TestD method, this trips the barrier
       //and both threads continue.
       barrier.await();
     } catch (Exception e) {

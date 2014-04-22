@@ -1,27 +1,9 @@
-/*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package won.bot.integrationtest;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -31,19 +13,21 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import won.bot.framework.events.event.impl.WorkDoneEvent;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
-import won.bot.impl.CommentBot;
+import won.bot.impl.BAAtomicCCActiveExitingBot;
 
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Integration test.
+ * User: Danijel
+ * Date: 16.4.14.
  */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
-public class CommentBotTest
+
+public class BAAtomicCCActiveExitingBotTest
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
   private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
@@ -62,6 +46,7 @@ public class CommentBotTest
   @Before
   public void before(){
     //create a bot instance and auto-wire it
+    //create a bot instance and auto-wire it
     AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
     this.bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
     Object botBean = beanFactory.initializeBean(this.bot, "mybot");
@@ -78,9 +63,8 @@ public class CommentBotTest
    * @throws Exception
    */
   @Test
-  public void testCommentBot() throws Exception
+  public void testBAAtomicCCActiveExitingBot() throws Exception
   {
-    logger.info("starting test case testCommentBot");
     //adding the bot to the bot manager will cause it to be initialized.
     //at that point, the trigger starts.
     botManager.addBot(this.bot);
@@ -91,16 +75,14 @@ public class CommentBotTest
     this.bot.getBarrier().await();
     //now check the results!
     this.bot.executeAsserts();
-    logger.info("finishing test case testCommentBot");
   }
-
 
   /**
    * We create a subclass of the bot we want to test here so that we can
    * add a listener to its internal event bus and to access its listeners, which
    * record information during the run that we later check with asserts.
    */
-  public static class MyBot extends CommentBot
+  public static class MyBot extends BAAtomicCCActiveExitingBot
   {
     /**
      * Used for synchronization with the @TestD method: it should wait at the
@@ -123,9 +105,9 @@ public class CommentBotTest
       //its only purpose is to trip the CyclicBarrier instance that
       // the test method is waiting on
       getEventBus().subscribe(WorkDoneEvent.class,
-        new ActionOnEventListener(
-          getEventListenerContext(),
-          new TripBarrierAction(getEventListenerContext(), barrier)));
+                              new ActionOnEventListener(
+                                getEventListenerContext(),
+                                new TripBarrierAction(getEventListenerContext(), barrier)));
     }
 
     public CyclicBarrier getBarrier()
@@ -138,36 +120,29 @@ public class CommentBotTest
      */
     public void executeAsserts()
     {
-      //1 act events
-      Assert.assertEquals(1, this.needCreator.getEventCount());
-      Assert.assertEquals(0, this.needCreator.getExceptionCount());
-      //1 create need events
-      Assert.assertEquals(1, this.commentFacetCreator.getEventCount());
-      Assert.assertEquals(0, this.commentFacetCreator.getExceptionCount());
-      //1 create comment events
-      Assert.assertEquals(2, this.needConnector.getEventCount());
+      //Coordinator creator
+      Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
+      Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
+      //28 Participants creator
+      Assert.assertEquals(noOfNeeds-1, this.participantNeedCreator.getEventCount());
+      Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
+      //Coordinator - Participants connector
+      Assert.assertEquals(noOfNeeds, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
-      //1 connect, 1 open
-      Assert.assertEquals(2, this.autoOpener.getEventCount());
-      Assert.assertEquals(0, this.autoOpener.getExceptionCount());
-      //10 messages
-      Assert.assertEquals(2, this.connectionCloser.getEventCount());
-      Assert.assertEquals(0, this.connectionCloser.getExceptionCount());
-      //2 close (one sent, one received - but for sending we create no event)
 
-      Assert.assertEquals(1,this.allNeedsDeactivator.getEventCount());
-      Assert.assertEquals(0, this.allNeedsDeactivator.getExceptionCount());
+      Assert.assertEquals(noOfNeeds-1, this.scriptsDoneListener.getEventCount());
+      Assert.assertEquals(0, this.scriptsDoneListener.getExceptionCount());
 
-
-      //4 NeedDeactivated events
-      Assert.assertEquals(2, this.workDoneSignaller.getEventCount());
+      //29 needs deactivated
+      Assert.assertEquals(noOfNeeds-1, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
       //TODO: there is more to check:
       //* what does the RDF look like?
       // --> pull it from the needURI/ConnectionURI and check contents
-      //* what does the database look like?      */
+      //* what does the database look like?
     }
 
   }
 }
+
