@@ -140,6 +140,7 @@ public class DirectoryBasedNeedProducer implements NeedProducer
   public boolean isExhausted()
   {
     initializeLazily();
+    if (isRepeat() && files != null && files.length > 0) return false;
     return this.fileIndex == NOT_INITIALIZED || this.files == null || this.fileIndex >= this.files.length;
   }
 

@@ -48,7 +48,10 @@ public abstract class AbstractCompositeNeedProducer implements NeedProducer
   @Override
   public synchronized boolean isExhausted()
   {
-    return selectNonExhaustedNeedFactory() == null;
+    for (NeedProducer delegate: this.needFactories){
+      if (!delegate.isExhausted()) return false;
+    }
+    return true;
   }
 
   private NeedProducer selectNonExhaustedNeedFactory(){

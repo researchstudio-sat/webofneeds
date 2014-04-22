@@ -43,6 +43,7 @@
         <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.protocol.impl.OwnerProtocolNeedServiceImpl.*(..))"/>
         <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.service.impl.DataAccessServiceImpl.*(..))"/>
         <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.service.impl.LinkedDataServiceImpl.*(..))"/>
+        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.rdfstorage.RDFStorageService.*(..))"/>
     </aop:config>
 
     <!-- this may not be needed... not sure when and why -->

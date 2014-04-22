@@ -16,14 +16,29 @@ import java.net.URI;
 public interface RDFStorageService
 {
 
+  /**
+   * Stores a copy of the specified model, iff it contains at least one triple.
+   * @param need
+   * @param graph
+   */
   public void storeContent(Need need, Model graph);
 
   public Model loadContent(Need need);
 
+  /**
+   * Stores a copy of the specified model, iff it contains at least one triple.
+   * @param event
+   * @param graph
+   */
   public void storeContent(ConnectionEvent event, Model graph);
 
   public Model loadContent(ConnectionEvent event);
 
+  /**
+   * Stores a copy of the specified model, iff it contains at least one triple.
+   * @param resourceURI
+   * @param model
+   */
   public void storeContent(URI resourceURI, Model model);
 
   public Model loadContent(URI resourceURI);

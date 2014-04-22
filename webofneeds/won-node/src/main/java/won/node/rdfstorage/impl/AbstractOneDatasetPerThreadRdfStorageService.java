@@ -14,26 +14,26 @@
  *    limitations under the License.
  */
 
-package won.bot.app;
+package won.node.rdfstorage.impl;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.stereotype.Component;
+import com.hp.hpl.jena.query.Dataset;
 
-@Component
-public class NeedCreatorBotApp implements CommandLineRunner
+/**
+ * Maintains thread-local dataset objects.
+ */
+public abstract class AbstractOneDatasetPerThreadRdfStorageService extends AbstractDatasetBasedRdfStorageService
 {
-
-  public static void main(String[] args) {
-    SpringApplication app = new SpringApplication(
-        new Object[]{"classpath:/spring/app/needCreatorBotApp.xml"}
-    );
-    app.run(args);
-  }
+  ThreadLocal<Dataset> datasetThreadLocal = new ThreadLocal<Dataset>();
 
   @Override
-  public void run(final String... strings) throws Exception
-  {
-
+  protected Dataset getDataset() {
+    Dataset dataset = datasetThreadLocal.get();
+    if (dataset == null){
+      dataset = createDataset();
+      datasetThreadLocal.set(dataset);
+    }
+    return dataset;
   }
+
+  protected abstract Dataset createDataset();
 }
