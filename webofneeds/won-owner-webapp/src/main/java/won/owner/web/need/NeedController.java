@@ -266,14 +266,16 @@ public class NeedController
     model.addAttribute("needURI", need.getNeedURI());
     List<Facet> facets = facetRepository.findByNeedURI(need.getNeedURI());
 
-          model.addAttribute("command", new NeedPojo(facets));
-
-
+    NeedPojo needCommandPojo = new NeedPojo(facets);
+          model.addAttribute("command", needCommandPojo);
 
     NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataSource.getModelForResource(need.getNeedURI()));
     pojo.setState(need.getState());
-
     model.addAttribute("pojo", pojo);
+
+    //set facets on 'command': (needed for the dropdown list in the 'connect' control TODO: deuglify
+    needCommandPojo.setNeedFacetURIs(pojo.getNeedFacetURIs());
+
 
     return "viewNeed";
   }

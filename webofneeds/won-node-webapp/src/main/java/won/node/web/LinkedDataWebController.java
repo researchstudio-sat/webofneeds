@@ -82,10 +82,14 @@ import java.util.Date;
 public class LinkedDataWebController
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
-  //prefix of a need resource
+  //full prefix of a need resource
   private String needResourceURIPrefix;
-  //prefix of a connection resource
+  //path of a need resource
+  private String needResourceURIPath;
+  //full prefix of a connection resource
   private String connectionResourceURIPrefix;
+  //path of a connection resource
+  private String connectionResourceURIPath;
   //prefix for URISs of RDF data
   private String dataURIPrefix;
   //prefix for URIs referring to real-world things
@@ -254,12 +258,22 @@ public class LinkedDataWebController
 
     String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), pageUriPrefix.getPath());
     logger.debug("resource URI requested with page mime type. redirecting from {} to {}", requestUri, redirectToURI);
-      if (redirectToURI.equals(requestUri)) {
-          logger.debug("redirecting to same URI avoided, sending status 500 instead");
-          return new ResponseEntity<String>("Could not redirect to linked data page", HttpStatus.INTERNAL_SERVER_ERROR);
-      }
+    if (redirectToURI.equals(requestUri)) {
+        logger.debug("redirecting to same URI avoided, sending status 500 instead");
+        return new ResponseEntity<String>("Could not redirect to linked data page", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
-    HttpHeaders headers = addNeverExpiresHeaders(new HttpHeaders());
+
+    //now, we want to suppress the 'never expires' header information
+    //for /resource/need and resource/connection so that crawlers always re-fetch these data
+    URI requestUriAsURI = URI.create(requestUri);
+    String requestPath = requestUriAsURI.getPath();
+    HttpHeaders headers = new HttpHeaders();
+    if (! (requestPath.replaceAll("/$","").endsWith(this.connectionResourceURIPath.replaceAll("/$", "")) ||
+           requestPath.replaceAll("/$","").endsWith(this.needResourceURIPath.replaceAll("/$", "")))) {
+      headers = addNeverExpiresHeaders(headers);
+    }
+    //add a location header
     headers.add("Location",redirectToURI);
     return new ResponseEntity<String>("", headers, HttpStatus.SEE_OTHER);
   }
@@ -465,4 +479,12 @@ public class LinkedDataWebController
     public void setNodeResourceURIPrefix(String nodeResourceURIPrefix) {
         this.nodeResourceURIPrefix = nodeResourceURIPrefix;
     }
+
+  public void setNeedResourceURIPath(final String needResourceURIPath) {
+    this.needResourceURIPath = needResourceURIPath;
+  }
+
+  public void setConnectionResourceURIPath(final String connectionResourceURIPath) {
+    this.connectionResourceURIPath = connectionResourceURIPath;
+  }
 }

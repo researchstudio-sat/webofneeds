@@ -10,6 +10,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
@@ -70,6 +72,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     private OwnerProtocolNeedServiceClientSide delegate;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void activate(URI needURI) throws Exception {
         logger.debug("owner to need: ACTIVATE called for need {}", needURI);
         List<Need> needs = needRepository.findByNeedURI(needURI);
@@ -82,6 +85,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deactivate(URI needURI) throws Exception {
         logger.debug("owner to need: DEACTIVATE called for need {}", needURI);
 
@@ -96,6 +100,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void open(URI connectionURI, Model content) throws Exception {
         if (logger.isDebugEnabled()) {
           logger.debug("owner to need: OPEN called for connection {} with content {}", connectionURI, StringUtils.abbreviate(RdfUtils.toString(content), 200));
@@ -113,6 +118,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void close(final URI connectionURI, Model content) throws Exception {
         if (logger.isDebugEnabled()) {
           logger.debug("owner to need: CLOSE called for connection {} with model {}", connectionURI, StringUtils.abbreviate(RdfUtils.toString(content), 200));
@@ -128,6 +134,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void textMessage(final URI connectionURI, final Model message)
             throws Exception {
         logger.debug("owner to need: MESSAGE called for connection {} with message {}", connectionURI, message);
@@ -170,17 +177,20 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String register(URI endpointURI)
     {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate) throws Exception {
         return createNeed(ownerURI, content, activate, null);
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public synchronized ListenableFuture<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeUri) throws Exception {
         if (logger.isDebugEnabled()) {
           logger.debug("owner to need: CREATE_NEED called for owner URI {}, activate {}, with content {}",
@@ -237,6 +247,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final Model content) throws Exception {
       if (logger.isDebugEnabled()) {
         logger.debug("owner to need: CONNECT called for need {}, other need {} and content {}", new Object[]{needURI, otherNeedURI, StringUtils.abbreviate(RdfUtils.toString(content),200)});

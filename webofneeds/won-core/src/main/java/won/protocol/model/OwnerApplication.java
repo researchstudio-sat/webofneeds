@@ -26,7 +26,8 @@ public class OwnerApplication {
      private List<Need> needs;
 
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER) //required eager as the object is passed out of a hibernate session in
+    // OwnerProtocolOutgoingMessagesProcessor
     @Fetch(value = FetchMode.SUBSELECT)
     @CollectionTable(name="QueueNames", joinColumns = @JoinColumn(name="owner_application_id"))
     @Column(name="queueName")
