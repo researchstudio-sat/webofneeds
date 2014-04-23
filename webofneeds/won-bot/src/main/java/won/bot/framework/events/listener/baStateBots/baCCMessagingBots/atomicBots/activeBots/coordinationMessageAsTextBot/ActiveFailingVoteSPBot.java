@@ -19,7 +19,9 @@ public class ActiveFailingVoteSPBot extends BATestBotScript
   protected List<BATestScriptAction> setupActions() {
     List<BATestScriptAction> actions = new ArrayList();
 
-    actions.add(new BATestScriptAction(false, "MESSAGE_FAILED", URI.create(WON_BA.STATE_EXITING.getURI())));
+    actions.add(new BATestScriptAction(true, "MESSAGE_FAIL", URI.create(WON_BA.STATE_ACTIVE.getURI())));
+    //no vote!
+    actions.add(new BATestScriptAction(false, "MESSAGE_FAILED", URI.create(WON_BA.STATE_FAILING_ACTIVE_CANCELING_COMPLETING.getURI())));
 
     return actions;
   }

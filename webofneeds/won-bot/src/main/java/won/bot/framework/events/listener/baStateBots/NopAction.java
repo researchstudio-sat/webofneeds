@@ -14,4 +14,8 @@ public class NopAction extends BATestScriptAction
   public boolean isNopAction() {
     return true;
   }
+
+  public String toString(){
+    return getClass().getSimpleName() + "@" + hashCode();
+  }
 }

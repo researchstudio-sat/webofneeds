@@ -3,9 +3,7 @@ package won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBo
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.BATestScriptAction;
 import won.bot.framework.events.listener.baStateBots.NopAction;
-import won.bot.framework.events.listener.baStateBots.WON_BA;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,16 +11,17 @@ import java.util.List;
  * User: Danijel
  * Date: 17.4.14.
  */
-public class ActiveFailingVoteFPBot extends BATestBotScript
+public class ActiveNoVoteFPBot extends BATestBotScript
 {
 
   @Override
   protected List<BATestScriptAction> setupActions() {
     List<BATestScriptAction> actions = new ArrayList();
 
-    actions.add(new NopAction());
-    actions.add(new NopAction());
-    actions.add(new BATestScriptAction(true, "MESSAGE_FAIL", URI.create(WON_BA.STATE_ACTIVE.getURI())));
+   actions.add(new NopAction());
+   // actions.add(new NopAction());
+   //
+    //no vote!
 
     return actions;
   }

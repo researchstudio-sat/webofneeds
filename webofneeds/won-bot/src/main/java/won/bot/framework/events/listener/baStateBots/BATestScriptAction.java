@@ -61,4 +61,13 @@ public class BATestScriptAction {
     public boolean isNopAction(){
       return false;
     }
+
+  @Override
+  public String toString() {
+    return "BATestScriptAction{" +
+      "senderIsParticipant=" + senderIsParticipant +
+      ", messageToBeSent=" + messageToBeSent +
+      ", stateOfSenderBeforeSending=" + stateOfSenderBeforeSending +
+      '}';
+  }
 }

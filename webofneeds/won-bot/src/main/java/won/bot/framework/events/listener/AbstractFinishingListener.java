@@ -60,12 +60,20 @@ public abstract class AbstractFinishingListener extends BaseEventListener implem
     if (doRun) {
       handleEvent(event);
     }
+    if (isFinished()) {
+      performFinish();
+    }
+  }
+
+  /**
+   * Performs all finishing actions and sets the finished flag
+   */
+  protected void performFinish() {
     synchronized (monitor){
-      if (!finished && isFinished()) {
-        unsubscribe();
-        publishFinishedEvent();
-        finished = true;
-      }
+      if (finished) return;
+      unsubscribe();
+      publishFinishedEvent();
+      finished = true;
     }
   }
 

@@ -53,11 +53,11 @@ public abstract class BAAtomicCCBaseBot extends EventBot{
     this.firstPhaseScripts = getFirstPhaseScripts();
     this.secondPhaseScripts = getSecondPhaseScripts();
     if (this.secondPhaseScripts.size() != this.firstPhaseScripts.size()) {
-      throw new IllegalArgumentException("same number of scripts in first and second phase required!");
+      throw new IllegalArgumentException("The same number of scripts in first and second phase is required!");
     }
-    this.noOfNeeds = firstPhaseScripts.size();
-    this.firstPhasetestScriptListeners = new ArrayList<BATestScriptListener>(noOfNeeds);
-    this.secondPhasetestScriptListeners = new ArrayList<BATestScriptListener>(noOfNeeds);
+    this.noOfNeeds = firstPhaseScripts.size()+1;
+    this.firstPhasetestScriptListeners = new ArrayList<BATestScriptListener>(noOfNeeds-1);
+    this.secondPhasetestScriptListeners = new ArrayList<BATestScriptListener>(noOfNeeds-1);
   }
 
   @Override
@@ -80,7 +80,7 @@ public abstract class BAAtomicCCBaseBot extends EventBot{
       1
     );
     bus.subscribe(FinishedEvent.class, this.coordinatorNeedCreator);
-
+    FinishedEventFilter coordinatorCreatorFilter = new FinishedEventFilter(coordinatorNeedCreator);
 
     final Iterator<BATestBotScript> firstPhasescriptIterator = firstPhaseScripts.iterator();
     final Iterator<BATestBotScript> secondPhasescriptIterator = secondPhaseScripts.iterator();
@@ -118,7 +118,6 @@ public abstract class BAAtomicCCBaseBot extends EventBot{
         secondPhaseScriptListenerFilter.addFilter(
           new AcceptOnceFilter(
             new FinishedEventFilter(secondPhaseTestScriptListener)));
-
       }
     };
 
@@ -127,19 +126,21 @@ public abstract class BAAtomicCCBaseBot extends EventBot{
       ctx, "needConnector", noOfNeeds,
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
                                       FacetType.BAAtomicCCCoordinatorFacet.getURI(),
-                                      FacetType.BACCParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES, scriptConnectHook));
+                                      FacetType.BACCParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES,
+        scriptConnectHook));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
-
     //for each group member, there are 2 listeners waiting for messages. when they are all finished, we're done.
     this.firstPhaseDoneListener = new ActionOnceAfterNEventsListener(
-      ctx, "scriptsDoneListener", firstPhaseScriptListenerFilter,
+      ctx, "firstPhaseDoneListener", firstPhaseScriptListenerFilter,
       noOfNeeds - 1,
       new BaseEventBotAction(ctx)
       {
         @Override
         protected void doRun(final Event event) throws Exception {
+          logger.debug("starting second phase");
           Iterator<BATestScriptListener> firstPhaseListeners = firstPhasetestScriptListeners.iterator();
           for(BATestScriptListener listener: secondPhasetestScriptListeners){
+            logger.debug("subscribing second phase listener {}", listener);
             //subscribe it to the relevant events.
             bus.subscribe(MessageFromOtherNeedEvent.class, listener);
             bus.subscribe(SecondPhaseStartedEvent.class, listener);
@@ -152,10 +153,9 @@ public abstract class BAAtomicCCBaseBot extends EventBot{
               correspondingFirstPhaseListener.getCoordinatorSideConnectionURI(),
               correspondingFirstPhaseListener.getParticipantURI()));
           }
-
         }
       });
-    bus.subscribe(FinishedEvent.class, this.scriptsDoneListener);
+    bus.subscribe(FinishedEvent.class, this.firstPhaseDoneListener);
 
 
     //for each group member, there are 2 listeners waiting for messages. when they are all finished, we're done.
@@ -163,7 +163,8 @@ public abstract class BAAtomicCCBaseBot extends EventBot{
       ctx, "scriptsDoneListener", secondPhaseScriptListenerFilter,
       noOfNeeds - 1,
       new DeactivateAllNeedsOfGroupAction(ctx, URI_LIST_NAME_PARTICIPANT));
-    bus.subscribe(FinishedEvent.class, this.scriptsDoneListener);
+      bus.subscribe(FinishedEvent.class, this.scriptsDoneListener);
+
 
     //When the needs are deactivated, all connections are closed. wait for the close events and signal work done.
     this.workDoneSignaller = new ActionOnceAfterNEventsListener(
@@ -171,6 +172,7 @@ public abstract class BAAtomicCCBaseBot extends EventBot{
       noOfNeeds - 1, new SignalWorkDoneAction(ctx)
     );
     bus.subscribe(CloseFromOtherNeedEvent.class, this.workDoneSignaller);
+
   }
 
 

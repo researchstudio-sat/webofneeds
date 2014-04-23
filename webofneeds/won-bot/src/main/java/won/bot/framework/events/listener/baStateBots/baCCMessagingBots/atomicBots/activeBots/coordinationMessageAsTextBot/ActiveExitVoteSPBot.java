@@ -19,6 +19,8 @@ public class ActiveExitVoteSPBot extends BATestBotScript
   protected List<BATestScriptAction> setupActions() {
     List<BATestScriptAction> actions = new ArrayList();
 
+    actions.add(new BATestScriptAction(true, "MESSAGE_EXIT", URI.create(WON_BA.STATE_ACTIVE.getURI())));
+    //no vote!
     actions.add(new BATestScriptAction(false, "MESSAGE_EXITED", URI.create(WON_BA.STATE_EXITING.getURI())));
 
     return actions;

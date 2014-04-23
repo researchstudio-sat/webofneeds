@@ -25,7 +25,8 @@ public class CompletingSPCancelingFailingBot extends BATestBotScript
 
     actions.add(new NopAction());
     actions.add(new BATestScriptAction(true, "MESSAGE_FAIL", URI.create(WON_BA.STATE_CANCELING_COMPLETING.getURI())));
-    actions.add(new BATestScriptAction(false, "MESSAGE_FAILED", URI.create(WON_BA.STATE_FAILING_ACTIVE_CANCELING.getURI())));
+    actions.add(new BATestScriptAction(false, "MESSAGE_FAILED", URI.create(WON_BA.STATE_FAILING_ACTIVE_CANCELING_COMPLETING
+                                                                                 .getURI())));
 
     return actions;
   }

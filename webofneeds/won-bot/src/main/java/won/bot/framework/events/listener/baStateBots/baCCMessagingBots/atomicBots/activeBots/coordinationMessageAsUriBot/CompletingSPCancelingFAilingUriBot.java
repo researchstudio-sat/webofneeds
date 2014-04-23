@@ -11,10 +11,10 @@ import java.util.List;
 
 /**
  * User: Danijel
- * Date: 17.4.14.
+ * Date: 22.4.14.
  */
-public class CompletingSPCancelingFailingUriBot  extends BATestBotScript
-{
+public class CompletingSPCancelingFailingUriBot extends BATestBotScript
+{          //CompletingSPCancelingFailingUriBot
 
   @Override
   protected List<BATestScriptAction> setupActions() {
@@ -25,7 +25,9 @@ public class CompletingSPCancelingFailingUriBot  extends BATestBotScript
 
     actions.add(new NopAction());
     actions.add(new BATestScriptAction(true, URI.create(WON_BA.MESSAGE_FAIL.getURI()), URI.create(WON_BA.STATE_CANCELING_COMPLETING.getURI())));
-    actions.add(new BATestScriptAction(false, URI.create(WON_BA.MESSAGE_FAILED.getURI()), URI.create(WON_BA.STATE_FAILING_ACTIVE_CANCELING.getURI())));
+    actions.add(new BATestScriptAction(false, URI.create(WON_BA.MESSAGE_FAILED.getURI()), URI.create(WON_BA.STATE_FAILING_ACTIVE_CANCELING_COMPLETING.getURI())));
+
+
 
     return actions;
   }
