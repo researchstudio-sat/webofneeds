@@ -18,8 +18,10 @@ package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.impl.*;
 import won.bot.framework.events.bus.EventBus;
+import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.impl.*;
 import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
@@ -39,6 +41,7 @@ public class MatcherProtocolBot extends EventBot
   //
   //we use BaseEventListener as their types so we can access the generic
   //functionality offered by that class
+  protected BaseEventListener matcherRegistrator;
   protected BaseEventListener needCreator;
   protected BaseEventListener matcher;
   protected BaseEventListener allNeedsDeactivator;
@@ -52,13 +55,27 @@ public class MatcherProtocolBot extends EventBot
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
+    this.matcherRegistrator = new ActionOnEventListener(
+      ctx,
+      new RegisterMatcherAction(ctx),
+      1
+    );
+    bus.subscribe(ActEvent.class,this.matcherRegistrator);
+
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(
         ctx,
         new CreateNeedAction(ctx,NAME_NEEDS),
         NO_OF_NEEDS
     );
-    bus.subscribe(ActEvent.class,this.needCreator);
+
+    bus.subscribe(MatcherRegisteredEvent.class, new ActionOnEventListener(ctx, new BaseEventBotAction(ctx)
+    {
+      @Override
+      protected void doRun(final Event event) throws Exception {
+        getEventListenerContext().getEventBus().subscribe(ActEvent.class, needCreator);
+      }
+    },1));
 
     this.matcherNotifier = new ActionOnceAfterNEventsListener(ctx,4,new DummyAction(ctx));
     bus.subscribe(NeedCreatedEventForMatcher.class,matcherNotifier);

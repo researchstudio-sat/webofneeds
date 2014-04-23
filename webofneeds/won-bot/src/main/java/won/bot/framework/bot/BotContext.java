@@ -31,11 +31,23 @@ public interface BotContext
   public List<URI> listNeedUris();
 
   /**
+   * list all node URIs known in this memory.
+   * @return
+   */
+  public List<URI> listNodeUris();
+  /**
    * Check if this memory knows the specified need URI.
    * @param needURI
    * @return
    */
   public boolean isNeedKnown(URI needURI);
+
+  /**
+   * Check if this memory knows the specified node URI
+   * @param wonNodeURI
+   * @return
+   */
+  public boolean isNodeKnown(URI wonNodeURI);
 
   /**
    * Save the specified need URI in this memory under the specified name.
@@ -49,6 +61,8 @@ public interface BotContext
    * @param uri
    */
   public void rememberNeedUri(URI uri);
+
+  public void rememberNodeUri(URI uri);
 
   public void rememberNamedNeedUriList(List<URI> uris, String name);
   public void appendToNamedNeedUriList(URI uri, String name);

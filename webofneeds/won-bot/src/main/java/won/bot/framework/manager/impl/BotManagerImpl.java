@@ -17,6 +17,7 @@ public class BotManagerImpl implements BotManager
   protected final Logger logger = LoggerFactory.getLogger(getClass());
   private List<Bot> bots = new LinkedList<Bot>();
   private Map<URI, Bot> botByUri = new HashMap<URI, Bot>();
+  private Map<URI, List<Bot>> botListByUri = new HashMap<URI, List<Bot>>();
   private Object monitor = new Object();
 
   @Override
@@ -28,6 +29,8 @@ public class BotManagerImpl implements BotManager
     }
     //check each bot, return first that knows the needUri
     for(Bot mybot: bots){
+      logger.debug("bot size: ",bots.size());
+      logger.debug("knows need: ", mybot.knowsNeedURI(needUri));
       if (mybot.knowsNeedURI(needUri)) {
         synchronized (getMonitor()){
           this.botByUri.put(needUri, mybot);
@@ -36,6 +39,24 @@ public class BotManagerImpl implements BotManager
       }
     }
     return null;
+  }
+
+  @Override
+  public List<Bot> getBotsForNodeURI(final URI wonNodeUri) {
+    {
+      List<Bot> botList = botListByUri.get(wonNodeUri);
+      if (botList!=null && botList.size()>0) return botList;
+    }
+    List<Bot> botList = new ArrayList<Bot>();
+    for (Bot mybot:bots){
+      if (mybot.knowsNodeURI(wonNodeUri)){
+        synchronized (getMonitor()){
+          botList.add(mybot);
+        }
+      }
+    }
+    this.botListByUri.put(wonNodeUri,botList);
+    return botList;
   }
 
   @Override

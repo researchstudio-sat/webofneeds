@@ -14,24 +14,30 @@
  *    limitations under the License.
  */
 
-package won.node.protocol;
-
-import com.hp.hpl.jena.rdf.model.Model;
+package won.bot.framework.events.event;
 
 import java.net.URI;
 
 /**
- * User: LEIH-NB
- * Date: 10.04.14
+ *
  */
-public interface MatcherProtocolMatcherServiceClientSide
+public abstract class BaseNodeSpecificEvent extends BaseEvent implements NodeSpecificEvent
 {
+  private final URI nodeURI;
 
-  public void matcherRegistered(final URI wonNodeURI);
+  protected BaseNodeSpecificEvent(final URI nodeURI) {
+    this.nodeURI = nodeURI;
+  }
 
-  public void needCreated(final URI needURI, final Model content);
+  @Override
+  public URI getNodeURI() {
+    return nodeURI;
+  }
 
-  public void needActivated(final URI needURI);
-
-  public void needDeactivated(final URI needURI);
+  @Override
+  public String toString() {
+    return getClass().getSimpleName()+ "{" +
+      "nodeURI=" + getNodeURI() +
+      '}';
+  }
 }

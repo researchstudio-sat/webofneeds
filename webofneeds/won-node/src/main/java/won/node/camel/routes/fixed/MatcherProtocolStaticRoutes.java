@@ -31,6 +31,10 @@ public class MatcherProtocolStaticRoutes extends RouteBuilder {
             .when(header("methodName").isEqualTo("hint"))
             .to("bean:matcherProtocolNeedJMSService?method=hint");
         from("seda:MatcherProtocolOut?concurrentConsumers=5").routeId("Node2MatcherRoute")
+            .choice()
+            .when(header("methodName").isEqualTo("matcherRegistered"))
+            .to("activemq:topic:MatcherProtocol.Out.Matcher")
+            .otherwise()
             .to("activemq:topic:MatcherProtocol.Out.Need");
     }
 }

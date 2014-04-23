@@ -9,8 +9,9 @@ import java.net.URI;
  * Date: 08.04.14
  */
 public interface MatcherProtocolMatcherService {
-    public void onNewNeed(URI needURI, Model content);
-    public void onNeedActivated(URI needURI);
-    public void onNeedDeactivated(URI needURI);
+    public void onMatcherRegistration(URI wonNodeUri);
+    public void onNewNeed(final URI wonNodeURI, URI needURI, Model content);
+    public void onNeedActivated(final URI wonNodeURI, URI needURI);
+    public void onNeedDeactivated(final URI wonNodeURI, URI needURI);
 
 }

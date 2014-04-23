@@ -26,7 +26,8 @@ import java.net.URI;
  */
 public interface MatcherProtocolMatcherServiceCallback
 {
-  void onNewNeed(URI needURI, Model content);
-  void onNeedActivated(URI needURI);
-  void onNeedDeactivated(URI needURI);
+  void onRegistered(URI wonNodeUri);
+  void onNewNeed(final URI wonNodeURI, URI needURI, Model content);
+  void onNeedActivated(final URI wonNodeURI, URI needURI);
+  void onNeedDeactivated(final URI wonNodeURI, URI needURI);
 }

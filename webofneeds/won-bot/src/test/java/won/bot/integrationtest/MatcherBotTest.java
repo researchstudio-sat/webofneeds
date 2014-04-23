@@ -135,6 +135,8 @@ public class MatcherBotTest
      */
     public void executeAsserts()
     {
+      Assert.assertEquals(1, this.matcherRegistrator.getEventCount());
+      Assert.assertEquals(0, this.matcherRegistrator.getExceptionCount());
       //1 act events
       Assert.assertEquals(2, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());

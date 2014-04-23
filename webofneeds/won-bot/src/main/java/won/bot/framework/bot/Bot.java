@@ -32,21 +32,17 @@ public interface Bot
 {
   public boolean knowsNeedURI(URI needURI);
 
-  /**
-   * If the Bot is registered as a matcher with the specified node, it returns true here.
-   * @param
-   * @return
-   */
-  //public boolean wantsUpdatesFromNode(URI nodeURI);
+  public boolean knowsNodeURI(URI wonNodeURI);
+
   public void onConnectFromOtherNeed(Connection con, final Model content) throws Exception;
   public void onOpenFromOtherNeed(Connection con, final Model content) throws Exception;
   public void onCloseFromOtherNeed(Connection con, final Model content) throws Exception;
   public void onHintFromMatcher(Match match, final Model content) throws Exception;
   public void onMessageFromOtherNeed(Connection con, ChatMessage message, final Model content) throws Exception;
-
-  public void onNewNeedCreatedNotificationForMatcher(final URI needURI, final  Model needModel);
-  public void onNeedActivatedNotificationForMatcher(final URI needURI);
-  public void onNeedDeactivatedNotificationForMatcher(final URI needURI);
+  public void onMatcherRegistered(URI wonNodeUri);
+  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Model needModel);
+  public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+  public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
   /**
    * Override this to be informed whenever the bot has created a new need successfully.
    * @param needUri

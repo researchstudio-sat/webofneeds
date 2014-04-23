@@ -51,7 +51,7 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
-  public CamelConfiguration configureCamelEndpoint(URI needUri, String startingEndpoint) throws Exception {
+  public synchronized CamelConfiguration configureCamelEndpoint(URI needUri, String startingEndpoint) throws Exception {
       String matcherProtocolQueueName;
       CamelConfiguration camelConfiguration = new CamelConfiguration();
 
@@ -87,7 +87,7 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
   }
 
   @Override
-  public URI getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException {
+  public synchronized URI getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException {
       Need need = null;
       URI wonNodeUri = null;
       //need = needRepository.findByNeedURI(needUri).get(0);
@@ -97,20 +97,18 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
           wonNodeUri = need.getWonNodeURI();
 
       }
-
-
       return wonNodeUri;
   }
 
   @Override
-  public Set<String> getMatcherProtocolOutTopics(URI wonNodeURI) {
+  public synchronized Set<String> getMatcherProtocolOutTopics(URI wonNodeURI) {
     Set<String> matcherProtocolTopics = ((MatcherActiveMQService)activeMQService)
       .getMatcherProtocolTopicNamesWithResource(wonNodeURI);
     return matcherProtocolTopics;
   }
 
   @Override
-  public void addRemoteTopicListeners(final Set<String> endpoints, final URI wonNodeUri)
+  public synchronized void addRemoteTopicListeners(final Set<String> endpoints, final URI wonNodeUri)
     throws CamelConfigurationFailedException {
     URI remoteEndpoint = activeMQService.getBrokerEndpoint(wonNodeUri);
     String remoteComponentName = componentName+ remoteEndpoint.toString().replaceAll("[/:]","" );
@@ -118,8 +116,6 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
                                                                        remoteComponentName
                                                                        );
     matcherProtocolCamelConfigurator.addRemoteTopicListeners(endpoints, remoteEndpoint);
-
-
   }
 
   @Override

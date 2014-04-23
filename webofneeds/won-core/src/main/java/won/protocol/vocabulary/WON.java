@@ -52,6 +52,9 @@ public class WON
   public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME = m.createProperty(BASE_URI,"hasActiveMQMatcherProtocolOutNeedCreatedTopicName");
   public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedActivatedTopicName");
   public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedDeactivatedTopicName");
+  public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED_TOPIC_NAME = m.createProperty
+    (BASE_URI, "hasActiveMQMatcherProtocolOutMatcherRegisteredTopicName");
+
 
   public static final Property EMBED_SPIN_ASK = m.createProperty(BASE_URI, "embedSpinAsk");
 

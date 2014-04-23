@@ -14,24 +14,14 @@
  *    limitations under the License.
  */
 
-package won.node.protocol;
-
-import com.hp.hpl.jena.rdf.model.Model;
+package won.bot.framework.events.event;
 
 import java.net.URI;
 
 /**
- * User: LEIH-NB
- * Date: 10.04.14
+ * Interface for events that are need-specific.
  */
-public interface MatcherProtocolMatcherServiceClientSide
+public interface NodeSpecificEvent
 {
-
-  public void matcherRegistered(final URI wonNodeURI);
-
-  public void needCreated(final URI needURI, final Model content);
-
-  public void needActivated(final URI needURI);
-
-  public void needDeactivated(final URI needURI);
+  public URI getNodeURI();
 }

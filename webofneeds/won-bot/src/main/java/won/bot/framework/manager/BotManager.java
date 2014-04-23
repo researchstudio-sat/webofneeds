@@ -4,6 +4,7 @@ import won.bot.framework.bot.Bot;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -11,7 +12,7 @@ import java.util.Collection;
 public interface BotManager
 {
   public Bot getBotForNeedURI(URI needUri);
-  //public List<Bot> getBotsForNodeURI(URI nodeUri);
+  public List<Bot> getBotsForNodeURI(URI nodeUri);
   public void addBot(Bot bot);
 
   /**

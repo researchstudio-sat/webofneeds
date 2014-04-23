@@ -27,6 +27,5 @@
 
 
     <bean name="matcherProtocolMatcherClientJMSBased" class="won.node.messaging.MatcherProtocolMatcherClientImplJMSBased">
-
     </bean>
 </beans>

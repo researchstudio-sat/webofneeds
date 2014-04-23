@@ -20,8 +20,6 @@ import org.apache.camel.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.MatcherProtocolMatcherService;
 import won.protocol.exception.CamelConfigurationFailedException;
@@ -42,7 +40,7 @@ import java.util.Set;
  */
 //TODO copied from OwnerProtocolOwnerService... refactoring needed
     //TODO: refactor service interfaces.
-public class MatcherProtocolMatcherServiceImplJMSBased implements ApplicationListener<ContextRefreshedEvent>
+public class MatcherProtocolMatcherServiceImplJMSBased
 {//implements MatcherProtocolMatcherService {
 
   final Logger logger = LoggerFactory.getLogger(getClass());
@@ -60,59 +58,70 @@ public class MatcherProtocolMatcherServiceImplJMSBased implements ApplicationLis
 
   private URI defaultNodeURI;
 
-  private boolean onApplicationRun = false;
 
-
-    public void needCreated(@Header("needURI") final String needURI, @Header("content") final String content) {
+    public void needCreated(@Header("wonNodeURI") final String wonNodeURI, @Header("needURI") final String needURI,
+                            @Header("content") final String content) {
         logger.debug("new need received: {} with content {}", needURI, content);
 
-        delegate.onNewNeed(URI.create(needURI), RdfUtils.toModel(content));
+        delegate.onNewNeed(URI.create(wonNodeURI), URI.create(needURI), RdfUtils.toModel(content));
     }
-    public void needActivated(@Header("needURI") final String needURI) {
+    public void needActivated(@Header("wonNodeURI") final String wonNodeURI,@Header("needURI") final String needURI) {
       logger.debug("need activated message received: {}", needURI);
 
-      delegate.onNeedActivated(URI.create(needURI));
+      delegate.onNeedActivated(URI.create(wonNodeURI), URI.create(needURI) );
     }
-    public void needDeactivated(@Header("needURI") final String needURI) {
+    public void needDeactivated(@Header("wonNodeURI") final String wonNodeURI,@Header("needURI") final String needURI) {
       logger.debug("need deactivated message received: {}", needURI);
 
-      delegate.onNeedDeactivated(URI.create(needURI));
+      delegate.onNeedDeactivated(URI.create(wonNodeURI), URI.create(needURI) );
     }
 
-
-  private void configureMatcherProtocolOutTopics(URI wonNodeUri) throws CamelConfigurationFailedException {
+  private Set<String> configureMatcherProtocolOutTopics(URI wonNodeUri) throws CamelConfigurationFailedException {
     Set<String> remoteTopics = matcherProtocolCommunicationService.getMatcherProtocolOutTopics (wonNodeUri);
     matcherProtocolCommunicationService.addRemoteTopicListeners(remoteTopics,wonNodeUri);
+    delegate.onMatcherRegistration(wonNodeUri);
+    return remoteTopics;
   }
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        if (!onApplicationRun){
-            logger.debug("registering owner application on application event");
+  public void register(final URI wonNodeURI) {
+      try {
+        new Thread(){
+          @Override
+          public void run() {
             try {
-                new Thread(){
-                    @Override
-                    public void run() {
-                        try {
-                          Iterator iter = matcherNodeURISource.getNodeURIIterator();
-                          while (iter.hasNext()){
-                            configureMatcherProtocolOutTopics((URI)iter.next());
-                          }
-
-                        } catch (Exception e) {
-                            logger.warn("Could not get topic lists from default node {}", defaultNodeURI,e);
-                    }
-                    }
-                }.start();
+                configureMatcherProtocolOutTopics(wonNodeURI);
             } catch (Exception e) {
-                logger.warn("getting topic lists from the node {} failed",defaultNodeURI);
+              logger.warn("Could not get topic lists from default node {}", defaultNodeURI,e);
             }
-            onApplicationRun = true;
-        }
+          }
+        }.start();
+      } catch (Exception e) {
+        logger.warn("getting topic lists from the node {} failed",defaultNodeURI);
+      }
 
+  }
+  public void register(){
+      logger.debug("registering owner application on application event");
+      try {
+        new Thread(){
+          @Override
+          public void run() {
+            try {
+              Iterator iter = matcherNodeURISource.getNodeURIIterator();
+              while (iter.hasNext()){
+                configureMatcherProtocolOutTopics((URI)iter.next());
+              }
 
-    }
+            } catch (Exception e) {
+              logger.warn("Could not get topic lists from default node {}", defaultNodeURI,e);
+            }
+          }
+        }.start();
+      } catch (Exception e) {
+        logger.warn("getting topic lists from the node {} failed",defaultNodeURI);
+      }
+  }
 
   public MatcherProtocolCommunicationService getMatcherProtocolCommunicationService() {
     return matcherProtocolCommunicationService;

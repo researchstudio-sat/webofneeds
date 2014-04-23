@@ -28,17 +28,22 @@ public class NopMatcherProtocolMatcherServiceCallback implements MatcherProtocol
 {
 
   @Override
-  public void onNewNeed(URI needURI, Model content) {
-      //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public void onNeedActivated(final URI needURI) {
+  public void onRegistered(final URI wonNodeUri) {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void onNeedDeactivated(final URI needURI) {
+  public void onNewNeed(final URI wonNodeURI, URI needURI, Model content) {
+      //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public void onNeedActivated(final URI wonNodeURI, final URI needURI) {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public void onNeedDeactivated(final URI wonNodeURI, final URI needURI) {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 }

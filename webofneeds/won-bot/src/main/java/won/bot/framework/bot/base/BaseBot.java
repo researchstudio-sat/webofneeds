@@ -46,6 +46,11 @@ public class BaseBot implements Bot
   }
 
   @Override
+  public boolean knowsNodeURI(final URI wonNodeURI) {
+    return this.botContext.isNodeKnown(wonNodeURI);
+  }
+
+  @Override
   public synchronized void initialize() throws Exception
   {
     if (!this.lifecyclePhase.isDown()) return;
@@ -118,13 +123,16 @@ public class BaseBot implements Bot
   @Override public void onMessageFromOtherNeed(Connection con, ChatMessage message, final Model content) throws Exception {}
 
   @Override
-  public void onNewNeedCreatedNotificationForMatcher(final URI needURI, final Model needModel){}
+  public void onMatcherRegistered(final URI wonNodeUri) {}
 
   @Override
-  public void onNeedActivatedNotificationForMatcher(final URI needURI) {}
+  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Model needModel){}
 
   @Override
-  public void onNeedDeactivatedNotificationForMatcher(final URI needURI) {}
+  public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {}
+
+  @Override
+  public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {}
 
   @Override public void act() throws Exception
   {}

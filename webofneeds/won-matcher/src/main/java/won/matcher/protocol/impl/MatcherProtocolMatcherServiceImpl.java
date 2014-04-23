@@ -31,25 +31,33 @@ public class MatcherProtocolMatcherServiceImpl implements MatcherProtocolMatcher
   //TODO: refactor this to use DataAccessService
 
   @Override
-  public void onNewNeed(URI needURI, Model content) {
+  public void onMatcherRegistration(final URI wonNodeUri) {
+    logger.debug("matcher registration complete on {} ",wonNodeUri);
+    matcherServiceCallback.onRegistered(wonNodeUri);
+  }
+
+  @Override
+  public void onNewNeed(final URI wonNodeURI, URI needURI, Model content) {
       logger.debug("matcher from need: need created event for needURI {}",needURI);
       if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-      matcherServiceCallback.onNewNeed(needURI, content);
+      matcherServiceCallback.onNewNeed(wonNodeURI , needURI, content);
   }
 
   @Override
-  public void onNeedActivated(final URI needURI) {
+  public void onNeedActivated(final URI wonNodeURI, final URI needURI) {
     logger.debug("matcher from need: need activated event for needURI {}", needURI);
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-    matcherServiceCallback.onNeedActivated(needURI);
+    matcherServiceCallback.onNeedActivated(wonNodeURI, needURI);
   }
 
   @Override
-  public void onNeedDeactivated(final URI needURI) {
+  public void onNeedDeactivated(final URI wonNodeURI, final URI needURI) {
     logger.debug("matcher from need: need deactivated event for needURI {}", needURI);
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-    matcherServiceCallback.onNeedDeactivated(needURI);
+    matcherServiceCallback.onNeedDeactivated(wonNodeURI, needURI);
   }
+
+
 
 
 }

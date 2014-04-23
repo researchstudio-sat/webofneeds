@@ -28,6 +28,7 @@
         <property name="matcherProtocolCommunicationService" ref="matcherProtocolCommunicationService"/>
         <property name="defaultNodeURI" value="http://localhost:8080/won"/>
         <property name="matcherNodeURISource" ref="matcherNodeURISource"/>
+        <qualifier value="default"/>
     </bean>
     <bean id="matcherProtocolMatcherService"
           class="won.matcher.protocol.impl.MatcherProtocolMatcherServiceImpl">

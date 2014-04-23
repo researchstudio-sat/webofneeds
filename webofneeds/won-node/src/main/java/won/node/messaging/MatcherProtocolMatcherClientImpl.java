@@ -42,7 +42,13 @@ public class MatcherProtocolMatcherClientImpl implements MatcherProtocolMatcherS
 
   private MatcherProtocolMatcherServiceClientSide delegate;
 
-    @Override
+  @Override
+  public void matcherRegistered(final URI wonNodeURI) {
+    logger.debug("calling matcherRegistered");
+    delegate.matcherRegistered(wonNodeURI);
+  }
+
+  @Override
   public void needCreated(final URI needURI, final Model content)
   {
     logger.debug("calling needCreated for needURI {}", needURI);
