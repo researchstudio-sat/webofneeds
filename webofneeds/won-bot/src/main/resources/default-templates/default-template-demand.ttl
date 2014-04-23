@@ -10,6 +10,4 @@
 
 <>
       a       won:Need ;
-      won:hasBasicNeedType won:Demand ;
-      won:hasFacet won:OwnerFacet;
-      won:isInState won:Active .
+      won:hasBasicNeedType won:Demand .
