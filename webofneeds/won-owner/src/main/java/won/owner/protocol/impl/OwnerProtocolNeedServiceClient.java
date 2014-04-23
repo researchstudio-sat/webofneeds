@@ -50,7 +50,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     private ApplicationContext ownerApplicationContext;
     final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Value(value = "${uri.prefix.node.default}")
+    @Value(value = "${uri.node.default}")
     String wonNodeDefault;
 
     @Autowired
