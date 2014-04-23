@@ -61,7 +61,7 @@ public class ConversationBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(
         ctx,
-        new CreateNeedAction(ctx,NAME_NEEDS),
+        new CreateNeedWithFacetsAction(ctx,NAME_NEEDS),
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class,this.needCreator);

@@ -71,7 +71,7 @@ public class GroupingBot extends EventBot
     //create needs every trigger execution until N needs are created
     this.groupMemberCreator = new ActionOnEventListener(
       ctx, "groupMemberCreator",
-      new CreateNeedAction(ctx, NAME_GROUPMEMBERS),
+      new CreateNeedWithFacetsAction(ctx, NAME_GROUPMEMBERS),
       NO_OF_GROUPMEMBERS
     );
     bus.subscribe(ActEvent.class, this.groupMemberCreator);

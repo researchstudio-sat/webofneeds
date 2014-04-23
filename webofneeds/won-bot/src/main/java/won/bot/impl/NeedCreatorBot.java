@@ -19,7 +19,7 @@ package won.bot.impl;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
-import won.bot.framework.events.action.impl.CreateNeedAction;
+import won.bot.framework.events.action.impl.CreateNeedWithFacetsAction;
 import won.bot.framework.events.action.impl.SignalWorkDoneAction;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.event.Event;
@@ -47,7 +47,7 @@ public class NeedCreatorBot extends EventBot
     //create needs every trigger execution until N needs are created
     this.groupMemberCreator = new ActionOnEventListener(
       ctx, "groupMemberCreator",
-      new CreateNeedAction(ctx),
+      new CreateNeedWithFacetsAction(ctx),
       -1
     );
     bus.subscribe(ActEvent.class, this.groupMemberCreator);

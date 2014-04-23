@@ -56,14 +56,14 @@ public class RandomSimulatorBot extends EventBot
     //create the first need when the first actEvent happens
     this.groupMemberCreator = new ActionOnceAfterNEventsListener(
       ctx, "groupMemberCreator",1,
-      new CreateNeedAction(ctx)
+      new CreateNeedWithFacetsAction(ctx)
     );
     bus.subscribe(ActEvent.class, this.groupMemberCreator);
 
     //each time a need was created, wait for a random interval, then create another one
     bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx,
       new RandomDelayedAction(ctx,MIN_NEXT_CREATION_TIMEOUT_MILLIS, MAX_NEXT_CREATION_TIMEOUT_MILLIS,this.hashCode(),
-      new CreateNeedAction(ctx)))
+      new CreateNeedWithFacetsAction(ctx)))
     );
 
     //print a logging message every N needs

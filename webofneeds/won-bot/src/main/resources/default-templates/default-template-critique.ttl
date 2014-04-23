@@ -9,6 +9,4 @@
 
 <>
       a       won:Need ;
-      won:hasBasicNeedType won:Critique ;
-      won:hasFacet won:OwnerFacet;
-      won:isInState won:Active .
+      won:hasBasicNeedType won:Critique .

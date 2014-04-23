@@ -3,33 +3,49 @@ package won.bot.framework.events.action.impl;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
-import won.bot.framework.events.event.Event;
+import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.EventBotActionUtils;
+import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.impl.NeedCreatedEvent;
-import won.bot.framework.events.EventListenerContext;
+import won.protocol.model.FacetType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
-* User: fkleedorfer
-* Date: 28.03.14
+* Creates a need with the specified facets.
+* If no facet is specified, the ownerFacet will be used.
 */
 public class CreateNeedWithFacetsAction extends BaseEventBotAction
 {
     private List<URI> facets;
     private String uriListName;
 
+    /**
+     * Creates a need with the specified facets.
+     * If no facet is specified, the ownerFacet will be used.
+     */
     public CreateNeedWithFacetsAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
-        super(eventListenerContext);
+      super(eventListenerContext);
+      if (facets == null || facets.length == 0) {
+        //add the default facet if none is present.
+        this.facets = new ArrayList<URI>(1);
+        this.facets.add(FacetType.OwnerFacet.getURI());
+      } else {
         this.facets = Arrays.asList(facets);
-        this.uriListName = uriListName;
+      }
+      this.uriListName = uriListName;
     }
 
+    /**
+     * Creates a need with the specified facets.
+     * If no facet is specified, the ownerFacet will be used.
+     */
     public CreateNeedWithFacetsAction(final EventListenerContext eventListenerContext, URI... facets)
     {
         this(eventListenerContext, null, facets);
