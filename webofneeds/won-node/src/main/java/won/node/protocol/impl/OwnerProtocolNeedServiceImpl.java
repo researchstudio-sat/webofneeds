@@ -51,20 +51,20 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     private OwnerApplicationRepository ownerApplicationRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public URI createNeed(URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException {
         URI needURI = this.needManagementService.createNeed(ownerURI, content, activate, ownerApplicationID);
         return needURI;
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void authorizeOwnerApplicationForNeedURI(String ownerApplicationID, URI needURI) {
         needManagementService.authorizeOwnerApplicationForNeedURI(ownerApplicationID, needURI);
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void authorizeOwnerApplicationForNeed(final String ownerApplicationID, final Need need) {
       needManagementService.authorizeOwnerApplicationForNeed(ownerApplicationID, need);
     }
@@ -94,37 +94,37 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     }
 
     // @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void activate(final URI needURI) throws NoSuchNeedException {
         this.needManagementService.activate(needURI);
     }
 
    // @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void deactivate(final URI needURI) throws NoSuchNeedException, NoSuchConnectionException, IllegalMessageForConnectionStateException {
         this.needManagementService.deactivate(needURI);
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public URI connect(final URI need, final URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
         return this.needCommunicationService.connect(need, otherNeedURI, content);
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         this.connectionCommunicationService.open(connectionURI, content);
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         this.connectionCommunicationService.close(connectionURI, content);
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         this.connectionCommunicationService.textMessage(connectionURI, message);
     }

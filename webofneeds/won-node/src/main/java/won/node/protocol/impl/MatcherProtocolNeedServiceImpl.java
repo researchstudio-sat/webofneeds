@@ -39,7 +39,7 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
   private MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService;
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional(propagation = Propagation.SUPPORTS)
   public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator, Model content) throws Exception {
     logger.debug("need from matcher: HINT received for need {} referring to need {} with score {} from originator {} and content {}", new Object[]{needURI, otherNeed, score, originator, content});
     matcherFacingNeedCommunicationService.hint(needURI, otherNeed, score, originator, content);

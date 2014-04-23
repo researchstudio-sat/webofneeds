@@ -42,28 +42,28 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   protected NeedFacingConnectionCommunicationServiceImpl connectionCommunicationService;
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional(propagation = Propagation.SUPPORTS)
   public URI connect(final URI need, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     logger.debug("need from need: CONNECT received for need {} referring to need {} with content {}", new Object[]{need, otherNeedURI, content});
     return this.needFacingNeedCommunicationService.connect(need, otherNeedURI, otherConnectionURI, content);
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional(propagation = Propagation.SUPPORTS)
   public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("need from need: OPEN received for connection {} with content {}", connectionURI, content);
     connectionCommunicationService.open(connectionURI, content);
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional(propagation = Propagation.SUPPORTS)
   public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("need from need: CLOSE received for connection {} with content {}", connectionURI, content);
     connectionCommunicationService.close(connectionURI, content);
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional(propagation = Propagation.SUPPORTS)
   public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("need from need: MESSAGE received for connection {} with content {}", connectionURI, message);
     connectionCommunicationService.textMessage(connectionURI, message);
