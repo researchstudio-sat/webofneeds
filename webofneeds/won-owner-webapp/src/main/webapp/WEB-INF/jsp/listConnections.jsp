@@ -25,9 +25,9 @@
                             <DT>Title:</DT>
                             <DD>${remoteNeed.title}</DD>
                         </c:if>
-                        <c:if test="${not empty remoteNeed.contentDescription}">
+                        <c:if test="${not empty remoteNeed.textDescription}">
                             <DT>Description:</DT>
-                            <DD>${remoteNeed.contentDescription}</DD>
+                            <DD>${remoteNeed.textDescription}</DD>
                         </c:if>
                         <c:if test="${not empty remoteNeed.tags}">
                             <DT>Tags:</DT>

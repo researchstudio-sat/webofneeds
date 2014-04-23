@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.facet.impl.FacetRegistry;
 import won.node.rdfstorage.RDFStorageService;
+import won.node.service.DataAccessService;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
@@ -112,6 +113,8 @@ public class NeedCommunicationServiceImpl implements
     //create ConnectionEvent in Database
     ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), originator, ConnectionEventType.MATCHER_HINT);
 
+    String baseURI = con.getConnectionURI().toString();
+    RdfUtils.replaceBaseURI(content, baseURI);
     //create rdf content for the ConnectionEvent and save it to disk
     dataService.saveAdditionalContentForEvent(content, con, event, score);
 
@@ -140,7 +143,8 @@ public class NeedCommunicationServiceImpl implements
 
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    logger.debug("CONNECT received for need {} referring to need {} (connection {}) with content '{}'", new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
+    logger.debug("CONNECT received for need {} referring to need {} (connection {}) with content '{}'",
+      new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
     if (otherConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
 
     //create Connection in Database

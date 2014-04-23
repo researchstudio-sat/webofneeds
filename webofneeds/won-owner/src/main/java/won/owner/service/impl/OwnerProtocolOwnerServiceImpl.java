@@ -83,7 +83,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
           match.setOriginator(originatorUriConvert);
         }
         match.setScore(scoreConvert);
-        matchRepository.saveAndFlush(match);
+        matchRepository.save(match);
         ownerServiceCallback.onHint(match, contentConvert);
     }
 
@@ -138,7 +138,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
                 throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
           } else {
                 con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
-                con = connectionRepository.saveAndFlush(con);
+                con = connectionRepository.save(con);
 
           }
         }
@@ -151,7 +151,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
           con.setRemoteNeedURI(otherNeedURIConvert);
           con.setConnectionURI(ownConnectionURIConvert);
           con.setTypeURI(facetURI);
-          connectionRepository.saveAndFlush(con);
+          connectionRepository.save(con);
 
           //TODO: do we save the connection content? where? as a chat content?
         }
@@ -168,7 +168,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //set new state and save in the db
         con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
         //save in the db
-        connectionRepository.saveAndFlush(con);
+        connectionRepository.save(con);
         ownerServiceCallback.onOpen(con, content);
     }
 
@@ -183,7 +183,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //set new state and save in the db
         con.setState(con.getState().transit(ConnectionEventType.PARTNER_CLOSE));
         //save in the db
-        connectionRepository.saveAndFlush(con);
+        connectionRepository.save(con);
         ownerServiceCallback.onClose(con, content);
     }
 
@@ -238,7 +238,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         chatMessage.setMessage(textMessage);
         chatMessage.setOriginatorURI(con.getRemoteNeedURI());
         //save in the db
-        chatMessageRepository.saveAndFlush(chatMessage);
+        chatMessageRepository.save(chatMessage);
         ownerServiceCallback.onTextMessage(con, chatMessage, message);
     }
 

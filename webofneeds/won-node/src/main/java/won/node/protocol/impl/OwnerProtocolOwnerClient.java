@@ -19,12 +19,8 @@ package won.node.protocol.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
-import won.protocol.jms.MessagingService;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedRepository;
 
 import java.net.URI;
 
@@ -33,17 +29,6 @@ public class OwnerProtocolOwnerClient implements OwnerProtocolOwnerServiceClient
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   private OwnerProtocolOwnerServiceClientSide delegate;
-
-  @Autowired
-  private OwnerProtocolOwnerClientFactory clientFactory;
-
-  private MessagingService messagingService;
-
-  @Autowired
-  private NeedRepository needRepository;
-
-    @Autowired
-    private ConnectionRepository connectionRepository;
 
     @Override
   public void hint(final URI ownNeedUri, final URI otherNeedUri, final double score, final URI originatorUri, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
@@ -78,19 +63,6 @@ public class OwnerProtocolOwnerClient implements OwnerProtocolOwnerServiceClient
     logger.debug("need to owner: MESSAGE for connection {} with message {}", connectionURI, message);
     delegate.textMessage(connectionURI,message);
   }
-
-  public void setClientFactory(final OwnerProtocolOwnerClientFactory clientFactory)
-  {
-    this.clientFactory = clientFactory;
-  }
-
-    public void setNeedRepository(NeedRepository needRepository) {
-        this.needRepository = needRepository;
-    }
-
-    public void setMessagingService(MessagingService messagingService) {
-        this.messagingService = messagingService;
-    }
 
     public void setDelegate(OwnerProtocolOwnerServiceClientSide delegate) {
         this.delegate = delegate;

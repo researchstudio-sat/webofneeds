@@ -48,7 +48,10 @@ public abstract class AbstractCompositeNeedProducer implements NeedProducer
   @Override
   public synchronized boolean isExhausted()
   {
-    return selectNonExhaustedNeedFactory() == null;
+    for (NeedProducer delegate: this.needFactories){
+      if (!delegate.isExhausted()) return false;
+    }
+    return true;
   }
 
   private NeedProducer selectNonExhaustedNeedFactory(){
@@ -70,8 +73,6 @@ public abstract class AbstractCompositeNeedProducer implements NeedProducer
    */
   protected abstract NeedProducer selectActiveNeedFactory();
 
-  protected abstract NeedProducer selectActiveNeedFactoryOfType(Class clazz);
-  
   protected Set<NeedProducer> getNeedFactories(){
     return needFactories;
   }

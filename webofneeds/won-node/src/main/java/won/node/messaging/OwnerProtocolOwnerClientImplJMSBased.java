@@ -34,6 +34,7 @@ import won.protocol.util.RdfUtils;
 
 import java.io.StringWriter;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,8 +73,8 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
       StringWriter sw = new StringWriter();
       content.write(sw, "TTL");
 
-      List<Need> needs = needRepository.findByNeedURI(ownNeedUri);
-      Need need = needs.get(0);
+
+      Need need = DataAccessUtils.loadNeed(needRepository, ownNeedUri);
       List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
 
       Map headerMap = new HashMap<String, String>();
@@ -97,10 +98,8 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
 
         URI ownerURI = clientFactory.getOwnerProtocolOwnerURI(ownNeedURI);
         Map headerMap = new HashMap<String, String>();
-        List<Need> needs = needRepository.findByNeedURI(ownNeedURI);
-        List<Need> needs2 = needRepository.findByNeedURI(otherNeedURI);
-        Need need = needs.get(0);
-       // Need otherNeed = needs2.get(0);
+        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
+
         List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
 
         headerMap.put("ownNeedURI", ownNeedURI.toString()) ;
@@ -119,42 +118,56 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
     @Override
     public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        URI needURI = con.getNeedURI();
-        Need need = needRepository.findByNeedURI(needURI).get(0);
-        List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
-        Map headerMap = new HashMap<String, String>();
-        headerMap.put("connectionURI", connectionURI.toString()) ;
-        headerMap.put("content",RdfUtils.toString(content));
-        headerMap.put("ownerApplications", ownerApplicationList);
-        headerMap.put("protocol","OwnerProtocol");
-        headerMap.put("methodName", "open");
-        messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
+      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+      URI needURI = con.getNeedURI();
+      Need need = null;
+      need = getNeedOrThrowISE(connectionURI, needURI);
+      List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
+      Map headerMap = new HashMap<String, String>();
+      headerMap.put("connectionURI", connectionURI.toString()) ;
+      headerMap.put("content",RdfUtils.toString(content));
+      headerMap.put("ownerApplications", ownerApplicationList);
+      headerMap.put("protocol","OwnerProtocol");
+      headerMap.put("methodName", "open");
+      messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
     }
 
     @Override
     public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        URI needURI = con.getNeedURI();
-        Need need = needRepository.findByNeedURI(needURI).get(0);
-        List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
-        Map headerMap = new HashMap<String, String>();
-        headerMap.put("connectionURI", connectionURI.toString()) ;
-        headerMap.put("content",RdfUtils.toString(content));
-        headerMap.put("ownerApplications", ownerApplicationList);
-        headerMap.put("protocol","OwnerProtocol");
-        headerMap.put("methodName", "close");
-        messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
+      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+      URI needURI = con.getNeedURI();
+      Need need = null;
+      need = getNeedOrThrowISE(connectionURI, needURI);
+      List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
+      Map headerMap = new HashMap<String, String>();
+      headerMap.put("connectionURI", connectionURI.toString()) ;
+      headerMap.put("content",RdfUtils.toString(content));
+      headerMap.put("ownerApplications", ownerApplicationList);
+      headerMap.put("protocol","OwnerProtocol");
+      headerMap.put("methodName", "close");
+      messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
     }
 
-    @Override
+  public Need getNeedOrThrowISE(final URI connectionURI, final URI needURI) {
+    final Need need;
+    try {
+      need = DataAccessUtils.loadNeed(needRepository, needURI);
+    } catch (NoSuchNeedException e) {
+      throw new IllegalStateException(new MessageFormat("did not find need {0} for connection {1}").format(needURI
+        .toString(),
+        connectionURI.toString()));
+    }
+    return need;
+  }
+
+  @Override
     public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         String messageConvert = RdfUtils.toString(message);
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         URI needURI = con.getNeedURI();
-        Need need = needRepository.findByNeedURI(needURI).get(0);
+        Need need = getNeedOrThrowISE(connectionURI, needURI);
         List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
         Map headerMap = new HashMap<String, String>();
         headerMap.put("connectionURI", connectionURI.toString()) ;

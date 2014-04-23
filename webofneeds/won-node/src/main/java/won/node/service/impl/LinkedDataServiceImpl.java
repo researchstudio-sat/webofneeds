@@ -42,8 +42,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * User: fkleedorfer
- * Date: 26.11.12
+ * Creates rdf models from the relational database.
+ * TODO: conform to: https://dvcs.w3.org/hg/ldpwg/raw-file/default/ldp-paging.html, especially for sorting
  */
 public class LinkedDataServiceImpl implements LinkedDataService
 {
@@ -66,7 +66,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private RDFStorageService rdfStorage;
 
   //TODO: used to access/create event URIs for connection model rendering. Could be removed if events knew their URIs.
-  @Autowired
   private URIService uriService;
   @Autowired
   private NeedModelMapper needModelMapper;
@@ -146,7 +145,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     model.setNsPrefix("",need.getNeedURI().toString());
 
     Resource needResource = model.getResource(needUri.toString());
-    addProtocolEndpoints(model, needResource);
 
     // add connections
     Resource connectionsContainer = model.createResource(need.getNeedURI().toString() + "/connections/", LDP.CONTAINER);

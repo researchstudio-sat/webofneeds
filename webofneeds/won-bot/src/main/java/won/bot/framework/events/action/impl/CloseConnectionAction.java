@@ -16,10 +16,10 @@
 
 package won.bot.framework.events.action.impl;
 
-import won.bot.framework.events.event.Event;
+import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
-import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.Event;
 
 import java.net.URI;
 

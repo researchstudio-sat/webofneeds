@@ -13,6 +13,12 @@
 </head>
 <body>
 
+<form method="POST" action="/owner/need/import">
+    To import a need into the owner application, provide its URI below:
+    <input type="text" name="needURI" size="80"/>
+    <input type="submit" value="submit" />
+</form>
+
 <h2>Needs: </h2>
 <!-- a href="/owner/need/reload">reload</a-->
 <table border="1">
@@ -30,10 +36,7 @@
             <td><a href="/owner/need/${need.id}">view</a></td>
         </tr>
     </c:forEach>
-    <form method="POST" action="/owner/need/import">
-        Need URI to import:
-        <input type="text" name="needURI" size="40"/>
-    </form>
+
 </table>
 </body>
 </html>

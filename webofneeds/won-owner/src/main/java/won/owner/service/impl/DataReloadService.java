@@ -60,7 +60,7 @@ public class DataReloadService {
         try {
             n = ownerService.readNeed(needRepository.findById(id).get(0).getNeedURI());
             n.setId(id);
-            needRepository.saveAndFlush(n);
+            needRepository.save(n);
         } catch (NoSuchNeedException e) {
             logger.warn("caught NoSuchNeedException:", e);
         }
@@ -72,7 +72,7 @@ public class DataReloadService {
       Need need = null;
       try {
         need = ownerService.readNeed(needURI);
-        needRepository.saveAndFlush(need);
+        needRepository.save(need);
         Collection<URI> connectionURIs = ownerService.listConnectionURIs(needURI);
         logger.debug("importing {} connections", connectionURIs.size());
         for(URI connectionURI: connectionURIs) {
@@ -95,7 +95,7 @@ public class DataReloadService {
         if (logger.isDebugEnabled() && conn != null && conn.getNeedURI() != null) {
           logger.debug("import successful for connection {}", connectionURI);
         }
-        connectionRepository.saveAndFlush(conn);
+        connectionRepository.save(conn);
         return conn;
       } catch (NoSuchConnectionException e) {
         logger.warn("caught Exception:", e);
@@ -112,12 +112,12 @@ public class DataReloadService {
             switch(cons.size()) {
                 case 0:
                     c = ownerService.readConnection(uri);
-                    connectionRepository.saveAndFlush(c);
+                    connectionRepository.save(c);
                     break;
                 case 1:
                     c = ownerService.readConnection(uri);
                     c.setId(cons.get(0).getId());
-                    connectionRepository.saveAndFlush(c);
+                    connectionRepository.save(c);
                     break;
                 default:
                     throw new IllegalStateException("Connection-URI is not unique in local Database!");

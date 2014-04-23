@@ -187,6 +187,34 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-tdb</artifactId>
+                <version>${org.apache.jena-tdb.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>xml-apis</artifactId>
+                        <groupId>xml-apis</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xerces</groupId>
+                        <artifactId>xercesImpl</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>jcl-over-slf4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
             <dependency>
                 <groupId>com.github.jsonld-java</groupId>
                 <artifactId>jsonld-java-jena</artifactId>
@@ -344,6 +372,7 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-c3p0</artifactId>
                 <version>${org.hibernate.version}</version>
+
             </dependency>
 
 
@@ -686,6 +715,7 @@
         <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
         <commons-io.version>2.4</commons-io.version>
         <org.apache.jena.version>2.11.0</org.apache.jena.version>
+        <org.apache.jena-tdb.version>1.0.0</org.apache.jena-tdb.version>
         <org.hibernate.version>4.1.8.Final</org.hibernate.version>
         <org.javasimon.version>3.4.0</org.javasimon.version>
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>

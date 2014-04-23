@@ -3,6 +3,7 @@ package won.protocol.util;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WON;
@@ -12,7 +13,7 @@ import java.net.URI;
 /**
  * User: gabriel
  * Date: 09.04.13
- * Time: 15:38
+ * T  ime: 15:38
  */
 public class ConnectionModelMapper implements ModelMapper<Connection>
 {
@@ -27,9 +28,13 @@ public class ConnectionModelMapper implements ModelMapper<Connection>
 
     if (connection.getRemoteConnectionURI() != null) {
       Resource remoteConnection = model.createResource(connection.getRemoteConnectionURI().toString());
-      model.add(model.createStatement(connectionMember, WON.HAS_REMOTE_CONNECTION, remoteConnection));
+      connectionMember.addProperty(WON.HAS_REMOTE_CONNECTION, remoteConnection);
     }
-
+    if (connection.getRemoteNeedURI() != null) {
+      Resource remoteNeed = model.createResource(connection.getRemoteNeedURI().toString());
+      connectionMember.addProperty(WON.HAS_REMOTE_NEED, remoteNeed);
+    }
+    connectionMember.addProperty(WON.HAS_FACET, model.createResource(connection.getTypeURI().toString()));
     return model;
   }
 
@@ -43,11 +48,14 @@ public class ConnectionModelMapper implements ModelMapper<Connection>
 
     URI connectionStateURI = URI.create(connectionRes.getProperty(WON.HAS_CONNECTION_STATE).getResource().getURI());
     connection.setState(ConnectionState.parseString(connectionStateURI.getFragment()));
-    connection.setRemoteConnectionURI(URI.create(connectionRes.getProperty(WON.HAS_REMOTE_CONNECTION).getResource().getURI()));
+    Statement remoteConnectionStmt = connectionRes.getProperty(WON.HAS_REMOTE_CONNECTION);
+    if (remoteConnectionStmt != null) {
+      connection.setRemoteConnectionURI(URI.create(connectionRes.getProperty(WON.HAS_REMOTE_CONNECTION).getResource()
+                                                                .getURI()));
+    }
     connection.setNeedURI(URI.create(connectionRes.getProperty(WON.BELONGS_TO_NEED).getResource().getURI()));
     connection.setRemoteNeedURI(URI.create(connectionRes.getProperty(WON.HAS_REMOTE_NEED).getResource().getURI()));
     connection.setTypeURI(URI.create(connectionRes.getProperty(WON.HAS_FACET).getResource().getURI()));
-
     return connection;
   }
 }

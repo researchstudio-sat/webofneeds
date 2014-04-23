@@ -16,12 +16,13 @@
 
 package won.bot.framework.events.action.impl;
 
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.action.BaseEventBotAction;
-import won.bot.framework.events.event.impl.ConnectFromOtherNeedEvent;
-import won.bot.framework.events.event.impl.OpenFromOtherNeedEvent;
 import won.bot.framework.events.EventListenerContext;
-import won.protocol.model.ConnectionState;
+import won.bot.framework.events.action.BaseEventBotAction;
+import won.bot.framework.events.event.ConnectionSpecificEvent;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.impl.HintFromMatcherEvent;
+import won.protocol.model.FacetType;
+import won.protocol.util.WonRdfUtils;
 
 /**
  * User: fkleedorfer
@@ -37,23 +38,17 @@ public class OpenConnectionAction extends BaseEventBotAction
 
   @Override
   public void doRun(final Event event) throws Exception {
-    if (event instanceof ConnectFromOtherNeedEvent) {
-      ConnectFromOtherNeedEvent connectEvent = (ConnectFromOtherNeedEvent) event;
-      logger.debug("auto-replying to connect for connection {}", connectEvent.getCon().getConnectionURI());
-      getEventListenerContext().getOwnerService().open(connectEvent.getCon().getConnectionURI(), null);
+    if (event instanceof ConnectionSpecificEvent) {
+      ConnectionSpecificEvent connectEvent = (ConnectionSpecificEvent) event;
+      logger.debug("auto-replying to connect for connection {}", connectEvent );
+      getEventListenerContext().getOwnerService().open(connectEvent.getConnectionURI(), null);
       return;
+    } else if (event instanceof HintFromMatcherEvent) {
+      HintFromMatcherEvent hintEvent = (HintFromMatcherEvent) event;
+      logger.debug("opening connection based on hint {}", event);
+      getEventListenerContext().getOwnerService().connect(hintEvent.getMatch().getFromNeed(),
+        hintEvent.getMatch().getToNeed(), WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(FacetType
+        .OwnerFacet.getURI(), FacetType.OwnerFacet.getURI()));
     }
-
-    if (event instanceof OpenFromOtherNeedEvent) {
-      OpenFromOtherNeedEvent openEvent = (OpenFromOtherNeedEvent) event;
-      if (openEvent.getCon().getState() == ConnectionState.REQUEST_RECEIVED) {
-        logger.debug("auto-replying to open for connection {}", openEvent.getCon().getConnectionURI());
-        getEventListenerContext().getOwnerService().open(openEvent.getCon().getConnectionURI(), null);
-      } else {
-        logger.debug("not auto-replying to open event with open as connection state is {}, not REQUEST_RECEIVED",openEvent.getCon().getState() );
-      }
-      return;
-    }
-
   }
 }

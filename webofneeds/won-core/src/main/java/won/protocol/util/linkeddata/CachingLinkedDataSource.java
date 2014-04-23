@@ -40,7 +40,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
 {
   private static final String CACHE_NAME = "linkedDataCache";
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  @Autowired
+  @Autowired(required = true)
   private EhCacheCacheManager cacheManager;
   private Ehcache cache;
 
@@ -48,6 +48,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
 
 
   public Model getModelForResource(URI resource){
+
     assert resource != null : "resource must not be null";
     Element element = cache.get(resource);
     Object model = element.getObjectValue();

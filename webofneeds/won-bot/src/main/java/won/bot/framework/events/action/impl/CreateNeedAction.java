@@ -24,6 +24,7 @@ import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.EventBotActionUtils;
 import won.bot.framework.events.event.impl.NeedCreatedEvent;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.impl.NeedProducerExhaustedEvent;
 import won.protocol.model.FacetType;
 import won.protocol.util.RdfUtils;
 
@@ -51,6 +52,7 @@ public class CreateNeedAction extends BaseEventBotAction
   {
       if (getEventListenerContext().getNeedProducer().isExhausted()){
           logger.debug("bot's need procucer is exhausted.");
+          getEventListenerContext().getEventBus().publish(new NeedProducerExhaustedEvent());
           return;
       }
     final Model needModel = getEventListenerContext().getNeedProducer().create();

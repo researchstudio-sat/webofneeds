@@ -4,9 +4,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlTransient;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * User: sbyim
@@ -22,8 +20,11 @@ public class OwnerApplication {
     @Column( name = "id" )
     private Long id;
 
-    @ManyToMany(mappedBy = "authorizedApplications", targetEntity = Need.class,fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+
+    @ManyToMany(mappedBy = "authorizedApplications", targetEntity = Need.class,fetch = FetchType.LAZY,
+      cascade = CascadeType.DETACH)
      private List<Need> needs;
+
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)

@@ -1,14 +1,17 @@
 package won.owner.ws;
 
+import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
+import com.hp.hpl.jena.sparql.path.Path;
+import com.hp.hpl.jena.sparql.path.PathParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.service.impl.URIService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.ws.AbstractClientFactory;
 import won.protocol.ws.OwnerProtocolNeedWebServiceEndpoint;
@@ -26,6 +29,8 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
   private static final String WSDL_LOCATION = "?wsdl";
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final String PATH_OWNER_PROTOCOL_ENDPOINT = "<"+WON.SUPPORTS_WON_PROTOCOL_IMPL+">/<"+WON
+    .HAS_OWNER_PROTOCOL_ENDPOINT+">";
 
   @Autowired
   private LinkedDataSource linkedDataSource;
@@ -47,11 +52,14 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
   {
     if (wonNodeURI == null)
       wonNodeURI = uriService.getDefaultOwnerProtocolNeedServiceEndpointURI();
-
+    Path propertyPath =  PathParser.parse(PATH_OWNER_PROTOCOL_ENDPOINT, new PrefixMappingImpl());
     OwnerProtocolNeedWebServiceClient client = getCachedClient(wonNodeURI);
 
+    URI protocolEndpoint = RdfUtils.toURI(WonLinkedDataUtils.getPropertyForURI(wonNodeURI, propertyPath,
+      linkedDataSource));
+
     if (client == null) {
-      client = new OwnerProtocolNeedWebServiceClient(URI.create(wonNodeURI.toURL() + WSDL_LOCATION).toURL());
+      client = new OwnerProtocolNeedWebServiceClient(URI.create(protocolEndpoint.toURL() + WSDL_LOCATION).toURL());
       cacheClient(wonNodeURI, client);
     }
 
@@ -60,19 +68,26 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
 
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpointForNeed(URI needURI) throws NoSuchNeedException, MalformedURLException
   {
-    URI needProtocolEndpoint = RdfUtils.getURIPropertyForResource(
-        linkedDataSource.getModelForResource(needURI),
-        needURI,
-        WON.HAS_OWNER_PROTOCOL_ENDPOINT);
-    if (needProtocolEndpoint == null) throw new NoSuchNeedException(needURI);
+    OwnerProtocolNeedWebServiceEndpoint endpoint = getOwnerProtocolEndpointForNeedOrConnection(needURI);
+    if (endpoint == null) throw new NoSuchNeedException(needURI);
+    return endpoint;
+  }
 
-    logger.debug("need protocol endpoint of need {} is {}", needURI.toString(), needProtocolEndpoint.toString());
+  private OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpointForNeedOrConnection(final URI needURI)
+    throws MalformedURLException {
+    Path propertyPath =  PathParser.parse(PATH_OWNER_PROTOCOL_ENDPOINT, new PrefixMappingImpl());
+    URI protocolEndpoint = RdfUtils.toURI(WonLinkedDataUtils.getWonNodePropertyForNeedOrConnectionURI(
+      needURI,
+      propertyPath, linkedDataSource
+    ));
+    if (protocolEndpoint == null) return null;
+    logger.debug("need protocol endpoint of need {} is {}", needURI, protocolEndpoint);
 
-    OwnerProtocolNeedWebServiceClient client = getCachedClient(needProtocolEndpoint);
+    OwnerProtocolNeedWebServiceClient client = getCachedClient(protocolEndpoint);
     if (client == null) {
-      URI wsdlURI = URI.create(needProtocolEndpoint.toString() + WSDL_LOCATION);
+      URI wsdlURI = URI.create(protocolEndpoint.toString() + WSDL_LOCATION);
       client = new OwnerProtocolNeedWebServiceClient(wsdlURI.toURL());
-      cacheClient(needProtocolEndpoint, client);
+      cacheClient(protocolEndpoint, client);
     }
 
     return client.getOwnerProtocolOwnerWebServiceEndpointPort();
@@ -80,22 +95,9 @@ public class OwnerProtocolNeedClientFactory extends AbstractClientFactory<OwnerP
 
   public OwnerProtocolNeedWebServiceEndpoint getOwnerProtocolEndpointForConnection(URI connectionURI) throws NoSuchConnectionException, MalformedURLException
   {
-    URI needProtocolEndpoint = RdfUtils.getURIPropertyForResource(
-        linkedDataSource.getModelForResource(connectionURI),
-        connectionURI,
-        WON.HAS_OWNER_PROTOCOL_ENDPOINT);
-    if (needProtocolEndpoint == null) throw new NoSuchConnectionException(connectionURI);
-
-    logger.debug("need protocol endpoint of connection {} is {}", connectionURI.toString(), needProtocolEndpoint.toString());
-
-    OwnerProtocolNeedWebServiceClient client = getCachedClient(connectionURI);
-    if (client == null) {
-      URI wsdlURI = URI.create(needProtocolEndpoint.toString() + WSDL_LOCATION);
-      client = new OwnerProtocolNeedWebServiceClient(wsdlURI.toURL());
-      cacheClient(wsdlURI, client);
-    }
-
-    return client.getOwnerProtocolOwnerWebServiceEndpointPort();
+    OwnerProtocolNeedWebServiceEndpoint endpoint = getOwnerProtocolEndpointForNeedOrConnection(connectionURI);
+    if (endpoint == null) throw new NoSuchConnectionException(connectionURI);
+    return endpoint;
   }
 
 }

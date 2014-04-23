@@ -1,7 +1,9 @@
 package won.node.messaging;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import org.apache.camel.*;
+import org.apache.camel.Exchange;
+import org.apache.camel.Header;
+import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +12,11 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
-import won.protocol.repository.NeedRepository;
-import won.protocol.service.*;
+import won.protocol.service.OwnerFacingNeedCommunicationService;
+import won.protocol.service.OwnerManagementService;
+import won.protocol.service.QueueManagementService;
 import won.protocol.util.RdfUtils;
+
 import javax.jms.JMSException;
 import java.net.URI;
 import java.util.Collection;
@@ -25,6 +29,8 @@ import java.util.List;
 public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolNeedService{ /*, WonMessageListener*/
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+
+
     @Autowired
     private OwnerProtocolNeedService delegate;
 
@@ -33,8 +39,6 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
     private QueueManagementService queueManagementService;
 
     private OwnerFacingNeedCommunicationService needCommunicationService;
-    @Autowired
-    private NeedRepository needRepository;
 
     private ProducerTemplate producerTemplate;
 

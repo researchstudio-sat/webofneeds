@@ -30,10 +30,10 @@ public class OwnerManagementServiceImpl implements ApplicationManagementService 
         OwnerApplication ownerApplication = new OwnerApplication();
         ownerApplication.setOwnerApplicationId(ownerApplicationId.toString());
         logger.info("ownerApplicationId: "+ownerApplication.getOwnerApplicationId().toString() );
-        ownerApplication = ownerApplicatonRepository.saveAndFlush(ownerApplication);
+        ownerApplication = ownerApplicatonRepository.save(ownerApplication);
         List<String> queueNames = queueManagementService.generateQueueNamesForOwnerApplication(ownerApplication);
         ownerApplication.setQueueNames(queueNames);
-        ownerApplication = ownerApplicatonRepository.saveAndFlush(ownerApplication);
+        ownerApplication = ownerApplicatonRepository.save(ownerApplication);
         return ownerApplicationId.toString();
 
     }

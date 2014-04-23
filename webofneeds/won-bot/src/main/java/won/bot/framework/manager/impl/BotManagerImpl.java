@@ -80,11 +80,16 @@ public class BotManagerImpl implements BotManager
   @Override
   public boolean isWorkDone()
   {
+    logger.debug("checking if the bots' work is all done");
     synchronized (getMonitor()){
       for(Bot bot: getBots()){
-        if (! bot.isWorkDone()) return false;
+        if (! bot.isWorkDone()) {
+          logger.debug("bot {} is not done yet", bot);
+          return false;
+        }
       }
     }
+    logger.debug("all bots are done");
     return true;
   }
 

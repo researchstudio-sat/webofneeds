@@ -16,6 +16,9 @@
 
 package won.matcher;
 
+import com.google.common.base.Charsets;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -62,7 +65,8 @@ public class Matcher
 
   private URI originatorURI;
 
-  private Set<String> hintMemory = new HashSet<String>();
+  private BloomFilter<CharSequence> hintMemory = BloomFilter.create(Funnels.stringFunnel(Charsets.UTF_8),100000,
+    0.001);
 
   private ConcurrentLinkedQueue<MatchResult> matches;
 
@@ -304,7 +308,10 @@ public class Matcher
 
 
   private boolean isNewHint(URI fromURI, URI toURI, double score){
-      return this.hintMemory.add("" + fromURI + toURI + Double.toString(score));
+      String key = "" + fromURI + toURI + Double.toString(score);
+      if (this.hintMemory.mightContain(key)) return false;
+      this.hintMemory.put(key);
+      return true;
     }
 
     private class MatchResult {

@@ -423,9 +423,7 @@ public class RdfUtils
    */
   public static URI getURIPropertyForPropertyPath(final Model model, final URI resourceURI, Path propertyPath)
   {
-    Node result = getNodeForPropertyPath(model, resourceURI, propertyPath);
-    if (result == null) return null;
-    return URI.create(result.getURI());
+    return toURI(getNodeForPropertyPath(model, resourceURI, propertyPath));
   }
 
   /**
@@ -445,15 +443,39 @@ public class RdfUtils
    */
   public static String getStringPropertyForPropertyPath(final Model model, final URI resourceURI, Path propertyPath)
   {
-    Node result = getNodeForPropertyPath(model, resourceURI, propertyPath);
-    if (result == null) {
-      return null;
-    }
-    return result.getLiteralLexicalForm();
+    return toString(getNodeForPropertyPath(model, resourceURI, propertyPath));
+  }
+
+  /**
+   * Returns the literal lexical form of the specified node or null if the node is null.
+   * @param node
+   * @return
+   */
+  public static String toString(Node node){
+    if (node == null) return null;
+    return node.getLiteralLexicalForm();
+  }
+
+  /**
+   * Returns the URI of the specified node or null if the node is null. If the node does not
+   * represent a resource, an UnsupportedOperationException is thrown.
+   * @param node
+   * @return
+   */
+  public static URI toURI(Node node){
+    if (node == null) return null;
+    return URI.create(node.getURI());
   }
 
 
-  private static Node getNodeForPropertyPath(final Model model, URI resourceURI, Path propertyPath) {
+  /**
+   * Returns the first RDF node found in the specified model for the specified property path.
+   * @param model
+   * @param resourceURI
+   * @param propertyPath
+   * @return
+   */
+  public static Node getNodeForPropertyPath(final Model model, URI resourceURI, Path propertyPath) {
     Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(), propertyPath);
     if (!result.hasNext()) return null;
     return result.next();

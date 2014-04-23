@@ -25,5 +25,4 @@ public abstract class BaseEvent implements Event
     return this.getClass().getSimpleName() + "@" + Integer.toHexString(hashCode());
   }
 
-
 }

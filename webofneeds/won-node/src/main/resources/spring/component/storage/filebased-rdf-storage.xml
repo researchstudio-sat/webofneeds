@@ -34,5 +34,8 @@
     <context:annotation-config />
 
     <!--- RDF Storage -->
-    <bean id="rdfStorageRef" class="won.node.rdfstorage.impl.RDFFileStorageService" />
+    <bean id="rdfStorageRef" class="won.node.rdfstorage.impl.DirectoryBasedRdfStorageImpl" init-method="init">
+        <property name="directory" value="${rdf.file.path}" />
+    </bean> 
+    
 </beans>
