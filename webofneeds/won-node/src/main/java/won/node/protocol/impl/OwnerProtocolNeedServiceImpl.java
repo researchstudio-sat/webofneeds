@@ -27,10 +27,10 @@ import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
 import won.protocol.repository.OwnerApplicationRepository;
+import won.protocol.service.ApplicationManagementService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
-import won.protocol.service.OwnerManagementService;
 
 import java.net.URI;
 import java.util.Collection;

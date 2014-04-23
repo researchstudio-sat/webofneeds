@@ -12,8 +12,8 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.service.ApplicationManagementService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
-import won.protocol.service.OwnerManagementService;
 import won.protocol.service.QueueManagementService;
 import won.protocol.util.RdfUtils;
 

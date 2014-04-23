@@ -186,7 +186,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Override
     public void activate(final URI needURI) throws NoSuchNeedException
     {
-        needRepository.save(need);
+
       logger.debug("ACTIVATING need. needURI:{}",needURI);
       if (needURI == null) throw new IllegalArgumentException("needURI is not set");
       Need need = DataAccessUtils.loadNeed(needRepository, needURI);
