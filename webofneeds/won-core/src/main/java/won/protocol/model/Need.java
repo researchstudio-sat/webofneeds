@@ -56,8 +56,9 @@ public class Need
   @Column( name = "creationDate", nullable = false)
   private Date creationDate;
 
-
-   @ManyToMany(targetEntity = OwnerApplication.class,fetch = FetchType.LAZY)
+  //EAGERly loaded because accessed outside hibernate session in
+  // OwnerProtocolCamelConfiguratorImpl TODO: change this!
+   @ManyToMany(targetEntity = OwnerApplication.class,fetch = FetchType.EAGER)
    @JoinTable(name="NEED_OWNERAPP",
            joinColumns = @JoinColumn(name="need_id"),
            inverseJoinColumns = @JoinColumn(name = "owner_application_id"))

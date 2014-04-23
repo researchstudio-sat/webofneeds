@@ -54,10 +54,11 @@
         </dependency>
 
         <!-- servlet stuff -->
-        <!--dependency> <!- - tomcat always complains about this, let's omit it - ->
+        <dependency> <!-- tomcat always complains about this.. should we omit it? -->
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-        </dependency-->
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 

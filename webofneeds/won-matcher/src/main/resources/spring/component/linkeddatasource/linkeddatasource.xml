@@ -24,9 +24,19 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
+    <!-- REST stuff -->
+    <!-- required so our linked data client can convert http responses into jena models -->
+    <context:annotation-config />
+    <context:component-scan base-package="won.protocol.rest">
+        <context:include-filter type="regex" expression="won.protocol.rest.*"/>
+    </context:component-scan>
+
     <!-- requires ehcache -->
 
     <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
         <property name="cacheManager" ref="cacheManager" />
+        <property name="linkedDataRestClient">
+            <bean class="won.protocol.rest.LinkedDataRestClient" />
+        </property>
     </bean>
 </beans>
