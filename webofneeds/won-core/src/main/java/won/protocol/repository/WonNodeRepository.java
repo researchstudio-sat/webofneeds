@@ -16,7 +16,6 @@
 
 package won.protocol.repository;
 
-import won.protocol.model.OwnerApplication;
 import won.protocol.model.WonNode;
 
 import java.net.URI;

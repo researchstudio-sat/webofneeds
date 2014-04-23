@@ -17,11 +17,8 @@
 package won.protocol.jms;
 
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.jms.ActiveMQService;
-import won.protocol.model.WonNode;
 
 import java.net.URI;
-import java.util.List;
 
 /**
  * User: LEIH-NB

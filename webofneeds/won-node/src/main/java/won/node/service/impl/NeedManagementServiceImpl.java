@@ -23,12 +23,18 @@ package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.javasimon.SimonManager;
+import org.javasimon.Split;
+import org.javasimon.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.rdfstorage.RDFStorageService;
-import won.protocol.exception.*;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
+import won.protocol.exception.IllegalNeedContentException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
@@ -65,32 +71,48 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
   @Autowired
   private NeedRepository needRepository;
-    @Autowired
-    private ConnectionRepository connectionRepository;
 
-    @Autowired
-    FacetRepository facetRepository;
-    @Autowired
+
+  @Autowired
+  private ConnectionRepository connectionRepository;
+
+  @Autowired
+  FacetRepository facetRepository;
+  @Autowired
     private OwnerApplicationRepository ownerApplicationRepository;
 
   @Override
   public URI createNeed(final URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException
   {
+    String stopwatchName = getClass().getName()+".createNeed";
+
+    Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase1");
+    Split split = stopwatch.start();
     logger.debug("CREATING need. OwnerURI:{}, OwnerApplicationId:{}",ownerURI, ownerApplicationID);
     if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
     Need need = new Need();
     need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
     need.setOwnerURI(ownerURI);
     need = needRepository.save(need);
+    split.stop();
+
+    stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase2");
+    split = stopwatch.start();
     //now, create the need URI and save again
     need.setNeedURI(URIService.createNeedURI(need));
     need.setWonNodeURI(URI.create(URIService.getGeneralURIPrefix()));
-    need = needRepository.saveAndFlush(need);
+    need = needRepository.save(need);
+    split.stop();
 
+    stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase3");
+    split = stopwatch.start();
     String baseURI = need.getNeedURI().toString();
     RdfUtils.replaceBaseURI(content, baseURI);
-
     rdfStorage.storeContent(need, content);
+    split.stop();
+
+    stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase4");
+    split = stopwatch.start();
     ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
     if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
 
@@ -108,34 +130,58 @@ public class NeedManagementServiceImpl implements NeedManagementService
         facet.setTypeURI(URI.create(stmtIterator.next().getObject().asResource().getURI()));
         facetRepository.save(facet);
     } while(stmtIterator.hasNext());
+    split.stop();
 
-    authorizeOwnerApplicationForNeed(ownerApplicationID,need.getNeedURI());
+    stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase5");
+    split = stopwatch.start();
+    authorizeOwnerApplicationForNeed(ownerApplicationID, need);
+    split.stop();
     return need.getNeedURI();
   }
-    @Override
-    public void authorizeOwnerApplicationForNeed(final String ownerApplicationID, URI needURI){
-        logger.debug("AUTHORIZING owner application. needURI:{}, OwnerApplicationId:{}",needURI, ownerApplicationID);
-        Need need = needRepository.findByNeedURI(needURI).get(0);
-        List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
-        if(ownerApplications.size()>0)  {
-            logger.debug("owner application is already known");
-            OwnerApplication ownerApplication = ownerApplications.get(0);
-            List<OwnerApplication> authorizedApplications = need.getAuthorizedApplications();
-            authorizedApplications.add(ownerApplication);
-            need.setAuthorizedApplications(authorizedApplications);
-        } else {
-            logger.debug("owner application is new - creating");
-            List<OwnerApplication> ownerApplicationList = new ArrayList<>();
-            OwnerApplication ownerApplication = new OwnerApplication();
-            ownerApplication.setOwnerApplicationId(ownerApplicationID);
-            ownerApplicationList.add(ownerApplication);
-            need.setAuthorizedApplications(ownerApplicationList);
-            logger.debug("setting OwnerApp ID: "+ownerApplicationList.get(0));
-        }
-        need = needRepository.saveAndFlush(need);
-    }
 
-    @Override
+  @Override
+  public void authorizeOwnerApplicationForNeedURI(final String ownerApplicationID, URI needURI){
+      logger.debug("AUTHORIZING owner application. needURI:{}, OwnerApplicationId:{}",needURI, ownerApplicationID);
+      Need need = needRepository.findByNeedURI(needURI).get(0);
+
+    authorizeOwnerApplicationForNeed(ownerApplicationID, need);
+  }
+
+  @Override
+  public void authorizeOwnerApplicationForNeed(final String ownerApplicationID, Need need) {
+    String stopwatchName = getClass().getName()+".authorizeOwnerApplicationForNeed";
+    Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase1");
+    Split split = stopwatch.start();
+    List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
+    split.stop();
+    stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase2");
+    split = stopwatch.start();
+    if(ownerApplications.size()>0)  {
+        logger.debug("owner application is already known");
+        OwnerApplication ownerApplication = ownerApplications.get(0);
+        List<OwnerApplication> authorizedApplications = need.getAuthorizedApplications();
+        if (authorizedApplications == null) {
+          authorizedApplications = new ArrayList<OwnerApplication>(1);
+        }
+        authorizedApplications.add(ownerApplication);
+        need.setAuthorizedApplications(authorizedApplications);
+    } else {
+        logger.debug("owner application is new - creating");
+        List<OwnerApplication> ownerApplicationList = new ArrayList<>(1);
+        OwnerApplication ownerApplication = new OwnerApplication();
+        ownerApplication.setOwnerApplicationId(ownerApplicationID);
+        ownerApplicationList.add(ownerApplication);
+        need.setAuthorizedApplications(ownerApplicationList);
+        logger.debug("setting OwnerApp ID: "+ownerApplicationList.get(0));
+    }
+    split.stop();
+    stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase3");
+    split = stopwatch.start();
+    need = needRepository.save(need);
+    split.stop();
+  }
+
+  @Override
     public void activate(final URI needURI) throws NoSuchNeedException
     {
         logger.debug("ACTIVATING need. needURI:{}",needURI);
@@ -143,7 +189,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
         Need need = DataAccessUtils.loadNeed(needRepository, needURI);
         need.setState(NeedState.ACTIVE);
         logger.debug("Setting Need State: "+ need.getState());
-        needRepository.saveAndFlush(need);
+        needRepository.save(need);
     }
 
     @Override
@@ -152,16 +198,13 @@ public class NeedManagementServiceImpl implements NeedManagementService
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
         Need need = DataAccessUtils.loadNeed(needRepository, needURI);
         need.setState(NeedState.INACTIVE);
-        need = needRepository.saveAndFlush(need);
+        need = needRepository.save(need);
         //close all connections
-        //TODO: load only connections which are not in state closed!
-        Collection<URI> connectionURIs = needInformationService.listConnectionURIs(need.getNeedURI());
+        Collection<URI> connectionURIs = connectionRepository.getConnectionURIsByNeedURIAndNotInState(need.getNeedURI
+          (), ConnectionState.CLOSED);
         for (URI connURI : connectionURIs) {
-
             try {
-                Connection conn = DataAccessUtils.loadConnection(connectionRepository,connURI);
-                if (!conn.getState().equals(ConnectionState.CLOSED))
-                    ownerFacingConnectionCommunicationService.close(connURI, null);
+                  ownerFacingConnectionCommunicationService.close(connURI, null);
             } catch (IllegalMessageForConnectionStateException e) {
                 logger.warn("wrong connection state",e);
             }

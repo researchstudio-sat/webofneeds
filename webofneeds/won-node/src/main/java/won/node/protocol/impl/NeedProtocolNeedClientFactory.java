@@ -1,5 +1,8 @@
 package won.node.protocol.impl;
 
+import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
+import com.hp.hpl.jena.sparql.path.Path;
+import com.hp.hpl.jena.sparql.path.PathParser;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import org.slf4j.Logger;
@@ -8,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.node.ws.NeedProtocolNeedWebServiceClient;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.repository.NeedRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.ws.AbstractClientFactory;
 import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
@@ -29,7 +32,9 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
 
   @Autowired
   private LinkedDataSource linkedDataSource;
-  private NeedRepository needRepository;
+
+  private final String PATH_NEED_PROTOCOL_ENDPOINT = "<"+WON.SUPPORTS_WON_PROTOCOL_IMPL+">/<"+WON
+    .HAS_NEED_PROTOCOL_ENDPOINT+">";
 
   public void setLinkedDataSource(final LinkedDataSource linkedDataSource)
   {
@@ -58,10 +63,12 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
   {
     URI needProtocolEndpoint = null;
     try{
-      needProtocolEndpoint = RdfUtils.getURIPropertyForResource(
-          linkedDataSource.getModelForResource(needURI),
-          needURI,
-          WON.HAS_NEED_PROTOCOL_ENDPOINT);
+      Path propertyPath =  PathParser.parse(PATH_NEED_PROTOCOL_ENDPOINT, new PrefixMappingImpl());
+      URI protocolEndpoint = RdfUtils.toURI(WonLinkedDataUtils.getWonNodePropertyForNeedOrConnectionURI(
+        needURI,
+        propertyPath, linkedDataSource
+      ));
+     return protocolEndpoint;
     } catch (UniformInterfaceException e){
       ClientResponse response = e.getResponse();
       if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
@@ -69,8 +76,6 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
       }
       else throw e;
     }
-
-    return needProtocolEndpoint;
   }
 
   public NeedProtocolNeedWebServiceEndpoint getNeedProtocolEndpointForConnection(URI connectionURI) throws NoSuchConnectionException, MalformedURLException

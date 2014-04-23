@@ -31,7 +31,7 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/mail-dir-bot.properties" ignore-unresolvable="true"/>
     
 
-    <bean id="needProducerFromMails" class="won.bot.framework.component.needproducer.impl.SimpleCompositeNeedProducer">
+    <bean id="needProducerFromMails" class="won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer">
         <qualifier value="default" />
         <property name="needFactories">
             <set>

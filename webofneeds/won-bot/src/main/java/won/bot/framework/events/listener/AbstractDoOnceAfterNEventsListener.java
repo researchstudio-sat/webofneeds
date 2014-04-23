@@ -63,8 +63,8 @@ public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListen
       if (finished){
         return;
       }
-      logger.debug("processing event {} of {} (event: {})", new Object[]{count, targetCount, event});
       count++;
+      logger.debug("processing event {} of {} (event: {})", new Object[]{count, targetCount, event});
       if (count >= targetCount) {
         logger.debug("calling doOnce");
         doRun = true;

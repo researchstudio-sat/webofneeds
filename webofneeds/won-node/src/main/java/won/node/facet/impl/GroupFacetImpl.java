@@ -32,7 +32,7 @@ public class GroupFacetImpl extends AbstractFacet
     return FacetType.GroupFacet;
   }
 
-    @Override
+  @Override
   public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     final List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
       ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());

@@ -17,7 +17,6 @@
 package won.protocol.model;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.mapping.Set;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 import javax.persistence.*;
@@ -57,8 +56,9 @@ public class Need
   @Column( name = "creationDate", nullable = false)
   private Date creationDate;
 
-
-   @ManyToMany(targetEntity = OwnerApplication.class,fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  //EAGERly loaded because accessed outside hibernate session in
+  // OwnerProtocolCamelConfiguratorImpl TODO: change this!
+   @ManyToMany(targetEntity = OwnerApplication.class,fetch = FetchType.EAGER)
    @JoinTable(name="NEED_OWNERAPP",
            joinColumns = @JoinColumn(name="need_id"),
            inverseJoinColumns = @JoinColumn(name = "owner_application_id"))

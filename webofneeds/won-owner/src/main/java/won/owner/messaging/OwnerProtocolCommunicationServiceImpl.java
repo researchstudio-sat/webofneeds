@@ -87,6 +87,7 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     }
     @Override
     public synchronized URI  getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException {
+        //TODO: make this more efficient
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionUri);
         URI needURI = con.getNeedURI();
         Need need = needRepository.findByNeedURI(needURI).get(0);

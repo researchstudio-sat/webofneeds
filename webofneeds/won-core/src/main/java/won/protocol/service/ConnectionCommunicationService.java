@@ -54,6 +54,9 @@ public interface ConnectionCommunicationService
    * Sends a chat message via the local connection identified by the specified connectionURI
    * to the remote partner.
    *
+   * Additionally, if the message contains user feedback on the connectionURI or an event inside the connection,
+   * the feedback is processed.
+   *
    *
    * @param connectionURI the local connection
    * @param message       the chat message

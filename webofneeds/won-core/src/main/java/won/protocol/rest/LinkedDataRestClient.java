@@ -21,6 +21,7 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.eval.PathEval;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -28,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.Iterator;
 
 /**
@@ -57,7 +59,18 @@ public class LinkedDataRestClient
     //TODO: improve error handling
     //If a ClientHandlerException is thrown here complaining that it can't read a Model with MIME media type text/html,
     //it was probably the wrong resourceURI
-    return r.accept(RDFMediaType.APPLICATION_RDF_XML).get(Model.class);
+    Model result;
+    try {
+       result = r.accept(RDFMediaType.APPLICATION_RDF_XML).get(Model.class);
+    } catch (ClientHandlerException e) {
+      throw new IllegalArgumentException(new MessageFormat("caught a clientHandler exception, " +
+        "which may indicate that the URI that was accessed isn't a" +
+        " linked data URI, please check {0}").format(resourceURI), e);
+    }
+    if (logger.isDebugEnabled()) {
+      logger.debug("fetched model with {} statements for resource {}",result.size(), resourceURI);
+    }
+    return result;
   }
 
     /**

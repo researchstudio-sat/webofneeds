@@ -40,14 +40,16 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
 {
   private static final String CACHE_NAME = "linkedDataCache";
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  @Autowired
+  @Autowired(required = true)
   private EhCacheCacheManager cacheManager;
+  private LinkedDataRestClient linkedDataRestClient;
   private Ehcache cache;
 
   //In-memory dataset for caching linked data.
 
 
   public Model getModelForResource(URI resource){
+
     assert resource != null : "resource must not be null";
     Element element = cache.get(resource);
     Object model = element.getObjectValue();
@@ -69,10 +71,11 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     this.cacheManager = cacheManager;
   }
 
-  private class LinkedDataCacheEntryFactory implements CacheEntryFactory {
-    //client for accessing linked data.
-    private LinkedDataRestClient linkedDataClient = new LinkedDataRestClient();
+  public void setLinkedDataRestClient(final LinkedDataRestClient linkedDataRestClient) {
+    this.linkedDataRestClient = linkedDataRestClient;
+  }
 
+  private class LinkedDataCacheEntryFactory implements CacheEntryFactory {
     private LinkedDataCacheEntryFactory(){}
 
     @Override
@@ -80,7 +83,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     {
       if (key instanceof URI) {
         logger.debug("fetching linked data for URI {}", key);
-        return linkedDataClient.readResourceData((URI) key);
+        return linkedDataRestClient.readResourceData((URI) key);
       } else {
         throw new IllegalArgumentException("this cache only resolves URIs to Models");
       }

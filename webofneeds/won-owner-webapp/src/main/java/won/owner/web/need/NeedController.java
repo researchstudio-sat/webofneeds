@@ -12,26 +12,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import won.owner.pojo.NeedPojo;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
+import won.owner.web.WonOwnerWebappUtils;
 import won.protocol.exception.*;
-import won.protocol.model.Facet;
-import won.protocol.model.Match;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
+import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.ProjectingIterator;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
@@ -39,9 +35,10 @@ import won.protocol.ws.fault.NoSuchConnectionFault;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * Created with IntelliJ IDEA.
@@ -114,6 +111,13 @@ public class NeedController
   public void setNeedRepository(NeedRepository needRepository)
   {
     this.needRepository = needRepository;
+  }
+
+  @RequestMapping(value = "/import", method = RequestMethod.POST)
+  public String importNeedPost(@RequestParam("needURI") URI needURI)
+  {
+    Need importedNeed = dataReloadService.importNeed(needURI);
+    return "redirect:/need/" + importedNeed.getId();
   }
 
   @RequestMapping(value = "/create", method = RequestMethod.GET)
@@ -262,14 +266,16 @@ public class NeedController
     model.addAttribute("needURI", need.getNeedURI());
     List<Facet> facets = facetRepository.findByNeedURI(need.getNeedURI());
 
-          model.addAttribute("command", new NeedPojo(facets));
-
-
+    NeedPojo needCommandPojo = new NeedPojo(facets);
+          model.addAttribute("command", needCommandPojo);
 
     NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataSource.getModelForResource(need.getNeedURI()));
     pojo.setState(need.getState());
-
     model.addAttribute("pojo", pojo);
+
+    //set facets on 'command': (needed for the dropdown list in the 'connect' control TODO: deuglify
+    needCommandPojo.setNeedFacetURIs(pojo.getNeedFacetURIs());
+
 
     return "viewNeed";
   }
@@ -283,8 +289,27 @@ public class NeedController
       return "noNeedFound";
 
     Need need = needs.get(0);
-    model.addAttribute("matches", matchRepository.findByFromNeed(need.getNeedURI()));
+    List<Match> matches = matchRepository.findByFromNeed(need.getNeedURI());
+    model.addAttribute("matches", matches);
 
+    //create an URI iterator from the matches and fetch the linked data descriptions for the needs.
+    final Iterator<Match> matchIterator = matches.iterator();
+    Iterator<com.hp.hpl.jena.rdf.model.Model> modelIterator = WonLinkedDataUtils.getModelForURIs(
+      new ProjectingIterator<Match, URI>(matchIterator)
+      {
+        @Override
+        public URI next() {
+          return this.baseIterator.next().getToNeed();
+        }
+      }, this.linkedDataSource);
+    Iterator<NeedPojo> needPojoIterator = WonOwnerWebappUtils.toNeedPojos(modelIterator);
+
+    //create a list of models and add all the descriptions:
+    List<NeedPojo> remoteNeeds = new ArrayList<NeedPojo>(matches.size());
+    while(modelIterator.hasNext()){
+      remoteNeeds.add(needPojoIterator.next());
+    }
+    model.addAttribute("remoteNeeds", remoteNeeds);
     return "listMatches";
   }
 
@@ -295,11 +320,27 @@ public class NeedController
     List<Need> needs = needRepository.findById(Long.valueOf(needId));
     if (needs.isEmpty())
       return "noNeedFound";
-
     Need need = needs.get(0);
+    List<Connection> connections = connectionRepository.findByNeedURI(need.getNeedURI());
+    model.addAttribute("connections", connections);
 
-    model.addAttribute("connections", connectionRepository.findByNeedURI(need.getNeedURI()));
+    //create an URI iterator from the matches and fetch the linked data descriptions for the needs.
+    final Iterator<Connection> connectionIterator = connections.iterator();
+    Iterator<com.hp.hpl.jena.rdf.model.Model> modelIterator = WonLinkedDataUtils.getModelForURIs(new ProjectingIterator<Connection,URI>(connectionIterator)
+    {
+      @Override
+      public URI next() {
+        return connectionIterator.next().getRemoteNeedURI();
+      }
+    }, this.linkedDataSource);
+    Iterator<NeedPojo> needPojoIterator = WonOwnerWebappUtils.toNeedPojos(modelIterator);
 
+    //create a list of models and add all the descriptions:
+    List<NeedPojo> remoteNeeds = new ArrayList<NeedPojo>(connections.size());
+    while(connectionIterator.hasNext()){
+      remoteNeeds.add(needPojoIterator.next());
+    }
+    model.addAttribute("remoteNeeds", remoteNeeds);
     return "listConnections";
   }
 

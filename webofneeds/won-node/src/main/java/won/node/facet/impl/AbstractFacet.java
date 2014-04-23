@@ -9,7 +9,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.node.service.impl.DataAccessService;
+import won.node.service.DataAccessService;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
@@ -132,7 +132,6 @@ public abstract class AbstractFacet implements Facet
    */
   @Override
   public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    final URI remoteConnectionURI = con.getRemoteConnectionURI();
     //inform the other side
     executorService.execute(new Runnable() {
       @Override

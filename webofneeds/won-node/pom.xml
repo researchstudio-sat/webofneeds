@@ -39,6 +39,11 @@
             <artifactId>spring-webmvc</artifactId>
         </dependency>
 
+        <!-- rdf -->
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-tdb</artifactId>
+        </dependency>
         <!-- messaging -->
         <dependency>
             <groupId>org.apache.camel</groupId>

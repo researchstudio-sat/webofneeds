@@ -29,6 +29,7 @@
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/owner.properties" ignore-unresolvable="true"/>
 
+
     <bean id="uriService" class="won.owner.service.impl.URIService">
         <property name="ownerProtocolOwnerServiceEndpointURI" value="${uri.owner.protocol.endpoint}" />
         <property name="defaultOwnerProtocolNeedServiceEndpointURI" value="${uri.need.protocol.endpoint.default}" />

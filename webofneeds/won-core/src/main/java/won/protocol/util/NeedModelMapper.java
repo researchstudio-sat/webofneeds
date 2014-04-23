@@ -65,6 +65,7 @@ public class NeedModelMapper implements ModelMapper<Need>
     }  else {
       logger.debug("no isInState property found for need resource {}", needRes.getURI());
     }
+    need.setWonNodeURI(URI.create(needRes.getPropertyResourceValue(WON.HAS_WON_NODE).toString()));
 
     return need;
   }

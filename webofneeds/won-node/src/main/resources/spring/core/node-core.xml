@@ -30,6 +30,7 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
     <!-- REST stuff -->
+    <!-- required so our linked data client can convert strings into jena models -->
     <context:component-scan base-package="won.protocol.rest">
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
     </context:component-scan>
@@ -75,6 +76,7 @@
         <property name="activeMqMatcherPrtotocolQueueName" value="${activemq.queuename.matcher.incoming}"/>
         <property name="rdfStorage" ref="rdfStorageRef" />
         <property name="pageSize" value="${linkeddata.pagesize}" />
+        <property name="uriService" ref="uriService" />
     </bean>
 
     <bean id="queueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/>
@@ -86,7 +88,7 @@
     <!--bean id="QueueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/-->
 
     <!--- DataAccessService -->
-    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessService" >
+    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessServiceImpl" >
         <property name="URIService" ref="uriService" />
         <property name="rdfStorageService" ref="rdfStorageRef" />
     </bean>

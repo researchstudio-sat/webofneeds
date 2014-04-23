@@ -19,9 +19,9 @@ package won.matcher.processor;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 
 import java.net.URI;
 
@@ -32,13 +32,12 @@ import java.net.URI;
 public class HintSender implements MatchProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  private MatcherProtocolNeedServiceClient client;
+  private MatcherProtocolNeedServiceClientSide client;
 
-  public HintSender()
+  public HintSender(MatcherProtocolNeedServiceClientSide client)
   {
-    //setup matcher client
-    client = new MatcherProtocolNeedServiceClient();
-    client.initializeDefault();
+    assert client != null : "client must not be null";
+    this.client = client;
   }
 
   @Override

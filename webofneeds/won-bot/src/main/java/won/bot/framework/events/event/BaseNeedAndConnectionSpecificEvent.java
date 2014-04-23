@@ -57,7 +57,7 @@ public abstract class BaseNeedAndConnectionSpecificEvent extends BaseEvent imple
 
   @Override
   public String toString() {
-    return getClass().getSimpleName()+ "{" +
+    return getClass().getSimpleName()+"@"+Integer.toHexString(hashCode())+ "{" +
       "needURI=" + getNeedURI() +
       ", connectionURI=" + getConnectionURI() +
       '}';

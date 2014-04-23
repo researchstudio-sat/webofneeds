@@ -21,14 +21,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.NoSuchNeedException;
 import won.protocol.jms.*;
-import won.protocol.model.Need;
-import won.protocol.model.WonNode;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.WonNodeRepository;
+import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
-import java.util.List;
 
 /**
  * User: LEIH-NB
@@ -77,19 +76,8 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
     }
 
     @Override
-    public URI getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException {
-        Need need = null;
-        URI wonNodeUri = null;
-        //need = needRepository.findByNeedURI(needUri).get(0);
-        List<Need> needList = needRepository.findByNeedURI(needUri);
-        if (needList.size()>0) {
-            need = needList.get(0);
-            wonNodeUri = need.getWonNodeURI();
-
-        }
-
-
-        return wonNodeUri;
+    public URI getWonNodeUriWithNeedUri(URI needUri) throws NoSuchNeedException {
+        return DataAccessUtils.loadNeed(needRepository, needUri).getWonNodeURI();
     }
 
     @Override

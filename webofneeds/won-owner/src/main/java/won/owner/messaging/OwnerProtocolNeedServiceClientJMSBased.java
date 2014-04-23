@@ -175,7 +175,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
 
         logger.debug("registered ownerappID: "+ownerApplicationId);
         WonNode wonNode = storeWonNode(ownerApplicationId,camelConfiguration,wonNodeURI);
-        wonNodeRepository.saveAndFlush(wonNode);
+        wonNodeRepository.save(wonNode);
 
         return ownerApplicationId;
     }

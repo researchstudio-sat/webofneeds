@@ -32,6 +32,7 @@ public abstract class BaseEventBotAction implements EventBotAction
   protected final Logger logger = LoggerFactory.getLogger(getClass());
   private EventListenerContext eventListenerContext;
   private static final String EXCEPTION_TAG = "failed";
+  private final String stopwatchName = getClass().getName();
 
 
   private BaseEventBotAction()
@@ -48,14 +49,18 @@ public abstract class BaseEventBotAction implements EventBotAction
     return new Runnable(){
       public void run()
       {
-        Stopwatch stopwatch = SimonManager.getStopwatch(getClass().getName());
+        Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName);
         Split split = stopwatch.start();
         try {
           doRun(event);
           split.stop();
         } catch (Exception e) {
-          logger.warn("could not run action {}", getClass().getName(), e);
+          logger.warn("could not run action {}", stopwatchName, e);
           split.stop(EXCEPTION_TAG);
+        } catch (Throwable t) {
+          logger.warn("could not run action {}", stopwatchName, t);
+          split.stop(EXCEPTION_TAG);
+          throw t;
         }
       }
     };

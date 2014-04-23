@@ -1,29 +1,37 @@
 package won.node.service.impl;
 
+import com.hp.hpl.jena.graph.TripleBoundary;
 import com.hp.hpl.jena.rdf.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.rdfstorage.RDFStorageService;
 import won.protocol.exception.*;
 import won.protocol.model.*;
-import won.protocol.repository.*;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.EventRepository;
+import won.protocol.repository.FacetRepository;
+import won.protocol.repository.NeedRepository;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User: gabriel
  * Date: 06/11/13
  */
-public class DataAccessService {
+public class DataAccessServiceImpl implements won.node.service.DataAccessService
+{
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   private RDFStorageService rdfStorageService;
   private URIService URIService;
 
-  @Autowired
-  private ChatMessageRepository chatMessageRepository;
   @Autowired
   private NeedRepository needRepository;
   @Autowired
@@ -76,10 +84,10 @@ public class DataAccessService {
       con.setRemoteConnectionURI(otherConnectionURI);
       con.setTypeURI(facetURI);
       //save connection (this creates a new id)
-      con = connectionRepository.saveAndFlush(con);
+      con = connectionRepository.save(con);
       //create and set new uri
       con.setConnectionURI(URIService.createConnectionURI(con));
-      con = connectionRepository.saveAndFlush(con);
+      con = connectionRepository.save(con);
 
       //TODO: do we save the connection content? where? as a chat content?
     }
@@ -87,6 +95,7 @@ public class DataAccessService {
     return con;
   }
 
+  @Override
   public Collection<URI> getSupportedFacets(URI needUri) throws NoSuchNeedException
   {
     List<URI> ret = new LinkedList<URI>();
@@ -110,6 +119,7 @@ public class DataAccessService {
    * @param content
    * @return
    */
+  @Override
   public URI getFacet(Model content) {
     return WonRdfUtils.FacetUtils.getFacet(content);
   }
@@ -119,11 +129,13 @@ public class DataAccessService {
    * @param content
    * @param facetURI
    */
+  @Override
   public void addFacet(final Model content, final URI facetURI)
   {
     WonRdfUtils.FacetUtils.addFacet(content, facetURI);
   }
 
+  @Override
   public Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
       throws ConnectionAlreadyExistsException {
     Connection con = null;
@@ -155,24 +167,26 @@ public class DataAccessService {
       }*/ else {
         //TODO: Move this to the transition() - Method in ATConnectionState
         con.setState(con.getState().transit(eventType));
-        con = connectionRepository.saveAndFlush(con);
+        con = connectionRepository.save(con);
       }
     }
 
     return con;
   }
 
+  @Override
   public ConnectionEvent createConnectionEvent(final URI connectionURI, final URI originator,
-                                                final ConnectionEventType connectionEventType) {
+    final ConnectionEventType connectionEventType) {
     ConnectionEvent event = new ConnectionEvent();
     event.setConnectionURI(connectionURI);
     event.setType(connectionEventType);
     event.setOriginatorUri(originator);
-    eventRepository.saveAndFlush(event);
+    eventRepository.save(event);
 
     return event;
   }
 
+  @Override
   public Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
@@ -183,31 +197,49 @@ public class DataAccessService {
     //set new state and save in the db
     con.setState(nextState);
     //save in the db
-    return connectionRepository.saveAndFlush(con);
+    return connectionRepository.save(con);
   }
 
-  public Connection saveChatMessage(Connection con, String message) throws NoSuchConnectionException {          //load connection, checking if it exists
-    if (con == null) throw new IllegalArgumentException("connectionURI is not set");
-    if (message == null) throw new IllegalArgumentException("message is not set");
+  /**
+   * Adds feedback, represented by the subgraph reachable from feedback, to the RDF description of the
+   * item identified by forResource
+   * @param forResource
+   * @param feedback
+   * @return true if feedback could be added false otherwise
+   */
+  @Override
+  public boolean addFeedback(final URI forResource, final Resource feedback){
+    //TODO: concurrent modifications to the model for this resource result in side-effects.
+    //think about locking.
+    logger.debug("adding feedback to resource {}", forResource);
+    Model model = rdfStorageService.loadContent(forResource);
+    if (model == null) {
+      logger.debug("could not add feedback to resource {}: no such resource found", forResource );
+      return false;
+    }
+    Resource mainRes = model.getResource(forResource.toString());
+    if (mainRes == null){
+      logger.debug("could not add feedback to resource {}: resource not found in model");
+      return false;
+    }
 
-    //construct chatMessage object to store in the db
-    ChatMessage chatMessage = new ChatMessage();
-    chatMessage.setCreationDate(new Date());
-    chatMessage.setLocalConnectionURI(con.getConnectionURI());
-    chatMessage.setMessage(message);
-    chatMessage.setOriginatorURI(con.getNeedURI());
-    //save in the db
-    chatMessageRepository.saveAndFlush(chatMessage);
-
-    return con;
+    mainRes.addProperty(WON.HAS_FEEDBACK, feedback);
+    ModelExtract extract = new ModelExtract(new StatementTripleBoundary(TripleBoundary.stopNowhere));
+    model.add(extract.extract(feedback, feedback.getModel()));
+    logger.debug("done adding feedback for resource {}, storing...", forResource);
+    rdfStorageService.storeContent(forResource, model);
+    logger.debug("stored feedback");
+    return true;
   }
 
+  @Override
   public void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event) {
     saveAdditionalContentForEvent(content, con, event, null);
   }
 
+  @Override
   public void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event,
-                                            final Double score) {
+    final Double score) {
     rdfStorageService.storeContent(event,
         RdfUtils.createContentForEvent(
             this.URIService.createEventURI(con, event), content, con, event, score));
@@ -226,9 +258,10 @@ public class DataAccessService {
     }
     */
 
+    @Override
     public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {
     con.setRemoteConnectionURI(remoteConnectionURI);
-    connectionRepository.saveAndFlush(con);
+    connectionRepository.save(con);
   }
 
   private boolean isNeedActive(final Need need) {
@@ -253,10 +286,12 @@ public class DataAccessService {
     return con.getState().transit(msg);
   }
 
+  @Override
   public void setURIService(URIService URIService) {
     this.URIService = URIService;
   }
 
+  @Override
   public void setRdfStorageService(RDFStorageService rdfStorageService) {
     this.rdfStorageService = rdfStorageService;
   }

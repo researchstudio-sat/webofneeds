@@ -18,7 +18,6 @@ package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
@@ -26,19 +25,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.facet.impl.FacetRegistry;
-import won.node.facet.impl.WON_BA;
 import won.node.rdfstorage.RDFStorageService;
+import won.node.service.DataAccessService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
-import won.protocol.model.FacetType;
 import won.protocol.repository.*;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.WON;
 
 import java.io.StringWriter;
 import java.net.URI;
@@ -59,8 +56,6 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
 
   @Autowired
   private ConnectionRepository connectionRepository;
-  @Autowired
-  private ChatMessageRepository chatMessageRepository;
   @Autowired
   private EventRepository eventRepository;
   @Autowired
@@ -93,25 +88,6 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         String textMessage = null;
-        //TODO: messages should be saved with RDF content, not with text content. If this was the case,
-        // the IF below isn't required.
-        //check for facet types:
-        if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI())  ||
-                con.getTypeURI().equals(FacetType.BACCParticipantFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BAAtomicPCCoordinatorFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BAAtomicCCCoordinatorFacet.getURI()))
-        {
-            Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-            StmtIterator stmtIterator = baseRes.listProperties(WON_BA.COORDINATION_MESSAGE);
-            textMessage = stmtIterator.next().getObject().toString();
-        } else {
-          Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-          StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
-          textMessage = stmtIterator.next().getObject().toString();
-        }
-        dataService.saveChatMessage(con,textMessage);
         //create ConnectionEvent in Database
         ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_MESSAGE);
         replaceBaseURIWithEventURI(message, con, event);

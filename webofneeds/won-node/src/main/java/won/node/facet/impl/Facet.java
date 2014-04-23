@@ -17,17 +17,11 @@
 package won.node.facet.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import won.node.service.impl.DataAccessService;
-import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
-import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
-import won.protocol.need.NeedProtocolNeedClientSide;
-import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 
 import java.net.URI;
-import java.util.concurrent.ExecutorService;
 
 /**
  * User: fkleedorfer
