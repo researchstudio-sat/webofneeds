@@ -52,7 +52,7 @@ public abstract class BAAtomicCCActiveExitingBot extends BAAtomicCCBaseBot{
 //
 //    //Coordination message is sent as MODEL
     scripts.add(new CompletingSPCancelingUriBot());
-    scripts.add(new CompletingSPCancelingFailingUriBot());
+    scripts.add(new CompletingSPCancelingFAilingUriBot());
     scripts.add(new CompletedSPCompensatingFailingUriBot());
     scripts.add(new CompletedSPCompensatingFailingUriBot());
     scripts.add(new ActiveSPCancelingUriBot());

@@ -13,7 +13,7 @@ import java.util.List;
  * User: Danijel
  * Date: 22.4.14.
  */
-public class CompletingSPCancelingFailingUriBot extends BATestBotScript
+public class CompletingSPCancelingFAilingUriBot extends BATestBotScript
 {          //CompletingSPCancelingFailingUriBot
 
   @Override
