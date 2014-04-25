@@ -34,11 +34,11 @@ import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
 public class RandomSimulatorBot extends EventBot
 {
 
-  private static final double PROB_OPEN_ON_HINT = 0.5;
-  private static final double PROB_MESSAGE_ON_OPEN = 0.8;
-  private static final double PROB_MESSAGE_ON_MESSAGE = 0.9;
+  private static final double PROB_OPEN_ON_HINT = 0.3;
+  private static final double PROB_MESSAGE_ON_OPEN = 0.5;
+  private static final double PROB_MESSAGE_ON_MESSAGE = 0.5;
   private static final long MIN_RECATION_TIMEOUT_MILLIS = 1000;
-  private static final long MAX_REACTION_TIMEOUT_MILLIS = 60 * 1000;
+  private static final long MAX_REACTION_TIMEOUT_MILLIS = 30 * 1000;
   private static final long MIN_NEXT_CREATION_TIMEOUT_MILLIS = 100;
   private static final long MAX_NEXT_CREATION_TIMEOUT_MILLIS = 3 * 1000;
 
