@@ -3,6 +3,7 @@ package won.owner.web.rest;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.DC;
 import org.apache.commons.collections.map.LRUMap;
@@ -11,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,8 +22,13 @@ import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
+import won.protocol.exception.ConnectionAlreadyExistsException;
+import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.model.*;
+import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.repository.ChatMessageRepository;
 import won.protocol.model.Match;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
@@ -28,13 +36,13 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -61,6 +69,9 @@ public class RestController
 
   @Autowired
   private MatchRepository matchRepository;
+
+  @Autowired
+  private ChatMessageRepository chatMessageRepository;
 
   @Autowired
   private ConnectionRepository connectionRepository;
@@ -121,7 +132,7 @@ public class RestController
       value="/{needId}/matches",
       produces = MediaType.APPLICATION_JSON,
       method = RequestMethod.GET)
-  public List<NeedPojo> findMatches(@PathParam("needId") long needId)
+  public List<NeedPojo> findMatches(@PathVariable("needId") long needId)
   {
 
     logger.info("Looking for matches for Need: " +  needId);
@@ -141,11 +152,11 @@ public class RestController
 
     //NeedPojo fullNeed = NeedFetcher.getNeedInfo(need);
 
-    logger.info("Looking for matches for: " + need.getNeedURI());
-    List<Match> matches = matchRepository.findByFromNeed(need.getNeedURI());
+	  logger.info("Looking for matches for: " + need.getNeedURI());
+	  List<Match> matches = matchRepository.findByFromNeed(need.getNeedURI());
 
 
-    logger.info("Found Matches: " + matches.size());
+	  logger.info("Found Matches: " + matches.size());
     for (Match match : matches) {
       URI matchUri;
       logger.debug("using match: {} ", match);
@@ -184,7 +195,8 @@ public class RestController
       produces = MediaType.APPLICATION_JSON,
       method = RequestMethod.POST
       )
-  public NeedPojo createNeed(NeedPojo needPojo) throws Exception {
+  public NeedPojo createNeed(@RequestBody NeedPojo needPojo)
+  {
 
     logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getCreationDate() + "/" +
         needPojo.getLongitude() + "/" + needPojo.getLatitude() + "/" + (needPojo.getState() == NeedState.ACTIVE));
@@ -215,99 +227,135 @@ public class RestController
     return returnList;
   }
 
-  private NeedPojo resolve(NeedPojo needPojo) throws Exception {
+  @ResponseBody
+  @RequestMapping(
+    value = "/need/{needId}",
+    produces = MediaType.APPLICATION_JSON,
+    method = RequestMethod.GET
+  )
+  public NeedPojo getNeed(@PathVariable("needId") long needId)
+  {
+
+		LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
+		List<NeedPojo> returnList = new ArrayList<NeedPojo>();
+
+		Iterable<Need> needs = needRepository.findById(needId);
+		Need need = needs.iterator().next();
+
+		NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+		needPojo.setNeedId(need.getId());
+
+		return needPojo;
+	}
 
 
-    if (needPojo.getNeedId() >= 0) {
+	private NeedPojo resolve(NeedPojo needPojo)
+    {
+		if (needPojo.getNeedId() >= 0) {
 
-      List<Need> needs = needRepository.findById(needPojo.getNeedId());
-      if (!needs.isEmpty()) {
-        logger.warn("Deactivating old need");
-        try {
-          ownerService.deactivate(needs.get(0).getNeedURI());
-        } catch (NoSuchNeedException e) {
-          logger.warn("Could not deactivate old Need: " + needs.get(0).getNeedURI());
-        }
-      }
-    }
-    URI needURI;
+		  List<Need> needs = needRepository.findById(needPojo.getNeedId());
+		  if (!needs.isEmpty()) {
+		    logger.warn("Deactivating old need");
+		    try {
+		      ownerService.deactivate(needs.get(0).getNeedURI());
+		    } catch (NoSuchNeedException e) {
+		      logger.warn("Could not deactivate old Need: " + needs.get(0).getNeedURI());
+		    }
+		  }
+		}
+		URI needURI;
 
-    try {
-      URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
-
-      com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
-
-      Resource needResource = needModel.createResource(WON.NEED);
-
-      // need type
-      needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
-
-      // need content
-      Resource needContent = needModel.createResource(WON.NEED_CONTENT);
-      if (!needPojo.getTitle().isEmpty())
-        needContent.addProperty(DC.title, needPojo.getTitle(), XSDDatatype.XSDstring);
-      if (!needPojo.getTextDescription().isEmpty())
-        needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
-      needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
+		try {
+		    URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
 
       // need modalities
       Resource needModality = needModel.createResource(WON.NEED_MODALITY);
+		    com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
-      //price and currency
-      if (needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
-        Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
-        if (needPojo.getLowerPriceLimit() != null)
-          priceSpecification.addProperty(WON.HAS_LOWER_PRICE_LIMIT, Double.toString(needPojo.getLowerPriceLimit()), XSDDatatype.XSDdouble);
-        if (needPojo.getUpperPriceLimit() != null)
-          priceSpecification.addProperty(WON.HAS_UPPER_PRICE_LIMIT, Double.toString(needPojo.getUpperPriceLimit()), XSDDatatype.XSDdouble);
-        if (!needPojo.getCurrency().isEmpty())
-          priceSpecification.addProperty(WON.HAS_CURRENCY, needPojo.getCurrency(), XSDDatatype.XSDstring);
+		    Resource needResource = needModel.createResource(ownerURI.toString(), WON.NEED);
 
-        needModel.add(needModel.createStatement(needModality, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
-      }
+		    // need type
+		    needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
 
-      if (needPojo.getLatitude() != null && needPojo.getLongitude() != null) {
-        Resource location = needModel.createResource(GEO.POINT)
-            .addProperty(GEO.LATITUDE, Double.toString(needPojo.getLatitude()))
-            .addProperty(GEO.LONGITUDE, Double.toString(needPojo.getLongitude()));
+		    // need content
+		    Resource needContent = needModel.createResource(WON.NEED_CONTENT);
+		    if (!needPojo.getTitle().isEmpty())
+			    needContent.addProperty(DC.title, needPojo.getTitle(), XSDDatatype.XSDstring);
+		    if (!needPojo.getTextDescription().isEmpty())
+			    needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
+		    if (!needPojo.getContentDescription().isEmpty())
+			    attachRdfToModelViaBlanknode(needPojo.getContentDescription(), "TTL", needContent, WON.HAS_CONTENT_DESCRIPTION, needModel);
+		    if (!needPojo.getTags().isEmpty()) {
+			    String[] tags = needPojo.getTags().split(",");
+			    for (String tag : tags) {
+				    needModel.add(needModel.createStatement(needContent, WON.HAS_TAG, tag.trim()));
+			    }
+		    }
 
-        needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_LOCATION, location));
-      }
+		    needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
 
-      // time constraint
-      if (!needPojo.getStartTime().isEmpty() || !needPojo.getEndTime().isEmpty()) {
-        Resource timeConstraint = needModel.createResource(WON.TIME_SPECIFICATION)
-            .addProperty(WON.HAS_RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
-        if (!needPojo.getStartTime().isEmpty())
-          timeConstraint.addProperty(WON.HAS_START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
-        if (!needPojo.getEndTime().isEmpty())
-          timeConstraint.addProperty(WON.HAS_END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
-        if (needPojo.getRecurIn() != null)
-          timeConstraint.addProperty(WON.HAS_RECURS_IN, Long.toString(needPojo.getRecurIn()));
-        if (needPojo.getRecurTimes() != null)
-          timeConstraint.addProperty(WON.HAS_RECURS_TIMES, Integer.toString(needPojo.getRecurTimes()));
-        needModel.add(needModel.createStatement(needModality, WON.HAS_TIME_SPECIFICATION, timeConstraint));
-      }
+		    // owner
+		    if (needPojo.isAnonymize()) {
+			    needModel.add(needModel.createStatement(needResource, WON.HAS_OWNER, WON.ANONYMIZED_OWNER));
+		    }
 
-      needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
+		    // need modalities
+		    Resource needModality = needModel.createResource(WON.NEED_MODALITY);
 
-      if (needPojo.getWonNode().equals("")) {
-        Future<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
-        needURI = futureResult.get();
-      } else {
-        Future<URI> futureResult = ((OwnerProtocolNeedServiceClient) ownerService).createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, URI.create(needPojo.getWonNode()));
-        needURI = futureResult.get();
-      }
+		    //price and currency
+		    if (needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
+			    Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
+			    if (needPojo.getLowerPriceLimit() != null)
+				    priceSpecification.addProperty(WON.HAS_LOWER_PRICE_LIMIT, Double.toString(needPojo.getLowerPriceLimit()), XSDDatatype.XSDdouble);
+			    if (needPojo.getUpperPriceLimit() != null)
+				    priceSpecification.addProperty(WON.HAS_UPPER_PRICE_LIMIT, Double.toString(needPojo.getUpperPriceLimit()), XSDDatatype.XSDdouble);
+			    if (!needPojo.getCurrency().isEmpty())
+				    priceSpecification.addProperty(WON.HAS_CURRENCY, needPojo.getCurrency(), XSDDatatype.XSDstring);
 
-      List<Need> needs = needRepository.findByNeedURI(needURI);
+			    needModel.add(needModel.createStatement(needModality, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
+		    }
+
+		    if (needPojo.getLatitude() != null && needPojo.getLongitude() != null) {
+			    Resource location = needModel.createResource(GEO.POINT)
+					    .addProperty(GEO.LATITUDE, Double.toString(needPojo.getLatitude()))
+					    .addProperty(GEO.LONGITUDE, Double.toString(needPojo.getLongitude()));
+
+			    needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_LOCATION, location));
+		    }
+
+		    // time constraint
+		    if (!needPojo.getStartTime().isEmpty() || !needPojo.getEndTime().isEmpty()) {
+			    Resource timeConstraint = needModel.createResource(WON.TIME_SPECIFICATION)
+					    .addProperty(WON.HAS_RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
+			    if (!needPojo.getStartTime().isEmpty())
+				    timeConstraint.addProperty(WON.HAS_START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
+			    if (!needPojo.getEndTime().isEmpty())
+				    timeConstraint.addProperty(WON.HAS_END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
+			    if (needPojo.getRecurIn() != null)
+				    timeConstraint.addProperty(WON.HAS_RECURS_IN, Long.toString(needPojo.getRecurIn()));
+			    if (needPojo.getRecurTimes() != null)
+				    timeConstraint.addProperty(WON.HAS_RECURS_TIMES, Integer.toString(needPojo.getRecurTimes()));
+			    needModel.add(needModel.createStatement(needModality, WON.HAS_TIME_SPECIFICATION, timeConstraint));
+		    }
+
+		    needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
+
+		    if (needPojo.getWonNode().equals("")) {
+			    needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+		    } else {
+			    needURI = ((OwnerProtocolNeedServiceClient) ownerService)
+					    .createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, needPojo.getWonNode());
+		    }
+
+		    List<Need> needs = needRepository.findByNeedURI(needURI);
 
 
-      NeedPojo fullNeed = new NeedPojo(needURI, linkedDataSource.getModelForResource(needs.get(0).getNeedURI()));
-      fullNeed.setNeedId(needs.get(0).getId());
+			LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
+			NeedPojo fullNeed = new NeedPojo(needURI, linkedDataRestClient.readResourceData(needs.get(0).getNeedURI()));
+			fullNeed.setNeedId(needs.get(0).getId());
 
-      //NeedPojo fullNeed = NeedFetcher.getNeedInfo(needs.get(0));
-      logger.info("Added need id:" + fullNeed.getNeedId() + "uri: " + needURI);
-
+			//NeedPojo fullNeed = NeedFetcher.getNeedInfo(needs.get(0));
+			logger.info("Added need id:" + fullNeed.getNeedId() + "uri: " + needURI);
 
 /*
 //            if(!fullNeed.isActive())
@@ -347,16 +395,214 @@ public class RestController
 */
 
 
-      if (needs.size() == 1)
-        return fullNeed;
+		  if (needs.size() == 1)
+		    return fullNeed;
 
-      // return viewNeed(need.getId().toString(), model);
-    } catch (IllegalNeedContentException e) {
-      e.printStackTrace();
-    }
+		  // return viewNeed(need.getId().toString(), model);
+		} catch (IllegalNeedContentException e) {
+		  e.printStackTrace();
+		}
 
 
-    return new NeedPojo();
-  }
+		return new NeedPojo();
+	}
+
+	private void attachRdfToModelViaBlanknode(final String rdfAsString, final String rdfLanguage, final Resource resourceToLinkTo,
+	                                          final Property propertyToLinkThrough, final com.hp.hpl.jena.rdf.model.Model modelToModify) {
+		com.hp.hpl.jena.rdf.model.Model model = RdfUtils.readRdfSnippet(rdfAsString, rdfLanguage);
+		RdfUtils.attachModelByBaseResource(resourceToLinkTo, propertyToLinkThrough, model);
+	}
+
+	// Matching and connecting
+
+	@RequestMapping(
+			value = "/match/{matchId}/connect",
+			method = RequestMethod.GET
+	)
+	public String connect(@PathVariable String matchId) {
+		String ret = "noNeedFound";
+
+		try {
+			List<Match> matches = matchRepository.findById(Long.valueOf(matchId));
+			if (!matches.isEmpty()) {
+				Match match = matches.get(0);
+				List<Need> needs = needRepository.findByNeedURI(match.getFromNeed());
+				if (!needs.isEmpty())
+					ret = "";
+				ownerService.connect(match.getFromNeed(), match.getToNeed(), null);
+			}
+		} catch (ConnectionAlreadyExistsException e) {
+			logger.warn("caught ConnectionAlreadyExistsException:", e);
+		} catch (IllegalMessageForNeedStateException e) {
+			logger.warn("caught IllegalMessageForNeedStateException:", e);
+		} catch (NoSuchNeedException e) {
+			logger.warn("caught NoSuchNeedException:", e);
+		}
+
+		return ret;
+	}
+
+	@ResponseBody
+	@RequestMapping(
+			value = "/{needId}/listMatches",
+			method = RequestMethod.GET,
+			produces=MediaType.APPLICATION_JSON
+	)
+	public List<Match> listMatches(@PathVariable String needId) {
+		List<Need> needs = needRepository.findById(Long.valueOf(needId));
+		if (needs.isEmpty())
+			return new ArrayList<>();
+
+		Need need = needs.get(0);
+
+		return matchRepository.findByFromNeed(need.getNeedURI());
+	}
+
+	@ResponseBody
+	@RequestMapping(
+			value = "/{needId}/listConnections",
+			method = RequestMethod.GET,
+			produces= MediaType.APPLICATION_JSON
+	)
+	public List<Connection> listConnections(@PathVariable String needId) {
+
+		List<Need> needs = needRepository.findById(Long.valueOf(needId));
+		if (needs.isEmpty())
+			return new ArrayList<>();
+
+		Need need = needs.get(0);
+
+		return connectionRepository.findByNeedURI(need.getNeedURI());
+	}
+
+	// Connections
+	@ResponseBody
+	@RequestMapping(
+			value = "/connection/{conId}/state",
+			method = RequestMethod.GET
+	)
+	public String getState(@PathVariable String conId) {
+		List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
+
+		if (cons.isEmpty())
+			return "noNeedFound";
+		Connection con = cons.get(0);
+		try {
+			switch (con.getState()) {
+				case REQUEST_RECEIVED:
+					return "manageConnection";
+				case REQUEST_SENT:
+					return "showMessagePending-Pending....";
+				case CLOSED:
+					return "showMessageClose-Connection Closed!";
+				case CONNECTED:
+					return "listMessages";
+			}
+		} catch (Exception e) {
+			logger.warn("error reading connection from won node");
+			return "error reading connection from won node: " + e.getMessage();
+		}
+		return "noNeedFound";
+	}
+
+	@ResponseBody
+	@RequestMapping(
+			value = "/connection/{conId}/body",
+			method = RequestMethod.GET,
+			produces = MediaType.APPLICATION_JSON
+	)
+	public List<ChatMessage> listMessages(@PathVariable String conId, Model model) {
+		List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
+
+		if (cons.isEmpty())
+			throw new RuntimeException("No need found");
+		Connection con = cons.get(0);
+		try {
+			return chatMessageRepository.findByLocalConnectionURI(con.getConnectionURI());
+		} catch (Exception e) {
+			logger.warn("error reading connection from won node");
+		}
+		return new ArrayList<>();
+	}
+
+	@ResponseBody
+	@RequestMapping(
+			value = "/connection/{conId}/send",
+			method = RequestMethod.POST
+	)
+	public String sendText(@PathVariable String conId, @RequestBody String text) {
+		List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
+		if (cons.isEmpty())
+			return "noNeedFound";
+		Connection con = cons.get(0);
+
+		try {
+			ownerService.textMessage(con.getConnectionURI(), text);
+		} catch (Exception e) {
+			logger.warn("error sending text message");
+			return "error sending text message: " + e.getMessage();
+		}
+
+		return "";
+	}
+
+
+	@ResponseBody
+	@RequestMapping(
+			value = "/connection/{conId}/accept",
+			method = RequestMethod.GET
+	)
+	public String accept(@PathVariable String conId) {
+		List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
+		if (cons.isEmpty())
+			return "noNeedFound";
+		Connection con = cons.get(0);
+		try {
+			ownerService.connect(con.getNeedURI(), con.getRemoteNeedURI(), null);
+		} catch (Exception e) {
+			logger.warn("error during accept", e);
+			return "error during accept: " + e.getMessage();
+		}
+
+		return "accept";
+	}
+
+	@RequestMapping(
+			value = "/{conId}/deny",
+			method = RequestMethod.GET
+	)
+	public String deny(@PathVariable String conId) {
+		List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
+		if (cons.isEmpty())
+			return "noNeedFound";
+		Connection con = cons.get(0);
+		try {
+			ownerService.close(con.getConnectionURI(), null);
+		} catch (Exception e) {
+			logger.warn("error during deny", e);
+			return "error during deny: " + e.getMessage();
+		}
+
+		return "deny";
+	}
+
+	@RequestMapping(
+			value = "/{conId}/close",
+			method = RequestMethod.GET
+	)
+	public String close(@PathVariable String conId) {
+		List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
+		if (cons.isEmpty())
+			return "noNeedFound";
+		Connection con = cons.get(0);
+		try {
+			ownerService.close(con.getConnectionURI(), null);
+		} catch (Exception e) {
+			logger.warn("error during close", e);
+			return "error during close: " + e.getMessage();
+		}
+
+		return "close";
+	}
 
 }

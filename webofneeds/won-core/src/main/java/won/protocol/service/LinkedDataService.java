@@ -23,8 +23,8 @@ import won.protocol.exception.NoSuchNeedException;
 import java.net.URI;
 
 /**
- * Linked data interface for the WON node.
- * TODO [REFACTORING]: move this interface to won-node module
+ * User: fkleedorfer
+ * Date: 26.11.12
  */
 public interface LinkedDataService
 {
@@ -61,7 +61,7 @@ public interface LinkedDataService
    */
 
   public Model getNodeModel();
-  public Model getConnectionModel(final URI connectionUri) throws NoSuchConnectionException;
+  public Model getConnectionModel(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException;
 
 
   /**
@@ -73,5 +73,4 @@ public interface LinkedDataService
    * @throws NoSuchNeedException
    */
   public Model listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException;
-
 }

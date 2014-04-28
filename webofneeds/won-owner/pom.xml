@@ -11,7 +11,7 @@
 
     <artifactId>won-owner</artifactId>
     <name>Owner</name>
-    <dependencies>
+	<dependencies>
         <!--
 
                  Warning! Only to be used in connection with the
@@ -72,8 +72,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
         </dependency>
-
-    </dependencies>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+		</dependency>
+	</dependencies>
 
     <build>
         <resources>

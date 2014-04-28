@@ -45,9 +45,11 @@
     <context:component-scan base-package="won.protocol.repository" />
     <context:component-scan base-package="won.protocol.service" />
     <context:component-scan base-package="won.protocol.util" />
+	<context:component-scan base-package="won.owner.model"/>
+	<context:component-scan base-package="won.owner.repository"/>
 
 
-    <!-- Database connection -->
+	<!-- Database connection -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="driverClass" value="${db.sql.jdbcDriverClass}" />
         <property name="jdbcUrl" value="${db.sql.jdbcUrl}"/>
@@ -66,7 +68,7 @@
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource" />
         <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
-        <property name="packagesToScan" value="won.protocol.model" />
+        <property name="packagesToScan" value="won.protocol.model,won.owner.model" />
     </bean>
 
     <!-- Configure transaction management -->
@@ -77,7 +79,7 @@
     <tx:annotation-driven transaction-manager="transactionManager" />
 
     <!-- Defines where repositories are placed -->
-    <jpa:repositories base-package="won.protocol.repository" />
-
+    <jpa:repositories base-package="won.protocol.repository"/>
+	<jpa:repositories base-package="won.owner.repository"/>
 
 </beans>
