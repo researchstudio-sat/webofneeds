@@ -22,9 +22,11 @@ import won.protocol.exception.NoSuchOwnerApplicationException;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.OwnerApplication;
+import won.protocol.model.WonNode;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.OwnerApplicationRepository;
+import won.protocol.repository.WonNodeRepository;
 
 import java.net.URI;
 import java.text.MessageFormat;
@@ -51,6 +53,22 @@ public class DataAccessUtils {
     return needs.get(0);
   }
 
+
+  /**
+   * Loads the specified wonNode from the database.
+   *
+   * @param wonNodeURI
+   * @throws won.protocol.exception.NoSuchNeedException
+   * @return the wonNode or null if none is found
+   */
+  public static WonNode loadWonNode(WonNodeRepository repository, final URI wonNodeURI)
+  {
+    List<WonNode> nodes = repository.findByWonNodeURI(wonNodeURI);
+    if (nodes.size() == 0) return null;
+    if (nodes.size() > 1) throw new IllegalStateException(MessageFormat.format("Inconsistent database state detected: multiple needs found with URI {0}",
+      wonNodeURI));
+    return nodes.get(0);
+  }
 
   public static String loadOwnerApplication(OwnerApplicationRepository ownerApplicationRepository, final String ownerApplicationId) throws NoSuchOwnerApplicationException {
     List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationId);

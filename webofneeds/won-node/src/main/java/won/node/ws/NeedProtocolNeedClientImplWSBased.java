@@ -51,6 +51,7 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
     try {
+      //TODO: make asynchronous
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForNeed(needUri);
       URI result = proxy.connect(needUri, otherNeedUri, otherConnectionUri, RdfUtils.toString(content));
       SettableFuture<URI> futureResult = SettableFuture.create();

@@ -32,6 +32,7 @@ import won.protocol.jms.MessagingService;
 import won.protocol.model.WonNode;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.WonNodeRepository;
+import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
@@ -172,24 +173,36 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
 
         camelConfiguration.setBrokerComponentName(ownerProtocolCommunicationServiceImpl.replaceComponentNameWithOwnerApplicationId(camelConfiguration, ownerApplicationId));
         camelConfiguration.setEndpoint(ownerProtocolCommunicationServiceImpl.replaceEndpointNameWithOwnerApplicationId(camelConfiguration,ownerApplicationId));
-
+        //TODO: check if won node is already in the db
         logger.debug("registered ownerappID: "+ownerApplicationId);
-        WonNode wonNode = storeWonNode(ownerApplicationId,camelConfiguration,wonNodeURI);
-        wonNodeRepository.save(wonNode);
+        storeWonNode(ownerApplicationId,camelConfiguration,wonNodeURI);
+
 
         return ownerApplicationId;
     }
+
+  /**
+   * Stores the won node information, possibly overwriting existing data.
+   * @param ownerApplicationId
+   * @param camelConfiguration
+   * @param wonNodeURI
+   * @return
+   * @throws NoSuchConnectionException
+   */
     public WonNode storeWonNode(String ownerApplicationId, CamelConfiguration camelConfiguration,URI wonNodeURI) throws NoSuchConnectionException {
-        WonNode wonNode = new WonNode();
+        WonNode wonNode = DataAccessUtils.loadWonNode(wonNodeRepository, wonNodeURI);
+        if (wonNode == null) {
+          wonNode = new WonNode();
+        }
         wonNode.setOwnerApplicationID(ownerApplicationId);
         wonNode.setOwnerProtocolEndpoint(camelConfiguration.getEndpoint());
         wonNode.setWonNodeURI(wonNodeURI);
         wonNode.setBrokerURI(ownerProtocolCommunicationServiceImpl.getBrokerUri(wonNodeURI));
         wonNode.setBrokerComponent(camelConfiguration.getBrokerComponentName());
         wonNode.setStartingComponent(ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator().getStartingEndpoint(wonNodeURI));
+        wonNodeRepository.save(wonNode);
         logger.debug("setting starting component {}", wonNode.getStartingComponent());
         return wonNode;
-
     }
 
     private void configureRemoteEndpointsForOwnerApplication(String ownerApplicationID, String remoteEndpoint) throws CamelConfigurationFailedException, ExecutionException, InterruptedException {
