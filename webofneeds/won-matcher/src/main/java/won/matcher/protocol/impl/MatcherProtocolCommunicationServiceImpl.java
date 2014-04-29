@@ -20,6 +20,7 @@ import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.jms.*;
@@ -28,6 +29,7 @@ import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
+import java.util.Set;
 
 /**
  * User: LEIH-NB
@@ -35,71 +37,109 @@ import java.net.URI;
  */
 public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolCommunicationService {
 
-    @Autowired
-    private NeedProtocolCamelConfigurator matcherProtocolCamelConfigurator;
+  private MatcherProtocolCamelConfigurator matcherProtocolCamelConfigurator;
 
-    @Autowired
-    private ActiveMQService matcherActiveMQService;
+  private MatcherActiveMQService activeMQService;
 
-    @Autowired
-    private NeedRepository needRepository;
-    @Autowired
-    private WonNodeRepository wonNodeRepository;
+  @Autowired
+  private NeedRepository needRepository;
+  @Autowired
+  private WonNodeRepository wonNodeRepository;
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+  private String componentName;
 
-    @Override
-    public CamelConfiguration configureCamelEndpoint(URI needUri, String startingEndpoint) throws Exception {
-        String matcherProtocolQueueName;
-        CamelConfiguration camelConfiguration = new CamelConfiguration();
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-        URI needBrokerUri = matcherActiveMQService.getBrokerEndpoint(needUri);
+  @Override
+  public synchronized CamelConfiguration configureCamelEndpoint(URI needUri, String startingEndpoint) throws Exception {
+    String matcherProtocolQueueName;
+    CamelConfiguration camelConfiguration = new CamelConfiguration();
 
-        if (matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(needBrokerUri)!=null){
-            camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.getEndpoint(needBrokerUri));
-            camelConfiguration.setBrokerComponentName(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(needBrokerUri));
-           //matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,needBrokerUri);
-        } else{
+    URI needBrokerUri =activeMQService.getBrokerEndpoint(needUri);
 
-            URI resourceUri = needUri;
-            URI brokerUri = needBrokerUri;
 
-            matcherProtocolQueueName = matcherActiveMQService.getProtocolQueueNameWithResource(resourceUri);
-            camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(brokerUri,matcherProtocolQueueName));
-            //matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,brokerUri);
-            camelConfiguration.setBrokerComponentName(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
-            ActiveMQComponent activeMQComponent = (ActiveMQComponent)matcherProtocolCamelConfigurator.getCamelContext().getComponent(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
-            logger.info("ActiveMQ Service Status : {}",activeMQComponent.getStatus().toString());
-            activeMQComponent.start();
-        }
-        return camelConfiguration;
+    if (matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(needBrokerUri)!=null){
+      if (matcherProtocolCamelConfigurator.getEndpoint(needBrokerUri)!=null)
+      {
+        camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.getEndpoint(needBrokerUri));
+      } else {
+        //matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,needBrokerUri);
+        matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(needUri);
+        camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(needBrokerUri,
+                                                                                                         matcherProtocolQueueName));
+      }
+      camelConfiguration.setBrokerComponentName(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(needBrokerUri));
+
+    } else{
+
+      URI resourceUri = needUri;
+      URI brokerUri = needBrokerUri;
+
+      matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
+      camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(brokerUri,matcherProtocolQueueName));
+      //matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,brokerUri);
+      camelConfiguration.setBrokerComponentName(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
+      ActiveMQComponent activeMQComponent = (ActiveMQComponent)matcherProtocolCamelConfigurator.getCamelContext().getComponent(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
+      logger.info("ActiveMQ Service Status : {}",activeMQComponent.getStatus().toString());
+      activeMQComponent.start();
     }
+    return camelConfiguration;
+  }
 
     @Override
     public URI getWonNodeUriWithNeedUri(URI needUri) throws NoSuchNeedException {
         return DataAccessUtils.loadNeed(needRepository, needUri).getWonNodeURI();
     }
 
-    @Override
-    public URI getBrokerUri(URI resourceUri) throws NoSuchConnectionException {
-        return matcherActiveMQService.getBrokerEndpoint(resourceUri);
-    }
+  @Override
+  public synchronized Set<String> getMatcherProtocolOutTopics(URI wonNodeURI) {
+    Set<String> matcherProtocolTopics = ((MatcherActiveMQService)activeMQService)
+      .getMatcherProtocolTopicNamesWithResource(wonNodeURI);
+    return matcherProtocolTopics;
+  }
 
-    @Override
-    public ActiveMQService getActiveMQService() {
-        return matcherActiveMQService;
-    }
+  @Override
+  public synchronized void addRemoteTopicListeners(final Set<String> endpoints, final URI wonNodeUri)
+    throws CamelConfigurationFailedException {
+    URI remoteEndpoint = activeMQService.getBrokerEndpoint(wonNodeUri);
+    String remoteComponentName = componentName+ remoteEndpoint.toString().replaceAll("[/:]","" );
+    logger.debug("remoteComponentName: {}", remoteComponentName);
+    matcherProtocolCamelConfigurator.addCamelComponentForWonNodeBrokerForTopics(remoteEndpoint,
+                                                                       remoteComponentName
+    );
+    matcherProtocolCamelConfigurator.addRemoteTopicListeners(endpoints, remoteEndpoint);
+  }
 
-    @Override
-    public void setActiveMQService(ActiveMQService activeMQService) {
-       this.matcherActiveMQService = activeMQService;
-    }
+  @Override
+  public URI getBrokerUri(URI resourceUri) throws NoSuchConnectionException {
+    return activeMQService.getBrokerEndpoint(resourceUri);
+  }
 
-    @Override
-    public CamelConfigurator getProtocolCamelConfigurator() {
-        return this.matcherProtocolCamelConfigurator;
+  @Override
+  public ActiveMQService getActiveMQService() {
+    return activeMQService;
+  }
 
-    }
+  @Override
+  public void setActiveMQService(ActiveMQService activeMQService) {
+    this.activeMQService = (MatcherActiveMQService) activeMQService;
+  }
+
+  @Override
+  public CamelConfigurator getProtocolCamelConfigurator() {
+    return this.matcherProtocolCamelConfigurator;
+
+  }
+
+  public void setComponentName(final String componentName) {
+    this.componentName = componentName;
+  }
+
+
+  public void setMatcherProtocolCamelConfigurator(NeedProtocolCamelConfigurator matcherProtocolCamelConfigurator) {
+    this.matcherProtocolCamelConfigurator = (MatcherProtocolCamelConfigurator) matcherProtocolCamelConfigurator;
+  }
+
 
 
 }

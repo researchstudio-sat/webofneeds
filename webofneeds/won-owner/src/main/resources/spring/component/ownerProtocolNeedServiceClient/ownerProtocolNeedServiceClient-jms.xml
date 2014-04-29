@@ -36,7 +36,7 @@
         <property name="defaultNodeURI" value="${uri.node.default}"/>
     </bean>
 
-    <bean id="activeMQService" class="won.protocol.jms.ActiveMQServiceImpl">
+    <bean id="ownerActiveMQService" class="won.protocol.jms.ActiveMQServiceImpl">
         <constructor-arg name="type" value="OwnerProtocol"/>
     </bean>
 
@@ -45,7 +45,7 @@
     <bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
 
     <bean id="ownerProtocolCommunicationService" class="won.owner.messaging.OwnerProtocolCommunicationServiceImpl">
-       <property name="activeMQService" ref="activeMQService"/>
+       <property name="activeMQService" ref="ownerActiveMQService"/>
 
     </bean>
 

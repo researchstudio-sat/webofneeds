@@ -24,6 +24,8 @@
     <import resource="classpath:/spring/component/ownerProtocolNeedService/ownerProtocolNeedService-jms.xml" />
     <import resource="classpath:/spring/component/ownerProtocolOwnerServiceClient/ownerProtocolOwnerServiceClient-jms.xml" />
     <import resource="classpath:/spring/component/ownerProtocolOwnerServiceClient/ownerProtocolOwnerServiceClient-ws.xml" />
+    <import
+            resource="classpath:/spring/component/matcherProtocolMatcherServiceClient/matcherProtocolMatcherServiceClient-jms.xml"/>
     <import resource="classpath:/spring/component/matcherProtocolNeedService/matcherProtocolNeedService-jms.xml"/>
     <import resource="classpath:/spring/component/scheduling/node-scheduling.xml" />
     <import resource="classpath:/spring/component/monitoring/node-monitoring-jmx.xml" />

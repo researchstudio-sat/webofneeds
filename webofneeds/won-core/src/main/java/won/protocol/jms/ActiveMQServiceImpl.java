@@ -33,6 +33,9 @@ import won.protocol.vocabulary.WON;
 
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * User: sbyim
@@ -42,13 +45,11 @@ public class ActiveMQServiceImpl implements ActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final String PATH_OWNER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME + ">";
     private static final String PATH_NEED_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME + ">";
-    private static final String PATH_MATCHER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME + ">";
     private static final String PATH_BROKER_URI = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_BROKER_URI + ">";
-    private String queueNamePath;
+    protected String queueNamePath;
+    private List<String> matcherProtocolTopicList;
     private ProtocolType protocolType;
-
-
-
+    private String pathInformation;
 
     public ActiveMQServiceImpl(ProtocolType type) {
         switch (type) {
@@ -59,12 +60,9 @@ public class ActiveMQServiceImpl implements ActiveMQService {
                 queueNamePath = PATH_NEED_PROTOCOL_QUEUE_NAME;
                 break;
             case MatcherProtocol:
-                queueNamePath = PATH_MATCHER_PROTOCOL_QUEUE_NAME;
                 break;
-
         }
         protocolType = type;
-
     }
 
     @Autowired
@@ -76,6 +74,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
         try{
             logger.debug("trying to get queue name prototol type {} on resource {}", protocolType, resourceUri);
             Path path = PathParser.parse(queueNamePath, PrefixMapping.Standard);
+
             Model resourceModel = linkedDataSource.getModelForResource(resourceUri);
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(
                 resourceModel,
@@ -108,6 +107,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
 
 
 
+
     //todo: rename this method to getBrokerURIForNode
     public final URI getBrokerEndpoint(URI resourceUri) {
         logger.debug("obtaining broker URI for node {}", resourceUri);
@@ -117,6 +117,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
           logger.debug("trying to get broker endpoint for {} on resource {}", protocolType, resourceUri);
           Path path = PathParser.parse(PATH_BROKER_URI, PrefixMapping.Standard);
           Model resourceModel = linkedDataSource.getModelForResource(resourceUri);
+          logger.debug("ResourceModel for {}: {}", resourceUri, resourceModel);
           activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(
                 resourceModel,
                 resourceUri,
@@ -129,7 +130,9 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             resourceUri);
           //we didnt't get the queue name. Check if the model contains a triple <baseuri> won:hasWonNode
           // <wonNode> and get the information from there.
+
           URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceModel);
+          logger.debug("wonNodeUri: {}", wonNodeUri);
           resourceModel = linkedDataSource.getModelForResource(wonNodeUri);
           activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(
             resourceModel,
@@ -146,7 +149,28 @@ public class ActiveMQServiceImpl implements ActiveMQService {
         logger.debug("returning brokerUri {} for resourceUri {} ",activeMQEndpoint,resourceUri);
         return activeMQEndpoint;
     }
+  public Set<String> getMatcherProtocolTopicNamesWithResource(URI resourceURI){
+    Set<String> activeMQMatcherProtocolTopicNames = new HashSet<>();
+    resourceURI = URI.create(resourceURI.toString()+pathInformation);
+    for (int i = 0; i< matcherProtocolTopicList.size();i++){
+      try{
+        Path path = PathParser.parse(matcherProtocolTopicList.get(i),PrefixMapping.Standard);
+        activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
+          linkedDataSource.getModelForResource(resourceURI),
+          resourceURI,
+          path
+        ));
+      }catch (UniformInterfaceException e){
+        ClientResponse response = e.getResponse();
+        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
+          return null;
+        }
+        else throw e;
+      }
 
+    }
+    return activeMQMatcherProtocolTopicNames;
+  }
   public void setLinkedDataSource(final LinkedDataSource linkedDataSource)
   {
     this.linkedDataSource = linkedDataSource;

@@ -43,7 +43,7 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
 
     @Autowired
     private OwnerProtocolCamelConfigurator ownerProtocolCamelConfigurator;
-    @Autowired
+
     private ActiveMQService activeMQService;
     @Autowired
     private NeedRepository needRepository;

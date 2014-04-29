@@ -19,29 +19,16 @@ package won.protocol.jms;
 import won.protocol.exception.CamelConfigurationFailedException;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Set;
 
 /**
  * User: LEIH-NB
  * Date: 10.03.14
  */
-public interface MatcherProtocolCamelConfigurator extends CamelConfigurator{
-    String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName) throws CamelConfigurationFailedException;
-
-    void addRemoteQueueListeners(List<String> endpoints, URI remoteEndpoint) throws CamelConfigurationFailedException;
-
-    void addRouteForEndpoint(String startingEndpoint, URI wonNodeURI) throws CamelConfigurationFailedException;
-
-    String getStartingEndpoint(URI wonNodeURI);
-
-    void setStartingEndpoint(URI wonNodeURI, String startingEndpoint);
-
-    void setStartingComponent(String startingComponent);
-    public String getBrokerComponent(URI resourceUri);
-    void setDefaultNodeURI(String defaultNodeURI);
-    public String replaceEndpointNameWithOwnerApplicationId(String endpointName, String ownerApplicationId) throws Exception;
-    public String replaceComponentNameWithOwnerApplicationId(String componentName, String ownerApplicationId);
-
-    void setComponentName(String componentName);
-    String addCamelComponentForWonNodeBroker(URI wonNodeURI, URI brokerURI, String ownerApplicationId);
+public interface MatcherProtocolCamelConfigurator extends NeedProtocolCamelConfigurator{
+  public void addRemoteTopicListeners(Set<String> endpoints, URI remoteEndpoint) throws
+    CamelConfigurationFailedException;
+  //TODO: more sophisticated approach for adding activemq components might be needed to enable more detailed jms
+  // configuration
+  public void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri,String brokerComponentName);
 }

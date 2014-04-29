@@ -22,10 +22,12 @@ import won.bot.framework.bot.BotContext;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
+import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.bus.impl.AsyncEventBusImpl;
-import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.event.impl.*;
+import won.matcher.component.MatcherNodeURISource;
+import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
@@ -146,6 +148,41 @@ public class EventBot extends TriggeredBot
       logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
+  @Override
+  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri, final Model needModel)
+  {
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new NeedCreatedEventForMatcher(needUri, needModel));
+    } else {
+      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
+  }
+  @Override
+  public void onMatcherRegistered(final URI wonNodeUri)
+  {
+    if (getLifecyclePhase().isActive()){
+      //EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
+      eventBus.publish(new MatcherRegisteredEvent(wonNodeUri));
+    } else {
+      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
+  }
+  @Override
+  public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI){
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new NeedActivatedEventForMatcher(needURI));
+    } else {
+      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
+  }
+  @Override
+  public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI){
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new NeedDeactivatedEventForMatcher(needURI));
+    } else {
+      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
+  }
 
   /*
    * Override this method to initialize your event listeners. Will be called before
@@ -213,13 +250,23 @@ public class EventBot extends TriggeredBot
       return EventBot.this.getNodeURISource();
     }
 
+    @Override
+    public MatcherNodeURISource getMatcherNodeURISource() {
+      return EventBot.this.getMatcheNodeURISource();
+    }
+
     public OwnerProtocolNeedServiceClientSide getOwnerService()
     {
       return EventBot.this.getOwnerService();
     }
 
-    public MatcherProtocolNeedServiceClientSide getMatcherService(){
-        return EventBot.this.getMatcherService();
+    public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient(){
+        return EventBot.this.getMatcherProtocolNeedServiceClient();
+    }
+
+    @Override
+    public MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
+      return EventBot.this.getMatcherProtocolMatcherService();
     }
 
 

@@ -21,6 +21,8 @@ import won.bot.framework.bot.BotContext;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.events.bus.EventBus;
+import won.matcher.component.MatcherNodeURISource;
+import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -45,6 +47,7 @@ public interface EventListenerContext
    */
   public NodeURISource getNodeURISource();
 
+  public MatcherNodeURISource getMatcherNodeURISource();
   /**
    * Returns the bot's owner service. Used to connect to WON_BA nodes.
    */
@@ -53,8 +56,12 @@ public interface EventListenerContext
   /**
    * Returns the bot's matcher service
    */
-  public MatcherProtocolNeedServiceClientSide getMatcherService();
-  
+  public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient();
+
+  //TODO: change this to an interface
+  public MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService();
+
+
   /**
    * Returns the bot's needProducer. Used to obtain an RDF model that can be sent to a WON_BA node to create a new need.
    * @return

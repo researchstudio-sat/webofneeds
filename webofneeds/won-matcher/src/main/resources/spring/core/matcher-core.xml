@@ -37,4 +37,6 @@
     </bean>
     <bean id="needProtocolCamelConfigurator" class="won.protocol.jms.NeedBasedCamelConfiguratorImpl"/>
 
+    <bean id="matcherNodeURISource" class="won.matcher.component.MatcherNodeURISourceImpl"/>
+
 </beans>

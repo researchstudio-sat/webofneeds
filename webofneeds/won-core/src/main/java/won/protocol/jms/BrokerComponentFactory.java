@@ -19,14 +19,13 @@ package won.protocol.jms;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.Component;
-import org.apache.camel.component.jms.JmsConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
+import won.protocol.model.MessagingType;
 
+import javax.jms.ConnectionFactory;
 import java.net.URI;
-
-import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComponent;
 
 /**
  * User: LEIH-NB
@@ -34,22 +33,38 @@ import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComp
  */
 public class BrokerComponentFactory {
     Logger logger = LoggerFactory.getLogger(this.getClass());
-    public synchronized Component getBrokerComponent(URI brokerURI){
-        //TODO: make this configurable for different broker implementations.
-        logger.info("establishing activemq connection for brokerUri {}",brokerURI);
-        ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURI);
-        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(activeMQConnectionFactory);
-        JmsConfiguration jmsConfiguration = new JmsConfiguration(cachingConnectionFactory);
-        jmsConfiguration.setTimeToLive(0);
-        jmsConfiguration.setDisableTimeToLive(true);
-        jmsConfiguration.setRequestTimeout(0);
 
-        ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent();
 
-        activeMQComponent.setConfiguration(jmsConfiguration);
+    public synchronized Component getBrokerComponent(URI brokerURI,MessagingType type){
+      //TODO: make this configurable for different broker implementations.
+      logger.info("establishing activemq connection for brokerUri {}",brokerURI);
+      ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURI);
 
-        return activeMQComponent;
+      CachingConnectionFactory cachingConnectionFactory = (CachingConnectionFactory) configureCachingConnectionFactory
+        (activeMQConnectionFactory);
+
+      WonJmsConfiguration jmsConfiguration = new WonJmsConfiguration(cachingConnectionFactory);
+
+      switch (type){
+        case Queue:
+          jmsConfiguration.configureJmsConfigurationForQueues();
+        case Topic:
+          jmsConfiguration.configureJmsConfigurationForTopics();
+      }
+
+      ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent();
+
+      activeMQComponent.setConfiguration(jmsConfiguration);
+
+      return activeMQComponent;
 
     }
+
+  public synchronized ConnectionFactory configureCachingConnectionFactory(ConnectionFactory connectionFactory){
+    CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(connectionFactory);
+    cachingConnectionFactory.setCacheConsumers(true);
+    cachingConnectionFactory.setCacheProducers(true);
+    return cachingConnectionFactory;
+  }
 
 }

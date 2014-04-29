@@ -16,113 +16,58 @@
 
 package won.matcher.messaging;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import org.apache.activemq.camel.component.ActiveMQComponent;
-import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-//import won.node.camel.routes.NeedProtocolDynamicRoutes;
+import won.matcher.camel.routes.MatcherApplicationListenerRouteBuilder;
 import won.protocol.exception.CamelConfigurationFailedException;
-import won.protocol.jms.BrokerComponentFactory;
 import won.protocol.jms.MatcherProtocolCamelConfigurator;
-import won.protocol.jms.NeedProtocolCamelConfigurator;
+import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
+import won.protocol.model.MessagingType;
 
 import java.net.URI;
+import java.util.Set;
+
+//import won.node.camel.routes.NeedProtocolDynamicRoutes;
 
 /**
  * User: LEIH-NB
  * Date: 26.02.14
  */
-public class MatcherProtocolCamelConfiguratorImpl { }
-    /*
-    private BiMap<URI, String> endpointMap = HashBiMap.create();
-    private BiMap<URI,String> brokerComponentMap = HashBiMap.create();
-    private String componentName;
-    private final String localComponentName = "seda";
-    private String vmComponentName;
-    private CamelContext camelContext;
+public class MatcherProtocolCamelConfiguratorImpl extends NeedBasedCamelConfiguratorImpl implements
+  MatcherProtocolCamelConfigurator{
 
-    @Autowired
-    private BrokerComponentFactory brokerComponentFactory;
-    private Logger logger = LoggerFactory.getLogger(getClass());
+  private Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Override
-    public synchronized String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName){
-        String brokerComponentName = setupBrokerComponentName(brokerUri);
-        addCamelComponentForWonNodeBroker(brokerUri, brokerComponentName);
-        String endpoint = brokerComponentName+":queue:"+needProtocolQueueName;
-        endpointMap.put(brokerUri,endpoint);
-        logger.info("endpoint of wonNodeURI {} is {}",brokerUri,endpointMap.get(brokerUri));
-        return endpoint;
+  @Override
+  public synchronized void addRemoteTopicListeners(final Set<String> endpoints, final URI remoteEndpoint)
+    throws CamelConfigurationFailedException {
+    logger.info("length of endpoints {}", endpoints.size());
+    MatcherApplicationListenerRouteBuilder matcherApplicationListenerRouteBuilder = new
+    MatcherApplicationListenerRouteBuilder(getCamelContext(),endpoints, remoteEndpoint);
+
+    try {
+      getCamelContext().addRoutes(matcherApplicationListenerRouteBuilder);
+    } catch (Exception e) {
+      logger.debug("adding route to camel context failed", e);
+      throw new CamelConfigurationFailedException("adding route to camel context failed",e);
     }
+  }
 
-    @Override
-    public synchronized String setupBrokerComponentName(URI brokerUri){
-            return this.componentName+brokerUri.toString().replaceAll("[/:]","");
+  public synchronized void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri,String brokerComponentName){
+
+    ActiveMQComponent activeMQComponent;
+    if (getCamelContext().getComponent(brokerComponentName)==null){
+      activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri,
+                                                                                        MessagingType.Topic);
+      logger.info("adding activemqComponent for brokerUri {} with brokerComponentName {}",brokerUri, brokerComponentName);
+      getCamelContext().addComponent(brokerComponentName,activeMQComponent);
+      try {
+        activeMQComponent.start();
+      } catch (Exception e) {
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      }
     }
-    /**
-     *
-     * @param brokerUri
-     * @return componentName
-     */       /*
-    @Override
-    public synchronized void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName){
-
-        ActiveMQComponent activeMQComponent;
-        if (camelContext.getComponent(brokerComponentName)==null){
-            activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri);
-            logger.info("adding activemqComponent for brokerUri {}",brokerUri);
-            camelContext.addComponent(brokerComponentName,activeMQComponent);
-        }
-        brokerComponentMap.put(brokerUri,brokerComponentName);
-    }
-
-    @Override
-    public synchronized void addRouteForEndpoint(String startingComponent,URI brokerUri) throws CamelConfigurationFailedException {
-
-        if (camelContext.getComponent(startingComponent)==null||camelContext.getRoute(startingComponent)==null){
-            NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(camelContext,startingComponent);
-            try {
-                camelContext.addRoutes(needProtocolRouteBuilder);
-            } catch (Exception e) {
-                throw new CamelConfigurationFailedException("adding route to camel context failed",e);
-            }
-        }
-    }
-
-    @Override
-    public void setCamelContext(CamelContext camelContext) {
-        this.camelContext=camelContext;
-    }
-
-    @Override
-    public CamelContext getCamelContext() {
-        return this.camelContext;
-    }
-
-
-    @Override
-    public String getEndpoint(URI brokerUri) {
-        return  endpointMap.get(brokerUri);
-    }
-    public void setComponentName(String componentName) {
-        this.componentName = componentName;
-    }
-
-    public String getComponentName() {
-        return componentName;
-    }
-
-    @Override
-    public String getBrokerComponentNameWithBrokerUri(URI brokerUri){
-        return brokerComponentMap.get(brokerUri);
-    }
-
-
-
-
-
+    brokerComponentMap.put(brokerUri,brokerComponentName);
+  }
 }
-           */

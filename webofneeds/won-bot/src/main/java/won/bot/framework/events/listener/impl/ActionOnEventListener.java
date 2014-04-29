@@ -16,14 +16,15 @@
 
 package won.bot.framework.events.listener.impl;
 
-import won.bot.framework.events.event.Event;
+import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.EventBotAction;
+import won.bot.framework.events.event.Event;
 import won.bot.framework.events.filter.EventFilter;
 import won.bot.framework.events.listener.BaseEventListener;
-import won.bot.framework.events.EventListenerContext;
 
 /**
  * Executes a task when an event is seen.
+ * If the property timesToRun > 0, will unregister after that number of events.
  */
 public class ActionOnEventListener extends BaseEventListener
 {

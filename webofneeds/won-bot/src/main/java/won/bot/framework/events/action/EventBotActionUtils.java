@@ -16,6 +16,8 @@
 
 package won.bot.framework.events.action;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.events.EventListenerContext;
 
 import java.net.URI;
@@ -26,12 +28,18 @@ import java.net.URI;
  */
 public class EventBotActionUtils
 {
-
+  private static Logger logger = LoggerFactory.getLogger(EventBotActionUtils.class);
   public static void rememberInListIfNamePresent(EventListenerContext ctx ,URI uri, String uriListName) {
       if (uriListName != null && uriListName.trim().length() > 0){
           ctx.getBotContext().appendToNamedNeedUriList(uri, uriListName);
+        logger.debug("remembering need in NamedNeedList {} ", uri);
       } else {
           ctx.getBotContext().rememberNeedUri(uri);
+        logger.debug("remembering need in List {} ", uri);
       }
+
+  }
+  public static void rememberInNodeListIfNamePresent(EventListenerContext ctx, URI uri){
+    ctx.getBotContext().rememberNodeUri(uri);
   }
 }
