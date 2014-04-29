@@ -10,9 +10,9 @@ import java.util.List;
 
 /**
  * User: Danijel
- * Date: 10.4.14.
+ * Date: 24.4.14.
  */
-public class BAAtomicCCActiveExitingBot extends BAAtomicBaseBot
+public class BAAtomicCCCompletingExitingBot extends BAAtomicBaseBot
 {
   @Override
   protected FacetType getParticipantFacetType() {
@@ -29,14 +29,14 @@ public class BAAtomicCCActiveExitingBot extends BAAtomicBaseBot
     List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(13);
 
     //Coordination message is sent as TEXT
-    scripts.add(new ActiveFPBot());
+    scripts.add(new CompletingFPBot());
     scripts.add(new CompletingFPBot());
     scripts.add(new CompletingFPBot());
     scripts.add(new CompletedFPBot());
     scripts.add(new CompletedFPBot());
     scripts.add(new ActiveFPBot());
     scripts.add(new ActiveFPBot());
-//
+
 //    //Coordination message is sent as MODEL
     scripts.add(new CompletingFPUriBot());
     scripts.add(new CompletingFPUriBot());
@@ -51,7 +51,7 @@ public class BAAtomicCCActiveExitingBot extends BAAtomicBaseBot
   protected List<BATestBotScript> getSecondPhaseScripts() {
     List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(13);
 
-    scripts.add(new ActiveExitVoteSPBot());
+    scripts.add(new CompletingExitVoteSPBot());
     scripts.add(new CompletingSPCancelingBot());
     scripts.add(new CompletingSPCancelingFailingBot());
     scripts.add(new CompletedSPCompensatingBot());
@@ -62,10 +62,12 @@ public class BAAtomicCCActiveExitingBot extends BAAtomicBaseBot
 //    //Coordination message is sent as MODEL
     scripts.add(new CompletingSPCancelingUriBot());
     scripts.add(new CompletingSPCancelingFAilingUriBot());
-    scripts.add(new CompletedSPCompensatingFailingUriBot());
+    scripts.add(new CompletedSPCCompensatingUriBot());
     scripts.add(new CompletedSPCompensatingFailingUriBot());
     scripts.add(new ActiveSPCancelingUriBot());
     scripts.add(new ActiveSPCancelingFailingUriBot());
+
+
 
     return scripts;
   }

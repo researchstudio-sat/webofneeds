@@ -20,12 +20,12 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!--
-       context that combines bot definitions with runner context
+       context tat combines bot definitions with runner context
     -->
     <!-- the runner -->
     <import resource="classpath:/spring/app/botRunner.xml" />
     <!-- the bots to run -->
-    <import resource="classpath:/spring/bot/mailBasedSimpleReactiveBotBAPC.xml" />
+    <import resource="classpath:/spring/bot/mailBasedSimpleReactiveBotBAAtomicPC.xml" />
 
 
 </beans>

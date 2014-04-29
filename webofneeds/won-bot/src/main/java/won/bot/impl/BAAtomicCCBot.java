@@ -10,9 +10,9 @@ import java.util.List;
 
 /**
  * User: Danijel
- * Date: 10.4.14.
+ * Date: 24.4.14.
  */
-public class BAAtomicCCActiveExitingBot extends BAAtomicBaseBot
+public class BAAtomicCCBot extends BAAtomicBaseBot
 {
   @Override
   protected FacetType getParticipantFacetType() {
@@ -26,10 +26,9 @@ public class BAAtomicCCActiveExitingBot extends BAAtomicBaseBot
 
   protected List<BATestBotScript> getFirstPhaseScripts() {
 
-    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(13);
+    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(12);
 
     //Coordination message is sent as TEXT
-    scripts.add(new ActiveFPBot());
     scripts.add(new CompletingFPBot());
     scripts.add(new CompletingFPBot());
     scripts.add(new CompletedFPBot());
@@ -49,9 +48,8 @@ public class BAAtomicCCActiveExitingBot extends BAAtomicBaseBot
   }
 
   protected List<BATestBotScript> getSecondPhaseScripts() {
-    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(13);
+    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(12);
 
-    scripts.add(new ActiveExitVoteSPBot());
     scripts.add(new CompletingSPCancelingBot());
     scripts.add(new CompletingSPCancelingFailingBot());
     scripts.add(new CompletedSPCompensatingBot());
