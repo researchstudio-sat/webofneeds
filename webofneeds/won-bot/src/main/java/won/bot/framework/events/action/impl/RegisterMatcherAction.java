@@ -22,6 +22,7 @@ import won.bot.framework.events.action.EventBotActionUtils;
 import won.bot.framework.events.event.Event;
 
 import java.net.URI;
+import java.util.Iterator;
 
 /**
 * User: fkleedorfer
@@ -38,14 +39,19 @@ public class RegisterMatcherAction extends BaseEventBotAction
     @Override
   protected void doRun(Event event) throws Exception
   {
-      if (getEventListenerContext().getNeedProducer().isExhausted()){
-          logger.debug("bot's need procucer is exhausted.");
-          return;
+    if (getEventListenerContext().getNeedProducer().isExhausted()){
+        logger.debug("bot's need procucer is exhausted.");
+        return;
+    }
+    final Iterator wonNodeUriIterator = getEventListenerContext().getMatcherNodeURISource().getNodeURIIterator();
+
+      while (wonNodeUriIterator.hasNext()){
+        logger.debug("matcher registered on won node {}");
+        URI wonNodeUri = (URI)wonNodeUriIterator.next();
+        getEventListenerContext().getMatcherProtocolMatcherService().register( wonNodeUri );
+        EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
+        logger.debug("matcher registered on won node {}");
       }
-    final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
-    logger.debug("matcher registered on won node {}", wonNodeUri);
-    getEventListenerContext().getMatcherProtocolMatcherService().register(wonNodeUri);
-    EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
   }
 
 

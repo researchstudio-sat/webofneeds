@@ -24,13 +24,11 @@ import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.jms.*;
-import won.protocol.model.Need;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -105,7 +103,8 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
     throws CamelConfigurationFailedException {
     URI remoteEndpoint = activeMQService.getBrokerEndpoint(wonNodeUri);
     String remoteComponentName = componentName+ remoteEndpoint.toString().replaceAll("[/:]","" );
-    matcherProtocolCamelConfigurator.addCamelComponentForWonNodeBroker(remoteEndpoint,
+    logger.debug("remoteComponentName: {}", remoteComponentName);
+    matcherProtocolCamelConfigurator.addCamelComponentForWonNodeBrokerForTopics(remoteEndpoint,
                                                                        remoteComponentName
     );
     matcherProtocolCamelConfigurator.addRemoteTopicListeners(endpoints, remoteEndpoint);

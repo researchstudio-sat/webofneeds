@@ -28,4 +28,7 @@ import java.util.Set;
 public interface MatcherProtocolCamelConfigurator extends NeedProtocolCamelConfigurator{
   public void addRemoteTopicListeners(Set<String> endpoints, URI remoteEndpoint) throws
     CamelConfigurationFailedException;
+  //TODO: more sophisticated approach for adding activemq components might be needed to enable more detailed jms
+  // configuration
+  public void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri,String brokerComponentName);
 }

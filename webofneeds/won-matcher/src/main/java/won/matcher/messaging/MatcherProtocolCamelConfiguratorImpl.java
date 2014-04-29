@@ -16,12 +16,14 @@
 
 package won.matcher.messaging;
 
+import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.matcher.camel.routes.MatcherApplicationListenerRouteBuilder;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.MatcherProtocolCamelConfigurator;
 import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
+import won.protocol.model.MessagingType;
 
 import java.net.URI;
 import java.util.Set;
@@ -50,5 +52,22 @@ public class MatcherProtocolCamelConfiguratorImpl extends NeedBasedCamelConfigur
       logger.debug("adding route to camel context failed", e);
       throw new CamelConfigurationFailedException("adding route to camel context failed",e);
     }
+  }
+
+  public synchronized void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri,String brokerComponentName){
+
+    ActiveMQComponent activeMQComponent;
+    if (getCamelContext().getComponent(brokerComponentName)==null){
+      activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri,
+                                                                                        MessagingType.Topic);
+      logger.info("adding activemqComponent for brokerUri {} with brokerComponentName {}",brokerUri, brokerComponentName);
+      getCamelContext().addComponent(brokerComponentName,activeMQComponent);
+      try {
+        activeMQComponent.start();
+      } catch (Exception e) {
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      }
+    }
+    brokerComponentMap.put(brokerUri,brokerComponentName);
   }
 }

@@ -26,6 +26,7 @@
         <property name="taskScheduler" ref="taskScheduler" />
         <property name="needProducer" ref="needProducerFromMails" />
         <property name="nodeURISource" ref="nodeUriSourceRandom" />
+        <property name="matcherNodeURISource" ref="matcherNodeURISource"/>
         <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
         <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
         <property name="matcherProtocolNeedServiceClient" ref="matcherProtocolNeedServiceClient"/>

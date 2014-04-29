@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
+import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
@@ -31,6 +32,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 public abstract class BasicServiceBot extends BaseBot
 {
   private NodeURISource nodeURISource;
+  private MatcherNodeURISource matcherNodeURISource;
   private NeedProducer needProducer;
   private OwnerProtocolNeedServiceClientSide ownerService;
   private MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient;
@@ -43,6 +45,16 @@ public abstract class BasicServiceBot extends BaseBot
   protected NodeURISource getNodeURISource()
   {
     return nodeURISource;
+  }
+
+  protected MatcherNodeURISource getMatcheNodeURISource(){
+    return matcherNodeURISource;
+  }
+
+  @Qualifier("default")
+  @Autowired(required = true)
+  public void setMatcherNodeURISource(final MatcherNodeURISource matcherNodeURISource) {
+    this.matcherNodeURISource = matcherNodeURISource;
   }
 
   @Qualifier("default")

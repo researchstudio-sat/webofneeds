@@ -26,6 +26,7 @@ import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.bus.impl.AsyncEventBusImpl;
 import won.bot.framework.events.event.impl.*;
+import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.model.ChatMessage;
@@ -247,6 +248,11 @@ public class EventBot extends TriggeredBot
     public NodeURISource getNodeURISource()
     {
       return EventBot.this.getNodeURISource();
+    }
+
+    @Override
+    public MatcherNodeURISource getMatcherNodeURISource() {
+      return EventBot.this.getMatcheNodeURISource();
     }
 
     public OwnerProtocolNeedServiceClientSide getOwnerService()

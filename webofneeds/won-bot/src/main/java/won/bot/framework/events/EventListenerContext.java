@@ -21,6 +21,7 @@ import won.bot.framework.bot.BotContext;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.events.bus.EventBus;
+import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
@@ -46,6 +47,7 @@ public interface EventListenerContext
    */
   public NodeURISource getNodeURISource();
 
+  public MatcherNodeURISource getMatcherNodeURISource();
   /**
    * Returns the bot's owner service. Used to connect to WON_BA nodes.
    */

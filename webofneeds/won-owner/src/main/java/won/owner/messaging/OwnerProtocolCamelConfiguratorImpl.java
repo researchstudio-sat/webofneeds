@@ -29,6 +29,7 @@ import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.BrokerComponentFactory;
 import won.protocol.jms.OwnerProtocolCamelConfigurator;
+import won.protocol.model.MessagingType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 
@@ -109,7 +110,8 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
             return componentName;
         }
 
-        ActiveMQComponent activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerURI);
+        ActiveMQComponent activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent
+          (brokerURI, MessagingType.Queue);
 
         camelContext.addComponent(componentName,activeMQComponent);
 

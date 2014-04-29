@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.CamelConfigurationFailedException;
+import won.protocol.model.MessagingType;
 
 import java.net.URI;
 
@@ -36,14 +37,14 @@ import java.net.URI;
 public class NeedBasedCamelConfiguratorImpl implements NeedProtocolCamelConfigurator {
 
     private BiMap<URI, String> endpointMap = HashBiMap.create();
-    private BiMap<URI,String> brokerComponentMap = HashBiMap.create();
+    protected BiMap<URI,String> brokerComponentMap = HashBiMap.create();
     private String componentName;
     private final String localComponentName = "seda";
     private String vmComponentName;
     private CamelContext camelContext;
 
     @Autowired
-    private BrokerComponentFactory brokerComponentFactory;
+    protected BrokerComponentFactory brokerComponentFactory;
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -72,7 +73,7 @@ public class NeedBasedCamelConfiguratorImpl implements NeedProtocolCamelConfigur
 
         ActiveMQComponent activeMQComponent;
         if (camelContext.getComponent(brokerComponentName)==null){
-            activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri);
+            activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri, MessagingType.Queue);
             logger.info("adding activemqComponent for brokerUri {}",brokerUri);
             camelContext.addComponent(brokerComponentName,activeMQComponent);
           try {

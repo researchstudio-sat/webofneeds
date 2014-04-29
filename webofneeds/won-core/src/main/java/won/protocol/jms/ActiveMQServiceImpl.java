@@ -74,6 +74,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
         try{
             logger.debug("trying to get queue name prototol type {} on resource {}", protocolType, resourceUri);
             Path path = PathParser.parse(queueNamePath, PrefixMapping.Standard);
+
             Model resourceModel = linkedDataSource.getModelForResource(resourceUri);
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(
                 resourceModel,
@@ -116,6 +117,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
           logger.debug("trying to get broker endpoint for {} on resource {}", protocolType, resourceUri);
           Path path = PathParser.parse(PATH_BROKER_URI, PrefixMapping.Standard);
           Model resourceModel = linkedDataSource.getModelForResource(resourceUri);
+          logger.debug("ResourceModel for {}: {}", resourceUri, resourceModel);
           activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(
                 resourceModel,
                 resourceUri,
@@ -128,7 +130,9 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             resourceUri);
           //we didnt't get the queue name. Check if the model contains a triple <baseuri> won:hasWonNode
           // <wonNode> and get the information from there.
+
           URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceModel);
+          logger.debug("wonNodeUri: {}", wonNodeUri);
           resourceModel = linkedDataSource.getModelForResource(wonNodeUri);
           activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(
             resourceModel,

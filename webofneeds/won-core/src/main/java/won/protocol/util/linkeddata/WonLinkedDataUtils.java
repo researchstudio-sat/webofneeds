@@ -79,6 +79,7 @@ public class WonLinkedDataUtils
     // <wonNode> and get the information from there.
     logger.debug("getting WON node URI from model", resourceModel);
     Resource baseResource = RdfUtils.getBaseResource(resourceModel);
+    logger.debug("resourceModel: {}",RdfUtils.toString(resourceModel));
     StmtIterator wonNodeStatementIterator = baseResource.listProperties(WON.HAS_WON_NODE);
     if (! wonNodeStatementIterator.hasNext()){
       //no won:hasWonNode triple found. we can't do anything.
