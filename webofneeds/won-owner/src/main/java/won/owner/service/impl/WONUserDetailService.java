@@ -19,12 +19,15 @@ public class WONUserDetailService implements UserDetailsService {
 
 	UserRepository userRepository;
 
-	@Autowired
-	public WONUserDetailService(final UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
+  public WONUserDetailService() {
+  }
 
-	@Override
+  @Autowired
+  public void setUserRepository(final UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
+
+  @Override
 	public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
 		User user = userRepository.findByUsername(username);
 		if(user == null) {

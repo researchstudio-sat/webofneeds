@@ -12,31 +12,26 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import won.owner.pojo.NeedPojo;
 import won.owner.protocol.impl.OwnerProtocolNeedServiceClient;
-import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.*;
-import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ChatMessageRepository;
-import won.protocol.model.Match;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
@@ -45,13 +40,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 @Controller
 @RequestMapping("/rest")
@@ -61,7 +52,7 @@ public class RestController
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  @Qualifier("ownerProtocolNeedServiceClientJMSBased")
+  @Qualifier("default")
   private OwnerProtocolNeedServiceClientSide ownerService;
 
   @Autowired
@@ -195,6 +186,8 @@ public class RestController
       produces = MediaType.APPLICATION_JSON,
       method = RequestMethod.POST
       )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
   public NeedPojo createNeed(@RequestBody NeedPojo needPojo)
   {
 
@@ -258,7 +251,7 @@ public class RestController
 		    logger.warn("Deactivating old need");
 		    try {
 		      ownerService.deactivate(needs.get(0).getNeedURI());
-		    } catch (NoSuchNeedException e) {
+		    } catch (Exception e) {
 		      logger.warn("Could not deactivate old Need: " + needs.get(0).getNeedURI());
 		    }
 		  }
@@ -268,9 +261,11 @@ public class RestController
 		try {
 		    URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
 
-      // need modalities
-      Resource needModality = needModel.createResource(WON.NEED_MODALITY);
-		    com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
+        com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
+
+        // need modalities
+        Resource needModality = needModel.createResource(WON.NEED_MODALITY);
+
 
 		    Resource needResource = needModel.createResource(ownerURI.toString(), WON.NEED);
 
@@ -293,14 +288,6 @@ public class RestController
 		    }
 
 		    needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
-
-		    // owner
-		    if (needPojo.isAnonymize()) {
-			    needModel.add(needModel.createStatement(needResource, WON.HAS_OWNER, WON.ANONYMIZED_OWNER));
-		    }
-
-		    // need modalities
-		    Resource needModality = needModel.createResource(WON.NEED_MODALITY);
 
 		    //price and currency
 		    if (needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
@@ -340,11 +327,13 @@ public class RestController
 
 		    needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
 
+        //TODO: here, need creation is synchronous. Make asynchronous.
 		    if (needPojo.getWonNode().equals("")) {
-			    needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+			    needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE).get();
 		    } else {
 			    needURI = ((OwnerProtocolNeedServiceClient) ownerService)
-					    .createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, needPojo.getWonNode());
+					    .createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE,
+                URI.create(needPojo.getWonNode())).get();
 		    }
 
 		    List<Need> needs = needRepository.findByNeedURI(needURI);
@@ -399,8 +388,8 @@ public class RestController
 		    return fullNeed;
 
 		  // return viewNeed(need.getId().toString(), model);
-		} catch (IllegalNeedContentException e) {
-		  e.printStackTrace();
+		} catch (Exception e) {
+		  logger.warn("Caught exception",e);
 		}
 
 
@@ -419,6 +408,8 @@ public class RestController
 			value = "/match/{matchId}/connect",
 			method = RequestMethod.GET
 	)
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
 	public String connect(@PathVariable String matchId) {
 		String ret = "noNeedFound";
 
@@ -437,7 +428,9 @@ public class RestController
 			logger.warn("caught IllegalMessageForNeedStateException:", e);
 		} catch (NoSuchNeedException e) {
 			logger.warn("caught NoSuchNeedException:", e);
-		}
+		} catch (Exception e) {
+      logger.warn("caught Exception:", e);
+    }
 
 		return ret;
 	}
@@ -530,6 +523,8 @@ public class RestController
 			value = "/connection/{conId}/send",
 			method = RequestMethod.POST
 	)
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
 	public String sendText(@PathVariable String conId, @RequestBody String text) {
 		List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
 		if (cons.isEmpty())
@@ -537,7 +532,7 @@ public class RestController
 		Connection con = cons.get(0);
 
 		try {
-			ownerService.textMessage(con.getConnectionURI(), text);
+			ownerService.textMessage(con.getConnectionURI(), WonRdfUtils.MessageUtils.textMessage(text));
 		} catch (Exception e) {
 			logger.warn("error sending text message");
 			return "error sending text message: " + e.getMessage();

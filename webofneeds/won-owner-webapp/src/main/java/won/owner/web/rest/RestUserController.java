@@ -18,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +63,8 @@ public class RestUserController {
 			value = "/",
 			method = RequestMethod.POST
 	)
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
 	public ResponseEntity registerUser(@RequestBody UserPojo user, Errors errors) {
 		try {
 			userRegisterValidator.validate(user, errors);
@@ -87,6 +91,8 @@ public class RestUserController {
 			value = "/login",
 			method = RequestMethod.POST
 	)
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
 	public ResponseEntity logIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
 		UsernamePasswordAuthenticationToken token =	new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
 		try {
@@ -103,6 +109,8 @@ public class RestUserController {
 			value = "/logout",
 			method = RequestMethod.POST
 	)
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
 	public ResponseEntity logOut() {
 		SecurityContext context = SecurityContextHolder.getContext();
 		if(context != null) {

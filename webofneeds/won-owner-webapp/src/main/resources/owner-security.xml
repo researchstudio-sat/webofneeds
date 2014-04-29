@@ -20,7 +20,6 @@
 		<intercept-url pattern="/rest/**" access="isAuthenticated()" />
 	</http>
 
-	<beans:import resource="classpath:ownerServices.xml" />
 
 	<beans:bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
 

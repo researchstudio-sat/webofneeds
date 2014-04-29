@@ -35,6 +35,8 @@ public class User implements UserDetails{
 
 	private String password;
 
+  //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
+  //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	private List<Need> needs;
 
