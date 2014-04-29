@@ -257,7 +257,9 @@ public class LinkedDataWebController
     }
 
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
-    HttpHeaders headers = addNeverExpiresHeaders(new HttpHeaders());
+    HttpHeaders headers = new HttpHeaders();
+    headers = addNeverExpiresHeadersForNonListEntities(headers, requestUri);
+    headers = addNeverExpiresHeaders(headers);
     headers.add("Location",redirectToURI);
     return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(null, headers, HttpStatus.SEE_OTHER);
   }
@@ -286,19 +288,24 @@ public class LinkedDataWebController
         return new ResponseEntity<String>("Could not redirect to linked data page", HttpStatus.INTERNAL_SERVER_ERROR);
     }
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
+    HttpHeaders headers = new HttpHeaders();
+    headers = addNeverExpiresHeadersForNonListEntities(headers, requestUri);
 
+    //add a location header
+    headers.add("Location",redirectToURI);
+    return new ResponseEntity<String>("", headers, HttpStatus.SEE_OTHER);
+  }
+
+  public HttpHeaders addNeverExpiresHeadersForNonListEntities(HttpHeaders headers, final String requestUri) {
     //now, we want to suppress the 'never expires' header information
     //for /resource/need and resource/connection so that crawlers always re-fetch these data
     URI requestUriAsURI = URI.create(requestUri);
     String requestPath = requestUriAsURI.getPath();
-    HttpHeaders headers = new HttpHeaders();
     if (! (requestPath.replaceAll("/$","").endsWith(this.connectionResourceURIPath.replaceAll("/$", "")) ||
            requestPath.replaceAll("/$","").endsWith(this.needResourceURIPath.replaceAll("/$", "")))) {
       headers = addNeverExpiresHeaders(headers);
     }
-    //add a location header
-    headers.add("Location",redirectToURI);
-    return new ResponseEntity<String>("", headers, HttpStatus.SEE_OTHER);
+    return headers;
   }
 
   @RequestMapping(
