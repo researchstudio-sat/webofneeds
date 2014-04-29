@@ -77,7 +77,8 @@ public class MatcherProtocolBot extends EventBot
       }
     },1));
 
-    this.matcherNotifier = new ActionOnceAfterNEventsListener(ctx,4,new DummyAction(ctx));
+    this.matcherNotifier = new ActionOnceAfterNEventsListener(ctx,4,new LogAction(ctx,
+      "Received all events for newly created needs."));
     bus.subscribe(NeedCreatedEventForMatcher.class,matcherNotifier);
     bus.subscribe(NeedCreatedEvent.class,matcherNotifier);
 
