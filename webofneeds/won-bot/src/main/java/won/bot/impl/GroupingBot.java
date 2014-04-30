@@ -40,7 +40,7 @@ import java.util.List;
 public class GroupingBot extends EventBot
 {
 
-  protected static final int NO_OF_GROUPMEMBERS = 50;
+  protected static final int NO_OF_GROUPMEMBERS = 5;
   protected static final int NO_OF_MESSAGES = 5;
   protected static final long MILLIS_BETWEEN_MESSAGES = 1;
   protected static final String NAME_GROUPS = "groups";
