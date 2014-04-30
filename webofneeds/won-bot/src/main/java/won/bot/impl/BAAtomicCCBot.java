@@ -1,8 +1,12 @@
 package won.bot.impl;
 
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
-import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsTextBot.*;
-import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsUriBot.*;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedBlockedFPBot;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedBlockedSPBot;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletingBlockingFPBot;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletingBlockingSPBot;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsUriBot.CompletedBlockedFPUriBot;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsUriBot.CompletedBlockedSPUriBot;
 import won.protocol.model.FacetType;
 
 import java.util.ArrayList;
@@ -26,44 +30,27 @@ public class BAAtomicCCBot extends BAAtomicBaseBot
 
   protected List<BATestBotScript> getFirstPhaseScripts() {
 
-    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(12);
+    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(3);
 
     //Coordination message is sent as TEXT
-    scripts.add(new CompletingFPBot());
-    scripts.add(new CompletingFPBot());
-    scripts.add(new CompletedFPBot());
-    scripts.add(new CompletedFPBot());
-    scripts.add(new ActiveFPBot());
-    scripts.add(new ActiveFPBot());
-//
-//    //Coordination message is sent as MODEL
-    scripts.add(new CompletingFPUriBot());
-    scripts.add(new CompletingFPUriBot());
-    scripts.add(new CompletedFPUriBot());
-    scripts.add(new CompletedFPUriBot());
-    scripts.add(new ActiveFPUriBot());
-    scripts.add(new ActiveFPUriBot());
+    scripts.add(new CompletingBlockingFPBot());
+    scripts.add(new CompletedBlockedFPBot());
+
+   //Coordination message is sent as MODEL
+    scripts.add(new CompletedBlockedFPUriBot());
 
     return scripts;
   }
 
   protected List<BATestBotScript> getSecondPhaseScripts() {
-    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(12);
+    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(3);
 
-    scripts.add(new CompletingSPCancelingBot());
-    scripts.add(new CompletingSPCancelingFailingBot());
-    scripts.add(new CompletedSPCompensatingBot());
-    scripts.add(new CompletedSPCompensatingFailingBot());
-    scripts.add(new ActiveSPCancelingBot());
-    scripts.add(new ActiveSPCancelingFailingBot());
-//
-//    //Coordination message is sent as MODEL
-    scripts.add(new CompletingSPCancelingUriBot());
-    scripts.add(new CompletingSPCancelingFAilingUriBot());
-    scripts.add(new CompletedSPCompensatingFailingUriBot());
-    scripts.add(new CompletedSPCompensatingFailingUriBot());
-    scripts.add(new ActiveSPCancelingUriBot());
-    scripts.add(new ActiveSPCancelingFailingUriBot());
+    scripts.add(new CompletingBlockingSPBot());
+    scripts.add(new CompletedBlockedSPBot());
+
+
+    //Coordination message is sent as MODEL
+    scripts.add(new CompletedBlockedSPUriBot());
 
     return scripts;
   }

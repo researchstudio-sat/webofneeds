@@ -67,8 +67,8 @@ public abstract class BABaseBot extends EventBot
 
   protected BABaseBot() {
     this.scripts= getScripts();
-    this.noOfNeeds = scripts.size();
-    this.testScriptListeners = new ArrayList<BATestScriptListener>(noOfNeeds);
+    this.noOfNeeds = scripts.size()+1;
+    this.testScriptListeners = new ArrayList<BATestScriptListener>(noOfNeeds-1);
   }
 
   protected abstract FacetType getParticipantFacetType();
