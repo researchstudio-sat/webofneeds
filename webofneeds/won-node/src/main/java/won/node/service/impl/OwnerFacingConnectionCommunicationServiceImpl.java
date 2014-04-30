@@ -111,6 +111,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     if (! feedbackWasPresent) {
       //a feedback message is not forwarded to the remote connection, and facets cannot react to it.
       //invoke facet implementation
+      //TODO: this may be much more responsive if done asynchronously. We dont return anything here anyway.
       reg.get(con).textMessageFromOwner(con, message);
     }
       //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.

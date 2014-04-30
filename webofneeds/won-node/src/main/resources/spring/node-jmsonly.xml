@@ -14,7 +14,7 @@
 
     <import resource="classpath:/spring/core/node-core.xml" />
     <import resource="classpath:/spring/component/storage/jdbc-storage.xml" />
-    <import resource="classpath:/spring/component/storage/filebased-rdf-storage.xml" />
+    <import resource="classpath:/spring/component/storage/jpabased-rdf-storage.xml" />
     <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml"/>
     <import resource="classpath:/spring/component/camel/node-camel.xml" />
     <import resource="classpath:/spring/component/facet/facet.xml" />

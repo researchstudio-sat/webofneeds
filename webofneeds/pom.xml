@@ -397,8 +397,19 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-c3p0</artifactId>
                 <version>${org.hibernate.version}</version>
-
+                <!--exclusions>
+                    <exclusion>
+                        <groupId>com.mchange</groupId>
+                        <artifactId>c3p0</artifactId>
+                    </exclusion>
+                </exclusions-->
             </dependency>
+
+            <!--dependency>
+                <groupId>com.mchange</groupId>
+                <artifactId>c3p0</artifactId>
+                <version>${com.mchange.c3p0.version}</version>
+            </dependency-->
 
             <!-- hibernate depends on this, but has it in test/provided scope -->
             <dependency>
@@ -770,6 +781,7 @@
         <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
         <com.fasterxml.classmate.version>1.0.0</com.fasterxml.classmate.version>
         <com.github.jsonld-java.version>0.3</com.github.jsonld-java.version>
+        <com.mchange.c3p0.version>0.9.5-pre8</com.mchange.c3p0.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
         <com.sun.xml.version>2.0EA3</com.sun.xml.version>
@@ -790,7 +802,7 @@
         <org.springframework.version>3.2.4.RELEASE</org.springframework.version>
 	    <org.springframework.security.version>3.1.3.RELEASE</org.springframework.security.version>
 	    <org.slf4j.version>1.6.6</org.slf4j.version>
-        <org.hsqldb.version>2.2.9</org.hsqldb.version>
+        <org.hsqldb.version>2.3.2</org.hsqldb.version>
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>

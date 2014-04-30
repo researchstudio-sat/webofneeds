@@ -20,13 +20,18 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.impl.CreateNeedWithFacetsAction;
+import won.bot.framework.events.action.impl.MultipleActions;
 import won.bot.framework.events.action.impl.SignalWorkDoneAction;
+import won.bot.framework.events.action.impl.UnsubscribeListenerAction;
+import won.bot.framework.events.action.impl.counter.*;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.NeedCreationFailedEvent;
 import won.bot.framework.events.event.impl.ActEvent;
 import won.bot.framework.events.event.impl.NeedCreatedEvent;
 import won.bot.framework.events.event.impl.NeedProducerExhaustedEvent;
 import won.bot.framework.events.listener.BaseEventListener;
+import won.bot.framework.events.listener.EventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 
 /**
@@ -42,38 +47,73 @@ public class NeedCreatorBot extends EventBot
   protected void initializeEventListeners() {
     final EventListenerContext ctx = getEventListenerContext();
 
-    EventBus bus = getEventBus();
+    final EventBus bus = getEventBus();
 
-    //create needs every trigger execution until N needs are created
+    final Counter needCreationSuccessfulCounter = new CounterImpl("needsCreated");
+    final Counter needCreationFailedCounter = new CounterImpl("needCreationFailed");
+    final Counter creationFinishedCounter = new CounterImpl("creationFinished");
+
+    //create a targeted counter that will publish an event when the taget is reached
+    //in this case, 0 unfinished need creations means that all needs were created
+    final Counter creationUnfinishedCounter = new TargetCounterDecorator(ctx, new CounterImpl("creationUnfinished"), 0);
+
+    //create needs every trigger execution until the need producer is exhausted
     this.groupMemberCreator = new ActionOnEventListener(
       ctx, "groupMemberCreator",
-      new CreateNeedWithFacetsAction(ctx),
+      new MultipleActions(ctx,
+        new IncrementCounterAction(ctx, creationFinishedCounter),
+        new IncrementCounterAction(ctx, creationUnfinishedCounter),
+        new CreateNeedWithFacetsAction(ctx)
+      ),
       -1
     );
     bus.subscribe(ActEvent.class, this.groupMemberCreator);
 
     bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx, "logger", new BaseEventBotAction(ctx)
     {
-      private int count = 0;
+      int lastOutput = 0;
       @Override
       protected void doRun(final Event event) throws Exception {
-        int cnt = 0;
-        synchronized (this){
-          count++;
-          cnt = count;
-        }
-        if (cnt % 200 == 0) {
-          logger.info("created {} needs", cnt);
+        int cnt = creationFinishedCounter.getCount();
+        int unfinishedCount = creationUnfinishedCounter.getCount();
+        int successCnt = needCreationSuccessfulCounter.getCount();
+        int failedCnt = needCreationFailedCounter.getCount();
+        if (cnt - lastOutput >= 200) {
+          logger.info("started creation of {} needs, creation not yet finished for {}. Successful: {}, failed: {}",
+            new Object[]{cnt,
+            unfinishedCount,
+            successCnt,
+            failedCnt});
+          lastOutput = cnt;
         }
       }
     }));
-    //When the needproducer is exhausted, stop.
+
+    //When the needproducer is exhausted, stop the creator.
+    getEventBus().subscribe(NeedProducerExhaustedEvent.class, new ActionOnEventListener(ctx,
+      new UnsubscribeListenerAction(ctx,groupMemberCreator)));
+
+    //when a need is created (or it failed), decrement the halfCreatedNeed counter
+    EventListener downCounter = new ActionOnEventListener(ctx, "downCounter",
+      new DecrementCounterAction(ctx, creationUnfinishedCounter));
+    //count a successful need creation
+    bus.subscribe(NeedCreatedEvent.class, downCounter);
+    //if a creation failed, we don't want to keep us from keeping the correct count
+    bus.subscribe(NeedCreationFailedEvent.class, downCounter);
+    //we count the one execution when the creator realizes that the producer is exhausted, we have to count down
+    //once for that, too.
+    bus.subscribe(NeedProducerExhaustedEvent.class, downCounter);
+
+    //also, keep track of what worked and what didn't
+    bus.subscribe(NeedCreationFailedEvent.class, new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationFailedCounter)));
+    bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationSuccessfulCounter)));
+
+    //wait for the targetCountReached event of the finishedCounter. We don't use
+    //another target counter, so we don't need to do more filtering.
     this.workDoneSignaller = new ActionOnEventListener(
       ctx, "workDoneSignaller",
-      new SignalWorkDoneAction(ctx),
-      1
-    );
-    bus.subscribe(NeedProducerExhaustedEvent.class, this.workDoneSignaller);
+      new SignalWorkDoneAction(ctx));
+    bus.subscribe(TargetCountReachedEvent.class, this.workDoneSignaller);
   }
 
 }
