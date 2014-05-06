@@ -46,6 +46,12 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
+        <dependency>
+            <artifactId>solr-solrj</artifactId>
+            <groupId>org.apache.solr</groupId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
         <!-- SIREn-->
         <dependency>
             <groupId>org.sindice.siren</groupId>
@@ -68,11 +74,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <artifactId>solr-solrj</artifactId>
-            <groupId>org.apache.solr</groupId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
 
         <!-- END: used for testing solr -->
         <dependency>

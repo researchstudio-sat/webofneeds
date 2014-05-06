@@ -14,23 +14,31 @@
  *    limitations under the License.
  */
 
-package won.bot.app;
+package won.bot.framework.events.event.impl;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+import com.hp.hpl.jena.rdf.model.Model;
+import won.bot.framework.events.event.BaseNeedSpecificEvent;
+
+import java.net.URI;
 
 /**
- * User: LEIH-NB
- * Date: 20.03.14
+ *
  */
-public class SimpleMatcherTest {
-    public static void main(String[] args) throws Exception {
-        SpringApplication app = new SpringApplication(
-                new Object[]{"classpath:/spring/app/simpleMatcherTest.xml"}
-        );
-        ConfigurableApplicationContext applicationContext =  app.run(args);
-        Thread.sleep(5*60*1000);
-        app.exit(applicationContext);
-    }
+public class NeedAddedToSolrEvent extends BaseNeedSpecificEvent
+{
+
+  private final Model needModel;
+
+  public NeedAddedToSolrEvent(final URI needURI, final Model needModel) {
+    super(needURI);
+    this.needModel = needModel;
+
+  }
+
+  public Model getNeedModel()
+  {
+    return needModel;
+  }
+
 
 }

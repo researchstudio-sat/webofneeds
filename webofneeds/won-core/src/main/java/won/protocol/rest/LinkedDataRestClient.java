@@ -63,9 +63,9 @@ public class LinkedDataRestClient
     try {
        result = r.accept(RDFMediaType.APPLICATION_RDF_XML).get(Model.class);
     } catch (ClientHandlerException e) {
-      throw new IllegalArgumentException(new MessageFormat("caught a clientHandler exception, " +
+      throw new IllegalArgumentException(MessageFormat.format("caught a clientHandler exception, " +
         "which may indicate that the URI that was accessed isn't a" +
-        " linked data URI, please check {0}").format(resourceURI), e);
+        " linked data URI, please check {0}", resourceURI), e);
     }
     if (logger.isDebugEnabled()) {
       logger.debug("fetched model with {} statements for resource {}",result.size(), resourceURI);

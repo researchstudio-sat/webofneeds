@@ -24,6 +24,7 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.util.Version;
+import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
@@ -96,7 +97,8 @@ public class SearchService
         NeedModelBuilder needModelBuilder = new NeedModelBuilder();
         needModelBuilder.copyValuesFromProduct(needModel);
         needModelBuilder.copyValuesToBuilder(builder);
-        combinedQuery.add(matcher.createQueryForDocument(builder.build()),BooleanClause.Occur.MUST);
+        SolrInputDocument solrDoc = builder.build();
+
       }
       if (combinedQuery.getClauses().length > 0) {
         return createSearchResult(this.solrIndexSearcher.search(combinedQuery, numResults), this.originatorURI);

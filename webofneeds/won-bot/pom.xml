@@ -17,7 +17,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
-      <!-- WON_BA stuff -->
+      <!-- WON stuff -->
       <dependency>
           <groupId>webofneeds</groupId>
           <artifactId>won-owner</artifactId>
@@ -33,7 +33,11 @@
           <artifactId>won-core</artifactId>
           <version>${project.version}</version>
       </dependency>
-
+      <dependency>
+          <groupId>webofneeds</groupId>
+          <artifactId>won-matcher-solr</artifactId>
+          <version>${project.version}</version>
+      </dependency>
       <!-- RDF -->
       <dependency>
           <groupId>org.apache.jena</groupId>
@@ -43,6 +47,14 @@
           <groupId>org.apache.jena</groupId>
           <artifactId>jena-arq</artifactId>
       </dependency>
+      <!-- Solr -->
+      <dependency>
+          <!-- in won-matcher-solr this has the 'magic scope' but here, we need it always -->
+          <artifactId>solr-solrj</artifactId>
+          <groupId>org.apache.solr</groupId>
+          <scope>compile</scope>
+      </dependency>
+
 
       <!-- SPRING stuff -->
       <dependency>

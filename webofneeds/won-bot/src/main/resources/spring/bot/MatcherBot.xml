@@ -22,13 +22,13 @@
     <import resource="classpath:spring/component/needproducer/needproducer-mails.xml"/>
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
 
-    <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.MatcherProtocolTestBot">
+    <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.MatcherBot">
         <property name="taskScheduler" ref="taskScheduler" />
-        <property name="needProducer" ref="needProducerFromMails" />
-        <property name="nodeURISource" ref="nodeUriSourceRandom" />
+        <!--property name="needProducer" ref="needProducerFromMails" /-->
+        <!--property name="nodeURISource" ref="nodeUriSourceRandom" /-->
         <property name="matcherNodeURISource" ref="matcherNodeURISource"/>
         <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
-        <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
+        <!--property name="ownerService" ref="ownerProtocolNeedServiceClient" /-->
         <property name="matcherProtocolNeedServiceClient" ref="matcherProtocolNeedServiceClient"/>
         <property name="matcherProtocolMatcherService" ref="matcherProtocolMatcherServiceJMSBased"/>
         <property name="trigger">
