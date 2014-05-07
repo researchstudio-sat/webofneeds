@@ -31,8 +31,8 @@ public class MatcherApp
         );
         app.setWebEnvironment(false);
         ConfigurableApplicationContext applicationContext =  app.run(args);
-        Thread.sleep(5*60*1000);
-        app.exit(applicationContext);
+        //Thread.sleep(5*60*1000);
+        //app.exit(applicationContext);
     }
 
 }
