@@ -20,8 +20,13 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.impl.*;
+import won.bot.framework.events.action.impl.counter.Counter;
+import won.bot.framework.events.action.impl.counter.CounterImpl;
+import won.bot.framework.events.action.impl.counter.DecrementCounterAction;
+import won.bot.framework.events.action.impl.counter.IncrementCounterAction;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.NeedCreationFailedEvent;
 import won.bot.framework.events.event.impl.*;
 import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.listener.EventListener;
@@ -37,10 +42,10 @@ public class RandomSimulatorBot extends EventBot
   private static final double PROB_OPEN_ON_HINT = 0.3;
   private static final double PROB_MESSAGE_ON_OPEN = 0.5;
   private static final double PROB_MESSAGE_ON_MESSAGE = 0.5;
-  private static final long MIN_RECATION_TIMEOUT_MILLIS = 10 * 1000;
-  private static final long MAX_REACTION_TIMEOUT_MILLIS = 30 * 1000;
-  private static final long MIN_NEXT_CREATION_TIMEOUT_MILLIS = 10 * 1000;
-  private static final long MAX_NEXT_CREATION_TIMEOUT_MILLIS = 30 * 1000;
+  private static final long MIN_RECATION_TIMEOUT_MILLIS = 1 * 1000;
+  private static final long MAX_REACTION_TIMEOUT_MILLIS = 3 * 1000;
+  private static final long MIN_NEXT_CREATION_TIMEOUT_MILLIS = 1 * 1000;
+  private static final long MAX_NEXT_CREATION_TIMEOUT_MILLIS = 3 * 1000;
 
   protected BaseEventListener groupMemberCreator;
   protected BaseEventListener workDoneSignaller;
@@ -53,35 +58,66 @@ public class RandomSimulatorBot extends EventBot
 
     EventBus bus = getEventBus();
 
+    final Counter needCreationSuccessfulCounter = new CounterImpl("needsCreated");
+    final Counter needCreationFailedCounter = new CounterImpl("needCreationFailed");
+    final Counter needCreationStartedCounter = new CounterImpl("creationStarted");
+    final Counter creationUnfinishedCounter = new CounterImpl("creationUnfinished");
+
     //create the first need when the first actEvent happens
     this.groupMemberCreator = new ActionOnceAfterNEventsListener(
       ctx, "groupMemberCreator",1,
-      new CreateNeedWithFacetsAction(ctx)
+      new MultipleActions(ctx,
+        new IncrementCounterAction(ctx, needCreationStartedCounter),
+        new IncrementCounterAction(ctx, creationUnfinishedCounter),
+        new CreateNeedWithFacetsAction(ctx)
+      )
     );
     bus.subscribe(ActEvent.class, this.groupMemberCreator);
 
-    //each time a need was created, wait for a random interval, then create another one
-    bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx,
-      new RandomDelayedAction(ctx,MIN_NEXT_CREATION_TIMEOUT_MILLIS, MAX_NEXT_CREATION_TIMEOUT_MILLIS,this.hashCode(),
-      new CreateNeedWithFacetsAction(ctx)))
-    );
+    //when a need is created (or it failed), decrement the creationUnfinishedCounter
+    EventListener downCounter = new ActionOnEventListener(ctx, "downCounter",
+      new DecrementCounterAction(ctx, creationUnfinishedCounter));
+    //count a successful need creation
+    bus.subscribe(NeedCreatedEvent.class, downCounter);
+    //if a creation failed, we don't want to keep us from keeping the correct count
+    bus.subscribe(NeedCreationFailedEvent.class, downCounter);
+    //we count the one execution when the creator realizes that the producer is exhausted, we have to count down
+    //once for that, too.
+    bus.subscribe(NeedProducerExhaustedEvent.class, downCounter);
+
+    //also, keep track of what worked and what didn't
+    bus.subscribe(NeedCreationFailedEvent.class, new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationFailedCounter)));
+    bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationSuccessfulCounter)));
+
+
 
     //print a logging message every N needs
     bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx, "logger", new BaseEventBotAction(ctx)
     {
-      private int count = 0;
+      int lastOutput = 0;
       @Override
       protected void doRun(final Event event) throws Exception {
-        int cnt = 0;
-        synchronized (this){
-          count++;
-          cnt = count;
-        }
-        if (cnt % 200 == 0) {
-          logger.info("created {} needs", cnt);
+        int cnt = needCreationStartedCounter.getCount();
+        int unfinishedCount = creationUnfinishedCounter.getCount();
+        int successCnt = needCreationSuccessfulCounter.getCount();
+        int failedCnt = needCreationFailedCounter.getCount();
+        if (cnt - lastOutput >= 200) {
+          logger.info("started creation of {} needs, creation not yet finished for {}. Successful: {}, failed: {}",
+            new Object[]{cnt,
+                         unfinishedCount,
+                         successCnt,
+                         failedCnt});
+          lastOutput = cnt;
         }
       }
     }));
+
+
+    //each time a need was created, wait for a random interval, then create another one
+    bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx,
+      new RandomDelayedAction(ctx,MIN_NEXT_CREATION_TIMEOUT_MILLIS, MAX_NEXT_CREATION_TIMEOUT_MILLIS,this.hashCode(),
+        new CreateNeedWithFacetsAction(ctx)))
+    );
 
     //when a hint is received, connect fraction of the cases after a random timeout
     bus.subscribe(HintFromMatcherEvent.class,
