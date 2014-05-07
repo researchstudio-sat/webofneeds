@@ -90,37 +90,6 @@
     <context:component-scan base-package="won.protocol.util" />
 
 
-    <!-- Database connection -->
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-        <property name="driverClass" value="${db.sql.jdbcDriverClass}" />
-        <property name="jdbcUrl" value="${db.sql.jdbcUrl}"/>
-        <property name="user" value="${db.sql.user}" />
-        <property name="password" value="${db.sql.password}" />
-    </bean>
-
-
-    <!-- Hibernate is used as JPA vendor-->
-    <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-        <property name="generateDdl" value="true" /> <!-- Automatically create tables for the entity classes. Don't do this in production! -->
-        <property name="showSql" value="false" /> <!-- Set this to true for analyzing SQL queries -->
-    </bean>
-
-    <!-- Entity manager -->
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="dataSource" ref="dataSource" />
-        <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
-        <property name="packagesToScan" value="won.protocol.model" />
-    </bean>
-
-    <!-- Configure transaction management -->
-    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="entityManagerFactory" />
-    </bean>
-
-    <tx:annotation-driven transaction-manager="transactionManager" />
-
-    <!-- Defines where repositories are placed -->
-    <jpa:repositories base-package="won.protocol.repository" />
 
 
 </beans>

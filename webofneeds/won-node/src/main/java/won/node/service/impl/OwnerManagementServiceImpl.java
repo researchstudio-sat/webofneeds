@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
-import won.protocol.service.OwnerManagementService;
+import won.protocol.service.ApplicationManagementService;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
  * User: sbyim
  * Date: 11.11.13
  */
-public class OwnerManagementServiceImpl implements OwnerManagementService {
+public class OwnerManagementServiceImpl implements ApplicationManagementService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired

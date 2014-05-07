@@ -65,4 +65,6 @@
     <bean id="ownerProtocolNeedReadService" class="won.owner.protocol.impl.OwnerProtocolNeedReadServiceImpl">
     </bean>
 
+	<bean id="wonUserDetailService" class="won.owner.service.impl.WONUserDetailService" />
+
 </beans>

@@ -116,6 +116,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
 
     //@Override
     public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeUri) throws IllegalNeedContentException {
+        //TODO: make asynchonous
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(wonNodeUri);
             content.setNsPrefix("",ownerURI.toString());
@@ -160,6 +161,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     //@Override
     public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws
             NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+        //TODO: make asynchonous
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
             SettableFuture futureResult = SettableFuture.create();

@@ -49,6 +49,12 @@ public class WON
   public static final Property HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,"hasActiveMQNeedProtocolQueueName");
   public static final Property HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,"hasActiveMQOwnerProtocolQueueName");
   public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,"hasActiveMQMatcherProtocolQueueName");
+  public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME = m.createProperty(BASE_URI,"hasActiveMQMatcherProtocolOutNeedCreatedTopicName");
+  public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedActivatedTopicName");
+  public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedDeactivatedTopicName");
+  public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED_TOPIC_NAME = m.createProperty
+    (BASE_URI, "hasActiveMQMatcherProtocolOutMatcherRegisteredTopicName");
+
 
   public static final Property EMBED_SPIN_ASK = m.createProperty(BASE_URI, "embedSpinAsk");
 
@@ -76,6 +82,12 @@ public class WON
   public static final Property HAS_TEXT_DESCRIPTION = m.createProperty(BASE_URI, "hasTextDescription");
   public static final Property HAS_CONTENT_DESCRIPTION = m.createProperty(BASE_URI, "hasContentDescription");
   public static final Property HAS_TAG = m.createProperty(BASE_URI, "hasTag");
+  public static final Property HAS_ATTACHED_MEDIA = m.createProperty(BASE_URI, "hasAttachedMedia");
+  public static final Property HAS_HEIGHT = m.createProperty(BASE_URI, "hasHeight");
+  public static final Property HAS_DEPTH = m.createProperty(BASE_URI, "hasDepth");
+  public static final Property HAS_WIDTH = m.createProperty(BASE_URI, "hasWidth");
+  public static final Property HAS_WEIGHT = m.createProperty(BASE_URI, "hasWeight");
+  public static final Property HAS_QUANTITATIVE_PROPERTY = m.createProperty(BASE_URI, "hasQuantitativeProperty");
 
   public static final Property HAS_FACET = m.createProperty(BASE_URI, "hasFacet");
   public static final Resource FACET = m.createResource(BASE_URI + "Facet");
@@ -152,6 +164,7 @@ public class WON
   //search result model
   public static final Property SEARCH_RESULT_URI = m.createProperty(BASE_URI,"uri");
   public static final Property SEARCH_RESULT_PREVIEW = m.createProperty(BASE_URI, "preview");
+
 
     public static final Property COORDINATION_MESSAGE = m.createProperty(BASE_URI + "coordinationMessage");
   /**

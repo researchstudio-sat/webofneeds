@@ -31,11 +31,18 @@ import java.net.URI;
 public interface Bot
 {
   public boolean knowsNeedURI(URI needURI);
+
+  public boolean knowsNodeURI(URI wonNodeURI);
+
   public void onConnectFromOtherNeed(Connection con, final Model content) throws Exception;
   public void onOpenFromOtherNeed(Connection con, final Model content) throws Exception;
   public void onCloseFromOtherNeed(Connection con, final Model content) throws Exception;
   public void onHintFromMatcher(Match match, final Model content) throws Exception;
   public void onMessageFromOtherNeed(Connection con, ChatMessage message, final Model content) throws Exception;
+  public void onMatcherRegistered(URI wonNodeUri);
+  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Model needModel);
+  public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+  public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
   /**
    * Override this to be informed whenever the bot has created a new need successfully.
    * @param needUri

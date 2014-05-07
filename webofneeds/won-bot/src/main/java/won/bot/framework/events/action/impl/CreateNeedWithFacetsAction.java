@@ -7,7 +7,9 @@ import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.EventBotActionUtils;
 import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.NeedCreationFailedEvent;
 import won.bot.framework.events.event.impl.NeedCreatedEvent;
+import won.bot.framework.events.event.impl.NeedProducerExhaustedEvent;
 import won.protocol.model.FacetType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -55,7 +57,8 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
     protected void doRun(Event event) throws Exception
     {
         if (getEventListenerContext().getNeedProducer().isExhausted()){
-            logger.info("bot's need producer is exhausted.");
+            logger.info("the bot's need producer is exhausted.");
+            getEventListenerContext().getEventBus().publish(new NeedProducerExhaustedEvent());
             return;
         }
         final Model needModel = getEventListenerContext().getNeedProducer().create();
@@ -84,6 +87,13 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
                     } catch (Exception e){
                         logger.warn("createNeed failed", e);
                     }
+                } else if (futureNeedUri.isCancelled()){
+                  try {
+                    logger.debug("need creation canceled");
+                    getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
+                  } catch (Exception e){
+                    logger.warn("createNeed failed", e);
+                  }
                 }
             }
         }, getEventListenerContext().getExecutor());

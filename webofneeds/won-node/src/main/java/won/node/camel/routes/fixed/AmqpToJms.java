@@ -32,6 +32,8 @@ public class AmqpToJms extends RouteBuilder{
                 .choice()
                 .when(header("protocol").isEqualTo("OwnerProtocol"))
                 .to("seda:OwnerProtocolOut")
+                .when(header("protocol").isEqualTo("MatcherProtocol"))
+                .to("seda:MatcherProtocolOut")
                 .otherwise()
                 .to("log:No protocol defined in header");
     }

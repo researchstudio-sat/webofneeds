@@ -18,10 +18,21 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>WEB-INF/spring-ws-servlet.xml
             classpath:/spring/owner-jmsonly.xml
+	        classpath:owner-security.xml
         </param-value>
     </context-param>
 
-    <!-- WEB SERVICES  -->
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- WEB SERVICES  -->
 
     <listener>
         <listener-class>
@@ -54,8 +65,8 @@
     <!-- GENERAL -->
 
     <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
         <welcome-file>index.jsp</welcome-file>
+	    <welcome-file>index.html</welcome-file>
     </welcome-file-list>
 
 </web-app>

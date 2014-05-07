@@ -102,7 +102,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
 
 
   private Bot getBotForNeedUri(URI needUri) {
-    Bot bot = botManager.getBot(needUri);
+    Bot bot = botManager.getBotForNeedURI(needUri);
     if (bot == null) throw new IllegalStateException("No bot registered for uri " + needUri);
     if (!bot.getLifecyclePhase().isActive()) {
       throw new IllegalStateException("bot responsible for need " + needUri + " is not active (lifecycle phase is: " +bot.getLifecyclePhase()+")");

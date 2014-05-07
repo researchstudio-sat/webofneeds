@@ -40,7 +40,7 @@ public class MatchNeedsAction extends BaseEventBotAction
     URI need2 = needs.get(1);
     logger.debug("matching needs {} and {}",need1,need2);
     logger.debug("getEventListnerContext():"+getEventListenerContext());
-    logger.debug("getMatcherService(): "+getEventListenerContext().getMatcherService());
-    getEventListenerContext().getMatcherService().hint(need1,need2,1.0, URI.create("http://localhost:8080/matcher"),null);
+    logger.debug("getMatcherService(): "+getEventListenerContext().getMatcherProtocolNeedServiceClient());
+    getEventListenerContext().getMatcherProtocolNeedServiceClient().hint(need1,need2,1.0, URI.create("http://localhost:8080/matcher"),null);
   }
 }

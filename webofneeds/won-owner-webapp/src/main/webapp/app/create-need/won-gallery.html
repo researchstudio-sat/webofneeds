@@ -1,0 +1,37 @@
+<div class="row">
+	<div class="col-lg-12">
+		<form file-upload="uploadOptions" action="rest/needphoto/" method="POST" enctype="multipart/form-data" id="photo-form">
+			<div class="img-upload-box img-upload-box-big">
+				<input type="file" name="photo" id="photo"
+				       style="position:absolute;top:0;right:0;font-size:190px;margin:0;opacity:0;direction:ltr;cursor: pointer;"
+						/>
+				<input type="hidden" name="unique" value="{{ need.binaryFolder }}"/>
+				<input type="hidden" name="selected" value="{{ selectedPhoto }}"/>
+				<span ng-show="!photos[selectedPhoto].uri" class="glyphicon glyphicon-picture"></span>
+				<br ng-show="!photos[selectedPhoto].uri" />
+				<h4 ng-show="!photos[selectedPhoto].uri">Click here and upload new image</h4>
+				<img style="width:100%" src="{{ photos[selectedPhoto].uri }}" ng-show="photos[selectedPhoto].uri"/>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="row" style="margin-bottom: 20px;">
+	<div class="col-lg-4">
+		<div class="img-upload-box img-upload-box-small" ng-class="{selected : selectedPhoto==0}" ng-click="onClickPhoto(0)">
+			<span class="glyphicon glyphicon-picture" ng-show="!photos[0].uri"></span>
+			<img style="width:100%" src="{{ photos[0].uri }}" ng-show="photos[0].uri"/>
+		</div>
+	</div>
+	<div class="col-lg-4">
+		<div class="img-upload-box img-upload-box-small" ng-class="{selected : selectedPhoto==1}" ng-click="onClickPhoto(1)">
+			<span class="glyphicon glyphicon-picture" ng-show="!photos[1].uri"></span>
+			<img style="width:100%" src="{{ photos[1].uri }}" ng-show="photos[1].uri"/>
+		</div>
+	</div>
+	<div class="col-lg-4">
+		<div class="img-upload-box img-upload-box-small" ng-class="{selected : selectedPhoto==2}" ng-click="onClickPhoto(2)">
+			<span class="glyphicon glyphicon-picture" ng-show="!photos[2].uri"></span>
+			<img style="width:100%" src="{{ photos[2].uri }}" ng-show="photos[2].uri"/>
+		</div>
+	</div>
+</div>

@@ -43,7 +43,7 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
 
     @Autowired
     private OwnerProtocolCamelConfigurator ownerProtocolCamelConfigurator;
-    @Autowired
+
     private ActiveMQService activeMQService;
     @Autowired
     private NeedRepository needRepository;
@@ -61,7 +61,8 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
         List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
         //OwnerProtocolCamelConfigurator ownerProtocolCamelConfigurator = camelConfiguratorFactory.createCamelConfigurator(methodName);
         logger.debug("configuring camel endpoint");
-        if (wonNodeList.size()>0){
+        if (ownerProtocolCamelConfigurator.getBrokerComponent(wonNodeUri)!=null && ownerProtocolCamelConfigurator
+          .getEndpoint(wonNodeUri)!=null){
             logger.debug("wonNode known");
             WonNode wonNode = wonNodeList.get(0);
             brokerURI = wonNode.getBrokerURI();
