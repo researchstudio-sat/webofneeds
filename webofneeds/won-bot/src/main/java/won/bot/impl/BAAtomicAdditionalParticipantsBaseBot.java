@@ -23,43 +23,59 @@ import won.protocol.model.FacetType;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * User: Danijel
- * Date: 10.4.14.
+ * Date: 7.5.14.
  */
-public abstract class BAAtomicBaseBot extends EventBot{
+public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
   public static final String URI_LIST_NAME_PARTICIPANT = "participants";
   public static final String URI_LIST_NAME_COORDINATOR = "coordinator";
   protected final int noOfNeeds;
+  protected final int noOfDelayedNeeds;
+  protected final int noOfNonDelayedNeeds;
   protected final List<BATestBotScript> firstPhaseScripts;
+  protected final List<BATestBotScript> firstPhaseScriptsWithDelay;
   protected final List<BATestBotScript> secondPhaseScripts;
+//  protected final List<BATestBotScript> secondPhaseScriptsWithDelay;
   private static final long MILLIS_BETWEEN_MESSAGES = 10;
 
   protected BaseEventListener participantNeedCreator;
   protected BaseEventListener coordinatorNeedCreator;
   protected BaseEventListener needConnector;
+  protected BaseEventListener needConnectorWithDelay;
   protected BaseEventListener scriptsDoneListener;
   protected BaseEventListener firstPhaseDoneListener;
+  protected BaseEventListener firstPhaseWithDelayDoneListener;
   protected BaseEventListener workDoneSignaller;
   protected final List<BATestScriptListener> firstPhasetestScriptListeners;
+  protected final List<BATestScriptListener> firstPhasetestScriptWithDelayListeners;
   protected final List<BATestScriptListener> secondPhasetestScriptListeners;
+ // protected final List<BATestScriptListener> secondPhasetestScriptWithDelayListeners;
 
   protected BaseEventListener firstPhaseCompleteListener;
 
-  protected BAAtomicBaseBot() {
+  protected BAAtomicAdditionalParticipantsBaseBot() {
     this.firstPhaseScripts = getFirstPhaseScripts();
+    this.firstPhaseScriptsWithDelay = getFirstPhaseScriptsWithDelay();
     this.secondPhaseScripts = getSecondPhaseScripts();
-    if (this.secondPhaseScripts.size() != this.firstPhaseScripts.size()) {
-      throw new IllegalArgumentException("The same number of scripts in first and second phase is required!");
-    }
-    this.noOfNeeds = firstPhaseScripts.size()+1;
-    this.firstPhasetestScriptListeners = Collections.synchronizedList( new ArrayList <BATestScriptListener>(noOfNeeds
-    -1));
-    this.secondPhasetestScriptListeners = Collections.synchronizedList( new ArrayList<BATestScriptListener>(noOfNeeds-1));
+//    this.secondPhaseScriptsWithDelay = getSecondPhaseScriptsWithDelay();
+//    if (this.secondPhaseScripts.size() != this.firstPhaseScripts.size()) {
+//      throw new IllegalArgumentException("The same number of scripts in first and second phase is required!");
+//    }
+//    if (this.secondPhaseScriptsWithDelay.size() != this.firstPhaseScriptsWithDelay.size())
+//      throw new IllegalArgumentException("The same number of scripts in first and second phase (wiht delay) is " +
+//        "required!");
+
+    this.noOfNonDelayedNeeds = firstPhaseScripts.size()+1;
+    this.noOfDelayedNeeds = firstPhaseScriptsWithDelay.size();
+    this.noOfNeeds = secondPhaseScripts.size()+1;
+    this.firstPhasetestScriptListeners = new ArrayList<BATestScriptListener>(noOfNonDelayedNeeds-1);
+    this.firstPhasetestScriptWithDelayListeners = new ArrayList<BATestScriptListener>(noOfDelayedNeeds);
+    this.secondPhasetestScriptListeners = new ArrayList<BATestScriptListener>(noOfNeeds-1);
+ //   this.secondPhasetestScriptWithDelayListeners = new ArrayList<BATestScriptListener>(noOfDelayedNeeds);
   }
 
   protected abstract FacetType getParticipantFacetType();
@@ -69,7 +85,7 @@ public abstract class BAAtomicBaseBot extends EventBot{
   protected void initializeEventListeners() {
     final EventListenerContext ctx = getEventListenerContext();
     final EventBus bus = getEventBus();
-
+    logger.info("info1: No of needs: "+noOfNeeds);
     //create needs every trigger execution until noOfNeeds are created
     this.participantNeedCreator = new ActionOnEventListener(
       ctx, "participantCreator",
@@ -88,12 +104,17 @@ public abstract class BAAtomicBaseBot extends EventBot{
     FinishedEventFilter coordinatorCreatorFilter = new FinishedEventFilter(coordinatorNeedCreator);
 
     final Iterator<BATestBotScript> firstPhasescriptIterator = firstPhaseScripts.iterator();
+    final Iterator<BATestBotScript> firstPhaseScriptWithDelayIterator = firstPhaseScriptsWithDelay.iterator();
     final Iterator<BATestBotScript> secondPhasescriptIterator = secondPhaseScripts.iterator();
+ //   final Iterator<BATestBotScript> secondPhasescriptWithDelayIterator = secondPhaseScripts.iterator();
+
     //make a composite filter, with one filter for each testScriptListener that wait
     // for the FinishedEvents the they emit. That filter will be used to shut
     // down all needs after all the scriptListeners have finished.
     final OrFilter firstPhaseScriptListenerFilter = new OrFilter();
+    final OrFilter firstPhaseScriptWithDelayListenerFilter = new OrFilter();
     final OrFilter secondPhaseScriptListenerFilter = new OrFilter();
+ //   final OrFilter secondPhaseScriptWithDelayListenerFilter = new OrFilter();
     //create a callback that gets called immediately before the connection is established
     ConnectFromListToListAction.ConnectHook scriptConnectHook = new ConnectFromListToListAction.ConnectHook()
     {
@@ -101,7 +122,7 @@ public abstract class BAAtomicBaseBot extends EventBot{
       public void onConnect(final URI fromNeedURI, final URI toNeedURI) {
         //create the listener that will execute the script actions
         BATestScriptListener testScriptListener = new BATestScriptListener(ctx, firstPhasescriptIterator.next(), fromNeedURI,
-                                                                           toNeedURI, MILLIS_BETWEEN_MESSAGES);
+          toNeedURI, MILLIS_BETWEEN_MESSAGES);
         //remember it so we can check its state later
         firstPhasetestScriptListeners.add(testScriptListener);
 
@@ -117,10 +138,42 @@ public abstract class BAAtomicBaseBot extends EventBot{
 
         //now we create the listener that is only active in the second phase
         //remember it so we can check its state later
+//        BATestScriptListener secondPhaseTestScriptListener = new BATestScriptListener(ctx,
+//          secondPhasescriptIterator.next(),fromNeedURI,toNeedURI, MILLIS_BETWEEN_MESSAGES);
+//        secondPhasetestScriptListeners.add(secondPhaseTestScriptListener);
+//        secondPhaseScriptListenerFilter.addFilter(
+//          new AcceptOnceFilter(
+//            new FinishedEventFilter(secondPhaseTestScriptListener)));
+      }
+    };
+
+
+    ConnectFromListToListAction.ConnectHook scriptConnectWithDelayHook = new ConnectFromListToListAction.ConnectHook()
+    {
+      @Override
+      public void onConnect(final URI fromNeedURI, final URI toNeedURI) {
+        //create the listener that will execute the script actions
+        BATestScriptListener testScriptListener = new BATestScriptListener(ctx, firstPhaseScriptWithDelayIterator.next(),
+          fromNeedURI, toNeedURI, MILLIS_BETWEEN_MESSAGES);
+        //remember it so we can check its state later
+        firstPhasetestScriptWithDelayListeners.add(testScriptListener);
+
+        //subscribe it to the relevant events.
+        bus.subscribe(ConnectFromOtherNeedEvent.class, testScriptListener);
+        bus.subscribe(OpenFromOtherNeedEvent.class, testScriptListener);
+        bus.subscribe(MessageFromOtherNeedEvent.class, testScriptListener);
+        //add a filter that will wait for the FinishedEvent emitted by that listener
+        //wrap it in an acceptance filter to make extra sure we count each listener only once.
+        firstPhaseScriptWithDelayListenerFilter.addFilter(
+          new AcceptOnceFilter(
+            new FinishedEventFilter(testScriptListener)));
+
+        //now we create the listener that is only active in the second phase
+        //remember it so we can check its state later
         BATestScriptListener secondPhaseTestScriptListener = new BATestScriptListener(ctx,
           secondPhasescriptIterator.next(),fromNeedURI,toNeedURI, MILLIS_BETWEEN_MESSAGES);
-        secondPhasetestScriptListeners.add(secondPhaseTestScriptListener);
-        secondPhaseScriptListenerFilter.addFilter(
+          secondPhasetestScriptListeners.add(secondPhaseTestScriptListener);
+          secondPhaseScriptListenerFilter.addFilter(
           new AcceptOnceFilter(
             new FinishedEventFilter(secondPhaseTestScriptListener)));
       }
@@ -128,15 +181,24 @@ public abstract class BAAtomicBaseBot extends EventBot{
 
     //when done, connect the participants to the coordinator
     this.needConnector = new ActionOnceAfterNEventsListener(
-      ctx, "needConnector", noOfNeeds,
+      ctx, "needConnector", noOfNonDelayedNeeds-1,
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
-                                      getCoordinatorFacetType().getURI(),
-                                      getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
+        getCoordinatorFacetType().getURI(),
+        getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
         scriptConnectHook));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
+
+    this.needConnectorWithDelay = new ActionOnceAfterNEventsListener(
+      ctx, "needConnectorWithDelay", firstPhaseScriptListenerFilter, noOfDelayedNeeds,
+      new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
+        getCoordinatorFacetType().getURI(),
+        getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
+        scriptConnectWithDelayHook));
+    bus.subscribe(NeedCreatedEvent.class, this.needConnectorWithDelay);
+
     //for each group member, there are 2 listeners waiting for messages. when they are all finished, we're done.
-    this.firstPhaseDoneListener = new ActionOnceAfterNEventsListener(
-      ctx, "firstPhaseDoneListener", firstPhaseScriptListenerFilter,
+    this.firstPhaseWithDelayDoneListener = new ActionOnceAfterNEventsListener(
+      ctx, "firstPhaseDoneWithDelayListener", firstPhaseScriptWithDelayListenerFilter,
       noOfNeeds - 1,
       new BaseEventBotAction(ctx)
       {
@@ -144,12 +206,15 @@ public abstract class BAAtomicBaseBot extends EventBot{
         protected void doRun(final Event event) throws Exception {
           logger.debug("starting second phase");
           Iterator<BATestScriptListener> firstPhaseListeners = firstPhasetestScriptListeners.iterator();
+          Iterator<BATestScriptListener>  firstPhaseWithDelayListeners = firstPhasetestScriptWithDelayListeners
+            .iterator();
           for(BATestScriptListener listener: secondPhasetestScriptListeners){
             logger.debug("subscribing second phase listener {}", listener);
             //subscribe it to the relevant events.
             bus.subscribe(MessageFromOtherNeedEvent.class, listener);
             bus.subscribe(SecondPhaseStartedEvent.class, listener);
-            BATestScriptListener correspondingFirstPhaseListener = firstPhaseListeners.next();
+            BATestScriptListener correspondingFirstPhaseListener = firstPhaseListeners.hasNext()? firstPhaseListeners
+              .next() : firstPhaseWithDelayListeners.next();
             listener.setCoordinatorSideConnectionURI(correspondingFirstPhaseListener.getCoordinatorSideConnectionURI());
             listener.setParticipantSideConnectionURI(correspondingFirstPhaseListener.getParticipantSideConnectionURI());
             listener.updateFilterForBothConnectionURIs();
@@ -168,7 +233,7 @@ public abstract class BAAtomicBaseBot extends EventBot{
       ctx, "scriptsDoneListener", secondPhaseScriptListenerFilter,
       noOfNeeds - 1,
       new DeactivateAllNeedsOfGroupAction(ctx, URI_LIST_NAME_PARTICIPANT));
-      bus.subscribe(FinishedEvent.class, this.scriptsDoneListener);
+    bus.subscribe(FinishedEvent.class, this.scriptsDoneListener);
 
 
     //When the needs are deactivated, all connections are closed. wait for the close events and signal work done.
@@ -183,4 +248,6 @@ public abstract class BAAtomicBaseBot extends EventBot{
 
   protected abstract List<BATestBotScript> getFirstPhaseScripts();
   protected abstract List<BATestBotScript> getSecondPhaseScripts();
+  protected abstract List<BATestBotScript> getFirstPhaseScriptsWithDelay();
+
 }

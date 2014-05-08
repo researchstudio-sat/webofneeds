@@ -55,6 +55,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     this.coordinatorURI = coordinatorURI;
     this.participantURI = participantURI;
     this.millisBetweenMessages = millisBetweenMessages;
+    this.name=script.getName();
   }
 
   public BATestScriptListener(final EventListenerContext context, final String name, final BATestBotScript script,
@@ -301,8 +302,9 @@ public class BATestScriptListener extends AbstractFinishingListener
 
   @Override
   public String toString() {
-    return "BATestScriptListener" + "@" + Integer.toHexString(hashCode()) + "{" +
-      "coordinatorURI=" + coordinatorURI +
+    return "BATestScriptListener" + "{" +
+      "name=" + name +
+      ", coordinatorURI=" + coordinatorURI +
       ", participantURI=" + participantURI +
       ", coordinatorSideConnectionURI=" + coordinatorSideConnectionURI +
       ", participantSideConnectionURI=" + participantSideConnectionURI +

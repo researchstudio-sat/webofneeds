@@ -1,0 +1,73 @@
+package won.bot.impl;
+
+import won.bot.framework.events.listener.baStateBots.BATestBotScript;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedFPBot;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedSPClosingBot;
+import won.protocol.model.FacetType;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * User: Danijel
+ * Date: 7.5.14.
+ */
+public class BAAtomicCCAdditionalParticipants extends BAAtomicAdditionalParticipantsBaseBot
+{
+  @Override
+  protected FacetType getParticipantFacetType() {
+    return FacetType.BACCParticipantFacet;
+  }
+
+  @Override
+  protected FacetType getCoordinatorFacetType() {
+    return FacetType.BAAtomicCCCoordinatorFacet;
+  }
+
+
+  protected List<BATestBotScript> getFirstPhaseScripts() {
+
+    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(2);
+
+    //Coordination message is sent as TEXT
+    scripts.add(new CompletedFPBot());
+    scripts.add(new CompletedFPBot());
+
+//
+//    //Coordination message is sent as MODEL
+ //   scripts.add(new CompletingFPUriBot());
+ //   scripts.add(new CompletingFPUriBot());
+
+    return scripts;
+  }
+
+  protected List<BATestBotScript> getFirstPhaseScriptsWithDelay() {
+    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(2);
+
+    scripts.add(new CompletedFPBot());
+    scripts.add(new CompletedFPBot());
+//
+//    //Coordination message is sent as MODEL
+    // scripts.add(new CompletingFPUriBot());
+    // scripts.add(new CompletingFPUriBot());
+
+    return scripts;
+  }
+
+  protected List<BATestBotScript> getSecondPhaseScripts() {
+    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(4);
+
+    scripts.add(new CompletedSPClosingBot());
+    scripts.add(new CompletedSPClosingBot());
+    scripts.add(new CompletedSPClosingBot());
+    scripts.add(new CompletedSPClosingBot());
+
+//
+//    //Coordination message is sent as MODEL
+    //scripts.add(new CompletedSPClosingUri;    TODO
+
+
+    return scripts;
+  }
+
+}
