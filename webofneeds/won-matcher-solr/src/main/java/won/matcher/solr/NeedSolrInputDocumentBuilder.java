@@ -35,6 +35,11 @@ import java.util.Collection;
 public class NeedSolrInputDocumentBuilder extends NeedBuilderBase<SolrInputDocument>
 {
 
+  /**
+   * Creates a SolrInputDocument. Will write whatever was specified as ContentDescription into
+   * the NTRIPLE field.
+   * @return
+   */
   @Override
   public SolrInputDocument build()
   {
@@ -46,7 +51,7 @@ public class NeedSolrInputDocumentBuilder extends NeedBuilderBase<SolrInputDocum
     addFieldIfPresent(doc, SolrFields.DESCRIPTION, getDescription());
     addFieldIfPresent(doc, SolrFields.LOCATION, location);
     addFieldIfPresent(doc, SolrFields.PRICE, getPriceLimitString());
-    addContentDescriptionIfPresent(doc, SolrFields.NTRIPLE, getContentDescription());
+    addNTriplesData(doc, SolrFields.NTRIPLE);
     if (getTags() != null) {
       for(String tag: getTags()){
         doc.addField(SolrFields.TAG,tag);
@@ -96,16 +101,19 @@ public class NeedSolrInputDocumentBuilder extends NeedBuilderBase<SolrInputDocum
     }
   }
 
-  private void addContentDescriptionIfPresent(final SolrInputDocument doc, final String field, final Model contentDescription)
+  /**
+   * Writes the need's data in ntriples format into the specified field.
+   * @param doc
+   * @param field
+   */
+  private void addNTriplesData(final SolrInputDocument doc, final String field)
   {
-    if (contentDescription != null){
-      StringWriter writer = new StringWriter();
-      NeedModelBuilder needModelBuilder = new NeedModelBuilder();
-      copyValuesToBuilder(needModelBuilder);
-      Model model = needModelBuilder.build();
-      model.write(writer, FileUtils.langNTriple, getURI().toString());
-      doc.addField(field, writer.toString());
-    }
+    StringWriter writer = new StringWriter();
+    NeedModelBuilder needModelBuilder = new NeedModelBuilder();
+    copyValuesToBuilder(needModelBuilder);
+    Model model = needModelBuilder.build();
+    model.write(writer, FileUtils.langNTriple, getURI().toString());
+    doc.addField(field, writer.toString());
   }
 
   private void addFieldIfPresent(SolrInputDocument doc, String field, Object value){

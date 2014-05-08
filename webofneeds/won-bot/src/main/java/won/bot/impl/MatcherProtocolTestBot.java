@@ -30,7 +30,7 @@ import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
 /**
  *
  */
-public class MatcherProtocolBot extends EventBot
+public class MatcherProtocolTestBot extends EventBot
 {
 
   private static final int NO_OF_NEEDS = 2;
@@ -47,7 +47,7 @@ public class MatcherProtocolBot extends EventBot
   protected BaseEventListener allNeedsDeactivator;
   protected BaseEventListener workDoneSignaller;
   protected BaseEventListener matcherNotifier;
-    private static final String NAME_NEEDS = "needs";
+  private static final String NAME_NEEDS = "needs";
 
   @Override
   protected void initializeEventListeners()
