@@ -1,5 +1,7 @@
 package won.bot.impl;
 
+
+import com.google.common.collect.Iterators;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
@@ -19,10 +21,12 @@ import won.bot.framework.events.listener.baStateBots.BATestScriptListener;
 import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.SecondPhaseStartedEvent;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
+import won.bot.framework.events.listener.impl.WaitForNEventsListener;
 import won.protocol.model.FacetType;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,6 +36,7 @@ import java.util.List;
  */
 public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
   public static final String URI_LIST_NAME_PARTICIPANT = "participants";
+  public static final String URI_LIST_NAME_PARTICIPANT_DELAYED = "delayedParticipants";
   public static final String URI_LIST_NAME_COORDINATOR = "coordinator";
   protected final int noOfNeeds;
   protected final int noOfDelayedNeeds;
@@ -43,11 +48,11 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
   private static final long MILLIS_BETWEEN_MESSAGES = 10;
 
   protected BaseEventListener participantNeedCreator;
+  protected BaseEventListener delayedParticipantNeedCreator;
   protected BaseEventListener coordinatorNeedCreator;
   protected BaseEventListener needConnector;
   protected BaseEventListener needConnectorWithDelay;
   protected BaseEventListener scriptsDoneListener;
-  protected BaseEventListener firstPhaseDoneListener;
   protected BaseEventListener firstPhaseWithDelayDoneListener;
   protected BaseEventListener workDoneSignaller;
   protected final List<BATestScriptListener> firstPhasetestScriptListeners;
@@ -72,9 +77,12 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
     this.noOfNonDelayedNeeds = firstPhaseScripts.size()+1;
     this.noOfDelayedNeeds = firstPhaseScriptsWithDelay.size();
     this.noOfNeeds = secondPhaseScripts.size()+1;
-    this.firstPhasetestScriptListeners = new ArrayList<BATestScriptListener>(noOfNonDelayedNeeds-1);
-    this.firstPhasetestScriptWithDelayListeners = new ArrayList<BATestScriptListener>(noOfDelayedNeeds);
-    this.secondPhasetestScriptListeners = new ArrayList<BATestScriptListener>(noOfNeeds-1);
+    this.firstPhasetestScriptListeners = Collections.synchronizedList(new ArrayList<BATestScriptListener>
+    (noOfNonDelayedNeeds-1));
+    this.firstPhasetestScriptWithDelayListeners = Collections.synchronizedList(new ArrayList<BATestScriptListener>
+      (noOfDelayedNeeds));
+    this.secondPhasetestScriptListeners = Collections.synchronizedList(new ArrayList<BATestScriptListener>
+      (noOfNeeds-1));
  //   this.secondPhasetestScriptWithDelayListeners = new ArrayList<BATestScriptListener>(noOfDelayedNeeds);
   }
 
@@ -86,13 +94,29 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
     final EventListenerContext ctx = getEventListenerContext();
     final EventBus bus = getEventBus();
     logger.info("info1: No of needs: "+noOfNeeds);
+
+    //wait for all needs to be created
+    WaitForNEventsListener allNeedsCreatedListener = new WaitForNEventsListener(ctx,
+      "waitForAllNeedsCreated",noOfNeeds);
+    bus.subscribe(NeedCreatedEvent.class, allNeedsCreatedListener);
+
+
     //create needs every trigger execution until noOfNeeds are created
     this.participantNeedCreator = new ActionOnEventListener(
       ctx, "participantCreator",
       new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_PARTICIPANT, getParticipantFacetType().getURI()),
-      noOfNeeds - 1
+      noOfNonDelayedNeeds - 1
     );
     bus.subscribe(ActEvent.class, this.participantNeedCreator);
+
+    //create needs every trigger execution until noOfNeeds are created
+    this.delayedParticipantNeedCreator = new ActionOnEventListener(
+      ctx, "delayedParticipantCreator",
+      new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_PARTICIPANT_DELAYED, getParticipantFacetType().getURI()),
+      noOfDelayedNeeds
+    );
+    bus.subscribe(ActEvent.class, this.delayedParticipantNeedCreator);
+
 
     //when done, create one coordinator need
     this.coordinatorNeedCreator = new ActionOnEventListener(
@@ -101,7 +125,6 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
       1
     );
     bus.subscribe(FinishedEvent.class, this.coordinatorNeedCreator);
-    FinishedEventFilter coordinatorCreatorFilter = new FinishedEventFilter(coordinatorNeedCreator);
 
     final Iterator<BATestBotScript> firstPhasescriptIterator = firstPhaseScripts.iterator();
     final Iterator<BATestBotScript> firstPhaseScriptWithDelayIterator = firstPhaseScriptsWithDelay.iterator();
@@ -138,12 +161,12 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
 
         //now we create the listener that is only active in the second phase
         //remember it so we can check its state later
-//        BATestScriptListener secondPhaseTestScriptListener = new BATestScriptListener(ctx,
-//          secondPhasescriptIterator.next(),fromNeedURI,toNeedURI, MILLIS_BETWEEN_MESSAGES);
-//        secondPhasetestScriptListeners.add(secondPhaseTestScriptListener);
-//        secondPhaseScriptListenerFilter.addFilter(
-//          new AcceptOnceFilter(
-//            new FinishedEventFilter(secondPhaseTestScriptListener)));
+        BATestScriptListener secondPhaseTestScriptListener = new BATestScriptListener(ctx,
+          secondPhasescriptIterator.next(),fromNeedURI,toNeedURI, MILLIS_BETWEEN_MESSAGES);
+        secondPhasetestScriptListeners.add(secondPhaseTestScriptListener);
+        secondPhaseScriptListenerFilter.addFilter(
+          new AcceptOnceFilter(
+            new FinishedEventFilter(secondPhaseTestScriptListener)));
       }
     };
 
@@ -179,42 +202,54 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
       }
     };
 
-    //when done, connect the participants to the coordinator
-    this.needConnector = new ActionOnceAfterNEventsListener(
-      ctx, "needConnector", noOfNonDelayedNeeds-1,
-      new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
-        getCoordinatorFacetType().getURI(),
-        getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
-        scriptConnectHook));
-    bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
-    this.needConnectorWithDelay = new ActionOnceAfterNEventsListener(
-      ctx, "needConnectorWithDelay", firstPhaseScriptListenerFilter, noOfDelayedNeeds,
+    //when done, connect the participants to the coordinator
+    this.needConnector = new ActionOnEventListener(
+      ctx, "needConnector", new FinishedEventFilter(allNeedsCreatedListener),
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
         getCoordinatorFacetType().getURI(),
         getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
-        scriptConnectWithDelayHook));
-    bus.subscribe(NeedCreatedEvent.class, this.needConnectorWithDelay);
+        scriptConnectHook),1);
+    bus.subscribe(FinishedEvent.class, this.needConnector);
+
+    //wait until the non-delayed participants are connected and done with their scripts
+    BaseEventListener waitForNonDelayedConnectsListener = new WaitForNEventsListener(ctx,
+      firstPhaseScriptListenerFilter, noOfNonDelayedNeeds - 1);
+    bus.subscribe(FinishedEvent.class, waitForNonDelayedConnectsListener);
+
+    FinishedEventFilter allNonDelayedConnectedFilter = new FinishedEventFilter(waitForNonDelayedConnectsListener);
+
+    this.needConnectorWithDelay = new ActionOnEventListener(
+      ctx, "needConnectorWithDelay", allNonDelayedConnectedFilter,
+      new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT_DELAYED,
+        getCoordinatorFacetType().getURI(),
+        getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
+        scriptConnectWithDelayHook),1);
+    bus.subscribe(FinishedEvent.class, this.needConnectorWithDelay);
 
     //for each group member, there are 2 listeners waiting for messages. when they are all finished, we're done.
     this.firstPhaseWithDelayDoneListener = new ActionOnceAfterNEventsListener(
       ctx, "firstPhaseDoneWithDelayListener", firstPhaseScriptWithDelayListenerFilter,
-      noOfNeeds - 1,
+      noOfDelayedNeeds,
       new BaseEventBotAction(ctx)
       {
         @Override
         protected void doRun(final Event event) throws Exception {
           logger.debug("starting second phase");
+          logger.debug("non-delayed listeners: {}", firstPhasetestScriptListeners.size());
+          logger.debug("delayed listeners: {}", firstPhasetestScriptWithDelayListeners.size());
           Iterator<BATestScriptListener> firstPhaseListeners = firstPhasetestScriptListeners.iterator();
           Iterator<BATestScriptListener>  firstPhaseWithDelayListeners = firstPhasetestScriptWithDelayListeners
             .iterator();
+          Iterator<BATestScriptListener>  combinedFirstPhaseListeners = Iterators.concat(firstPhaseListeners,
+            firstPhaseWithDelayListeners);
+          logger.debug("# of listeners in second phase: {}", secondPhasetestScriptListeners.size());
           for(BATestScriptListener listener: secondPhasetestScriptListeners){
             logger.debug("subscribing second phase listener {}", listener);
             //subscribe it to the relevant events.
             bus.subscribe(MessageFromOtherNeedEvent.class, listener);
             bus.subscribe(SecondPhaseStartedEvent.class, listener);
-            BATestScriptListener correspondingFirstPhaseListener = firstPhaseListeners.hasNext()? firstPhaseListeners
-              .next() : firstPhaseWithDelayListeners.next();
+            BATestScriptListener correspondingFirstPhaseListener = combinedFirstPhaseListeners.next();
             listener.setCoordinatorSideConnectionURI(correspondingFirstPhaseListener.getCoordinatorSideConnectionURI());
             listener.setParticipantSideConnectionURI(correspondingFirstPhaseListener.getParticipantSideConnectionURI());
             listener.updateFilterForBothConnectionURIs();
@@ -225,7 +260,7 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
           }
         }
       });
-    bus.subscribe(FinishedEvent.class, this.firstPhaseDoneListener);
+    bus.subscribe(FinishedEvent.class, this.firstPhaseWithDelayDoneListener);
 
 
     //for each group member, there are 2 listeners waiting for messages. when they are all finished, we're done.

@@ -2,7 +2,7 @@ package won.bot.impl;
 
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedFPBot;
-import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedSPClosingBot;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedSPClosingAdditionalParticipantsBot;
 import won.protocol.model.FacetType;
 
 import java.util.ArrayList;
@@ -57,10 +57,10 @@ public class BAAtomicCCAdditionalParticipants extends BAAtomicAdditionalParticip
   protected List<BATestBotScript> getSecondPhaseScripts() {
     List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(4);
 
-    scripts.add(new CompletedSPClosingBot());
-    scripts.add(new CompletedSPClosingBot());
-    scripts.add(new CompletedSPClosingBot());
-    scripts.add(new CompletedSPClosingBot());
+    scripts.add(new CompletedSPClosingAdditionalParticipantsBot("CompletedSPClosingBot-1"));
+    scripts.add(new CompletedSPClosingAdditionalParticipantsBot("CompletedSPClosingBot-2"));
+    scripts.add(new CompletedSPClosingAdditionalParticipantsBot("CompletedSPClosingBot-3"));
+    scripts.add(new CompletedSPClosingAdditionalParticipantsBot("CompletedSPClosingBot-4"));
 
 //
 //    //Coordination message is sent as MODEL
