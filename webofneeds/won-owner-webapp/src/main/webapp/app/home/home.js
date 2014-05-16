@@ -27,7 +27,7 @@ angular.module('won.owner').controller('HomeCtrl', function ($scope, $location, 
 
 });
 
-angular.module('won.owner').controller('SignInCtrl', function ($scope, $location, userService) {
+angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$window,$location, userService) {
 
 	$scope.user = {
 		username:'',
@@ -39,7 +39,8 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope, $location
 	onLoginResponse = function(result) {
 		if (result.status == 'OK') {
 			userService.setAuth($scope.username);
-			$location.path("/");
+			$location.path('/');
+
 		} else {
 			$scope.error = result.message;
 		}
@@ -55,7 +56,7 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope, $location
 
 });
 
-angular.module('won.owner').controller('RegisterCtrl', function ($scope, $location, userService) {
+angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,$window, $location, userService) {
 
 	$scope.registerUser = new function(){
 		this.reset = function() {
@@ -73,19 +74,32 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $locati
 
 	$scope.error = '';
 	$scope.success = '';
+  $scope.registered = false;
 
 	onRegisterResponse = function(result) {
 		if(result.status == "OK") {
 			$scope.error = '';
 			$scope.success = '';
-			$scope.registerUser.reset();
+
 			angular.resetForm($scope, "registerForm");
-			$scope.success = 'You\'ve been successfully registered. Please try to Sign in';
-		} else {
+		//	$scope.success = 'You\'ve been successfully registered. Please try to Sign in';
+            $scope.registered = true;
+            userService.logIn($scope.registerUser).then(onLoginResponse);
+            $scope.registerUser.reset();
+            //$location.path("/");
+        } else {
 			$scope.error = result.message;
 		}
 	}
+    onLoginResponse = function(result) {
+        if (result.status == 'OK') {
+            userService.setAuth($scope.username);
+            $window.location.href = '/owner';
 
+        } else {
+            $scope.error = result.message;
+        }
+    }
 	$scope.onClickRegister = function () {
 		var validPass = true;
 		if(!$scope.registerUser.isSamePassword()) {

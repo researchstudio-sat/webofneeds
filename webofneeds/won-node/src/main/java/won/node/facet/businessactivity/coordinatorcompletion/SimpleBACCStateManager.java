@@ -13,7 +13,7 @@ import java.util.HashMap;
 public class SimpleBACCStateManager  implements  BACCStateManager{
     private HashMap<String, BACCState> map = new HashMap();
 
-    public BACCState getStateForNeedUri(URI ownerUri, URI needUri){
+    public synchronized BACCState getStateForNeedUri(URI ownerUri, URI needUri){
         return map.get(ownerUri.toString()+ needUri.toString());
     }
 
@@ -25,7 +25,7 @@ public class SimpleBACCStateManager  implements  BACCStateManager{
         }
     }
 
-    public void setStateForNeedUri(BACCState state, URI ownerUri, URI needUri)
+    public synchronized void setStateForNeedUri(BACCState state, URI ownerUri, URI needUri)
     {
         map.put(ownerUri.toString()+needUri.toString(), state);
     }

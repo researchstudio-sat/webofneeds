@@ -45,36 +45,35 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractFacet {
             public void run()
             {
                 try {
-                    ownerFacingConnectionClient.open(con.getConnectionURI(), content);
-                    stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
-                    logger.debug("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
-                    logger.debug("Coordinator state phase: {}", stateManager.getStateForNeedUri(con.getNeedURI(),
+                  ownerFacingConnectionClient.open(con.getConnectionURI(), content);
+                  stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
+                  logger.debug("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                  logger.debug("Coordinator state phase: {}", stateManager.getStateForNeedUri(con.getNeedURI(),
                                                                                             con.getRemoteNeedURI()).getPhase());
-                } catch (WonProtocolException e) {
-                    logger.debug("caught Exception:", e);
-                }
 
-                // adding Participants is possible only in the first phase
-                if(isCoordinatorInFirstPhase(con))  //add a new Participant (first phase in progress)
-                {
-                    stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
-                    logger.debug("Coordinator state: " + stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
-                    logger.debug("Coordinator state phase: {}", stateManager.getStateForNeedUri(con.getNeedURI(),
-                                                                                           con.getRemoteNeedURI()).getPhase());
-                }
-                else  // second phase in progress, new participants can not be added anymore
-                {
-                    logger.debug("It is not possible to add more participants. The second phase of the protocol has already been started.");
-                    Model myContent = ModelFactory.createDefaultModel();
-                    myContent.setNsPrefix("","no:uri");
-                    Resource res = myContent.createResource("no:uri");
-                    //close the initiated connection
-                    try {
-                        ownerFacingConnectionClient.close(con.getConnectionURI(), myContent);
-                        needFacingConnectionClient.close(con, myContent);   //abort sent to participant
-                    } catch (Exception e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
+
+                  // adding Participants is possible only in the first phase
+                  if(isCoordinatorInFirstPhase(con))  //add a new Participant (first phase in progress)
+                  {
+                      stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
+                      logger.debug("Coordinator state: " + stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                      logger.debug("Coordinator state phase: {}", stateManager.getStateForNeedUri(con.getNeedURI(),
+                                                                                             con.getRemoteNeedURI()).getPhase());
+                  }
+                  else  // second phase in progress, new participants can not be added anymore
+                  {
+                      logger.debug("It is not possible to add more participants. The second phase of the protocol has already been started.");
+                      Model myContent = ModelFactory.createDefaultModel();
+                      myContent.setNsPrefix("","no:uri");
+                      Resource res = myContent.createResource("no:uri");
+                      //close the initiated connection
+
+                      ownerFacingConnectionClient.close(con.getConnectionURI(), myContent);
+                      needFacingConnectionClient.close(con, myContent);   //abort sent to participant
+
+                  }
+                } catch (Exception e) {
+                  logger.warn("caught Exception:", e);
                 }
             }
         });

@@ -8,6 +8,13 @@ app = angular.module('won.owner', ['ui.bootstrap', 'ui.map', 'blueimp.fileupload
 			when('/need-detail/:needId', {controller:'NeedDetailCtrl', templateUrl:'app/need-detail/need-detail.partial.html'}).
 			otherwise({redirectTo : '/'});
 
+app.directive('header', function(){
+    return {
+        restrict: 'A',
+        replace: true,
+        tempalteUrl:'templates/header.html'
+    }
+})
 	var interceptor = function ($rootScope, $q, $location, $window) {
 
 		function success(response) {
