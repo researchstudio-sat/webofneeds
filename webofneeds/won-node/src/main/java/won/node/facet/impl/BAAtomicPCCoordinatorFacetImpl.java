@@ -44,38 +44,73 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractFacet{
       public void run()
       {
         try {
-          ownerFacingConnectionClient.open(con.getConnectionURI(), content);
-          stateManager.setStateForNeedUri(BAPCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
-          logger.debug("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
-          logger.debug("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
-        } catch (WonProtocolException e) {
-          logger.debug("caught Exception:", e);
-        }
-
-        // adding Participants is possible only in the first phase
-        if(isCoordinatorInFirstPhase(con))  //add a new Participant (first phase in progress)
-        {
-          stateManager.setStateForNeedUri(BAPCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
-          logger.debug("Coordinator state: " + stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
-          logger.debug("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
-        }
-        else  // second phase in progress, new participants can not be added anymore
-        {
-          logger.debug("It is not possible to add more participants. The second phase of the protocol has already been started.");
-          Model myContent = ModelFactory.createDefaultModel();
-          myContent.setNsPrefix("","no:uri");
-          Resource res = myContent.createResource("no:uri");
-          //close the initiated connection
-          try {
-            ownerFacingConnectionClient.close(con.getConnectionURI(), myContent);
-            needFacingConnectionClient.close(con, myContent);   //abort sent to participant
+            // adding Participants is possible only in the first phase
+            if(isCoordinatorInFirstPhase(con))  //add a new Participant (first phase in progress)
+            {
+              stateManager.setStateForNeedUri(BAPCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
+              ownerFacingConnectionClient.open(con.getConnectionURI(), content);
+              logger.debug("Coordinator state: " + stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+              logger.debug("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
+            }
+            else  // second phase in progress, new participants can not be added anymore
+            {
+              logger.debug("It is not possible to add more participants. The second phase of the protocol has already been started.");
+              Model myContent = ModelFactory.createDefaultModel();
+              myContent.setNsPrefix("","no:uri");
+              Resource res = myContent.createResource("no:uri");
+              //close the initiated connection
+              needFacingConnectionClient.close(con, myContent);
+            }
           } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+              logger.debug("could not handle participant connect", e);
           }
-        }
-      }
-    });
-  }
+    }
+
+  });
+ }
+
+//  //Acceptance received from Participant
+//  public void openFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+//    //inform the need side
+//    //CONNECTED state
+//    executorService.execute(new Runnable()
+//    {
+//      @Override
+//      public void run()
+//      {
+//        try {
+//          ownerFacingConnectionClient.open(con.getConnectionURI(), content);
+//          stateManager.setStateForNeedUri(BAPCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
+//          logger.debug("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+//          logger.debug("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
+//        } catch (WonProtocolException e) {
+//          logger.debug("caught Exception:", e);
+//        }
+//
+//        // adding Participants is possible only in the first phase
+//        if(isCoordinatorInFirstPhase(con))  //add a new Participant (first phase in progress)
+//        {
+//          stateManager.setStateForNeedUri(BAPCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
+//          logger.debug("Coordinator state: " + stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+//          logger.debug("Coordinator state indicator: {}", stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()).getPhase());
+//        }
+//        else  // second phase in progress, new participants can not be added anymore
+//        {
+//          logger.debug("It is not possible to add more participants. The second phase of the protocol has already been started.");
+//          Model myContent = ModelFactory.createDefaultModel();
+//          myContent.setNsPrefix("","no:uri");
+//          Resource res = myContent.createResource("no:uri");
+//          //close the initiated connection
+//          try {
+//            ownerFacingConnectionClient.close(con.getConnectionURI(), myContent);
+//            needFacingConnectionClient.close(con, myContent);   //abort sent to participant
+//          } catch (Exception e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//          }
+//        }
+//      }
+//    });
+//  }
 
   //Coordinator sends message to Participant
   public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {

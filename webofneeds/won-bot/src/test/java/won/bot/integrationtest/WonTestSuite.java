@@ -26,22 +26,21 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses(
         {ConversationBotTest.class,
-                GroupingBotTest.class,
-                CommentBotTest.class,
-                BACCBotTest.class,
-                BAPCBotTest.class,
-                MatcherBotTest.class,
-
-                BAAtomicCCActiveExitingBotTest.class,
-                BAAtomicCCActiveFailingBotTest.class,
-                BAAtomicCCActiveNotCompletingBotTest.class,
-                BAAtomicCCBotTest.class,
-                BAAtomicCCCompletingFailingBotTest.class,
-                BAAtomicCCCompletingNotCompletingBotTest.class,
-                BAAtomicPCActiveExitingBotTest.class,
-                BAAtomicPCActiveFailingBotTest.class,
-                BAAtomicPCActiveNotCompletingBotTest.class,
-                BAAtomicPCBotTest.class
+         GroupingBotTest.class,
+         CommentBotTest.class,
+         BACCBotTest.class,
+         BAPCBotTest.class,
+         MatcherBotTest.class,
+         BAAtomicCCActiveExitingBotTest.class,
+         BAAtomicCCActiveFailingBotTest.class,
+         BAAtomicCCActiveNotCompletingBotTest.class,
+         BAAtomicCCBotTest.class,
+         BAAtomicCCCompletingFailingBotTest.class,
+         BAAtomicCCCompletingNotCompletingBotTest.class,
+         BAAtomicPCActiveExitingBotTest.class,
+         BAAtomicPCActiveFailingBotTest.class,
+         BAAtomicPCActiveNotCompletingBotTest.class,
+         BAAtomicPCBotTest.class
         })
 public class WonTestSuite
 {

@@ -39,6 +39,10 @@ public class RegisterMatcherAction extends BaseEventBotAction
     @Override
   protected void doRun(Event event) throws Exception
   {
+    if (getEventListenerContext().getNeedProducer().isExhausted()){
+        logger.debug("bot's need procucer is exhausted.");
+        return;
+    }
     final Iterator wonNodeUriIterator = getEventListenerContext().getMatcherNodeURISource().getNodeURIIterator();
 
       while (wonNodeUriIterator.hasNext()){
