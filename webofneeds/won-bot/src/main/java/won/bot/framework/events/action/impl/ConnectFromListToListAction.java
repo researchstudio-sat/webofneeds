@@ -63,8 +63,8 @@ public class ConnectFromListToListAction extends BaseEventBotAction
 
           List<URI> fromNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(fromListName);
           List<URI> toNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(toListName);
-          logger.info("tmp: Need size is "+toNeeds.size());
-        logger.debug("connecting {} needs from list {} to {} needs from list {}", new Object[]{fromNeeds.size(),fromListName, toNeeds.size(), toListName});
+          logger.debug("connecting needs from list \"{}\" ({}) to needs from list \"{}\" ({})",
+            new Object[]{fromListName,fromNeeds, toListName, toNeeds});
           long start = System.currentTimeMillis();
           long count = 0;
           if (fromListName.equals(toListName)){

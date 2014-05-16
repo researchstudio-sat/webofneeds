@@ -13,13 +13,20 @@ import java.util.List;
 public abstract class BATestBotScript {
     private List<BATestScriptAction> actions;
     private Iterator<BATestScriptAction> iterator;
+  private String name;
 
-    public BATestBotScript() {
+  public BATestBotScript(String name) {
         this.actions = setupActions();
         this.iterator = actions.iterator();
+                                    this.name = name;
     }
 
-    protected abstract List<BATestScriptAction> setupActions();
+  protected BATestBotScript() {
+    this("");
+    this.name = (getClass().getSimpleName() + "@" + Integer.toHexString(hashCode()));
+  }
+
+  protected abstract List<BATestScriptAction> setupActions();
 
     public BATestScriptAction getNextAction() {
         return iterator.next();
@@ -29,4 +36,11 @@ public abstract class BATestBotScript {
         return iterator.hasNext();
     }
 
+  public String getName() {
+    return name;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
+  }
 }

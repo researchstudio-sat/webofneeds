@@ -44,37 +44,31 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractFacet {
             @Override
             public void run()
             {
-                try {
-                  ownerFacingConnectionClient.open(con.getConnectionURI(), content);
+              try {
+
+                // adding Participants is possible only in the first phase
+                if(isCoordinatorInFirstPhase(con))  //add a new Participant (first phase in progress)
+                {
                   stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
+                  ownerFacingConnectionClient.open(con.getConnectionURI(), content);
                   logger.debug("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
                   logger.debug("Coordinator state phase: {}", stateManager.getStateForNeedUri(con.getNeedURI(),
-                                                                                            con.getRemoteNeedURI()).getPhase());
-
-
-                  // adding Participants is possible only in the first phase
-                  if(isCoordinatorInFirstPhase(con))  //add a new Participant (first phase in progress)
-                  {
-                      stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
-                      logger.debug("Coordinator state: " + stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
-                      logger.debug("Coordinator state phase: {}", stateManager.getStateForNeedUri(con.getNeedURI(),
-                                                                                             con.getRemoteNeedURI()).getPhase());
-                  }
-                  else  // second phase in progress, new participants can not be added anymore
-                  {
-                      logger.debug("It is not possible to add more participants. The second phase of the protocol has already been started.");
-                      Model myContent = ModelFactory.createDefaultModel();
-                      myContent.setNsPrefix("","no:uri");
-                      Resource res = myContent.createResource("no:uri");
-                      //close the initiated connection
-
-                      ownerFacingConnectionClient.close(con.getConnectionURI(), myContent);
-                      needFacingConnectionClient.close(con, myContent);   //abort sent to participant
-
-                  }
-                } catch (Exception e) {
-                  logger.warn("caught Exception:", e);
+                    con.getRemoteNeedURI()).getPhase());
                 }
+                else  // second phase in progress, new participants can not be added anymore
+                {
+                    logger.debug("It is not possible to add more participants. The second phase of the protocol has already been started.");
+                    Model myContent = ModelFactory.createDefaultModel();
+                    myContent.setNsPrefix("","no:uri");
+                    Resource res = myContent.createResource("no:uri");
+                    //TODO: add an explanation (error message) to the model, detailing that it's too late to
+                    // participate in the transaction now
+                    //close the initiated connection
+                    needFacingConnectionClient.close(con, myContent);   //abort sent to participant
+                }
+              } catch (Exception e) {
+                logger.warn("could not handle participant connect", e);
+              }
             }
         });
     }
@@ -395,13 +389,31 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractFacet {
         List<Connection> listOfCons = getAllCoordinatorParticipantConnections(con);
         URI ownerUri, needUri;
         BACCState currentState;
+        logger.debug("checking if coordinator is in first phase for connection {}", con.getConnectionURI());
+
         for(Connection c: listOfCons)
         {
             ownerUri = c.getNeedURI();
             needUri = c.getRemoteNeedURI();
-            currentState = stateManager.getStateForNeedUri(ownerUri, needUri);
-            if(currentState.getPhase() == BACCState.Phase.SECOND)
-                return false;
+            logger.debug("checking if coordinator is in first phase for coordinator {} and participant {}", ownerUri,
+              needUri);
+          currentState = stateManager.getStateForNeedUri(ownerUri, needUri);
+          logger.debug("state is {}: ", currentState);
+          if (currentState == null){
+            //this happens when a connection is being opened in a parallel thread
+            //and execution hasn't yet reached the point where its state is recorded
+            //That other connection definitely hasn't caused phase 2 to start, so
+            //we can safely say we're still in phase 1.
+            //Therefore, continue with the next check.
+            logger.debug("ignoring connection {} for phase one check as it" +
+              " hasn't been processed by the facet logic yet",
+              c.getConnectionURI());
+            continue;
+          }
+          logger.debug("phase is {}: ", currentState.getPhase());
+          if(currentState.getPhase() == BACCState.Phase.SECOND){
+            return false;
+          }
         }
         return true;
     }
