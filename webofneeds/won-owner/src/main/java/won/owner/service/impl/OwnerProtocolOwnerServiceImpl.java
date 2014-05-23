@@ -203,7 +203,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
                 con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI()) ||
                 con.getTypeURI().equals(FacetType.BACCParticipantFacet.getURI()) ||
                 con.getTypeURI().equals(FacetType.BAAtomicPCCoordinatorFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BAAtomicPCParticipantFacet.getURI()))
+                con.getTypeURI().equals(FacetType.BAAtomicCCCoordinatorFacet.getURI()))
         {
             baFacetType = true;
             stmtIterator = baseRes.listProperties(WON.COORDINATION_MESSAGE);

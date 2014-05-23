@@ -55,6 +55,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     this.coordinatorURI = coordinatorURI;
     this.participantURI = participantURI;
     this.millisBetweenMessages = millisBetweenMessages;
+    this.name=script.getName();
   }
 
   public BATestScriptListener(final EventListenerContext context, final String name, final BATestBotScript script,
@@ -78,7 +79,12 @@ public class BATestScriptListener extends AbstractFinishingListener
   @Override
   public boolean isFinished() {
     synchronized (countMonitor) {
-      return (!script.hasNext()) && messagesInFlight == 0;
+      //messagesInFlight may become negative if a message is received that we didn't send.
+      boolean bFinished =(!script.hasNext()) && messagesInFlight <= 0;
+      logger.debug("isFinished()=={}, scripts.hasNext()=={}, messagesInFlight =={}", new Object[]{bFinished,
+        script.hasNext(),
+        messagesInFlight});
+      return bFinished;
     }
   }
 
@@ -92,6 +98,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     if (!(event instanceof NeedSpecificEvent && event instanceof ConnectionSpecificEvent)) {
       return;
     }
+    logger.debug("handling event: {}", event);
     //extract need URI and connection URI from event
     URI needURI = ((NeedSpecificEvent) event).getNeedURI();
     URI connectionURI = ((ConnectionSpecificEvent) event).getConnectionURI();
@@ -123,6 +130,7 @@ public class BATestScriptListener extends AbstractFinishingListener
 
     if (event instanceof ConnectFromOtherNeedEvent){
       //send an automatic open
+      logger.debug("sending automatic open in response to connect");
       sendOpen(connectionURI, new Date(System.currentTimeMillis() + millisBetweenMessages));
       return;
     }
@@ -131,11 +139,26 @@ public class BATestScriptListener extends AbstractFinishingListener
     if (this.script.hasNext()){
       //if there is an action, execute it.
       BATestScriptAction action = this.script.getNextAction();
-      URI fromCon = getConnectionToSendFrom(action.isSenderIsCoordinator());
-      sendMessage(action, fromCon, new Date(System.currentTimeMillis() + millisBetweenMessages));
-      synchronized (countMonitor){
-        this.messagesInFlight++;
+      logger.debug("executing next script action: {}", action);
+      if (!action.isNopAction()){
+        URI fromCon = getConnectionToSendFrom(action.isSenderIsCoordinator());
+        logger.debug("sending message for action {} on connection {}", action, fromCon);
+        sendMessage(action, fromCon, new Date(System.currentTimeMillis() + millisBetweenMessages));
+        synchronized (countMonitor){
+          this.messagesInFlight++;
+        }
+      } else {
+        logger.debug("not sending any messages for action {}", action);
+        //if there are no more messages in the script, we're done:
+        // it means we don't expect to receive more messages from anyone else, and
+        // because we don't send one, we won't receive one from ourselves
+        if (!script.hasNext()){
+          logger.debug("unsubscribing from all events as last script action is NOP");
+          performFinish();
+        }
       }
+    } else {
+      logger.debug("script has no more actions.");
     }
     //in any case: remember that we processed a message. Especially important for the message sent
     //through the last action, which we have to process as well otherwise the listener will finish too early
@@ -235,7 +258,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     }
   }
 
-  private void updateFilterForBothConnectionURIs() {
+  public void updateFilterForBothConnectionURIs() {
     OrFilter filter = new OrFilter();
     filter.addFilter(new ConnectionUriEventFilter(this.coordinatorSideConnectionURI));
     filter.addFilter(new ConnectionUriEventFilter(this.participantSideConnectionURI));
@@ -253,10 +276,35 @@ public class BATestScriptListener extends AbstractFinishingListener
       .participantSideConnectionURI);
   }
 
+  public URI getCoordinatorURI() {
+    return coordinatorURI;
+  }
+
+  public URI getParticipantURI() {
+    return participantURI;
+  }
+
+  public URI getCoordinatorSideConnectionURI() {
+    return coordinatorSideConnectionURI;
+  }
+
+  public URI getParticipantSideConnectionURI() {
+    return participantSideConnectionURI;
+  }
+
+  public void setCoordinatorSideConnectionURI(final URI coordinatorSideConnectionURI) {
+    this.coordinatorSideConnectionURI = coordinatorSideConnectionURI;
+  }
+
+  public void setParticipantSideConnectionURI(final URI participantSideConnectionURI) {
+    this.participantSideConnectionURI = participantSideConnectionURI;
+  }
+
   @Override
   public String toString() {
-    return "BATestScriptListener" + "@" + Integer.toHexString(hashCode()) + "{" +
-      "coordinatorURI=" + coordinatorURI +
+    return "BATestScriptListener" + "{" +
+      "name=" + name +
+      ", coordinatorURI=" + coordinatorURI +
       ", participantURI=" + participantURI +
       ", coordinatorSideConnectionURI=" + coordinatorSideConnectionURI +
       ", participantSideConnectionURI=" + participantSideConnectionURI +

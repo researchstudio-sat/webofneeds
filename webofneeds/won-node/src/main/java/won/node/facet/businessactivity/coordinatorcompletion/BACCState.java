@@ -14,31 +14,7 @@ import java.net.URI;
  * To change this template use File | Settings | File Templates.
  */
 public enum BACCState {
-    SUGGESTED("Suggested"){
-        public BACCState transit(BACCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
-    REQUEST_SENT("RequestSent"){
-        public BACCState transit(BACCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
-    REQUEST_RECEIVED("RequestReceived"){
-        public BACCState transit(BACCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
-    CONNECTED("Connected"){
-        public BACCState transit(BACCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
-    ACTIVE("Active"){
+    ACTIVE("Active", Phase.FIRST){
         public BACCState transit(BACCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -57,7 +33,8 @@ public enum BACCState {
             }
         }
     },
-    CANCELING_ACTIVE("CancelingActive"){
+
+    CANCELING_ACTIVE("CancelingActive", Phase.FIRST){
         public BACCState transit(BACCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -71,7 +48,6 @@ public enum BACCState {
                     return FAILING_ACTIVE_CANCELING_COMPLETING;
                 case MESSAGE_CANCELED:
                     return ENDED;
-
                 case MESSAGE_CANNOTCOMPLETE:
                     return NOT_COMPLETING;
                 default:
@@ -79,7 +55,7 @@ public enum BACCState {
             }
         }
     },
-    CANCELING_COMPLETING("CancelingActive"){
+    CANCELING_COMPLETING("CancelingCompleting", Phase.FIRST){
         public BACCState transit(BACCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -102,7 +78,7 @@ public enum BACCState {
             }
         }
     },
-    COMPLETING("Completing"){
+    COMPLETING("Completing", Phase.FIRST){
       public BACCState transit(BACCEventType msg)
       {
           resendEvent = null;
@@ -124,7 +100,7 @@ public enum BACCState {
           }
       }
     },
-    COMPLETED("Completed"){
+    COMPLETED("Completed", Phase.FIRST){
         public BACCState transit(BACCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -144,7 +120,7 @@ public enum BACCState {
             }
         }
     },
-    CLOSING("Closing") {
+    CLOSING("Closing", Phase.FIRST) {
         public BACCState transit (BACCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -164,7 +140,7 @@ public enum BACCState {
             }
         }
     },
-    COMPENSATING("Compensating"){
+    COMPENSATING("Compensating", Phase.FIRST){
         public BACCState transit (BACCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -186,7 +162,7 @@ public enum BACCState {
             }
         }
     },
-    FAILING_ACTIVE_CANCELING_COMPLETING("FailingActiveCancelingCompleting") {
+    FAILING_ACTIVE_CANCELING_COMPLETING("FailingActiveCancelingCompleting", Phase.FIRST) {
         public BACCState transit (BACCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -198,12 +174,14 @@ public enum BACCState {
                     return FAILING_ACTIVE_CANCELING_COMPLETING;
                 case MESSAGE_FAIL:
                     return FAILING_ACTIVE_CANCELING_COMPLETING;
+                case MESSAGE_FAILED:
+                    return ENDED;
                 default:
                     return FAILING_ACTIVE_CANCELING_COMPLETING;
             }
         }
     },
-    FAILING_COMPENSATING("FailingCompensating") {
+    FAILING_COMPENSATING("FailingCompensating", Phase.FIRST) {
         public BACCState transit (BACCEventType msg) {
             resendEvent = null;
             switch (msg) {
@@ -225,7 +203,7 @@ public enum BACCState {
             }
         }
     },
-    NOT_COMPLETING("NotCompleting"){
+    NOT_COMPLETING("NotCompleting", Phase.FIRST){
         public BACCState transit (BACCEventType msg) {
             resendEvent = null;
             switch (msg) {
@@ -244,7 +222,7 @@ public enum BACCState {
             }
         }
     },
-    EXITING("Exiting") {
+    EXITING("Exiting", Phase.FIRST) {
         public BACCState transit (BACCEventType msg) {
             resendEvent = null;
             switch (msg) {
@@ -262,7 +240,7 @@ public enum BACCState {
             }
         }
     },
-    ENDED("Ended") {
+    ENDED("Ended", Phase.FIRST) {
         public BACCState transit (BACCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -306,7 +284,7 @@ public enum BACCState {
             }
         }
     },
-    CLOSED("Closed"){
+    CLOSED("Closed", Phase.FIRST){
         public BACCState transit(BACCEventType msg){
             resendEvent = null;
             return null;
@@ -316,11 +294,19 @@ public enum BACCState {
     private static final Logger logger = LoggerFactory.getLogger(BACCState.class);
 
     private String name;
+    private Phase phase;
     private static BACCEventType resendEvent = null;
+    public static enum Phase {FIRST, SECOND, CANCELED_FROM_COORDINATOR};
+
+    private BACCState(String name, Phase phase)
+    {
+        this.name = name;
+        this.phase = phase;
+    }
 
     private BACCState(String name)
     {
-        this.name = name;
+        this(name, Phase.FIRST);
     }
 
     public BACCEventType getResendEvent(){
@@ -368,6 +354,14 @@ public enum BACCState {
     public URI getURI()
     {
         return URI.create(WON.BASE_URI + name);
+    }
+
+    public Phase getPhase() {
+        return phase;
+    }
+
+    public void setPhase (Phase phase) {
+        this.phase = phase;
     }
 
 

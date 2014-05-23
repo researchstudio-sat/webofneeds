@@ -1,7 +1,6 @@
 package won.bot.framework.events.listener.baStateBots;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import won.protocol.util.WonRdfUtils;
 
@@ -40,7 +39,6 @@ public class BATestScriptAction {
     public BATestScriptAction(boolean senderIsParticipant, URI coordinationMessageUriToBeSent,URI stateOfSenderBeforeSending) {
         this.senderIsParticipant = senderIsParticipant;
         this.stateOfSenderBeforeSending = stateOfSenderBeforeSending;
-        System.out.println(("daki Dodaj: "+coordinationMessageUriToBeSent.toString()));
         this.messageToBeSent = WonRdfUtils.MessageUtils.genericMessage(WON_BA.COORDINATION_MESSAGE, new ResourceImpl(coordinationMessageUriToBeSent.toString()));
     }
 
@@ -59,4 +57,17 @@ public class BATestScriptAction {
     public URI getStateOfSenderBeforeSending() {
         return stateOfSenderBeforeSending;
     }
+
+    public boolean isNopAction(){
+      return false;
+    }
+
+  @Override
+  public String toString() {
+    return "BATestScriptAction{" +
+      "senderIsParticipant=" + senderIsParticipant +
+      ", messageToBeSent=" + messageToBeSent +
+      ", stateOfSenderBeforeSending=" + stateOfSenderBeforeSending +
+      '}';
+  }
 }

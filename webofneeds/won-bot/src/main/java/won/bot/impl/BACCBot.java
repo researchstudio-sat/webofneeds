@@ -1,8 +1,9 @@
 package won.bot.impl;
 
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
+import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.*;
 import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.*;
-import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordinationnMessageAsTextBots.*;
+import won.protocol.model.FacetType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,16 @@ import java.util.List;
  */
 public class BACCBot extends BABaseBot {
 
+
+  @Override
+  protected FacetType getParticipantFacetType() {
+    return FacetType.BACCParticipantFacet;
+  }
+
+  @Override
+  protected FacetType getCoordinatorFacetType() {
+    return FacetType.BACCCoordinatorFacet;
+  }
 
   @Override
   protected List<BATestBotScript> getScripts() {

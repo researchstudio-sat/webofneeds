@@ -63,7 +63,8 @@ public class ConnectFromListToListAction extends BaseEventBotAction
 
           List<URI> fromNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(fromListName);
           List<URI> toNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(toListName);
-          logger.debug("connecting {} needs from list {} to {} needs from list {}", new Object[]{fromNeeds.size(),fromListName, toNeeds.size(), toListName});
+          logger.debug("connecting needs from list \"{}\" ({}) to needs from list \"{}\" ({})",
+            new Object[]{fromListName,fromNeeds, toListName, toNeeds});
           long start = System.currentTimeMillis();
           long count = 0;
           if (fromListName.equals(toListName)){
@@ -85,6 +86,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction
                   for (URI toUri:toNeeds) {
                       try{
                         count ++;
+                        logger.info("tmp: Connect {} with {}",fromUri.toString(), toUri.toString());
                         performConnect(fromUri, toUri, new Date(start + count * millisBetweenCalls));
                       } catch (Exception e) {
                           logger.warn("could not connect {} and {}", new Object[]{fromUri, toUri}, e);
@@ -103,12 +105,13 @@ public class ConnectFromListToListAction extends BaseEventBotAction
       {
         try {
           logger.debug("connecting needs {} and {}",fromUri,toUri);
+          logger.info("tmp: connecting needs {} and {}",fromUri,toUri);
           if (connectHook != null){
             connectHook.onConnect(fromUri, toUri);
           }
           getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet));
         } catch (Exception e) {
-          logger.warn("could not connect {} and {}", fromUri, toUri);
+          logger.warn("could not connect {} and {}", fromUri, toUri);  //throws
           logger.warn("caught exception", e);
         }
       }

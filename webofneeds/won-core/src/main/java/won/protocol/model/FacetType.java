@@ -27,7 +27,7 @@ public enum FacetType {
     BACCCoordinatorFacet("BACCCoordinatorFacet"),
     BACCParticipantFacet("BACCParticipantFacet"),
     BAAtomicPCCoordinatorFacet("BAAtomicPCCoordinatorFacet"),
-    BAAtomicPCParticipantFacet("BAAtomicPCParticipantFacet");
+    BAAtomicCCCoordinatorFacet("BAAtomicCCCoordinatorFacet");
 
 
 
@@ -64,8 +64,8 @@ public enum FacetType {
            return FacetType.BACCParticipantFacet;
        else if(uri.equals(FacetType.BAAtomicPCCoordinatorFacet.getURI()))
            return FacetType.BAAtomicPCCoordinatorFacet;
-       else if(uri.equals(FacetType.BAAtomicPCParticipantFacet.getURI()))
-           return FacetType.BAAtomicPCParticipantFacet;
+       else if(uri.equals(FacetType.BAAtomicCCCoordinatorFacet.getURI()))
+           return FacetType.BAAtomicCCCoordinatorFacet;
        else if (uri.equals(FacetType.CommentFacet.getURI()))
            return FacetType.CommentFacet;
        else if(uri.equals(FacetType.CommentModeratedFacet.getURI()))

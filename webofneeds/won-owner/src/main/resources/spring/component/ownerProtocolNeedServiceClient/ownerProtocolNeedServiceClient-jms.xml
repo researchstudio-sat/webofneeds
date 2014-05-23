@@ -33,7 +33,7 @@
     <bean id="ownerProtocolCamelConfigurator" class="won.owner.messaging.OwnerProtocolCamelConfiguratorImpl" >
        <property name="startingComponent" value="seda:"/>
         <property name="componentName" value="activemq"/>
-        <property name="defaultNodeURI" value="${uri.node.default}"/>
+        <property name="defaultNodeURI"  value="${uri.node.default}"/>
     </bean>
 
     <bean id="ownerActiveMQService" class="won.protocol.jms.ActiveMQServiceImpl">

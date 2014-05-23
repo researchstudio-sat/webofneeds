@@ -59,7 +59,7 @@ public class ConversationBotTest
   SpringAwareBotManagerImpl botManager;
 
   /**
-   * This is run before each @Test method.
+   * This is run before each @TestD method.
    */
   @Before
   public void before(){
@@ -105,7 +105,7 @@ public class ConversationBotTest
   public static class MyBot extends ConversationBot
   {
     /**
-     * Used for synchronization with the @Test method: it should wait at the
+     * Used for synchronization with the @TestD method: it should wait at the
      * barrier until our bot is done, then execute the asserts.
      */
     CyclicBarrier barrier = new CyclicBarrier(2);

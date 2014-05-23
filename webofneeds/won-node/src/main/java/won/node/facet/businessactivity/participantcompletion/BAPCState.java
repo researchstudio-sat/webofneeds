@@ -14,31 +14,7 @@ import java.net.URI;
  * To change this template use File | Settings | File Templates.
  */
 public enum BAPCState {
-    SUGGESTED("Suggested"){
-        public BAPCState transit(BAPCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
-    REQUEST_SENT("RequestSent"){
-        public BAPCState transit(BAPCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
-    REQUEST_RECEIVED("RequestReceived"){
-        public BAPCState transit(BAPCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
-    CONNECTED("Connected"){
-        public BAPCState transit(BAPCEventType msg){
-            resendEvent = null;
-            return null;
-        }
-    },
-    ACTIVE("Active"){
+    ACTIVE("Active", Phase.FIRST){
         public BAPCState transit(BAPCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -57,7 +33,7 @@ public enum BAPCState {
             }
         }
     },
-    CANCELING("Canceling"){
+    CANCELING("Canceling", Phase.FIRST){
         public BAPCState transit(BAPCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -78,7 +54,7 @@ public enum BAPCState {
             }
         }
     },
-    COMPLETED("Completed"){
+    COMPLETED("Completed", Phase.FIRST){
         public BAPCState transit(BAPCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -96,7 +72,7 @@ public enum BAPCState {
             }
         }
     },
-    CLOSING("Closing") {
+    CLOSING("Closing", Phase.FIRST) {
         public BAPCState transit (BAPCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -114,7 +90,7 @@ public enum BAPCState {
             }
         }
     },
-    COMPENSATING("Compensating"){
+    COMPENSATING("Compensating", Phase.FIRST){
         public BAPCState transit (BAPCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -134,7 +110,7 @@ public enum BAPCState {
             }
         }
     },
-    FAILING_ACTIVE_CANCELING("FailingActiveCanceling") {
+    FAILING_ACTIVE_CANCELING("FailingActiveCanceling", Phase.FIRST) {
         public BAPCState transit (BAPCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -150,7 +126,7 @@ public enum BAPCState {
             }
         }
     },
-    FAILING_COMPENSATING("FailingCompensating") {
+    FAILING_COMPENSATING("FailingCompensating", Phase.FIRST) {
         public BAPCState transit (BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
@@ -170,7 +146,7 @@ public enum BAPCState {
             }
         }
     },
-    NOT_COMPLETING("NotCompleting"){
+    NOT_COMPLETING("NotCompleting", Phase.FIRST){
         public BAPCState transit (BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
@@ -186,7 +162,7 @@ public enum BAPCState {
             }
         }
     },
-    EXITING("Exiting") {
+    EXITING("Exiting", Phase.FIRST) {
         public BAPCState transit (BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
@@ -202,7 +178,7 @@ public enum BAPCState {
             }
         }
     },
-    ENDED("Ended") {
+    ENDED("Ended", Phase.FIRST) {
         public BAPCState transit (BAPCEventType msg){
             resendEvent = null;
             switch (msg) {
@@ -243,7 +219,7 @@ public enum BAPCState {
             }
         }
     },
-    CLOSED("Closed"){
+    CLOSED("Closed", Phase.FIRST){
         public BAPCState transit(BAPCEventType msg){
             resendEvent = null;
             return null;
@@ -253,11 +229,19 @@ public enum BAPCState {
     private static final Logger logger = LoggerFactory.getLogger(BAPCState.class);
 
     private String name;
+    private Phase phase;
     private static BAPCEventType resendEvent = null;
+    public static enum Phase{FIRST, SECOND, CANCELED_FROM_COORDINATOR};
+
+    private BAPCState(String name, Phase phase)
+    {
+      this.name = name;
+      this.phase = phase;
+    }
 
     private BAPCState(String name)
     {
-        this.name = name;
+      this(name, Phase.FIRST);
     }
 
 
@@ -304,6 +288,14 @@ public enum BAPCState {
     public URI getURI()
     {
         return URI.create(WON.BASE_URI + name);
+    }
+
+    public Phase getPhase() {
+      return phase;
+    }
+
+    public void setPhase(Phase phase) {
+      this.phase = phase;
     }
 
 

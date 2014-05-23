@@ -165,7 +165,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
       /*if(!eventType.isMessageAllowed(con.getState())){
         throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
       }*/ else {
-        //TODO: Move this to the transition() - Method in ConnectionState
+        //TODO: Move this to the transition() - Method in ATConnectionState
         con.setState(con.getState().transit(eventType));
         con = connectionRepository.save(con);
       }
@@ -269,7 +269,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   }
 
   /**
-   * Calculates the connectionState resulting from the message in the current connection state.
+   * Calculates the ATConnectionState resulting from the message in the current connection state.
    * Checks if the specified message is allowed in the connection's state and throws an exception if not.
    *
    * @param con

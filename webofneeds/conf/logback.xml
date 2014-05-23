@@ -47,6 +47,10 @@
     <!-- SET to DEBUG to see more info about need creation -->
     <logger name="won.bot.framework.component.needproducer" level="INFO"/>
 
+    <!-- Temporal -->
+    <logger name="won.bot.impl.BAAtomicCCAdditionalParticipants" level="DEBUG" />
+    <logger name="won.bot.impl.BAAtomicCCActiveExitingBot" level="DEBUG" />
+
     <root level="debug">
         <appender-ref ref="STDOUT"/>
     </root>
