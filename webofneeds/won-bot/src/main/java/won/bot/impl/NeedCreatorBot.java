@@ -51,7 +51,7 @@ public class NeedCreatorBot extends EventBot
 
     final Counter needCreationSuccessfulCounter = new CounterImpl("needsCreated");
     final Counter needCreationFailedCounter = new CounterImpl("needCreationFailed");
-    final Counter creationFinishedCounter = new CounterImpl("creationFinished");
+    final Counter needCreationStartedCounter = new CounterImpl("creationStarted");
 
     //create a targeted counter that will publish an event when the taget is reached
     //in this case, 0 unfinished need creations means that all needs were created
@@ -61,7 +61,7 @@ public class NeedCreatorBot extends EventBot
     this.groupMemberCreator = new ActionOnEventListener(
       ctx, "groupMemberCreator",
       new MultipleActions(ctx,
-        new IncrementCounterAction(ctx, creationFinishedCounter),
+        new IncrementCounterAction(ctx, needCreationStartedCounter),
         new IncrementCounterAction(ctx, creationUnfinishedCounter),
         new CreateNeedWithFacetsAction(ctx)
       ),
@@ -74,16 +74,16 @@ public class NeedCreatorBot extends EventBot
       int lastOutput = 0;
       @Override
       protected void doRun(final Event event) throws Exception {
-        int cnt = creationFinishedCounter.getCount();
+        int cnt = needCreationStartedCounter.getCount();
         int unfinishedCount = creationUnfinishedCounter.getCount();
         int successCnt = needCreationSuccessfulCounter.getCount();
         int failedCnt = needCreationFailedCounter.getCount();
         if (cnt - lastOutput >= 200) {
           logger.info("started creation of {} needs, creation not yet finished for {}. Successful: {}, failed: {}",
             new Object[]{cnt,
-            unfinishedCount,
-            successCnt,
-            failedCnt});
+                         unfinishedCount,
+                         successCnt,
+                         failedCnt});
           lastOutput = cnt;
         }
       }
