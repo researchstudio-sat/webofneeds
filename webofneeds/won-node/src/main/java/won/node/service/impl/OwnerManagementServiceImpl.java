@@ -24,7 +24,7 @@ public class OwnerManagementServiceImpl implements ApplicationManagementService 
     private QueueManagementServiceImpl queueManagementService;
 
     @Override
-    public String registerOwnerApplication() {
+    public String  registerOwnerApplication() {
         UUID ownerApplicationId = UUID.randomUUID();  //TODO: owner application id generation shall be reviewed.
         logger.info("ownerApplicationId: "+ownerApplicationId.toString() );
         OwnerApplication ownerApplication = new OwnerApplication();

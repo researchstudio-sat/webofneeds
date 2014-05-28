@@ -47,7 +47,7 @@ public class ModelHolder
   private URI uri;
 
   //the model as a byte array
-  @Lob @Column( name = "model", nullable = false)
+  @Lob @Column( name = "model", nullable = false, length = 100000)
   private byte[] modelBytes;
 
   //for multiple accesses to model, cache it.

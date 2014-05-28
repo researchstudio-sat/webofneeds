@@ -64,15 +64,15 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
             @Header("ownerApplicationID") String ownerApplicationID,
             Exchange exchange) throws IllegalNeedContentException, JMSException {
 
-        URI connectionURI = null;
+        URI needURI = null;
         URI ownerURIconvert = URI.create(ownerURI);
         Model contentconvert = RdfUtils.toModel(content);
 
         logger.debug("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
-        connectionURI = delegate.createNeed(ownerURIconvert, contentconvert, activate,ownerApplicationID );
-        exchange.getOut().setBody(connectionURI);
+        needURI = delegate.createNeed(ownerURIconvert, contentconvert, activate,ownerApplicationID );
+        exchange.getOut().setBody(needURI);
 
-       return connectionURI;
+       return needURI;
     }
 
     public void activate(

@@ -100,7 +100,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   {
     List<URI> ret = new LinkedList<URI>();
     Need need = DataAccessUtils.loadNeed(needRepository, needUri);
-    Model content = rdfStorageService.loadContent(need);
+    Model content = rdfStorageService.loadContent(need.getNeedURI());
     if (content == null) return ret;
     Resource baseRes = content.getResource(content.getNsPrefixURI(""));
     StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);

@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.node.rdfstorage.RDFStorageService;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ModelHolder;
-import won.protocol.model.Need;
 import won.protocol.repository.ModelHolderRepostory;
 
 import java.net.URI;
@@ -36,16 +35,6 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   private ModelHolderRepostory modelHolderRepostory;
 
   @Override
-  public void storeContent(final Need need, final Model graph) {
-    storeContent(need.getNeedURI(), graph);
-  }
-
-  @Override
-  public Model loadContent(final Need need) {
-    return loadContent(need.getNeedURI());
-  }
-
-  @Override
   public void storeContent(final ConnectionEvent event, final Model graph) {
     storeContent(createEventURI(event), graph);
   }
@@ -57,8 +46,13 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
 
   @Override
   public void storeContent(final URI resourceURI, final Model model) {
-    ModelHolder holder = new ModelHolder(resourceURI, model);
-    modelHolderRepostory.save(holder);
+    ModelHolder modelHolder = modelHolderRepostory.findOne(resourceURI);
+    if (modelHolder!=null){
+      modelHolder.setModel(model);
+    } else{
+      modelHolder = new ModelHolder(resourceURI, model);
+    }
+    modelHolderRepostory.save(modelHolder);
   }
 
   @Override

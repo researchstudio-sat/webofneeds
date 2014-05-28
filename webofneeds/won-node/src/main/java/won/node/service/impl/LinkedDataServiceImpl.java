@@ -136,7 +136,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Need need = needInformationService.readNeed(needUri);
 
     // load the model from storage
-    Model model = rdfStorage.loadContent(need);
+    Model model = rdfStorage.loadContent(need.getNeedURI());
     setNsPrefixes(model);
 
     Model needModel = needModelMapper.toModel(need);

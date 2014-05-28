@@ -9,6 +9,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.node.rdfstorage.RDFStorageService;
 import won.node.service.DataAccessService;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
@@ -61,6 +62,8 @@ public abstract class AbstractFacet implements Facet
   protected ExecutorService executorService;
 
   protected DataAccessService dataService;
+
+  protected RDFStorageService rdfStorageService;
 
   /**
    *
@@ -325,6 +328,7 @@ public abstract class AbstractFacet implements Facet
         try {
           ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
           dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
+
         } catch (WonProtocolException e) {
           // we can't connect the connection. we send a close back to the owner
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
@@ -426,4 +430,9 @@ public abstract class AbstractFacet implements Facet
   public void setOwnerProtocolOwnerService(OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService) {
     this.ownerProtocolOwnerService = ownerProtocolOwnerService;
   }
+
+  public void setRdfStorageService(final RDFStorageService rdfStorageService) {
+    this.rdfStorageService = rdfStorageService;
+  }
+
 }
