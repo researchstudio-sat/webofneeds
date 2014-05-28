@@ -86,7 +86,7 @@ public class CommentBot extends EventBot
               ctx,
           2, new CloseConnectionAction(ctx)
       );
-      bus.subscribe( ConnectFromOtherNeedEvent.class, this.connectionCloser);
+      bus.subscribe(ConnectFromOtherNeedEvent.class, this.connectionCloser);
       bus.subscribe(OpenFromOtherNeedEvent.class,this.connectionCloser);
 
       //add a listener that auto-responds to a close message with a deactivation of both needs.
