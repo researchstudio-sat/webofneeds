@@ -108,7 +108,6 @@ public class LinkedDataWebController
   private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
 
 
-
   @Autowired
   private URIService uriService;
 
@@ -258,8 +257,7 @@ public class LinkedDataWebController
 
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = new HttpHeaders();
-    headers = addNeverExpiresHeadersForNonListEntities(headers, requestUri);
-    headers = addNeverExpiresHeaders(headers);
+    headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
     headers.add("Location",redirectToURI);
     return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(null, headers, HttpStatus.SEE_OTHER);
   }
@@ -289,14 +287,22 @@ public class LinkedDataWebController
     }
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = new HttpHeaders();
-    headers = addNeverExpiresHeadersForNonListEntities(headers, requestUri);
+    headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
 
     //add a location header
     headers.add("Location",redirectToURI);
     return new ResponseEntity<String>("", headers, HttpStatus.SEE_OTHER);
   }
 
-  public HttpHeaders addNeverExpiresHeadersForNonListEntities(HttpHeaders headers, final String requestUri) {
+  /**
+   * If the request URI is the URI of a list page (list of needs, list of connections) it gets the
+   * header that says 'already expired' so that crawlers re-download these data. For other URIs, the
+   * 'never expires' header is added.
+   * @param headers
+   * @param requestUri
+   * @return
+   */
+  public HttpHeaders addExpiresHeadersBasedOnRequestURI(HttpHeaders headers, final String requestUri) {
     //now, we want to suppress the 'never expires' header information
     //for /resource/need and resource/connection so that crawlers always re-fetch these data
     URI requestUriAsURI = URI.create(requestUri);
@@ -304,6 +310,8 @@ public class LinkedDataWebController
     if (! (requestPath.replaceAll("/$","").endsWith(this.connectionResourceURIPath.replaceAll("/$", "")) ||
            requestPath.replaceAll("/$","").endsWith(this.needResourceURIPath.replaceAll("/$", "")))) {
       headers = addNeverExpiresHeaders(headers);
+    } else {
+      headers = addAlreadyExpiredHeaders(headers);
     }
     return headers;
   }
