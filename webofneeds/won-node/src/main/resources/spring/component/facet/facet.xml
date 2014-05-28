@@ -87,7 +87,7 @@
         <property name="stateManager" ref="baStateManager" />
     </bean>
 
-    <bean id="baStateManager" class="won.node.facet.businessactivity.SimpleBAStateManager" />
+    <bean id="baStateManager" class="won.node.facet.businessactivity.statemanager.JpaBasedBAStateManager" />
 
     <bean id="controlFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ControlFacetImpl" />
     <bean id="ownerFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.OwnerFacetImpl" />
