@@ -4,9 +4,9 @@ import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.facet.businessactivity.coordinatorcompletion.BACCState;
 import won.node.facet.businessactivity.coordinatorcompletion.BACCEventType;
-import won.node.facet.businessactivity.coordinatorcompletion.SimpleBACCStateManager;
+import won.node.facet.businessactivity.coordinatorcompletion.BACCState;
+import won.node.facet.businessactivity.statemanager.BAStateManager;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
@@ -26,11 +26,12 @@ import java.net.URI;
 public class BACCCoordinatorFacetImpl extends AbstractFacet
 {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private SimpleBACCStateManager stateManager = new SimpleBACCStateManager();
 
+    private URI facetURI = this.getFacetType().getURI();
 
     @Autowired
     private ConnectionRepository connectionRepository;
+    private BAStateManager stateManager;
 
     @Override
     public FacetType getFacetType() {
@@ -48,8 +49,8 @@ public class BACCCoordinatorFacetImpl extends AbstractFacet
                 try {
                     ownerFacingConnectionClient.open(con.getConnectionURI(), content);
 
-                    stateManager.setStateForNeedUri(BACCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
-                    logger.debug("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                    stateManager.setStateForNeedUri(BACCState.ACTIVE.getURI(), con.getNeedURI(), con.getRemoteNeedURI(), facetURI);
+                    logger.debug("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), facetURI));
                 } catch (WonProtocolException e) {
                     logger.warn("caught Exception:", e);
                 }
@@ -105,10 +106,12 @@ public class BACCCoordinatorFacetImpl extends AbstractFacet
                     {
                         if(eventType.isBACCCoordinatorEventType(eventType))
                         {
-                            BACCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                            BACCState state = BACCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
+                              con.getRemoteNeedURI(), facetURI).toString());
                             logger.debug("Current state of the Coordinator: "+state.getURI().toString());
-                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                            logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                            stateManager.setStateForNeedUri(state.transit(eventType).getURI(), con.getNeedURI(),
+                              con.getRemoteNeedURI(), facetURI);
+                            logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), facetURI));
 
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
@@ -158,10 +161,12 @@ public class BACCCoordinatorFacetImpl extends AbstractFacet
                     // URI -> eventType
                     BACCEventType eventType = BACCEventType.getCoordinationEventTypeFromURI(sCoordMsg);
 
-                    BACCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                    BACCState state = BACCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
+                    con.getRemoteNeedURI(), facetURI).toString());
                     logger.debug("Current state of the Coordinator: "+state.getURI().toString());
-                    stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                    logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                    stateManager.setStateForNeedUri(state.transit(eventType).getURI(), con.getNeedURI(),
+                      con.getRemoteNeedURI(), facetURI);
+                    logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), facetURI));
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
 
@@ -174,11 +179,13 @@ public class BACCCoordinatorFacetImpl extends AbstractFacet
 
                         if(BACCEventType.isBACCCoordinatorEventType(resendEventType))
                         {
-                            state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                            state = BACCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
+                              con.getRemoteNeedURI(), facetURI).toString());
                             logger.debug("Coordinator re-sends the previous message.");
                             logger.debug("Current state of the Coordinator: "+state.getURI().toString());
-                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                            logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                            stateManager.setStateForNeedUri(state.transit(eventType).getURI(), con.getNeedURI(),
+                              con.getRemoteNeedURI(), facetURI);
+                            logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), facetURI));
 
                             // eventType -> URI Resource
                             Resource r = myContent.createResource(resendEventType.getURI().toString());
@@ -198,5 +205,9 @@ public class BACCCoordinatorFacetImpl extends AbstractFacet
 
             }
         });
+    }
+
+    public void setStateManager(final BAStateManager stateManager) {
+      this.stateManager = stateManager;
     }
 }
