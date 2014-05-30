@@ -25,21 +25,22 @@ import java.net.URI;
 import java.util.List;
 
 /**
-* User: fkleedorfer
-* Date: 28.03.14
-*/
+ * User: fkleedorfer
+ * Date: 28.03.14
+ */
 public class DeactivateAllNeedsAction extends BaseEventBotAction
 {
-      public DeactivateAllNeedsAction(EventListenerContext eventListenerContext) {
-          super(eventListenerContext);
-      }
-
-      @Override
-      protected void doRun(Event event) throws Exception {
-          List<URI> toDeactivate = getEventListenerContext().getBotContext().listNeedUris();
-          for (URI uri: toDeactivate){
-              getEventListenerContext().getOwnerService().deactivate(uri);
-              getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
-          }
-      }
+  public DeactivateAllNeedsAction(EventListenerContext eventListenerContext) {
+    super(eventListenerContext);
   }
+
+  @Override
+  protected void doRun(Event event) throws Exception {
+
+    List<URI> toDeactivate = getEventListenerContext().getBotContext().listNeedUris();
+    for (URI uri: toDeactivate){
+      getEventListenerContext().getOwnerService().deactivate(uri);
+      getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
+    }
+  }
+}

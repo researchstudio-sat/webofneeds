@@ -308,9 +308,8 @@ public enum BAPCState {
     public static BAPCState parseString(final String fragment)
     {
         for (BAPCState state : values())
-            if (state.name.equals(fragment))
+          if (state.getURI().toString().equals(fragment))
                 return state;
-
         logger.warn("No enum could be matched for: {}", fragment);
         return null;
     }
