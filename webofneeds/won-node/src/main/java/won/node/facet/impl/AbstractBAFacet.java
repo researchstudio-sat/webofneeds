@@ -19,6 +19,7 @@ import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.io.StringWriter;
@@ -26,13 +27,10 @@ import java.net.URI;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Created with IntelliJ IDEA.
- * User: gabriel
- * Date: 16.09.13
- * Time: 17:09
- * To change this template use File | Settings | File Templates.
+ * User: Danijel
+ * Date: 4.6.14.
  */
-public abstract class AbstractFacet implements Facet
+public abstract class AbstractBAFacet implements Facet
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -73,8 +71,8 @@ public abstract class AbstractFacet implements Facet
    * @param con the connection object
    * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
    *                as well as the base URI of the graph will be attached to the resource identifying the event.
-   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
+   * @throws won.protocol.exception.NoSuchConnectionException if connectionURI does not refer to an existing connection
+   * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
   @Override
   public void openFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
@@ -84,9 +82,9 @@ public abstract class AbstractFacet implements Facet
         @Override
         public void run() {
           try {
-              needFacingConnectionClient.open(con, content);
+            needFacingConnectionClient.open(con, content);
           } catch (Exception e) {
-             logger.warn("caught Exception in openFromOwner",e);
+            logger.warn("caught Exception in openFromOwner",e);
           }
         }
       });
@@ -114,9 +112,9 @@ public abstract class AbstractFacet implements Facet
         public void run()
         {
           try {
-              needFacingConnectionClient.close(con, content);
+            needFacingConnectionClient.close(con, content);
           } catch (Exception e) {
-              logger.warn("caught Exception in closeFromOwner: ",e);
+            logger.warn("caught Exception in closeFromOwner: ",e);
           }
         }
       });
@@ -140,9 +138,9 @@ public abstract class AbstractFacet implements Facet
       @Override
       public void run() {
         try {
-            needFacingConnectionClient.textMessage(con, message);
+          needFacingConnectionClient.textMessage(con, message);
         } catch (Exception e) {
-            logger.warn("caught Exception in textMessageFromOwner: ",e);
+          logger.warn("caught Exception in textMessageFromOwner: ",e);
         }
       }
     });
@@ -229,6 +227,17 @@ public abstract class AbstractFacet implements Facet
     });
   }
 
+  public void storeBAStateForConnection(Connection con, URI stateUri)
+  {
+    Model connectionBAStateContent =  ModelFactory.createDefaultModel();
+    connectionBAStateContent.setNsPrefix("",con.getConnectionURI().toString());
+    Resource baseResource = connectionBAStateContent.createResource(con.getConnectionURI().toString());
+    baseResource.addProperty(WON_BA.BA_STATE, connectionBAStateContent.createResource(stateUri.toString()));
+
+    logger.debug("linked data:"+ RdfUtils.toString(connectionBAStateContent));
+    rdfStorageService.storeContent(con.getConnectionURI(), connectionBAStateContent);
+  }
+
   /**
    * This function is invoked when a matcher sends a hint message to a won node and
    * usually executes registered facet specific code.
@@ -248,7 +257,7 @@ public abstract class AbstractFacet implements Facet
    */
   @Override
   public void hint(final Connection con, final double score, final URI originator, final Model content)
-      throws NoSuchNeedException, IllegalMessageForNeedStateException {
+    throws NoSuchNeedException, IllegalMessageForNeedStateException {
 
     final Model remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
 
@@ -342,7 +351,7 @@ public abstract class AbstractFacet implements Facet
             logger.warn("caught Exception sending close back from connectFromOwner::", e1);
           }
         } catch (Exception e) {
-            logger.warn("caught Exception in connectFromOwner: ",e);
+          logger.warn("caught Exception in connectFromOwner: ",e);
         }
       }
     });
@@ -376,10 +385,10 @@ public abstract class AbstractFacet implements Facet
     //replace won:hasRemoteFacet
     stmtIterator = baseRes.listProperties(WON.HAS_FACET);
     if (stmtIterator != null) {
-        while (stmtIterator.hasNext()) {
-          Resource facet = stmtIterator.nextStatement().getObject().asResource();
-          newBaseRes.addProperty(WON.HAS_REMOTE_FACET, facet);
-        }
+      while (stmtIterator.hasNext()) {
+        Resource facet = stmtIterator.nextStatement().getObject().asResource();
+        newBaseRes.addProperty(WON.HAS_REMOTE_FACET, facet);
+      }
     }
     if (logger.isDebugEnabled()){
       StringWriter modelAsString = new StringWriter();

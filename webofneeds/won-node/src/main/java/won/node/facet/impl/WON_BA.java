@@ -24,6 +24,8 @@ public class WON_BA {
 
     public static final Property COORDINATION_MESSAGE = m.createProperty(BASE_URI + "coordinationMessage");
     public static final Property COORDINATOR_VOTE_REQUEST = m.createProperty(BASE_URI + "coordinatorVoteRequest");
+  public static final Property BA_STATE = m.createProperty(BASE_URI + "hasBAState");
+
     public static final Resource COORDINATOR = m.createResource(BASE_URI + "Coordinator");
     public static final Resource PARTICIPANT = m.createResource(BASE_URI + "Participant");
     public static final Resource COORDINATION_MESSAGE_ABORT = m.createResource(BASE_URI + "Abort");

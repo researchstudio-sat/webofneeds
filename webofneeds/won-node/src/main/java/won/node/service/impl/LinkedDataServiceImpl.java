@@ -194,8 +194,11 @@ public class LinkedDataServiceImpl implements LinkedDataService
   {
     Connection connection = needInformationService.readConnection(connectionUri);
 
-    Model model = connectionModelMapper.toModel(connection);
+    // load the model from storage
+    Model model = rdfStorage.loadContent(connection.getConnectionURI());
     setNsPrefixes(model);
+    Model mappedModel = connectionModelMapper.toModel(connection);
+    model.add(mappedModel);
     model.setNsPrefix("",connection.getConnectionURI().toString());
 
     //create connection member
