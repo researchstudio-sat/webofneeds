@@ -154,6 +154,25 @@ public class URIService
   {
     return URI.create(con.getConnectionURI()+"/event/"+event.getId());
   }
+
+  public URI createEventURI(final URI connectionURI, final String eventId)
+  {
+    return URI.create(connectionURI.toString()+"/event/"+eventId);
+  }
+
+  /**
+   * Assumes the specified uri to be of the form [connectionURI]/event/[long event id].
+   * @param eventURI
+   * @return
+   */
+  public Long getEventIdFromEventURI(final URI eventURI)
+  {
+    String path = eventURI.getPath();
+    return new Long(path.substring(path.lastIndexOf("/")+1,path.length()));
+  }
+
+
+
   public String getGeneralURIPrefix(){
       return this.generalURIPrefix;
   }

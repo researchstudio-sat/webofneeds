@@ -73,4 +73,6 @@ public interface LinkedDataService
    * @throws NoSuchNeedException
    */
   public Model listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException;
+
+  Model getEventModel(URI eventURI);
 }

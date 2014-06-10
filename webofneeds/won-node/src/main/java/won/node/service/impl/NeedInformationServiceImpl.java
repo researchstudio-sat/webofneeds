@@ -53,6 +53,8 @@ public class NeedInformationServiceImpl implements NeedInformationService
   private ConnectionRepository connectionRepository;
   @Autowired
   private EventRepository eventRepository;
+  @Autowired
+  private URIService uriService;
 
   private static final int DEFAULT_PAGE_SIZE = 500;
 
@@ -100,6 +102,18 @@ public class NeedInformationServiceImpl implements NeedInformationService
   {
     return eventRepository.findByConnectionURI(connectionURI);
   }
+
+  /**
+   * Returns null if no event found.
+   * @param eventURI
+   * @return
+   */
+  @Override
+  public ConnectionEvent readEvent(final URI eventURI)
+  {
+    return eventRepository.findOne(uriService.getEventIdFromEventURI(eventURI));
+  }
+
 
   @Override
   public Need readNeed(final URI needURI) throws NoSuchNeedException

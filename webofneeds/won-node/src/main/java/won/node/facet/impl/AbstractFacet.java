@@ -320,6 +320,7 @@ public abstract class AbstractFacet implements Facet
   public void connectFromOwner(final Connection con, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
     final Model remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
+
     final Connection connectionForRunnable = con;
     //send to need
     executorService.execute(new Runnable() {

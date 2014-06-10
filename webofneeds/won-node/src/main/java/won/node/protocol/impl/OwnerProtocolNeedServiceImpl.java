@@ -172,6 +172,12 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     return needInformationService.readEvents(connectionURI);
   }
 
+  @Override
+  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+  public ConnectionEvent readEvent(final URI eventURI) {
+    return needInformationService.readEvent(eventURI);
+  }
+
   public void setNeedCommunicationService(final OwnerFacingNeedCommunicationService needCommunicationService) {
         this.needCommunicationService = needCommunicationService;
     }

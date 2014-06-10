@@ -83,7 +83,8 @@ import java.util.Date;
  */
 @Controller
 @RequestMapping("/")
-public class LinkedDataWebController
+public class
+  LinkedDataWebController
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
   //full prefix of a need resource
@@ -145,6 +146,25 @@ public class LinkedDataWebController
       model.addAttribute("dataURI", uriService.toDataURIIfPossible(connectionURI).toString());
       return "rdfModelView";
     } catch (NoSuchConnectionException e) {
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return "notFoundView";
+    }
+  }
+
+  //webmvc controller method
+  @RequestMapping("${uri.path.page.connection}/{identifier}/event/{eventId}")
+  public String showEventPage(@PathVariable(value="identifier") String identifier,
+                              @PathVariable(value="eventId") String eventId,
+                              Model model,
+                              HttpServletResponse response) {
+    URI eventURI = uriService.createEventURI(uriService.createConnectionURIForId(identifier), eventId);
+    com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.getEventModel(eventURI);
+    if (model != null) {
+      model.addAttribute("rdfModel", rdfModel);
+      model.addAttribute("resourceURI", eventURI.toString());
+      model.addAttribute("dataURI", uriService.toDataURIIfPossible(eventURI).toString());
+      return "rdfModelView";
+    } else {
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
     }
@@ -396,6 +416,33 @@ public class LinkedDataWebController
       return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.NOT_FOUND);
     }
   }
+
+  @RequestMapping(
+    value="${uri.path.data.connection}/{identifier}/event/{eventId}",
+    method = RequestMethod.GET,
+    produces={"application/rdf+xml","application/x-turtle","text/turtle","text/rdf+n3","application/json","application/ld+json"})
+  public ResponseEntity<com.hp.hpl.jena.rdf.model.Model> readEvent(
+    HttpServletRequest request,
+    @PathVariable(value="identifier") String identifier,
+    @PathVariable(value="eventId") String eventId) {
+    logger.debug("readConnection() called");
+
+    URI eventURI = uriService.createEventURI(uriService.createConnectionURIForId(identifier), eventId);
+    com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.getEventModel(eventURI);
+    if (rdfModel != null) {
+      HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(),
+                                                                                URI.create(request.getRequestURI()),
+                                                                                eventURI));
+      return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(rdfModel, headers, HttpStatus.OK);
+    } else {
+      return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.NOT_FOUND);
+    }
+  }
+
+
+
+
+
 
 
     /**

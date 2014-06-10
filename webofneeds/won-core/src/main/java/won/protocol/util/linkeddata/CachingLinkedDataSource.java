@@ -17,6 +17,9 @@
 package won.protocol.util.linkeddata;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
@@ -31,6 +34,9 @@ import won.protocol.rest.LinkedDataRestClient;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * LinkedDataSource implementation that uses an ehcache for caching.
@@ -57,6 +63,60 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     throw new IllegalStateException(
         new MessageFormat("The underlying linkedDataCache should only contain Models, but we got a {0} for URI {1}")
             .format(new Object[]{model.getClass(), resource}));
+  }
+
+  @Override
+  public Model getModelForResource(final URI resourceUri, List<URI> properties, List<URI> objects,
+                                   int maxRequest, int maxDepth) {
+    Set<URI> crawledURIs = new HashSet<URI>();
+    Set<URI> newlyDiscoveredURIs = new HashSet<URI>();
+    Set<URI> urisToCrawl = null;
+    newlyDiscoveredURIs.add(resourceUri);
+    int depth = 0;
+    int requests = 0;
+
+    Model model = getModelForResource(resourceUri);
+
+
+    OUTER: while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest){
+      urisToCrawl = newlyDiscoveredURIs;
+      newlyDiscoveredURIs = new HashSet<URI>();
+      for (URI currentURI: urisToCrawl) {
+        //add all models from urisToCrawl
+        Model currentModel =  getModelForResource(currentURI);
+        model.add(currentModel);
+        newlyDiscoveredURIs.addAll(getURIsToCrawl(currentModel, crawledURIs, properties, objects));
+        crawledURIs.add(currentURI);
+        requests++;
+        logger.debug("current Request: "+requests);
+        if (requests >= maxRequest) break OUTER;
+
+      }
+      depth++;
+      logger.debug("current Depth: "+depth);
+    }
+    return model;
+  }
+
+
+  private Set<URI> getURIsToCrawl(Model model, Set<URI> crawled,  List<URI> properties, List<URI> objects) {
+    Set<URI> toCrawl = new HashSet<>();
+    for (int i = 0; i<properties.size();i++){
+      Property p = model.createProperty(properties.get(i).toString());
+      NodeIterator objectIterator = model.listObjectsOfProperty(p);
+      for (;objectIterator.hasNext();){
+        RDFNode objectNode = objectIterator.next();
+
+        if (objectNode.isURIResource()) {
+          URI discoveredUri = URI.create(objectNode.asResource().getURI());
+          if (!crawled.contains(discoveredUri)){
+            toCrawl.add(discoveredUri);
+          }
+        }
+      }
+
+    }
+    return toCrawl;
   }
 
   @Override

@@ -17,11 +17,11 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.impl.*;
+import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.event.impl.*;
-import won.bot.framework.events.listener.*;
+import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
 import won.protocol.model.FacetType;
@@ -50,8 +50,8 @@ public class CommentBot extends EventBot
   protected BaseEventListener allNeedsDeactivator;
   protected BaseEventListener needDeactivator;
   protected BaseEventListener workDoneSignaller;
-  private static final String NAME_NEEDS = "needs";
-  private static final String NAME_COMMENTS = "comments";
+  protected static final String NAME_NEEDS = "needs";
+  protected static final String NAME_COMMENTS = "comments";
 
   @Override
   protected void initializeEventListeners()
@@ -73,7 +73,8 @@ public class CommentBot extends EventBot
     bus.subscribe(NeedCreatedEvent.class, this.commentFacetCreator);
 
     this.needConnector = new ActionOnceAfterNEventsListener(ctx,
-        2, new ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_COMMENTS,  FacetType.OwnerFacet.getURI(),FacetType.CommentFacet.getURI(),MILLIS_BETWEEN_MESSAGES)
+        2, new ConnectFromListToListAction(ctx, NAME_NEEDS,NAME_COMMENTS,  FacetType.OwnerFacet.getURI(),
+                                           FacetType.CommentFacet.getURI(),MILLIS_BETWEEN_MESSAGES)
     );
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
