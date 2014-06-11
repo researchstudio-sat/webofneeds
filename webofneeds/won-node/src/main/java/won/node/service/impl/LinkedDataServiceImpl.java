@@ -193,12 +193,13 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public Model getConnectionModel(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException
   {
     Connection connection = needInformationService.readConnection(connectionUri);
+    Model model = connectionModelMapper.toModel(connection);
 
     // load the model from storage
-    Model model = rdfStorage.loadContent(connection.getConnectionURI());
+    //Model model = rdfStorage.loadContent(connection.getConnectionURI());
     setNsPrefixes(model);
-    Model mappedModel = connectionModelMapper.toModel(connection);
-    model.add(mappedModel);
+    //Model mappedModel = connectionModelMapper.toModel(connection);
+    //model.add(mappedModel);
     model.setNsPrefix("",connection.getConnectionURI().toString());
 
     //create connection member
