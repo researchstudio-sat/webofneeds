@@ -232,6 +232,34 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return model;
   }
 
+  /**
+   * Returns the rdf model for the event.
+   * @param eventURI
+   * @return null if no event is found.
+   * @throws NoSuchConnectionException
+   */
+  @Override
+  public Model getEventModel(final URI eventURI)
+  {
+    ConnectionEvent event = needInformationService.readEvent(eventURI);
+    if (event == null) return null;
+    Model model = ModelFactory.createDefaultModel();
+    setNsPrefixes(model);
+    model.setNsPrefix("",eventURI.toString());
+
+    Resource eventMember = model.createResource(eventURI.toString(),WON.toResource(event.getType()));
+    if (event.getOriginatorUri() != null) {
+      eventMember.addProperty(WON.HAS_ORIGINATOR, model.createResource(event.getOriginatorUri().toString()));
+    }
+
+    if (event.getCreationDate() != null) {
+      eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.toLiteral(event.getCreationDate(), model));
+    }
+
+    addAdditionalData(model, eventURI, eventMember);
+    return model;
+  }
+
   private void addAdditionalData(final Model model, URI resourceToLoad, final Resource targetResource) {
     Model additionalDataModel = rdfStorage.loadContent(resourceToLoad);
     if (additionalDataModel != null && additionalDataModel.size() > 0) {

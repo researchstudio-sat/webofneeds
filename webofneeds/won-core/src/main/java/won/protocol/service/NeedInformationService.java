@@ -132,4 +132,5 @@ public interface NeedInformationService {
      */
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
+  ConnectionEvent readEvent(URI eventURI);
 }
