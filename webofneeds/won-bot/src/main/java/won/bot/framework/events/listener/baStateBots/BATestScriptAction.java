@@ -39,7 +39,7 @@ public class BATestScriptAction {
     public BATestScriptAction(boolean senderIsParticipant, URI coordinationMessageUriToBeSent,URI stateOfSenderBeforeSending) {
         this.senderIsParticipant = senderIsParticipant;
         this.stateOfSenderBeforeSending = stateOfSenderBeforeSending;
-        this.messageToBeSent = WonRdfUtils.MessageUtils.genericMessage(WON_BA.COORDINATION_MESSAGE, new ResourceImpl(coordinationMessageUriToBeSent.toString()));
+        this.messageToBeSent = WonRdfUtils.MessageUtils.genericMessage(WON_TX.COORDINATION_MESSAGE, new ResourceImpl(coordinationMessageUriToBeSent.toString()));
     }
 
     public boolean isSenderIsParticipant() {

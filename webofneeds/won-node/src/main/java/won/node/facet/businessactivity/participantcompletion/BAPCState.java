@@ -2,7 +2,7 @@ package won.node.facet.businessactivity.participantcompletion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.vocabulary.WON;
+import won.node.facet.impl.WON_TX;
 
 import java.net.URI;
 
@@ -287,7 +287,7 @@ public enum BAPCState {
 
     public URI getURI()
     {
-        return URI.create(WON.BASE_URI + name);
+        return URI.create(WON_TX.BASE_URI + name);
     }
 
     public Phase getPhase() {

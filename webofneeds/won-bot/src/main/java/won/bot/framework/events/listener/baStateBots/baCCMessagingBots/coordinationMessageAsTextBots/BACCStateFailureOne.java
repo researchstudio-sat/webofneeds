@@ -2,7 +2,7 @@ package won.bot.framework.events.listener.baStateBots.baCCMessagingBots.coordina
 
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.BATestScriptAction;
-import won.bot.framework.events.listener.baStateBots.WON_BA;
+import won.bot.framework.events.listener.baStateBots.WON_TX;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -20,12 +20,12 @@ public class BACCStateFailureOne extends BATestBotScript {
     @Override
     protected List<BATestScriptAction> setupActions() {
         List<BATestScriptAction> actions = new ArrayList();
-        actions.add(new BATestScriptAction(true, "MESSAGE_CANCELED", URI.create(WON_BA.STATE_CANCELING_ACTIVE.getURI()))); //Message can be sent from Participant, but not from this state
-        actions.add(new BATestScriptAction(true, "MESSAGE_CANCELED", URI.create(WON_BA.STATE_ACTIVE.getURI())));  //Message can not be sent from Participant, only from Coordinator
+        actions.add(new BATestScriptAction(true, "MESSAGE_CANCELED", URI.create(WON_TX.STATE_CANCELING_ACTIVE.getURI()))); //Message can be sent from Participant, but not from this state
+        actions.add(new BATestScriptAction(true, "MESSAGE_CANCELED", URI.create(WON_TX.STATE_ACTIVE.getURI())));  //Message can not be sent from Participant, only from Coordinator
         //da je false ne bi radilo!!! ispitaj!!!
-        actions.add(new BATestScriptAction(true, "MESSAGE_CANCELED", URI.create(WON_BA.STATE_ACTIVE.getURI())));  //Message can not be sent from Participant, only from Coordinator
-        actions.add(new BATestScriptAction(false, "MESSAGE_CANCEL", URI.create(WON_BA.STATE_ACTIVE.getURI())));
-        actions.add(new BATestScriptAction(true, "MESSAGE_CANCELED", URI.create(WON_BA.STATE_CANCELING_ACTIVE.getURI())));
+        actions.add(new BATestScriptAction(true, "MESSAGE_CANCELED", URI.create(WON_TX.STATE_ACTIVE.getURI())));  //Message can not be sent from Participant, only from Coordinator
+        actions.add(new BATestScriptAction(false, "MESSAGE_CANCEL", URI.create(WON_TX.STATE_ACTIVE.getURI())));
+        actions.add(new BATestScriptAction(true, "MESSAGE_CANCELED", URI.create(WON_TX.STATE_CANCELING_ACTIVE.getURI())));
 
 //        actions.add(new BATestScriptAction(false, "MESSAGE_CANCEL", URI.create(WON_BA.STATE_ACTIVE.getURI())));  //Message can not be sent from Participant, only from Coordinator
 //        actions.add(new BATestScriptAction(false, "MESSAGE_EXITED", URI.create(WON_BA.STATE_ACTIVE.getURI())));  //Message can be sent from Coordinator, but not from this state

@@ -14,6 +14,7 @@ import won.bot.framework.events.event.impl.WorkDoneEvent;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.BAAtomicCCActiveExitingBot;
+import won.protocol.repository.ConnectionRepository;
 
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +37,7 @@ public class BAAtomicCCActiveExitingBotTest
 
   @Autowired
   ApplicationContext applicationContext;
+  private static ConnectionRepository connectionRepository;
 
   @Autowired
   SpringAwareBotManagerImpl botManager;
@@ -141,6 +143,31 @@ public class BAAtomicCCActiveExitingBotTest
       //* what does the RDF look like?
       // --> pull it from the needURI/ConnectionURI and check contents
       //* what does the database look like?
+
+
+      // tmp version
+//      List<URI> needURIs = this.getBotContext().listNeedUris();
+//      for(URI needURI : needURIs)
+//      {
+//        List<Connection> listOfCons = connectionRepository.findByNeedURI(needURI);
+//      //  List<Connection> listOfCons = connectionRepository.findByNeedURIAndStateAndTypeURI(needURI,
+//      //  ConnectionState.CLOSED, FacetType.BAAtomicCCCoordinatorFacet.getURI());
+//        if(!listOfCons.isEmpty()){
+//          for(Connection con : listOfCons)
+//          {
+//            Model connectionContent = rdfStorageSeervice.loadContent(con.getConnectionURI());
+//            NodeIterator ni = connectionContent.listObjectsOfProperty
+//              (connectionContent.getProperty(WON_TX.BA_STATE.getURI().toString()));
+//            if(ni.hasNext())
+//            {
+//              Assert.assertEquals(WON_TX.STATE_ENDED.getURI().toString(), ni.toList().get(0).toString());
+//            }
+//          }
+//        }
+//      }
+
+      //tmp version ends
+
     }
 
   }

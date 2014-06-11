@@ -32,7 +32,8 @@
         <module>won-matcher-webapp</module>
         <module>won-ontology-validator</module>
         <module>won-bot</module>
-  </modules>
+        <module>won-facets</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
@@ -111,7 +112,7 @@
                 <artifactId>jms</artifactId>
                 <version>${jms.version}</version>
             </dependency>
-            
+
             <!-- SIREn-->
             <dependency>
                 <groupId>org.sindice.siren</groupId>
@@ -337,7 +338,7 @@
                 <artifactId>spring-jms</artifactId>
                 <version>${org.springframework.version}</version>
             </dependency>
-                <!-- spring-security -->
+            <!-- spring-security -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-web</artifactId>
@@ -800,8 +801,8 @@
         <org.springframework.data.commons.version>1.4.0.RELEASE</org.springframework.data.commons.version>
         <org.springframework.data.jpa.version>1.2.0.RELEASE</org.springframework.data.jpa.version>
         <org.springframework.version>4.0.4.RELEASE</org.springframework.version>
-	    <org.springframework.security.version>3.1.3.RELEASE</org.springframework.security.version>
-	    <org.slf4j.version>1.6.6</org.slf4j.version>
+        <org.springframework.security.version>3.1.3.RELEASE</org.springframework.security.version>
+        <org.slf4j.version>1.6.6</org.slf4j.version>
         <org.hsqldb.version>2.3.2</org.hsqldb.version>
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>

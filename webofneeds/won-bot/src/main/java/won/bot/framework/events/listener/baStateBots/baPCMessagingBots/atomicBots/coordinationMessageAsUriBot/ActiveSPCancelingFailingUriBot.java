@@ -3,7 +3,7 @@ package won.bot.framework.events.listener.baStateBots.baPCMessagingBots.atomicBo
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.BATestScriptAction;
 import won.bot.framework.events.listener.baStateBots.NopAction;
-import won.bot.framework.events.listener.baStateBots.WON_BA;
+import won.bot.framework.events.listener.baStateBots.WON_TX;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -24,8 +24,8 @@ public class ActiveSPCancelingFailingUriBot extends BATestBotScript
     //actions.add(new BATestScriptAction(false, "MESSAGE_CANCEL", URI.create(WON_BA.STATE_ACTIVE.getURI()), 3));
 
     actions.add(new NopAction());
-    actions.add(new BATestScriptAction(true, URI.create(WON_BA.MESSAGE_FAIL.getURI()), URI.create(WON_BA.STATE_CANCELING.getURI())));
-    actions.add(new BATestScriptAction(false, URI.create(WON_BA.MESSAGE_FAILED.getURI()), URI.create(WON_BA.STATE_FAILING_ACTIVE_CANCELING.getURI())));
+    actions.add(new BATestScriptAction(true, URI.create(WON_TX.MESSAGE_FAIL.getURI()), URI.create(WON_TX.STATE_CANCELING.getURI())));
+    actions.add(new BATestScriptAction(false, URI.create(WON_TX.MESSAGE_FAILED.getURI()), URI.create(WON_TX.STATE_FAILING_ACTIVE_CANCELING.getURI())));
 
     return actions;
   }

@@ -12,9 +12,10 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * Time: 18.13
  * To change this template use File | Settings | File Templates.
  */
-public class WON_BA {
+public class WON_TX
+{
     // public static final String BASE_URI = "http://purl.org/webofneeds/tx/model#";
-    public static final String BASE_URI = "http://purl.org/webofneeds/model#";
+    public static final String BASE_URI = "http://purl.org/webofneeds/tx/model#";
 
 
     public static final String DEFAULT_PREFIX= "won-tx";
@@ -24,7 +25,9 @@ public class WON_BA {
 
     public static final Property COORDINATION_MESSAGE = m.createProperty(BASE_URI + "coordinationMessage");
     public static final Property COORDINATOR_VOTE_REQUEST = m.createProperty(BASE_URI + "coordinatorVoteRequest");
-    public static final Resource COORDINATOR = m.createResource(BASE_URI + "Coordinator");
+  public static final Property BA_STATE = m.createProperty(BASE_URI + "hasBAState");
+
+  public static final Resource COORDINATOR = m.createResource(BASE_URI + "Coordinator");
     public static final Resource PARTICIPANT = m.createResource(BASE_URI + "Participant");
     public static final Resource COORDINATION_MESSAGE_ABORT = m.createResource(BASE_URI + "Abort");
     public static final Resource COORDINATION_MESSAGE_COMMIT = m.createResource(BASE_URI + "Commit");
@@ -67,22 +70,6 @@ public class WON_BA {
     //Business Activities -CC
     public static final Resource STATE_CANCELING = m.createResource(BASE_URI + "Canceling");
     public static final Resource STATE_FAILING_ACTIVE_CANCELING = m.createResource(BASE_URI + "FailingActiveCanceling");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /** returns the URI for this schema
