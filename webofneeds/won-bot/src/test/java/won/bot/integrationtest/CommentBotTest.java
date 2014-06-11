@@ -215,20 +215,11 @@ public class CommentBotTest
       //* what does the database look like?      */
     }
     public void  executeCommentRDFValidationAssert(){
-      /* LinkTraversalBasedQueryEngine.register();
-      QueriedDataset qds = new QueriedDatasetImpl();
-
-      JenaIOBasedQueriedDataset qdsWrapper = new JenaIOBasedQueriedDataset(qds);
-      JenaIOBasedLinkedDataCache ldcache = new JenaIOBasedLinkedDataCache( qdsWrapper );
-
-      Dataset dsARQ = new LinkedDataCacheWrappingDataset(ldcache);
-      */
 
       List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(NAME_COMMENTS);
 
       LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
-     // LinkedDataCrawlingContext ldc = new LinkedDataCrawlingContext(8,30,30000);
-      //linkedDataSource.setLdc(ldc);
+
       List<URI> properties = new ArrayList<>();
       List<URI> objects = new ArrayList<>();
 
@@ -247,11 +238,11 @@ public class CommentBotTest
       String queryString = sparqlPrefix +
         "SELECT ?need ?connection ?need2 WHERE {" +
         "?need won:hasConnections ?connections."+
-        "?need won:hasFacet won:CommentFacet."+
         "?connections rdfs:member ?connection."+
+        "?connection won:hasFacet won:CommentFacet."+
         "?connection won:hasRemoteConnection ?connection2."+
         "?connection2 won:belongsToNeed ?need2."+
-        "?need2 sioc:hasReply ?need."+
+        "?need sioc:hasReply ?need2."+
         "}";
 
       Query query = QueryFactory.create(queryString);
