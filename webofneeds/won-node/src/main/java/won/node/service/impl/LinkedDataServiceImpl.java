@@ -193,12 +193,13 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public Model getConnectionModel(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException
   {
     Connection connection = needInformationService.readConnection(connectionUri);
+    Model model = connectionModelMapper.toModel(connection);
 
     // load the model from storage
-    Model model = rdfStorage.loadContent(connection.getConnectionURI());
+    //Model model = rdfStorage.loadContent(connection.getConnectionURI());
     setNsPrefixes(model);
-    Model mappedModel = connectionModelMapper.toModel(connection);
-    model.add(mappedModel);
+    //Model mappedModel = connectionModelMapper.toModel(connection);
+    //model.add(mappedModel);
     model.setNsPrefix("",connection.getConnectionURI().toString());
 
     //create connection member
@@ -229,6 +230,34 @@ public class LinkedDataServiceImpl implements LinkedDataService
       }
     }
 
+    return model;
+  }
+
+  /**
+   * Returns the rdf model for the event.
+   * @param eventURI
+   * @return null if no event is found.
+   * @throws NoSuchConnectionException
+   */
+  @Override
+  public Model getEventModel(final URI eventURI)
+  {
+    ConnectionEvent event = needInformationService.readEvent(eventURI);
+    if (event == null) return null;
+    Model model = ModelFactory.createDefaultModel();
+    setNsPrefixes(model);
+    model.setNsPrefix("",eventURI.toString());
+
+    Resource eventMember = model.createResource(eventURI.toString(),WON.toResource(event.getType()));
+    if (event.getOriginatorUri() != null) {
+      eventMember.addProperty(WON.HAS_ORIGINATOR, model.createResource(event.getOriginatorUri().toString()));
+    }
+
+    if (event.getCreationDate() != null) {
+      eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.toLiteral(event.getCreationDate(), model));
+    }
+
+    addAdditionalData(model, eventURI, eventMember);
     return model;
   }
 

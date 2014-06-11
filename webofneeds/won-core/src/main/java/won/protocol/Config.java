@@ -34,7 +34,8 @@ public class Config
 
   public static InputStream getInputStreamForConfigFile(String filename) throws FileNotFoundException{
     String configDir = System.getProperty(Config.SYSPROPKEY_WON_CONFIG_DIR);
-    if (configDir == null) throw new IllegalArgumentException("no won config dir defined by system property '" + Config.SYSPROPKEY_WON_CONFIG_DIR+"'");
+    if (configDir == null) throw new IllegalArgumentException("system property '" + Config
+      .SYSPROPKEY_WON_CONFIG_DIR+"' should point to the configuration dir but is null");
     File configDirFile = new File(configDir);
     if (!configDirFile.exists()) throw new IllegalArgumentException("won config dir '" + configDir +"' defined by system property '" + Config.SYSPROPKEY_WON_CONFIG_DIR+"' does not exist");
     if (!configDirFile.canRead()) throw new IllegalArgumentException("won config dir '" + configDir +"' defined by system property '" + Config.SYSPROPKEY_WON_CONFIG_DIR+"' is not readable");

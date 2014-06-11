@@ -13,6 +13,10 @@ import won.protocol.model.FacetType;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SIOC;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * User: gabriel
  * Date: 17/01/14
@@ -32,42 +36,32 @@ public class CommentFacet extends AbstractFacet
 
 
     super.connectFromNeed(con, content);
-    /* when connected change linked data*/
-    Model needContent = rdfStorageService.loadContent(con.getNeedURI());
-    PrefixMapping prefixMapping = PrefixMapping.Factory.create();
-//    prefixMapping.setNsPrefix(SIOC.getURI(),"sioc");
-    needContent.withDefaultMappings(prefixMapping);
-    needContent.setNsPrefix("sioc",SIOC.getURI());
-    Resource post = needContent.createResource(con.getNeedURI().toString(), SIOC.POST);
-    Resource reply = needContent.createResource(con.getRemoteNeedURI().toString(),SIOC.POST);
-    needContent.add(needContent.createStatement(needContent.getResource(con.getNeedURI().toString()), SIOC.HAS_REPLY,
-                                                needContent.getResource(con.getRemoteNeedURI().toString())));
+    addLinkedDataStatements(con, content);
+    // Model content = rdfStorageService.loadContent(con.getNeedURI());
 
-    // add WON node link
-    logger.debug("linked data:"+ RdfUtils.toString(needContent));
-    rdfStorageService.storeContent(con.getNeedURI(),needContent);
 
   }
-  /*
   @Override
-  public void connectFromOwner(final Connection con, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    //TODO: disallow this call - as it would mean that the need asks the remote need if it wants to be
-    //a comment - that would be too strange
+  public void connectFromOwner(final Connection con, final Model content) throws NoSuchNeedException,
+    IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     super.connectFromOwner(con, content);
-    Model needContent = rdfStorageService.loadContent(con.getNeedURI());
+    addLinkedDataStatements(con, content);
+  }
+  private void addLinkedDataStatements(final Connection con, final Model content){
+    List<URI> properties = new ArrayList<>();
+
     PrefixMapping prefixMapping = PrefixMapping.Factory.create();
 //    prefixMapping.setNsPrefix(SIOC.getURI(),"sioc");
-    needContent.withDefaultMappings(prefixMapping);
-    needContent.setNsPrefix("sioc",SIOC.getURI());
-    Resource post = needContent.createResource(con.getNeedURI().toString(), SIOC.POST);
-    Resource reply = needContent.createResource(con.getRemoteNeedURI().toString(),SIOC.POST);
-    needContent.add(needContent.createStatement(needContent.getResource(con.getNeedURI().toString()), SIOC.HAS_REPLY,
-                                            needContent.getResource(con.getRemoteNeedURI().toString())));
+    content.withDefaultMappings(prefixMapping);
+    content.setNsPrefix("sioc", SIOC.getURI());
+    Resource post = content.createResource(con.getNeedURI().toString(), SIOC.POST);
+    Resource reply = content.createResource(con.getRemoteNeedURI().toString(),SIOC.POST);
+    content.add(content.createStatement(content.getResource(con.getNeedURI().toString()), SIOC.HAS_REPLY,
+                                        content.getResource(con.getRemoteNeedURI().toString())));
 
     // add WON node link
-    logger.debug("linked data:"+ RdfUtils.toString(needContent));
-    rdfStorageService.storeContent(con.getNeedURI(),needContent);
-
+    logger.debug("linked data:"+ RdfUtils.toString(content));
+    rdfStorageService.storeContent(con.getNeedURI(),content);
   }
-      */
+
 }

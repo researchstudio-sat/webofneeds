@@ -16,6 +16,10 @@
 
 package won.bot.integrationtest;
 
+import com.hp.hpl.jena.query.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,9 +36,19 @@ import won.bot.framework.events.event.impl.WorkDoneEvent;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.CommentBot;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.vocabulary.WON;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 
 /**
  * Integration test.
@@ -48,7 +62,7 @@ public class CommentBotTest
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
   private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
 
-  MyBot bot;
+  private static MyBot bot;
 
   @Autowired
   ApplicationContext applicationContext;
@@ -56,21 +70,42 @@ public class CommentBotTest
   @Autowired
   SpringAwareBotManagerImpl botManager;
 
+  private static boolean run = false;
+
   /**
    * This is run before each @TestD method.
    */
   @Before
   public void before(){
-    //create a bot instance and auto-wire it
-    AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
-    this.bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-    Object botBean = beanFactory.initializeBean(this.bot, "mybot");
-    this.bot = (MyBot) botBean;
-    //the bot also needs a trigger so its act() method is called regularly.
-    // (there is no trigger bean in the context)
-    PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-    trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
-    this.bot.setTrigger(trigger);
+    if (!run)
+    {
+      AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
+      bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+      Object botBean = beanFactory.initializeBean(bot, "mybot");
+      bot = (MyBot) botBean;
+      //the bot also needs a trigger so its act() method is called regularly.
+      // (there is no trigger bean in the context)
+      PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+      trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
+      bot.setTrigger(trigger);
+      logger.info("starting test case testCommentBot");
+      //adding the bot to the bot manager will cause it to be initialized.
+      //at that point, the trigger starts.
+      botManager.addBot(bot);
+
+      //the bot should now be running. We have to wait for it to finish before we
+      //can check the results:
+      //Together with the barrier.await() in the bot's listener, this trips the barrier
+      //and both threads continue.
+      try {
+        bot.getBarrier().await();
+      } catch (InterruptedException e) {
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      } catch (BrokenBarrierException e) {
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      }
+      run = true;
+    }
   }
 
   /**
@@ -80,20 +115,21 @@ public class CommentBotTest
   @Test
   public void testCommentBot() throws Exception
   {
-    logger.info("starting test case testCommentBot");
-    //adding the bot to the bot manager will cause it to be initialized.
-    //at that point, the trigger starts.
-    botManager.addBot(this.bot);
-    //the bot should now be running. We have to wait for it to finish before we
-    //can check the results:
-    //Together with the barrier.await() in the bot's listener, this trips the barrier
-    //and both threads continue.
-    this.bot.getBarrier().await();
+
     //now check the results!
-    this.bot.executeAsserts();
-    logger.info("finishing test case testMatcherBot");
+    bot.executeAsserts();
+
+    logger.info("finishing test case testCommentBot");
   }
 
+  @Test
+  public void testCommentRDF(){
+    logger.info("starting test case testCommentRDF");
+    bot.executeCommentRDFValidationAssert();
+    //Model commentModel = bot.executeCommentRDFValidationAsserts();
+    //Model needModel = bot.executeNeedRDFValidationAsserts();
+    //bot.executeNeedCommentConnectionRDFValidationAsserts(needModel,commentModel);
+  }
 
   /**
    * We create a subclass of the bot we want to test here so that we can
@@ -107,6 +143,16 @@ public class CommentBotTest
      * barrier until our bot is done, then execute the asserts.
      */
     CyclicBarrier barrier = new CyclicBarrier(2);
+
+    private static final String sparqlPrefix =
+      "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>"+
+        "PREFIX geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>"+
+        "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>"+
+        "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"+
+        "PREFIX won:   <http://purl.org/webofneeds/model#>"+
+        "PREFIX gr:    <http://purl.org/goodrelations/v1#>"+
+        "PREFIX sioc:  <http://rdfs.org/sioc/ns#>"+
+        "PREFIX ldp:   <http://www.w3.org/ns/ldp#>";
 
     /**
      * Default constructor is required for instantiation through Spring.
@@ -168,6 +214,214 @@ public class CommentBotTest
       // --> pull it from the needURI/ConnectionURI and check contents
       //* what does the database look like?      */
     }
+    public void  executeCommentRDFValidationAssert(){
 
+      List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(NAME_COMMENTS);
+
+      LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
+
+      List<URI> properties = new ArrayList<>();
+      List<URI> objects = new ArrayList<>();
+
+      properties.add(URI.create(WON.HAS_CONNECTIONS.getURI()));
+      //properties.add(RDF.type);
+      properties.add(URI.create(WON.HAS_REMOTE_CONNECTION.toString()));
+      properties.add(URI.create(WON.HAS_REMOTE_NEED.toString()));
+      properties.add(URI.create(RDFS.member.toString()));
+
+      List<URI> crawled = new ArrayList<>();
+
+      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,30,8);
+
+      logger.debug("crawled dataset: {}",RdfUtils.toString(dataModel));
+
+      String queryString = sparqlPrefix +
+        "SELECT ?need ?connection ?need2 WHERE {" +
+        "?need won:hasConnections ?connections."+
+        "?connections rdfs:member ?connection."+
+        "?connection won:hasFacet won:CommentFacet."+
+        "?connection won:hasRemoteConnection ?connection2."+
+        "?connection2 won:belongsToNeed ?need2."+
+        "?need sioc:hasReply ?need2."+
+        "}";
+
+      Query query = QueryFactory.create(queryString);
+      QueryExecution qExec = QueryExecutionFactory.create(query, dataModel);
+      ResultSet results = qExec.execSelect();
+
+      List<String> actualList = new ArrayList<>();
+      for (; results.hasNext(); ) {
+        QuerySolution soln = results.nextSolution();
+        actualList.add(soln.toString());
+        RDFNode node = soln.get("?connection");
+      }
+      assertTrue("wrong number of results", actualList.size() >= 1);
+      qExec.close();
+
+    }
+
+    public Model executeNeedRDFValidationAsserts(){
+
+      List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(NAME_NEEDS);
+      Model needModel = getEventListenerContext().getLinkedDataSource().getModelForResource(needs.get(0));
+      System.out.println("executing queries...");
+      String queryString = sparqlPrefix +
+        "SELECT ?need WHERE {" +
+        "?need a won:Need"+
+        "}";
+      Query query = QueryFactory.create(queryString);
+      QueryExecution qExec = QueryExecutionFactory.create(query, needModel);
+      //ResultSet results = executeQuery(queryString,needModel);
+      List<String> actualList = new ArrayList<>();
+      ResultSet results = qExec.execSelect();
+      for (; results.hasNext(); ) {
+        QuerySolution soln = results.nextSolution();
+        actualList.add(soln.toString());
+      }
+
+      assertTrue("wrong number of results", actualList.size() >= 1);
+      //String expected1 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Open_01_1> ) ( ?eventType = <" + WON_ONTOLOGY_URI + "Open> )";
+      //assertThat(actualList, hasItems(expected1));
+      return needModel;
+    }
+    public Model executeCommentRDFValidationAsserts(){
+      List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(NAME_COMMENTS);
+      Model commentModel = getEventListenerContext().getLinkedDataSource().getModelForResource(needs.get(0));
+      System.out.println("executing queries...");
+      String queryString = sparqlPrefix +
+        "SELECT ?need WHERE {" +
+        "?need a won:Need."+
+        "?need won:hasFacet won:CommentFacet" +
+        "}";
+      Query query = QueryFactory.create(queryString);
+      QueryExecution qExec = QueryExecutionFactory.create(query, commentModel);
+      List<String> actualList = new ArrayList<>();
+      try {
+        ResultSet results = qExec.execSelect();
+        for (; results.hasNext(); ) {
+          QuerySolution soln = results.nextSolution();
+          actualList.add(soln.toString());
+        }
+      } finally {
+        qExec.close();
+      }
+      assertTrue("wrong number of results", actualList.size() >= 1);
+      return commentModel;
+    }
+    public void executeNeedCommentConnectionRDFValidationAsserts(Model needModel, Model commentModel){
+
+      System.out.println("executing queries...");
+      String queryString = sparqlPrefix +
+        "SELECT ?need ?connection ?state WHERE {" +
+        "?need won:hasConnections ?connections."+
+        "?connections rdfs:member ?connection."+
+        "?connection won:hasConnectionState ?state."+
+        "}";
+      logger.debug(RdfUtils.toString(needModel));
+      Dataset dataset = null;
+      //Query query = queryString.asQuery();
+      //QueryExecution qExec = QueryExecutionFactory.create(query, dataset);
+      Query query = QueryFactory.create(queryString);
+      QueryExecution qExec = QueryExecutionFactory.create(query, commentModel);
+     // Query query = QueryFactory.create(queryString);
+    //  QueryExecution qExec = QueryExecutionFactory.create(query, dsARQ);
+      ResultSet results = qExec.execSelect();
+
+      // ResultSet results = executeQuery(queryString,needModel);
+      URI needConnectionCollectionURI = null;
+      URI needConnectionURI = null;
+      URI commentConnectionsURI = null;
+      URI needConnectionURICheck = null;
+      List<String> actualList = new ArrayList<>();
+      for (; results.hasNext(); ) {
+        QuerySolution soln = results.nextSolution();
+        actualList.add(soln.toString());
+        RDFNode node =  soln.get("?connections");
+        String nodeStr = node.toString();
+        needConnectionCollectionURI = URI.create(nodeStr);
+      }
+      qExec.close();
+      assertTrue("wrong number of results", actualList.size() >= 1);
+
+      Model needConnections = getEventListenerContext().getLinkedDataSource().getModelForResource(needConnectionCollectionURI);
+      String queryString2 = sparqlPrefix+
+        "SELECT ?connection WHERE {" +
+        "?connections rdfs:member ?connection"+
+        "}";
+
+      logger.debug(RdfUtils.toString(needConnections));
+      Query query2 = QueryFactory.create(queryString2);
+      QueryExecution qExec2 = QueryExecutionFactory.create(query2, needConnections);
+      ResultSet results2 = qExec2.execSelect();
+
+      //ResultSet results2 = executeQuery(queryString2, needConnections);
+      List<String> actualList2 = new ArrayList<>();
+      for (; results2.hasNext(); ) {
+        QuerySolution soln = results2.nextSolution();
+        actualList2.add(soln.toString());
+        RDFNode node =  soln.get("?connection");
+        String nodeStr = node.toString();
+        needConnectionURI = URI.create(nodeStr);
+      }
+      qExec2.close();
+      assertTrue("wrong number of results", actualList2.size() >= 1);
+
+      Model needConnection = getEventListenerContext().getLinkedDataSource().getModelForResource(needConnectionURI);
+      String queryString3 = sparqlPrefix +
+        "SELECT ?remoteConnection WHERE {" +
+        "?connection won:hasRemoteConnection ?remoteConnection"+
+        "}";
+      logger.debug(RdfUtils.toString(needConnection));
+      Query query3 = QueryFactory.create(queryString3);
+      QueryExecution qExec3 = QueryExecutionFactory.create(query3, needConnection);
+      ResultSet results3 = qExec3.execSelect();
+      List<String> actualList3 = new ArrayList<>();
+      for (;results3.hasNext();){
+        QuerySolution soln = results3.nextSolution();
+        actualList3.add(soln.toString());
+        RDFNode node = soln.get("?remoteConnection");
+        String nodeStr = node.toString();
+        commentConnectionsURI = URI.create(nodeStr);
+
+      }
+      assertTrue("wrong number of results", actualList3.size() >= 1);
+
+      Model remoteConnections = getEventListenerContext().getLinkedDataSource().getModelForResource(commentConnectionsURI);
+      String queryString4 = sparqlPrefix +
+        "SELECT ?remoteConnection WHERE {" +
+        "?connection won:hasRemoteConnection ?remoteConnection"+
+        "}";
+      logger.debug(RdfUtils.toString(remoteConnections));
+      // ResultSet results3 = executeQuery(queryString2, needConnections);
+      Query query4 = QueryFactory.create(queryString4);
+      QueryExecution qExec4 = QueryExecutionFactory.create(query4, remoteConnections);
+      ResultSet results4 = qExec4.execSelect();
+
+
+      List<String> actualList4 = new ArrayList<>();
+      for (; results4.hasNext(); ) {
+        QuerySolution soln = results4.nextSolution();
+        actualList4.add(soln.toString());
+        RDFNode node =  soln.get("?remoteConnection");
+        String nodeStr = node.toString();
+        needConnectionURICheck = URI.create(nodeStr);
+      }
+      qExec4.close();
+      assertTrue("wrong number of results", actualList4.size() >= 1);
+      assertEquals(needConnectionURI,needConnectionURICheck);
+
+    }
+    public ResultSet executeQuery(String queryString, Model model){
+      Query query = QueryFactory.create(queryString);
+      QueryExecution qExec = QueryExecutionFactory.create(query, model);
+      ResultSet results;
+      try {
+        results = qExec.execSelect();
+
+      } finally {
+        qExec.close();
+      }
+      return results;
+    }
   }
 }
