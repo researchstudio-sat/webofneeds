@@ -79,6 +79,7 @@ public class CommentBotTest
   public void before(){
     if (!run)
     {
+      //create a bot instance and auto-wire it
       AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
       bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
       Object botBean = beanFactory.initializeBean(bot, "mybot");
