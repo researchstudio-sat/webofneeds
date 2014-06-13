@@ -32,7 +32,8 @@
         <module>won-matcher-webapp</module>
         <module>won-ontology-validator</module>
         <module>won-bot</module>
-  </modules>
+        <module>won-cryptography</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
