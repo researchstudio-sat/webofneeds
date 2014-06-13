@@ -1,9 +1,5 @@
-angular.module('won.owner').controller('CreateNeedCtrl', function ($scope, $location, $http, needService, userService) {
-	$scope.mapOptions = {
-		center : new google.maps.LatLng(35.784, -78.670),
-		zoom : 15,
-		mapTypeId:google.maps.MapTypeId.ROADMAP
-	};
+angular.module('won.owner').controller('CreateNeedCtrl', function ($scope,  $location, $http, needService, mapService, userService) {
+
 
 	$scope.uploadOptions = {
 		maxFileSize:5000000,
@@ -13,6 +9,16 @@ angular.module('won.owner').controller('CreateNeedCtrl', function ($scope, $loca
 	$scope.succesShow = false;
 
 	$scope.marker = null;
+
+    $scope.getMapOptions = function(){
+
+        return {
+            center:mapService.getGeolocation(),
+            zoom:15,
+            mapTypeId:google.maps.MapTypeId.ROADMAP
+        };
+    }
+    $scope.mapOptions = $scope.getMapOptions();
 
 	$scope.getCleanNeed = function() {
 		return {
@@ -68,6 +74,8 @@ angular.module('won.owner').controller('CreateNeedCtrl', function ($scope, $loca
 	$scope.cancel = function () {
 		$location.path("/");
 	};
+
+
 
 
 });

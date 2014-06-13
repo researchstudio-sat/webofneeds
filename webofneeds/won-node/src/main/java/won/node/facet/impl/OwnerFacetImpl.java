@@ -1,7 +1,12 @@
 package won.node.facet.impl;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.protocol.exception.ConnectionAlreadyExistsException;
+import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchNeedException;
+import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 
 /**
@@ -15,8 +20,22 @@ public class OwnerFacetImpl extends AbstractFacet
 {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Override
-    public FacetType getFacetType() {
-        return FacetType.OwnerFacet;
-    }
+  @Override
+  public FacetType getFacetType() {
+      return FacetType.OwnerFacet;
+  }
+
+  @Override
+  public void connectFromNeed(final Connection con, final Model content) throws NoSuchNeedException,
+    IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+
+    super.connectFromNeed(con, content);
+    /* when connected change linked data*/
+
+
+
+
+  }
+
+
 }

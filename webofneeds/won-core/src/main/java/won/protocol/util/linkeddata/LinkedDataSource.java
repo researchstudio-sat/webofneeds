@@ -19,6 +19,7 @@ package won.protocol.util.linkeddata;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  * Interface for fetching linked data as a jena Model.
@@ -27,4 +28,6 @@ public interface LinkedDataSource
 {
   public Model getModelForResource(URI resourceUri);
 
+  public Model getModelForResource(final URI resourceUri, List<URI> properties, List<URI> objects,
+                                   int maxRequest, int maxDepth);
 }

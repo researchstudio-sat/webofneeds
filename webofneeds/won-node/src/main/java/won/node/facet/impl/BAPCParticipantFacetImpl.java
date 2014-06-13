@@ -1,18 +1,18 @@
 package won.node.facet.impl;
 
 
-
 import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import won.node.facet.businessactivity.participantcompletion.BAPCEventType;
-import won.node.facet.businessactivity.participantcompletion.SimpleBAPCStateManager;
-import won.protocol.exception.*;
+import won.node.facet.businessactivity.participantcompletion.BAPCState;
+import won.node.facet.businessactivity.statemanager.BAStateManager;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
-
-import won.node.facet.businessactivity.participantcompletion.BAPCState;
-
 
 import java.net.URI;
 
@@ -23,11 +23,12 @@ import java.net.URI;
  * Time: 16.30
  * To change this template use File | Settings | File Templates.
  */
-public class BAPCParticipantFacetImpl extends AbstractFacet
+public class BAPCParticipantFacetImpl extends AbstractBAFacet
 {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private SimpleBAPCStateManager stateManager = new SimpleBAPCStateManager();
+    @Autowired
+    private BAStateManager stateManager;
 
     @Override
     public FacetType getFacetType() {
@@ -45,8 +46,9 @@ public class BAPCParticipantFacetImpl extends AbstractFacet
                         needFacingConnectionClient.open(con, content);
                         //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
 
-                        stateManager.setStateForNeedUri(BAPCState.ACTIVE, con.getNeedURI(), con.getRemoteNeedURI());
-                        logger.info("Participant state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                        stateManager.setStateForNeedUri(BAPCState.ACTIVE.getURI(), con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI());
+                        storeBAStateForConnection(con, BAPCState.ACTIVE.getURI());
+                        logger.info("Participant state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
                     } catch (WonProtocolException e) {
                         logger.debug("caught Exception:", e);
                     } catch (Exception e) {
@@ -56,8 +58,6 @@ public class BAPCParticipantFacetImpl extends AbstractFacet
             });
         }
     }
-
-
 
     // Participant sends message to Coordinator
     public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
@@ -103,10 +103,15 @@ public class BAPCParticipantFacetImpl extends AbstractFacet
                     {
                         if(eventType.isBAPCParticipantEventType(eventType))
                         {
-                            BAPCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                            BAPCState state, newState;
+                            state = BAPCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
+                              con.getRemoteNeedURI(), getFacetType().getURI()).toString());
                             logger.info("Current state of the Participant: "+state.getURI().toString());
-                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                            logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                            newState = state.transit(eventType);
+                            stateManager.setStateForNeedUri(newState.getURI(), con.getNeedURI(),
+                              con.getRemoteNeedURI(), getFacetType().getURI());
+                            storeBAStateForConnection(con, newState.getURI());
+                            logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
 
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
@@ -158,10 +163,15 @@ public class BAPCParticipantFacetImpl extends AbstractFacet
                     // URI -> eventType
                     BAPCEventType eventType = BAPCEventType.getCoordinationEventTypeFromURI(sCoordMsg);
 
-                    BAPCState state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                    BAPCState state, newState;
+                    state = BAPCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
+                      con.getRemoteNeedURI(), getFacetType().getURI()).toString());
                     logger.info("Current state of the Participant: "+state.getURI().toString());
-                    stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                    logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                    newState = state.transit(eventType);
+                    stateManager.setStateForNeedUri(newState.getURI(), con.getNeedURI(),
+                      con.getRemoteNeedURI(), getFacetType().getURI());
+                    storeBAStateForConnection(con, newState.getURI());
+                    logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
 
@@ -174,11 +184,16 @@ public class BAPCParticipantFacetImpl extends AbstractFacet
 
                         if(BAPCEventType.isBAPCParticipantEventType(resendEventType))
                         {
-                            state = stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI());
+                            state = BAPCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
+                              con.getRemoteNeedURI(), getFacetType().getURI()).toString());
                             logger.info("Participant re-sends the previous message.");
                             logger.info("Current state of the Participant: "+state.getURI().toString());
-                            stateManager.setStateForNeedUri(state.transit(eventType), con.getNeedURI(), con.getRemoteNeedURI());
-                            logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI()));
+                            newState = state.transit(resendEventType);
+                            stateManager.setStateForNeedUri(newState.getURI(), con.getNeedURI(),
+                              con.getRemoteNeedURI(), getFacetType().getURI());
+                            storeBAStateForConnection(con, newState.getURI());
+
+                            logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
 
                             // eventType -> URI Resource
                             Resource r = myContent.createResource(resendEventType.getURI().toString());
@@ -199,5 +214,9 @@ public class BAPCParticipantFacetImpl extends AbstractFacet
 
             }
         });
+    }
+
+    public void setStateManager(final BAStateManager stateManager) {
+      this.stateManager = stateManager;
     }
 }

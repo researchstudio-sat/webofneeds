@@ -309,6 +309,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         }
         else{
             //todo refactor with register()
+          //TODO what happens with persistent WonNodeRepository? shouldn't camel configured again?
             //camelContext.getComponent()
             ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
         }

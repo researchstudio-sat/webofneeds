@@ -58,18 +58,7 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
     @Override
   public void hint(final URI ownNeedUri, final URI otherNeedUri, final double score, final URI originatorUri, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
-   /* try {
-      OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(ownNeedUri);
 
-
-    } catch (MalformedURLException e) {
-      logger.warn("couldn't create URL for needProtocolEndpoint", e);
-    } catch (NoSuchNeedFault noSuchNeedFault) {
-      throw NoSuchNeedFault.toException(noSuchNeedFault);
-    } catch (IllegalMessageForNeedStateFault illegalMessageForNeedStateFault) {
-      logger.warn("couldn't send hint", illegalMessageForNeedStateFault);
-    }
-                    */
       StringWriter sw = new StringWriter();
       content.write(sw, "TTL");
 

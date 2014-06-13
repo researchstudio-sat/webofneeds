@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.node.facet.impl.Facet;
 import won.node.facet.impl.FacetRegistry;
 import won.node.rdfstorage.RDFStorageService;
 import won.node.service.DataAccessService;
@@ -123,7 +124,8 @@ public class NeedCommunicationServiceImpl implements
   }
 
   @Override
-  public URI connect(final URI needURI, final URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+  public URI connect(final URI needURI, final URI otherNeedURI, final Model content) throws NoSuchNeedException,
+    IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     //create Connection in Database
     Connection con =  dataService.createConnection(needURI, otherNeedURI, null, content, ConnectionState.REQUEST_SENT, ConnectionEventType.OWNER_OPEN);
 
@@ -136,7 +138,9 @@ public class NeedCommunicationServiceImpl implements
     dataService.saveAdditionalContentForEvent(content, con, event, null);
 
     //invoke facet implementation
-    reg.get(con).connectFromOwner(con, content);
+    Facet facet = reg.get(con);
+    facet.connectFromOwner(con, content);
+    //reg.get(con).connectFromOwner(con, content);
 
     return con.getConnectionURI();
   }
@@ -159,7 +163,8 @@ public class NeedCommunicationServiceImpl implements
     dataService.saveAdditionalContentForEvent(content, con, event, null);
 
     //invoke facet implementation
-    reg.get(con).connectFromNeed(con, content);
+    Facet facet = reg.get(con);
+    facet.connectFromNeed(con, content);
 
     return con.getConnectionURI();
   }

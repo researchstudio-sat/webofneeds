@@ -1,0 +1,43 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
+    <div class="container" style="padding:0">
+        <div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
+            <ul class="nav navbar-nav">
+                <li ng-class="isActive()"><a href="#/">
+                    <span class="glyphicon glyphicon-transfer"></span>&nbsp;Web Of Needs</a>
+                </li>
+                <li ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak><a href="#/create-need/">
+                    <span class="glyphicon glyphicon-plus"></span>&nbsp;New	Need</a>
+                </li>
+                <li ng-show="!showPublic()" ng-class="isActive('need-list')" ng-cloak><a href="#/need-list/">
+                    <span class="glyphicon glyphicon-globe"></span>&nbsp;My Needs</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" ng-cloak>
+                <li><span ng-show="checkRegistered()">{{message}}</span></li>
+                <li ng-show="showPublic()" ng-class="isActive('register')"><a href="#/register">Create account</a></li>
+                <li ng-show="showPublic()" ng-class="isActive('signin')"><a href="#/signin">Sign in</a></li>
+                <li ng-show="!showPublic()"><a href="#/need-list">{{userdata.username}}</a></li>
+                <li ng-show="!showPublic()"><a href="" ng-click="onClickSignOut()">Sign out</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+

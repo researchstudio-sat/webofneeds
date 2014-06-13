@@ -31,7 +31,7 @@
 
     <aop:config proxy-target-class="false">
         <!-- name of the class or interface -->
-        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.facet.impl.Facet.*(..))"/>
+        <!--aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.facet.impl.Facet.*(..))"/-->
         <!-- messaging would be nice to monitor but we'd have to extract interfaces for those beans
         aop:advisor advice-ref="monitoringInterceptor"
         pointcut="execution(* won.node.messaging.NeedProtocolNeedClientImplJMSBased.*(..))"/>

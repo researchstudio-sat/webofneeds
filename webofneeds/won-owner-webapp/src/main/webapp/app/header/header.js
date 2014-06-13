@@ -1,4 +1,4 @@
-angular.module('won.owner').controller("HeaderCtrl", function($scope, $location, userService) {
+angular.module('won.owner').controller("HeaderCtrl", function($scope, $window,$location, userService) {
 
 	$scope.isActive = function(where) {
 		if ($location.path().indexOf(where) > -1) {
@@ -8,10 +8,31 @@ angular.module('won.owner').controller("HeaderCtrl", function($scope, $location,
 		}
 	};
 
+    $scope.authenticated = false;
+
 	$scope.showPublic = function() {
-		return !userService.isAuth();
+        $scope.authenticated = !userService.isAuth();
+		return  $scope.authenticated;
 	};
 
+    $scope.checkRegistered = function(){
+        return userService.getRegistered();
+    };
+    $scope.userdata = { username : userService.getUserName()};
+    $scope.message = "successfully registered";
+
+    $scope.$watch(userService.isAuth, function(logged_in){
+        if(logged_in){
+            $scope.userdata = { username : userService.getUserName()};
+            $scope.authenticated = true;
+            //$window.location.reload();
+          //  $location.path('/');
+
+      //      $window.location.reload();
+       //     $scope.showPublic();
+      //      $scope.$apply();
+        }
+    })
 
 	onResponseSignOut = function (result) {
 		if (result.status == 'OK') {

@@ -42,17 +42,6 @@ public abstract class AbstractDatasetBasedRdfStorageService implements RDFStorag
 
   protected abstract Dataset getDataset();
 
-  @Override
-  public void storeContent(final Need need, final Model graph)
-  {
-    this.storeContent(need.getNeedURI(), graph);
-  }
-
-  @Override
-  public Model loadContent(final Need need)
-  {
-    return this.loadContent(need.getNeedURI());
-  }
 
   @Override
   public void storeContent(final ConnectionEvent event, final Model graph)

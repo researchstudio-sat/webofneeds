@@ -83,7 +83,8 @@ import java.util.Date;
  */
 @Controller
 @RequestMapping("/")
-public class LinkedDataWebController
+public class
+  LinkedDataWebController
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
   //full prefix of a need resource
@@ -106,7 +107,6 @@ public class LinkedDataWebController
 
   //date format for Expires header (rfc 1123)
   private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
-
 
 
   @Autowired
@@ -146,6 +146,25 @@ public class LinkedDataWebController
       model.addAttribute("dataURI", uriService.toDataURIIfPossible(connectionURI).toString());
       return "rdfModelView";
     } catch (NoSuchConnectionException e) {
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return "notFoundView";
+    }
+  }
+
+  //webmvc controller method
+  @RequestMapping("${uri.path.page.connection}/{identifier}/event/{eventId}")
+  public String showEventPage(@PathVariable(value="identifier") String identifier,
+                              @PathVariable(value="eventId") String eventId,
+                              Model model,
+                              HttpServletResponse response) {
+    URI eventURI = uriService.createEventURI(uriService.createConnectionURIForId(identifier), eventId);
+    com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.getEventModel(eventURI);
+    if (model != null) {
+      model.addAttribute("rdfModel", rdfModel);
+      model.addAttribute("resourceURI", eventURI.toString());
+      model.addAttribute("dataURI", uriService.toDataURIIfPossible(eventURI).toString());
+      return "rdfModelView";
+    } else {
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
     }
@@ -258,8 +277,7 @@ public class LinkedDataWebController
 
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = new HttpHeaders();
-    headers = addNeverExpiresHeadersForNonListEntities(headers, requestUri);
-    headers = addNeverExpiresHeaders(headers);
+    headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
     headers.add("Location",redirectToURI);
     return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(null, headers, HttpStatus.SEE_OTHER);
   }
@@ -289,14 +307,22 @@ public class LinkedDataWebController
     }
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = new HttpHeaders();
-    headers = addNeverExpiresHeadersForNonListEntities(headers, requestUri);
+    headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
 
     //add a location header
     headers.add("Location",redirectToURI);
     return new ResponseEntity<String>("", headers, HttpStatus.SEE_OTHER);
   }
 
-  public HttpHeaders addNeverExpiresHeadersForNonListEntities(HttpHeaders headers, final String requestUri) {
+  /**
+   * If the request URI is the URI of a list page (list of needs, list of connections) it gets the
+   * header that says 'already expired' so that crawlers re-download these data. For other URIs, the
+   * 'never expires' header is added.
+   * @param headers
+   * @param requestUri
+   * @return
+   */
+  public HttpHeaders addExpiresHeadersBasedOnRequestURI(HttpHeaders headers, final String requestUri) {
     //now, we want to suppress the 'never expires' header information
     //for /resource/need and resource/connection so that crawlers always re-fetch these data
     URI requestUriAsURI = URI.create(requestUri);
@@ -304,6 +330,8 @@ public class LinkedDataWebController
     if (! (requestPath.replaceAll("/$","").endsWith(this.connectionResourceURIPath.replaceAll("/$", "")) ||
            requestPath.replaceAll("/$","").endsWith(this.needResourceURIPath.replaceAll("/$", "")))) {
       headers = addNeverExpiresHeaders(headers);
+    } else {
+      headers = addAlreadyExpiredHeaders(headers);
     }
     return headers;
   }
@@ -388,6 +416,33 @@ public class LinkedDataWebController
       return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.NOT_FOUND);
     }
   }
+
+  @RequestMapping(
+    value="${uri.path.data.connection}/{identifier}/event/{eventId}",
+    method = RequestMethod.GET,
+    produces={"application/rdf+xml","application/x-turtle","text/turtle","text/rdf+n3","application/json","application/ld+json"})
+  public ResponseEntity<com.hp.hpl.jena.rdf.model.Model> readEvent(
+    HttpServletRequest request,
+    @PathVariable(value="identifier") String identifier,
+    @PathVariable(value="eventId") String eventId) {
+    logger.debug("readConnection() called");
+
+    URI eventURI = uriService.createEventURI(uriService.createConnectionURIForId(identifier), eventId);
+    com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.getEventModel(eventURI);
+    if (rdfModel != null) {
+      HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(),
+                                                                                URI.create(request.getRequestURI()),
+                                                                                eventURI));
+      return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(rdfModel, headers, HttpStatus.OK);
+    } else {
+      return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.NOT_FOUND);
+    }
+  }
+
+
+
+
+
 
 
     /**

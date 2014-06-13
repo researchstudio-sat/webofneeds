@@ -66,7 +66,7 @@ public class LinkedDataRestClient
     } catch (ClientHandlerException e) {
       throw new IllegalArgumentException(MessageFormat.format("caught a clientHandler exception, " +
         "which may indicate that the URI that was accessed isn't a" +
-        " linked data URI, please check {0}.", resourceURI.toString()), e);
+        " linked data URI, please check {0}", resourceURI), e);
     }
     if (logger.isDebugEnabled()) {
       logger.debug("fetched model with {} statements for resource {}",result.size(), resourceURI);

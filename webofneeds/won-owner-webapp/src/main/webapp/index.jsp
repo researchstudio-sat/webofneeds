@@ -28,6 +28,7 @@
 
 		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
@@ -54,8 +55,10 @@
 						</li>
 					</ul>
 					<ul class="nav navbar-nav navbar-right" ng-cloak>
+                        <li><span ng-show="checkRegistered()">{{message}}</span></li>
 						<li ng-show="showPublic()" ng-class="isActive('register')"><a href="#/register">Create account</a></li>
 						<li ng-show="showPublic()" ng-class="isActive('signin')"><a href="#/signin">Sign in</a></li>
+            <li ng-show="!showPublic()"><a href="#/need-list">{{userdata.username}}</a></li>
 						<li ng-show="!showPublic()"><a href="" ng-click="onClickSignOut()">Sign out</a></li>
 					</ul>
 				</div>

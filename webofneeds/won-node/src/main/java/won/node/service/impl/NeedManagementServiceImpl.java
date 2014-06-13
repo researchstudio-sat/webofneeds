@@ -108,7 +108,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     split = stopwatch.start();
     String baseURI = need.getNeedURI().toString();
     RdfUtils.replaceBaseURI(content, baseURI);
-    rdfStorage.storeContent(need, content);
+    rdfStorage.storeContent(need.getNeedURI(), content);
     split.stop();
 
     stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase4");

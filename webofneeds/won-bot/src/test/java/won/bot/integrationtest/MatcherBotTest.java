@@ -31,7 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import won.bot.framework.events.event.impl.WorkDoneEvent;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
-import won.bot.impl.MatcherProtocolBot;
+import won.bot.impl.MatcherProtocolTestBot;
 
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
@@ -97,7 +97,7 @@ public class MatcherBotTest
    * add a listener to its internal event bus and to access its listeners, which
    * record information during the run that we later check with asserts.
    */
-  public static class MyBot extends MatcherProtocolBot
+  public static class MyBot extends MatcherProtocolTestBot
   {
     /**
      * Used for synchronization with the @TestD method: it should wait at the

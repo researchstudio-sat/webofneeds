@@ -47,11 +47,10 @@ public class RegisterMatcherAction extends BaseEventBotAction
 
       while (wonNodeUriIterator.hasNext()){
         URI wonNodeUri = (URI)wonNodeUriIterator.next();
-        logger.debug("registering matcher on won node {}",wonNodeUri);
-
+        logger.debug("registering matcher on won node {}", wonNodeUri);
         getEventListenerContext().getMatcherProtocolMatcherService().register( wonNodeUri );
         EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
-        logger.debug("matcher registered on won node {}",wonNodeUri);
+        logger.debug("matcher registered on won node {}", wonNodeUri);
       }
   }
 

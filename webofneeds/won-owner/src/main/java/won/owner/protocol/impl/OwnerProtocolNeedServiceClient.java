@@ -211,7 +211,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
             if (wonNodeUri == null) need.setWonNodeURI(URI.create(wonNodeDefault));
             else need.setWonNodeURI(wonNodeUri);
             needRepository.save(need);
-            needRepository.findByNeedURI(need.getNeedURI());
 
             ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
             if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
@@ -231,14 +230,11 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
               } while (stmtIterator.hasNext());
             //now that we're done, let our callers know the URI
             result.set(need.getNeedURI());
-          } catch (InterruptedException e) {
-            logger.warn("interrupted", e);
-            result.cancel(true);
-          } catch (ExecutionException e) {
-            logger.warn("ExecutionException caught", e);
-            result.cancel(true);
+          } catch (Exception e) {
+              logger.info("Error creating need {}. Stacktrace follows", need);
+              logger.warn("Error creating need", e);
+              result.cancel(true);
           }
-
         }
       }
     );
@@ -267,21 +263,23 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
         //find out the facet to connect with
         final URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
         //save the connection object in the database
+        Connection con = null;
         try {
           //Create new connection object
-          Connection con = new Connection();
+          con = new Connection();
           con.setNeedURI(needURI);
           con.setState(ConnectionState.REQUEST_SENT);
           con.setTypeURI(facetURI);
           con.setRemoteNeedURI(otherNeedURI);
           con.setConnectionURI(uri.get());
+          if (logger.isDebugEnabled()) {
+            logger.debug("saving connection: {}", con);
+          }
           connectionRepository.save(con);
           result.set(con.getConnectionURI());
-        } catch (InterruptedException e) {
-          logger.warn("could not connect", e);
-          result.cancel(true);
-        } catch (ExecutionException e) {
-          logger.warn("could not connect", e);
+        } catch (Exception e) {
+          logger.info("Error creating connection {}. Stacktrace follows", con);
+          logger.warn("Error creating connection ", e);
           result.cancel(true);
         }
       }

@@ -1,6 +1,7 @@
 angular.module('won.owner').factory('userService', function ($window, $http) {
 
 	var user = {};
+    var registered = false;
 	user = $window.user;
 
 	return {
@@ -14,6 +15,9 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 		getUserName:function () {
 			return user.username;
 		},
+        getRegistered:function (){
+            return registered;
+        },
 		resetAuth:function () {
 			user = {
 				isAuth : false
@@ -26,6 +30,7 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 			).then(
 				function() {
 					// success
+                    registered = true;
 					return {status : "OK"};
 				},
 				function(response) {

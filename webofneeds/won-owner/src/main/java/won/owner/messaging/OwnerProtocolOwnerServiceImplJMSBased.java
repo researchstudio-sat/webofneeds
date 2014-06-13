@@ -84,6 +84,7 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
     public void connect(@Header("ownNeedURI") final String ownNeedURI, @Header("otherNeedURI")final String otherNeedURI, @Header("ownConnectionURI")final String ownConnectionURI,
                         @Header("content")final String content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
+
       if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
       if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
       if (ownConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");

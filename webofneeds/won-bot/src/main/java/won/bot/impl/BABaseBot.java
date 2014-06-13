@@ -36,6 +36,7 @@ import won.protocol.model.FacetType;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -68,7 +69,7 @@ public abstract class BABaseBot extends EventBot
   protected BABaseBot() {
     this.scripts= getScripts();
     this.noOfNeeds = scripts.size()+1;
-    this.testScriptListeners = new ArrayList<BATestScriptListener>(noOfNeeds-1);
+    this.testScriptListeners = Collections.synchronizedList(new ArrayList(noOfNeeds-1));
   }
 
   protected abstract FacetType getParticipantFacetType();

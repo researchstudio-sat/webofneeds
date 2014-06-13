@@ -374,9 +374,8 @@ public enum BACCState {
     public static BACCState parseString(final String fragment)
     {
         for (BACCState state : values())
-            if (state.name.equals(fragment))
+            if (state.getURI().toString().equals(fragment))
                 return state;
-
         logger.warn("No enum could be matched for: {}", fragment);
         return null;
     }
