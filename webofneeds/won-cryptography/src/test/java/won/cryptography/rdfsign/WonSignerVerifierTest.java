@@ -26,15 +26,18 @@ public class WonSignerVerifierTest {
 
 
     @Test
-    public void modelAddRemoveSignatureTest() throws IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public void modelAddRemoveSignatureTest() throws IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException {
 
         Model model1 = ModelFactory.createDefaultModel();
-        InputStream is1 = TryTest.class.getResourceAsStream(RESOURCE_FILE);
+        InputStream is1 = WonSignerVerifierTest.class.getResourceAsStream(RESOURCE_FILE);
         model1.read(new InputStreamReader(is1), RESOURCE_URI, FileUtils.langTurtle);
 
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-        kpg.initialize(1024);
-        KeyPair keyPair = kpg.genKeyPair();
+//        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+//        kpg.initialize(1024);
+//        KeyPair keyPair = kpg.genKeyPair();
+
+        CryptographyService crypService = new CryptographyService();
+        KeyPair keyPair = crypService.createNewNeedKeyPair(URI.create(RESOURCE_URI));
 
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
@@ -64,10 +67,10 @@ public class WonSignerVerifierTest {
     //TODO ask Florian about the simple use-case test/tests in webofneeds project
     //that I can run and use to build upon when adding signing functionality
     @Test
-    public void signVerifyTest() throws IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public void signVerifyTest() throws IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException {
 
         Model model1 = ModelFactory.createDefaultModel();
-        InputStream is1 = TryTest.class.getResourceAsStream(RESOURCE_FILE);
+        InputStream is1 = WonSignerVerifierTest.class.getResourceAsStream(RESOURCE_FILE);
         model1.read(new InputStreamReader(is1), RESOURCE_URI, FileUtils.langTurtle);
 
         //KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
