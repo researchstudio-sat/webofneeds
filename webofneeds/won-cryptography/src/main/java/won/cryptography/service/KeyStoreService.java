@@ -117,7 +117,8 @@ public class KeyStoreService {
 
         try {
 
-            inputStream = new FileInputStream(storeFile);
+            if (storeFile.exists() && storeFile.isFile())
+                inputStream = new FileInputStream(storeFile);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
