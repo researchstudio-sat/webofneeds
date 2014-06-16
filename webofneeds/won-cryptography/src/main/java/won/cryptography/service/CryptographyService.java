@@ -1,5 +1,6 @@
 package won.cryptography.service;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,6 +8,7 @@ import java.io.File;
 import java.net.URI;
 import java.security.Key;
 import java.security.KeyPair;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
@@ -35,6 +37,8 @@ public class CryptographyService {
     private KeyStoreService keyStoreService;
 
     public CryptographyService () {
+
+        Security.addProvider(new BouncyCastleProvider());
 
         keyPairService = new KeyPairService();
         certificateService = new CertificateService();

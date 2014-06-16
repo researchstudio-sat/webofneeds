@@ -18,6 +18,10 @@ public class KeyPairService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    public KeyPairService() {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
     public KeyPair generateNewKeyPair() {
 
         Security.addProvider(new BouncyCastleProvider());

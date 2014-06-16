@@ -18,17 +18,22 @@ public class KeyStoreService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final String PROVIDER_BC = org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
-    private static final String KEY_STORE_TYPE = "UEBER";
+    private static final String KEY_STORE_TYPE = "UBER";
 
     // ToDo: password should not be here
     private final char[] storePW = "temp".toCharArray();
 
     // ToDo: load from config file
 
-
     private File storeFile;
 
     private java.security.KeyStore store;
+
+    public KeyStoreService() {
+
+        this(null);
+
+    }
 
     public KeyStoreService(File storeFile) {
 
