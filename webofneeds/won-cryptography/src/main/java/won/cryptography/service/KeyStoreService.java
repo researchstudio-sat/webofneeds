@@ -44,7 +44,7 @@ public class KeyStoreService {
         try {
             store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, PROVIDER_BC);
 
-            if (storeFile == null)
+            if (storeFile == null || !storeFile.exists() || !storeFile.isFile())
                 store.load(null, null);
             else {
                 loadStoreFromFile();
@@ -117,8 +117,7 @@ public class KeyStoreService {
 
         try {
 
-            if (storeFile.exists() && storeFile.isFile())
-                inputStream = new FileInputStream(storeFile);
+            inputStream = new FileInputStream(storeFile);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
