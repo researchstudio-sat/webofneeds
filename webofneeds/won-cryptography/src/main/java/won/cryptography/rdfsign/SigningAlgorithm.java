@@ -13,7 +13,7 @@ import java.security.*;
 // verifying the attached signature
 public interface SigningAlgorithm {
 
-    public String sign(Model model, PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException;
+    public String sign(Model model, PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException;
 
-    public boolean verify(Model model, PublicKey publicKey, String signature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, IOException;
+    public boolean verify(Model model, PublicKey publicKey, String signature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, IOException, NoSuchProviderException;
 }

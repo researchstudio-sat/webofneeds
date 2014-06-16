@@ -39,7 +39,7 @@ public class WonVerifier {
 
     //TODO implement
     //TODO chng exceptions to won exceptions?
-    public boolean verify(PublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, IOException {
+    public boolean verify(PublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, IOException, NoSuchProviderException {
 
         //TODO or get public key from eg model or some other known location?
         //TODO if many signatures first extract which parts should be verified with which signature?

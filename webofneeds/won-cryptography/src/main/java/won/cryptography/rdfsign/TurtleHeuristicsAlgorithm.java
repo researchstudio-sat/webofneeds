@@ -26,10 +26,10 @@ public class TurtleHeuristicsAlgorithm implements SigningAlgorithm {
     //TODO chng exceptions to WON exceptions
     @Override
     //public byte[] sign(Model model, PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-    public String sign(Model model, PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public String sign(Model model, PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException {
 
         // TODO eliptic curve will be used
-        Signature sig = Signature.getInstance("MD5WithRSA");
+        Signature sig = Signature.getInstance("SHA256WithECDSA", "BC");
         sig.initSign(privateKey);
         byte[] data = serializeForSigning(model);
         byte[] hashedData = hashForSigning(data);
@@ -43,7 +43,7 @@ public class TurtleHeuristicsAlgorithm implements SigningAlgorithm {
 
     //TODO chng exceptions to WON exceptions
     @Override
-    public boolean verify(Model model, PublicKey publicKey, String signature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, IOException {
+    public boolean verify(Model model, PublicKey publicKey, String signature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, IOException, NoSuchProviderException {
 
         // serialize and hash without-signature model
         // dataHash
@@ -52,7 +52,7 @@ public class TurtleHeuristicsAlgorithm implements SigningAlgorithm {
 
         // decrypt signature using the public key
         // and compare dataHash to SigHash
-        Signature sig = Signature.getInstance("MD5WithRSA");
+        Signature sig = Signature.getInstance("SHA256WithECDSA", "BC");
         sig.initVerify(publicKey);
         sig.update(hashedData);
 

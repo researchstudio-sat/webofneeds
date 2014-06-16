@@ -36,7 +36,7 @@ public class WonSigner {
     //TODO implement
     //TODO chng exceptions to won exceptions?
     //TODO where to put public key
-    public Model addSignature(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public Model addSignature(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException {
 
         String sigString = this.algorithm.sign(model, privateKey);
 
