@@ -58,6 +58,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- doesn't exist in the public repository -->
+        <dependency>
+            <groupId>de.uni_koblenz.aggrimm.icp</groupId>
+            <artifactId>signingframework</artifactId>
+            <version>1.0</version>
+        </dependency>
+
     </dependencies>
 
     <properties>

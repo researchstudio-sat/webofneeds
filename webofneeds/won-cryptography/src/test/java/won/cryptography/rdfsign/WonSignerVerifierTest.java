@@ -26,7 +26,7 @@ public class WonSignerVerifierTest {
 
 
     @Test
-    public void modelAddRemoveSignatureTest() throws IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException {
+    public void modelAddRemoveSignatureTest() throws Exception {
 
         Model model1 = ModelFactory.createDefaultModel();
         InputStream is1 = WonSignerVerifierTest.class.getResourceAsStream(RESOURCE_FILE);
@@ -67,7 +67,7 @@ public class WonSignerVerifierTest {
     //TODO ask Florian about the simple use-case test/tests in webofneeds project
     //that I can run and use to build upon when adding signing functionality
     @Test
-    public void signVerifyTest() throws IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException {
+    public void signVerifyTest() throws Exception {
 
         Model model1 = ModelFactory.createDefaultModel();
         InputStream is1 = WonSignerVerifierTest.class.getResourceAsStream(RESOURCE_FILE);
