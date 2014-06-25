@@ -16,14 +16,21 @@
 
 package won.bot.framework.events.listener.baStateBots;
 
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.ConnectFromOtherNeedEvent;
+import com.hp.hpl.jena.query.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.MessageEvent;
 import won.bot.framework.events.event.NeedSpecificEvent;
+import won.bot.framework.events.event.impl.ConnectFromOtherNeedEvent;
+import won.bot.framework.events.filter.EventFilter;
 import won.bot.framework.events.filter.impl.*;
 import won.bot.framework.events.listener.AbstractFinishingListener;
-import won.bot.framework.events.filter.EventFilter;
-import won.bot.framework.events.EventListenerContext;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.CachingLinkedDataSource;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import java.net.URI;
@@ -132,6 +139,9 @@ public class BATestScriptListener extends AbstractFinishingListener
       //send an automatic open
       logger.debug("sending automatic open in response to connect");
       sendOpen(connectionURI, new Date(System.currentTimeMillis() + millisBetweenMessages));
+      synchronized (countMonitor){
+        this.messagesInFlight++;
+      }
       return;
     }
 
@@ -140,14 +150,7 @@ public class BATestScriptListener extends AbstractFinishingListener
       //if there is an action, execute it.
       BATestScriptAction action = this.script.getNextAction();
       logger.debug("executing next script action: {}", action);
-      if (!action.isNopAction()){
-        URI fromCon = getConnectionToSendFrom(action.isSenderIsCoordinator());
-        logger.debug("sending message for action {} on connection {}", action, fromCon);
-        sendMessage(action, fromCon, new Date(System.currentTimeMillis() + millisBetweenMessages));
-        synchronized (countMonitor){
-          this.messagesInFlight++;
-        }
-      } else {
+      if (action.isNopAction()){
         logger.debug("not sending any messages for action {}", action);
         //if there are no more messages in the script, we're done:
         // it means we don't expect to receive more messages from anyone else, and
@@ -155,6 +158,16 @@ public class BATestScriptListener extends AbstractFinishingListener
         if (!script.hasNext()){
           logger.debug("unsubscribing from all events as last script action is NOP");
           performFinish();
+        }
+      } else {
+        URI fromCon = getConnectionToSendFrom(action.isSenderIsCoordinator());
+        logger.debug("sending message for action {} on connection {}", action, fromCon);
+        //check if the connection is really in the state required for the action
+        assert connectionBAStateAllowsAction(fromCon, action) : "connection state does not allow next action";
+       // logger.debug("vrati {}", connectionBAStateAllowsAction(fromCon, action));
+        sendMessage(action, fromCon, new Date(System.currentTimeMillis() + millisBetweenMessages));
+        synchronized (countMonitor){
+          this.messagesInFlight++;
         }
       }
     } else {
@@ -164,9 +177,54 @@ public class BATestScriptListener extends AbstractFinishingListener
     //through the last action, which we have to process as well otherwise the listener will finish too early
     //which may cause the bot to finish and the whole application to shut down before all messages have been
     //received, which leads to ugly exceptions
-    synchronized (countMonitor){
-      this.messagesInFlight--;
+    if (event instanceof MessageEvent){
+      //only decrement the message counter if the event indicates that
+      //we received a message
+      synchronized (countMonitor){
+        this.messagesInFlight--;
+      }
     }
+  }
+
+  private boolean connectionBAStateAllowsAction(final URI fromCon, final BATestScriptAction action) {
+
+    LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
+    if (linkedDataSource instanceof CachingLinkedDataSource) {
+      ((CachingLinkedDataSource)linkedDataSource).removeElement(fromCon);
+    }
+    logger.info("fromCon {}, stateOfSenderBeforeSending{}", fromCon, action.getStateOfSenderBeforeSending());
+    Model dataModel = linkedDataSource.getModelForResource(fromCon);
+
+    logger.info("crawled dataset for fromCon {}: {}", fromCon, RdfUtils.toString(dataModel));
+
+    String sparqlPrefix =
+      "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>"+
+        "PREFIX geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>"+
+        "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>"+
+        "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"+
+        "PREFIX won:   <http://purl.org/webofneeds/model#>"+
+        "PREFIX wontx:   <http://purl.org/webofneeds/tx/model#>"+
+        "PREFIX gr:    <http://purl.org/goodrelations/v1#>"+
+        "PREFIX sioc:  <http://rdfs.org/sioc/ns#>"+
+        "PREFIX ldp:   <http://www.w3.org/ns/ldp#>";
+
+    String stateForComperisson =action.getStateOfSenderBeforeSending().toString();
+    stateForComperisson = stateForComperisson.substring(stateForComperisson.lastIndexOf("#")+1);
+
+    logger.debug("state for compersion: {}", stateForComperisson);
+
+    String queryString = sparqlPrefix +
+      "ASK WHERE { ?con wontx:hasBAState ?state }";
+
+    QuerySolutionMap binding = new QuerySolutionMap();
+    binding.add("con", new ResourceImpl(fromCon.toString()));
+    binding.add("state", new ResourceImpl(action.getStateOfSenderBeforeSending().toString()));
+    Query query = QueryFactory.create(queryString);
+    QueryExecution qExec = QueryExecutionFactory.create(query, dataModel, binding);
+    boolean result = qExec.execAsk();
+
+
+    return result;
   }
 
   private boolean bothConnectionURIsAreKnown() {

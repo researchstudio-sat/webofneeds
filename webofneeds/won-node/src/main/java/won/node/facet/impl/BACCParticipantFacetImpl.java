@@ -4,9 +4,9 @@ import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.facet.businessactivity.statemanager.BAStateManager;
 import won.node.facet.businessactivity.coordinatorcompletion.BACCEventType;
 import won.node.facet.businessactivity.coordinatorcompletion.BACCState;
+import won.node.facet.businessactivity.statemanager.BAStateManager;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
@@ -29,6 +29,8 @@ public class BACCParticipantFacetImpl extends AbstractBAFacet
 
     @Autowired
     private ConnectionRepository connectionRepository;
+
+    @Autowired
     private BAStateManager stateManager;
 
     @Override
@@ -47,7 +49,8 @@ public class BACCParticipantFacetImpl extends AbstractBAFacet
                         needFacingConnectionClient.open(con, content);
                         stateManager.setStateForNeedUri(BACCState.ACTIVE.getURI(), con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI());
                         storeBAStateForConnection(con, BACCState.ACTIVE.getURI());
-                        logger.debug("Participant state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
+                        logger.debug("Participant state {} for Coordinator {} ",stateManager.getStateForNeedUri(con
+                          .getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()), con.getRemoteNeedURI());
 
                     } catch (Exception e) {
                         logger.warn("caught Exception:", e);
@@ -106,7 +109,9 @@ public class BACCParticipantFacetImpl extends AbstractBAFacet
                             BACCState state, newState;
                             state = BACCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
                               con.getRemoteNeedURI(), getFacetType().getURI()).toString());
-                            logger.debug("Current state of the Participant: "+state.getURI().toString());
+                            logger.debug("Current state of the Participant {} for Coordinator {} ", state.getURI()
+                                                                                                      .toString
+                              (), con.getRemoteNeedURI());
                             newState = state.transit(eventType);
                             stateManager.setStateForNeedUri(newState.getURI(), con.getNeedURI(),
                               con.getRemoteNeedURI(), getFacetType().getURI());
@@ -166,7 +171,7 @@ public class BACCParticipantFacetImpl extends AbstractBAFacet
                     BACCState state, newState;
                     state = BACCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
                       con.getRemoteNeedURI(), getFacetType().getURI()).toString());
-                    logger.debug("Current state of the Participant: "+state.getURI().toString());
+                    logger.debug("Current state of the Participant {}: "+state.getURI().toString());
                     newState = state.transit(eventType);
                     stateManager.setStateForNeedUri(newState.getURI(), con.getNeedURI(),
                       con.getRemoteNeedURI(), getFacetType().getURI());

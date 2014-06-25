@@ -7,6 +7,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.node.facet.impl.WON_TX;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.exception.*;
 import won.protocol.model.*;
@@ -205,7 +206,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
                 con.getTypeURI().equals(FacetType.BAAtomicCCCoordinatorFacet.getURI()))
         {
             baFacetType = true;
-            stmtIterator = baseRes.listProperties(WON.COORDINATION_MESSAGE);
+            stmtIterator = baseRes.listProperties(WON_TX.COORDINATION_MESSAGE);
         }
         else
         {

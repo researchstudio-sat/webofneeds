@@ -20,6 +20,11 @@
       <!-- WON stuff -->
       <dependency>
           <groupId>webofneeds</groupId>
+          <artifactId>won-facets-tx</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>webofneeds</groupId>
           <artifactId>won-owner</artifactId>
           <version>${project.version}</version>
       </dependency>

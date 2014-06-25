@@ -32,6 +32,8 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Applica
   @Autowired
   private TaskScheduler taskScheduler;
 
+  private boolean shutdownApplicationContextIfWorkDone = true;
+
 
   @Override
   public void onApplicationEvent(final ApplicationEvent event)
@@ -97,6 +99,14 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Applica
     this.taskScheduler = taskScheduler;
   }
 
+  public boolean isShutdownApplicationContextIfWorkDone() {
+    return shutdownApplicationContextIfWorkDone;
+  }
+
+  public void setShutdownApplicationContextIfWorkDone(final boolean shutdownApplicationContextIfWorkDone) {
+    this.shutdownApplicationContextIfWorkDone = shutdownApplicationContextIfWorkDone;
+  }
+
   private void registerCheckWorkDoneTrigger()
   {
     if (this.checkWorkDoneTrigger == null){
@@ -107,7 +117,13 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Applica
       @Override
       public void run()
       {
-        if (isWorkDone()) SpringApplication.exit(applicationContext);
+        boolean workDone = isWorkDone();
+        if (! shutdownApplicationContextIfWorkDone){
+          logger.debug("botmanager will not shutdown spring context when work is done. (workDone:{})",workDone );
+        } else {
+          logger.debug("botmanager will shutdown spring context when work is done. (workDone:{})",workDone );
+          if (workDone) SpringApplication.exit(applicationContext);
+        }
       }
     }, checkWorkDoneTrigger);
   }

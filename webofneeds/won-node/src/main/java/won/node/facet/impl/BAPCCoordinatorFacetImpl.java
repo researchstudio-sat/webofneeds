@@ -45,12 +45,16 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
             public void run()
             {
                 try {
+                    logger.debug("*** open from Particiapnt:");
+                    logger.debug("coordinator {}, participant {}",con.getNeedURI(), con.getRemoteNeedURI());
+                    logger.debug("con {}",  con.getConnectionURI());
                     ownerFacingConnectionClient.open(con.getConnectionURI(), content);
-
                     stateManager.setStateForNeedUri(BAPCState.ACTIVE.getURI(), con.getNeedURI(),
                       con.getRemoteNeedURI(), getFacetType().getURI());
                     storeBAStateForConnection(con, BAPCState.ACTIVE.getURI());
-                    logger.debug("Coordinator state: " + stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
+                    logger.debug("opened from Participant");
+                    logger.debug("coordinator {}, participant {}", con.getNeedURI().toString(), con.getRemoteNeedURI().toString());
+                    logger.debug("con {}, con BAstate {}",con.getConnectionURI().toString(), stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString());
                 } catch (WonProtocolException e) {
                     logger.warn("caught Exception:", e);
                 }
@@ -81,7 +85,9 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                         messageForSending = ni.toList().get(0).toString();
                         messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
                         eventType = BAPCEventType.getCoordinationEventTypeFromString(messageForSending);
-                        logger.debug("Coordinator sends the text message: {}", eventType.getURI());
+                        logger.debug("*** Coordinator sends the text message {}", eventType.getURI());
+                        logger.debug("coordinator {}, participant {}",con.getNeedURI(), con.getRemoteNeedURI());
+                        logger.debug("con {}",  con.getConnectionURI());
                     }
                     //message as MODEL
                     else {
@@ -90,11 +96,13 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                         {
                             String eventTypeURI = ni.toList().get(0).asResource().getURI().toString();
                             eventType = BAPCEventType.getBAEventTypeFromURI(eventTypeURI);
-                            logger.debug("Coordinator sends the RDF: {}", eventType.getURI());
+                            logger.debug("*** Coordinator sends the text message {}", eventType.getURI());
+                            logger.debug("coordinator {}, participant {}",con.getNeedURI(), con.getRemoteNeedURI());
+                            logger.debug("con {}",  con.getConnectionURI());
                         }
                         else
                         {
-                            logger.debug("Message {} does not contain a proper content.", message.toString());
+                            logger.debug("ERROR: Message {} does not contain a proper content.", message.toString());
                             return;
                         }
                     }
@@ -110,7 +118,7 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                             BAPCState state, newState;
                             state = BAPCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
                               con.getRemoteNeedURI(), getFacetType().getURI()).toString());
-                            logger.debug("Current state of the Coordinator: "+state.getURI().toString());
+                            logger.debug("Before sending Coordinator has the BAState {} ",state.getURI().toString());
                             newState = state.transit(eventType);
                             stateManager.setStateForNeedUri(newState.getURI(), con.getNeedURI(),
                               con.getRemoteNeedURI(), getFacetType().getURI());

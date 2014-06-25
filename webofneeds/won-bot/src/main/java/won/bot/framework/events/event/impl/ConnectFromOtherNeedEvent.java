@@ -18,11 +18,12 @@ package won.bot.framework.events.event.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.event.BaseNeedAndConnectionSpecificEvent;
+import won.bot.framework.events.event.MessageEvent;
 import won.protocol.model.Connection;
 
 /**
  */
-public class ConnectFromOtherNeedEvent extends BaseNeedAndConnectionSpecificEvent
+public class ConnectFromOtherNeedEvent extends BaseNeedAndConnectionSpecificEvent  implements MessageEvent
 {
 
   private final Model content;

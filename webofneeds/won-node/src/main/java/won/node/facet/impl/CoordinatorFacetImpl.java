@@ -63,6 +63,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
         RDFDataMgr.write(System.out, remoteFacetModel, Lang.TTL);*/
 
     final Connection connectionForRunnable = con;
+
     //send to need
     executorService.execute(new Runnable() {
       @Override
@@ -208,12 +209,12 @@ public class CoordinatorFacetImpl extends AbstractFacet
           Model myContent = ModelFactory.createDefaultModel();
           myContent.setNsPrefix("","no:uri");
           Resource res = myContent.createResource("no:uri");
-
           if(c.getState() == ConnectionState.CONNECTED || c.getState() == ConnectionState.REQUEST_SENT)
           {
             if (res == null) {
               logger.debug("no default prexif specified in model, could not obtain additional content, using ABORTED message");
             }
+
             res.removeAll(WON_TX.COORDINATION_MESSAGE);
             res.addProperty(WON_TX.COORDINATION_MESSAGE, WON_TX.COORDINATION_MESSAGE_ABORT);
           }

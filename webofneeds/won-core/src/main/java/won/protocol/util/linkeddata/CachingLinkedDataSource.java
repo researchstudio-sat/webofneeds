@@ -53,6 +53,19 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
 
   //In-memory dataset for caching linked data.
 
+  /**
+   * Removes the element associated with the
+   * specified URI from the cache
+   * @param resource
+   */
+  public void removeElement(URI resource) {
+    assert resource != null : "resource must not be null";
+    cache.remove(resource);
+  }
+  
+  public void clear(){
+    cache.removeAll();
+  }
 
   public Model getModelForResource(URI resource){
 

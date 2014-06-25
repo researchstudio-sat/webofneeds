@@ -3,7 +3,7 @@ package won.bot.framework.events.listener.baStateBots.baPCMessagingBots.atomicBo
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.BATestScriptAction;
 import won.bot.framework.events.listener.baStateBots.NopAction;
-import won.bot.framework.events.listener.baStateBots.WON_TX;
+import won.node.facet.impl.WON_TX;
 
 import java.net.URI;
 import java.util.ArrayList;

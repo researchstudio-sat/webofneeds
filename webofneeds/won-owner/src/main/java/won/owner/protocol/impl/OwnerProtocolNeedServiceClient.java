@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import won.node.facet.impl.WON_TX;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.*;
@@ -28,7 +29,6 @@ import won.protocol.vocabulary.WON;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 /**
@@ -147,7 +147,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     chatMessage.setLocalConnectionURI(connectionURI);
 
     Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-    StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
+    StmtIterator stmtIterator = baseRes.listProperties(WON_TX.HAS_TEXT_MESSAGE);
     String textMessage = null;
     while (stmtIterator.hasNext()) {
       RDFNode obj = stmtIterator.nextStatement().getObject();

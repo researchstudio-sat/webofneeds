@@ -2,6 +2,8 @@ package won.bot.framework.events.listener.baStateBots;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+//import won.bot.framework.events.listener.standardTwoPhaseCommitBots.WON_TX;
+import won.node.facet.impl.WON_TX;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;

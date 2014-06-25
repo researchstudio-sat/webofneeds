@@ -32,7 +32,7 @@ import org.junit.runners.Suite;
          BAAtomicCCActiveExitingBotTest.class,
          BAAtomicCCActiveFailingBotTest.class,
          BAAtomicCCActiveNotCompletingBotTest.class,
-         BAAtomicCCBotTest.class,
+      //   BAAtomicCCBotTest.class,
          BAAtomicCCCompletingFailingBotTest.class,
          BAAtomicCCCompletingNotCompletingBotTest.class,
          BAAtomicPCActiveExitingBotTest.class,

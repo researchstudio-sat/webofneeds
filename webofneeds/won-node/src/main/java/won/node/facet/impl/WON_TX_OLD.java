@@ -12,7 +12,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * Time: 12.06
  * To change this template use File | Settings | File Templates.
  */
-public class WON_TX
+public class WON_TX_OLD
 {
    // public static final String BASE_URI = "http://purl.org/webofneeds/tx/model#";
     public static final String BASE_URI = "http://purl.org/webofneeds/tx/model#";

@@ -18,13 +18,14 @@ package won.bot.framework.events.event.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.event.BaseNeedAndConnectionSpecificEvent;
+import won.bot.framework.events.event.MessageEvent;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 
 /**
  *
  */
-public class MessageFromOtherNeedEvent extends BaseNeedAndConnectionSpecificEvent
+public class MessageFromOtherNeedEvent extends BaseNeedAndConnectionSpecificEvent  implements MessageEvent
 {
   private final ChatMessage message;
   private final Model content;
@@ -41,5 +42,13 @@ public class MessageFromOtherNeedEvent extends BaseNeedAndConnectionSpecificEven
 
   public Model getContent() {
     return content;
+  }
+
+  @Override
+  public String toString() {
+    return "MessageFromOtherNeedEvent{" +
+      "message=" + message +
+      ", content=" + content +
+      '}';
   }
 }

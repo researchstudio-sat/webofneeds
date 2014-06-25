@@ -43,12 +43,13 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
                 @Override
                 public void run() {
                     try {
+                        logger.debug("*** Participant sends open");
+
                         needFacingConnectionClient.open(con, content);
                         //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
 
                         stateManager.setStateForNeedUri(BAPCState.ACTIVE.getURI(), con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI());
                         storeBAStateForConnection(con, BAPCState.ACTIVE.getURI());
-                        logger.info("Participant state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
                     } catch (WonProtocolException e) {
                         logger.debug("caught Exception:", e);
                     } catch (Exception e) {
@@ -80,9 +81,12 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
                     {
                         messageForSending = ni.toList().get(0).toString();
                         messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
-                        logger.info("Participant sends: " + messageForSending);
+
                         eventType = BAPCEventType.getCoordinationEventTypeFromString(messageForSending);
-                    }
+
+                        logger.debug("*** Participant sends the text message:"+eventType.getURI()+" coordinator:"+con.getRemoteNeedURI()+ " participant:"+con.getNeedURI()+
+                        " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString());
+                  }
                     // message as MODEL
                     else {
                         ni = message.listObjectsOfProperty(message.getProperty(WON_TX.COORDINATION_MESSAGE.getURI().toString()));
@@ -90,7 +94,9 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
                         {
                             String eventTypeURI = ni.toList().get(0).asResource().getURI().toString();
                             eventType = BAPCEventType.getBAEventTypeFromURI(eventTypeURI);
-                            logger.info("Participants sends the RDF:" );
+
+                            logger.debug("*** Participant sends the RDF message:"+eventType.getURI()+" coordinator:"+con.getRemoteNeedURI()+ " participant:"+con.getNeedURI()+
+                            " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString());
                         }
                     }
 
@@ -106,28 +112,31 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
                             BAPCState state, newState;
                             state = BAPCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
                               con.getRemoteNeedURI(), getFacetType().getURI()).toString());
-                            logger.info("Current state of the Participant: "+state.getURI().toString());
+
                             newState = state.transit(eventType);
                             stateManager.setStateForNeedUri(newState.getURI(), con.getNeedURI(),
                               con.getRemoteNeedURI(), getFacetType().getURI());
                             storeBAStateForConnection(con, newState.getURI());
-                            logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
+
+                            logger.debug("New state = coordinator:"+con.getRemoteNeedURI()+ " participant:"+con.getNeedURI()+
+                            " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString());
 
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
                             baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
 
                             needFacingConnectionClient.textMessage(con, myContent);
+
+                            logger.debug("Participant sent the message.");
                         }
                         else
                         {
-                            logger.info("The eventType: "+eventType.getURI().toString()+" can not be triggered by Participant.");
+                            logger.info("The eventType: {} can not be triggered by Participant.", eventType.getURI().toString());
                         }
-
                     }
                     else
                     {
-                        logger.info("The event type denoted by "+messageForSending+" is not allowed.");
+                        logger.info("The event type denoted by {} is not allowed.", messageForSending);
                     }
                 } catch (WonProtocolException e) {
                     logger.warn("caught WonProtocolException:", e);
@@ -145,7 +154,10 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
             @Override
             public void run() {
                 try {
-                    logger.info("Received message from Coordinator: " + message.toString());
+
+                    logger.debug("*** Participant receives a message:"+message.toString()+" coordinator:"+con.getRemoteNeedURI()+ " participant:"+con.getNeedURI()+
+                    " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString());
+
                     NodeIterator it = message.listObjectsOfProperty(WON_TX.COORDINATION_MESSAGE);
                     if (!it.hasNext()) {
                         logger.info("message did not contain a won-ba:coordinationMessage");
@@ -166,18 +178,23 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
                     BAPCState state, newState;
                     state = BAPCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
                       con.getRemoteNeedURI(), getFacetType().getURI()).toString());
-                    logger.info("Current state of the Participant: "+state.getURI().toString());
+
                     newState = state.transit(eventType);
                     stateManager.setStateForNeedUri(newState.getURI(), con.getNeedURI(),
                       con.getRemoteNeedURI(), getFacetType().getURI());
                     storeBAStateForConnection(con, newState.getURI());
-                    logger.info("New state of the Participant:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
+
+                    logger.debug("New state = coordinator:"+con.getRemoteNeedURI()+ " participant:"+con.getNeedURI()+
+                      " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString());
 
                     ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+
+                    logger.debug("The message is received");
 
                     BAPCEventType resendEventType = state.getResendEvent();
                     if(resendEventType!=null)
                     {
+                        logger.debug("Resending!!!");
                         Model myContent = ModelFactory.createDefaultModel();
                         myContent.setNsPrefix("","no:uri");
                         Resource baseResource = myContent.createResource("no:uri");

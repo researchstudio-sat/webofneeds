@@ -189,6 +189,7 @@ public abstract class AbstractBAFacet implements Facet
     rdfStorageService.storeContent(con.getConnectionURI(), connectionBAStateContent);
   }
 
+
   /**
    * This function is invoked when a matcher sends a hint message to a won node and
    * usually executes registered facet specific code.

@@ -128,14 +128,15 @@ public class ParticipantFacetImpl extends AbstractFacet
       {
         try {
           //if (msgForRunnable == WON_TX.COORDINATION_MESSAGE_ABORT){
-
-          if (msgForRunnable.equals(WON_TX.COORDINATION_MESSAGE_ABORT)){
-            logger.info("Abort the following connection: "+con.getConnectionURI()+" "+con.getNeedURI()+" "+con.getRemoteNeedURI() +" "+con.getState()+ " "+con.getTypeURI());
+          if(msgForRunnable!=null){
+            if (msgForRunnable.equals(WON_TX.COORDINATION_MESSAGE_ABORT)){
+              logger.info("Abort the following connection: "+con.getConnectionURI()+" "+con.getNeedURI()+" "+con.getRemoteNeedURI() +" "+con.getState()+ " "+con.getTypeURI());
+            }
+            else {
+              logger.info("Committed: "+con.getConnectionURI()+" "+con.getNeedURI()+" "+con.getRemoteNeedURI() +" "+con.getState()+ " "+con.getTypeURI());
+            }
+            ownerFacingConnectionClient.close(con.getConnectionURI(), content);
           }
-          else {
-            logger.info("Committed: "+con.getConnectionURI()+" "+con.getNeedURI()+" "+con.getRemoteNeedURI() +" "+con.getState()+ " "+con.getTypeURI());
-          }
-          ownerFacingConnectionClient.close(con.getConnectionURI(), content);
 
         } catch (WonProtocolException e) {
           logger.warn("caught WonProtocolException:", e);

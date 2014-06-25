@@ -3,6 +3,7 @@ package won.node.facet.businessactivity.statemanager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import won.node.facet.impl.WON_TX;
 import won.protocol.model.BAState;
 import won.protocol.repository.BAStateRepository;
 
@@ -34,7 +35,7 @@ public class JpaBasedBAStateManager implements BAStateManager
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void setStateForNeedUri(final URI stateUri, final URI coordinatorURI, final URI participantURI, final URI facetURI) {
+  public void setStateForNeedUri(final URI stateUri, final URI statePhaseURI, final URI coordinatorURI, final URI participantURI, final URI facetURI) {
     BAState state = null;
     List<BAState> states = stateRepository.findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI, participantURI, facetURI);
     Iterator<BAState> stateIterator = states.iterator();
@@ -50,7 +51,26 @@ public class JpaBasedBAStateManager implements BAStateManager
     state.setParticipantURI(participantURI);
     state.setBaStateURI(stateUri);
     state.setFacetTypeURI(facetURI);
+    state.setBaPhaseURI(statePhaseURI);
     stateRepository.save(state);
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public void setStateForNeedUri(final URI stateUri, final URI coordinatorURI, final URI participantURI, final URI facetURI) {
+    setStateForNeedUri(stateUri, URI.create(WON_TX.PHASE_NONE.getURI()), coordinatorURI, participantURI, facetURI);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public URI getStatePhaseForNeedUri(final URI coordinatorURI, final URI participantURI, final URI facetURI) {
+    List<BAState> states = stateRepository.findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI, participantURI, facetURI);
+    Iterator<BAState> stateIterator = states.iterator();
+    if(stateIterator.hasNext()) {
+      return stateIterator.next().getBaPhaseURI();
+    } else {
+      return null;
+    }
   }
 
   public void setStateRepository(final BAStateRepository stateRepository) {

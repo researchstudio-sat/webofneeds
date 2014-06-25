@@ -310,9 +310,31 @@ public enum BAPCState {
         for (BAPCState state : values())
           if (state.getURI().toString().equals(fragment))
                 return state;
-        logger.warn("No enum could be matched for: {}", fragment);
+        logger.warn("2No enum could be matched for: {}", fragment);
         return null;
     }
+
+    public static Phase parsePhase(final String fragment)
+    {
+      String comparedString = fragment;
+      comparedString = fragment.substring(fragment.lastIndexOf("#baPhase")+8);
+      for(Phase phase : Phase.values())
+      {
+        if (phase.toString().equals(comparedString))
+          return phase;
+      }
+      logger.warn("1No enum could be matched for: {}", fragment);
+      return null;
+    }
+
+  public static URI getPhaseURI(Phase phase)
+  {
+    return URI.create(WON_TX.BASE_URI + "baPhase"+phase.toString());
+  }
+
+
+
+
 
 
 
