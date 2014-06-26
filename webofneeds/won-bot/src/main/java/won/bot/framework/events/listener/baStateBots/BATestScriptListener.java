@@ -164,7 +164,6 @@ public class BATestScriptListener extends AbstractFinishingListener
         logger.debug("sending message for action {} on connection {}", action, fromCon);
         //check if the connection is really in the state required for the action
         assert connectionBAStateAllowsAction(fromCon, action) : "connection state does not allow next action";
-       // logger.debug("vrati {}", connectionBAStateAllowsAction(fromCon, action));
         sendMessage(action, fromCon, new Date(System.currentTimeMillis() + millisBetweenMessages));
         synchronized (countMonitor){
           this.messagesInFlight++;
@@ -192,10 +191,10 @@ public class BATestScriptListener extends AbstractFinishingListener
     if (linkedDataSource instanceof CachingLinkedDataSource) {
       ((CachingLinkedDataSource)linkedDataSource).removeElement(fromCon);
     }
-    logger.info("fromCon {}, stateOfSenderBeforeSending{}", fromCon, action.getStateOfSenderBeforeSending());
+    logger.debug("fromCon {}, stateOfSenderBeforeSending{}", fromCon, action.getStateOfSenderBeforeSending());
     Model dataModel = linkedDataSource.getModelForResource(fromCon);
 
-    logger.info("crawled dataset for fromCon {}: {}", fromCon, RdfUtils.toString(dataModel));
+    logger.debug("crawled dataset for fromCon {}: {}", fromCon, RdfUtils.toString(dataModel));
 
     String sparqlPrefix =
       "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>"+
@@ -207,11 +206,6 @@ public class BATestScriptListener extends AbstractFinishingListener
         "PREFIX gr:    <http://purl.org/goodrelations/v1#>"+
         "PREFIX sioc:  <http://rdfs.org/sioc/ns#>"+
         "PREFIX ldp:   <http://www.w3.org/ns/ldp#>";
-
-    String stateForComperisson =action.getStateOfSenderBeforeSending().toString();
-    stateForComperisson = stateForComperisson.substring(stateForComperisson.lastIndexOf("#")+1);
-
-    logger.debug("state for compersion: {}", stateForComperisson);
 
     String queryString = sparqlPrefix +
       "ASK WHERE { ?con wontx:hasBAState ?state }";

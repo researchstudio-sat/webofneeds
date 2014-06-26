@@ -19,7 +19,6 @@ public class CompletingBlockingSPBot extends BATestBotScript
   protected List<BATestScriptAction> setupActions() {
     List<BATestScriptAction> actions = new ArrayList();
 
-    actions.add(new BATestScriptAction(true, "MESSAGE_COMPLETED", URI.create(WON_TX.STATE_COMPLETING.getURI())));
     actions.add(new BATestScriptAction(false, "MESSAGE_CLOSE", URI.create(WON_TX.STATE_COMPLETED.getURI())));
     actions.add(new BATestScriptAction(true, "MESSAGE_CLOSED", URI.create(WON_TX.STATE_CLOSING.getURI())));
 
@@ -28,3 +27,6 @@ public class CompletingBlockingSPBot extends BATestBotScript
     return actions;
   }
 }
+
+
+

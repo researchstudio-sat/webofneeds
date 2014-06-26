@@ -236,7 +236,7 @@ public class BACCBotTest
 
       Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,300);
 
-      logger.info("crawled dataset: {}", RdfUtils.toString(dataModel));
+      logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
 
       String queryString = sparqlPrefix +
         "SELECT ?need ?connection ?need2 WHERE {" +
@@ -287,7 +287,7 @@ public class BACCBotTest
 
       Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,300);
 
-      logger.info("crawled dataset: {}", RdfUtils.toString(dataModel));
+      logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
 
       String queryString = sparqlPrefix +
         "SELECT ?need ?connection ?need2 WHERE {" +

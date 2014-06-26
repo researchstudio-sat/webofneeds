@@ -21,6 +21,7 @@ import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.BAAtomicCCBot;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
@@ -206,6 +207,10 @@ public class BAAtomicCCBotTest
 
       LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
 
+      if (linkedDataSource instanceof CachingLinkedDataSource) {
+        ((CachingLinkedDataSource)linkedDataSource).clear();
+      }
+
       List<URI> properties = new ArrayList<>();
       List<URI> objects = new ArrayList<>();
 
@@ -219,7 +224,7 @@ public class BAAtomicCCBotTest
 
       Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,30,8);
 
-      logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
+      logger.debug("1crawled dataset: {}", RdfUtils.toString(dataModel));
 
       String queryString = sparqlPrefix +
         "SELECT ?need ?connection ?need2 WHERE {" +
@@ -253,6 +258,10 @@ public class BAAtomicCCBotTest
 
       LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
 
+      if (linkedDataSource instanceof CachingLinkedDataSource) {
+        ((CachingLinkedDataSource)linkedDataSource).clear();
+      }
+
       List<URI> properties = new ArrayList<>();
       List<URI> objects = new ArrayList<>();
 
@@ -266,7 +275,7 @@ public class BAAtomicCCBotTest
 
       Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,300);
 
-      logger.info("crawled dataset: {}", RdfUtils.toString(dataModel));
+      logger.info("2crawled dataset: {}", RdfUtils.toString(dataModel));
 
       String queryString = sparqlPrefix +
         "SELECT ?need ?connection ?need2 WHERE {" +

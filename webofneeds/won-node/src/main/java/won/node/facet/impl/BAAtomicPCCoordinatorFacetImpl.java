@@ -49,7 +49,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
             // adding Participants is possible only in the first phase
             if(isCoordinatorInFirstPhase(con))  //add a new Participant (first phase in progress)
             {
-              logger.debug("*** open from Participant (coordinator:"+con.getNeedURI()+ " participant:"+con.getRemoteNeedURI()+
+              logger.debug("Open from Participant (coordinator:"+con.getNeedURI()+ " participant:"+con.getRemoteNeedURI()+
               " con:" +  con.getConnectionURI());
 
               stateManager.setStateForNeedUri(BAPCState.ACTIVE.getURI(), URI.create(WON_TX.PHASE_FIRST.getURI().toString()), con.getNeedURI(), con.getRemoteNeedURI(),
@@ -57,7 +57,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
               storeBAStateForConnection(con, BAPCState.ACTIVE.getURI());
               ownerFacingConnectionClient.open(con.getConnectionURI(), content);
 
-              logger.debug("*** opened from Participant = coordinator:"+con.getNeedURI()+ " participant:"+con.getRemoteNeedURI()+
+              logger.debug("Opened from Participant = coordinator:"+con.getNeedURI()+ " participant:"+con.getRemoteNeedURI()+
                 " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()+
                  "phase:"+ BAPCState.parsePhase(stateManager.getStatePhaseForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()));
             }
@@ -101,7 +101,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
             messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
             eventType = BAPCEventType.getCoordinationEventTypeFromString(messageForSending);
 
-            logger.debug("*** Coordinator sends the text message:"+eventType.getURI()+" coordinator:"+con.getNeedURI()+ " participant:"+con.getRemoteNeedURI()+
+            logger.debug("Coordinator sends the text message:"+eventType.getURI()+" coordinator:"+con.getNeedURI()+ " participant:"+con.getRemoteNeedURI()+
               " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()+
               " phase:"+ BAPCState.parsePhase(stateManager.getStatePhaseForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()));
           }
@@ -114,7 +114,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
               String eventTypeURI = ni.toList().get(0).asResource().getURI().toString();
               eventType = BAPCEventType.getBAEventTypeFromURI(eventTypeURI);
 
-              logger.debug("*** Coordinator sends the RDF message:"+eventType.getURI()+" coordinator:"+con.getNeedURI()+ " participant:"+con.getRemoteNeedURI()+
+              logger.debug("Coordinator sends the RDF message:"+eventType.getURI()+" coordinator:"+con.getNeedURI()+ " participant:"+con.getRemoteNeedURI()+
                 " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()+
                 " phase:"+ BAPCState.parsePhase(stateManager.getStatePhaseForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()));
             }
@@ -137,12 +137,8 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
                 //check whether all connections are in the state COMPLETED (all participant voted with YES)
                 // if yes -> send message and firstPhase is ended;
                 // if no -> wait for other participants to vote
-                logger.debug("Can first phase finish?");
-
                 if(canFirstPhaseFinish(con))
                 {
-                  logger.debug("First phase can finish.");
-
                   BAPCState state = BAPCState.parseString(stateManager.getStateForNeedUri(con.getNeedURI(),
                     con.getRemoteNeedURI(), getFacetType().getURI()).toString());
 
@@ -156,7 +152,6 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
                   logger.debug("New state = coordinator:"+con.getNeedURI()+ " participant:"+con.getRemoteNeedURI()+
                     " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()+
                     " phase:"+ BAPCState.parsePhase(stateManager.getStatePhaseForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()));
-
 
                   // eventType -> URI Resource
                   r = myContent.createResource(eventType.getURI().toString());
@@ -264,7 +259,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
             eventType.getURI().toString().equals(WON_TX.MESSAGE_FAIL.getURI().toString()) ||
             eventType.getURI().toString().equals(WON_TX.MESSAGE_CANNOTCOMPLETE.getURI().toString())))
           {
-            logger.debug("Coordinator receives NO vote" +isCFP+" "+eventType.getURI().toString() +con.getNeedURI() +" " + con.getRemoteNeedURI());
+            logger.debug("Coordinator receives NO vote. Is it in the first phase? " +isCFP+" "+eventType.getURI().toString() +con.getNeedURI() +" " + con.getRemoteNeedURI());
 
             state = state.transit(eventType);
             state.setPhase(BAPCState.Phase.SECOND); // The second phase is beginning
@@ -304,7 +299,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
                 state = BAPCState.parseString(stateManager.getStateForNeedUri(ownerUri,
                   needUri, getFacetType().getURI()).toString());  //must be Active
 
-                logger.debug("GLOBAL NO, ACTIVE actions = coordinator:"+tmpCon.getNeedURI()+ " participant:"+tmpCon.getRemoteNeedURI()+
+                logger.debug("GLOBAL NO, actions for ACTIVE states = coordinator:"+tmpCon.getNeedURI()+ " participant:"+tmpCon.getRemoteNeedURI()+
                   " tmpCon:" +  tmpCon.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(tmpCon.getNeedURI(), tmpCon.getRemoteNeedURI(), getFacetType().getURI()).toString()+
                   " phase must be FIRST:"+ BAPCState.parsePhase(stateManager.getStatePhaseForNeedUri(tmpCon.getNeedURI(), tmpCon.getRemoteNeedURI(), getFacetType().getURI()).toString()));
 
@@ -323,8 +318,6 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
                 Resource r = myContent.createResource(BAPCEventType.MESSAGE_CANCEL.getURI().toString());
                 baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
                 needFacingConnectionClient.textMessage(tmpCon, myContent);
-
-                logger.debug("No sent to particiapant.");
 
                 baseResource.removeAll(WON_TX.COORDINATION_MESSAGE) ;
               }
@@ -396,7 +389,6 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
               logger.debug("Current state of the Coordinator: "+state.getURI().toString());
 
               newState = state.transit(resendEventType);  //propagate the phase, it is better to have this global
-             // newState.setPhase(state.getPhase());     //daki obrisi
 
               URI phaseURI =  stateManager.getStatePhaseForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI());
               stateManager.setStateForNeedUri(newState.getURI(), phaseURI, con.getNeedURI(), con.getRemoteNeedURI(),
@@ -484,9 +476,9 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
       currentState = BAPCState.parseString(currentStateURI.toString());
     //  logger.debug("phase is {}: ", currentState.getPhase());
       BAPCState.Phase phase = BAPCState.parsePhase(stateManager.getStatePhaseForNeedUri(ownerUri, needUri, getFacetType().getURI()).toString());
-      if(phase == null)
+      if(phase == null)        //redundant, this or the previous condition can be omitted
       {
-        continue; //???
+        continue;
       }
       if(BAPCState.getPhaseURI(phase).toString().equals(WON_TX.PHASE_SECOND.getURI().toString())){
         return false;

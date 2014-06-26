@@ -20,7 +20,9 @@ public class CompletedBlockedFPBot extends BATestBotScript
     List<BATestScriptAction> actions = new ArrayList();
     actions.add(new BATestScriptAction(false, "MESSAGE_COMPLETE", URI.create(WON_TX.STATE_ACTIVE.getURI())));
     actions.add(new BATestScriptAction(true, "MESSAGE_COMPLETED", URI.create(WON_TX.STATE_COMPLETING.getURI())));
-    actions.add(new BATestScriptAction(false, "MESSAGE_CLOSE", URI.create(WON_TX.STATE_COMPLETED.getURI())));
     return actions;
   }
 }
+
+
+

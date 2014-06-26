@@ -17,11 +17,6 @@ public class EmptySPBot extends BATestBotScript
   protected List<BATestScriptAction> setupActions() {
     List<BATestScriptAction> actions = new ArrayList();
 
-
-   // actions.add(new BATestScriptAction(true, "MESSAGE_CLOSED", URI.create(WON_TX.STATE_CLOSING.getURI())));
-
-
-
     return actions;
   }
 }
