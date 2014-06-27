@@ -202,6 +202,30 @@ public class RestNeedController {
 		return createdNeedPojo;
 	}
 
+  @ResponseBody
+  @RequestMapping(
+    value = "/create/saveDraft",
+    consumes = MediaType.APPLICATION_JSON,
+    produces = MediaType.APPLICATION_JSON,
+    method = RequestMethod.POST
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public NeedPojo createDraft(@RequestBody NeedPojo needPojo) {
+    User user = (User) wonUserDetailService.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+
+    logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getCreationDate() + "/" +
+                  needPojo.getLongitude() + "/" + needPojo.getLatitude() + "/" + (needPojo.getState() == NeedState.ACTIVE));
+    //TODO: using fixed Facets - change this
+    needPojo.setFacetTypes(new String[]{FacetType.OwnerFacet.getURI().toString()});
+    NeedPojo createdNeedPojo = resolve(needPojo);
+    List<Need> needs = needRepository.findByNeedURI(URI.create(createdNeedPojo.getNeedURI()));
+    user.getNeeds().add(needs.get(0));
+    wonUserDetailService.save(user);
+
+    return createdNeedPojo;
+  }
+
 	@ResponseBody
 	@RequestMapping(
 			value = "/",

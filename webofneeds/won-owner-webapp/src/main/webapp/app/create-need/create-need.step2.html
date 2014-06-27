@@ -1,0 +1,90 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<div>
+    <div class="row">
+        <div class="col-lg-12">
+            <won-progress-tracker current-step='currentStep' number-of-steps = 'numberOfSteps' class="col-lg-12 top-buffer"
+                    ></won-progress-tracker>
+        </div>
+    </div>
+    <div class="row">
+		<div class="col-lg-8 col-lg-offset-2">
+			<div ng-cloak class="alert alert-dismissable alert-success" ng-show="succesShow" style="margin-top:10px; margin-bottom: 10px;">
+				Need has been successfully saved
+			</div>
+			<div ng-cloak class="alert alert-dismissable alert-error" ng-show="error" style="margin-top:10px; margin-bottom: 10px;">
+			        Error occurred during saving of need	
+			</div>
+		</div>
+    </div>
+
+	<div class="row top-buffer">
+		<div class="col-lg-8 col-lg-offset-2">
+			<form class="form-horizontal">
+				<div class="well">
+					<fieldset>
+						<div class="form-group">
+							<label for="inputName" class="col-lg-8 col-lg-offset-2">Title</label>
+                            <div class="row">
+                                <div class="col-lg-8 col-lg-offset-2">
+                                    <input type="text" class="form-control" id="inputName" ng-model="need.title"
+                                           placeholder="Roughly, what's it about?" />
+                                </div>
+                            </div>
+						</div>
+						<div class="form-group">
+							<label for="textarea-description" class="col-lg-8 col-lg-offset-2" >Description</label>
+                            <div class="row">
+                                <div class="col-lg-8 col-lg-offset-2">
+                                    <textarea class="form-control" rows="8" id="textarea-description"
+                                              ng-model="need.textDescription"
+                                              placeholder="{{descriptionPlaceholder}}"></textarea>
+                                </div>
+                            </div>
+
+							<!--span class="help-block">A longer block of help text that breaks onto a new line and may extend beyond one line.</span-->
+						</div>
+                        <div class="form-group">
+                            <label for="inputName" class="col-lg-8 col-lg-offset-2">Tags</label>
+                            <div class="col-lg-8 col-lg-offset-2">
+									<span style="margin-right:5px;cursor:pointer;" class="label label-primary btnTag"
+                                          ng-click="removeTag('{{tagName}}')"
+                                          ng-repeat="tagName in need.tags">{{tagName}}&nbsp;&nbsp;|&nbsp;x
+									</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-lg-8 col-lg-offset-2">
+                                <input type="text" class="form-control" id="inputTagName"
+                                       placeholder="e.g. furniture, electronics, for children,...">
+                            </div>
+                        </div>
+
+					</fieldset>
+				</div>
+
+			</form>
+		</div>
+	</div>
+    <div class="row top-buffer">
+        <div class="col-lg-4 col-lg-offset-4" style="text-align:right;margin-top:15px;">
+            <button type="button" class="btn btn-primary" ng-click="cancel()">Cancel</button>
+            <button type="button" class="btn btn-success" ng-click="save()">Save</button>
+            <button type="button" class="btn btn-success" ng-click="saveDraft()">Save Draft</button>
+        </div>
+    </div>
+</div>

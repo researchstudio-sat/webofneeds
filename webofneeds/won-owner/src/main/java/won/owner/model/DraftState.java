@@ -1,4 +1,20 @@
 /*
+ * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/*
  * This file is subject to the terms and conditions defined in file 'LICENSE.txt', which is part of this source code package.
  */
 
@@ -20,11 +36,11 @@ import java.util.List;
  */
 @Entity
 @Table(
-		name = "wonUser",
-		uniqueConstraints = @UniqueConstraint(columnNames = {"username"})
+		name = "needDraftState",
+		uniqueConstraints = @UniqueConstraint(columnNames = {"id"})
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class User implements UserDetails{
+public class DraftState implements UserDetails{
 
 	@Id
 	@GeneratedValue
@@ -48,10 +64,10 @@ public class User implements UserDetails{
 	@Transient
 	private Collection<SimpleGrantedAuthority> authorities;
 
-	public User() {
+	public DraftState() {
 	}
 
-	public User(final String username, final String password) {
+	public DraftState(final String username, final String password) {
 		this.username = username;
 		this.password = password;
 	}
@@ -121,7 +137,7 @@ public class User implements UserDetails{
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		final User user = (User) o;
+		final DraftState user = (DraftState) o;
 
 		if (id != null ? !id.equals(user.id) : user.id != null) return false;
 		if (needs != null ? !needs.equals(user.needs) : user.needs != null) return false;

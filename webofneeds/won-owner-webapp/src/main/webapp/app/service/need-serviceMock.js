@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 NeeLD = function (needURI, needLD) {
 	this.needURI = needURI.replace('data', 'resource');
 	this.title = '';
@@ -77,11 +93,11 @@ CategorizedNeeds = function() {
 	}
 }
 
-angular.module('won.owner').factory('needService', function ($http, $q, connectionService) {
+angular.module('won.owner').factory('needServiceMock', function ($http, $q, connectionService) {
 
-	var needService = {};
+	var needServiceMock = {};
 
-	needService.getNeedById = function (needId) {
+	needServiceMock.getNeedById = function (needId) {
 		return $http.get('/owner/rest/need/' + needId);
 	};
 
@@ -196,27 +212,6 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 		);
 	}
 
-    needService.saveDraft = function(need, currentStep,userName){
-        var needToSave = angular.copy(need);
-        needToSave.currentStep = currentStep;
-        needToSave.userName = userName;
-        return $http({
-            method:'POST',
-            url:'/owner/rest/need/create/saveDraft',
-            data:needToSave,
-            success:function(content){
-                console.log(content);
-            }
-        }).then(
-            function () {
-                // success
-                return {status:"OK"};
-            },
-            function (response) {
-                console.log("FATAL ERROR");
-            }
-        );;
-    }
 	needService.save = function(need) {
 		var needToSave = angular.copy(need);
 		needToSave.tags = need.tags.join(",");
@@ -246,7 +241,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 				function (response) {
 					console.log("FATAL ERROR");
 				}
-		);
+		);;
 	};
 
 	return needService;

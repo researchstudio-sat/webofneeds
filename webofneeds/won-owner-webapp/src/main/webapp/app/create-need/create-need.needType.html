@@ -1,0 +1,148 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<div>
+    <div class="col-lg-12">
+        <div class="row top-buffer">
+            <div class="col-lg-8 col-lg-offset-2">
+                <div ng-cloak class="alert alert-dismissible alert-success" ng-show="successShow"
+                     style="margin-top:10px; margin-bottom: 10px;" data-dismiss="alert">
+                    <span class="close" data-ng-click="successShow=false">&times;</span>
+                    <button type="button" class="close" data-ng-click="successShow=false">×</button>
+                    Need has been successfully saved
+                </div>
+                <div ng-cloak class="alert alert-dismissable alert-error" ng-show="error" style="margin-top:10px; margin-bottom: 10px;">
+                    Error occurred during saving of need
+                </div>
+            </div>
+        </div>
+        <div class="row top-buffer">
+            <div class="col-lg-12">
+                <div class="row">
+                    <won-progress-tracker current-step='currentStep' number-of-steps = 'numberOfSteps'
+                                          jump-To-Step="jumpToStep(num)"
+                                          class="col-lg-12"
+                            ></won-progress-tracker>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="row top-buffer">
+            <div class="col-lg-12">
+                <form class="form-horizontal">
+                    <div ng-show="showPublic(1)" class="col-lg-6 col-lg-offset-3">
+                        <fieldset>
+                            <div class="form-group">
+                                <div class="btn-group-vertical col-lg-12">
+                                    <button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
+                                            btn-radio="'DEMAND'" ng-click="nextStep()">Want: I'm looking for
+                                    </button>
+                                    <button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
+                                            btn-radio="'OFFER'" ng-click="nextStep()">Offer: I'm offering
+                                    </button>
+                                    <button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
+                                            btn-radio="'DO_TOGETHER'" ng-click="nextStep()">Activity: Looking for
+                                        people
+                                        to
+                                    </button>
+                                    <button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
+                                            btn-radio="'CRITIQUE'" ng-click="nextStep()">Critique: Let's do something
+                                        about
+                                    </button>
+                                </div>
+                                <!--ul class="nav nav-pills nav-stacked">
+                                    <li><a href="" ng-click="nextStep()"><i class="icon-want"></i>Want: I'm looking for</a></li>
+                                    <li><a href="" ng-click="nextStep()">Offer: I'm offering</a></li>
+                                    <li><a href="" ng-click="nextStep()">Activity: Looking for people
+                                        to</a></li>
+                                    <li><a href="" ng-click="nextStep()">Critique: Let's do something
+                                        about</a></li>
+                                </ul-->
+                            </div>
+
+                        </fieldset>
+
+                    </div>
+                    <div ng-show="showPublic(2)" class="col-lg-8 col-lg-offset-2">
+
+                        <div class="well">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label for="inputName" class="col-lg-8 col-lg-offset-2">Title *</label>
+                                    <div class="row">
+                                        <div class="col-lg-8 col-lg-offset-2">
+                                            <input type="text" class="form-control" id="inputName" ng-model="need.title"
+                                                   placeholder="Roughly, what's it about?" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="textarea-description" class="col-lg-8 col-lg-offset-2" >Description
+                                    *</label>
+                                    <div class="row">
+                                        <div class="col-lg-8 col-lg-offset-2">
+                                            <textarea class="form-control" rows="8" id="textarea-description"
+                                                      ng-model="need.textDescription"
+                                                      placeholder="{{descriptionPlaceholder}}" required></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!--span class="help-block">A longer block of help text that breaks onto a new line and may extend beyond one line.</span-->
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputName" class="col-lg-8 col-lg-offset-2">Tags</label>
+                                    <div class="col-lg-8 col-lg-offset-2">
+                                        <span style="margin-right:5px;cursor:pointer;" class="label label-primary btnTag"
+                                              ng-click="removeTag('{{tagName}}')"
+                                              ng-repeat="tagName in need.tags">{{tagName}}&nbsp;&nbsp;|&nbsp;x
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-lg-8 col-lg-offset-2">
+                                        <input type="text" class="form-control" id="inputTagName"
+                                               placeholder="e.g. furniture, electronics, for children,...">
+                                    </div>
+                                </div>
+
+                            </fieldset>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        <div class="row top-buffer">
+            <div class="col-lg-6 col-lg-offset-3"
+                 style="text-align:center;margin-top:15px;">
+                <button ng-show = "previousButton" type="button" class="btn btn-primary"
+                        ng-click="previousStep()">Previous</button>
+                <button ng-show = "saveDraftButton" type="button" class="btn btn-primary" ng-click="saveDraft()">
+                    <span class="glyphicon glyphicon-floppy-disk"> Save Draft {{counter}}</span>
+                </button>
+                <button ng-show="nextButton" type="button" class="btn btn-success" ng-click="nextStep()">Next</button>
+                <button ng-show="previewButton" type="button" class="btn btn-primary"
+                        ng-click="jumpToStep(4)">Skip to Preview</button>
+
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
