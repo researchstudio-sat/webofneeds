@@ -163,7 +163,8 @@ public class BATestScriptListener extends AbstractFinishingListener
         URI fromCon = getConnectionToSendFrom(action.isSenderIsCoordinator());
         logger.debug("sending message for action {} on connection {}", action, fromCon);
         //check if the connection is really in the state required for the action
-        assert connectionBAStateAllowsAction(fromCon, action) : "connection state does not allow next action";
+        assert connectionBAStateAllowsAction(fromCon, action) : "connection state of connection " + fromCon +" does " +
+          "not allow next action " + action;
         sendMessage(action, fromCon, new Date(System.currentTimeMillis() + millisBetweenMessages));
         synchronized (countMonitor){
           this.messagesInFlight++;

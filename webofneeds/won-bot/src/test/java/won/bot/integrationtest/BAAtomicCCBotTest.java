@@ -273,7 +273,7 @@ public class BAAtomicCCBotTest
 
       List<URI> crawled = new ArrayList<>();
 
-      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,300);
+      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,4);
 
       logger.info("2crawled dataset: {}", RdfUtils.toString(dataModel));
 

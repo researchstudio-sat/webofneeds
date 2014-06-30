@@ -100,7 +100,7 @@ public class BAAtomicCCCompletingFailingBotTest
 
   @AfterClass
   public static void shutdown(){
-    staticBotManager.setShutdownApplicationContextIfWorkDone(true);
+    //staticBotManager.setShutdownApplicationContextIfWorkDone(true);
   }
 
   /**
@@ -231,7 +231,7 @@ public class BAAtomicCCCompletingFailingBotTest
 
       List<URI> crawled = new ArrayList<>();
 
-      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,300);
+      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,4);
 
       logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
 
@@ -282,7 +282,7 @@ public class BAAtomicCCCompletingFailingBotTest
 
       List<URI> crawled = new ArrayList<>();
 
-      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,300);
+      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,4);
 
       logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
 

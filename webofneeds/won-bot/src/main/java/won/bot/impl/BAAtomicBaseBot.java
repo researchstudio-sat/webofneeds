@@ -22,10 +22,7 @@ import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
 import won.protocol.model.FacetType;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * User: Danijel
@@ -35,8 +32,7 @@ public abstract class BAAtomicBaseBot extends EventBot{
   public static final String URI_LIST_NAME_PARTICIPANT = "participants";
   public static final String URI_LIST_NAME_COORDINATOR = "coordinator";
   protected final int noOfNeeds;
-  protected final List<BATestBotScript> firstPhaseScripts;
-  protected final List<BATestBotScript> secondPhaseScripts;
+  protected final List<TwoPhaseScript> scripts;
   private static final long MILLIS_BETWEEN_MESSAGES = 10;
 
   protected BaseEventListener participantNeedCreator;
@@ -45,21 +41,37 @@ public abstract class BAAtomicBaseBot extends EventBot{
   protected BaseEventListener scriptsDoneListener;
   protected BaseEventListener firstPhaseDoneListener;
   protected BaseEventListener workDoneSignaller;
-  protected final List<BATestScriptListener> firstPhasetestScriptListeners;
-  protected final List<BATestScriptListener> secondPhasetestScriptListeners;
+  protected final List<TwoPhaseScriptListener> scriptListeners;
 
   protected BaseEventListener firstPhaseCompleteListener;
+  private Object scriptIteratorMonitor = new Object();
 
   protected BAAtomicBaseBot() {
-    this.firstPhaseScripts = getFirstPhaseScripts();
-    this.secondPhaseScripts = getSecondPhaseScripts();
-    if (this.secondPhaseScripts.size() != this.firstPhaseScripts.size()) {
+    this.scripts = setupScripts();
+    this.noOfNeeds = scripts.size()+1;
+    this.scriptListeners = Collections.synchronizedList( new ArrayList <TwoPhaseScriptListener>(noOfNeeds
+      -1));
+  }
+
+  /**
+   * Fetches scripts for first and second phase from concrete implementation and builds one list of TwoPhaseScript
+   * objects.
+   * @return
+   */
+  private List<TwoPhaseScript> setupScripts(){
+    List<BATestBotScript> firstPhaseScripts = getFirstPhaseScripts();
+    List<BATestBotScript> secondPhaseScripts = getSecondPhaseScripts();
+    if (secondPhaseScripts.size() != firstPhaseScripts.size()) {
       throw new IllegalArgumentException("The same number of scripts in first and second phase is required!");
     }
-    this.noOfNeeds = firstPhaseScripts.size()+1;
-    this.firstPhasetestScriptListeners = Collections.synchronizedList( new ArrayList <BATestScriptListener>(noOfNeeds
-    -1));
-    this.secondPhasetestScriptListeners = Collections.synchronizedList( new ArrayList<BATestScriptListener>(noOfNeeds-1));
+    List<TwoPhaseScript> scripts = new LinkedList<TwoPhaseScript>();
+    Iterator<BATestBotScript> firstIter = firstPhaseScripts.iterator();
+    Iterator<BATestBotScript> secondIter = secondPhaseScripts.iterator();
+    while(firstIter.hasNext()){
+      TwoPhaseScript script = new TwoPhaseScript(firstIter.next(), secondIter.next());
+      scripts.add(script);
+    }
+    return Collections.synchronizedList(scripts);
   }
 
   protected abstract FacetType getParticipantFacetType();
@@ -87,8 +99,8 @@ public abstract class BAAtomicBaseBot extends EventBot{
     bus.subscribe(FinishedEvent.class, this.coordinatorNeedCreator);
     FinishedEventFilter coordinatorCreatorFilter = new FinishedEventFilter(coordinatorNeedCreator);
 
-    final Iterator<BATestBotScript> firstPhasescriptIterator = firstPhaseScripts.iterator();
-    final Iterator<BATestBotScript> secondPhasescriptIterator = secondPhaseScripts.iterator();
+    final Iterator<TwoPhaseScript> scriptIterator = scripts.iterator();
+
     //make a composite filter, with one filter for each testScriptListener that wait
     // for the FinishedEvents the they emit. That filter will be used to shut
     // down all needs after all the scriptListeners have finished.
@@ -99,12 +111,11 @@ public abstract class BAAtomicBaseBot extends EventBot{
     {
       @Override
       public void onConnect(final URI fromNeedURI, final URI toNeedURI) {
-        //create the listener that will execute the script actions
-        BATestScriptListener testScriptListener = new BATestScriptListener(ctx, firstPhasescriptIterator.next(), fromNeedURI,
-                                                                           toNeedURI, MILLIS_BETWEEN_MESSAGES);
-        //remember it so we can check its state later
-        firstPhasetestScriptListeners.add(testScriptListener);
+        TwoPhaseScript script = scriptIterator.next();
 
+        //create the listener that will execute the script actions
+        BATestScriptListener testScriptListener = new BATestScriptListener(ctx, script.getFirstPhaseScript(), fromNeedURI,
+                                                                           toNeedURI, MILLIS_BETWEEN_MESSAGES);
         //subscribe it to the relevant events.
         bus.subscribe(ConnectFromOtherNeedEvent.class, testScriptListener);
         bus.subscribe(OpenFromOtherNeedEvent.class, testScriptListener);
@@ -118,8 +129,13 @@ public abstract class BAAtomicBaseBot extends EventBot{
         //now we create the listener that is only active in the second phase
         //remember it so we can check its state later
         BATestScriptListener secondPhaseTestScriptListener = new BATestScriptListener(ctx,
-          secondPhasescriptIterator.next(),fromNeedURI,toNeedURI, MILLIS_BETWEEN_MESSAGES);
-        secondPhasetestScriptListeners.add(secondPhaseTestScriptListener);
+          script.getSecondPhaseScript(),fromNeedURI,toNeedURI, MILLIS_BETWEEN_MESSAGES);
+
+        //remember both listeners as a pair as we'll need them together later
+        TwoPhaseScriptListener twoPhaseScriptListener = new TwoPhaseScriptListener(testScriptListener,
+          secondPhaseTestScriptListener);
+        scriptListeners.add(twoPhaseScriptListener);
+
         secondPhaseScriptListenerFilter.addFilter(
           new AcceptOnceFilter(
             new FinishedEventFilter(secondPhaseTestScriptListener)));
@@ -143,20 +159,21 @@ public abstract class BAAtomicBaseBot extends EventBot{
         @Override
         protected void doRun(final Event event) throws Exception {
           logger.debug("starting second phase");
-          Iterator<BATestScriptListener> firstPhaseListeners = firstPhasetestScriptListeners.iterator();
-          for(BATestScriptListener listener: secondPhasetestScriptListeners){
+          for(TwoPhaseScriptListener listener: scriptListeners){
             logger.debug("subscribing second phase listener {}", listener);
             //subscribe it to the relevant events.
-            bus.subscribe(MessageFromOtherNeedEvent.class, listener);
-            bus.subscribe(SecondPhaseStartedEvent.class, listener);
-            BATestScriptListener correspondingFirstPhaseListener = firstPhaseListeners.next();
-            listener.setCoordinatorSideConnectionURI(correspondingFirstPhaseListener.getCoordinatorSideConnectionURI());
-            listener.setParticipantSideConnectionURI(correspondingFirstPhaseListener.getParticipantSideConnectionURI());
-            listener.updateFilterForBothConnectionURIs();
+            bus.subscribe(MessageFromOtherNeedEvent.class, listener.getSecondPhaseListener());
+            bus.subscribe(SecondPhaseStartedEvent.class, listener.getSecondPhaseListener());
+
+            listener.getSecondPhaseListener().setCoordinatorSideConnectionURI(listener.getFirstPhaseListener()
+              .getCoordinatorSideConnectionURI());
+            listener.getSecondPhaseListener().setParticipantSideConnectionURI(listener.getFirstPhaseListener()
+              .getParticipantSideConnectionURI());
+            listener.getSecondPhaseListener().updateFilterForBothConnectionURIs();
             bus.publish(new SecondPhaseStartedEvent(
-              correspondingFirstPhaseListener.getCoordinatorURI(),
-              correspondingFirstPhaseListener.getCoordinatorSideConnectionURI(),
-              correspondingFirstPhaseListener.getParticipantURI()));
+              listener.getFirstPhaseListener().getCoordinatorURI(),
+              listener.getFirstPhaseListener().getCoordinatorSideConnectionURI(),
+              listener.getFirstPhaseListener().getParticipantURI()));
           }
         }
       });
@@ -183,4 +200,40 @@ public abstract class BAAtomicBaseBot extends EventBot{
 
   protected abstract List<BATestBotScript> getFirstPhaseScripts();
   protected abstract List<BATestBotScript> getSecondPhaseScripts();
+
+  private class TwoPhaseScript{
+    private BATestBotScript firstPhaseScript;
+    private BATestBotScript secondPhaseScript;
+
+    private TwoPhaseScript(final BATestBotScript firstPhaseScript, final BATestBotScript secondPhaseScript) {
+      this.firstPhaseScript = firstPhaseScript;
+      this.secondPhaseScript = secondPhaseScript;
+    }
+
+    public BATestBotScript getSecondPhaseScript() {
+      return secondPhaseScript;
+    }
+
+    public BATestBotScript getFirstPhaseScript() {
+      return firstPhaseScript;
+    }
+  }
+
+  private class TwoPhaseScriptListener {
+    private BATestScriptListener firstPhaseListener;
+    private BATestScriptListener secondPhaseListener;
+
+    private TwoPhaseScriptListener(final BATestScriptListener firstPhaseListener, final BATestScriptListener secondPhaseListener) {
+      this.firstPhaseListener = firstPhaseListener;
+      this.secondPhaseListener = secondPhaseListener;
+    }
+
+    public BATestScriptListener getFirstPhaseListener() {
+      return firstPhaseListener;
+    }
+
+    public BATestScriptListener getSecondPhaseListener() {
+      return secondPhaseListener;
+    }
+  }
 }

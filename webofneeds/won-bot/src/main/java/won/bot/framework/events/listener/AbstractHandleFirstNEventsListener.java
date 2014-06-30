@@ -16,8 +16,8 @@
 
 package won.bot.framework.events.listener;
 
-import won.bot.framework.events.event.Event;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.Event;
 import won.bot.framework.events.filter.EventFilter;
 
 /**
@@ -59,9 +59,10 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
   {
     boolean doRun = false;
     synchronized (monitor){
-      if (!finished) {
-        count++;
+      if (finished) {
+        return;
       }
+      count++;
       if (count <= targetCount) {
         logger.debug("processing event {} of {} (event: {})", new Object[]{count, targetCount, event});
         logger.debug("calling handleFirstNTimes");
@@ -77,6 +78,11 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
           publishFinishedEvent();
           finished = true;
         }
+      }
+    } else {
+      //make sure we decrement the count if we didn't get to run - we only want to count the first N events here.
+      synchronized (monitor) {
+        count--;
       }
     }
   }
