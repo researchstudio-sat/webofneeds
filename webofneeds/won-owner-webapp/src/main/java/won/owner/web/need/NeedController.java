@@ -26,6 +26,7 @@ import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.ProjectingIterator;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.GEO;
@@ -354,13 +355,10 @@ public class NeedController
 
       Need need1 = needs.get(0);
 
-      com.hp.hpl.jena.rdf.model.Model facetModel = ModelFactory.createDefaultModel();
-
-      facetModel.setNsPrefix("", "no:uri");
-      Resource baseRes = facetModel.createResource(facetModel.getNsPrefixURI(""));
-      baseRes.addProperty(WON.HAS_FACET, facetModel.createResource(needPojo.getOwnFacetURI()));
-      baseRes.addProperty(WON.HAS_REMOTE_FACET, facetModel.createResource(needPojo.getRemoteFacetURI()));
-
+      com.hp.hpl.jena.rdf.model.Model facetModel =
+        WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
+          URI.create(needPojo.getOwnFacetURI()),
+          URI.create(needPojo.getRemoteFacetURI()));
       ownerService.connect(need1.getNeedURI(), new URI(needPojo.getNeedURI()), facetModel);
       return "redirect:/need/" + need1.getId().toString();//viewNeed(need1.getId().toString(), model);
     } catch (URISyntaxException e) {
@@ -376,9 +374,7 @@ public class NeedController
     } catch (ExecutionException e) {
         logger.warn("caught ExcutionException", e);
     } catch (CamelConfigurationFailedException e) {
-
-        logger.warn("caught CameConfigurationException", e);  //To change body of catch statement use File | Settings | File Templates.
-
+        logger.warn("caught CameConfigurationException", e);
         logger.warn("caught CamelConfigurationFailedException",e);
     } catch (Exception e) {
         logger.warn("caught Exception",e);
@@ -419,9 +415,15 @@ public class NeedController
       if (!matches.isEmpty()) {
         Match match = matches.get(0);
         List<Need> needs = needRepository.findByNeedURI(match.getFromNeed());
-        if (!needs.isEmpty())
+        if (!needs.isEmpty()){
           ret = "redirect:/need/" + needs.get(0).getId().toString();//viewNeed(needs.get(0).getId().toString(), model);
-        ownerService.connect(match.getFromNeed(), match.getToNeed(), null);
+        }
+        //TODO: match object does not contain facet info, assume OwnerFacet.
+        com.hp.hpl.jena.rdf.model.Model facetModel =
+          WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
+            FacetType.OwnerFacet.getURI(),
+            FacetType.OwnerFacet.getURI());
+        ownerService.connect(match.getFromNeed(), match.getToNeed(), facetModel);
       }
     } catch (ConnectionAlreadyExistsException e) {
       logger.warn("caught ConnectionAlreadyExistsException:", e);

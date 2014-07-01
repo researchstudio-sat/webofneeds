@@ -420,7 +420,12 @@ public class RestController
 				List<Need> needs = needRepository.findByNeedURI(match.getFromNeed());
 				if (!needs.isEmpty())
 					ret = "";
-				ownerService.connect(match.getFromNeed(), match.getToNeed(), null);
+        //TODO: match object does not contain facet info, assume OwnerFacet.
+        com.hp.hpl.jena.rdf.model.Model facetModel =
+          WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
+            FacetType.OwnerFacet.getURI(),
+            FacetType.OwnerFacet.getURI());
+				ownerService.connect(match.getFromNeed(), match.getToNeed(), facetModel);
 			}
 		} catch (ConnectionAlreadyExistsException e) {
 			logger.warn("caught ConnectionAlreadyExistsException:", e);
@@ -553,7 +558,9 @@ public class RestController
 			return "noNeedFound";
 		Connection con = cons.get(0);
 		try {
-			ownerService.connect(con.getNeedURI(), con.getRemoteNeedURI(), null);
+      //changed from connect to open as we already have a connection object.
+			//ownerService.connect(con.getNeedURI(), con.getRemoteNeedURI(), facetModel);
+      ownerService.open(con.getConnectionURI(),null);
 		} catch (Exception e) {
 			logger.warn("error during accept", e);
 			return "error during accept: " + e.getMessage();

@@ -60,7 +60,7 @@ public class UpdateListener implements SolrEventListener
       //we need to replace the classloader spring uses, otherwise it doesn't find our xml config
       final ClassLoader myClassLoader = this.getClass().getClassLoader();
       ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext
-        ("classpath:/spring/matcher-wsonly.xml"){
+        ("classpath:/spring/matcher-jmsonly.xml"){
         protected void initBeanDefinitionReader(XmlBeanDefinitionReader reader) {
           super.initBeanDefinitionReader(reader);
           reader.setBeanClassLoader(myClassLoader);
