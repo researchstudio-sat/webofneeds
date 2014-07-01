@@ -3,13 +3,7 @@ app = angular.module('won.owner', ['ui.bootstrap', 'ui.map', 'blueimp.fileupload
 			when('/', {controller : 'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
 			when('/signin', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
 			when('/register', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
-			when('/create-need', {controller : 'CreateNeedCtrl', templateUrl:'app/create-need/create-need.partial.html'}).
-            //when('/create-need-new/:needType', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.partial-new.html'}).
-            when('/create-need-new/:step', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.needType.html'}).
-            when('/create-need-new/need/:needType', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.needType.html'}).
-            when('/create-need-new', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.partial-new.html'}).
-            when('/create-need-step1', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.needType.html'}).
-            when('/create-need-step2', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.step2.html'}).
+            when('/create-need/:step', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
             when('/need-list', {controller : 'NeedListCtrl', templateUrl:'app/need-list/need-list.partial.html'}).
 			when('/need-detail/:needId', {controller:'NeedDetailCtrl', templateUrl:'app/need-detail/need-detail.partial.html'}).
 			otherwise({redirectTo : '/'});
@@ -116,15 +110,15 @@ app.run(function($httpBackend){
 
         $httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
 
-      /*  $httpBackend.whenPOST('/owner/rest/need/create').respond(function(method, url, data){
+        $httpBackend.whenPOST('/owner/rest/need/create').respond(function(method, url, data){
 
             return [200, 'text',{}];
-        });               */
+        });
        /* $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').respond(function(method, url, data){
 
             return [200, 'text',{}];
         });*/
-        $httpBackend.whenPOST('/owner/rest/need/create/save').passThrough();
+
         $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').passThrough();
         $httpBackend.whenGET(/.*/).passThrough();
         $httpBackend.whenPOST(/.*/).passThrough();
@@ -138,7 +132,6 @@ app.run(function($httpBackend){
         $httpBackend.whenGET('/need-detail/:needId').passThrough();
         $httpBackend.whenGET('app/home/home.partial.html').passThrough();
         $httpBackend.whenGET('app/home/home.partial.html').passThrough();
-        $httpBackend.whenGET('app/create-need/create-need.partial.html').passThrough();
         $httpBackend.whenGET(/app\/.*/).passThrough();
         $httpBackend.whenGET('/app.*/').passThrough();
     }

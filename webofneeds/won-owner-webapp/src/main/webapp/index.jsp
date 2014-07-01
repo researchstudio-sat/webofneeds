@@ -34,8 +34,8 @@
 		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
-		<script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/create-need/create-need-new.js"/>"></script>
+
+        <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
 	</head>
@@ -52,7 +52,7 @@
 
 
 						<li ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak><a
-                                href="#/create-need-new/1/">
+                                href="#/create-need/1/">
 							<span class="glyphicon glyphicon-plus"></span>&nbsp;New	Post</a>
 						</li>
 						<li ng-show="!showPublic()" ng-class="isActive('need-list')" ng-cloak><a href="#/need-list/">
