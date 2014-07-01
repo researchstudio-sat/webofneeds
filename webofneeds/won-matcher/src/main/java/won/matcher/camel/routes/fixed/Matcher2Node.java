@@ -28,7 +28,7 @@ public class Matcher2Node extends RouteBuilder{
     @Override
     public void configure(){
         from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=5").routeId("Matcher2NodeRoute")
-                .wireTap("bean:messagingService?method=inspectMessage")
+                .wireTap("bean:matcherMessagingService?method=inspectMessage")
                 .recipientList(header("remoteBrokerEndpoint"));
 
     }
