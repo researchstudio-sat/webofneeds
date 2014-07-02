@@ -261,31 +261,33 @@ public class RdfUtils
    */
   public static void attachModelByBaseResource(final Resource subject, final Property property, final Model objectModel, final boolean replaceBaseResourceByBlankNode){
     Model subjectModel = subject.getModel();
-    Resource baseResource = null;
-    if (replaceBaseResourceByBlankNode){
-      baseResource = subjectModel.createResource();
+    //either explicitly use blank node, or do so if there is no base resource prefix
+    //as the model may have triples containing the null relative URI.
+    // we still want to attach these and try to get them by using
+    //the empty URI, and replacing that resource by a blank node
+    if (replaceBaseResourceByBlankNode || objectModel.getNsPrefixURI("") == null){
+      //create temporary resource and replace objectModel's base resource to avoid clashes
+      String tempURI = "tmp:"+Integer.toHexString(objectModel.hashCode());
+      replaceBaseResource(objectModel, objectModel.createResource(tempURI));
+      //merge models
+      subjectModel.add(objectModel);
+      //replace temporary resource by blank node
+      Resource blankNode = subjectModel.createResource();
+      subject.addProperty(property, blankNode);
+      replaceResourceInModel(subjectModel.getResource(tempURI), blankNode);
+      //merge the prefixes, but don't add the objectModel's default prefix in any case - we don't want it to end up as
+      //the resulting model's base prefix.
+      Map<String, String> objectModelPrefixes = objectModel.getNsPrefixMap();
+      objectModelPrefixes.remove("");
+      subjectModel.setNsPrefixes(mergeNsPrefixes(subjectModel.getNsPrefixMap(), objectModelPrefixes));
     } else {
       String baseURI = objectModel.getNsPrefixURI("");
-      if (baseURI == null) {
-        //although not clear how this could come about:
-        //the model has no default namespace prefix, but it may have
-        //triples containing the null relative URI. we still want to attach these and try to get them by using
-        //the empty URI, and replacing that resource by a blank node
-        baseURI = "";
-        baseResource = subjectModel.createResource();
-      } else {
-        baseResource = subjectModel.getResource(baseURI); //getResource because it may exist already
-      }
+      Resource baseResource = objectModel.getResource(baseURI); //getResource because it may exist already
+      subjectModel.add(objectModel);
+      baseResource = subjectModel.getResource(baseResource.getURI());
+      subject.addProperty(property, baseResource);
+      RdfUtils.replaceBaseResource(subjectModel, baseResource);
     }
-    subject.addProperty(property, baseResource);
-    RdfUtils.replaceBaseResource(objectModel, baseResource);
-    //add all of specified model to the subject's model
-    subjectModel.add(objectModel);
-    //merge the prefixes, but don't add the objectModel's default prefix in any case - we don't want it to end up as
-    //the resulting model's base prefix.
-    Map<String, String> objectModelPrefixes = objectModel.getNsPrefixMap();
-    objectModelPrefixes.remove("");
-    subjectModel.setNsPrefixes(mergeNsPrefixes(subjectModel.getNsPrefixMap(), objectModelPrefixes));
   }
 
   /**

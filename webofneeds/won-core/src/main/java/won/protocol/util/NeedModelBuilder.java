@@ -48,7 +48,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     Resource needResource = identifyNeedResource(needModel);
     this.setUri(needResource.getURI());
     Resource basicNeedTypeResource = needResource.getPropertyResourceValue(WON.HAS_BASIC_NEED_TYPE);
-    if (basicNeedTypeResource != null) this.setBasicNeedType(basicNeedTypeResource.getURI().toString());
+    if (basicNeedTypeResource != null) this.setBasicNeedType(URI.create(basicNeedTypeResource.getURI()));
     Statement creationDateStmt = needResource.getProperty(DCTerms.created);
     if (creationDateStmt != null) {
       this.setCreationDate(DateTimeUtils.toDate(creationDateStmt.getObject(), needModel));
@@ -300,10 +300,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     }
     if (getContentDescription() != null) {
       Model contentDescriptionModel = getContentDescription();
-      Resource linkingBlankNode = needModel.createResource();
-      RdfUtils.replaceBaseResource(contentDescriptionModel, linkingBlankNode);
-      needContent.addProperty(WON.HAS_CONTENT_DESCRIPTION, linkingBlankNode);
-      needModel.add(contentDescriptionModel);
+      RdfUtils.attachModelByBaseResource(needContent,WON.HAS_CONTENT_DESCRIPTION,contentDescriptionModel);
     }
   }
 

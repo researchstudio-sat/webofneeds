@@ -71,6 +71,19 @@ public class WonRdfUtils
       return messageModel;
     }
 
+    /**
+     * Returns the first won:hasTextMessage object, or null if none is found.
+     * @param model
+     * @return
+     */
+    public static String getTextMessage(Model model){
+      Statement stmt = model.getProperty(RdfUtils.getBaseResource(model),WON.HAS_TEXT_MESSAGE);
+      if (stmt != null) {
+        return stmt.getObject().asLiteral().getLexicalForm();
+      }
+      return null;
+    }
+
   }
 
   public static class FacetUtils {

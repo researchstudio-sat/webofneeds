@@ -27,6 +27,7 @@ import won.bot.framework.events.event.impl.NeedAddedToSolrEvent;
 import won.bot.framework.events.event.impl.NeedCreatedEventForMatcher;
 import won.matcher.solr.NeedSolrInputDocumentBuilder;
 import won.protocol.util.NeedModelBuilder;
+import won.protocol.util.RdfUtils;
 
 import java.net.MalformedURLException;
 
@@ -71,6 +72,11 @@ public class IndexNeedAction extends BaseEventBotAction
     NeedModelBuilder needModelBuilder = new NeedModelBuilder();
     needModelBuilder.copyValuesFromProduct(needModel);
     needModelBuilder.copyValuesToBuilder(builder);
+    if (logger.isDebugEnabled()){
+      logger.debug("got this model from won node: {}", RdfUtils.toString(needModel));
+      logger.debug("writing this solrInputDocument to siren: {}", builder.build());
+    }
+
     //we want the NTRIPLE field to contain the complete RDF data:
     //builder.setContentDescription(needModelBuilder.build());
     SolrInputDocument doc = builder.build();

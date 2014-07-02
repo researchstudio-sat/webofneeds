@@ -186,11 +186,12 @@ public enum BACCEventType {
 
     public static BACCEventType getCoordinationEventTypeFromString(final String fragment)
     {
-        for (BACCEventType event : BACCEventType.values())
+      for (BACCEventType event : BACCEventType.values()) {
             if (event.name().equals(fragment))
             {
                 return event;
             }
+        }
         return null;
     }
 

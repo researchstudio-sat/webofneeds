@@ -310,7 +310,7 @@ public enum BAPCState {
         for (BAPCState state : values())
           if (state.getURI().toString().equals(fragment))
                 return state;
-        logger.warn("2No enum could be matched for: {}", fragment);
+        logger.debug("2No enum could be matched for: {}", fragment);
         return null;
     }
 
@@ -323,7 +323,7 @@ public enum BAPCState {
         if (phase.toString().equals(comparedString))
           return phase;
       }
-      logger.warn("1No enum could be matched for: {}", fragment);
+      logger.debug("1No enum could be matched for: {}", fragment);
       return null;
     }
 

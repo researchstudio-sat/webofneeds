@@ -13,6 +13,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 
@@ -76,20 +77,17 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
                     Resource r = null;
 
                     //message (event) for sending
-                    NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_TX.BASE_URI,"hasTextMessage"));
-                    if(ni.hasNext())
+                    messageForSending = WonRdfUtils.MessageUtils.getTextMessage(message);
+                    if(messageForSending != null)
                     {
-                        messageForSending = ni.toList().get(0).toString();
-                        messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
-
                         eventType = BAPCEventType.getCoordinationEventTypeFromString(messageForSending);
-
-                        logger.debug("*** Participant sends the text message:"+eventType.getURI()+" coordinator:"+con.getRemoteNeedURI()+ " participant:"+con.getNeedURI()+
+                        logger.debug("*** Participant sends the text message:"+eventType+" coordinator:"+con.getRemoteNeedURI()+ " participant:"+con.getNeedURI()+
                         " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString());
-                  }
+                    }
                     // message as MODEL
                     else {
-                        ni = message.listObjectsOfProperty(message.getProperty(WON_TX.COORDINATION_MESSAGE.getURI().toString()));
+                        NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_TX.COORDINATION_MESSAGE
+                          .getURI().toString()));
                         if(ni.hasNext())
                         {
                             String eventTypeURI = ni.toList().get(0).asResource().getURI().toString();

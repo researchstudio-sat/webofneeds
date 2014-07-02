@@ -69,7 +69,7 @@ public class WON
   public static final Property HAS_CONTENT = m.createProperty(BASE_URI, "hasContent");
 
   public static final Resource TEXT_MESSAGE = m.createResource(BASE_URI + "TextMessage");
-  public static final Property HAS_TEXT_MESSAGE = m.createProperty("http://purl.org/webofneeds/tx/model#" + "hasTextMessage");
+  public static final Property HAS_TEXT_MESSAGE = m.createProperty(BASE_URI + "hasTextMessage");
   public static final Resource MESSAGE = m.createResource(BASE_URI + "Message");
   public static final Property HAS_FEEDBACK = m.createProperty(BASE_URI, "hasFeedback");
   //used to express which URI the feedback relates to

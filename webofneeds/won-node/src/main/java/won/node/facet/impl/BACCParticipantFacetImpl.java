@@ -13,6 +13,7 @@ import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 
@@ -78,22 +79,20 @@ public class BACCParticipantFacetImpl extends AbstractBAFacet
                     //message (event) for sending
 
                     // message as TEXT
-                    NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_TX.BASE_URI,"hasTextMessage"));
-                    if(ni.hasNext())
+                    messageForSending = WonRdfUtils.MessageUtils.getTextMessage(message);
+                    if(messageForSending != null)
                     {
-                        messageForSending = ni.toList().get(0).toString();
-                        messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
                         logger.debug("Participant sends: " + messageForSending);
                         eventType = BACCEventType.getCoordinationEventTypeFromString(messageForSending);
                     }
                     // message as MODEL
                     else {
-                        ni = message.listObjectsOfProperty(message.getProperty(WON_TX.COORDINATION_MESSAGE.getURI().toString()));
-                        if(ni.hasNext())
+                        NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_TX
+                          .COORDINATION_MESSAGE.getURI()));
+                        if (ni.hasNext())
                         {
                             String eventTypeURI = ni.toList().get(0).asResource().getURI().toString();
                             eventType = BACCEventType.getBAEventTypeFromURI(eventTypeURI);
-                            logger.debug("Participants sends the RDF:" );
                         }
                     }
 

@@ -258,8 +258,11 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     }
     */
 
-    @Override
-    public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {
+  @Override
+  public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("updating remote connection URI of con {} to {}", con, remoteConnectionURI);
+    }
     con.setRemoteConnectionURI(remoteConnectionURI);
     connectionRepository.save(con);
   }

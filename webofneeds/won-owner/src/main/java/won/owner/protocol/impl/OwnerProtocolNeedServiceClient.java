@@ -146,16 +146,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     chatMessage.setCreationDate(new Date());
     chatMessage.setLocalConnectionURI(connectionURI);
 
-    Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-    StmtIterator stmtIterator = baseRes.listProperties(WON_TX.HAS_TEXT_MESSAGE);
-    String textMessage = null;
-    while (stmtIterator.hasNext()) {
-      RDFNode obj = stmtIterator.nextStatement().getObject();
-      if (obj.isLiteral()) {
-        textMessage = obj.asLiteral().getLexicalForm();
-        break;
-      }
-    }
+    String textMessage = WonRdfUtils.MessageUtils.getTextMessage(message);
     if (textMessage == null) {
       logger.debug("could not extract text message from RDF content of message");
       textMessage = "[could not extract text message]";
