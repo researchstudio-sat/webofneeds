@@ -17,18 +17,23 @@
 /*
  * This file is subject to the terms and conditions defined in file 'LICENSE.txt', which is part of this source code package.
  */
-
+           /*
 package won.owner.repository;
 
-import won.owner.model.User;
+import won.owner.model.Draft;
 import won.protocol.repository.WonRepository;
 
+import java.net.URI;
+import java.util.List;
+       */
 /**
  * User: syim
  * Date: 11/7/13
- */
-public interface NeedDraftRepository extends WonRepository<User> {
+ */                       /*
+public interface NeedDraftRepository extends WonRepository<Draft>
+{
 
-	public User findByUsername(String username);
+	public List<Draft> findByNeedURI(URI uri);
 
 }
+       */

@@ -35,6 +35,8 @@ public class User implements UserDetails{
 
 	private String password;
 
+
+
   //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
   //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
@@ -42,8 +44,8 @@ public class User implements UserDetails{
 
   //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
   //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
-  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-  private List<Need> drafts;
+ // @OneToMany( fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+ // private List<Need> drafts;
 
 	@Transient
 	private Collection<SimpleGrantedAuthority> authorities;
@@ -111,10 +113,16 @@ public class User implements UserDetails{
 	public List<Need> getNeeds() {
 		return needs;
 	}
-
+  /*
+  public List<Need> getDrafts(){
+    return drafts;
+  }
 	public void setNeeds(final List<Need> needs) {
 		this.needs = needs;
 	}
+  public void setDrafts(final List<Need> drafts) {
+    this.drafts = drafts;
+  }    */
 
 	@Override
 	public boolean equals(final Object o) {

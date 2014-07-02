@@ -1,4 +1,4 @@
-package won.node.rdfstorage;
+package won.protocol.repository.rdfstorage;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.model.ConnectionEvent;

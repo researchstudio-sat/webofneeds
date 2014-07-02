@@ -1,7 +1,7 @@
 
-<div class="col-lg-8 col-lg-offset-2">
+<div class="col-lg-12">
 	<div class="row-fluid">
-		<div class="col-lg-8 col-lg-offset-2">
+		<div class="col-lg-12">
             <nav class="navbar navbar-default" role="navigation">
                 <div class="container-fluid">
                     <!-- Brand and toggle get grouped for better mobile display -->
@@ -16,26 +16,28 @@
                     <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <ul class="nav nav-progress-justified">
-                            <li class="active fill"
+                            <li class="active fill centered-text"
                                 ng-show="showPublic(1)"><a href=""
                                                            ng-click="jumpToStep({num:1})">Step
                                 1<br>
                                 Type</a></li>
-                            <li
-                                    ng-show="!showPublic(1)"><a href="" ng-click="jumpToStep({num:1})">Step 1 <br>
+                            <li class="centered-text" ng-show="!showPublic(1)"><a href=""
+                                                                              ng-click="jumpToStep({num:1})">Step 1 <br>
                                 Type</a></li>
-                            <li class="active" ng-show="showPublic(2)">
+                            <li class="active centered-text" ng-show="showPublic(2)">
                                 <a href="" ng-click="jumpToStep({num:2})">Step 2 <br> Basic Description</a></li>
-                            <li ng-show="!showPublic(2)"><a href="" ng-click="jumpToStep({num:2})">Step 2 <br> Basic
+                            <li class="centered-text" ng-show="!showPublic(2)"><a href=""
+                                                                                  ng-click="jumpToStep({num:2})">Step 2 <br> Basic
                                 Description</a></li>
-                            <li class="active" ng-show="showPublic(3)">
+                            <li class="active centered-text" ng-show="showPublic(3)">
                                 <a href="" ng-click="jumpToStep({num:3})">Step 3 <br> Additional Data</a></li>
-                            <li ng-show="!showPublic(3)"><a href="" ng-click="jumpToStep({num:3})">Step 3 <br>
+                            <li class="centered-text" ng-show="!showPublic(3)"><a href=""
+                                                                                  ng-click="jumpToStep({num:3})">Step 3 <br>
                                 Additional
                                 Data</a></li>
-                            <li class="active" ng-show="showPublic(4)">
+                            <li class="active centered-text" ng-show="showPublic(4)">
                                 <a href="" ng-click="jumpToStep({num:4})">Step 4 <br> Preview</a></li>
-                            <li ng-show="!showPublic(4)">
+                            <li class="centered-text" ng-show="!showPublic(4)">
                                 <a href="" ng-click="jumpToStep({num:4})">Step 4 <br> Preview</a></li>
                         </ul>
                     </div><!-- /.navbar-collapse -->

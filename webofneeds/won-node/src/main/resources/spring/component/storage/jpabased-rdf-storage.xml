@@ -34,7 +34,7 @@
     <context:annotation-config />
 
     <!--- RDF Storage -->
-    <bean id="rdfStorageRef" class="won.node.rdfstorage.impl.JpaRepositoryBasedRdfStorageServiceImpl" />
+    <bean id="rdfStorageRef" class="won.protocol.repository.rdfstorage.impl.JpaRepositoryBasedRdfStorageServiceImpl" />
 
     
 </beans>

@@ -49,22 +49,7 @@
 						<li ng-class="isActive()"><a href="#/">
 							<span class="glyphicon glyphicon-transfer"></span>&nbsp;Web Of Needs</a>
 						</li>
-                        <li ng-show="!showPublic()" ng-class="isActive()">
-                            <div class="btn-group">
-                                <button type=button class="btn btn-primary dropdown-toggle navbar-btn"
-                                        data-toggle="dropdown">
-                                    <span class="glyphicon glyphicon-plus"></span>&nbsp;New	Post</a>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="#/create-need-new/want/">Want</a>
-                                        <a href="#/create-need-new/offer/">Offer</a>
-                                        <a href="#/create-need-new/activity/">Activity</a>
-                                        <a href="#/create-need-new/critique/">Critique</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+
 
 						<li ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak><a
                                 href="#/create-need-new/1/">

@@ -1,5 +1,23 @@
 /** Common **/
+.div-table-cell {
+    display:table-cell;
+
+}
+.div-table-row {
+    display:table-row;
+
+}
+.div-table {
+    display:table;
+
+}
+.centered-text{
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
 .top-buffer { margin-top:20px; }
+.bottom-buffer { margin-bottom:20px; }
 .fill {
     min-height: 100%;
 }
@@ -93,7 +111,7 @@
 }
 
 #content {
-	background-color: #F5F5F5;
+	background-color: #FFFFFF;
 }
 
 .map-canvas {
@@ -157,6 +175,9 @@ h1#main-heading {
 }
 
 /** Create need **/
+.additional-info-title {
+    font-size: large;
+}
 .img-upload-box {
 	background-color: #CACACA;
 	border: 1px solid #CACACA;

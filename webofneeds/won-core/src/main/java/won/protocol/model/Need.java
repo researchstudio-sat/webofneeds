@@ -30,6 +30,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "need")
+//@Inheritance(strategy=InheritanceType.JOINED)
 public class Need
 {
   @Id
@@ -38,7 +39,7 @@ public class Need
   private Long id;
   /* The URI of the need */
   @Column( name = "needURI", unique = true)
-  private URI needURI;
+  protected URI needURI;
   /* The state of the need */
   @Column( name = "state")
   private NeedState state;

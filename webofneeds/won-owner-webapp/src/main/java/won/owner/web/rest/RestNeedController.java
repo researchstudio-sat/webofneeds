@@ -3,6 +3,7 @@ package won.owner.web.rest;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -17,8 +18,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import won.owner.model.DraftState;
 import won.owner.model.User;
+import won.owner.pojo.DraftPojo;
 import won.owner.pojo.NeedPojo;
+import won.owner.repository.DraftStateRepository;
+
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
 import won.owner.service.impl.WONUserDetailService;
@@ -31,6 +37,7 @@ import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
@@ -60,8 +67,15 @@ public class RestNeedController {
 	@Autowired
 	private NeedRepository needRepository;
 
+
+  @Autowired
+  private DraftStateRepository draftStateRepository;
+
 	@Autowired
 	private MatchRepository matchRepository;
+
+  @Autowired
+  private RDFStorageService rdfStorage;
 
 	@Autowired
 	private ChatMessageRepository chatMessageRepository;
@@ -177,7 +191,6 @@ public class RestNeedController {
 
 	}
 
-
 	@ResponseBody
 	@RequestMapping(
 			value = "/create",
@@ -201,7 +214,7 @@ public class RestNeedController {
 
 		return createdNeedPojo;
 	}
-
+  /*
   @ResponseBody
   @RequestMapping(
     value = "/create/saveDraft",
@@ -224,6 +237,37 @@ public class RestNeedController {
     wonUserDetailService.save(user);
 
     return createdNeedPojo;
+  }         */
+
+  @ResponseBody
+  @RequestMapping(
+    value = "/create/saveDraft",
+    consumes = MediaType.APPLICATION_JSON,
+    produces = MediaType.APPLICATION_JSON,
+    method = RequestMethod.POST
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public DraftPojo createDraft(@RequestBody DraftPojo draftPojo) {
+
+    User user = (User) wonUserDetailService.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+
+    user.getNeeds().size();
+
+    DraftPojo createdDraftPojo = resolveDraft(draftPojo,user);
+    NeedPojo createdNeedPojo = (NeedPojo) createdDraftPojo;
+
+    List<Need> drafts = needRepository.findByNeedURI(URI.create(createdNeedPojo.getNeedURI()));
+
+    user.getNeeds().add(drafts.get(0));
+    wonUserDetailService.save(user);
+
+    int currentStep = draftPojo.getCurrentStep();
+    String userName = draftPojo.getUserName();
+    DraftState draftState = new DraftState(URI.create(draftPojo.getNeedURI()),currentStep);
+    draftStateRepository.save(draftState);
+    return createdDraftPojo;
+
   }
 
 	@ResponseBody
@@ -270,7 +314,109 @@ public class RestNeedController {
 
 		return needPojo;
 	}
+  private DraftPojo resolveDraft(DraftPojo draftPojo, User user){
+    URI needURI;
+    //Draft needDraft2 = new Draft();
 
+    Need needDraft = new Need();
+
+    URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
+    int draftNumber = user.getNeeds().size()+1;
+    URI draftId = URI.create(ownerURI.toString()+"/"+user.getUsername()+"/"+ draftNumber);
+
+    needDraft.setNeedURI(draftId);
+
+    com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
+    Resource needResource = needModel.createResource(draftId.toString(), WON.NEED);
+
+    Model draftModel = configureNeedModel(draftId.toString(),needModel,draftPojo);
+
+    //needDraft.setContent(RdfUtils.toString(draftModel));
+    needDraft.setState(NeedState.INACTIVE);
+    needDraft.setOwnerURI(ownerURI);
+    try{
+      needRepository.save(needDraft);
+      rdfStorage.storeContent(needDraft.getNeedURI(),draftModel);
+    } catch(Exception e){
+      e.printStackTrace();
+      int size = needRepository.findByNeedURI(needDraft.getNeedURI()).size();
+      logger.debug(String.valueOf(size));
+    }
+
+    draftPojo.setNeedURI(draftId.toString());
+
+    return draftPojo;
+  }
+  private Model configureNeedModel(String needURI, Model needModel, NeedPojo needPojo) {
+    URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
+
+    Resource needResource = needModel.createResource(needURI, WON.NEED);
+
+    // need type
+    needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
+
+    // need content
+    Resource needContent = needModel.createResource(WON.NEED_CONTENT);
+    if (!needPojo.getTitle().isEmpty())
+      needContent.addProperty(DC.title, needPojo.getTitle(), XSDDatatype.XSDstring);
+    if (!needPojo.getTextDescription().isEmpty())
+      needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
+    if (!needPojo.getContentDescription().isEmpty())
+      attachRdfToModelViaBlanknode(needPojo.getContentDescription(), "TTL", needContent, WON.HAS_CONTENT_DESCRIPTION, needModel);
+    if (!needPojo.getTags().isEmpty()) {
+      String[] tags = needPojo.getTags().split(",");
+      for (String tag : tags) {
+        needModel.add(needModel.createStatement(needContent, WON.HAS_TAG, tag.trim()));
+      }
+    }
+
+    needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
+
+    for(String ft : needPojo.getFacetTypes()) {
+      needModel.add(needModel.createStatement(needResource, WON.HAS_FACET, needModel.createResource(ft)));
+    }
+
+
+    // need modalities
+    Resource needModality = needModel.createResource(WON.NEED_MODALITY);
+
+    //price and currency
+    if (needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
+      Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
+      if (needPojo.getLowerPriceLimit() != null)
+        priceSpecification.addProperty(WON.HAS_LOWER_PRICE_LIMIT, Double.toString(needPojo.getLowerPriceLimit()), XSDDatatype.XSDfloat);
+      if (needPojo.getUpperPriceLimit() != null)
+        priceSpecification.addProperty(WON.HAS_UPPER_PRICE_LIMIT, Double.toString(needPojo.getUpperPriceLimit()), XSDDatatype.XSDfloat);
+      if (!needPojo.getCurrency().isEmpty())
+        priceSpecification.addProperty(WON.HAS_CURRENCY, needPojo.getCurrency(), XSDDatatype.XSDstring);
+
+      needModel.add(needModel.createStatement(needModality, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
+    }
+
+    if (needPojo.getLatitude() != null && needPojo.getLongitude() != null) {
+      Resource location = needModel.createResource(GEO.POINT)
+                                   .addProperty(GEO.LATITUDE, Double.toString(needPojo.getLatitude()))
+                                   .addProperty(GEO.LONGITUDE, Double.toString(needPojo.getLongitude()));
+
+      needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_LOCATION, location));
+    }
+
+    // time constraint
+    if (!needPojo.getStartTime().isEmpty() || !needPojo.getEndTime().isEmpty()) {
+      Resource timeConstraint = needModel.createResource(WON.TIME_SPECIFICATION)
+                                         .addProperty(WON.HAS_RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
+      if (!needPojo.getStartTime().isEmpty())
+        timeConstraint.addProperty(WON.HAS_START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
+      if (!needPojo.getEndTime().isEmpty())
+        timeConstraint.addProperty(WON.HAS_END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
+      if (needPojo.getRecurIn() != null)
+        timeConstraint.addProperty(WON.HAS_RECURS_IN, Long.toString(needPojo.getRecurIn()));
+      if (needPojo.getRecurTimes() != null)
+        timeConstraint.addProperty(WON.HAS_RECURS_TIMES, Integer.toString(needPojo.getRecurTimes()));
+      needModel.add(needModel.createStatement(needModality, WON.HAS_TIME_SPECIFICATION, timeConstraint));
+    }
+    return needModel;
+  }
 	private NeedPojo resolve(NeedPojo needPojo) {
 		if (needPojo.getNeedId() >= 0) {
 
@@ -290,75 +436,10 @@ public class RestNeedController {
       URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
 
       com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
-
       Resource needResource = needModel.createResource("no:uri", WON.NEED);
       needModel.setNsPrefix("","no:uri");
 
-      // need type
-      needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
-
-      // need content
-      Resource needContent = needModel.createResource(WON.NEED_CONTENT);
-      if (!needPojo.getTitle().isEmpty())
-        needContent.addProperty(DC.title, needPojo.getTitle(), XSDDatatype.XSDstring);
-      if (!needPojo.getTextDescription().isEmpty())
-        needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
-      if (!needPojo.getContentDescription().isEmpty())
-        attachRdfToModelViaBlanknode(needPojo.getContentDescription(), "TTL", needContent, WON.HAS_CONTENT_DESCRIPTION, needModel);
-      if (!needPojo.getTags().isEmpty()) {
-        String[] tags = needPojo.getTags().split(",");
-        for (String tag : tags) {
-          needModel.add(needModel.createStatement(needContent, WON.HAS_TAG, tag.trim()));
-        }
-      }
-
-      needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
-
-      for(String ft : needPojo.getFacetTypes()) {
-        needModel.add(needModel.createStatement(needResource, WON.HAS_FACET, needModel.createResource(ft)));
-      }
-
-
-      // need modalities
-      Resource needModality = needModel.createResource(WON.NEED_MODALITY);
-
-      //price and currency
-      if (needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
-        Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
-        if (needPojo.getLowerPriceLimit() != null)
-          priceSpecification.addProperty(WON.HAS_LOWER_PRICE_LIMIT, Double.toString(needPojo.getLowerPriceLimit()), XSDDatatype.XSDfloat);
-        if (needPojo.getUpperPriceLimit() != null)
-          priceSpecification.addProperty(WON.HAS_UPPER_PRICE_LIMIT, Double.toString(needPojo.getUpperPriceLimit()), XSDDatatype.XSDfloat);
-        if (!needPojo.getCurrency().isEmpty())
-          priceSpecification.addProperty(WON.HAS_CURRENCY, needPojo.getCurrency(), XSDDatatype.XSDstring);
-
-        needModel.add(needModel.createStatement(needModality, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
-      }
-
-      if (needPojo.getLatitude() != null && needPojo.getLongitude() != null) {
-        Resource location = needModel.createResource(GEO.POINT)
-                                     .addProperty(GEO.LATITUDE, Double.toString(needPojo.getLatitude()))
-                                     .addProperty(GEO.LONGITUDE, Double.toString(needPojo.getLongitude()));
-
-        needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_LOCATION, location));
-      }
-
-      // time constraint
-      if (!needPojo.getStartTime().isEmpty() || !needPojo.getEndTime().isEmpty()) {
-        Resource timeConstraint = needModel.createResource(WON.TIME_SPECIFICATION)
-                                           .addProperty(WON.HAS_RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
-        if (!needPojo.getStartTime().isEmpty())
-          timeConstraint.addProperty(WON.HAS_START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
-        if (!needPojo.getEndTime().isEmpty())
-          timeConstraint.addProperty(WON.HAS_END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
-        if (needPojo.getRecurIn() != null)
-          timeConstraint.addProperty(WON.HAS_RECURS_IN, Long.toString(needPojo.getRecurIn()));
-        if (needPojo.getRecurTimes() != null)
-          timeConstraint.addProperty(WON.HAS_RECURS_TIMES, Integer.toString(needPojo.getRecurTimes()));
-        needModel.add(needModel.createStatement(needModality, WON.HAS_TIME_SPECIFICATION, timeConstraint));
-      }
-
-      needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
+      needModel = configureNeedModel("",needModel,needPojo);
 
       if (needPojo.getWonNode().equals("")) {
         ListenableFuture<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);

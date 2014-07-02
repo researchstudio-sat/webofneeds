@@ -294,4 +294,17 @@ angular.module('won.owner').directive('wonGallery', function factory() {
 		}
 	};
 });
+angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  $location, $http, $routeParams, needService, mapService, userService){
+  $scope.imageInputFieldCollapsed = true;
+  $scope.locationInputFieldCollapsed = true;
+  $scope.timeInputFieldCollapsed = true;
+
+  $scope.imageCollapseClick = function(){
+        $scope.imageInputFieldCollapsed = !$scope.imageInputFieldCollapsed;
+    };
+
+    $scope.locationCollapseClick = function(){
+        $scope.locationInputFieldCollapsed = !$scope.locationInputFieldCollapsed;
+    };
+});
 

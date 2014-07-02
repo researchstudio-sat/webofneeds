@@ -16,7 +16,7 @@
 
 <div>
     <div class="col-lg-12">
-        <div class="row top-buffer">
+        <div id="needSaveAlert" class="row top-buffer">
             <div class="col-lg-8 col-lg-offset-2">
                 <div ng-cloak class="alert alert-dismissible alert-success" ng-show="successShow"
                      style="margin-top:10px; margin-bottom: 10px;" data-dismiss="alert">
@@ -29,7 +29,7 @@
                 </div>
             </div>
         </div>
-        <div class="row top-buffer">
+        <div id="progressTracker" class="row top-buffer">
             <div class="col-lg-12">
                 <div class="row">
                     <won-progress-tracker current-step='currentStep' number-of-steps = 'numberOfSteps'
@@ -42,7 +42,7 @@
         </div>
 
 
-        <div class="row top-buffer">
+        <div id="createNeedContent" class="row top-buffer">
             <div class="col-lg-12">
                 <form class="form-horizontal">
                     <div ng-show="showPublic(1)" class="col-lg-6 col-lg-offset-3">
@@ -65,14 +65,6 @@
                                         about
                                     </button>
                                 </div>
-                                <!--ul class="nav nav-pills nav-stacked">
-                                    <li><a href="" ng-click="nextStep()"><i class="icon-want"></i>Want: I'm looking for</a></li>
-                                    <li><a href="" ng-click="nextStep()">Offer: I'm offering</a></li>
-                                    <li><a href="" ng-click="nextStep()">Activity: Looking for people
-                                        to</a></li>
-                                    <li><a href="" ng-click="nextStep()">Critique: Let's do something
-                                        about</a></li>
-                                </ul-->
                             </div>
 
                         </fieldset>
@@ -123,10 +115,113 @@
                             </fieldset>
                         </div>
                     </div>
+                    <div ng-show="showPublic(3)" class="col-lg-10 col-lg-offset-1" ng-controller="AdditionalInfoCtrl">
+                        <div class="col-lg-12">
+                            <div class="col-lg-12 bottom-buffer">
+                                <span>
+                                    <p>
+                                        Filling out the following categories makes it easier for people,
+                                        who need what you have to offer, to find this post and start messaging with you. <br>
+                                        You can add photos or sketches of the thing you're offering, or specify where and when it
+                                        will be available
+                                    </p>
+                                </span>
+                            </div>
+
+                        </div>
+                        <div id="imagesInfoCollapsed" ng-show="imageInputFieldCollapsed"
+                             class="well div-table col-lg-12">
+                            <div class="div-table-row">
+                                <div class="col-lg-3 div-table-cell centered-text additional-info-title">Images</div>
+                                <div class="col-lg-8 div-table-cell">Add photos or sketches to give people a better idea what
+                                    you're
+                                    offering
+                                </div>
+                                <div class="col-lg-1 div-table-cell centered-text">
+                                        <span >
+                                            <a href="" class="glyphicon glyphicon-chevron-right"
+                                               ng-click="imageCollapseClick()">
+                                            </a>
+                                        </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="imagesInfoTitleWell" ng-show="!imageInputFieldCollapsed"
+                             class="well div-table col-lg-12">
+                            <div class="div-table-row">
+                                <div class="col-lg-11 div-table-cell centered-text">Images</div>
+                                <div class="col-lg-1 div-table-cell centered-text">
+                                        <span>
+                                            <a href="" class="glyphicon glyphicon-chevron-down"
+                                               ng-click="imageCollapseClick()"></a>
+                                        </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="imagesInfoInputFields" ng-show="!imageInputFieldCollapsed" class="div-table col-lg-12">
+                            <div class="div-table-row">
+                                <div class="col-lg-10 col-lg-offset-1 div-table-cell">Add photos or sketches to give people a better
+                                    idea what
+                                    you're
+                                    offering
+                                </div>
+                            </div>
+                            <div class="div-table-row">
+                                <div class="col-lg-10 col-lg-offset-1 div-table-cell" won-gallery need="need"></div>
+                            </div>
+                        </div>
+                        <div id="locationInfoCollapsed" ng-show="locationInputFieldCollapsed"
+                             class="well div-table col-lg-12">
+                            <div class="div-table-row">
+                                <div class="col-lg-3 div-table centered-text additional-info-title">Location</div>
+                                <div class="col-lg-8">Where's your offer available? i.e. where can people pick it up or
+                                    where would you deliver it to?
+                                </div>
+                                <div class="col-lg-1 div-table-cell centered-text">
+                                    <span ><a href="" class="glyphicon glyphicon-chevron-right"
+                                              ng-click="locationCollapseClick()"></a></span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div id="locationInfoInputFields" ng-show="!locationInputFieldCollapsed"
+                             class="well div-table col-lg-12">
+                            <div class="div-table-row">
+                                <div class="col-lg-10 col-lg-offset-1 div-table-cell">Where's your offer available? i.e. where can people pick it up or
+                                    where would you deliver it to?
+                                </div>
+                            </div>
+                            <div class="div-table-row">
+                                <div class="well">
+                                    <fieldset>
+                                        <legend>Where new need takes place</legend>
+                                        <section id="map">
+                                            <div ui-map="myMap" ui-options="mapOptions" class="map-canvas"
+                                                 ui-event="{'map-click' : 'onClickMap($event,$params, $myMap)'}"></div>
+                                        </section>
+                                        <span class="help-block">Please click on the map above and determine where need takes place</span>
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="timeInfoCollapsed" ng-show="timeInputFieldCollapsed" class="well div-table col-lg-12">
+                            <div class="div-table-row">
+                                <div class="col-lg-3 div-table centered-text additional-info-title">Time</div>
+                                <div class="col-lg-8">Is it only available during a limited time interval or up till a
+                                    deadline? then use these
+                                </div>
+                                <div class="col-lg-1 div-table-cell centered-text">
+                                    <span ><a href="" class="glyphicon glyphicon-chevron-right"></a></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </form>
             </div>
 
         </div>
+
         <div class="row top-buffer">
             <div class="col-lg-6 col-lg-offset-3"
                  style="text-align:center;margin-top:15px;">
@@ -138,7 +233,8 @@
                 <button ng-show="nextButton" type="button" class="btn btn-success" ng-click="nextStep()">Next</button>
                 <button ng-show="previewButton" type="button" class="btn btn-primary"
                         ng-click="jumpToStep(4)">Skip to Preview</button>
-
+                <button ng-show="saveDraftButton" type="button" class="btn btn-primary"
+                        ng-click="save()">Save</button>
             </div>
         </div>
 

@@ -116,15 +116,16 @@ app.run(function($httpBackend){
 
         $httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
 
-        $httpBackend.whenPOST('/owner/rest/need/create').respond(function(method, url, data){
+      /*  $httpBackend.whenPOST('/owner/rest/need/create').respond(function(method, url, data){
 
             return [200, 'text',{}];
-        });
-        $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').respond(function(method, url, data){
+        });               */
+       /* $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').respond(function(method, url, data){
 
             return [200, 'text',{}];
-        });
-
+        });*/
+        $httpBackend.whenPOST('/owner/rest/need/create/save').passThrough();
+        $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').passThrough();
         $httpBackend.whenGET(/.*/).passThrough();
         $httpBackend.whenPOST(/.*/).passThrough();
         $httpBackend.whenPOST(/\/owner\/rest\/user\/.*/).passThrough();
