@@ -196,6 +196,30 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 		);
 	}
 
+    needService.saveDraft = function(need, currentStep,userName){
+        var needToSave = angular.copy(need);
+        needToSave.currentStep = currentStep+'';
+        needToSave.userName = userName;
+        needToSave.tags = need.tags.join(",");
+        delete needToSave.binaryFolder;
+        return $http({
+            method:'POST',
+            url:'/owner/rest/need/create/saveDraft',
+            data:needToSave,
+            success:function(content){
+                console.log(content);
+            }
+        }).then(
+            function () {
+                // success
+                return {status:"OK"};
+            },
+            function (response) {
+                console.log("FATAL ERROR");
+            }
+        );
+    }
+
 	needService.save = function(need) {
 		var needToSave = angular.copy(need);
 		needToSave.tags = need.tags.join(",");
@@ -225,7 +249,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 				function (response) {
 					console.log("FATAL ERROR");
 				}
-		);;
+		);
 	};
 
 	return needService;

@@ -119,7 +119,7 @@ angular.module('won.owner').directive('wonGallery', function factory() {
 				}
 			});
 
-			$scope.$on('fileuploadstop', function (e, data) {
+			$scope.$on('file uploadstop', function (e, data) {
 				var absPath = $location.absUrl();
 				var ownerPath = absPath.substr(0,absPath.indexOf('#'));
 				$scope.photos[$scope.selectedPhoto].uri = ownerPath + 'rest/needphoto/' + $scope.need.binaryFolder + "/" + $scope.selectedPhoto + $scope.lastExtension + '/';

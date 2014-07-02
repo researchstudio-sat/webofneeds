@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.node.rdfstorage.impl;
+package won.protocol.repository.rdfstorage.impl;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.tdb.TDBFactory;

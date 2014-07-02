@@ -14,26 +14,26 @@
  *    limitations under the License.
  */
 
-package won.node.rdfstorage.impl;
-
-import com.hp.hpl.jena.query.Dataset;
-
-/**
- * Maintains thread-local dataset objects.
+/*
+ * This file is subject to the terms and conditions defined in file 'LICENSE.txt', which is part of this source code package.
  */
-public abstract class AbstractOneDatasetPerThreadRdfStorageService extends AbstractDatasetBasedRdfStorageService
+           /*
+package won.owner.repository;
+
+import won.owner.model.Draft;
+import won.protocol.repository.WonRepository;
+
+import java.net.URI;
+import java.util.List;
+       */
+/**
+ * User: syim
+ * Date: 11/7/13
+ */                       /*
+public interface NeedDraftRepository extends WonRepository<Draft>
 {
-  ThreadLocal<Dataset> datasetThreadLocal = new ThreadLocal<Dataset>();
 
-  @Override
-  protected Dataset getDataset() {
-    Dataset dataset = datasetThreadLocal.get();
-    if (dataset == null){
-      dataset = createDataset();
-      datasetThreadLocal.set(dataset);
-    }
-    return dataset;
-  }
+	public List<Draft> findByNeedURI(URI uri);
 
-  protected abstract Dataset createDataset();
 }
+       */

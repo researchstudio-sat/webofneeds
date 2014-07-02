@@ -14,21 +14,26 @@
  *    limitations under the License.
  */
 
-package won.node.rdfstorage.impl;
+package won.protocol.repository.rdfstorage.impl;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
 
 /**
- * Simple in-memory RDF storage for testing/benchmarking purposes.
+ * Maintains thread-local dataset objects.
  */
-public class InMemoryRdfStorageImpl extends AbstractDatasetBasedRdfStorageService
+public abstract class AbstractOneDatasetPerThreadRdfStorageService extends AbstractDatasetBasedRdfStorageService
 {
-  private Dataset dataset;
+  ThreadLocal<Dataset> datasetThreadLocal = new ThreadLocal<Dataset>();
 
   @Override
   protected Dataset getDataset() {
-    return DatasetFactory.createMem();
+    Dataset dataset = datasetThreadLocal.get();
+    if (dataset == null){
+      dataset = createDataset();
+      datasetThreadLocal.set(dataset);
+    }
+    return dataset;
   }
 
+  protected abstract Dataset createDataset();
 }

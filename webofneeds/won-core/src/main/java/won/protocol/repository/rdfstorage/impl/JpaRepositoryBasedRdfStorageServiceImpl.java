@@ -14,71 +14,51 @@
  *    limitations under the License.
  */
 
-package won.node.rdfstorage.impl;
+package won.protocol.repository.rdfstorage.impl;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.ReadWrite;
 import com.hp.hpl.jena.rdf.model.Model;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.node.rdfstorage.RDFStorageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.model.ConnectionEvent;
-import won.protocol.model.Need;
-import won.protocol.util.RdfUtils;
+import won.protocol.model.ModelHolder;
+import won.protocol.repository.ModelHolderRepostory;
 
 import java.net.URI;
 
 /**
- * Simple in-memory RDF storage for testing/benchmarking purposes.
+ * Rdf Storage service that delegates to a JPA repository
  */
-public abstract class AbstractDatasetBasedRdfStorageService implements RDFStorageService
+public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageService
 {
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-
-  public AbstractDatasetBasedRdfStorageService() {
-
-  }
-
-  protected abstract Dataset getDataset();
-
+  @Autowired
+  private ModelHolderRepostory modelHolderRepostory;
 
   @Override
-  public void storeContent(final ConnectionEvent event, final Model graph)
-  {
+  public void storeContent(final ConnectionEvent event, final Model graph) {
     storeContent(createEventURI(event), graph);
   }
 
   @Override
-  public Model loadContent(final ConnectionEvent event)
-  {
+  public Model loadContent(final ConnectionEvent event) {
     return loadContent(createEventURI(event));
   }
 
   @Override
   public void storeContent(final URI resourceURI, final Model model) {
-    if (model.isEmpty()) return;
-    Model copy = RdfUtils.cloneModel(model);
-    Dataset dataset = getDataset();
-    try {
-      dataset.begin(ReadWrite.WRITE);
-      dataset.addNamedModel(resourceURI.toString(), copy);
-      dataset.commit();
-    } finally {
-      dataset.end();
+    ModelHolder modelHolder = modelHolderRepostory.findOne(resourceURI);
+    if (modelHolder!=null){
+      modelHolder.setModel(model);
+    } else{
+      modelHolder = new ModelHolder(resourceURI, model);
     }
+    modelHolderRepostory.save(modelHolder);
   }
 
   @Override
   public Model loadContent(final URI resourceURI) {
-    Dataset dataset = getDataset();
-    try {
-      dataset.begin(ReadWrite.READ);
-      Model ret = dataset.getNamedModel(resourceURI.toString());
-      return ret == null ? null: RdfUtils.cloneModel(ret);
-    } finally {
-      dataset.end();
-    }
+    ModelHolder modelHolder = modelHolderRepostory.findOne(resourceURI);
+    return modelHolder == null ? null : modelHolder.getModel();
   }
 
   /**
