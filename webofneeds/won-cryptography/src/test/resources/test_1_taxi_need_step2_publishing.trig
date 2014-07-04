@@ -51,8 +51,10 @@
 
 #node-defined content and signature of the owner's permanent part data
 :NOD1 {
+  #make initally used blank node equivalent to URI generated later
   _:wonneed owl:sameAs <http://www.example.com/resource/need/100/v1>;
-            won:latestVersion <http://www.example.com/resource/need/100>;
+            won:latestVersion <http://www.example.com/resource/need/100>;       #TODO: find vocabulary for versioning
+                                                                                #(the mmento framework seems to be a good starting point)
             won:hasConnections <http://www.example.com/resource/need/100/v1/connections/> ;
             won:isInState won:Active ;
             won:matcherProtocolEndpoint <http://www.example.com/won/protocol/matcher> ;
@@ -63,7 +65,8 @@
   <http://www.example.com/resource/need/100/v1/connections/>
     a   ldp:Container .
 
-  # signature of the owner's permanent part of data:
+
+ # signature of the owner's permanent part of data:
   :OWN1 sig:signature [
         rdf:type sig:WonSignature ;
         sig:creator <http://example.com/webid#key-5>;
@@ -71,7 +74,6 @@
                 "2013-09-252T10:49:54.050+0000";
         sig:signatureValue
   "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
-
 }
 
 # signature of the node-defined data and of the owner's signature.
