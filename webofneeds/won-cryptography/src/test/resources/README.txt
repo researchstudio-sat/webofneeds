@@ -1,11 +1,44 @@
+If there are parts of the data that are signed and parts that
+are not (e.g. triples that are going to change frequently) then
+we require a named graphs representation to be able to specify
+which parts of the data the signature refers to.
+
+Also, if there are parts of the data that are signed by different
+participants, then we also require the named graphs to be able
+to specify which part is signed by which signature.
+
+Moreover, if the data signed by participant 1 has to be resigned
+(possible with added data) by participant 2, and the signature of
+participant 1 is to be kept in the data, then the named graph
+are also required to refer to the signed by participant 1 graph
+signature.
+
+
+
 Next steps:
 
 Use algorithm from signingframework but change signature and signed data representation a bit,
 namely, don't use nested graphs.
 
-2 solutions possible:
+for that one need:
+- change (subclass?) Assembler class and implement own assemble() method not to use nested graphs
+- subclass all classes implementing Signing algorithm and override assemble() method to call
+our own Assembler implementation
+- map Jena graph representation
+- define more clear the versioning scenario (connections and won need)
 
-(1)
+
+Define how we represent the signature
+- already decided: named graphs
+- to be done: make an example in trig for different stages of the need (creation by owner,
+final creation by won node, after connections are added, etc.) with the signature(s), then
+it will be clear what we are still missing in our signature definition
+- to be done: find which signature rdf vocabulary to use or define own own??
+
+
+Signature representation - 2 solutions possible:
+
+(1) # currently chosen by Florian solution
 When signing signed data (data in graph A and triples containing signature of A),
 sign only the triples containing signature of A inside a new graph B. The signature itself
 of B describe with triples.
