@@ -254,6 +254,10 @@ public class EventBot extends TriggeredBot
       return EventBot.this.getNodeURISource();
     }
 
+    public URI getSolrServerURI(){
+      return EventBot.this.getSolrServerURI();
+    }
+
     @Override
     public MatcherNodeURISource getMatcherNodeURISource() {
       return EventBot.this.getMatcheNodeURISource();

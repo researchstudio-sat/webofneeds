@@ -40,4 +40,12 @@ public class Interval
       this.from = from;
     }
   }
+  public Date getFrom() {
+    return from;
+  }
+
+  public Date getTo() {
+    return to;
+  }
+
 }
