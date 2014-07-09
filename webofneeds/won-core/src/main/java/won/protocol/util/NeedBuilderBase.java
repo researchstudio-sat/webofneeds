@@ -42,6 +42,10 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   private URI uriURI;
   private String uriString;
   private URI basicNeedTypeURI;
+  private Long recurIn;
+  private int recurTimes;
+  private boolean recurInfiniteTimes;
+  private List<URI> facetTypes;
   private BasicNeedType basicNeedTypeBNT;
   private String basicNeedTypeURIString;
   private URI stateURI;
@@ -314,10 +318,49 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
     return this;
   }
 
+  public List<URI> getFacetTypes() {
+    return facetTypes;
+  }
+
+  public int getRecurTimes() {
+    return recurTimes;
+  }
+
+  public Long getRecurIn() {
+    return recurIn;
+  }
+
+  @Override
+  public NeedBuilder<T> setFacetTypes(final List<URI> facetTypes) {
+    this.facetTypes = facetTypes;
+    return this;
+  }
+
   @Override
   public NeedBuilder<T> setTitle(final String title)
   {
     this.title = title;
+    return this;
+  }
+  @Override
+  public NeedBuilder<T> setRecurIn(final Long recurIn) {
+    this.recurIn = recurIn;
+    return this;
+  }
+
+  @Override
+  public NeedBuilder<T> setRecurTimes(final int recurTimes) {
+    this.recurTimes = recurTimes;
+    return this;
+  }
+
+  public boolean isRecurInfiniteTimes() {
+    return recurInfiniteTimes;
+  }
+
+  @Override
+  public NeedBuilder<T> setRecurInfiniteTimes(final boolean recurInfiniteTimes) {
+    this.recurInfiniteTimes = recurInfiniteTimes;
     return this;
   }
 
@@ -503,6 +546,10 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
     this.matcherProtocolEndpointString = null;
     this.matcherProtocolEndpointURI = endpoint;
     return this;
+  }
+
+  public BasicNeedType getBasicNeedTypeBNT() {
+    return basicNeedTypeBNT;
   }
 
   @Override
