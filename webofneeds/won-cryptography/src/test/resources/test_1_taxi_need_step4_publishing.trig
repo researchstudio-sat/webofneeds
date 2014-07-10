@@ -11,6 +11,8 @@
 @prefix acco:    <http://purl.org/acco/ns#>.
 @prefix tio:     <http://purl.org/tio/ns#> .
 @prefix sig:     <http://www.example.com/signature#> .
+@prefix pav:     <http://purl.org/pav/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
 
 # owner-specified content (permanent):
 :OWN1 {
@@ -52,8 +54,8 @@
 #node-defined content and signature of the owner's permanent part data
 :NOD1 {
   _:wonneed owl:sameAs <http://www.example.com/resource/need/100/v2>;
-            won:prevVersion <http://www.example.com/resource/need/100/v1>;
-            won:latestVersion <http://www.example.com/resource/need/100>;
+            pav:previousVersion <http://www.example.com/resource/need/100/v1>;
+            dc:isVersionOf <http://www.example.com/resource/need/100>;
             won:hasConnections <http://www.example.com/resource/need/100/v2/connections/> ;
             won:isInState won:Active ;
             won:matcherProtocolEndpoint <http://www.example.com/won/protocol/matcher> ;

@@ -11,6 +11,7 @@
 @prefix acco:    <http://purl.org/acco/ns#>.
 @prefix tio:     <http://purl.org/tio/ns#> .
 @prefix sig:     <http://www.example.com/signature#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
 
 # owner-specified content (permanent):
 :OWN1 {
@@ -53,8 +54,10 @@
 :NOD1 {
   #make initally used blank node equivalent to URI generated later
   _:wonneed owl:sameAs <http://www.example.com/resource/need/100/v1>;
-            won:latestVersion <http://www.example.com/resource/need/100>;       #TODO: find vocabulary for versioning
+            #won:latestVersion <http://www.example.com/resource/need/100>;
+                                                                                #TODO: find vocabulary for versioning
                                                                                 #(the mmento framework seems to be a good starting point)
+            dc:isVersionOf <http://www.example.com/resource/need/100>
             won:hasConnections <http://www.example.com/resource/need/100/v1/connections/> ;
             won:isInState won:Active ;
             won:matcherProtocolEndpoint <http://www.example.com/won/protocol/matcher> ;

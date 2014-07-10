@@ -44,8 +44,8 @@
       # Solve question where to link:
       # 1. Here we could link to the owner's WebID (If there is one).
       # This is of course a privacy issue (making the
-      # WebID the owner's pseudonym across a number of needs). (see https://dvcs.w3
-      .org/hg/WebID/raw-file/tip/spec/identity-respec.htm)
+      # WebID the owner's pseudonym across a number of needs).
+      # (see https://dvcs.w3.org/hg/WebID/raw-file/tip/spec/identity-respec.htm)
       # 2. We could refer to a public key that is part of the need RDF.
       #
       # The second case actually makes sense: The correctness of the public key (i.e.
@@ -108,6 +108,11 @@
 # signature of the webid
 :#OWNER-WEBID sig:signature [
       rdf:type sig:WonSignature ;
+      # TODO is that correct?:
+      # If the public key is provided as part of data
+      # and the need URI is used as WebID  (see above):
+      # sig:creator :; # but then the no:uri is webID which is wrong...
+      # Or, if external WebID is used, then URI of the WebID:
       sig:creator <http://example.com/webid#key-5>;
       sig:created
               "2013-09-252T10:49:54.050+0000";

@@ -10,8 +10,7 @@ to specify which part is signed by which signature.
 Moreover, if the data signed by participant 1 has to be resigned
 (possible with added data) by participant 2, and the signature of
 participant 1 is to be kept in the data, then the named graph
-are also required to refer to the signed by participant 1 graph
-signature.
+are also required to refer to the signed by participant 1 data.
 
 
 
@@ -21,11 +20,28 @@ Use algorithm from signingframework but change signature and signed data represe
 namely, don't use nested graphs.
 
 for that one need:
-- change (subclass?) Assembler class and implement own assemble() method not to use nested graphs
+- add class similar to Assembler class and implement own assemble() method by adding signature triples
+in the default graph with the signed data graph as subject (not to use nested graphs)
 - subclass all classes implementing Signing algorithm and override assemble() method to call
 our own Assembler implementation
 - map Jena graph representation
-- define more clear the versioning scenario (connections and won need)
+- wrap the algoritms or implement separate WonSigner/Verifier to decompose named graphs data into
+separate graphs and perform on each of them the canonicalize/hash/sign/assemble methods
+of the algorithm, and then merge the graphs and signature triples together into one dataset
+
+
+Define more clear the versioning scenario (connections and won need):
+- possible simple solution for won need:
+  HTTP:
+  example.com/resource12/ -> 303 example.com/resource12.rdf -> example.com/resource12/20140705120036.rdf
+  example.com/resource12/20140705120036/ -> 303 example.com/resource12/20140705120036.rdf
+  RDF:
+  @prefix dc:      <http://purl.org/dc/elements/1.1/> .
+  @prefix pav:     <http://purl.org/pav/> .
+  @prefix owl:     <http://www.w3.org/2002/07/owl#> .
+  _:wonneed owl:sameAs <example.com/resource12/20140705120036/>;
+            dc:isVersionOf <example.com/resource12/>
+            pav:previousVersion <http://www.example.com/resource12/20140617095504>;
 
 
 Define how we represent the signature
@@ -33,7 +49,8 @@ Define how we represent the signature
 - to be done: make an example in trig for different stages of the need (creation by owner,
 final creation by won node, after connections are added, etc.) with the signature(s), then
 it will be clear what we are still missing in our signature definition
-- to be done: find which signature rdf vocabulary to use or define own own??
+- to be done: find which signature rdf vocabulary to use or define own own
+- for now I will use the Signingframework vocabulary since that's already implemented
 
 
 Signature representation - 2 solutions possible:
@@ -71,6 +88,7 @@ G2 sig:signature [
   sig:signer <http://authority.payswarm.com/webid#key-873> ;
   sig:signatureValue
 "kMzVmMVDIyOWM32MzI4ZDY3NjI4mQ3OOGQzNGNTIyZTkQzNmExMgoYz=" . ] .
+
 
 
 (2)

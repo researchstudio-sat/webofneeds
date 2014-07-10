@@ -11,9 +11,14 @@ import java.security.*;
  */
 public interface SigningAlgorithm2 {
 
-    public Dataset sign(Model model, PrivateKey privateKey) throws Exception;
+    // canonicalize, hash, sign, add signature(s) (assemble)
+    public Dataset sign(Dataset dataset, PrivateKey privateKey) throws Exception;
+    // alternatively list of models as input
 
-    public boolean verify(Dataset model, PublicKey publicKey) throws Exception;
+
+    // canonicalize, hash, verify, maybe output VerificationResult (e.g. if parts are
+    // verified sucessfully and parts are not)
+    public boolean verify(Dataset dataset, PublicKey publicKey) throws Exception;
 
     //public boolean verify(Model model, PublicKey publicKey) throws Exception;
 }

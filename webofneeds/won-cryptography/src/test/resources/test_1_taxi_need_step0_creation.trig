@@ -10,10 +10,9 @@
 @prefix sp:      <http://spinrdf.org/sp#>.
 @prefix acco:    <http://purl.org/acco/ns#>.
 @prefix tio:     <http://purl.org/tio/ns#> .
-@prefix sig:     <http://www.example.com/signature#> .
 
 # owner-specified content (permanent):
-:OWN1 {
+:#OWN1 {
   _:wonneed won:Need ;
               won:hasBasicNeedType
                   won:Supply ;
@@ -35,7 +34,7 @@
 
 # owner-specified content (transient):
 # doesn't have to be in the named graph, can also be in the default graph
-:OWN2 {
+:#OWN2 {
   _:wonneed won:hasNeedModality
       [ a   won:NeedModality
          won:hasLocationSpecification  [
@@ -45,12 +44,3 @@
          ]
       ] .
 }
-
-
-# signature of the permanent part of data:
-:OWN1 sig:signature [
-      rdf:type sig:WonSignature ;
-      sig:creator <http://example.com/webid#key-5>;
-      sig:created
-              "2013-09-252T10:49:54.050+0000";
-"OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .

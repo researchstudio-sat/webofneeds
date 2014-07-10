@@ -1,4 +1,5 @@
-@prefix :    no:uri .
+#TODO should here be <http://www.example.com/resource/need/100> or <http://www.example.com/resource/need/100/v1>?:
+@prefix :    <http://www.example.com/resource/need/100> .
 @prefix dc:  <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
