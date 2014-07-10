@@ -37,7 +37,8 @@ public interface ConnectionCommunicationService
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void open(URI connectionURI, Model content)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException;
 
   /**
    * Closes the connection identified by the specified URI.

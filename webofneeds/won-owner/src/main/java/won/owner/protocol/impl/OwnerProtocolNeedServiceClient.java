@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import won.node.facet.impl.WON_TX;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ChatMessageRepository;
@@ -89,7 +90,16 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     delegate.deactivate(needURI);
     Need need = needs.get(0);
     need.setState(NeedState.INACTIVE);
+
     needRepository.save(need);
+    List<Connection> cons = connectionRepository.findByNeedURI(needURI);
+    if (cons.size() != 1)
+      throw new NoSuchConnectionException(needURI);
+    for(Connection con : cons){
+       con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
+      connectionRepository.save(con);
+    }
+
 
   }
 
@@ -100,9 +110,16 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
       logger.debug("owner to need: OPEN called for connection {} with content {}", connectionURI,
         StringUtils.abbreviate(RdfUtils.toString(content), 200));
     }
+
     List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
     if (cons.size() != 1)
       throw new NoSuchConnectionException(connectionURI);
+
+    URI needURI = cons.get(0).getNeedURI();
+    List<Need> needs = needRepository.findByNeedURI(needURI);
+    Need need = needs.get(0);
+    if(need.getState()==NeedState.INACTIVE)
+      throw new WonProtocolException("Need is inactive");
 
     delegate.open(connectionURI, content);
 
