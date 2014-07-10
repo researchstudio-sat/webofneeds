@@ -87,7 +87,8 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
       }
     }
     @Override
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void open(final URI connectionURI, final Model content)
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
       proxy.open(connectionURI, RdfUtils.toString(content));

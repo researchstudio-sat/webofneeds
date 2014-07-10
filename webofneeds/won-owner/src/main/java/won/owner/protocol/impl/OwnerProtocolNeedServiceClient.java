@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import won.node.facet.impl.WON_TX;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
@@ -93,12 +92,13 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
     needRepository.save(need);
     List<Connection> cons = connectionRepository.findByNeedURI(needURI);
-    if (cons.size() != 1)
-      throw new NoSuchConnectionException(needURI);
-    for(Connection con : cons){
-       con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
-      connectionRepository.save(con);
+    if (cons.size() >= 1){
+      for(Connection con : cons){
+        con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
+        connectionRepository.save(con);
+      }
     }
+
 
 
   }

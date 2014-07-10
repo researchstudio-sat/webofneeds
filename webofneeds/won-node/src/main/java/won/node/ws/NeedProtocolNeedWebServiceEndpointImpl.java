@@ -71,7 +71,8 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
   @Override
   @WebMethod
   public void open(@WebParam(name = "connectionURI") final URI connectionURI,
-                   @WebParam(name = "content") final String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
+                   @WebParam(name = "content") final String content)
+    throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault, IllegalMessageForNeedStateException {
       wireDependenciesLazily();
     try {
       needProtocolNeedService.open(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));

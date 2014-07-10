@@ -60,7 +60,8 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     private ConnectionModelMapper connectionModelMapper;
 
     //@Override
-    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(URI connectionURI, Model content)
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
             proxy.open(connectionURI, RdfUtils.toString(content));

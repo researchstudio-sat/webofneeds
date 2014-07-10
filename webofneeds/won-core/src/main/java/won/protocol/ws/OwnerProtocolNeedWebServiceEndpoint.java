@@ -17,6 +17,7 @@
 package won.protocol.ws;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.ws.fault.*;
 
 import javax.jws.WebMethod;
@@ -39,7 +40,7 @@ public interface OwnerProtocolNeedWebServiceEndpoint
 
   @WebMethod
   public void open(@WebParam(name="connectionURI") final URI connectionURI, @WebParam(name = "content") final String content)
-          throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
+    throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault, IllegalMessageForNeedStateException;
 
   @WebMethod
   public void close(@WebParam(name="connectionURI") final URI connectionURI, @WebParam(name = "content") final String content)

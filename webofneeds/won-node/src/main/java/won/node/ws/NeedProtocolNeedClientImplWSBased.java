@@ -68,7 +68,8 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   }
 
     @Override
-    public void open(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(final Connection connection, final Model content)
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
         try {
             NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
             proxy.open(connection.getRemoteConnectionURI(), RdfUtils.toString(content));

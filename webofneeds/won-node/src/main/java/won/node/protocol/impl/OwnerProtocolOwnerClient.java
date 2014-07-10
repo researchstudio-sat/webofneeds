@@ -46,7 +46,8 @@ public class OwnerProtocolOwnerClient implements OwnerProtocolOwnerServiceClient
   }
   @Override
 
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void open(final URI connectionURI, final Model content)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
     logger.debug("need to owner: OPEN for connection {}", connectionURI);
     delegate.open(connectionURI,content);
   }
@@ -61,7 +62,7 @@ public class OwnerProtocolOwnerClient implements OwnerProtocolOwnerServiceClient
   @Override
   public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("need to owner: MESSAGE for connection {} with message {}", connectionURI, message);
-    delegate.textMessage(connectionURI,message);
+    delegate.textMessage(connectionURI, message);
   }
 
     public void setDelegate(OwnerProtocolOwnerServiceClientSide delegate) {

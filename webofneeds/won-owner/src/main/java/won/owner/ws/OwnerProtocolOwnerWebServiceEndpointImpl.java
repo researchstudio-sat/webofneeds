@@ -60,7 +60,8 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     }
 
     @Override
-    public void open(@WebParam(name = "connectionURI") URI connectionURI, @WebParam(name = "content") String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
+    public void open(@WebParam(name = "connectionURI") URI connectionURI, @WebParam(name = "content") String content)
+      throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault, IllegalMessageForNeedStateException {
         wireDependenciesLazily();
       try {
         ownerProtocolOwnerService.open(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
