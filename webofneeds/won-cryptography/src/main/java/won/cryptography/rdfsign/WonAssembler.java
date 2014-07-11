@@ -6,7 +6,6 @@ import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.*;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -21,7 +20,28 @@ import java.util.LinkedList;
  */
 public class WonAssembler {
 
-    public static String SIG_GRAPH_NAME_TEMP = "SIG-GRAPH-PLACEHOLDER-TEMP";
+    public static String SIG_GRAPH_NAME_TEMP = ":SIG-GRAPH-PLACEHOLDER-TEMP";
+
+    /**
+     * Assumes that namedSignedGraph is GraphCollection containing exactly one named graph
+     * with the name graphName, and that for this namedSignedGraph the signature is already
+     * calculated internally (i.e. an Algorithm methods canonicalize(namedSignedGraph),
+     * postCanonicalize(namedSignedGraph), hash(namedSignedGraph, envHashAlgorithm),
+     * postHash(namedSignedGraph), sign(namedSignedGraph, privateKey, "\"cert\"") have
+     * already been applied.
+     *
+     * @param namedSignedGraph
+     * @param graphName
+     * @param graphOrigin
+     * @throws Exception
+     */
+    public static void assemble(GraphCollection namedSignedGraph, String graphName, Dataset graphOrigin) throws Exception {
+
+        Ontology o = prepareSignatureOntology(namedSignedGraph);
+        verifyGraphCollectionContainsExactlyOneNamedGraph(namedSignedGraph);
+        addSignatureTriplesToOrigin(namedSignedGraph, o, graphName, graphOrigin);
+
+    }
 
     public static void assemble(GraphCollection gc, String signatureGraphSuffix) throws Exception {
         assemble(gc, signatureGraphSuffix, true);
@@ -30,10 +50,34 @@ public class WonAssembler {
 
     public static void assemble(GraphCollection gc, String signatureGraphSuffix, Boolean addSignature) throws Exception {
 
-        /*
-        Start copy from de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.generic.Assembler
-        assemble(GraphCollection gc, String signatureGraphName, Boolean addSignature)
-         */
+        Ontology o = prepareSignatureOntology(gc);
+        verifyGraphCollectionContainsExactlyOneNamedGraph(gc);
+        addSignatureAsSeparateGraph(gc, o);
+
+        //String sigGraphName = foundNamedGraph.getName() + "-" + signatureGraphSuffix;
+        //TODO signature suffix name will be managed by WonSigner...
+        //and this name will be used in this case for named graphs with corresponding
+        //to this graph signature
+
+    }
+
+    private static void verifyGraphCollectionContainsExactlyOneNamedGraph(GraphCollection gc) {
+        LinkedList<NamedGraph> graphs = gc.getGraphs();
+        if (graphs.size() == 1 && !graphs.get(0).getName().isEmpty()) {
+            // it's OK
+        } else if (graphs.size() == 2
+                && graphs.get(0).getName().isEmpty() || graphs.get(1).getName().isEmpty()) {
+            // it's OK
+        } else {
+            // it's not OK
+            throw new IllegalArgumentException(WonAssembler.class.getName() +
+                    " expects exactly one named graph, found " + (graphs.size() - 1));
+        }
+    }
+
+    private static Ontology prepareSignatureOntology(GraphCollection gc) {
+
+
 
         //Get Signature Data
         SignatureData sigData=gc.getSignature();
@@ -68,74 +112,37 @@ public class WonAssembler {
         }
         o.setSigPrefix(sigPre);
 
-        /*
-        End copy from de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.generic.Assembler
-        assemble(GraphCollection gc, String signatureGraphName, Boolean addSignature)
-         */
+        return o;
+    }
 
+    private static NamedGraph getSignatureAsGraph(GraphCollection gc, Ontology o) {
 
-        //Create a signature for each named graph
+      String name = gc.getGraphs().get(0).getName();
+      if (name.isEmpty()) {
+        name = gc.getGraphs().get(1).getName();
+      }
 
-        //Cache old root level graph list
-        //LinkedList<NamedGraph> temp = gc.getGraphs();
-
-        LinkedList<NamedGraph> graphs = gc.getGraphs();
-        if (graphs.size() != 2) {
-            throw new IllegalArgumentException(WonAssembler.class.getName() +
-                    " expects exactly one named graph, found " + (graphs.size() - 1));
+        NamedGraph sigGraph = new NamedGraph(SIG_GRAPH_NAME_TEMP, 0, null);
+        sigGraph.applyPrefixes(gc.getPrefixes());
+        ArrayList<Triple> sigGraphTriples = sigGraph.getTriples();
+        LinkedList<Triple> signatureTriples = o.getTriples();
+        for (Triple t : signatureTriples){
+          String subj = t.getSubject();
+          if (subj.equals("_:sig-1")) {
+            subj = name;
+          }
+            sigGraphTriples.add( new Triple(subj,t.getPredicate(),t.getObject()) );
         }
-        NamedGraph namedGraph = graphs.get(0);
-        if (namedGraph.getName().equals("")) {
-            namedGraph = graphs.get(1);
-        }
-        //String sigGraphName = foundNamedGraph.getName() + "-" + signatureGraphSuffix;
-        //TODO signature suffix name will be managed by WonSigner...
-        //and this name will be used in this case for named graphs with corresponding
-        //to this graph signature
+        return sigGraph;
+    }
 
-        //Create signature graph
-        //NamedGraph sigGraph=new NamedGraph(signatureGraphName,0,null);
+    private static void addSignatureAsSeparateGraph(GraphCollection gc, Ontology o) {
 
-        //Put old graphs into signature graph
-        //sigGraph.setChildren(temp);
-
-        //New list for graphs at root level
-        //LinkedList<NamedGraph> graphs=new LinkedList<NamedGraph>();
-
-        //Add virtual graph
-        //graphs.add(new NamedGraph("",-1,null));
-
-        //Add signature graph
-        //graphs.add(sigGraph);
-
-        //Set this list as new root level graph list
-        //gc.setGraphs(graphs);
-
-        //Copy root level triples (in old root level virtual graph)
-        //ArrayList<Triple> rootTriples = new ArrayList<Triple>();
-        //Iterator<NamedGraph> it = temp.iterator();
-//        while (it.hasNext()) {
-//            NamedGraph checkGraph=it.next();
-//            //Is virtual graph?
-//            if (checkGraph.getDepth()==-1 && checkGraph.getName().length()==0){
-//                //Triples
-//                for (Triple t:checkGraph.getTriples()){
-//                    rootTriples.add(t);
-//                }
-//                //MSGs
-//                if (checkGraph.getMSGs()!=null){
-//                    for (MSG msg:checkGraph.getMSGs()){
-//                        for (Triple t:msg.getTriples()){
-//                            rootTriples.add(t);
-//                        }
-//                    }
-//                }
-//                it.remove();
-//                break;
-//            }
-//        }
-        //Update depths of modified graph collection
-        //gc.updateDepths();
+        boolean addSignature = true;
+      String name = gc.getGraphs().get(0).getName();
+      if (name.isEmpty()) {
+        name = gc.getGraphs().get(1).getName();
+      }
 
         //Add signature triples from onotology
         NamedGraph sigGraph = new NamedGraph(SIG_GRAPH_NAME_TEMP, 0, null);
@@ -147,7 +154,11 @@ public class WonAssembler {
             signatureTriples=o.getTriplesWithoutSignature();
         }
         for (Triple t:signatureTriples){
-            sigGraphTriples.add( new Triple(t.getSubject(),t.getPredicate(),t.getObject()) );
+          String subj = t.getSubject();
+          if (subj.equals("_:sig-1")) {
+            subj = name;
+          }
+            sigGraphTriples.add( new Triple(subj,t.getPredicate(),t.getObject()) );
         }
         gc.addGraph(sigGraph);
         //Add old root triples
@@ -156,7 +167,23 @@ public class WonAssembler {
         //}
 
         //Add signature prefix
-        gc.addPrefix(new Prefix(sigPre+":","<"+sigIri+">"));
+        gc.addPrefix(new Prefix(o.getSigPrefix()+":","<"+Ontology.getSigIri()+">"));
         gc.applyPrefixes();
+    }
+
+
+    private static void addSignatureTriplesToOrigin(
+        GraphCollection namedSignedGraph, Ontology o, String graphName, Dataset graphOrigin) throws Exception {
+        namedSignedGraph.addPrefix(new Prefix(o.getSigPrefix()+":","<"+Ontology.getSigIri()+">"));
+        namedSignedGraph.applyPrefixes();
+        NamedGraph signatureAsGraph = getSignatureAsGraph(namedSignedGraph, o);
+
+        //Model signatureAsModel = ModelConverter.namedGraphToModel(signatureAsGraph, namedSignedGraph.getPrefixes());
+      Model signatureAsModel = ModelConverter.namedGraphToModel(signatureAsGraph.getName(), namedSignedGraph);
+        graphOrigin.getDefaultModel().add(signatureAsModel);
+        for (String prefix : signatureAsModel.getNsPrefixMap().keySet()) {
+            graphOrigin.getDefaultModel().setNsPrefix(prefix, signatureAsModel.getNsPrefixMap().get(prefix));
+        }
+        graphOrigin.getDefaultModel().getNsPrefixMap().putAll(signatureAsModel.getNsPrefixMap());
     }
 }
