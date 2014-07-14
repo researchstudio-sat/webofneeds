@@ -126,7 +126,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
       connections = model.createResource(this.connectionResourceURIPrefix,LDP.CONTAINER);
     }
     for (URI connectionURI : uris) {
-      model.add(model.createStatement(connections, RDFS.member, model.createResource(connectionURI.toString())));
+      model.add(model.createStatement(connections, RDFS.member, model.createResource(connectionURI.toString(),
+                                                                                     WON.CONNECTION) ));
+
     }
     return model;
   }

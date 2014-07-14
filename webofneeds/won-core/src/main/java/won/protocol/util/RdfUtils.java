@@ -22,9 +22,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Utilities for RDF manipulation with Jena.
@@ -428,6 +426,20 @@ public class RdfUtils
     return toURI(getNodeForPropertyPath(model, resourceURI, propertyPath));
   }
 
+  public static List<URI> getURIListForPropertyPath(final Model model, final URI resourceURI, Path propertyPath)
+  {
+    Iterator<Node> nodeIterator = getNodesForPropertyPath(model,resourceURI,propertyPath);
+    List<URI> nodeURIList = new ArrayList<>();
+    if (nodeIterator==null) return nodeURIList;
+    if (!nodeIterator.hasNext()) return null;
+
+    while(nodeIterator.hasNext()){
+      nodeURIList.add(toURI(nodeIterator.next()));
+    }
+    return nodeURIList;
+  }
+
+
   /**
    * Evaluates the path on the model obtained by dereferencing the specified resourceURI.
    * If the path resolves to multiple resources, only the first one is returned.
@@ -482,6 +494,15 @@ public class RdfUtils
     if (!result.hasNext()) return null;
     return result.next();
   }
+
+  public static Iterator<Node> getNodesForPropertyPath(final Model model, URI resourceURI, Path propertyPath) {
+    Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(), propertyPath);
+    logger.debug("running path eval: "+ RdfUtils.toString(model));
+    if (!result.hasNext()) return null;
+    return result;
+  }
+
+
 
 
   /**
