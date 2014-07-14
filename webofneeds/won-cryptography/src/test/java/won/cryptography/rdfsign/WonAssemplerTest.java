@@ -30,12 +30,8 @@ public class WonAssemplerTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    // test_1_graph.trig cannot be read (syntax error) by Jena but is read by
-    // Signingframework. While test_2_graph.trig cannot be read (syntax error)
-    // by Signingframework but is read by Jena. Therefore, for testing purposes,
-    // both versions are used depending on testing case
-    //private static final String RESOURCE_FILE = "/test_1_graph.trig";
-    private static final String RESOURCE_FILE = "/test_2_graph.trig";
+    // graph named :#NAME cannot be read (syntax error) by Jena but is read by Signingframework.
+    private static final String RESOURCE_FILE = "/test_1_graph.trig";
     private static final String RESOURCE_URI = "http://www.example.com/resource/need/12";
 
 

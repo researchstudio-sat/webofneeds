@@ -31,11 +31,18 @@ public class ModelConverter
   /**
    *  Converts Signingframework's NamedGraph into Jena's Model.
    *
-   *  In the base URI, only <http://www.example.com/resource/need/12#>
-   *  is supported.  <http://www.example.com/resource/need/12> or
-   *  <http://www.example.com/resource/need/12/> are not supported,
-   *  for reasons, see comments in test_1_cupboard.trig
-   *
+   *  It is required, that GraphCollection stores the prefixes (if present),
+   *  but that they are not applied (i.e. its applyPrefixes() method should not
+   *  be called). Otherwise there could be errors when converting, since
+   *  Signingframework when applying prefixes just looks whether the resource
+   *  uri starts with that prefix uri, which would be true in both cases below:
+   *  @prefix :    <http://www.example.com/resource/need/12#> .
+   *  @prefix need:    <http://www.example.com/resource/need/12> .
+   *  Also, applying prefixes in NamedGraph in cases like
+   *  @prefix :    <http://www.example.com/resource/need/12/>
+   *  <http://www.example.com/resource/need/12/connections/> a   ldp:Container .
+   *  would result in a wrong RDF triple:
+   *  :connections/ a ldp:Container .
    */
   public static Model namedGraphToModel(String graphName, GraphCollection gc) throws Exception {
     NamedGraph graph = null;
@@ -52,10 +59,10 @@ public class ModelConverter
   /**
    * Converts Jena's Model into Signingframework's NamedGraph of GraphCollection.
    *
-   *  In the base URI, only <http://www.example.com/resource/need/12#>
-   *  is supported.  <http://www.example.com/resource/need/12> or
-   *  <http://www.example.com/resource/need/12/> are not supported,
-   *  for reasons, see comments in test_1_cupboard.trig
+   *  Resulting GraphCollection contains exactly one NamedGraph that corresponds to
+   *  the provided Model (modelURI) from the provided Dataset. The resulting
+   *  GraphCollection stores the prefixes (if were present in the Datastore),
+   *  but they are not applied (for reasons, see namedGraphToModel() doc).
    */
   public static GraphCollection modelToGraphCollection(String modelURI, Dataset modelDataset) {
 
@@ -65,9 +72,6 @@ public class ModelConverter
     return modelToGraphCollection(modelURI, model, pm);
   }
 
-
-  // TODO prefixes generalization (if graph name is provided as URI or as local name)
-  // TODO or provide Dataset as the second argument, so that prefixes are extracted inside the method
   private static Model namedGraphToModel(NamedGraph graph, List<Prefix> prefixes) throws Exception {
 
     // Here, the simplest, but probably not the most efficient, approach is
@@ -76,35 +80,45 @@ public class ModelConverter
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
+
     String dfPref = "";
+    // write prefixes
     for (Prefix p : prefixes) {
       writer.write(p.toString());
-      //TODO chng prefix handling
       if (p.getPrefix().equals(":")) {
         dfPref = p.getIriContent();
       }
     }
+
+    // write NamedGraph
     TriGPlusWriter.writeGraph(writer, graph, 3);
     writer.close();
-    String content = os.toString();
+    //String content = os.toString();
 
+    // read the result with Jena as Dataset
     ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
     Dataset dataset = DatasetFactory.createMem();
     RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
 
-    Model model = dataset.getNamedModel(dfPref + graph.getName().replace(":", ""));
+    // extract the Model that corresponds to the NamedGraph
+    String modelName = graphNameToModelName(graph.getName(), dfPref);
+    Model model = dataset.getNamedModel(modelName);
     for (Prefix pref : prefixes) {
       model.setNsPrefix(pref.getPrefix().replace(":", ""), pref.getIriContent());
     }
-    // or default graph of dataset also has prefix map
 
     return model;
   }
 
+  private static String graphNameToModelName(final String graphName, final String dfPref) {
+    if (graphName.startsWith("<")) {
+      return graphName.substring(1, graphName.length() - 1);
+    } else {
+      return dfPref + graphName.replace(":", "");
+    }
+  }
 
 
-
-  // TODO prefixes generalization (if graph name is provided as URI or as local name)
   private static GraphCollection modelToGraphCollection(String name, Model model, Map<String, String> pm) {
 
     // Convert each subj pred obj in Jena Statement into String and add to
@@ -129,7 +143,13 @@ public class ModelConverter
     for (String prefix : pm.keySet()) {
       graphc.addPrefix(new Prefix(prefix + ":", "<" + pm.get(prefix) + ">"));
     }
-    graphc.applyPrefixes();
+    // don't apply prefixes since it can result in funny things like:
+    // pref:/connections/, and also the collision on the prefix uris
+    // that starts the same. E.g. having prefixes below in need rdf
+    // would cause errors
+    // @prefix :    <http://www.example.com/resource/need/12#> .
+    // @prefix need:    <http://www.example.com/resource/need/12> .
+    //graphc.applyPrefixes();
 
     return graphc;
   }
@@ -139,9 +159,6 @@ public class ModelConverter
     String result = null;
     if (rdfNode.isURIResource()) {
       String uri = rdfNode.asResource().getURI();
-      //if (uri.endsWith("/")) {
-      //  uri = uri.substring(0, uri.length() - 1);
-      //}
       result = enclose(uri, "<", ">");
     } else if (rdfNode.isLiteral()) {
       result = enclose(rdfNode.asLiteral().getLexicalForm(), "\"", "\"");
@@ -152,7 +169,8 @@ public class ModelConverter
       }
     } else if (rdfNode.isAnon()) {
       result = enclose(rdfNode.asResource().getId().getLabelString(), "_:", "");
-    } else { // It might need to be improved as some syntax cases might not be covered so far
+    } else {
+      // TODO It might need to be improved as some syntax cases might not be covered so far
       // a collection??
       throw new UnsupportedOperationException("support missing for converting: " + rdfNode.toString());
     }

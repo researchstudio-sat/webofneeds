@@ -1,22 +1,5 @@
-# the below prefixes will not be possible in Signingframework representation if you
-# change the order of prefix .../12# and .../12 since when applying
-# prefixes it looks whether the resource uri starts with that prefix uri
-# which would be true in both cases and the first in order would apply
-#@prefix :    <http://www.example.com/resource/need/12#> .
-#@prefix need:    <http://www.example.com/resource/need/12> .
-
-# moreover, applying prefixes in NamedGraph in cases like
-#@prefix :    <http://www.example.com/resource/need/12/>
-# <http://www.example.com/resource/need/12/connections/> a   ldp:Container .
-# results in:
-# :connections/ a ldp:Container .
-# and in cases like
-#@prefix :    <http://www.example.com/resource/need/12>
-# <http://www.example.com/resource/need/12/connections/> a   ldp:Container .
-# results in:
-# :/connections/ a ldp:Container .
-
 @prefix :    <http://www.example.com/resource/need/12#> .
+@prefix need:    <http://www.example.com/resource/need/12> .
 @prefix dc:  <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .

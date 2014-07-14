@@ -1,4 +1,4 @@
-@prefix :        <no:uri> .
+@prefix :        <no:uri#> .
 @prefix dc:      <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
@@ -12,7 +12,8 @@
 @prefix tio:     <http://purl.org/tio/ns#> .
 
 # owner-specified content (permanent):
-:#OWN1 {
+:OWN1
+{
   _:wonneed a won:Need ;
               won:hasBasicNeedType
                   won:Supply ;
@@ -21,8 +22,8 @@
                     won:hasContentDescription
                     [ a tio:Taxi, gr:SomeItems ;
                           gr:name "Fastest taxi in town"@en ;
-                          gr:description "Wherever you want to go, we'll take you there"@en .
+                          gr:description "Wherever you want to go, we'll take you there"@en
                           # Link to the hotel and its features
-                    ] .
+                    ]
                   ] .
 }
