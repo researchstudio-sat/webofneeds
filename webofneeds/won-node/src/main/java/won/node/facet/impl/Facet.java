@@ -36,13 +36,13 @@ public interface Facet
 
   void closeFromOwner(Connection con, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void textMessageFromOwner(Connection con, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  void sendMessageFromOwner(Connection con, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   void openFromNeed(Connection con, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   void closeFromNeed(Connection con, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void textMessageFromNeed(Connection con, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  void sendMessageFromNeed(Connection con, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   void hint(Connection con, double score, URI originator, Model content)
       throws NoSuchNeedException, IllegalMessageForNeedStateException;

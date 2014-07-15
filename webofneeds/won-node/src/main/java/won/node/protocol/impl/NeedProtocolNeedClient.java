@@ -63,9 +63,9 @@ public class NeedProtocolNeedClient implements NeedProtocolNeedClientSide
   }
 
   @Override
-  public void textMessage(final Connection connection, final Model message) throws Exception {
+  public void sendMessage(final Connection connection, final Model message) throws Exception {
     logger.debug("need to need: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
-    delegate.textMessage(connection, message);
+    delegate.sendMessage(connection, message);
 
   }
 

@@ -148,7 +148,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void textMessage(final URI connectionURI, final Model message)
+  public void sendMessage(final URI connectionURI, final Model message)
     throws Exception {
     logger.debug("owner to need: MESSAGE called for connection {} with message {}", connectionURI, message);
 
@@ -157,7 +157,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
       throw new NoSuchConnectionException(connectionURI);
     Connection con = cons.get(0);
     //todo: text message shall be returned
-    delegate.textMessage(connectionURI, message);
+    delegate.sendMessage(connectionURI, message);
     //todo: the parameter for setMessage method shall be set by retrieving the result of delegate.textMessage method
     ChatMessage chatMessage = new ChatMessage();
     chatMessage.setCreationDate(new Date());

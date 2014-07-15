@@ -89,12 +89,12 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
     //@Override
-    public void textMessage(URI connectionURI, Model message) throws
+    public void sendMessage(URI connectionURI, Model message) throws
             NoSuchConnectionException, IllegalMessageForConnectionStateException {
         String messageString = RdfUtils.toString(message);
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
-            proxy.textMessage(connectionURI, messageString);
+            proxy.sendMessage(connectionURI, messageString);
         } catch (MalformedURLException e) {
             logger.warn("couldn't create URL for needProtocolEndpoint", e);
         } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {

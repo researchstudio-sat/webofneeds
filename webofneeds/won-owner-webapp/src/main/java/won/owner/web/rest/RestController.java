@@ -537,7 +537,7 @@ public class RestController
 		Connection con = cons.get(0);
 
 		try {
-			ownerService.textMessage(con.getConnectionURI(), WonRdfUtils.MessageUtils.textMessage(text));
+			ownerService.sendMessage(con.getConnectionURI(), WonRdfUtils.MessageUtils.textMessage(text));
 		} catch (Exception e) {
 			logger.warn("error sending text message");
 			return "error sending text message: " + e.getMessage();

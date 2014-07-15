@@ -59,7 +59,7 @@ public interface NeedProtocolNeedWebServiceEndpoint
           @WebParam(name = "content") String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 
   @WebMethod
-  void textMessage(
-          @WebParam(name = "connectionURI") URI connectionURI,
-          @WebParam(name = "content") String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
+  void sendMessage(
+    @WebParam(name = "connectionURI") URI connectionURI,
+    @WebParam(name = "content") String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 }

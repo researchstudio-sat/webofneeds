@@ -236,7 +236,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     {
       public void run() {
         try {
-          getEventListenerContext().getOwnerService().textMessage(fromCon, action.getMessageToBeSent());
+          getEventListenerContext().getOwnerService().sendMessage(fromCon, action.getMessageToBeSent());
         } catch (Exception e) {
           logger.warn("could not send message from {} ", fromCon);
           logger.warn("caught exception", e);

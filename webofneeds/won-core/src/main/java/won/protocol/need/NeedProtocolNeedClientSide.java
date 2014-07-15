@@ -37,7 +37,7 @@ public interface NeedProtocolNeedClientSide   //extends ConnectionCommunicationS
 
   public void close(final Connection connection, final Model content) throws Exception;
 
-  public void textMessage(final Connection connection, final Model message) throws Exception;
+  public void sendMessage(final Connection connection, final Model message) throws Exception;
 
 
 

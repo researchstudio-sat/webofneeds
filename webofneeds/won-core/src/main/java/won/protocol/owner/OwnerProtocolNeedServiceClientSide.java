@@ -93,12 +93,13 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      * TODO: text messages are currently being saved on the owner side without checking whether the messages are succesfully processed on the node side. should be changed.
      *
      *
+     *
      * @param connectionURI the local connection
      * @param message       the chat message
      * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
      * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
      */
-    public void textMessage(URI connectionURI, Model message) throws Exception;
+    public void sendMessage(URI connectionURI, Model message) throws Exception;
 
     public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException, CamelConfigurationFailedException, Exception;
 

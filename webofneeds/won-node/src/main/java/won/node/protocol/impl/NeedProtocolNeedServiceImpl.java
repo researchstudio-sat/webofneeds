@@ -90,9 +90,9 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void sendMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("need from need: MESSAGE received for connection {} with content {}", connectionURI, message);
-    connectionCommunicationService.textMessage(connectionURI, message);
+    connectionCommunicationService.sendMessage(connectionURI, message);
   }
 
 

@@ -124,7 +124,7 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
             public void run()
             {
                 try {
-                    getEventListenerContext().getOwnerService().textMessage(senderURI, myContent);
+                    getEventListenerContext().getOwnerService().sendMessage(senderURI, myContent);
                     logger.info("State of the sender before sending: {} ", action.getStateOfSenderBeforeSending());
                 } catch (Exception e) {
                     logger.warn("could not send message via connection {}", senderURI, e);

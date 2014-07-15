@@ -151,7 +151,7 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
   }
 
   @Override
-    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    public void sendMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         String messageConvert = RdfUtils.toString(message);
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
@@ -163,7 +163,7 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
         headerMap.put("message",messageConvert);
         headerMap.put("ownerApplications", ownerApplicationList);
         headerMap.put("protocol","OwnerProtocol");
-        headerMap.put("methodName", "textMessage");
+        headerMap.put("methodName", "sendMessage");
         messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
     }
   public void setClientFactory(final OwnerProtocolOwnerClientFactory clientFactory)

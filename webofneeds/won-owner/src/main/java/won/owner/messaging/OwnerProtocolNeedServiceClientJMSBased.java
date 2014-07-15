@@ -226,7 +226,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public void textMessage(URI connectionURI, Model message) throws Exception {
+    public void sendMessage(URI connectionURI, Model message) throws Exception {
         String messageConvert = RdfUtils.toString(message);
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithConnectionUri(connectionURI);
@@ -237,7 +237,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         Map<String, Object> headerMap = new HashMap<>();
         headerMap.put("connectionURI",connectionURI.toString());
         headerMap.put("message",messageConvert);
-        headerMap.put("methodName","textMessage");
+        headerMap.put("methodName","sendMessage");
         headerMap.put("remoteBrokerEndpoint", endpoint);
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);

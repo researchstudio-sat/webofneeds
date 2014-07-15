@@ -1,7 +1,6 @@
 package won.node.facet.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -129,19 +128,20 @@ public abstract class AbstractFacet implements Facet
    * It is used to indicate the sending of a chat message with by the specified connection object con
    * to the remote partner.
    *
+   *
    * @param con the connection object
    * @param message  the chat message
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
   @Override
-  public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void sendMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
     executorService.execute(new Runnable() {
       @Override
       public void run() {
         try {
-            needFacingConnectionClient.textMessage(con, message);
+            needFacingConnectionClient.sendMessage(con, message);
         } catch (Exception e) {
             logger.warn("caught Exception in textMessageFromOwner: ",e);
         }
@@ -210,19 +210,20 @@ public abstract class AbstractFacet implements Facet
    * It is used to indicate the sending of a chat message with by the specified connection object con
    * to the remote partner.
    *
+   *
    * @param con the connection object
    * @param message  the chat message
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
   @Override
-  public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void sendMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //send to the need side
     executorService.execute(new Runnable() {
       @Override
       public void run() {
         try {
-          ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+          ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message);
         } catch (Exception e) {
           logger.warn("caught Exception in textMessageFromNeed:", e);
         }

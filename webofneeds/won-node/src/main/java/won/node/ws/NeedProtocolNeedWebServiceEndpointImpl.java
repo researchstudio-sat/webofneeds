@@ -99,13 +99,13 @@ public class NeedProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutowi
 
   @Override
   @WebMethod
-  public void textMessage(
-          @WebParam(name = "connectionURI") final URI connectionURI,
-          @WebParam(name = "content") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
+  public void sendMessage(
+    @WebParam(name = "connectionURI") final URI connectionURI,
+    @WebParam(name = "content") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
     wireDependenciesLazily();
     try {
       Model messageConvert = RdfUtils.toModel(message);
-      needProtocolNeedService.textMessage(connectionURI, messageConvert);
+      needProtocolNeedService.sendMessage(connectionURI, messageConvert);
     } catch (NoSuchConnectionException e) {
       throw NoSuchConnectionFault.fromException(e);
     } catch (IllegalMessageForConnectionStateException e) {

@@ -164,12 +164,12 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
         delegate.close(connectionURIConvert, contentConvert);
     }
 
-    public void textMessage(
-            @Header("connectionURI") String connectionURI,
-            @Header("message")String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void sendMessage(
+      @Header("connectionURI") String connectionURI,
+      @Header("message") String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         URI connectionURIconvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(message);
-        delegate.textMessage(connectionURIconvert, contentConvert);
+        delegate.sendMessage(connectionURIconvert, contentConvert);
     }
 
     public URI connect(

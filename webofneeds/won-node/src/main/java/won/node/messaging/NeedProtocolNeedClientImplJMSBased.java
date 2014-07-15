@@ -49,7 +49,7 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
     private String connectStartingEndpoint;
     private String openStartingEndpoint;
     private String closeStartingEndpoint;
-    private String textMessageStartingEndpoint;
+    private String sendMessageStartingEndpoint;
 
     @Autowired
     private NeedProtocolCommunicationService protocolCommunicationService;
@@ -101,16 +101,17 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
   }
 
 
-  public void textMessage(final Connection connection, final Model message) throws Exception {
+  public void sendMessage(final Connection connection, final Model message) throws Exception {
       String messageConvert = RdfUtils.toString(message);
-      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),textMessageStartingEndpoint);
+      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),
+                                                                                                  sendMessageStartingEndpoint);
       Map headerMap = new HashMap<String, String>();
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
       headerMap.put("content", messageConvert);
-      headerMap.put("methodName","textMessage");
+      headerMap.put("methodName","sendMessage");
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-      messagingService.sendInOnlyMessage(null,headerMap,null, textMessageStartingEndpoint );
+      messagingService.sendInOnlyMessage(null,headerMap,null, sendMessageStartingEndpoint);
   }
 
 
@@ -140,8 +141,8 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
         this.closeStartingEndpoint = closeStartingEndpoint;
     }
 
-    public void setTextMessageStartingEndpoint(String textMessageStartingEndpoint) {
-        this.textMessageStartingEndpoint = textMessageStartingEndpoint;
+    public void setSendMessageStartingEndpoint(String sendMessageStartingEndpoint) {
+        this.sendMessageStartingEndpoint = sendMessageStartingEndpoint;
     }
 
 }

@@ -80,7 +80,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
  }
 
   //Coordinator sends message to Participant
-  public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void sendMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     final URI remoteConnectionURI = con.getRemoteConnectionURI();
     //inform the other side
     executorService.execute(new Runnable() {
@@ -155,7 +155,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
                   // eventType -> URI Resource
                   r = myContent.createResource(eventType.getURI().toString());
                   baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                  needFacingConnectionClient.textMessage(con, myContent);
+                  needFacingConnectionClient.sendMessage(con, myContent);
 
                   logger.debug("Coordinator sent message to participant");
 
@@ -193,7 +193,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
                 // eventType -> URI Resource
                 r = myContent.createResource(eventType.getURI().toString());
                 baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                needFacingConnectionClient.textMessage(con, myContent);
+                needFacingConnectionClient.sendMessage(con, myContent);
                 logger.debug("Coordinator sent message to participant");
               }
             }
@@ -216,7 +216,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
   }
 
   //Coordinator receives message from Participant
-  public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void sendMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //send to the need side
     executorService.execute(new Runnable() {
       @Override
@@ -270,7 +270,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
               " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()+
               " phase must be SECOND:"+ BAPCState.parsePhase(stateManager.getStatePhaseForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()));
 
-            ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+            ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message);
             logger.debug("NO received");
 
             //new Participants can not be added anymore
@@ -316,7 +316,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
 
                 Resource r = myContent.createResource(BAPCEventType.MESSAGE_CANCEL.getURI().toString());
                 baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                needFacingConnectionClient.textMessage(tmpCon, myContent);
+                needFacingConnectionClient.sendMessage(tmpCon, myContent);
 
                 baseResource.removeAll(WON_TX.COORDINATION_MESSAGE) ;
               }
@@ -346,7 +346,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
 
                 Resource r = myContent.createResource(BAPCEventType.MESSAGE_COMPENSATE.getURI().toString());
                 baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                needFacingConnectionClient.textMessage(tmpCon, myContent);
+                needFacingConnectionClient.sendMessage(tmpCon, myContent);
                 baseResource.removeAll(WON_TX.COORDINATION_MESSAGE) ;
               }
             }
@@ -366,7 +366,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
               " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()+
               " phase:"+ BAPCState.parsePhase(stateManager.getStatePhaseForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()));
 
-            ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+            ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message);
 
             logger.debug("Coordinator received the message.");
           }
@@ -403,7 +403,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
               // eventType -> URI Resource
               Resource r = myContent.createResource(resendEventType.getURI().toString());
               baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-              needFacingConnectionClient.textMessage(con, myContent);
+              needFacingConnectionClient.sendMessage(con, myContent);
             }
             else
             {
