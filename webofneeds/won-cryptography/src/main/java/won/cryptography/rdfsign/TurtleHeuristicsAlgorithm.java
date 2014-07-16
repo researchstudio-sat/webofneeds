@@ -17,7 +17,7 @@ import java.util.Map;
  * representation.
  *
  * This is a temporary algorithm to be used only before more
- * established algorithms are implemented/integrated into WonSigner.
+ * established algorithms are implemented/integrated into WonSignerOld.
  *
  * Created by ypanchenko on 12.06.2014.
  */

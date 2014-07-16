@@ -16,7 +16,8 @@ import java.security.*;
 /**
  * Created by ypanchenko on 16.06.2014.
  */
-public class WonSignerVerifierTest {
+public class WonSignerVerifierOldTest
+{
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -29,7 +30,7 @@ public class WonSignerVerifierTest {
     public void modelAddRemoveSignatureTest() throws Exception {
 
         Model model1 = ModelFactory.createDefaultModel();
-        InputStream is1 = WonSignerVerifierTest.class.getResourceAsStream(RESOURCE_FILE);
+        InputStream is1 = WonSignerVerifierOldTest.class.getResourceAsStream(RESOURCE_FILE);
         model1.read(new InputStreamReader(is1), RESOURCE_URI, FileUtils.langTurtle);
 
 //        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
@@ -46,13 +47,13 @@ public class WonSignerVerifierTest {
         //System.out.println(outFile1);
         //model1.write(new FileWriter(outFile1), FileUtils.langTurtle);
 
-        WonSigner signer = new WonSigner(model1);
+        WonSignerOld signer = new WonSignerOld(model1);
         Model signedModel = signer.addSignature(privateKey, publicKey);
         //File outFile = testFolder.newFile();
         //System.out.println(outFile);
         //signedModel.write(new FileWriter(outFile), FileUtils.langTurtle);
 
-        WonVerifier verifier = new WonVerifier(signedModel);
+        WonVerifierOld verifier = new WonVerifierOld(signedModel);
         verifier.removeSignature(signedModel);
         Model model2 = signedModel;
 
@@ -70,7 +71,7 @@ public class WonSignerVerifierTest {
     public void signVerifyTest() throws Exception {
 
         Model model1 = ModelFactory.createDefaultModel();
-        InputStream is1 = WonSignerVerifierTest.class.getResourceAsStream(RESOURCE_FILE);
+        InputStream is1 = WonSignerVerifierOldTest.class.getResourceAsStream(RESOURCE_FILE);
         model1.read(new InputStreamReader(is1), RESOURCE_URI, FileUtils.langTurtle);
 
         //KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
@@ -84,14 +85,14 @@ public class WonSignerVerifierTest {
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
 
-        WonSigner signer = new WonSigner(model1);
+        WonSignerOld signer = new WonSignerOld(model1);
         Model signedModel = signer.addSignature(privateKey, publicKey);
 
         File outFile = testFolder.newFile();
         System.out.println(outFile);
         signedModel.write(new FileWriter(outFile), FileUtils.langTurtle);
 
-        WonVerifier verifier = new WonVerifier(signedModel);
+        WonVerifierOld verifier = new WonVerifierOld(signedModel);
 
         Assert.assertTrue(verifier.verify(publicKey));
 

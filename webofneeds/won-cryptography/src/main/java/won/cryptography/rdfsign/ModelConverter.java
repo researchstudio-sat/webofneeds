@@ -93,7 +93,7 @@ public class ModelConverter
     // write NamedGraph
     TriGPlusWriter.writeGraph(writer, graph, 3);
     writer.close();
-    //String content = os.toString();
+    String content = os.toString();
 
     // read the result with Jena as Dataset
     ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());

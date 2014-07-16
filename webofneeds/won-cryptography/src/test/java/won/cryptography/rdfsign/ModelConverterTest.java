@@ -30,7 +30,6 @@ public class ModelConverterTest
     "/test_1_cupboard.trig",
     "/test_1_graph.trig",
     "/test_1_cupboard_no_pref.trig"};
-  private static final String RESOURCE_URI = "http://www.example.com/resource/need/12";
 
 
   @Test
