@@ -8,11 +8,9 @@ import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import sun.misc.BASE64Decoder;
 
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,31 +24,18 @@ import java.util.List;
 public class WonVerifier
 {
 
-  private BouncyCastleProvider provider;
-  //TODO which hashing algorithm to use?
-  private static String envHashAlgorithm = "sha-256";
-  //private SignatureAlgorithmInterface algorithm;
   private Dataset dataset;
   private List<String> verifyGraphURIs = new ArrayList<String>();
   private List<String> currentGraphURIs = new ArrayList<String>();
   private List<Model> currentGraphSignatures = new ArrayList<Model>();
-  private boolean signSig = true;
   //private  byte[] signature;
   private List<String> verifiedURIs = new ArrayList<String>();
   private boolean allVerified = true;
 
-  //copy
-  public WonVerifier(Dataset dataset
-                     //, SignatureAlgorithmInterface algorithm
-  ) {
+  public WonVerifier(Dataset dataset) {
     this.dataset = dataset;
-    //this.algorithm = algorithm;
-    this.signSig = true;
     initSignedGraphURIs();
     prepareForVerifying();
-    //TODO check maybe it's not needed here
-    provider = new BouncyCastleProvider();
-    Security.addProvider(provider);
   }
 
   /**
@@ -84,14 +69,12 @@ public class WonVerifier
     }
   }
 
-  //copy
   private void add(final Model toModel, final StmtIterator stmtIterator) {
     while (stmtIterator.hasNext()) {
       toModel.add(stmtIterator.next());
     }
   }
 
-  //copy
   private void initSignedGraphURIs() {
     Iterator<String> namesIterator = dataset.listNames();
     while (namesIterator.hasNext()) {
@@ -155,7 +138,6 @@ public class WonVerifier
         throw new Exception("No algorithm found for graph digest method '" + sigData.getGraphDigestMethod() + "'");
       }
       //Verify
-      //boolean verified = hashingAlgorithm.verify(inputGraph, publicKey);
       boolean verified = verify(hashingAlgorithm, inputGraph, publicKey);
       if (verified) {
         verifiedURIs.add(currentGraphURIs.get(i));
@@ -191,7 +173,8 @@ public class WonVerifier
                          final PublicKey publicKey) throws Exception {
 
     SignatureData sigData = graph.getSignature();
-    Signature sig = Signature.getInstance("SHA256WithECDSA", "BC");
+    Signature sig = Signature.getInstance(WonSigner.SIGNING_ALGORITHM_NAME,
+                                          WonSigner.SIGNING_ALGORITHM_PROVIDER);
 
     String sigString = sigData.getSignature();
     if (sigString == null) {

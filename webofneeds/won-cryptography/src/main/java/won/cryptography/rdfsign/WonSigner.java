@@ -6,13 +6,13 @@ import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterf
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import sun.misc.BASE64Encoder;
 
 import java.security.PrivateKey;
-import java.security.Security;
 import java.security.Signature;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by ypanchenko on 12.06.2014.
@@ -20,13 +20,15 @@ import java.util.*;
 public class WonSigner
 {
 
-
-  private BouncyCastleProvider provider;
+  public static final String SIGNING_ALGORITHM_NAME = "NONEwithECDSA";
+  public static final String SIGNING_ALGORITHM_PROVIDER = "BC";
   //TODO which hashing algorithm to use?
-  private static String envHashAlgorithm = "sha-256";
+  public static final String ENV_HASH_ALGORITHM = "sha-256";
+
+
   private SignatureAlgorithmInterface algorithm;
   private Dataset dataset;
-  private List<String> signedGraphURIs  = new ArrayList<String>();
+  private List<String> signedGraphURIs = new ArrayList<String>();
   private boolean signSig = true;
   //private  byte[] signature;
 
@@ -44,8 +46,8 @@ public class WonSigner
     initSignedGraphURIs();
     prepareForSigning();
     //TODO check maybe it's not needed here
-    provider = new BouncyCastleProvider();
-    Security.addProvider(provider);
+    //provider = new BouncyCastleProvider();
+    //Security.addProvider(provider);
   }
 
 //  /**
@@ -145,32 +147,22 @@ public class WonSigner
     throws Exception {
     this.algorithm.canonicalize(inputWithOneNamedGraph);
     this.algorithm.postCanonicalize(inputWithOneNamedGraph);
-    this.algorithm.hash(inputWithOneNamedGraph, envHashAlgorithm);
+    this.algorithm.hash(inputWithOneNamedGraph, ENV_HASH_ALGORITHM);
     this.algorithm.postHash(inputWithOneNamedGraph);
     //this.algorithm.sign(inputWithOneNamedGraph, privateKey, "\"cert\"");
-    signTemp(inputWithOneNamedGraph, privateKey, "\"cert\"");
+    sign(inputWithOneNamedGraph, privateKey, "\"cert\"");
   }
 
-  private void signTemp(GraphCollection gc, PrivateKey privateKey, String verficiationCertificate) throws Exception {
-      //Signature Data existing?
-      if (!gc.hasSignature()){
-        throw new Exception("GraphCollection has no signature data. Call 'canonicalize' and 'hash' methods first.");
-      }
+  private void sign(GraphCollection gc, PrivateKey privateKey, String verficiationCertificate) throws Exception {
+    //Signature Data existing?
+    if (!gc.hasSignature()) {
+      throw new Exception("GraphCollection has no signature data. Call 'canonicalize' and 'hash' methods first.");
+    }
 
-      //Get Signature Data
-      SignatureData sigData=gc.getSignature();
-
-      //Sign
-    //TODO make sure this is correct from signing algorithm security point of view...
-     //Cipher cipher = Cipher.getInstance(privateKey.getAlgorithm(), provider);
-    //Cipher cipher = Cipher.getInstance(privateKey.getAlgorithm());
-    //  cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-    //  String signature = new String(
-    //    Base64.encodeBase64(
-    //      cipher.doFinal(sigData.getHash().toByteArray())
-    //    )
-    //  );
-    Signature sig = Signature.getInstance("SHA256WithECDSA", "BC");
+    //Get Signature Data
+    SignatureData sigData = gc.getSignature();
+    // Sign
+    Signature sig = Signature.getInstance(SIGNING_ALGORITHM_NAME, SIGNING_ALGORITHM_PROVIDER);
     sig.initSign(privateKey);
     sig.update(sigData.getHash().toByteArray());
 
@@ -178,13 +170,13 @@ public class WonSigner
     String signature = new BASE64Encoder().encode(signatureBytes);
 
 
-      //Update Signature Data
+    //Update Signature Data
     //TODO is there a better way to escape new lines in the signature?
     // is there anything else that need to be escaped?
     //what if there will be 3 double quotes in a row in signature? or it cannot be?
-      sigData.setSignature("\"\"\""+signature+"\"\"\"");
-      sigData.setSignatureMethod(privateKey.getAlgorithm().toLowerCase());
-      sigData.setVerificationCertificate(verficiationCertificate);
-    }
+    sigData.setSignature("\"\"\"" + signature + "\"\"\"");
+    sigData.setSignatureMethod(privateKey.getAlgorithm().toLowerCase());
+    sigData.setVerificationCertificate(verficiationCertificate);
+  }
 
 }
