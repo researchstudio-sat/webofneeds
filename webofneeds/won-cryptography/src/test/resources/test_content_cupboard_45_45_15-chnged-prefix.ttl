@@ -1,0 +1,53 @@
+@prefix :    <http://www.example.com/resource/need/12> .
+@prefix dc:  <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix wofn:     <http://purl.org/webofneeds/model#> .
+@prefix gr:  <http://purl.org/goodrelations/v1#> .
+@prefix ldp:     <http://www.w3.org/ns/ldp#> .
+@prefix sp:  <http://spinrdf.org/sp#>.
+
+<http://www.example.com/resource/need/12>
+  a   wofn:Need ;
+  wofn:hasBasicNeedType
+      wofn:Supply ;
+  wofn:hasContent
+      [ a   wofn:NeedContent ;
+        dc:title "small cupboard"^^xsd:string ;
+        wofn:hasContentDescription
+        [ a   <http://dbpedia.org/resource/Cupboard> , gr:Individual ;
+          gr:color "natural birch";
+          gr:width
+            [ a   gr:QuantitativeValueFloat ;
+              gr:hasUnitOfMeasurement "CMT"^^xsd:string ;
+              gr:hasValue "45"^^xsd:float
+              ];
+
+          gr:height
+            [ a   gr:QuantitativeValueFloat ;
+              gr:hasUnitOfMeasurement "CMT"^^xsd:string ;
+              gr:hasValue "45"^^xsd:float
+              ];
+
+            gr:depth
+              [ a   gr:QuantitativeValueFloat ;
+                gr:hasUnitOfMeasurement "CMT"^^xsd:string ;
+                gr:hasValue "15"^^xsd:float
+                ]
+        ]
+      ] ;
+  wofn:hasNeedModality
+      [ a   wofn:NeedModality
+      ] ;
+  wofn:isInState wofn:Active ;
+  wofn:matcherProtocolEndpoint
+      <http://www.example.com/won/protocol/matcher> ;
+  wofn:needCreationDate
+      "2013-09-25T10:49:54Z"^^xsd:dateTime ;
+  wofn:needProtocolEndpoint
+      <http://www.example.com/won/protocol/need> ;
+  wofn:ownerProtocolEndpoint
+      <http://www.example.com/won/protocol/owner> .
+

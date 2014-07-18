@@ -33,6 +33,7 @@
         <module>won-ontology-validator</module>
         <module>won-bot</module>
         <module>won-facets</module>
+        <module>won-cryptography</module>
     </modules>
 
     <dependencyManagement>
