@@ -14,6 +14,17 @@
     <version>0.1-SNAPSHOT</version>
     <name>Cryptography</name>
 
+    <repositories>
+        <repository>
+            <id>signingframework-repo-local</id>
+            <name>repository for signingframework</name>
+            <url>file:${project.basedir}/signingframework-repo</url>
+            <releases>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+        </repository>
+    </repositories>
+
     <dependencies>
 
         <dependency>
@@ -43,14 +54,6 @@
             <version>2.3</version>
         </dependency>
 
-        <!-- rdf-signing and rdf-signing testing -->
-        <!--<dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>apache-jena-libs</artifactId>
-            <type>pom</type>
-            <version>2.11.2</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
