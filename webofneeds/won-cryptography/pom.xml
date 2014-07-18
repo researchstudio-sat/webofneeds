@@ -19,9 +19,6 @@
             <id>signingframework-repo-local</id>
             <name>repository for signingframework</name>
             <url>file:${project.basedir}/signingframework-repo</url>
-            <releases>
-                <updatePolicy>never</updatePolicy>
-            </releases>
         </repository>
     </repositories>
 
