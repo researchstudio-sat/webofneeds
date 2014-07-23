@@ -30,6 +30,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 	$scope.successShow = false;
 
     $scope.previousButton = false;
+    $scope.saveButton = false;
     $scope.saveDraftButton = false;
     $scope.nextButton = false;
     $scope.previewButton = false;
@@ -41,22 +42,27 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             $scope.saveDraftButton = false;
             $scope.nextButton = false;
             $scope.previewButton = false;
+            $scope.saveButton = false;
         }else if(step == 2  ){
             $scope.previousButton = true;
             $scope.saveDraftButton = true;
             $scope.nextButton = true;
             $scope.previewButton = true;
+            $scope.saveButton = true;
         } else if(step == 3){
             if($scope.collapsed == true){
                 $scope.previousButton = false;
                 $scope.saveDraftButton = true;
                 $scope.nextButton = false;
                 $scope.previewButton = true;
+                $scope.saveButton = true;
+
             } else {
                 $scope.previousButton = true;
                 $scope.saveDraftButton = true;
                 $scope.nextButton = false;
                 $scope.previewButton = true;
+                $scope.saveButton = true;
             }
         }
     }
@@ -135,12 +141,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 		$scope.need.tags.splice($scope.need.tags.indexOf(tagName),1);
 	};
 
-    /*$scope.saveDraft = function () {
-      //  needService.saveDraft($scope.need);
-        if($scope.currentStep <= $scope.numberOfSteps) {
-            $scope.currentStep ++;
-        }
-    };  */
     $scope.nextStep = function(){
         if($scope.currentStep <= $scope.numberOfSteps) {
 
