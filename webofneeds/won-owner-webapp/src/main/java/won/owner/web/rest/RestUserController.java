@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
  * Date: 11/12/13
  */
 @Controller
-@RequestMapping("/rest/user")
+@RequestMapping("/rest/users")
 public class RestUserController {
 
 	private WONUserDetailService wonUserDetailService;
@@ -58,6 +58,12 @@ public class RestUserController {
 		this.userRegisterValidator = userRegisterValidator;
 	}
 
+  /**
+   * registers user
+   * @param user registration data of a user
+   * @param errors
+   * @return ResponseEntity with Http Status Code
+   */
 	@ResponseBody
 	@RequestMapping(
 			value = "/",
@@ -87,8 +93,15 @@ public class RestUserController {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
+  /**
+   * check authentication and returrn ResponseEntity with HTTP status code
+   * @param user user object
+   * @param request
+   * @param response
+   * @return
+   */
 	@RequestMapping(
-			value = "/login",
+			value = "/signin",
 			method = RequestMethod.POST
 	)
   //TODO: move transactionality annotation into the service layer
@@ -105,8 +118,12 @@ public class RestUserController {
 		}
 	}
 
+  /**
+   *
+   * @return
+   */
 	@RequestMapping(
-			value = "/logout",
+			value = "/signout",
 			method = RequestMethod.POST
 	)
   //TODO: move transactionality annotation into the service layer

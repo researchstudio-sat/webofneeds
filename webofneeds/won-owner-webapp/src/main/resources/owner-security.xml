@@ -14,9 +14,9 @@
 	<http pattern="/scripts" security="none"/>
 	<http pattern="/style" security="none"/>
 	<http auto-config="true" use-expressions="true" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint">
-		<intercept-url pattern="/rest/user/logout" access="isAuthenticated()"/>
-		<intercept-url pattern="/rest/user/" access="isAnonymous()"/>
-		<intercept-url pattern="/rest/user/login" access="isAnonymous()"/>
+		<intercept-url pattern="/rest/users/signout" access="isAuthenticated()"/>
+		<intercept-url pattern="/rest/users/" access="isAnonymous()"/>
+		<intercept-url pattern="/rest/users/signin" access="isAnonymous()"/>
 		<intercept-url pattern="/rest/**" access="isAuthenticated()" />
 	</http>
 
