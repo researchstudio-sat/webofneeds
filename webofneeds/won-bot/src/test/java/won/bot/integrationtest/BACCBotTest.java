@@ -47,7 +47,7 @@ import static junit.framework.TestCase.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
 
-public class BACCBotTest extends PropertyPathConfigurator
+public class BACCBotTest
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private static final int RUN_ONCE = 1;
@@ -236,7 +236,7 @@ public class BACCBotTest extends PropertyPathConfigurator
       List<URI> crawled = new ArrayList<>();
 
       Model dataModel = linkedDataSource.getModelForResourceWithPropertyPath(needs.get(0),
-                                                                             BACCBotTest
+                                                                             PropertyPathConfigurator
                                                                                .configurePropertyPaths
                                                                                  (), 300,4);
       logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
@@ -289,7 +289,7 @@ public class BACCBotTest extends PropertyPathConfigurator
       List<URI> crawled = new ArrayList<>();
 
       Model dataModel = linkedDataSource.getModelForResourceWithPropertyPath(needs.get(0),
-                                                                             BACCBotTest
+                                                                             PropertyPathConfigurator
                                                                                .configurePropertyPaths
                                                                                  (), 300,4);
 
