@@ -270,7 +270,7 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
               " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()+
               " phase must be SECOND:"+ BAPCState.parsePhase(stateManager.getStatePhaseForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()));
 
-            ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message);
+
             logger.debug("NO received");
 
             //new Participants can not be added anymore
@@ -350,6 +350,8 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
                 baseResource.removeAll(WON_TX.COORDINATION_MESSAGE) ;
               }
             }
+            //now, after all messages were sent to partners, tell the owner.
+            ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message);
           }
           else
           {

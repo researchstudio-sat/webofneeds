@@ -268,7 +268,6 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
               .getNeedURI(),
               con.getRemoteNeedURI(), getFacetType().getURI()).toString()));
 
-            ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message);
 
             logger.debug("Vote: NO ({})", eventType.getURI().toString());
             //new Participants can not be added anymore
@@ -342,6 +341,8 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
                 baseResource.removeAll(WON_TX.COORDINATION_MESSAGE) ;
               }
             }
+            //now, after sending messages to all partners, tell the owner
+            ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message);
           }
           else
           {
