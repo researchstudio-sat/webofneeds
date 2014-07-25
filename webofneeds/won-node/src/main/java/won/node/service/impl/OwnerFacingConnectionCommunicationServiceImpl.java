@@ -16,198 +16,186 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.graph.TripleBoundary;
+import com.hp.hpl.jena.rdf.model.*;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.node.facet.impl.FacetRegistry;
+import won.node.service.DataAccessService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.WonProtocolException;
-import won.protocol.model.*;
-import won.protocol.repository.ChatMessageRepository;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionEvent;
+import won.protocol.model.ConnectionEventType;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.EventRepository;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WON;
 
+import java.io.StringWriter;
 import java.net.URI;
-import java.util.Date;
-import java.util.concurrent.ExecutorService;
+import java.util.LinkedList;
+import java.util.List;
+
 
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ *
  */
 public class OwnerFacingConnectionCommunicationServiceImpl implements ConnectionCommunicationService
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  private ConnectionCommunicationService needFacingConnectionClient;
-
-  private ExecutorService executorService;
-
+  private FacetRegistry reg;
+  private DataAccessService dataService;
   @Autowired
   private ConnectionRepository connectionRepository;
   @Autowired
-  private ChatMessageRepository chatMessageRepository;
-  @Autowired
-  private EventRepository eventRepository;
-  @Autowired
-  private RDFStorageService rdfStorageService;
+  private URIService URIService;
 
   @Override
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    //load connection, checking if it exists
+  public void open(final URI connectionURI, final Model content)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    logger.debug("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
+
+    Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
+
+    ConnectionEvent event = dataService
+      .createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_OPEN);
+
+    dataService.saveAdditionalContentForEvent(content, con, event);
+
+    //invoke facet implementation
+    reg.get(con).openFromOwner(con, content);
+  }
+
+  @Override
+  public void close(final URI connectionURI, final Model content)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    logger.debug("CLOSE received from the owner side for connection {} with content {}", connectionURI, content);
+
+    Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
+
+    ConnectionEvent event = dataService
+      .createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_CLOSE);
+
+    dataService.saveAdditionalContentForEvent(content, con, event);
+
+    //invoke facet implementation
+    reg.get(con).closeFromOwner(con, content);
+  }
+
+  @Override
+  public void sendMessage(final URI connectionURI, final Model message)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_OPEN);
-    //set new state and save in the db
-    con.setState(nextState);
-    //save in the db
-    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
 
-    ConnectionEvent event = new ConnectionEvent();
-    event.setConnectionURI(con.getConnectionURI());
-    event.setType(ConnectionEventType.OWNER_OPEN);
-    event.setOriginatorUri(con.getRemoteConnectionURI());
-    eventRepository.saveAndFlush(event);
+    //create ConnectionEvent in Database
 
-    rdfStorageService.storeContent(event, content);
-
-    //inform the other side
-    if (con.getRemoteConnectionURI() != null) {
-      executorService.execute(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          try {
-            needFacingConnectionClient.open(connectionForRunnable.getRemoteConnectionURI(), content);
-          } catch (WonProtocolException e) {
-            logger.debug("caught Exception:", e);
-          }
-        }
-      });
+    ConnectionEvent event = dataService
+      .createConnectionEvent(con.getConnectionURI(), connectionURI, ConnectionEventType.OWNER_MESSAGE);
+    Resource eventNode = message.createResource(this.URIService.createEventURI(con, event).toString());
+    RdfUtils.replaceBaseResource(message, eventNode);
+    //create rdf content for the ConnectionEvent and save it to disk
+    dataService.saveAdditionalContentForEvent(message, con, event);
+    if (logger.isDebugEnabled()) {
+      StringWriter writer = new StringWriter();
+      RDFDataMgr.write(writer, message, Lang.TTL);
+      logger.debug("message after saving:\n{}", writer.toString());
     }
-  }
+    boolean feedbackWasPresent = processFeedbackMessage(con, message);
 
-  @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info("CLOSE received from the owner side for connection {0} with content {1}", connectionURI, content);
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit
-    ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_CLOSE);
-    //set new state and save in the db
-    con.setState(nextState);
-    //save in the db
-    final Connection connectionForRunnable = connectionRepository.saveAndFlush(con);
-
-    ConnectionEvent event = new ConnectionEvent();
-    event.setConnectionURI(con.getConnectionURI());
-    event.setType(ConnectionEventType.OWNER_CLOSE);
-    event.setOriginatorUri(con.getRemoteConnectionURI());
-    eventRepository.saveAndFlush(event);
-
-    rdfStorageService.storeContent(event, content);
-
-    //inform the other side
-    if (con.getRemoteConnectionURI() != null) {
-      executorService.execute(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          try {
-            needFacingConnectionClient.close(connectionForRunnable.getRemoteConnectionURI(), content);
-          } catch (WonProtocolException e) {
-            logger.warn("caught WonProtocolException:", e);
-          }
-        }
-      });
+    if (! feedbackWasPresent) {
+      //a feedback message is not forwarded to the remote connection, and facets cannot react to it.
+      //invoke facet implementation
+      //TODO: this may be much more responsive if done asynchronously. We dont return anything here anyway.
+      reg.get(con).sendMessageFromOwner(con, message);
     }
+      //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.
+      //return con.getConnectionURI();
   }
 
-  @Override
-  public void textMessage(final URI connectionURI, final String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
-  {
-    logger.info("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
-    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
-    if (message == null) throw new IllegalArgumentException("message is not set");
-    //load connection, checking if it exists
-    Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit (should not result in state change)
-    //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
-    //construct chatMessage object to store in the db
-    ChatMessage chatMessage = new ChatMessage();
-    chatMessage.setCreationDate(new Date());
-    chatMessage.setLocalConnectionURI(con.getConnectionURI());
-    chatMessage.setMessage(message);
-    chatMessage.setOriginatorURI(con.getNeedURI());
-    //save in the db
-    chatMessageRepository.saveAndFlush(chatMessage);
-    final URI remoteConnectionURI = con.getRemoteConnectionURI();
-    //inform the other side
-    executorService.execute(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        try {
-          needFacingConnectionClient.textMessage(remoteConnectionURI, message);
-        } catch (WonProtocolException e) {
-          logger.warn("caught WonProtocolException:", e);
-        }
-      }
-    });
+  /*
+@Override
+public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+{
+  logger.debug("SEND_TEXT_MESSAGE received from the owner side for connection {} with message '{}'", connectionURI, message);
+  Connection con = dataService.saveChatMessage(connectionURI,message);
 
+  //invoke facet implementation
+  reg.get(con).textMessageFromOwner(con, message);
+
+}
+   */
+  public void setReg(FacetRegistry reg) {
+    this.reg = reg;
   }
 
-  public void setNeedFacingConnectionClient(final ConnectionCommunicationService needFacingConnectionClient)
-  {
-    this.needFacingConnectionClient = needFacingConnectionClient;
-  }
-
-  public void setConnectionRepository(final ConnectionRepository connectionRepository)
-  {
-    this.connectionRepository = connectionRepository;
-  }
-
-  public void setChatMessageRepository(final ChatMessageRepository chatMessageRepository)
-  {
-    this.chatMessageRepository = chatMessageRepository;
+  public void setDataService(DataAccessService dataService) {
+    this.dataService = dataService;
   }
 
   /**
-   * Calculates the connectionState resulting from the message in the current connection state.
-   * Checks if the specified message is allowed in the connection's state and throws an exception if not.
+   * Finds feedback in the message, processes it and removes it from the message.
    *
    * @param con
-   * @param msg
-   * @return
-   * @throws won.protocol.exception.IllegalMessageForConnectionStateException
-   *          if the message is not allowed in the connection's current state
+   * @param message
+   * @return true if feedback was present, false otherwise
    */
-  private ConnectionState performStateTransit(Connection con, ConnectionEventType msg) throws IllegalMessageForConnectionStateException
-  {
-    if (!msg.isMessageAllowed(con.getState())) {
-      throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(), con.getState());
+  private boolean processFeedbackMessage(final Connection con, final Model message) {
+    assert con != null : "connection must not be null";
+    assert message != null : "message must not be null";
+    boolean feedbackWasPresent = false;
+    Resource baseResource = RdfUtils.getBaseResource(message);
+    List<Resource> resourcesToRemove = new LinkedList<Resource>();
+    StmtIterator stmtIterator = baseResource.listProperties(WON.HAS_FEEDBACK);
+    //iterate over feedback nodes, find which resources there is feedback about,
+    //and add the feedback to the resource's description
+    while (stmtIterator.hasNext()) {
+      feedbackWasPresent = true;
+      final Statement stmt = stmtIterator.nextStatement();
+      processFeedback(baseResource, resourcesToRemove, stmt.getObject());
     }
-    return con.getState().transit(msg);
+    if (feedbackWasPresent) {
+      removeResourcesWithSubgraphs(message, resourcesToRemove);
+    }
+    return feedbackWasPresent;
   }
 
-  public void setExecutorService(final ExecutorService executorService)
-  {
-    this.executorService = executorService;
+  private void processFeedback(final Resource baseResource, final List<Resource> resourcesToRemove,
+    final RDFNode feedbackNode) {
+    if (!feedbackNode.isResource()) {
+      logger.warn("feedback node is not a resource, cannot process feedback in message {}", baseResource);
+      return;
+    }
+    final Resource feedbackRes = (Resource) feedbackNode;
+    final Statement forResourceStmt = feedbackRes.getProperty(WON.FOR_RESOURCE);
+    final RDFNode forResourceNode = forResourceStmt.getObject();
+    if (!forResourceNode.isResource()) {
+      logger.warn("for_resource node is not a resource, cannot process feedback in message {}", baseResource);
+      return;
+    }
+    final Resource forResource = forResourceNode.asResource();
+    if (!dataService.addFeedback(URI.create(forResource.getURI().toString()), feedbackRes)) {
+      logger.warn("failed to add feedback to resource {}", baseResource);
+    }
+    resourcesToRemove.add(feedbackRes);
   }
 
-  public void setRdfStorageService(final RDFStorageService rdfStorageService)
-  {
-    this.rdfStorageService = rdfStorageService;
+  private void removeResourcesWithSubgraphs(final Model model, final List<Resource> resourcesToRemove) {
+    logger.debug("removing feedback from message");
+    ModelExtract extract = new ModelExtract(new StatementTripleBoundary(TripleBoundary.stopNowhere));
+    for (Resource resourceToRemove : resourcesToRemove) {
+      logger.debug("removing resource {}", resourcesToRemove);
+      Model modelToRemove = extract.extract(resourceToRemove, model);
+      model.remove(modelToRemove);
+      logger.debug("removed subgraph");
+      //additionally, remove the triples linking to the resourceToRemove
+      logger.debug("removing statements linking to subgraph");
+      model.remove(model.listStatements((Resource) null, (Property) null, (RDFNode) resourceToRemove));
+    }
   }
 }

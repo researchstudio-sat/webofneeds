@@ -1,5 +1,6 @@
 package won.protocol.ws;
 
+import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.ws.fault.*;
 
 import javax.jws.WebMethod;
@@ -44,7 +45,7 @@ public interface OwnerProtocolOwnerWebServiceEndpoint {
     public void open(
             @WebParam(name = "connectionURI") final URI connectionURI,
             @WebParam(name = "content") final String content)
-            throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
+      throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault, IllegalMessageForNeedStateException;
 
     @WebMethod
     public void close(
@@ -53,8 +54,8 @@ public interface OwnerProtocolOwnerWebServiceEndpoint {
             throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 
     @WebMethod
-    public void textMessage(
-            @WebParam(name = "connectionURI") final URI connectionURI,
-            @WebParam(name = "message") final String message)
+    public void sendMessage(
+      @WebParam(name = "connectionURI") final URI connectionURI,
+      @WebParam(name = "content") final String message)
             throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 }

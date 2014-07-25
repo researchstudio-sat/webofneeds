@@ -16,8 +16,8 @@
 
 package won.node.ws;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.util.FileUtils;
-import org.hsqldb.lib.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.owner.OwnerProtocolNeedService;
@@ -48,11 +48,12 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     }
 
     @WebMethod
-    public void textMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "message") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault
-    {
+    public void sendMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(
+      name = "content") final String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         wireDependenciesLazily();
       try {
-        ownerProtocolNeedService.textMessage(connectionURI, message);
+        Model messageConvert = RdfUtils.toModel(message);
+        ownerProtocolNeedService.sendMessage(connectionURI, messageConvert);
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {
@@ -61,7 +62,8 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     }
 
     @WebMethod
-    public void open(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "content") final String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
+    public void open(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "content") final String content)
+      throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault, IllegalMessageForNeedStateException {
         wireDependenciesLazily();
       try {
         ownerProtocolNeedService.open(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
@@ -89,15 +91,14 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     {
         wireDependenciesLazily();
       try {
-        return ownerProtocolNeedService.createNeed(ownerURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), activate);
+        return ownerProtocolNeedService.createNeed(ownerURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), activate, null);
       } catch (IllegalNeedContentException e) {
         throw IllegalNeedContentFault.fromException(e);
       }
     }
 
     @WebMethod
-    public URI connect(@WebParam(name = "needURI") final URI needURI, @WebParam(name = "otherNeedURI") final URI otherNeedURI, @WebParam(name = "content") final String content) throws NoSuchNeedFault, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault
-    {
+    public URI connect(@WebParam(name = "needURI") final URI needURI, @WebParam(name = "otherNeedURI") final URI otherNeedURI, @WebParam(name = "content") final String content) throws NoSuchNeedFault, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault {
         wireDependenciesLazily();
       try {
         return ownerProtocolNeedService.connect(needURI, otherNeedURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
@@ -111,12 +112,16 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     }
 
     @WebMethod
-    public void deactivate(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedFault {
+    public void deactivate(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedFault, NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         wireDependenciesLazily();
       try {
         ownerProtocolNeedService.deactivate(needURI);
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
+      } catch (NoSuchConnectionException e) {
+          throw NoSuchConnectionFault.fromException(e);
+      } catch (IllegalMessageForConnectionStateException e) {
+          throw IllegalMessageForConnectionStateFault.fromException(e);  //To change body of catch statement use File | Settings | File Templates.
       }
     }
 

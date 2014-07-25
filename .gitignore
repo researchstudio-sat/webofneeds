@@ -9,6 +9,7 @@
 *.iws
 /*/.idea
 */.idea
+atlassian-ide-plugin.xml
 
 # NetBeans
 nbproject
@@ -38,5 +39,8 @@ bin/setenv.*
 /needserver/repository
 /webofneeds/won-node/src/main/resources.lan/*
 /webofneeds/won-owner/src/main/resources.lan/*
+/webofneeds/won-matcher-solr/overlays/*
+webofneeds/won-matcher-webapp/overlays
 
-
+#local config
+webofneeds/conf.local

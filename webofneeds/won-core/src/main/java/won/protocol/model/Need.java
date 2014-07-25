@@ -23,12 +23,14 @@ import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
  */
 @Entity
 @Table(name = "need")
+//@Inheritance(strategy=InheritanceType.JOINED)
 public class Need
 {
   @Id
@@ -37,7 +39,7 @@ public class Need
   private Long id;
   /* The URI of the need */
   @Column( name = "needURI", unique = true)
-  private URI needURI;
+  protected URI needURI;
   /* The state of the need */
   @Column( name = "state")
   private NeedState state;
@@ -46,10 +48,22 @@ public class Need
   @Column( name = "ownerURI" )
   private URI ownerURI;
 
+    /* The need protocol endpoint URI where the won node of the need can be reached */
+    @Column(name="wonNodeURI")
+    private URI wonNodeURI;
+
   /* The creation date of the need */
   @Temporal(TemporalType.TIMESTAMP)
   @Column( name = "creationDate", nullable = false)
   private Date creationDate;
+
+  //EAGERly loaded because accessed outside hibernate session in
+  // OwnerProtocolCamelConfiguratorImpl TODO: change this!
+   @ManyToMany(targetEntity = OwnerApplication.class,fetch = FetchType.EAGER)
+   @JoinTable(name="NEED_OWNERAPP",
+           joinColumns = @JoinColumn(name="need_id"),
+           inverseJoinColumns = @JoinColumn(name = "owner_application_id"))
+   private List<OwnerApplication> authorizedApplications;
 
   @PrePersist
   protected void onCreate() {
@@ -147,4 +161,22 @@ public class Need
        config.configure();
        new SchemaExport(config).create(true, true);
    }
+
+
+    public List<OwnerApplication> getAuthorizedApplications() {
+        return authorizedApplications;
+    }
+
+    public void setAuthorizedApplications(List<OwnerApplication> authorizedApplications) {
+        this.authorizedApplications = authorizedApplications;
+    }
+
+
+    public URI getWonNodeURI() {
+        return wonNodeURI;
+    }
+
+    public void setWonNodeURI(URI wonNodeURI) {
+        this.wonNodeURI = wonNodeURI;
+    }
 }

@@ -16,6 +16,7 @@
 
 package won.protocol.ws;
 
+import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.ws.fault.*;
 
 import javax.jws.WebMethod;
@@ -33,12 +34,13 @@ import java.net.URI;
 public interface OwnerProtocolNeedWebServiceEndpoint
 {
   @WebMethod
-  public void textMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "message") final String message)
+  public void sendMessage(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(
+    name = "content") final String message)
           throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 
   @WebMethod
   public void open(@WebParam(name="connectionURI") final URI connectionURI, @WebParam(name = "content") final String content)
-          throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
+    throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault, IllegalMessageForNeedStateException;
 
   @WebMethod
   public void close(@WebParam(name="connectionURI") final URI connectionURI, @WebParam(name = "content") final String content)
@@ -49,7 +51,7 @@ public interface OwnerProtocolNeedWebServiceEndpoint
           throws NoSuchNeedFault, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault;
 
   @WebMethod
-  public void deactivate(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedFault;
+  public void deactivate(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedFault, NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 
   @WebMethod
   public void activate(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedFault;

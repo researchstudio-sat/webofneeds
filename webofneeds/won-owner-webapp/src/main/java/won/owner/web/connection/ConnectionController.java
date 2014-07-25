@@ -3,6 +3,7 @@ package won.owner.web.connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -10,11 +11,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.pojo.TextMessagePojo;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
-import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.model.Need;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.NeedRepository;
+import won.protocol.util.DataAccessUtils;
+import won.protocol.util.WonRdfUtils;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 /**
@@ -29,10 +36,14 @@ public class ConnectionController {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private OwnerProtocolNeedService ownerService;
+    @Qualifier("default")
+    private OwnerProtocolNeedServiceClientSide ownerService;
 
     @Autowired
     private ConnectionRepository connectionRepository;
+
+    @Autowired
+    private NeedRepository needRepository;
 
     @Autowired
     private ChatMessageRepository chatMessageRepository;
@@ -45,18 +56,18 @@ public class ConnectionController {
         Connection con = cons.get(0);
         model.addAttribute("connection", con);
         model.addAttribute("command", new TextMessagePojo());
-
         return "viewConnection";
     }
 
 
     @RequestMapping(value = "/{conId}/body", method = RequestMethod.GET)
-    public String listMessages(@PathVariable String conId, Model model) {
-        List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
+    public String listMessages(@PathVariable String conId, Model model) throws NoSuchConnectionException {
+        Connection con = DataAccessUtils.loadConnection(connectionRepository,Long.valueOf(conId));
+     //   List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
 
-        if(cons.isEmpty())
+       if(con==null)
             return "noNeedFound";
-        Connection con = cons.get(0);
+        //Connection con = cons.get(0);
         try {
             switch (con.getState()) {
                 case REQUEST_RECEIVED:
@@ -83,18 +94,42 @@ public class ConnectionController {
     public String sendText(@PathVariable String conId, @ModelAttribute("SpringWeb") TextMessagePojo text, Model model) {
         List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
         if(cons.isEmpty())
-            return "noNeedFound";
+            return "noConnectionFound";
         Connection con = cons.get(0);
-
         try {
-            ownerService.textMessage(con.getConnectionURI(), text.getText());
+          ownerService.sendMessage(con.getConnectionURI(), WonRdfUtils.MessageUtils.textMessage(text.getText()));
         } catch (Exception e) {
-          logger.warn("error sending text message");
-          return "error sending text message: " + e.getMessage();
+            logger.warn("error sending text message");
+            return "error sending text message: " + e.getMessage();
         }
 
         return  "redirect:/connection/" + con.getId().toString();//"viewConnection";
     }
+
+  @RequestMapping(value = "/{conId}/feedback", method = RequestMethod.POST)
+  public String sendFeedback(@PathVariable String conId, @ModelAttribute("feedback") Boolean isFeedbackPositive,
+    Model model) {
+    List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
+    if(cons.isEmpty()) {
+      return "noConnectionFound";
+    }
+    Connection con = cons.get(0);
+    try {
+      ownerService.sendMessage(
+        con.getConnectionURI(),
+        WonRdfUtils.MessageUtils.binaryFeedbackMessage(con.getConnectionURI(), isFeedbackPositive));
+    } catch (Exception e) {
+      logger.warn("error sending text message",e);
+    }
+    //we have to load the need to get its id for the redirect:
+    List<Need> needs = needRepository.findByNeedURI(con.getNeedURI());
+    if (needs.size() != 1) {
+      throw new IllegalStateException(new MessageFormat("expected to find 1 need with uri {0} but found {1}").format(
+        con.getNeedURI().toString(),
+        needs.size()));
+    }
+    return  "redirect:../../need/" + needs.get(0).getId() +"/listConnections/";
+  }
 
 
     @RequestMapping(value = "/{conId}/accept", method = RequestMethod.POST)
@@ -104,13 +139,31 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
-            ownerService.connect(con.getNeedURI(), con.getRemoteNeedURI(), null);
+            //TODO: add rdf content here as soon as we support its creation in the owner app
+            ownerService.open(con.getConnectionURI(), null);
         } catch (Exception e) {
           logger.warn("error during accept", e);
           return "error during accept: " + e.getMessage();
         }
 
         return  "redirect:/connection/" + con.getId().toString() + "/body";
+    }
+
+    @RequestMapping(value = "/{conId}/open", method = RequestMethod.POST)
+    public String open(@PathVariable String conId, Model model) {
+      List<Connection> cons = connectionRepository.findById(Long.valueOf(conId));
+      if(cons.isEmpty())
+        return "noNeedFound";
+      Connection con = cons.get(0);
+      try {
+        //TODO: add rdf content here as soon as we support its creation in the owner app
+        ownerService.open(con.getConnectionURI(), null);
+      } catch (Exception e) {
+        logger.warn("error during open", e);
+        return "error during open: " + e.getMessage();
+      }
+
+      return  "redirect:/connection/" + con.getId().toString() + "/body";
     }
 
     @RequestMapping(value = "/{conId}/deny", method = RequestMethod.POST)
@@ -120,6 +173,7 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
+          //TODO: add rdf content here as soon as we support its creation in the owner app
             ownerService.close(con.getConnectionURI(), null);
         } catch (Exception e) {
           logger.warn("error during deny", e);
@@ -136,6 +190,7 @@ public class ConnectionController {
             return "noNeedFound";
         Connection con = cons.get(0);
         try {
+          //TODO: add rdf content here as soon as we support its creation in the owner app
             ownerService.close(con.getConnectionURI(), null);
         } catch (Exception e) {
           logger.warn("error during close", e);

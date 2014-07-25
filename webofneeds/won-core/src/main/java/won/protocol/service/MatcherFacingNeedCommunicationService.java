@@ -18,6 +18,7 @@ package won.protocol.service;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 
 import java.net.URI;
@@ -32,6 +33,8 @@ public interface MatcherFacingNeedCommunicationService
    * Notifies the need of a matching otherNeed with the specified match score. Originator
    * identifies the entity making the call. Normally, originator is a matching service.
    *
+   * Expects <> won:hasFacet [FACET] in the RDF content, will choose a facet supported by the need if none is present.
+   *
    * @param needURI    the URI of the need
    * @param otherNeed  URI of the other need (may be on the local needserver)
    * @param score      match score between 0.0 (bad) and 1.0 (good). Implementations treat lower values as 0.0 and higher values as 1.0.
@@ -43,6 +46,6 @@ public interface MatcherFacingNeedCommunicationService
    * @throws won.protocol.exception.IllegalMessageForNeedStateException
    *          if the need is not active
    */
-  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException;
+  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content) throws Exception;
 
 }

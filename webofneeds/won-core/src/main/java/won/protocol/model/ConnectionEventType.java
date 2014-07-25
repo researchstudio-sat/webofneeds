@@ -29,13 +29,18 @@ public enum ConnectionEventType
   //in general, be permissive about messages where possible. Don't care about duplicate messages
 
   //close may always be called. It always closes the connnection.
-  OWNER_CLOSE("Close", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
-          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED),
-  PARTNER_CLOSE("Close", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
-          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED),
+  OWNER_CLOSE("OwnerClose", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
+          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
+  PARTNER_CLOSE("PartnerClose", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
+          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
+    //open may always be called. It may re-open a connection, it does not change the state of connected connections
+  OWNER_OPEN("OwnerOpen", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
+          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
+  PARTNER_OPEN("PartnerOpen", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
+          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
 
-  OWNER_OPEN("Open", ConnectionState.REQUEST_RECEIVED, ConnectionState.SUGGESTED),
-  PARTNER_OPEN("Open", ConnectionState.REQUEST_SENT, ConnectionState.SUGGESTED),
+  OWNER_MESSAGE("OwnerMessage", ConnectionState.CONNECTED),
+  PARTNER_MESSAGE("PartnerMessage", ConnectionState.CONNECTED),
 
   MATCHER_HINT("Hint");
 

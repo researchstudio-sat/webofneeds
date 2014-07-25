@@ -64,6 +64,8 @@ public class MatcherProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAut
         throw NoSuchNeedFault.fromException(e);
       } catch (IllegalMessageForNeedStateException e) {
         throw IllegalMessageForNeedStateFault.fromException(e);
+      } catch (Exception e) {
+        e.printStackTrace();
       }
     }
 

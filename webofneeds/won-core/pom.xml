@@ -35,6 +35,31 @@
                  <dependencyManagement> section in the parent pom!
 
         -->
+        <!-- Messaging stuff -->
+        <dependency>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-amqp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-camel</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
         <!-- REST stuff -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -86,7 +111,10 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons-core</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
+        </dependency>
         <!-- ORM  -->
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -96,6 +124,20 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-c3p0</artifactId>
         </dependency>
+        <!--dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+        </dependency-->
+        <dependency>
+            <!-- required for hibernate, which has it in test/provided scopes but needs it in our application -->
+            <groupId>org.jboss</groupId>
+            <artifactId>jandex</artifactId>
+        </dependency>
+        <dependency>
+            <!-- required for hibernate, which has it in test/provided scopes but needs it in our application -->
+            <groupId>com.fasterxml</groupId>
+            <artifactId>classmate</artifactId>
+        </dependency>
 
 
         <!-- DATABASE -->
@@ -103,11 +145,18 @@
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+        </dependency>
         <!-- RDF STUFF -->
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-tdb</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.jsonld-java</groupId>
@@ -161,6 +210,18 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-
+        <!-- MONITORING -->
+        <dependency>
+            <groupId>org.javasimon</groupId>
+            <artifactId>javasimon-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.javasimon</groupId>
+            <artifactId>javasimon-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.supercsv</groupId>
+            <artifactId>super-csv</artifactId>
+        </dependency>
     </dependencies>
 </project>

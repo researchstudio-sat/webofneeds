@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation=
+               "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <!--
+         Load properties but ignore unresolvable properties so that
+         they are searched in other property configurers defined in the context
+    -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/owner.properties" ignore-unresolvable="true"/>
+
+    <import resource="classpath:/spring/core/owner-core.xml" />
+    <import resource="classpath:/spring/component/ehcache/owner-ehcache.xml" />
+    <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml" />
+    <import resource="classpath:/spring/component/storage/owner-storage.xml" />
+    <import resource="classpath:/spring/component/storage/jpabased-rdf-storage.xml" />
+    <import resource="classpath:/spring/component/camel/owner-camel.xml" />
+    <import resource="classpath:/spring/component/ownerProtocolNeedServiceClient/ownerProtocolNeedServiceClient-jmsonly.xml" />
+
+</beans>

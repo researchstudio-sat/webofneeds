@@ -10,7 +10,11 @@
                 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" />
+    <!--
+         Load properties but ignore unresolvable properties so that
+         they are searched in other property configuerers defined in the context
+    -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" ignore-unresolvable="true"/>
 
 
     <!-- Activate Annotation based configuration -->

@@ -1,0 +1,101 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.uni_koblenz.aggrimm.icp</groupId>
+  <artifactId>signingframework</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <name>signingframework</name>
+  <url>http://icp.it-risk.iwvi.uni-koblenz.de/wiki/Signing_Graphs</url>
+  
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+  
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+		<pluginManagement>
+			<plugins>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.4</version>
+					<configuration>
+			      <descriptorRefs>
+			        <descriptorRef>jar-with-dependencies</descriptorRef>
+			      </descriptorRefs>
+						<archive>
+							<manifest>
+								<addClasspath>true</addClasspath>
+								<mainClass>de.uni_koblenz.aggrimm.icp.crypto.sign.main.Main</mainClass>
+							</manifest>
+						</archive>
+					</configuration>
+				</plugin>
+
+			  <plugin>
+			  	<groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-assembly-plugin</artifactId>
+			    <configuration>
+			      <descriptorRefs>
+			        <descriptorRef>jar-with-dependencies</descriptorRef>
+			      </descriptorRefs>
+			      <archive>
+							<manifest>
+								<mainClass>de.uni_koblenz.aggrimm.icp.crypto.sign.main.Main</mainClass>
+							</manifest>
+						</archive>
+			    </configuration>
+			    <executions>
+			      <execution>
+			        <phase>package</phase>
+			        <goals>
+			          <goal>single</goal>
+			        </goals>
+			      </execution>
+			    </executions>
+			  </plugin>
+
+			  <plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.3.2</version>
+					<configuration>
+						<source>1.7</source>
+						<target>1.7</target>
+					</configuration>
+			  </plugin>
+
+			</plugins>
+		</pluginManagement>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+    	<groupId>commons-codec</groupId>
+    	<artifactId>commons-codec</artifactId>
+    	<version>1.8</version>
+    </dependency>
+    
+    <dependency>
+    	<groupId>log4j</groupId>
+    	<artifactId>log4j</artifactId>
+    	<version>1.2.12</version>
+    </dependency>
+
+  </dependencies>
+
+  <organization>
+  	<url>http://www.uni-koblenz-landau.de</url>
+  	<name>University of Koblenz-Landau</name>
+  </organization>
+
+</project>

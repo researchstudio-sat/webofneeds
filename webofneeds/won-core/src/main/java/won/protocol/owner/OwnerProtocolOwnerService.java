@@ -19,10 +19,14 @@ package won.protocol.owner;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.service.ConnectionCommunicationService;
+import javax.jms.Message;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -32,18 +36,24 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
 {
   /**
    * Informs the owner of a hint that has been received for the need.
+   *
    * @param ownNeedURI
    * @param otherNeedURI
    * @param score
    * @param originatorURI
+   * @param content
    * @throws NoSuchNeedException if ownNeedURI is not a known need URI
    */
-  public void hint(URI ownNeedURI, URI otherNeedURI, double score, URI originatorURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException;
+  public void hint(String ownNeedURI, String otherNeedURI, String score, String originatorURI, String content) throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
   /**
    * Informs the owner of a connection initiated by the need identified by otherNeedURI to the
    * need identified by ownNeedURI. The connection URI ownConnectionURI has been created automatically by the
    * needserver upon being contacted and is passed here to serve as a connection handle.
+   *
+   *
+   *
+   *
    *
    *
    *
@@ -57,6 +67,7 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    * @throws ConnectionAlreadyExistsException
    *                             if the two needs are already connected
    */
-  public void connect(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI, Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
+  public void connect(String ownNeedURI, String otherNeedURI, String ownConnectionURI, String content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
+  //TODO move to another interface maybe?
 }

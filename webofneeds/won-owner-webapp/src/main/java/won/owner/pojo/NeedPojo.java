@@ -1,18 +1,23 @@
 package won.owner.pojo;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.DCTerms;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.model.BasicNeedType;
+import won.protocol.model.Facet;
+import won.protocol.model.FacetType;
 import won.protocol.model.NeedState;
 import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.MAONT;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * User: Gabriel
@@ -27,7 +32,12 @@ public class NeedPojo
 
   private String title;
   private BasicNeedType basicNeedType;
-  private NeedState state;
+  private NeedState state = NeedState.ACTIVE;
+  private String[] needFacetURIs;
+  private String[] facetURIs = FacetType.getNames();
+  private String ownFacetURI;
+  private String remoteFacetURI;
+  private String[] facetTypes = new String[]{"http://purl.org/webofneeds/model#OwnerFacet"};
   private boolean anonymize;
   private String wonNode;
 
@@ -53,22 +63,41 @@ public class NeedPojo
 
   private long needId = -1;
 
+  private List<ImagePojo> images;
+
   public NeedPojo()
   {
 
+  }
+
+  public NeedPojo(List<Facet> facets)  {
+    needFacetURIs = new String[facets.size()];
+    int i = 0;
+
+    for(Facet facet : facets) {
+        needFacetURIs[i++] = facet.getFacetType().getURI().toString();
+    }
   }
 
   public NeedPojo(URI needUri, final Model model)
   {
     this.needURI = needUri.toString();
     Resource need = model.getResource(needUri.toString());
-    creationDate = need.getProperty(WON.NEED_CREATION_DATE).getString();
+    creationDate = need.getProperty(DCTerms.created).getString();
 
     Statement basicNeedStat = need.getProperty(WON.HAS_BASIC_NEED_TYPE);
     if (basicNeedStat != null) {
       URI uri = URI.create(basicNeedStat.getResource().getURI());
       basicNeedType = BasicNeedType.parseString(uri.getFragment());
     }
+
+    StmtIterator facetIter = need.listProperties(WON.HAS_FACET);
+    List<String> facets = new ArrayList<String>(10);
+    while(facetIter.hasNext()) {
+      Statement stmt = facetIter.nextStatement();
+      facets.add(stmt.getObject().toString());
+    }
+    this.needFacetURIs = facets.toArray(new String[facets.size()]);
 
     Statement needContentStatement = need.getProperty(WON.HAS_CONTENT);
     if (needContentStatement != null) {
@@ -81,6 +110,26 @@ public class NeedPojo
 
       Statement contentDescriptionStat = needContent.getProperty(WON.HAS_CONTENT_DESCRIPTION);
       if (contentDescriptionStat != null) contentDescription = " [ RDF CONTENT ] ";
+
+      Statement attachedMedia = needContent.getProperty(WON.HAS_ATTACHED_MEDIA);
+      List<ImagePojo> images = new ArrayList<ImagePojo>();
+      if (attachedMedia != null){
+        Seq imageSeq = attachedMedia.getSeq();
+        NodeIterator it = imageSeq.iterator();
+        while (it.hasNext()) {
+          //check if the node is a MA:IMAGGE
+          RDFNode node = it.next();
+          if (! node.isResource()) continue;
+          Resource nodeRes = node.asResource();
+          if (!nodeRes.hasProperty(RDF.type, MAONT.IMAGE)) continue;
+          //it's an image. get the URI (ma:locator)
+          ImagePojo imagePojo = new ImagePojo();
+          Statement locatorStmt = nodeRes.getProperty(MAONT.LOCATOR);
+          if (locatorStmt == null) continue;
+          imagePojo.setUri(locatorStmt.getObject().toString());
+        }
+      }
+      this.images = images;
 
       StmtIterator tagProps = needContent.listProperties(WON.HAS_TAG);
       StringBuilder tags = new StringBuilder();
@@ -119,8 +168,8 @@ public class NeedPojo
         recurInfiniteTimes = timeConstraints.getResource().getProperty(WON.HAS_RECUR_INFINITE_TIMES).getBoolean();
       }
 
-      Statement priceSpecification = needModality.getResource().getProperty(WON.HAS_PRICE_SPECIFICATION);
-      if (priceSpecification != null) {
+       Statement priceSpecification = needModality.getResource().getProperty(WON.HAS_PRICE_SPECIFICATION);
+       if (priceSpecification != null) {
 
         Statement currencyStat = priceSpecification.getResource().getProperty(WON.HAS_CURRENCY);
         if (currencyStat != null) currency = currencyStat.getString();
@@ -134,6 +183,46 @@ public class NeedPojo
 
     }
 
+  }
+
+  public String[] getNeedFacetURIs() {
+      return needFacetURIs;
+  }
+
+  public void setNeedFacetURIs(String[] needFacetURIs) {
+      this.needFacetURIs = needFacetURIs;
+  }
+
+  public String getOwnFacetURI() {
+        return ownFacetURI;
+  }
+
+  public void setOwnFacetURI(String ownFacetURI) {
+        this.ownFacetURI = ownFacetURI;
+  }
+
+  public String getRemoteFacetURI() {
+        return remoteFacetURI;
+  }
+
+  public void setRemoteFacetURI(String remoteFacetURI) {
+        this.remoteFacetURI = remoteFacetURI;
+  }
+
+  public String[] getFacetTypes() {
+     return facetTypes;
+  }
+
+  public void setFacetTypes(String[] facetTypes) {
+     this.facetTypes = facetTypes;
+  }
+
+  public String[] getFacetURIs() {
+      return facetURIs;
+  }
+
+  public void setFacetURIs(String[] facetURIs) {
+        this.facetURIs = facetURIs;
   }
 
   public String getCreationDate()
@@ -344,6 +433,14 @@ public class NeedPojo
   public void setContentDescription(final String contentDescription)
   {
     this.contentDescription = contentDescription;
+  }
+
+  public List<ImagePojo> getImages() {
+    return images;
+  }
+
+  public void setImages(List<ImagePojo> images) {
+    this.images = images;
   }
 
 }

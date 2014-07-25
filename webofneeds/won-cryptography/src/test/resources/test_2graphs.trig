@@ -1,0 +1,10 @@
+@prefix :      <http://www.example.com#> .
+
+
+:G1 {
+  _:subj :pred1 :obj1 .
+}
+
+:G2 {
+  _:subj :pred2 :obj2 .
+}

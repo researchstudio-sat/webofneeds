@@ -7,12 +7,13 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
-import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.owner.OwnerProtocolNeedReadService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class DataReloadService {
-    private OwnerProtocolNeedService ownerService;
+    private OwnerProtocolNeedReadService ownerService;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -36,7 +37,7 @@ public class DataReloadService {
     @Autowired
     private ConnectionRepository connectionRepository;
 
-    public void setOwnerService(OwnerProtocolNeedService ownerService) {
+    public void setOwnerService(OwnerProtocolNeedReadService ownerService) {
         this.ownerService = ownerService;
     }
 
@@ -59,10 +60,47 @@ public class DataReloadService {
         try {
             n = ownerService.readNeed(needRepository.findById(id).get(0).getNeedURI());
             n.setId(id);
-            needRepository.saveAndFlush(n);
+            needRepository.save(n);
         } catch (NoSuchNeedException e) {
             logger.warn("caught NoSuchNeedException:", e);
         }
+    }
+
+    public Need importNeed(URI needURI) {
+      logger.debug("importing need {}", needURI);
+      assert needURI != null : "cannot import - needURI is null";
+      Need need = null;
+      try {
+        need = ownerService.readNeed(needURI);
+        needRepository.save(need);
+        Collection<URI> connectionURIs = ownerService.listConnectionURIs(needURI);
+        logger.debug("importing {} connections", connectionURIs.size());
+        for(URI connectionURI: connectionURIs) {
+          importConnection(connectionURI);
+        }
+        return need;
+      } catch (NoSuchNeedException e) {
+        logger.warn("caught NoSuchNeedException:", e);
+      }
+      return null;
+    }
+
+    public Connection importConnection(URI connectionURI) {
+      assert connectionURI != null : "cannot import - connectionURI is null";
+      logger.debug("importing connection {}", connectionURI);
+      Connection conn = null;
+      try {
+        logger.debug("reading connection {}", connectionURI);
+        conn = ownerService.readConnection(connectionURI);
+        if (logger.isDebugEnabled() && conn != null && conn.getNeedURI() != null) {
+          logger.debug("import successful for connection {}", connectionURI);
+        }
+        connectionRepository.save(conn);
+        return conn;
+      } catch (NoSuchConnectionException e) {
+        logger.warn("caught Exception:", e);
+      }
+      return null;
     }
 
     public void reloadConnection(URI uri) {
@@ -74,12 +112,12 @@ public class DataReloadService {
             switch(cons.size()) {
                 case 0:
                     c = ownerService.readConnection(uri);
-                    connectionRepository.saveAndFlush(c);
+                    connectionRepository.save(c);
                     break;
                 case 1:
                     c = ownerService.readConnection(uri);
                     c.setId(cons.get(0).getId());
-                    connectionRepository.saveAndFlush(c);
+                    connectionRepository.save(c);
                     break;
                 default:
                     throw new IllegalStateException("Connection-URI is not unique in local Database!");

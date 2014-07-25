@@ -2,7 +2,6 @@ package won.protocol.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -17,7 +16,7 @@ public enum BasicNeedType
 
   DEMAND("Demand"),
   SUPPLY("Supply"),
-  DO_TOGETHER("Do_together"),
+  DO_TOGETHER("DoTogether"),
   CRITIQUE("Critique");
 
   private static final Logger logger = LoggerFactory.getLogger(BasicNeedType.class);

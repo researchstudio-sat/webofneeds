@@ -46,6 +46,12 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
+        <dependency>
+            <artifactId>solr-solrj</artifactId>
+            <groupId>org.apache.solr</groupId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
         <!-- SIREn-->
         <dependency>
             <groupId>org.sindice.siren</groupId>
@@ -68,18 +74,17 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <artifactId>solr-solrj</artifactId>
-            <groupId>org.apache.solr</groupId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
 
         <!-- END: used for testing solr -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -190,8 +195,8 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <!--excludeScope>provided</excludeScope-->
                             <includeGroupIds>${project.groupId}</includeGroupIds>
@@ -206,8 +211,8 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <includeGroupIds>${project.groupId}</includeGroupIds>
                             <includeScope>test</includeScope> <!-- should select all required project artifacts irrespective of scope -->

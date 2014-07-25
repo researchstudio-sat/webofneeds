@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <artifactId>webofneeds</artifactId>
+        <groupId>webofneeds</groupId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>won-cryptography</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <name>Cryptography</name>
+
+    <repositories>
+        <repository>
+            <id>signingframework-repo-local</id>
+            <name>repository for signingframework</name>
+            <url>file:${project.basedir}/signingframework-repo</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
+        <!-- security related stuff -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
+
+        <!-- tools -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- doesn't exist in the public repository -->
+        <dependency>
+            <groupId>de.uni_koblenz.aggrimm.icp</groupId>
+            <artifactId>signingframework</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+    </dependencies>
+
+    <properties>
+        <bouncycastle.version>1.50</bouncycastle.version>
+    </properties>
+
+</project>

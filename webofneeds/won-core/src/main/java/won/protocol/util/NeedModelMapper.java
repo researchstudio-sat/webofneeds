@@ -1,6 +1,7 @@
 package won.protocol.util;
 
 import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.vocabulary.DCTerms;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class NeedModelMapper implements ModelMapper<Need>
     Resource needResource = model.createResource(need.getNeedURI().toString(), WON.NEED);
     Literal creationDate = DateTimeUtils.toLiteral(need.getCreationDate(), model);
     if (creationDate != null) {
-      model.add(model.createStatement(needResource, WON.NEED_CREATION_DATE, creationDate));
+      model.add(model.createStatement(needResource, DCTerms.created, creationDate));
     }
     model.add(model.createStatement(needResource, WON.IS_IN_STATE, WON.toResource(need.getState())));
 
@@ -48,7 +49,7 @@ public class NeedModelMapper implements ModelMapper<Need>
 
     need.setNeedURI(URI.create(needRes.getURI()));
 
-    Statement dateStat = needRes.getProperty(WON.NEED_CREATION_DATE);
+    Statement dateStat = needRes.getProperty(DCTerms.created);
     if (dateStat != null && dateStat.getObject().isLiteral()) {
       need.setCreationDate(DateTimeUtils.toDate(dateStat.getObject().asLiteral(), model));
       logger.debug("found needCreationDate literal value '{}'",dateStat.getObject().asLiteral().getString());
@@ -64,6 +65,7 @@ public class NeedModelMapper implements ModelMapper<Need>
     }  else {
       logger.debug("no isInState property found for need resource {}", needRes.getURI());
     }
+    need.setWonNodeURI(URI.create(needRes.getPropertyResourceValue(WON.HAS_WON_NODE).toString()));
 
     return need;
   }

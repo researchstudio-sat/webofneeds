@@ -20,6 +20,9 @@
         <input type="hidden" name="deliveryMethod" value="DELIVERY_MODE_DIRECT_DOWNLOAD" />
         <table>
             <tr>
+                <td colspan="2"><input type="submit" value="Submit"/></td>
+            </tr>
+            <tr>
                 <td><form:label path="title">Need title:</form:label></td>
                 <td><form:input path="title" /></td>
             </tr>
@@ -50,6 +53,10 @@
             <tr>
                 <td><form:label path="tags">comma-separated Tags:</form:label></td>
                 <td><form:textarea path="tags" rows="2" cols="30" /></td>
+            </tr>
+            <tr>
+                <td>Facet type:</td>
+                <td><form:checkboxes items="${command.facetURIs}" path="facetTypes" delimiter="<br/>"/></td>
             </tr>
             <tr>
                 <td><form:label path="upperPriceLimit">Upper price limit:</form:label> </td>
@@ -102,9 +109,7 @@
                     </UL>
                 </td>
             </tr>
-            <tr>
-                <td colspan="2"><input type="submit" value="Submit"/></td>
-            </tr>
+
         </table>
     </form:form>
 </body>

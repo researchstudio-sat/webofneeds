@@ -16,6 +16,10 @@
 
 package won.node.web;
 
+import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,26 +83,30 @@ import java.util.Date;
  */
 @Controller
 @RequestMapping("/")
-public class LinkedDataWebController
+public class
+  LinkedDataWebController
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
-  //prefix of a need resource
+  //full prefix of a need resource
   private String needResourceURIPrefix;
-  //prefix of a connection resource
+  //path of a need resource
+  private String needResourceURIPath;
+  //full prefix of a connection resource
   private String connectionResourceURIPrefix;
+  //path of a connection resource
+  private String connectionResourceURIPath;
   //prefix for URISs of RDF data
   private String dataURIPrefix;
   //prefix for URIs referring to real-world things
   private String resourceURIPrefix;
   //prefix for human readable pages
   private String pageURIPrefix;
-
+  private String  nodeResourceURIPrefix;
   @Autowired
   private LinkedDataService linkedDataService;
 
   //date format for Expires header (rfc 1123)
   private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
-
 
 
   @Autowired
@@ -109,7 +117,9 @@ public class LinkedDataWebController
     return "index";
   }
 
-  //webmvc controller method
+
+
+    //webmvc controller method
   @RequestMapping("${uri.path.page.need}/{identifier}")
   public String showNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
     try {
@@ -130,12 +140,31 @@ public class LinkedDataWebController
   public String showConnectionPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
     try {
       URI connectionURI = uriService.createConnectionURIForId(identifier);
-      com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.getConnectionModel(connectionURI);
+      com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.getConnectionModel(connectionURI, true);
       model.addAttribute("rdfModel", rdfModel);
       model.addAttribute("resourceURI", connectionURI.toString());
       model.addAttribute("dataURI", uriService.toDataURIIfPossible(connectionURI).toString());
       return "rdfModelView";
     } catch (NoSuchConnectionException e) {
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return "notFoundView";
+    }
+  }
+
+  //webmvc controller method
+  @RequestMapping("${uri.path.page.connection}/{identifier}/event/{eventId}")
+  public String showEventPage(@PathVariable(value="identifier") String identifier,
+                              @PathVariable(value="eventId") String eventId,
+                              Model model,
+                              HttpServletResponse response) {
+    URI eventURI = uriService.createEventURI(uriService.createConnectionURIForId(identifier), eventId);
+    com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.getEventModel(eventURI);
+    if (model != null) {
+      model.addAttribute("rdfModel", rdfModel);
+      model.addAttribute("resourceURI", eventURI.toString());
+      model.addAttribute("dataURI", uriService.toDataURIIfPossible(eventURI).toString());
+      return "rdfModelView";
+    } else {
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
     }
@@ -155,8 +184,21 @@ public class LinkedDataWebController
       return "rdfModelView";
   }
 
+    @RequestMapping("${uri.path.page}")
+    public String showNodeInformationPage(
+            HttpServletRequest request,
+            Model model,
+            HttpServletResponse response) {
+        com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.getNodeModel();
+        model.addAttribute("rdfModel", rdfModel);
+        model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+        model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
+        return "rdfModelView";
+    }
 
-  //webmvc controller method
+
+
+    //webmvc controller method
   @RequestMapping("${uri.path.page.connection}")
   public String showConnectionURIListPage(
       @RequestParam(defaultValue="-1") int page,
@@ -175,24 +217,49 @@ public class LinkedDataWebController
   public String showConnectionURIListPage(
       @PathVariable String identifier,
       @RequestParam(defaultValue="-1") int page,
+      @RequestParam(value="deep",defaultValue = "false") boolean deep,
       HttpServletRequest request,
-      Model model,
+      Model webmvcModel,
       HttpServletResponse response) {
     URI needURI = uriService.createNeedURIForId(identifier);
     try{
-      com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.listConnectionURIs(page,needURI);
-      model.addAttribute("rdfModel", rdfModel);
-      model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
-      model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
+      com.hp.hpl.jena.rdf.model.Model model = linkedDataService.listConnectionURIs(page,needURI);
+        if (deep){
+            addDeepConnectionData(needURI.toString(), model);
+        }
+      webmvcModel.addAttribute("rdfModel", model);
+      webmvcModel.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+      webmvcModel.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
       return "rdfModelView";
     } catch (NoSuchNeedException e) {
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
+    } catch (NoSuchConnectionException e) {
+        logger.warn("did not find connection that should be connected to need. connection:{}",e.getUnknownConnectionURI());
+        return "notFoundView"; //TODO: should display an error view
     }
   }
 
+    private void addDeepConnectionData(String needUri, com.hp.hpl.jena.rdf.model.Model model) throws NoSuchConnectionException {
+        //add the connection model to each connection
+        Resource connectionsResource = model.getResource(needUri+"/connections/");
+        NodeIterator it = model.listObjectsOfProperty(connectionsResource, RDFS.member);
+        while (it.hasNext()){
+            RDFNode node = it.next();
+            com.hp.hpl.jena.rdf.model.Model connectionModel =
+                    this.linkedDataService.getConnectionModel(URI.create(node.asResource().getURI()), false); //do not include event data
+            model.add(connectionModel);
+        }
+    }
 
-  @RequestMapping(
+  /**
+   * If the HTTP 'Accept' header is an RDF MIME type
+   * (as listed in the 'produces' value of the RequestMapping annotation),
+   * a redirect to a data uri is sent.
+   * @param request
+   * @return
+   */
+    @RequestMapping(
       value="${uri.path.resource}/**",
       method = RequestMethod.GET,
       produces={"application/rdf+xml","application/x-turtle","text/turtle","text/rdf+n3","application/json","application/ld+json"})
@@ -202,13 +269,26 @@ public class LinkedDataWebController
     URI dataUri = URI.create(this.dataURIPrefix);
     String requestUri = request.getRequestURI();
     String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), dataUri.getPath());
+    logger.debug("resource URI requested with data mime type. redirecting from {} to {}", requestUri, redirectToURI);
+    if (redirectToURI.equals(requestUri)) {
+        logger.debug("redirecting to same URI avoided, sending status 500 instead");
+        return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
-    HttpHeaders headers = addNeverExpiresHeaders(new HttpHeaders());
+    HttpHeaders headers = new HttpHeaders();
+    headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
     headers.add("Location",redirectToURI);
     return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(null, headers, HttpStatus.SEE_OTHER);
   }
 
+    /**
+     * If the HTTP 'Accept' header is 'text/html'
+     * (as listed in the 'produces' value of the RequestMapping annotation),
+     * a redirect to a page uri is sent.
+     * @param request
+     * @return
+     */
   @RequestMapping(
       value="${uri.path.resource}/**",
       method = RequestMethod.GET,
@@ -220,10 +300,40 @@ public class LinkedDataWebController
     String requestUri = request.getRequestURI();
 
     String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), pageUriPrefix.getPath());
+    logger.debug("resource URI requested with page mime type. redirecting from {} to {}", requestUri, redirectToURI);
+    if (redirectToURI.equals(requestUri)) {
+        logger.debug("redirecting to same URI avoided, sending status 500 instead");
+        return new ResponseEntity<String>("Could not redirect to linked data page", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
-    HttpHeaders headers = addNeverExpiresHeaders(new HttpHeaders());
+    HttpHeaders headers = new HttpHeaders();
+    headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
+
+    //add a location header
     headers.add("Location",redirectToURI);
     return new ResponseEntity<String>("", headers, HttpStatus.SEE_OTHER);
+  }
+
+  /**
+   * If the request URI is the URI of a list page (list of needs, list of connections) it gets the
+   * header that says 'already expired' so that crawlers re-download these data. For other URIs, the
+   * 'never expires' header is added.
+   * @param headers
+   * @param requestUri
+   * @return
+   */
+  public HttpHeaders addExpiresHeadersBasedOnRequestURI(HttpHeaders headers, final String requestUri) {
+    //now, we want to suppress the 'never expires' header information
+    //for /resource/need and resource/connection so that crawlers always re-fetch these data
+    URI requestUriAsURI = URI.create(requestUri);
+    String requestPath = requestUriAsURI.getPath();
+    if (! (requestPath.replaceAll("/$","").endsWith(this.connectionResourceURIPath.replaceAll("/$", "")) ||
+           requestPath.replaceAll("/$","").endsWith(this.needResourceURIPath.replaceAll("/$", "")))) {
+      headers = addNeverExpiresHeaders(headers);
+    } else {
+      headers = addAlreadyExpiredHeaders(headers);
+    }
+    return headers;
   }
 
   @RequestMapping(
@@ -270,8 +380,22 @@ public class LinkedDataWebController
     } catch (NoSuchNeedException e) {
       return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.NOT_FOUND);
     }
+
   }
 
+    @RequestMapping(
+            value="${uri.path.data}",
+            method = RequestMethod.GET,
+            produces={"application/rdf+xml","application/x-turtle","text/turtle","text/rdf+n3","application/json","application/ld+json"})
+    public ResponseEntity<com.hp.hpl.jena.rdf.model.Model> readNode(
+            HttpServletRequest request) {
+        logger.debug("readNode() called");
+        URI nodeUri = URI.create(this.nodeResourceURIPrefix);
+        com.hp.hpl.jena.rdf.model.Model model = linkedDataService.getNodeModel();
+        //TODO: need information does change over time. The immutable need information should never expire, the mutable should
+        HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), nodeUri));
+        return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(model, headers, HttpStatus.OK);
+    }
 
   @RequestMapping(
       value="${uri.path.data.connection}/{identifier}",
@@ -283,7 +407,7 @@ public class LinkedDataWebController
     logger.debug("readConnection() called");
     URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
     try {
-      com.hp.hpl.jena.rdf.model.Model model = linkedDataService.getConnectionModel(connectionUri);
+      com.hp.hpl.jena.rdf.model.Model model = linkedDataService.getConnectionModel(connectionUri, true);
       //TODO: connection information does change over time. The immutable connection information should never expire, the mutable should
       HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), connectionUri));
       return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(model, headers, HttpStatus.OK);
@@ -293,8 +417,42 @@ public class LinkedDataWebController
     }
   }
 
+  @RequestMapping(
+    value="${uri.path.data.connection}/{identifier}/event/{eventId}",
+    method = RequestMethod.GET,
+    produces={"application/rdf+xml","application/x-turtle","text/turtle","text/rdf+n3","application/json","application/ld+json"})
+  public ResponseEntity<com.hp.hpl.jena.rdf.model.Model> readEvent(
+    HttpServletRequest request,
+    @PathVariable(value="identifier") String identifier,
+    @PathVariable(value="eventId") String eventId) {
+    logger.debug("readConnection() called");
+
+    URI eventURI = uriService.createEventURI(uriService.createConnectionURIForId(identifier), eventId);
+    com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.getEventModel(eventURI);
+    if (rdfModel != null) {
+      HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(),
+                                                                                URI.create(request.getRequestURI()),
+                                                                                eventURI));
+      return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(rdfModel, headers, HttpStatus.OK);
+    } else {
+      return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.NOT_FOUND);
+    }
+  }
 
 
+
+
+
+
+
+    /**
+     * Get the RDF for the connections of the specified need.
+     * @param request
+     * @param identifier
+     * @param page if used, returns the specified page number.
+     * @param deep If true, connection data is added to the model (not only connection URIs). Default: false.
+     * @return
+     */
   @RequestMapping(
       value="${uri.path.data.need}/{identifier}/connections",
       method = RequestMethod.GET,
@@ -302,16 +460,29 @@ public class LinkedDataWebController
   public ResponseEntity<com.hp.hpl.jena.rdf.model.Model> readConnectionsOfNeed(
       HttpServletRequest request,
       @PathVariable(value="identifier") String identifier,
-      @RequestParam(value="page",defaultValue = "-1") int page) {
+      @RequestParam(value="page",defaultValue = "-1") int page,
+      @RequestParam(value="deep",defaultValue = "false") boolean deep) {
     logger.debug("readConnectionsOfNeed() called");
     URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
 
     try {
-      com.hp.hpl.jena.rdf.model.Model model = linkedDataService.listConnectionURIs(page, needUri);
-      HttpHeaders headers = addAlreadyExpiredHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), needUri));
+        com.hp.hpl.jena.rdf.model.Model model = null;
+        HttpHeaders headers = null;
+        model = linkedDataService.listConnectionURIs(page, needUri);
+        if (deep){
+            //add the connection model to each connection
+            addDeepConnectionData(needUri.toString(), model);
+        }
+        //append the required headers
+        headers = addAlreadyExpiredHeaders(addLocationHeaderIfNecessary(
+                new HttpHeaders(), URI.create(request.getRequestURI()), needUri));
+
       return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(model, headers, HttpStatus.OK);
     } catch (NoSuchNeedException e) {
       return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.NOT_FOUND);
+    } catch (NoSuchConnectionException e) {
+      logger.warn("did not find connection that should be connected to need. connection:{}",e.getUnknownConnectionURI());
+      return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -406,4 +577,19 @@ public class LinkedDataWebController
     this.pageURIPrefix = pageURIPrefix;
   }
 
+    public String getNodeResourceURIPrefix() {
+        return nodeResourceURIPrefix;
+    }
+
+    public void setNodeResourceURIPrefix(String nodeResourceURIPrefix) {
+        this.nodeResourceURIPrefix = nodeResourceURIPrefix;
+    }
+
+  public void setNeedResourceURIPath(final String needResourceURIPath) {
+    this.needResourceURIPath = needResourceURIPath;
+  }
+
+  public void setConnectionResourceURIPath(final String connectionResourceURIPath) {
+    this.connectionResourceURIPath = connectionResourceURIPath;
+  }
 }

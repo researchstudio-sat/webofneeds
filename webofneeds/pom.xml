@@ -13,8 +13,7 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>webofneeds</groupId>
     <artifactId>webofneeds</artifactId>
@@ -32,6 +31,9 @@
         <module>won-matcher-solr</module>
         <module>won-matcher-webapp</module>
         <module>won-ontology-validator</module>
+        <module>won-bot</module>
+        <module>won-facets</module>
+        <module>won-cryptography</module>
     </modules>
 
     <dependencyManagement>
@@ -42,13 +44,74 @@
                 <artifactId>solr</artifactId>
                 <version>${solr.version}</version>
                 <type>war</type>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-core</artifactId>
                 <version>${solr.version}</version>
+            </dependency>
+            <!-- Camel, AMQP & ActiveMQ -->
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-core</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-jms</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-spring</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-amqp</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-camel</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-pool</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-broker</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.qpid</groupId>
+                <artifactId>qpid-client</artifactId>
+                <version>${qpid.version}</version>
+            </dependency>
+            <!-- xbean is required for ActiveMQ broker configuration in the spring xml file -->
+            <dependency>
+                <groupId>org.apache.xbean</groupId>
+                <artifactId>xbean-spring</artifactId>
+                <version>${xbean.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-kahadb-store</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-amqp</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.jms</groupId>
+                <artifactId>jms</artifactId>
+                <version>${jms.version}</version>
             </dependency>
 
             <!-- SIREn-->
@@ -84,6 +147,14 @@
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>jcl-over-slf4j</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
 
@@ -100,6 +171,47 @@
                         <groupId>xerces</groupId>
                         <artifactId>xercesImpl</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>jcl-over-slf4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-tdb</artifactId>
+                <version>${org.apache.jena-tdb.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>xml-apis</artifactId>
+                        <groupId>xml-apis</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xerces</groupId>
+                        <artifactId>xercesImpl</artifactId>
+                    </exclusion>
+                    <exclusion>
+
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>jcl-over-slf4j</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -113,13 +225,18 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>jstl</artifactId>
                 <version>${javax.servlet.jstl.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>${javax.validation.version}</version>
             </dependency>
 
             <!-- commons-httpclient -->
@@ -217,6 +334,32 @@
                 <artifactId>spring-web</artifactId>
                 <version>${org.springframework.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jms</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+            <!-- spring-security -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-web</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-config</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-taglibs</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
 
 
 
@@ -244,11 +387,52 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
                 <version>${org.hibernate.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.ibm.icu</groupId>
+                        <artifactId>icu4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
+
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-c3p0</artifactId>
                 <version>${org.hibernate.version}</version>
+                <!--exclusions>
+                    <exclusion>
+                        <groupId>com.mchange</groupId>
+                        <artifactId>c3p0</artifactId>
+                    </exclusion>
+                </exclusions-->
+            </dependency>
+
+            <!--dependency>
+                <groupId>com.mchange</groupId>
+                <artifactId>c3p0</artifactId>
+                <version>${com.mchange.c3p0.version}</version>
+            </dependency-->
+
+            <!-- hibernate depends on this, but has it in test/provided scope -->
+            <dependency>
+                <groupId>org.jboss</groupId>
+                <artifactId>jandex</artifactId>
+                <version>${org.jboss.jandex.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <!-- hibernate depends on this, but has it in test/provided scope -->
+            <dependency>
+                <groupId>com.fasterxml</groupId>
+                <artifactId>classmate</artifactId>
+                <version>${com.fasterxml.classmate.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${org.hibernate.hibernate-validator.version}</version>
             </dependency>
 
 
@@ -307,12 +491,102 @@
                 <artifactId>logback-core</artifactId>
                 <version>${ch.qos.logback.version}</version>
             </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.17</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Simon Monitoring stuff -->
+            <dependency>
+                <groupId>org.javasimon</groupId>
+                <artifactId>javasimon-core</artifactId>
+                <version>${org.javasimon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javasimon</groupId>
+                <artifactId>javasimon-spring</artifactId>
+                <version>${org.javasimon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javasimon</groupId>
+                <artifactId>javasimon-console-embed</artifactId>
+                <version>${org.javasimon.version}</version>
+            </dependency>
+
 
             <!-- UTILS -->
             <dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
                 <version>${commons-collections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-email</artifactId>
+                <version>${org.apache.commons.email.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.supercsv</groupId>
+                <artifactId>super-csv</artifactId>
+                <version>${net.sf.supercsv.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>1.7.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>${org.quartz-scheduler.version}</version>
+            </dependency>
+            <!-- CACHING -->
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache-core</artifactId>
+                <version>${net.sf.ehcache.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>${commons-fileupload.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${com.google.guava.version}</version>
+            </dependency>
+
+            <!-- ASPECTJ -->
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+
+
+            <!-- SPRING-BOOT -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-cli</artifactId>
+                <version>${org.springframework.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot</artifactId>
+                <version>${org.springframework.boot.version}</version>
             </dependency>
 
             <!-- TESTING -->
@@ -335,16 +609,12 @@
                 <scope>test</scope>
             </dependency>
 
-
+            <!-- used for testing solr -->
             <dependency>
                 <artifactId>solr-solrj</artifactId>
                 <groupId>org.apache.solr</groupId>
                 <version>${solr.version}</version>
             </dependency>
-
-
-            <!-- END: used for testing solr -->
-
         </dependencies>
     </dependencyManagement>
 
@@ -446,6 +716,8 @@
                     <version>0.2.5</version>
                 </plugin>
 
+
+
             </plugins>
         </pluginManagement>
         <plugins>
@@ -469,6 +741,12 @@
             <id>org.topbraid</id>
             <url>http://www.topquadrant.com/repository/spin/</url>
         </repository>
+        <!-- jboss repo used for javax.jms -->
+        <repository>
+            <id>repository.jboss.org-public</id>
+            <name>JBoss repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public</url>
+        </repository>
     </repositories>
 
     <properties>
@@ -477,7 +755,6 @@
             -Xlint:deprecation,fallthrough,finally,path,serial,unchecked
         </maven.compile.compilerargs>
         <compile.forked>false</compile.forked>
-
         <java.source.version>1.7</java.source.version>
         <java.target.version>1.7</java.target.version>
         <surefire.skip>false</surefire.skip>
@@ -486,35 +763,56 @@
         <surefire.reportformat>brief</surefire.reportformat>
         <surefire.usefile>false</surefire.usefile>
         <dependencies.scope>compile</dependencies.scope>
-
         <!-- versions for various dependencies -->
+        <aspectj.version>1.5.4</aspectj.version>
         <commons-collections.version>3.2.1</commons-collections.version>
+        <commons-fileupload.version>1.2.2</commons-fileupload.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
+        <commons-io.version>2.4</commons-io.version>
         <solr.version>3.5.0</solr.version>
+        <camel.version>2.12.1</camel.version>
+        <qpid.version>0.24</qpid.version>
+        <activemq.version>5.8.0</activemq.version>
+        <activemq.conf>classpath:</activemq.conf>
+        <jms.version>1.1</jms.version>
+        <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed-->
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>
-        <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
         <com.github.jsonld-java.version>0.3-SNAPSHOT</com.github.jsonld-java.version>
+        <com.google.guava.version>15.0</com.google.guava.version>
+        <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
+        <com.fasterxml.classmate.version>1.0.0</com.fasterxml.classmate.version>
+        <com.github.jsonld-java.version>0.3</com.github.jsonld-java.version>
+        <com.mchange.c3p0.version>0.9.5-pre8</com.mchange.c3p0.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
         <com.sun.xml.version>2.0EA3</com.sun.xml.version>
         <com.sun.xml.ws.version>2.2.8-promoted-b146</com.sun.xml.ws.version>
         <junit.version>4.11</junit.version>
-        <log4j.version>1.2.17</log4j.version>
-        <org.apache.jena.jsonld.version>0.0.1-SNAPSHOT</org.apache.jena.jsonld.version>
+        <org.apache.commons.email.version>1.3.1</org.apache.commons.email.version>
+        <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
         <org.apache.jena.version>2.11.0</org.apache.jena.version>
-        <org.hibernate.version>4.1.8.Final</org.hibernate.version>
+        <org.apache.jena-tdb.version>1.0.0</org.apache.jena-tdb.version>
+        <org.hibernate.version>4.3.5.Final</org.hibernate.version>
+        <org.hibernate.hibernate-validator.version>5.1.0.Final</org.hibernate.hibernate-validator.version>
+        <org.javasimon.version>3.4.0</org.javasimon.version>
+        <org.jboss.jandex.version>1.1.0.Final</org.jboss.jandex.version>
+        <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
+        <org.springframework.boot.version>1.0.2.RELEASE</org.springframework.boot.version>
         <org.springframework.data.commons.version>1.4.0.RELEASE</org.springframework.data.commons.version>
         <org.springframework.data.jpa.version>1.2.0.RELEASE</org.springframework.data.jpa.version>
-        <org.springframework.version>3.2.4.RELEASE</org.springframework.version>
+        <org.springframework.version>4.0.4.RELEASE</org.springframework.version>
+        <org.springframework.security.version>3.1.3.RELEASE</org.springframework.security.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
-        <org.hsqldb.version>2.2.9</org.hsqldb.version>
+        <org.hsqldb.version>2.3.2</org.hsqldb.version>
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
+        <javax.validation.version>1.1.0.Final</javax.validation.version>
         <cargo.version>1.4.2</cargo.version>
         <jrebel.version>1.1.3</jrebel.version>
         <wagon.version>1.0-beta-3</wagon.version>
         <assembly.version>2.2</assembly.version>
+        <net.sf.supercsv.version>2.1.0</net.sf.supercsv.version>
     </properties>
 
     <profiles>

@@ -1,17 +1,22 @@
 package won.node.protocol.impl;
 
+import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
+import com.hp.hpl.jena.sparql.path.Path;
+import com.hp.hpl.jena.sparql.path.PathParser;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.ws.NeedProtocolNeedWebServiceClient;
-import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.ws.AbstractClientFactory;
+import won.protocol.ws.NeedProtocolNeedWebServiceEndpoint;
 
 import javax.ws.rs.core.Response;
 import java.net.MalformedURLException;
@@ -26,11 +31,14 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private LinkedDataRestClient linkedDataRestClient;
+  private LinkedDataSource linkedDataSource;
 
-  public void setLinkedDataRestClient(final LinkedDataRestClient linkedDataRestClient)
+  private final String PATH_NEED_PROTOCOL_ENDPOINT = "<"+WON.SUPPORTS_WON_PROTOCOL_IMPL+">/<"+WON
+    .HAS_NEED_PROTOCOL_ENDPOINT+">";
+
+  public void setLinkedDataSource(final LinkedDataSource linkedDataSource)
   {
-    this.linkedDataRestClient = linkedDataRestClient;
+    this.linkedDataSource = linkedDataSource;
   }
 
   //TODO: switch from linkedDataRestClient to need and connection repositories?
@@ -55,7 +63,12 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
   {
     URI needProtocolEndpoint = null;
     try{
-      needProtocolEndpoint = linkedDataRestClient.getURIPropertyForResource(needURI, WON.NEED_PROTOCOL_ENDPOINT);
+      Path propertyPath =  PathParser.parse(PATH_NEED_PROTOCOL_ENDPOINT, new PrefixMappingImpl());
+      URI protocolEndpoint = RdfUtils.toURI(WonLinkedDataUtils.getWonNodePropertyForNeedOrConnectionURI(
+        needURI,
+        propertyPath, linkedDataSource
+      ));
+     return protocolEndpoint;
     } catch (UniformInterfaceException e){
       ClientResponse response = e.getResponse();
       if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
@@ -63,8 +76,6 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
       }
       else throw e;
     }
-
-    return needProtocolEndpoint;
   }
 
   public NeedProtocolNeedWebServiceEndpoint getNeedProtocolEndpointForConnection(URI connectionURI) throws NoSuchConnectionException, MalformedURLException
@@ -83,4 +94,9 @@ public class NeedProtocolNeedClientFactory extends AbstractClientFactory<NeedPro
 
     return client.getNeedProtocolNeedWebServiceEndpointPort();
   }
+    //TODO: change this method so that it gets the URI from RDF triples.
+
+
+
+
 }

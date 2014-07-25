@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>webofneeds</groupId>
+    <artifactId>webofneeds</artifactId>
+    <version>0.1-SNAPSHOT</version>
+  </parent>
+  <groupId>webofneeds</groupId>
+  <artifactId>won-bot</artifactId>
+  <packaging>jar</packaging>
+  <version>0.1-SNAPSHOT</version>
+  <name>Bot</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+      <!-- WON stuff -->
+      <dependency>
+          <groupId>webofneeds</groupId>
+          <artifactId>won-facets-tx</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>webofneeds</groupId>
+          <artifactId>won-owner</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>webofneeds</groupId>
+          <artifactId>won-matcher</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>webofneeds</groupId>
+          <artifactId>won-core</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>webofneeds</groupId>
+          <artifactId>won-matcher-solr</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <!-- RDF -->
+      <dependency>
+          <groupId>org.apache.jena</groupId>
+          <artifactId>jena-core</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.jena</groupId>
+          <artifactId>jena-arq</artifactId>
+      </dependency>
+      <!-- Solr -->
+      <dependency>
+          <!-- in won-matcher-solr this has the 'magic scope' but here, we need it always -->
+          <artifactId>solr-solrj</artifactId>
+          <groupId>org.apache.solr</groupId>
+          <scope>compile</scope>
+      </dependency>
+
+
+      <!-- SPRING stuff -->
+      <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-cli</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot</artifactId>
+      </dependency>
+
+      <!-- UTILS -->
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-email</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.jsoup</groupId>
+          <artifactId>jsoup</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.quartz-scheduler</groupId>
+          <artifactId>quartz</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.aspectj</groupId>
+          <artifactId>aspectjweaver</artifactId>
+      </dependency>
+
+      <!-- LOGGING -->
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-core</artifactId>
+      </dependency>
+
+      <!-- TESTING -->
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-test</artifactId>
+      </dependency>
+
+      <!-- MONITORING -->
+      <dependency>
+          <groupId>org.javasimon</groupId>
+          <artifactId>javasimon-core</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.javasimon</groupId>
+          <artifactId>javasimon-spring</artifactId>
+      </dependency>
+  </dependencies>
+</project>

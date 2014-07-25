@@ -37,7 +37,11 @@ public class Connection
   /* The uri of the connection's need object */
   @Column( name = "needURI")
   private URI needURI;
+  /* The uri of the facet's type */
+  @Column( name = "typeURI")
+  private URI typeURI;
   /* The URI of the remote connection */
+  /* Caution: on the owner side, the remote connection URI is never known. */
   @Column( name = "remoteConnectionURI")
   private URI remoteConnectionURI;
   /* The URI of the remote need */
@@ -60,7 +64,15 @@ public class Connection
         '}';
   }
 
-  public Long getId() {
+    public URI getTypeURI() {
+        return typeURI;
+    }
+
+    public void setTypeURI(URI typeURI) {
+        this.typeURI = typeURI;
+    }
+
+    public Long getId() {
       return id;
   }
 

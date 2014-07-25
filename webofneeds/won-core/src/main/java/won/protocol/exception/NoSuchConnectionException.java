@@ -38,6 +38,10 @@ public class NoSuchConnectionException extends WonProtocolException
     super(MessageFormat.format("No connection with the URI {0} is known on this server.", unknownConnectionURI));
     this.unknownConnectionURI = unknownConnectionURI;
   }
-
+    public NoSuchConnectionException(final Long unknownConnectionID)
+    {
+        super(MessageFormat.format("No connection with the URI {0} is known on this server.", unknownConnectionID));
+        this.unknownConnectionURI = unknownConnectionURI;
+    }
 
 }

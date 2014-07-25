@@ -54,9 +54,10 @@
         </dependency>
 
         <!-- servlet stuff -->
-        <dependency>
+        <dependency> <!-- tomcat always complains about this.. should we omit it? -->
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
@@ -130,8 +131,8 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <includeGroupIds>${project.groupId}</includeGroupIds>
                         </configuration>

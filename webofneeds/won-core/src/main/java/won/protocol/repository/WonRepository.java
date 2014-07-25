@@ -16,11 +16,8 @@
 
 package won.protocol.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import won.protocol.model.Need;
 
 import java.util.List;
 
@@ -31,10 +28,14 @@ import java.util.List;
  * Time: 17:05
  * To change this template use File | Settings | File Templates.
  */
+@NoRepositoryBean
 public interface WonRepository<M> extends PagingAndSortingRepository<M, Long> {
     List<M> findById(Long id);
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    //Removed the annotation as it interferes with CGLIB autoproxying aop.
+    //@Transactional(propagation = Propagation.REQUIRES_NEW)
+    //if needed, the business level services must be annotated.
+    // see https://stackoverflow.com/questions/13977093/how-to-use-jparepositories-with-proxy-target-class-true
     M saveAndFlush(M obj);
 
 }
