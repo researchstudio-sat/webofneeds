@@ -49,13 +49,14 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                     logger.debug("*** open from Particiapnt:");
                     logger.debug("coordinator {}, participant {}",con.getNeedURI(), con.getRemoteNeedURI());
                     logger.debug("con {}",  con.getConnectionURI());
-                    ownerFacingConnectionClient.open(con.getConnectionURI(), content);
+
                     stateManager.setStateForNeedUri(BAPCState.ACTIVE.getURI(), con.getNeedURI(),
                       con.getRemoteNeedURI(), getFacetType().getURI());
                     storeBAStateForConnection(con, BAPCState.ACTIVE.getURI());
                     logger.debug("opened from Participant");
                     logger.debug("coordinator {}, participant {}", con.getNeedURI().toString(), con.getRemoteNeedURI().toString());
                     logger.debug("con {}, con BAstate {}",con.getConnectionURI().toString(), stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString());
+                    ownerFacingConnectionClient.open(con.getConnectionURI(), content);
                 } catch (WonProtocolException e) {
                     logger.warn("caught Exception:", e);
                 }

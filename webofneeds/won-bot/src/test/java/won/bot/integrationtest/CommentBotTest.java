@@ -187,7 +187,6 @@ public class CommentBotTest extends PropertyPathConfigurator
     public void executeAsserts()
     {
       //1 act events
-      Assert.assertEquals(1, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
       //1 create need events
       Assert.assertEquals(1, this.commentFacetCreator.getEventCount());
