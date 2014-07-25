@@ -28,7 +28,7 @@ import java.util.List;
  * User: syim
  * Date: 11.07.14
  */
-public abstract class PropertyPathConfigurator
+public class PropertyPathConfigurator
 {
   public static List<Path> configurePropertyPaths(){
     List<Path> propertyPaths = new ArrayList<>();

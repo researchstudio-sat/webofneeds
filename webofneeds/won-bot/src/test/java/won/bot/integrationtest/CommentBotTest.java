@@ -56,7 +56,7 @@ import static junit.framework.TestCase.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
-public class CommentBotTest extends PropertyPathConfigurator
+public class CommentBotTest
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private static final int RUN_ONCE = 1;
@@ -234,7 +234,8 @@ public class CommentBotTest extends PropertyPathConfigurator
 
 
 
-      Model dataModel = linkedDataSource.getModelForResourceWithPropertyPath(needs.get(0),CommentBotTest.configurePropertyPaths(), 30,
+      Model dataModel = linkedDataSource.getModelForResourceWithPropertyPath(needs.get(0),PropertyPathConfigurator
+        .configurePropertyPaths(), 30,
                                                                              8 );
 
       logger.debug("crawled dataset with property path: {}",RdfUtils.toString(dataModel));
