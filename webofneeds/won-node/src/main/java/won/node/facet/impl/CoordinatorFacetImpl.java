@@ -1,8 +1,9 @@
 package won.node.facet.impl;
 
-import com.hp.hpl.jena.rdf.model.*;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
 
   @Override
   public void connectFromOwner(final Connection con, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    logger.info("Coordinator: ConntectFromOwner");
+    logger.debug("Coordinator: ConntectFromOwner");
     Resource baseRes = content.getResource(content.getNsPrefixURI(""));
 
     StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_REMOTE_FACET);
@@ -55,12 +56,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
     baseRes = remoteFacetModel.createResource(remoteFacetModel.getNsPrefixURI(""));
     Resource remoteFacetResource = stmtIterator.next().getObject().asResource();
     baseRes.addProperty(WON.HAS_FACET, remoteFacetModel.createResource(remoteFacetResource.getURI()));
-    RDFDataMgr.write(System.out, remoteFacetModel, Lang.TTL);
 
-    // test
-       /* Resource participant = remoteFacetModel.createResource(WON_TX.BASE_URI+con.getRemoteNeedURI()); //participant URI
-        remoteFacetModel.add(WON_TX.COORDINATOR,WON_TX.COORDINATOR_VOTE_REQUEST, participant);
-        RDFDataMgr.write(System.out, remoteFacetModel, Lang.TTL);*/
 
     final Connection connectionForRunnable = con;
 
@@ -98,7 +94,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
 
   public void openFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
-    logger.info("Coordinator: OpenFromOwner");
+    logger.debug("Coordinator: OpenFromOwner");
 
     if (con.getRemoteConnectionURI() != null) {
       executorService.execute(new Runnable() {
@@ -119,7 +115,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
 
   public void openFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
-    logger.info("Coordinator: OpenFromNeed");
+    logger.debug("Coordinator: OpenFromNeed");
 
     executorService.execute(new Runnable()
     {
@@ -143,10 +139,10 @@ public class CoordinatorFacetImpl extends AbstractFacet
             globalCommit(con);
           }
           else{
-            logger.info("Wait for votes of: ");
+            logger.debug("Wait for votes of: ");
             for(Connection c : cons)
             {
-              logger.info("   "+c.getConnectionURI()+" "+c.getNeedURI()+" "+c.getRemoteNeedURI());
+              logger.debug("   "+c.getConnectionURI()+" "+c.getNeedURI()+" "+c.getRemoteNeedURI());
             }
             ownerFacingConnectionClient.open(con.getConnectionURI(), content);
           }
@@ -161,7 +157,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
   @Override
   public void closeFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
-    logger.info("Coordinator: closeFromOwner");
+    logger.debug("Coordinator: closeFromOwner");
     executorService.execute(new Runnable()
     {
       @Override
@@ -241,7 +237,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
           needFacingConnectionClient.close(c, content);
         }
       }
-      logger.info("Transaction commited!");
+      logger.debug("Transaction commited!");
     }  catch (WonProtocolException e) {
       logger.warn("caught WonProtocolException:", e);
     } catch (Exception e) {
