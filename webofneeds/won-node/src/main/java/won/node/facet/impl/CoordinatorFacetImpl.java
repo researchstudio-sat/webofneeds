@@ -1,5 +1,6 @@
 package won.node.facet.impl;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -8,16 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
-import won.protocol.model.FacetType;
+import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * Created with IntelliJ IDEA.
@@ -60,36 +58,44 @@ public class CoordinatorFacetImpl extends AbstractFacet
 
     final Connection connectionForRunnable = con;
 
-    //send to need
-    executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          Future<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
-          dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
-        } catch (WonProtocolException e) {
-          // we can't connect the connection. we send a close back to the owner
-          // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
-          // For now, we call the close method as if it had been called from the remote side
-          // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
-          try {
-            needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI(), content);
-          } catch (NoSuchConnectionException e1) {
-            logger.warn("caught NoSuchConnectionException:", e1);
-          } catch (IllegalMessageForConnectionStateException e1) {
-            logger.warn("caught IllegalMessageForConnectionStateException:", e1);
+    try {
+      final ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),
+        con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
+      this.executorService.execute(new Runnable(){
+        @Override
+        public void run() {
+          try{
+            if (logger.isDebugEnabled()) {
+              logger.debug("saving remote connection URI");
+            }
+            dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
+          } catch (Exception e) {
+            logger.warn("Error saving connection {}. Stacktrace follows", con);
+            logger.warn("Error saving connection ", e);
           }
         }
-        catch (InterruptedException e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (ExecutionException e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (Exception e) {
-          logger.debug("caught Exception", e);
-        }
+      });
+    } catch (WonProtocolException e) {
+      // we can't connect the connection. we send a close back to the owner
+      // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
+      // For now, we call the close method as if it had been called from the remote side
+      // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
+      try {
+        Connection c = closeConnectionLocally(connectionForRunnable, content);
+        needFacingConnectionCommunicationService.close(c.getConnectionURI(), content);
+      } catch (NoSuchConnectionException e1) {
+        logger.warn("caught NoSuchConnectionException:", e1);
+      } catch (IllegalMessageForConnectionStateException e1) {
+        logger.warn("caught IllegalMessageForConnectionStateException:", e1);
       }
-    });
-
+    }
+    catch (InterruptedException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } catch (ExecutionException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } catch (Exception e) {
+      logger.debug("caught Exception", e);
+    }
   }
 
   public void openFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
@@ -133,16 +139,14 @@ public class CoordinatorFacetImpl extends AbstractFacet
             myContent.setNsPrefix("","no:uri");
             Resource baseResource = myContent.createResource("no:uri");
             baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, WON_TX.COORDINATION_MESSAGE_COMMIT);
-
             ownerFacingConnectionClient.open(con.getConnectionURI(), myContent);
-
             globalCommit(con);
           }
           else{
             logger.debug("Wait for votes of: ");
             for(Connection c : cons)
             {
-              logger.debug("   "+c.getConnectionURI()+" "+c.getNeedURI()+" "+c.getRemoteNeedURI());
+              logger.debug("   " + c.getConnectionURI() + " " + c.getNeedURI() + " " + c.getRemoteNeedURI());
             }
             ownerFacingConnectionClient.open(con.getConnectionURI(), content);
           }
@@ -167,7 +171,6 @@ public class CoordinatorFacetImpl extends AbstractFacet
           //send close to the coordinator's owner (TODO: necessary?)
           ownerFacingConnectionClient.close(con.getConnectionURI(), content);
           globalAbort(con);
-
         } catch (WonProtocolException e) {
           logger.warn("caught WonProtocolException:", e);
         }
@@ -200,8 +203,6 @@ public class CoordinatorFacetImpl extends AbstractFacet
       {
         if(c.getState()!=ConnectionState.CLOSED)
         {
-          ownerFacingConnectionClient.close(c.getConnectionURI(), content);
-
           Model myContent = ModelFactory.createDefaultModel();
           myContent.setNsPrefix("","no:uri");
           Resource res = myContent.createResource("no:uri");
@@ -210,10 +211,10 @@ public class CoordinatorFacetImpl extends AbstractFacet
             if (res == null) {
               logger.debug("no default prexif specified in model, could not obtain additional content, using ABORTED message");
             }
-
             res.removeAll(WON_TX.COORDINATION_MESSAGE);
             res.addProperty(WON_TX.COORDINATION_MESSAGE, WON_TX.COORDINATION_MESSAGE_ABORT);
           }
+          closeConnectionLocally(c, content);
           needFacingConnectionClient.close(c, myContent);  //Abort sent to participant
         }
       }
@@ -226,14 +227,16 @@ public class CoordinatorFacetImpl extends AbstractFacet
 
   public void commitTransaction(Connection con, Model content)
   {
-    List<Connection> cons = connectionRepository.findByNeedURI(con.getNeedURI());
+    List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
+      ConnectionState.CONNECTED, FacetType.CoordinatorFacet.getURI());
     try{
       for(Connection c : cons)
       {
-        //proveri ownerFacingConnectionClient.close(c.getConnectionURI(), content);
-        if(c.getState()!=ConnectionState.CLOSED)
+        if(c.getState()==ConnectionState.CONNECTED)
         {
-          ownerFacingConnectionClient.close(c.getConnectionURI(), content);
+          //emulate a close by owner
+          c = closeConnectionLocally(c, content);
+          //tell the partner
           needFacingConnectionClient.close(c, content);
         }
       }
@@ -245,7 +248,24 @@ public class CoordinatorFacetImpl extends AbstractFacet
     }
   }
 
-
+  /**
+   * Closes the connection locally and returns a connection object reflecting the state change.
+   * @param con
+   * @param content
+   * @return
+   * @throws NoSuchConnectionException
+   * @throws IllegalMessageForConnectionStateException
+   */
+  public Connection closeConnectionLocally(Connection con, final Model content)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    //emulate a close by owner
+    con = dataService.nextConnectionState(con.getConnectionURI(), ConnectionEventType.OWNER_CLOSE);
+    //store the event
+    ConnectionEvent event = dataService
+      .createConnectionEvent(con.getConnectionURI(), con.getNeedURI(), ConnectionEventType.OWNER_CLOSE);
+    dataService.saveAdditionalContentForEvent(content, con, event);
+    return con;
+  }
 
 
 }

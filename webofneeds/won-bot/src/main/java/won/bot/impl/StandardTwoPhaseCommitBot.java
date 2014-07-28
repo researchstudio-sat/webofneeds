@@ -8,7 +8,6 @@ import won.bot.framework.events.event.impl.*;
 import won.bot.framework.events.filter.impl.FinishedEventFilter;
 import won.bot.framework.events.filter.impl.NeedUriInNamedListFilter;
 import won.bot.framework.events.listener.BaseEventListener;
-import won.bot.framework.events.listener.EventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
 import won.bot.framework.events.listener.impl.WaitForNEventsListener;
@@ -29,11 +28,12 @@ public class StandardTwoPhaseCommitBot extends EventBot{
   //
   //we use BaseEventListener as their types so we can access the generic
   //functionality offered by that class
-  protected BaseEventListener needCreator;
   protected BaseEventListener needConnector;
   protected BaseEventListener autoOpener;
   protected BaseEventListener participantDeactivator;
   protected BaseEventListener workDoneSignaller;
+  protected BaseEventListener creationWaiter;
+  protected BaseEventListener coordinatorDeactivator;
 
   protected BaseEventListener participantNeedCreator;
   protected BaseEventListener coordinatorNeedCreator;
@@ -63,7 +63,7 @@ public class StandardTwoPhaseCommitBot extends EventBot{
     bus.subscribe(FinishedEvent.class, this.coordinatorNeedCreator);
 
     //wait for N NeedCreatedEvents
-    EventListener creationWaiter = new WaitForNEventsListener(ctx, noOfNeeds);
+    creationWaiter = new WaitForNEventsListener(ctx, noOfNeeds);
     bus.subscribe(NeedCreatedEvent.class, creationWaiter);
 
     //when done, connect the participants to the coordinator
@@ -78,7 +78,8 @@ public class StandardTwoPhaseCommitBot extends EventBot{
     //subscribe it to:
     // * connect events - so it responds with open
     // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
-    this.autoOpener = new ActionOnEventListener(ctx, new OpenConnectionAction(ctx));
+    this.autoOpener = new ActionOnEventListener(ctx,new NeedUriInNamedListFilter(ctx, URI_LIST_NAME_PARTICIPANT),
+      new OpenConnectionAction(ctx));
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
     //after the last connect event, all connections are closed!
@@ -88,7 +89,7 @@ public class StandardTwoPhaseCommitBot extends EventBot{
     (ctx), noOfNeeds-1);
     bus.subscribe(CloseFromOtherNeedEvent.class, this.participantDeactivator);
 
-    BaseEventListener coordinatorDeactivator = new ActionOnEventListener(ctx, "coordinatorDeactivator",
+    coordinatorDeactivator = new ActionOnEventListener(ctx, "coordinatorDeactivator",
       new FinishedEventFilter(participantDeactivator),new DeactivateAllNeedsOfGroupAction(ctx, URI_LIST_NAME_COORDINATOR),1);
     bus.subscribe(FinishedEvent.class, coordinatorDeactivator);
 
