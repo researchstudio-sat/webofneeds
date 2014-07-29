@@ -28,9 +28,9 @@ public class BotManagerImpl implements BotManager
       if (bot != null) return bot;
     }
     //check each bot, return first that knows the needUri
+    logger.debug("bots size:{} ", bots.size());
     for(Bot mybot: bots){
-      logger.debug("bot size: ",bots.size());
-      logger.debug("knows need: ", mybot.knowsNeedURI(needUri));
+      logger.debug("bot knows need: {}", mybot.knowsNeedURI(needUri));
       if (mybot.knowsNeedURI(needUri)) {
         synchronized (getMonitor()){
           this.botByUri.put(needUri, mybot);

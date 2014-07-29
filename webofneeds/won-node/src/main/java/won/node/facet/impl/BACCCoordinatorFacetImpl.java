@@ -46,10 +46,9 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
             public void run()
             {
                 try {
-                    ownerFacingConnectionClient.open(con.getConnectionURI(), content);
-
                     stateManager.setStateForNeedUri(BACCState.ACTIVE.getURI(), con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI());
                     storeBAStateForConnection(con, BACCState.ACTIVE.getURI());
+                    ownerFacingConnectionClient.open(con.getConnectionURI(), content);
                     logger.debug("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
                 } catch (WonProtocolException e) {
                     logger.warn("caught Exception:", e);

@@ -47,12 +47,11 @@ public class BACCParticipantFacetImpl extends AbstractBAFacet
                 @Override
                 public void run() {
                     try {
-                        needFacingConnectionClient.open(con, content);
                         stateManager.setStateForNeedUri(BACCState.ACTIVE.getURI(), con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI());
                         storeBAStateForConnection(con, BACCState.ACTIVE.getURI());
                         logger.debug("Participant state {} for Coordinator {} ",stateManager.getStateForNeedUri(con
                           .getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()), con.getRemoteNeedURI());
-
+                        needFacingConnectionClient.open(con, content);
                     } catch (Exception e) {
                         logger.warn("caught Exception:", e);
                     }
