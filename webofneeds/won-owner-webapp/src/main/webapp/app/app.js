@@ -119,7 +119,11 @@ app.run(function($httpBackend){
             return [200, 'text',{}];
         });*/
         $httpBackend.whenPOST('/owner/rest/needs/').passThrough();
+        $httpBackend.whenGET('/owner/rest/needs/drafts').passThrough();
         $httpBackend.whenPOST('/owner/rest/needs/drafts').passThrough();
+        $httpBackend.whenDELETE('/owner/rest/needs/drafts').passThrough();
+        $httpBackend.whenGET('/owner/rest/needs/drafts/.+').passThrough();
+        $httpBackend.whenDELETE('/owner/rest/needs/drafts/.+').passThrough();
        // $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').passThrough();
         $httpBackend.whenGET(/.*/).passThrough();
         $httpBackend.whenPOST(/.*/).passThrough();
@@ -133,8 +137,8 @@ app.run(function($httpBackend){
         $httpBackend.whenGET('/need-detail/:needId').passThrough();
         $httpBackend.whenGET('app/home/home.partial.html').passThrough();
         $httpBackend.whenGET('app/home/home.partial.html').passThrough();
-        $httpBackend.whenGET(/app\/.*/).passThrough();
-        $httpBackend.whenGET('/app.*/').passThrough();
+       // $httpBackend.whenGET(/app\/.*/).passThrough();
+       // $httpBackend.whenGET('/app.*/').passThrough();
     }
 );
 angular.resetForm = function (scope, formName, defaults) {

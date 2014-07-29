@@ -80,6 +80,19 @@ public abstract class AbstractDatasetBasedRdfStorageService implements RDFStorag
     }
   }
 
+  @Override
+  public boolean removeContent(final URI resourceURI){
+    Dataset dataset = getDataset();
+    try{
+      dataset.begin(ReadWrite.WRITE);
+      dataset.removeNamedModel(resourceURI.toString());
+      dataset.commit();
+      return true;
+    } finally {
+      dataset.end();
+    }
+  }
+
   /**
    * Helper method that creates a URI for the specified ConnectionEvent.
    * TODO: replace by more principled approach for generating event URIs. Do they get a publicly dereferencable URI?

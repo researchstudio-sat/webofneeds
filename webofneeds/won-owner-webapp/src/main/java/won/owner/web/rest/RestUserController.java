@@ -135,5 +135,21 @@ public class RestUserController {
 		}
 		return new ResponseEntity(HttpStatus.OK);
 	}
+  @RequestMapping(
+    value = "/{userId}/favourites",
+    method = RequestMethod.POST
+  )
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity saveAsFavourite(){
+    return null;
+  }
+  @RequestMapping(
+    value="/{userId}/resetPassword",
+    method = RequestMethod.POST
+  )
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity resetPassword(@RequestBody String password){
+     return null;
+  }
 
 }
