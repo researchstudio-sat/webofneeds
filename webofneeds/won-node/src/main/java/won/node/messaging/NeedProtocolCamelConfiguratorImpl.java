@@ -16,8 +16,8 @@
 
 package won.node.messaging;
 
+import org.apache.camel.RoutesBuilder;
 import won.node.camel.routes.NeedProtocolDynamicRoutes;
-import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
 
 import java.net.URI;
@@ -30,16 +30,8 @@ import java.net.URI;
  */
 public class NeedProtocolCamelConfiguratorImpl extends NeedBasedCamelConfiguratorImpl {
 
-    @Override
-    public synchronized void addRouteForEndpoint(String startingComponent,URI brokerUri) throws CamelConfigurationFailedException {
-      if (getCamelContext().getRoute(startingComponent)==null){
-        NeedProtocolDynamicRoutes needProtocolRouteBuilder = new NeedProtocolDynamicRoutes(getCamelContext(),startingComponent);
-        try {
-          getCamelContext().addRoutes(needProtocolRouteBuilder);
-        } catch (Exception e) {
-          throw new CamelConfigurationFailedException("adding route to camel context failed",e);
-        }
-      }
-    }
-
+  @Override
+  protected RoutesBuilder createRoutesBuilder(final String startingEndpoint, final URI brokerUri) {
+    return new NeedProtocolDynamicRoutes(getCamelContext(), startingEndpoint);
+  }
 }

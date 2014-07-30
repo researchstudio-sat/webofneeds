@@ -15,16 +15,27 @@
  */
 
 
-package won.matcher.camel.routes.fixed;
+package won.matcher.camel.routes;
+import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
+
+import java.util.List;
 
 /**
  * User: LEIH-NB
  * Date: 10.10.13
  */
 
-//TODO: change to asyncronous processing maybe
-public class Matcher2Node extends RouteBuilder{
+public class Matcher2NodeDynamicRoutes extends RouteBuilder{
+  private List<String> endpoints;
+  private String routeID;
+  private String from;
+
+  public Matcher2NodeDynamicRoutes(CamelContext camelContext, String from){
+    super(camelContext);
+    this.from = from;
+
+  }
     @Override
     public void configure(){
         from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=5").routeId("Matcher2NodeRoute")

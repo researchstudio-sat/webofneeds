@@ -23,11 +23,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import won.owner.pojo.ConnectionPojo;
 import won.owner.pojo.NeedPojo;
+import won.owner.pojo.TextMessagePojo;
+import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
+import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.rest.LinkedDataRestClient;
 
 import javax.ws.rs.core.MediaType;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User: LEIH-NB
@@ -39,6 +44,10 @@ public class RestConnectionController
 {
   @Autowired
   private ConnectionRepository connectionRepository;
+
+  @Autowired
+  private ChatMessageRepository chatMessageRepository;
+
 
 
   @ResponseBody
@@ -57,6 +66,19 @@ public class RestConnectionController
     return connectionPojo;
 
   }
+
+  @ResponseBody
+  @RequestMapping(
+    value = "/{conId}/messages",
+    method = RequestMethod.GET,
+    produces = MediaType.APPLICATION_JSON
+  )
+  public List<ChatMessage> listMessages(@PathVariable String conId) {
+    Connection con = connectionRepository.findOne(Long.valueOf(conId));
+    List<TextMessagePojo> textMessages = new LinkedList<TextMessagePojo>();
+    return chatMessageRepository.findByLocalConnectionURI(con.getConnectionURI());
+  }
+
 
   @ResponseBody
   @RequestMapping(

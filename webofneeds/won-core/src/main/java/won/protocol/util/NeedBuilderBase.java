@@ -208,6 +208,12 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
     return tags;
   }
 
+  protected String[] getTagsArray()
+  {
+    String[] ret = new String[tags.size()];
+    return tags.toArray(ret);
+  }
+
   protected String getDescription()
   {
     return description;
