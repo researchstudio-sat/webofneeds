@@ -45,6 +45,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
   @Override
   public void copyValuesFromProduct(final Model needModel)
   {
+    assert needModel != null : "needModel must not be null";
     Resource needResource = identifyNeedResource(needModel);
     this.setUri(needResource.getURI());
     Resource basicNeedTypeResource = needResource.getPropertyResourceValue(WON.HAS_BASIC_NEED_TYPE);
@@ -70,15 +71,18 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
       this.setState(needState.getURI());
     }
     Resource needContent = needResource.getPropertyResourceValue(WON.HAS_CONTENT);
-    copyValuesFromNeedContent(needContent);
+    if (needContent != null) {
+      copyValuesFromNeedContent(needContent);
+    }
     Resource needModality = needResource.getPropertyResourceValue(WON.HAS_NEED_MODALITY);
-    copyValuesFromNeedModality(needModality);
-
-
+    if (needModality != null) {
+      copyValuesFromNeedModality(needModality);
+    }
   }
 
   private void copyValuesFromNeedModality(final Resource needModality)
   {
+    assert needModality != null : "needModality must not be null";
     StmtIterator it = needModality.listProperties(WON.HAS_TIME_SPECIFICATION);
     while (it.hasNext()) {
       Statement stmt = it.next();
@@ -107,6 +111,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
 
   private Interval toInterval(final Resource timeSpec)
   {
+    assert timeSpec != null : "timeSpec must not be null";
     Statement fromStmt = timeSpec.getProperty(WON.HAS_START_TIME);
     Date fromDate = extractDateFromObject(fromStmt);
     Statement toStmt = timeSpec.getProperty(WON.HAS_END_TIME);
@@ -115,6 +120,11 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     return null;
   }
 
+  /**
+   * Extracts a Date from the object of the specified triple. Returns null if fromStmt is null.
+   * @param fromStmt
+   * @return
+   */
   private Date extractDateFromObject(final Statement fromStmt)
   {
     if (fromStmt != null) {
@@ -126,6 +136,11 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     return null;
   }
 
+  /**
+   * Extracts a Float from the object of the specified triple. Returns null if fromStmt is null.
+   * @param stmt
+   * @return
+   */
   private Float extractFloatFromObject(final Statement stmt)
   {
     if (stmt == null) return null;
@@ -134,6 +149,11 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     return stmt.getFloat();
   }
 
+  /**
+   * Extracts a Double from the object of the specified triple. Returns null if fromStmt is null.
+   * @param stmt
+   * @return
+   */
   private Double extractDoubleFromObject(final Statement stmt)
   {
     if (stmt == null) return null;
@@ -142,6 +162,11 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     return stmt.getDouble();
   }
 
+  /**
+   * Extracts a String from the object of the specified triple. Returns null if fromStmt is null.
+   * @param stmt
+   * @return
+   */
   private String extractStringFromObject(final Statement stmt)
   {
     if (stmt == null) return null;
@@ -150,8 +175,10 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     return stmt.getString();
   }
 
+
   private void copyValuesFromNeedContent(final Resource needContent)
   {
+    assert needContent != null : "needContent must not be null";
     Resource contentDescription = needContent.getPropertyResourceValue(WON.HAS_CONTENT_DESCRIPTION);
     if (contentDescription != null) {
       Graph g = contentDescription.getModel().getGraph();
@@ -198,6 +225,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
 
   private Resource identifyNeedResource(final Model needModel)
   {
+    assert needModel != null : "needModel must not be null";
     Resource needResource = null;
     //try fetching the base URI resource. If that is a Need, we'll assume we found the need resource
     String baseUri = needModel.getNsPrefixURI("");
