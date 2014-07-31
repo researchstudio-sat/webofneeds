@@ -29,7 +29,7 @@ public class NeedPojoNeedModelBuilder extends NeedBuilderBase<Model>
   public NeedPojoNeedModelBuilder(NeedPojo needPojo){
     if (!needPojo.getTitle().isEmpty())
       this.setTitle(needPojo.getTitle());
-    if (!needPojo.getContentDescription().isEmpty())
+    if (needPojo.getContentDescription() != null && !needPojo.getContentDescription().isEmpty())
       this.setContentDescription(needPojo.getContentDescription());
     if (needPojo.getState()!=null)
       this.setState(needPojo.getState());
