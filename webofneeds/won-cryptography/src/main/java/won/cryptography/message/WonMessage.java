@@ -1,10 +1,8 @@
 package won.cryptography.message;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.*;
-
-import java.util.Iterator;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
  * User: ypanchenko
@@ -15,10 +13,9 @@ public class WonMessage
 
   private Dataset messageContent;
   private Model messageMetadata;
-  private MessageMethod method;
-  //private MessageProtocol protocol;
+  private WonMessageMethod method;
   private String protocolUri;
-  // TODO
+  private Resource msgBnode;
   // private Signature signature;
 
 
@@ -26,13 +23,7 @@ public class WonMessage
     initMessageMetadata();
   }
 
-  //    public WonMessage(MessageProtocol protocol, MessageMethod method, Dataset messageContent) {
-//        this.protocol = protocol;
-//        this.method = method;
-//        this.messageContent = messageContent;
-//        initMessageMetadata(protocol, method);
-//    }
-  public WonMessage(String protocolUri, MessageMethod method, Dataset messageContent) {
+  public WonMessage(String protocolUri, WonMessageMethod method, Dataset messageContent) {
     this.protocolUri = protocolUri;
     this.method = method;
     this.messageContent = messageContent;
@@ -42,60 +33,66 @@ public class WonMessage
 
   private void initMessageMetadata() {
     messageMetadata = ModelFactory.createDefaultModel();
-    messageMetadata.setNsPrefix(MessageOntology.DEFAULT_PREFIX, MessageOntology.MESSAGE_ONTOLOGY_URI);
-    //messageMetadata.getNsPrefixMap().put(MessageOntology.DEFAULT_PREFIX, MessageOntology.MESSAGE_ONTOLOGY_URI);
+    messageMetadata.setNsPrefix(WonMessageOntology.DEFAULT_PREFIX, WonMessageOntology.MESSAGE_ONTOLOGY_URI);
+    this.msgBnode = messageMetadata.createResource();
+    Resource protocolResource = this.messageMetadata.createResource(WonMessageOntology.MESSAGE_TYPE_RESOURCE);
+    msgBnode.addProperty(RDF.type, protocolResource);
   }
 
 
-  private void addMessageMetadata(String protocolUri, MessageMethod method) {
-
-    Resource msgBnode = messageMetadata.createResource();
-
+  private void addMessageMetadata(String protocolUri, WonMessageMethod method) {
     // create protocol triple
-    Property protocolProp = messageMetadata
-      .createProperty(MessageOntology.MESSAGE_ONTOLOGY_URI, MessageOntology.PROTOCOL_PROPERTY);
-    Resource protocolResource = messageMetadata.createResource(protocolUri);
-    msgBnode.addProperty(protocolProp, protocolResource);
-
+    addProtocolTriples(protocolUri);
     // create method triples
+    addMethodTriples(method);
+  }
+
+  private void addProtocolTriples(final String protocolUri) {
+
+    Property protocolProp = this.messageMetadata
+      .createProperty(WonMessageOntology.MESSAGE_ONTOLOGY_URI, WonMessageOntology.PROTOCOL_PROPERTY);
+    Resource protocolResource = this.messageMetadata.createResource(this.protocolUri);
+    msgBnode.addProperty(protocolProp, protocolResource);
+  }
+
+  private void addMethodTriples(final WonMessageMethod method) {
     Property methodProp = messageMetadata
-      .createProperty(MessageOntology.MESSAGE_ONTOLOGY_URI, MessageOntology.METHOD_PROPERTY);
+      .createProperty(WonMessageOntology.MESSAGE_ONTOLOGY_URI, WonMessageOntology.METHOD_PROPERTY);
     Resource methodResource = messageMetadata.createResource(method.getMethodUri());
     msgBnode.addProperty(methodProp, methodResource);
     // including method parameters triples
     for (String paramUri : method.getParameterMap().keySet()) {
       Property paramNameProp = messageMetadata
-        .createProperty(MessageOntology.MESSAGE_ONTOLOGY_URI, MessageOntology.PARAM_NAME_PROPERTY);
+        .createProperty(WonMessageOntology.MESSAGE_ONTOLOGY_URI, WonMessageOntology.PARAM_NAME_PROPERTY);
       Resource paramNameResource = messageMetadata.createResource(paramUri);
       methodResource.addProperty(paramNameProp, paramNameResource);
       Property paramValueProp = messageMetadata
-        .createProperty(MessageOntology.MESSAGE_ONTOLOGY_URI, MessageOntology.PARAM_VALUE_PROPERTY);
+        .createProperty(WonMessageOntology.MESSAGE_ONTOLOGY_URI, WonMessageOntology.PARAM_VALUE_PROPERTY);
       Literal paramValueResource = messageMetadata.createLiteral(method.getParameterMap().get(paramUri));
       methodResource.addProperty(paramValueProp, paramValueResource);
     }
-
   }
 
   public Dataset getMessageContent() {
     return messageContent;
   }
 
+  public Model getMessageMetadata() {
+    return messageMetadata;
+  }
+
   public void setMessageContent(Dataset messageContent) {
     this.messageContent = messageContent;
   }
 
-  public MessageMethod getMethod() {
+  public WonMessageMethod getMethod() {
     return method;
   }
 
-  public void setMethod(MessageMethod method) {
+  public void setMethod(WonMessageMethod method) {
     this.method = method;
-    //TODO add triples to
+    addMethodTriples(method);
   }
-
-//    public MessageProtocol getProtocol() {
-//        return protocol;
-//    }
 
   public String getProtocol() {
     return protocolUri;
@@ -103,30 +100,33 @@ public class WonMessage
 
   public void setProtocol(String protocolUri) {
     this.protocolUri = protocolUri;
+    addProtocolTriples(protocolUri);
   }
 
   public boolean hasMethod(String methodUri) {
     return (this.method != null && this.method.getMethodUri().equals(methodUri));
   }
 
-  public Dataset asDataset() {
-    // TODO create clone instead?
-    Dataset dataset = DatasetFactory.createMem();
-    dataset.getDefaultModel().add(messageMetadata);
-    // TODO the approach from example 1 fits better since the signatures are already in the default graph
-    dataset.getDefaultModel().add(messageContent.getDefaultModel());
-    Iterator<String> names = messageContent.listNames();
-    while (names.hasNext()) {
-      String name = names.next();
-      dataset.addNamedModel(name, messageContent.getNamedModel(name));
-    }
-    for (String prefix : messageContent.getDefaultModel().getNsPrefixMap().keySet()) {
-      dataset.getDefaultModel().setNsPrefix(prefix, messageContent.getDefaultModel().getNsPrefixMap().get(prefix));
-    }
-    // TODO need to check if the prefix is already in use
-    for (String prefix : messageMetadata.getNsPrefixMap().keySet()) {
-      dataset.getDefaultModel().setNsPrefix(prefix, messageMetadata.getNsPrefixMap().get(prefix));
-    }
-    return dataset;
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) return true;
+    if (!(o instanceof WonMessage)) return false;
+
+    final WonMessage message = (WonMessage) o;
+
+    if (messageContent != null ? !messageContent.equals(message.messageContent) : message.messageContent != null)
+      return false;
+    if (method != null ? !method.equals(message.method) : message.method != null) return false;
+    if (protocolUri != null ? !protocolUri.equals(message.protocolUri) : message.protocolUri != null) return false;
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = messageContent != null ? messageContent.hashCode() : 0;
+    result = 31 * result + (method != null ? method.hashCode() : 0);
+    result = 31 * result + (protocolUri != null ? protocolUri.hashCode() : 0);
+    return result;
   }
 }

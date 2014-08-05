@@ -65,6 +65,13 @@
             <version>1.0</version>
         </dependency>
 
+        <!-- jena uses this to read/write Json-Ld -->
+        <dependency>
+            <groupId>com.github.jsonld-java</groupId>
+            <artifactId>jsonld-java</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+
     </dependencies>
 
     <properties>
