@@ -35,8 +35,6 @@ public class WonMessageDecoder
 
   public static WonMessage decodeFromDataset(Dataset message) {
     // TODO how to handle copying properly...?
-
-
     Model defaultModel = message.getDefaultModel();
     Model messageMeta = ModelFactory.createDefaultModel();
     StmtIterator stmtIterator = defaultModel.listStatements();
@@ -46,7 +44,7 @@ public class WonMessageDecoder
         messageMeta.add(stmt);
       }
     }
-    // TODO add all prefixes or only relevant..?
+
     Model defaultModelDiff = defaultModel.difference(messageMeta);
 
     Dataset dataset = DatasetFactory.createMem();
@@ -54,6 +52,10 @@ public class WonMessageDecoder
     List<String> names = getModelNames(message);
     for (String name : names) {
       dataset.addNamedModel(name, message.getNamedModel(name));
+    }
+    // TODO add all prefixes or somehow check and add only relevant (e.g. no wonmessage ontology prefix)?
+    for (String prefix : message.getDefaultModel().getNsPrefixMap().keySet()) {
+      dataset.getDefaultModel().setNsPrefix(prefix, message.getDefaultModel().getNsPrefixMap().get(prefix));
     }
     Resource msgBnode = extractMessageBnode(messageMeta);
     WonMessageMethod method = extractMethod(msgBnode, messageMeta);
@@ -91,8 +93,7 @@ public class WonMessageDecoder
       // then the structure of WonMessage or MessageMethod has to be changed...
     }
 
-    // TODO
-    // set method parameters
+    // TODO set method parameters
 //    if (methodResource != null) {
 //      StmtIterator stmtIter = messageMeta.listStatements(methodResource, methodProp, NULL_NODE);
 //

@@ -32,10 +32,8 @@ public class WonMessageDecoderTest
     Assert.assertTrue(DatasetLib.isomorphic(messageContentExpected, messageContent));
     Assert.assertTrue(messageMetaExpected.isIsomorphicWith(messageMeta));
 
-    //System.out.println("MSG_META");
-    //TestUtils.print(messageMeta);
-    //System.out.println("MSG_META_EXP");
-    //TestUtils.print(messageMetaExpected);
+    //System.out.println("MSG_CONTENT");
+    TestUtils.print(messageContent);
 
   }
 
