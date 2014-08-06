@@ -2,9 +2,6 @@
  * Created by fsalcher on 06.08.2014.
  */
 
-
-
-
 var socket;
 
 
@@ -12,7 +9,9 @@ var connect = function () {
 
     var url = document.getElementById("targetAddress").value;
 
-    socket = new WebSocket(url);
+    var options = {debug: true};
+
+    socket = new SockJS(url, null, options);
 
     socket.onopen = function () {
         writeOutput("connection has been established!");
