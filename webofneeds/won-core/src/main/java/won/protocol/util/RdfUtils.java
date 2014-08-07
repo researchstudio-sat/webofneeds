@@ -7,6 +7,7 @@ import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.eval.PathEval;
+import com.hp.hpl.jena.sparql.util.Context;
 import com.hp.hpl.jena.util.FileUtils;
 import com.hp.hpl.jena.util.ResourceUtils;
 import org.apache.jena.riot.Lang;
@@ -490,13 +491,18 @@ public class RdfUtils
    * @return
    */
   public static Node getNodeForPropertyPath(final Model model, URI resourceURI, Path propertyPath) {
-    Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(), propertyPath);
+    //Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
+    //                                        propertyPath);
+    Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
+                                           propertyPath, Context.emptyContext);
+
     if (!result.hasNext()) return null;
     return result.next();
   }
 
   public static Iterator<Node> getNodesForPropertyPath(final Model model, URI resourceURI, Path propertyPath) {
-    Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(), propertyPath);
+    Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
+                                           propertyPath, Context.emptyContext);
     logger.debug("running path eval: "+ RdfUtils.toString(model));
     if (!result.hasNext()) return null;
     return result;
