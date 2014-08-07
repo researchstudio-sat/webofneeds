@@ -87,9 +87,7 @@ public class OpToSirenQuery
         expressions = new ExprList();
       } else {
         //Caution: we're making a shallow copy here
-        //expressions = new ExprList(expressionStack.peek());
-        expressions = new ExprList();
-        expressions.addAll(expressionStack.peek());
+        expressions = new ExprList(expressionStack.peek());
       }
       //add the expressions of the filter, transforming them to CNF first
       //expressions.addAll(TransformFilterCNF.translateFilterExpressionsToCNF(opFilter));

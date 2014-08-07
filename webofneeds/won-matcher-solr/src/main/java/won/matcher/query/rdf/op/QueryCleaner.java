@@ -46,10 +46,7 @@ public class QueryCleaner extends TransformBase
       return original;
     }
 
-    //ExprList expressions = new ExprList(leftF.getExprs());
-    ExprList expressions = new ExprList();
-    expressions.addAll(leftF.getExprs());
-
+    ExprList expressions = new ExprList(leftF.getExprs());
     // Add the RHS filter to the LHS
     expressions.addAll(rightF.getExprs());
     return OpFilter.filter(expressions,joinBGPs((OpBGP)leftF.getSubOp(), (OpBGP)rightF.getSubOp()));

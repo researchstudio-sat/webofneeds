@@ -20,10 +20,10 @@ public class KeyStoreService {
     private static final String PROVIDER_BC = org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
     private static final String KEY_STORE_TYPE = "UBER";
 
-    // ToDo: password should really not be here! (FS)
+    // ToDo: password should not be here
     private final char[] storePW = "temp".toCharArray();
 
-    // ToDo: load from config file (FS)
+    // ToDo: load from config file
 
     private File storeFile;
 
