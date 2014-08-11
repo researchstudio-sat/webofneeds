@@ -96,6 +96,13 @@ GRAPH :[randomNeedID_1]/messages/0#data {
         msg:hasContent :[randomNeedID_1]/transient .
 
 
+        :[randomNeedID_1]/core#data
+            crypt:hasSignature [
+                a crypt:WonSignature ;
+                crypt:signer webID:owner_1 .
+                # signature data ...
+            ]
+
         :[randomNeedID_1]/transient#data
             crypt:hasSignature [
                 a crypt:WonSignature ;
