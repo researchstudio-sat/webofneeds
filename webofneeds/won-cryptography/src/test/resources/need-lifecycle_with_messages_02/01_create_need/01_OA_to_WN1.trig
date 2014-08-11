@@ -41,11 +41,11 @@ GRAPH :[randomNeedID_1]/transient#data {
 
 ############# MESSAGE HEADER ##############
 
-_:message msg:containsMessage :[randomNeedID_1]/messages/0
+_:message msg:containsMessage :[randomNeedID_1]/event/0
 
-GRAPH :[randomNeedID_1]/messages/0#data {
+GRAPH :[randomNeedID_1]/event/0#data {
 
-    :[randomNeedID_1]/messages/0
+    :[randomNeedID_1]/event/0
         a msg:CreateMessage ;
 
         msg:hasContent :[randomNeedID_1]/core ;
@@ -69,7 +69,7 @@ GRAPH :[randomNeedID_1]/messages/0#data {
 
 ############# MESSAGE SIGNATURE ##############
 
-:[randomNeedID_1]/messages/0#data
+:[randomNeedID_1]/event/0#data
     crypt:hasSignature [
         a crypt:WonSignature ;
         crypt:signer webID:owner_1 .
