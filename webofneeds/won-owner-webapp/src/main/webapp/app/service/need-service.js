@@ -77,7 +77,7 @@ CategorizedNeeds = function() {
 	}
 }
 
-angular.module('won.owner').factory('needService', function ($http, $q, connectionService) {
+angular.module('won.owner').factory('needService', function ($http, $q, connectionService, messageService) {
 
 	var needService = {};
 
@@ -202,7 +202,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
         needToSave.userName = userName;
         needToSave.tags = need.tags.join(",");
         delete needToSave.binaryFolder;
-        return $http({
+        /*return $http({
             method:'POST',
             url:'/owner/rest/needs/drafts',
             data:needToSave,
@@ -217,7 +217,8 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
             function (response) {
                 console.log("FATAL ERROR");
             }
-        );
+        );   */
+        messageService.sendMessage("createNeed",needToSave);
     }
 
 	needService.save = function(need) {

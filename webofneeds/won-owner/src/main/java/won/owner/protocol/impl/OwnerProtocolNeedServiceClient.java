@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
+import won.protocol.message.WonMessage;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ChatMessageRepository;
@@ -177,6 +178,12 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     chatMessageRepository.save(chatMessage);
 
 
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public void processMessage(final WonMessage wonMessage) {
+    delegate.processMessage(wonMessage);
   }
 
   @Override

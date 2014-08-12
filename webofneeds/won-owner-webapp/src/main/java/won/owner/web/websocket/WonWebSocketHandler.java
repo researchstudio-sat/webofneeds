@@ -18,9 +18,16 @@ package won.owner.web.websocket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import won.protocol.message.WonMessageDecoder;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+
+import java.io.IOException;
 
 /**
  * User: syim
@@ -29,10 +36,20 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class WonWebSocketHandler extends TextWebSocketHandler
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
+  private WonMessageDecoder wonMessageDecoder;
+
+
+  @Autowired
+  @Qualifier("default")
+  private OwnerProtocolNeedServiceClientSide ownerService;
 
   @Override
-  public void handleTextMessage(WebSocketSession session, TextMessage message){
-   logger.debug(message.getPayload());
-    message.getPayload();
+  public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
+    logger.debug(message.getPayload());
+    //WonMessage incomingMessage = wonMessageDecoder.decode(Lang.JSONLD,message.getPayload());
+    //ownerService.processMessage(incomingMessage);
+    WebSocketMessage<String> wonMessage = new TextMessage("from node");
+
+    session.sendMessage(wonMessage);
   }
 }

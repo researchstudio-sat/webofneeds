@@ -1,8 +1,9 @@
-package won.cryptography.message;
+package won.protocol.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
+
 
 /**
  * User: ypanchenko

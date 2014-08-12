@@ -16,12 +16,11 @@
 
 package won.owner.camel.routes.fixed;
 
-import org.apache.camel.builder.RouteBuilder;
-
 /**
  * User: LEIH-NB
  * Date: 27.11.13
  */
+/*
 public class WebSocketRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
@@ -30,4 +29,4 @@ public class WebSocketRoutes extends RouteBuilder {
         .log("${body}")
         .to("websocket://owner");
     }
-}
+}         */

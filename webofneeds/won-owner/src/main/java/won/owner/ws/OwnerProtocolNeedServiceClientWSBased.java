@@ -25,6 +25,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
@@ -105,7 +106,12 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
 
-    @Override
+  @Override
+  public void processMessage(final WonMessage wonMessage) {
+
+  }
+
+  @Override
     public String register(URI endpointURI) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }

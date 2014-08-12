@@ -20,7 +20,7 @@
 		<script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
 		<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
 		<script type="text/javascript" src="<c:url value="/bower_components/js-md5/js/md5.js"/>"></script>
-
+        <script type="text/javascript" src="<c:url value="/bower_components/sockjs/sockjs.js"/>"></script>
 		<script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
@@ -31,10 +31,10 @@
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
-		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
-
         <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>

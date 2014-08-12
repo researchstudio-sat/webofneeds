@@ -29,6 +29,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import won.protocol.exception.*;
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MessagingService;
+import won.protocol.message.WonMessage;
 import won.protocol.model.WonNode;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.WonNodeRepository;
@@ -153,7 +154,14 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         logger.debug("sending activate message: " + needURI.toString());
 
     }
-    /**
+
+  @Override
+  public void processMessage(final WonMessage wonMessage) {
+    wonMessage.getMethod().getMethodUri();
+    //URI wonNodeUri ownerProtocolCommunicationServiceImpl
+  }
+
+  /**
      * registers the owner application at a won node.
      *
      * @return ownerApplicationId

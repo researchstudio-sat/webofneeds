@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.context.ApplicationContextAware;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
@@ -30,6 +31,7 @@ import java.util.concurrent.ExecutionException;
  */
 public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAware{
 
+  public void processMessage(WonMessage wonMessage);
     /**
      * registers the owner application on WON Node and receive client ID
      *

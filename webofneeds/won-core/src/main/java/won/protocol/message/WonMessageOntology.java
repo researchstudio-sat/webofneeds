@@ -1,4 +1,4 @@
-package won.cryptography.message;
+package won.protocol.message;
 
 /**
  * User: ypanchenko

@@ -6,6 +6,9 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.Test;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageMethod;
+import won.protocol.message.WonMessageOntology;
 
 import java.io.IOException;
 import java.io.InputStream;

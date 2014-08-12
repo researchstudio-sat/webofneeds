@@ -14,14 +14,18 @@ var connect = function () {
     socket = new SockJS(url, null, options);
 
     socket.onopen = function () {
+        console.log("connection has been established!")
         writeOutput("connection has been established!");
     }
 
     socket.onmessage = function (event) {
+        console.log("Received data: "+event.data);
+
         writeOutput('Received data: ' + event.data);
     };
 
     socket.onclose = function () {
+        console.log("Lost connection")
         writeOutput('Lost connection!');
     };
 };

@@ -5,6 +5,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.sparql.lib.DatasetLib;
 import org.junit.Assert;
 import org.junit.Test;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDecoder;
 
 /**
  * User: ypanchenko
