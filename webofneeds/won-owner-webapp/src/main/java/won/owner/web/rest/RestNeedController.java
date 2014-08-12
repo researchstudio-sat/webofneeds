@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -214,7 +215,7 @@ public class RestNeedController {
 	)
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
-	public NeedPojo createNeed(@RequestBody NeedPojo needPojo) {
+	public ResponseEntity<NeedPojo> createNeed(@RequestBody NeedPojo needPojo) {
     User user = getCurrentUser();
 
     logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getCreationDate() + "/" +
@@ -222,11 +223,12 @@ public class RestNeedController {
     //TODO: using fixed Facets - change this
     needPojo.setFacetTypes(new String[]{FacetType.OwnerFacet.getURI().toString()});
     NeedPojo createdNeedPojo = resolve(needPojo);
-		List<Need> needs = needRepository.findByNeedURI(URI.create(createdNeedPojo.getNeedURI()));
-		user.getNeeds().add(needs.get(0));
+		Need need = needRepository.findOne(createdNeedPojo.getNeedId());
+		user.getNeeds().add(need);
 		wonUserDetailService.save(user);
-
-		return createdNeedPojo;
+    HttpHeaders headers = new HttpHeaders();
+    headers.setLocation(need.getNeedURI());
+		return new ResponseEntity<NeedPojo>(createdNeedPojo, headers, HttpStatus.CREATED);
 	}
 
   @ResponseBody
@@ -600,7 +602,7 @@ public class RestNeedController {
       Model needModel = needPojoNeedModelBuilder.build();
       needModel.setNsPrefix("","no:uri");
 
-      if (needPojo.getWonNode().equals("")) {
+      if (needPojo.getWonNode() == null || needPojo.getWonNode().equals("")) {
         ListenableFuture<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
         needURI = futureResult.get();
       } else {

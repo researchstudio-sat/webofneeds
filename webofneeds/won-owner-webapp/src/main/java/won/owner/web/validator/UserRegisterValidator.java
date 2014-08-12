@@ -43,14 +43,13 @@ public class UserRegisterValidator implements Validator {
 		validator.validate(target, errors);
 
 		if (!user.getPassword().equals(user.getPasswordAgain())) {
-			errors.rejectValue("password","passwordsArentSame", "Both filled passwords should be the same");
-			errors.rejectValue("passwordAgain", "passwordsArentSame", "Both filled passwords should be the same");
+			errors.rejectValue("passwordAgain", "passwordsArentSame", "Passwords don't match");
 		}
 
 		if(errors.getFieldError("username") != null) {
 			User userInDb = (User) wonUserDetailService.loadUserByUsername(user.getUsername());
 			if(userInDb != null) {
-				errors.reject("userIsAlreadyInDb", "Username already exist, please try to choose different");
+				errors.reject("userIsAlreadyInDb", "Username already exists, please choose a different one");
 			}
 		}
 	}
