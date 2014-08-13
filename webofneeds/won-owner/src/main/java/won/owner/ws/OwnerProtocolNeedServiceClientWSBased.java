@@ -18,6 +18,7 @@ package won.owner.ws;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     private ConnectionModelMapper connectionModelMapper;
 
     //@Override
-    public void open(URI connectionURI, Model content)
+    public void open(URI connectionURI, Model content, Dataset messageEvent)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
@@ -75,7 +76,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
         }
     }
     //@Override
-    public void close(URI connectionURI, Model content) throws
+    public void close(URI connectionURI, Model content, Dataset messageEvent) throws
             NoSuchConnectionException, IllegalMessageForConnectionStateException {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
@@ -90,7 +91,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
     //@Override
-    public void sendMessage(URI connectionURI, Model message) throws
+    public void sendMessage(URI connectionURI, Model message, Dataset messageEvent) throws
             NoSuchConnectionException, IllegalMessageForConnectionStateException {
         String messageString = RdfUtils.toString(message);
         try {
@@ -105,24 +106,30 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
         }
     }
 
-
-  @Override
-  public void processMessage(final WonMessage wonMessage) {
-
-  }
-
   @Override
     public String register(URI endpointURI) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     //@Override
-    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate) throws IllegalNeedContentException {
-        return createNeed(ownerURI, content, activate,null);
+    public ListenableFuture<URI> createNeed(
+            URI ownerURI,
+            Model content,
+            boolean activate,
+            Dataset messageEvent)
+            throws IllegalNeedContentException {
+        return createNeed(ownerURI, content, activate, null, messageEvent);
     }
 
     //@Override
-    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeUri) throws IllegalNeedContentException {
+    public ListenableFuture<URI> createNeed(
+            URI ownerURI,
+            Model content,
+            boolean activate,
+            URI wonNodeUri,
+            Dataset messageEvent)
+            throws IllegalNeedContentException {
+
         //TODO: make asynchonous
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(wonNodeUri);
@@ -143,7 +150,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
     //@Override
-    public void activate(URI needURI) throws NoSuchNeedException {
+    public void activate(URI needURI, Dataset messageEvent) throws NoSuchNeedException {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
             proxy.activate(needURI);
@@ -154,7 +161,8 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
         }
     }
     //@Override
-    public void deactivate(URI needURI) throws NoSuchNeedException, NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
+    public void deactivate(URI needURI, Dataset messageEvent)
+            throws NoSuchNeedException, NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(needURI);
             proxy.deactivate(needURI);
@@ -166,7 +174,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
     //@Override
-    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws
+    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content, Dataset messageEvent) throws
             NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
         //TODO: make asynchonous
         try {

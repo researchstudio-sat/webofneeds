@@ -16,6 +16,7 @@
 
 package won.node.protocol.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -59,7 +60,13 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public URI createNeed(URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException {
+    public URI createNeed(
+            URI ownerURI,
+            final Model content,
+            final boolean activate,
+            String ownerApplicationID
+            )
+            throws IllegalNeedContentException {
         URI needURI = this.needManagementService.createNeed(ownerURI, content, activate, ownerApplicationID);
         return needURI;
     }
