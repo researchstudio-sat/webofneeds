@@ -51,9 +51,11 @@ public abstract class AbstractFinishingListener extends BaseEventListener implem
     boolean doRun = true;
     synchronized (monitor){
       if (finished){
+        logger.debug("not executing handleEvent() as listener is finished: {}",this);
         return;
       }
       if (isFinished()) {
+        logger.debug("not executing handleEvent() as listener's finishing condition is met: {}",this);
         doRun = false;
       }
     }
@@ -61,6 +63,7 @@ public abstract class AbstractFinishingListener extends BaseEventListener implem
       handleEvent(event);
     }
     if (isFinished()) {
+      logger.debug("performing finishing actions for listener: {}",this);
       performFinish();
     }
   }

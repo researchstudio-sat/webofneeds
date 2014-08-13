@@ -18,7 +18,7 @@ package won.node.service;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
-import won.node.rdfstorage.RDFStorageService;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.node.service.impl.URIService;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;

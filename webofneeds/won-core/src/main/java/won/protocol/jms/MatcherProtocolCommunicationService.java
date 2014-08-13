@@ -17,8 +17,6 @@
 package won.protocol.jms;
 
 import won.protocol.exception.CamelConfigurationFailedException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchNeedException;
 
 import java.net.URI;
 import java.util.Set;
@@ -29,10 +27,8 @@ import java.util.Set;
  */
 public interface MatcherProtocolCommunicationService extends ProtocolCommunicationService {
     public CamelConfiguration configureCamelEndpoint(URI needUri,String startingEndpoint) throws Exception;
-    public URI  getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException, NoSuchNeedException;
     public Set<String> getMatcherProtocolOutTopics(URI wonNodeURI);
     public void addRemoteTopicListeners(final Set<String> endpoints, final URI remoteEndpoint)
       throws CamelConfigurationFailedException;
-
 
 }

@@ -14,12 +14,13 @@
 		<script src="scripts/jquery.10.2.js"></script>
 
 		<script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-mocks/angular-mocks.js"></script>
 		<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
 		<script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
 		<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
 		<script type="text/javascript" src="<c:url value="/bower_components/js-md5/js/md5.js"/>"></script>
-
+        <script type="text/javascript" src="<c:url value="/bower_components/sockjs/sockjs.js"/>"></script>
 		<script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
@@ -30,10 +31,11 @@
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
-		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
-		<script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
 	</head>
@@ -47,8 +49,11 @@
 						<li ng-class="isActive()"><a href="#/">
 							<span class="glyphicon glyphicon-transfer"></span>&nbsp;Web Of Needs</a>
 						</li>
-						<li ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak><a href="#/create-need/">
-							<span class="glyphicon glyphicon-plus"></span>&nbsp;New	Need</a>
+
+
+						<li ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak><a
+                                href="#/create-need/1/">
+							<span class="glyphicon glyphicon-plus"></span>&nbsp;New	Post</a>
 						</li>
 						<li ng-show="!showPublic()" ng-class="isActive('need-list')" ng-cloak><a href="#/need-list/">
 							<span class="glyphicon glyphicon-globe"></span>&nbsp;My Needs</a>

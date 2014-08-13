@@ -9,7 +9,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.node.rdfstorage.RDFStorageService;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.node.service.DataAccessService;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
@@ -122,31 +122,6 @@ public abstract class AbstractBAFacet implements Facet
   }
 
   /**
-   * This function is invoked when an owner sends a text message to a won node and usually executes registered facet specific code.
-   * It is used to indicate the sending of a chat message with by the specified connection object con
-   * to the remote partner.
-   *
-   * @param con the connection object
-   * @param message  the chat message
-   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
-   */
-  @Override
-  public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    //inform the other side
-    executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          needFacingConnectionClient.textMessage(con, message);
-        } catch (Exception e) {
-          logger.warn("caught Exception in textMessageFromOwner: ",e);
-        }
-      }
-    });
-  }
-
-  /**
    *
    * This function is invoked when an won node sends an open message to another won node and usually executes registered facet specific code.
    * It is used to open a connection which is identified by the connection object con. A rdf graph can be sent along with the request.
@@ -173,6 +148,7 @@ public abstract class AbstractBAFacet implements Facet
       }
     });
   }
+
 
   /**
    *
@@ -202,41 +178,17 @@ public abstract class AbstractBAFacet implements Facet
     });
   }
 
-  /**
-   * This function is invoked when a won node sends a text message to another won node and usually executes registered facet specific code.
-   * It is used to indicate the sending of a chat message with by the specified connection object con
-   * to the remote partner.
-   *
-   * @param con the connection object
-   * @param message  the chat message
-   * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
-   * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
-   */
-  @Override
-  public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    //send to the need side
-    executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
-        } catch (Exception e) {
-          logger.warn("caught Exception in textMessageFromNeed:", e);
-        }
-      }
-    });
-  }
-
   public void storeBAStateForConnection(Connection con, URI stateUri)
   {
     Model connectionBAStateContent =  ModelFactory.createDefaultModel();
     connectionBAStateContent.setNsPrefix("",con.getConnectionURI().toString());
     Resource baseResource = connectionBAStateContent.createResource(con.getConnectionURI().toString());
-    baseResource.addProperty(WON_BA.BA_STATE, connectionBAStateContent.createResource(stateUri.toString()));
+    baseResource.addProperty(WON_TX.BA_STATE, connectionBAStateContent.createResource(stateUri.toString()));
 
     logger.debug("linked data:"+ RdfUtils.toString(connectionBAStateContent));
     rdfStorageService.storeContent(con.getConnectionURI(), connectionBAStateContent);
   }
+
 
   /**
    * This function is invoked when a matcher sends a hint message to a won node and

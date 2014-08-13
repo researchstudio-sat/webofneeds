@@ -62,7 +62,7 @@ public class MatcherApplicationListenerRouteBuilder extends RouteBuilder  {
     public void configure() throws Exception {
                for (int i = 0; i<endpoints.size();i++){
                    from(endpoints.get(i)).routeId("Node2MatcherRoute"+brokerUri+i)
-                           .wireTap("bean:messagingService?method=inspectMessage")
+                           .wireTap("bean:matcherMessagingService?method=inspectMessage")
                            .choice()
                            .when(header("methodName").isEqualTo("needCreated"))
                            .to("bean:matcherProtocolMatcherServiceJMSBased?method=needCreated")

@@ -13,6 +13,7 @@ import won.protocol.exception.WonProtocolException;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 
@@ -45,10 +46,9 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
             public void run()
             {
                 try {
-                    ownerFacingConnectionClient.open(con.getConnectionURI(), content);
-
                     stateManager.setStateForNeedUri(BACCState.ACTIVE.getURI(), con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI());
                     storeBAStateForConnection(con, BACCState.ACTIVE.getURI());
+                    ownerFacingConnectionClient.open(con.getConnectionURI(), content);
                     logger.debug("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
                 } catch (WonProtocolException e) {
                     logger.warn("caught Exception:", e);
@@ -58,7 +58,7 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
     }
 
     //Coordinator sends message to Participant
-    public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void sendMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         final URI remoteConnectionURI = con.getRemoteConnectionURI();
         //inform the other side
         executorService.execute(new Runnable() {
@@ -73,18 +73,18 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
                     //message (event) for sending
 
                     //message as TEXT
-                    NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_BA.BASE_URI,"hasTextMessage"));
-                    if (ni.hasNext())
+                    messageForSending = WonRdfUtils.MessageUtils.getTextMessage(message);
+                    if (messageForSending != null)
                     {
-                        messageForSending = ni.toList().get(0).toString();
-                        messageForSending = messageForSending.substring(0, messageForSending.indexOf("^^http:"));
                         eventType = BACCEventType.getCoordinationEventTypeFromString(messageForSending);
-                        logger.debug("Coordinator sends the text message: {}", eventType.getURI());
+                        logger.debug("Coordinator sends the text message: {}", eventType);
                     }
 
                     //message as MODEL
                     else {
-                        ni = message.listObjectsOfProperty(message.getProperty(WON_BA.COORDINATION_MESSAGE.getURI().toString()));
+                        NodeIterator ni = message.listObjectsOfProperty(message.getProperty(WON_TX.COORDINATION_MESSAGE
+                          .getURI()
+                                                                                                           .toString()));
                         if(ni.hasNext())
                         {
                             String eventTypeURI = ni.toList().get(0).asResource().getURI().toString();
@@ -117,8 +117,8 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
 
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
-                            baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
-                            needFacingConnectionClient.textMessage(con, myContent);
+                            baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
+                            needFacingConnectionClient.sendMessage(con, myContent);
                         }
                         else
                         {
@@ -139,14 +139,14 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
     }
 
     //Coordinator receives message from Participant
-    public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void sendMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //send to the need side
         executorService.execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     logger.debug("Received message from Participant: " + message.toString());
-                    NodeIterator it = message.listObjectsOfProperty(WON_BA.COORDINATION_MESSAGE);
+                    NodeIterator it = message.listObjectsOfProperty(WON_TX.COORDINATION_MESSAGE);
                     if (!it.hasNext()) {
                         logger.debug("message did not contain a won-ba:coordinationMessage");
                         return;
@@ -174,7 +174,7 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
                     logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
 
 
-                    ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+                    ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message);
 
                     BACCEventType resendEventType = state.getResendEvent();
                     if(resendEventType!=null)
@@ -197,8 +197,8 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
 
                             // eventType -> URI Resource
                             Resource r = myContent.createResource(resendEventType.getURI().toString());
-                            baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, r);
-                            needFacingConnectionClient.textMessage(con, myContent);
+                            baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
+                            needFacingConnectionClient.sendMessage(con, myContent);
                         }
                         else
                         {

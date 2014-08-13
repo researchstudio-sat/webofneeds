@@ -56,7 +56,7 @@ public class NeedProtocolNeedServiceImplJMSBased
   }
 
   public void open(@Header("connectionURI") final String connectionURI, @Header("content") final String content)
-    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
     logger.debug("NODE2: open received for need {], otherNeed{},connectionURI {}, content {}");
     URI connectionURIConvert = URI.create(connectionURI);
     Model contentConvert = RdfUtils.toModel(content);
@@ -72,12 +72,12 @@ public class NeedProtocolNeedServiceImplJMSBased
     delegate.close(connectionURIConvert, contentConvert);
   }
 
-  public void textMessage(@Header("connectionURI") final String connectionURI, @Header("content") final String message)
+  public void sendMessage(@Header("connectionURI") final String connectionURI, @Header("content") final String message)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("NODE2: text message received for connection {], message {}", connectionURI, message);
     URI connectionURIConvert = URI.create(connectionURI);
     Model messageConvert = RdfUtils.toModel(message);
-    delegate.textMessage(connectionURIConvert, messageConvert);
+    delegate.sendMessage(connectionURIConvert, messageConvert);
   }
 
   public void setNeedFacingNeedCommunicationService(final NeedFacingNeedCommunicationService needFacingNeedCommunicationService) {

@@ -88,22 +88,23 @@
         <property name="stateManager" ref="baStateManager" />
     </bean>
 
-    <bean id="baStateManager" class="won.node.facet.businessactivity.statemanager.JpaBasedBAStateManager" />
+   <bean id="baStateManager" class="won.node.facet.businessactivity.statemanager.JpaBasedBAStateManager" />
+    <!--   <bean id="baStateManager" class="won.node.facet.businessactivity.statemanager.SimpleBAStateManager" />  -->
 
-    <bean id="controlFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ControlFacetImpl" />
-    <bean id="ownerFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.OwnerFacetImpl" />
-    <bean id="groupFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.GroupFacetImpl" />
-    <bean id="coordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CoordinatorFacetImpl" />
-    <bean id="participantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ParticipantFacetImpl" />
-    <bean id="baPCCoordinatorFacetImplRef" parent="abstractBAFacetRef" class="won.node.facet.impl.BAPCCoordinatorFacetImpl" />
-    <bean id="baPCParticipantFacetImplRef" parent="abstractBAFacetRef" class="won.node.facet.impl.BAPCParticipantFacetImpl" />
-    <bean id="baCCCoordinatorFacetImplRef" parent="abstractBAFacetRef" class="won.node.facet.impl.BACCCoordinatorFacetImpl" />
-    <bean id="baCCParticipantFacetImplRef"  parent="abstractBAFacetRef" class="won.node.facet.impl.BACCParticipantFacetImpl" />
-    <bean id="baAtomicPCCoordinatorFacetImplRef" parent="abstractBAFacetRef" class="won.node.facet.impl.BAAtomicPCCoordinatorFacetImpl" />
-    <bean id="baAtomicCCCoordinatorFacetImplRef" parent="abstractBAFacetRef" class="won.node.facet.impl.BAAtomicCCCoordinatorFacetImpl" />
-    <bean id="commentUnrestrictedFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentUnrestrictedFacet" />
-    <bean id="commentModeratedFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentModeratedFacet" />
-    <bean id="commentFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentFacet" />
+     <bean id="controlFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ControlFacetImpl" />
+     <bean id="ownerFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.OwnerFacetImpl" />
+     <bean id="groupFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.GroupFacetImpl" />
+     <bean id="coordinatorFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CoordinatorFacetImpl" />
+     <bean id="participantFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.ParticipantFacetImpl" />
+     <bean id="baPCCoordinatorFacetImplRef" parent="abstractBAFacetRef" class="won.node.facet.impl.BAPCCoordinatorFacetImpl" />
+     <bean id="baPCParticipantFacetImplRef" parent="abstractBAFacetRef" class="won.node.facet.impl.BAPCParticipantFacetImpl" />
+     <bean id="baCCCoordinatorFacetImplRef" parent="abstractBAFacetRef" class="won.node.facet.impl.BACCCoordinatorFacetImpl" />
+     <bean id="baCCParticipantFacetImplRef"  parent="abstractBAFacetRef" class="won.node.facet.impl.BACCParticipantFacetImpl" />
+     <bean id="baAtomicPCCoordinatorFacetImplRef" parent="abstractBAFacetRef" class="won.node.facet.impl.BAAtomicPCCoordinatorFacetImpl" />
+     <bean id="baAtomicCCCoordinatorFacetImplRef" parent="abstractBAFacetRef" class="won.node.facet.impl.BAAtomicCCCoordinatorFacetImpl" />
+     <bean id="commentUnrestrictedFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentUnrestrictedFacet" />
+     <bean id="commentModeratedFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentModeratedFacet" />
+     <bean id="commentFacetImplRef" parent="abstractFacetRef" class="won.node.facet.impl.CommentFacet" />
 
 
-</beans>
+ </beans>

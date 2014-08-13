@@ -19,25 +19,14 @@ package won.matcher.protocol.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchNeedException;
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MatcherProtocolCommunicationService;
 import won.protocol.jms.MessagingService;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
-import won.protocol.model.WonNode;
-import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
-import won.protocol.ws.MatcherProtocolNeedWebServiceEndpoint;
-import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
-import won.protocol.ws.fault.NoSuchNeedFault;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,7 +48,6 @@ public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocol
         logger.info("need-facing: HINT called for needURI {} and otherNeed {} " +
                 "with score {} from originator {}.", new Object[]{needURI, otherNeed, score, originator});
 
-        URI wonNodeUri = matcherProtocolCommunicationService.getWonNodeUriWithNeedUri(needURI);
 
         CamelConfiguration camelConfiguration = matcherProtocolCommunicationService.configureCamelEndpoint(needURI,startingEndpoint);
         String endpoint = camelConfiguration.getEndpoint();

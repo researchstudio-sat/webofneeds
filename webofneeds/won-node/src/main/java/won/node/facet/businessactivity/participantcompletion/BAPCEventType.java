@@ -1,12 +1,10 @@
 package won.node.facet.businessactivity.participantcompletion;
 
 
-
-import won.node.facet.impl.WON_BA;
+import won.node.facet.impl.WON_TX;
 
 import java.net.URI;
 import java.util.ArrayList;
-
 import java.util.Arrays;
 
 /**
@@ -130,7 +128,7 @@ public enum BAPCEventType {
 
 
     public URI getURI() {
-        return URI.create(WON_BA.BASE_URI + name);
+        return URI.create(WON_TX.BASE_URI + name);
     }
 
     public BAPCEventType getBAEventTypeFromURIParticipantInbound (String sURI)

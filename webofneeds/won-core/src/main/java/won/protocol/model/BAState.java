@@ -29,6 +29,8 @@ public class BAState
   private URI baStateURI;
   @Column( name = "facetTypeURI")
   private URI facetTypeURI;
+  @Column( name = "baPhase")
+  private URI baPhaseURI;
 
   @Override
   public boolean equals(final Object o) {
@@ -44,6 +46,7 @@ public class BAState
     if (id != null ? !id.equals(baState.id) : baState.id != null) return false;
     if (participantURI != null ? !participantURI.equals(baState.participantURI) : baState.participantURI != null)
       return false;
+    if (baPhaseURI != null ? !baPhaseURI.equals(baState.baPhaseURI) : baState.baPhaseURI != null) return false;
 
     return true;
   }
@@ -55,6 +58,7 @@ public class BAState
     result = 31 * result + (participantURI != null ? participantURI.hashCode() : 0);
     result = 31 * result + (baStateURI != null ? baStateURI.hashCode() : 0);
     result = 31 * result + (facetTypeURI != null ? facetTypeURI.hashCode() : 0);
+    result = 31 * result + (baPhaseURI != null ? baPhaseURI.hashCode() : 0);
     return result;
   }
 
@@ -97,4 +101,13 @@ public class BAState
   public void setFacetTypeURI(final URI facetTypeURI) {
     this.facetTypeURI = facetTypeURI;
   }
+
+  public URI getBaPhaseURI() {
+    return baPhaseURI;
+  }
+
+  public void setBaPhaseURI(final URI baPhaseURI) {
+    this.baPhaseURI = baPhaseURI;
+  }
+
 }

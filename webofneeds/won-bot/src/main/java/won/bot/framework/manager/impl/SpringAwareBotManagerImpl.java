@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.scheduling.TaskScheduler;
@@ -32,6 +33,8 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Applica
   @Autowired
   private TaskScheduler taskScheduler;
 
+  private boolean shutdownApplicationContextIfWorkDone = false;
+
 
   @Override
   public void onApplicationEvent(final ApplicationEvent event)
@@ -43,6 +46,12 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Applica
         findAndRegisterBots();
       } catch (Exception e) {
         logger.warn("Error registering bots", e);
+      }
+    } else if (event instanceof ContextClosedEvent) {
+      try {
+        destroy();
+      } catch (Exception e) {
+        logger.warn("Error destroying bot manager "+this, e);
       }
     }
   }
@@ -97,6 +106,14 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Applica
     this.taskScheduler = taskScheduler;
   }
 
+  public boolean isShutdownApplicationContextIfWorkDone() {
+    return shutdownApplicationContextIfWorkDone;
+  }
+
+  public void setShutdownApplicationContextIfWorkDone(final boolean shutdownApplicationContextIfWorkDone) {
+    this.shutdownApplicationContextIfWorkDone = shutdownApplicationContextIfWorkDone;
+  }
+
   private void registerCheckWorkDoneTrigger()
   {
     if (this.checkWorkDoneTrigger == null){
@@ -107,7 +124,13 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Applica
       @Override
       public void run()
       {
-        if (isWorkDone()) SpringApplication.exit(applicationContext);
+        boolean workDone = isWorkDone();
+        if (! shutdownApplicationContextIfWorkDone){
+          logger.debug("botmanager will not shutdown spring context when work is done. (workDone:{})",workDone );
+        } else {
+          logger.debug("botmanager will shutdown spring context when work is done. (workDone:{})",workDone );
+          if (workDone) SpringApplication.exit(applicationContext);
+        }
       }
     }, checkWorkDoneTrigger);
   }

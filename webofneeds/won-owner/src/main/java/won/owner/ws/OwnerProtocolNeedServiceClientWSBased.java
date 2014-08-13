@@ -25,6 +25,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
@@ -60,7 +61,8 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     private ConnectionModelMapper connectionModelMapper;
 
     //@Override
-    public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(URI connectionURI, Model content)
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
             proxy.open(connectionURI, RdfUtils.toString(content));
@@ -88,12 +90,12 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
     //@Override
-    public void textMessage(URI connectionURI, Model message) throws
+    public void sendMessage(URI connectionURI, Model message) throws
             NoSuchConnectionException, IllegalMessageForConnectionStateException {
         String messageString = RdfUtils.toString(message);
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
-            proxy.textMessage(connectionURI, messageString);
+            proxy.sendMessage(connectionURI, messageString);
         } catch (MalformedURLException e) {
             logger.warn("couldn't create URL for needProtocolEndpoint", e);
         } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {
@@ -104,7 +106,12 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     }
 
 
-    @Override
+  @Override
+  public void processMessage(final WonMessage wonMessage) {
+
+  }
+
+  @Override
     public String register(URI endpointURI) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }

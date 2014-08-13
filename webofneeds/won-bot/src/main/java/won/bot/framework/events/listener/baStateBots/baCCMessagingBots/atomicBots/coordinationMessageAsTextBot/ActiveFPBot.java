@@ -20,6 +20,7 @@ public class ActiveFPBot extends BATestBotScript
 
     actions.add(new NopAction());
 
+
     return actions;
   }
 }

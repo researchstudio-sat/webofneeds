@@ -1,12 +1,117 @@
 /** Common **/
+.div-table-cell {
+    display:table-cell;
 
+}
+.div-table-row {
+    display:table-row;
+
+}
+.div-table {
+    display:table;
+
+}
+.centered-text{
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+.top-buffer { margin-top:20px; }
+.bottom-buffer { margin-bottom:20px; }
+.fill {
+    min-height: 100%;
+}
+.nav-progress-justified {
+    width: 100%;
+}
+.icon-want {
+    background:url('../images/want.jpg') 0 0 no-repeat;
+    height: 16px;
+    line-height: 16px;
+    width: 16px;
+}
+.nav-progress-justified > li {
+    float: none;
+}
+.nav-progress-justified > li > a:hover,
+.nav-progress-justified > li > a:focus {
+    color: #ffffff;
+    background-color: #178acc;
+}
+.nav-progress-justified > .active > a,
+.nav-progress-justified > .active > a:hover,
+.nav-progress-justified > .active > a:focus {
+    color: #ffffff;
+    background-color: #178acc;
+}
+.nav-progress-justified > li > a,
+.nav-progress-justified {
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+.nav-progress-justified > li > a {
+    color: #ffffff;
+}
+.nav-progress-justified > .disabled > a,
+.nav-progress-justified > .disabled > a:hover,
+.nav-progress-justified > .disabled > a:focus {
+    color: #cccccc;
+    background-color: transparent;
+}
+@media (min-width: 768px) {
+    .nav-progress-justified {
+        float: none;
+        margin: 0;
+    }
+    .nav-progress-justified > li {
+        display: table-cell;
+        width: 1%;
+    }
+
+    .nav-progress-justified > li {
+        float: none;
+    }
+
+    .nav-progress-justified > li > a {
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+}
+/*
+.nav-tabs.nav-progress-justified {
+    width: 100%;
+    border-bottom: 0;
+}
+
+.nav-tabs.nav-progress-justified > li {
+    float: none;
+}
+
+.nav-tabs.nav-progress-justified > li > a {
+    text-align: center;
+}*/
+@media (min-width: 768px) {
+    .nav-tabs.nav-progress-justified > li {
+        display: table-cell;
+        width: 1%;
+    }
+}
+ /*
+.nav-tabs.nav-progress-justified > li > a {
+    margin-right: 0;
+    border-bottom: 1px solid #dddddd;
+}
+
+.nav-tabs.nav-progress-justified > .active > a {
+    border-bottom-color: #ffffff;
+}
+        */
 .navbar {
 	border-radius: 0;
 	margin-bottom: 0;
 }
 
 #content {
-	background-color: #F5F5F5;
+	background-color: #FFFFFF;
 }
 
 .map-canvas {
@@ -70,6 +175,9 @@ h1#main-heading {
 }
 
 /** Create need **/
+.additional-info-title {
+    font-size: large;
+}
 .img-upload-box {
 	background-color: #CACACA;
 	border: 1px solid #CACACA;

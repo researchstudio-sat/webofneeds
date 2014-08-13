@@ -2,7 +2,7 @@ package won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBo
 
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.BATestScriptAction;
-import won.bot.framework.events.listener.baStateBots.WON_BA;
+import won.node.facet.impl.WON_TX;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -19,9 +19,9 @@ public class CompletingFailinglVoteSPBot extends BATestBotScript
   protected List<BATestScriptAction> setupActions() {
     List<BATestScriptAction> actions = new ArrayList();
 
-    actions.add(new BATestScriptAction(true, "MESSAGE_FAIL", URI.create(WON_BA.STATE_COMPLETING.getURI())));
+    actions.add(new BATestScriptAction(true, "MESSAGE_FAIL", URI.create(WON_TX.STATE_COMPLETING.getURI())));
     //no vote!
-    actions.add(new BATestScriptAction(false, "MESSAGE_FAILED", URI.create(WON_BA.STATE_FAILING_ACTIVE_CANCELING_COMPLETING.getURI())));
+    actions.add(new BATestScriptAction(false, "MESSAGE_FAILED", URI.create(WON_TX.STATE_FAILING_ACTIVE_CANCELING_COMPLETING.getURI())));
 
     return actions;
   }

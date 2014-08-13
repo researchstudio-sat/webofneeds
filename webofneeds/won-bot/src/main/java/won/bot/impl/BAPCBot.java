@@ -35,7 +35,7 @@ public class BAPCBot extends BABaseBot {
     //subscribe it to:
     // * message events - so it responds
     // * open events - so it initiates the chain reaction of responses
-    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(20);
+    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(18);
 
     //Coordination message is sent as TEXT
     scripts.add(new BAPCStateExitBot());
@@ -58,8 +58,8 @@ public class BAPCBot extends BABaseBot {
     scripts.add(new BAPCStateActiveCannotCompleteUriBot());
 
     //with failures
-    scripts.add(new BAPCStateCompleteWithFailureUriBot());
-    scripts.add(new BAPCStateCompleteWithFailureBot());
+   // scripts.add(new BAPCStateCompleteWithFailureUriBot());
+   // scripts.add(new BAPCStateCompleteWithFailureBot());
     return scripts;
   }
 }

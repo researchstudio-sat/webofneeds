@@ -7,7 +7,7 @@ import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.impl.CloseFromOtherNeedEvent;
 import won.bot.framework.events.event.impl.NeedDeactivatedEvent;
-import won.bot.framework.events.listener.standardTwoPhaseCommitBots.WON_TX;
+import won.node.facet.impl.WON_TX;
 
 import java.net.URI;
 import java.util.List;

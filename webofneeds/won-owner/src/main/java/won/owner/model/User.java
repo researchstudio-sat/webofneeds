@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import won.protocol.model.Need;
 
 import javax.persistence.*;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,7 +22,7 @@ import java.util.List;
  */
 @Entity
 @Table(
-		name = "wonuser",
+		name = "wonUser",
 		uniqueConstraints = @UniqueConstraint(columnNames = {"username"})
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -35,10 +37,17 @@ public class User implements UserDetails{
 
 	private String password;
 
+
+
   //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
   //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	private List<Need> needs;
+
+  //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
+  //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
+ // @OneToMany( fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+ // private List<Need> drafts;
 
 	@Transient
 	private Collection<SimpleGrantedAuthority> authorities;
@@ -106,10 +115,28 @@ public class User implements UserDetails{
 	public List<Need> getNeeds() {
 		return needs;
 	}
+  public boolean removeNeeds(List<Need> needsToRemove){
+    return needs.removeAll(needsToRemove);
 
+  }
+  public List<URI> getNeedURIs(){
+    List<Need> needs = getNeeds();
+    List<URI> needURIs = new ArrayList <>();
+    for(Need need : needs){
+      needURIs.add(need.getNeedURI());
+    }
+    return needURIs;
+  }
+  /*
+  public List<Need> getDrafts(){
+    return drafts;
+  }
 	public void setNeeds(final List<Need> needs) {
 		this.needs = needs;
 	}
+  public void setDrafts(final List<Need> drafts) {
+    this.drafts = drafts;
+  }    */
 
 	@Override
 	public boolean equals(final Object o) {

@@ -17,6 +17,7 @@
 package won.protocol.util.linkeddata;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.sparql.path.Path;
 
 import java.net.URI;
 import java.util.List;
@@ -26,8 +27,11 @@ import java.util.List;
  */
 public interface LinkedDataSource
 {
-  public Model getModelForResource(URI resourceUri);
+  public Model getModelForResource(URI resourceURI);
 
-  public Model getModelForResource(final URI resourceUri, List<URI> properties, List<URI> objects,
+  public Model getModelForResource(final URI resourceURI, List<URI> properties,
                                    int maxRequest, int maxDepth);
+
+  public Model getModelForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,int maxRequest,
+                                                   int maxDepth );
 }

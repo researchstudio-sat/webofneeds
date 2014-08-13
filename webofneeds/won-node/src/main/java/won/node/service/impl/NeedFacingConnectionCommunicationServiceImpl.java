@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.facet.impl.FacetRegistry;
-import won.node.rdfstorage.RDFStorageService;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.node.service.DataAccessService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
@@ -85,10 +85,9 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     reg.get(con).closeFromNeed(con, content);
   }
     @Override
-    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void sendMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        String textMessage = null;
-        //create ConnectionEvent in Database
+      //create ConnectionEvent in Database
         ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_MESSAGE);
         replaceBaseURIWithEventURI(message, con, event);
         //create rdf content for the ConnectionEvent and save it to disk
@@ -99,7 +98,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
           logger.debug("message after saving:\n{}",writer.toString());
         }
         //invoke facet implementation
-        reg.get(con).textMessageFromNeed(con, message);
+        reg.get(con).sendMessageFromNeed(con, message);
     }
 
   private void replaceBaseURIWithEventURI(final Model message, final Connection con, final ConnectionEvent event) {

@@ -18,12 +18,13 @@ package won.bot.framework.events.event.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.event.BaseEvent;
+import won.bot.framework.events.event.MessageEvent;
 import won.protocol.model.Match;
 
 /**
  *
  */
-public class HintFromMatcherEvent extends BaseEvent
+public class HintFromMatcherEvent extends BaseEvent  implements MessageEvent
 {
   private final Match match;
   final Model content;

@@ -25,7 +25,9 @@ import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.bus.impl.AsyncEventBusImpl;
+import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.listener.BaseEventListener;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
@@ -210,6 +212,8 @@ public class EventBot extends TriggeredBot
   protected void doInitializeCustom()
   {
     this.eventBus = new AsyncEventBusImpl(getExecutor());
+    //add an eventhandler that reacts to errors
+    this.getEventBus().subscribe(ErrorEvent.class,new ErrorEventListener(getEventListenerContext()));
     initializeEventListeners();
     this.eventBus.publish(new InitializeEvent());
   }
@@ -248,6 +252,10 @@ public class EventBot extends TriggeredBot
     public NodeURISource getNodeURISource()
     {
       return EventBot.this.getNodeURISource();
+    }
+
+    public URI getSolrServerURI(){
+      return EventBot.this.getSolrServerURI();
     }
 
     @Override
@@ -306,6 +314,42 @@ public class EventBot extends TriggeredBot
     public LinkedDataSource getLinkedDataSource()
     {
       return EventBot.this.getLinkedDataSource();
+    }
+  }
+
+  /**
+   * Event listener that will stop the bot by publishing a WorkDoneEvent if an ErrorEvent is seen.
+   * Expects to be registered for WorkDoneEvents and ErrorEvents and will not react to a WorkDoneEvent.
+   */
+  private class ErrorEventListener extends BaseEventListener {
+
+    private boolean done = false;
+    private Object monitor = new Object();
+    public ErrorEventListener(EventListenerContext context) {
+      super(context);
+    }
+
+    @Override
+    protected void doOnEvent(final Event event) throws Exception {
+      synchronized (monitor) {
+        if (event instanceof ErrorEvent) {
+          //only react to an ErrorEvent
+          if (! done) {
+            //make sure we send only one WorkDoneEvent
+            logger.warn("saw an ErrorEvent, stopping the bot by publishing a WorkDoneEvent");
+            getEventListenerContext().getEventBus().publish(new WorkDoneEvent());
+          }
+          setDoneAndUnsubscribe();
+        }
+        if (event instanceof WorkDoneEvent) {
+          setDoneAndUnsubscribe();
+        }
+      }
+    }
+
+    private void setDoneAndUnsubscribe() {
+      done = true;
+      getEventBus().unsubscribe(this);
     }
   }
 

@@ -18,8 +18,9 @@ package won.bot.framework.events.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.events.event.Event;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.impl.ErrorEvent;
 import won.bot.framework.events.event.impl.FinishedEvent;
 import won.bot.framework.events.filter.EventFilter;
 
@@ -33,6 +34,7 @@ public abstract class BaseEventListener implements EventListener
   private int eventCount = 0;
   private int exceptionCount = 0;
   private long millisExecuting = 0;
+  private boolean unsubscribeOnException = true;
   protected EventFilter eventFilter = null;
   protected String name = getClass().getSimpleName();
 
@@ -79,9 +81,13 @@ public abstract class BaseEventListener implements EventListener
     try {
       doOnEvent(event);
     } catch (Throwable e) {
-      logger.warn("caught throwable", e);
+      logger.warn("Caught Throwable during event processing by EventListener. Swallowing and publishing an ErrorEvent",
+        e);
+      if (unsubscribeOnException) {
+        context.getEventBus().unsubscribe(this);
+      }
+      context.getEventBus().publish(new ErrorEvent(this,e));
       countThrowable(e);
-      throw e;
     } finally {
       noteTimeExecuting(startTime);
     }
@@ -109,6 +115,14 @@ public abstract class BaseEventListener implements EventListener
   public int getEventCount()
   {
     return eventCount;
+  }
+
+  public boolean isUnsubscribeOnException() {
+    return unsubscribeOnException;
+  }
+
+  public void setUnsubscribeOnException(final boolean unsubscribeOnException) {
+    this.unsubscribeOnException = unsubscribeOnException;
   }
 
   protected synchronized void countThrowable(final Throwable e){

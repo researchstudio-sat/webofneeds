@@ -83,7 +83,11 @@
 			<artifactId>spring-security-taglibs</artifactId>
             <scope>${dependencies.scope}</scope>
 		</dependency>
-
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
         <!-- Hibernate Validator -->
 		<dependency>
 			<groupId>org.hibernate</groupId>

@@ -74,7 +74,7 @@
                     <input type="submit" value="Good Match!"/>
                 </form>
                 <form method="POST" action="/owner/connection/${connection.id}/feedback">
-                    <input type="hidden" name="feedback" value="true" />
+                    <input type="hidden" name="feedback" value="false" />
                     <input type="submit" value="Bad Match!"/>
                 </form>
             </td>

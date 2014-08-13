@@ -1,6 +1,6 @@
 package won.node.facet.businessactivity.coordinatorcompletion;
 
-import won.node.facet.impl.WON_BA;
+import won.node.facet.impl.WON_TX;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -165,7 +165,7 @@ public enum BACCEventType {
 
 
     public URI getURI() {
-        return URI.create(WON_BA.BASE_URI + name);
+        return URI.create(WON_TX.BASE_URI + name);
     }
 
     public BACCEventType getBAEventTypeFromURIParticipantInbound (String sURI)
@@ -186,11 +186,12 @@ public enum BACCEventType {
 
     public static BACCEventType getCoordinationEventTypeFromString(final String fragment)
     {
-        for (BACCEventType event : BACCEventType.values())
+      for (BACCEventType event : BACCEventType.values()) {
             if (event.name().equals(fragment))
             {
                 return event;
             }
+        }
         return null;
     }
 

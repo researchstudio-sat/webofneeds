@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import won.bot.PropertyPathConfigurator;
 import won.bot.framework.events.event.impl.WorkDoneEvent;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
@@ -79,6 +80,7 @@ public class CommentBotTest
   public void before(){
     if (!run)
     {
+      //create a bot instance and auto-wire it
       AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
       bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
       Object botBean = beanFactory.initializeBean(bot, "mybot");
@@ -185,7 +187,6 @@ public class CommentBotTest
     public void executeAsserts()
     {
       //1 act events
-      Assert.assertEquals(1, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
       //1 create need events
       Assert.assertEquals(1, this.commentFacetCreator.getEventCount());
@@ -231,9 +232,13 @@ public class CommentBotTest
 
       List<URI> crawled = new ArrayList<>();
 
-      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,30,8);
 
-      logger.debug("crawled dataset: {}",RdfUtils.toString(dataModel));
+
+      Model dataModel = linkedDataSource.getModelForResourceWithPropertyPath(needs.get(0),PropertyPathConfigurator
+        .configurePropertyPaths(), 30,
+                                                                             8 );
+
+      logger.debug("crawled dataset with property path: {}",RdfUtils.toString(dataModel));
 
       String queryString = sparqlPrefix +
         "SELECT ?need ?connection ?need2 WHERE {" +

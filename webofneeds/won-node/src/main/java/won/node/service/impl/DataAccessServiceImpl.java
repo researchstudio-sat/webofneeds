@@ -5,7 +5,7 @@ import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.rdfstorage.RDFStorageService;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
@@ -258,8 +258,11 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     }
     */
 
-    @Override
-    public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {
+  @Override
+  public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("updating remote connection URI of con {} to {}", con, remoteConnectionURI);
+    }
     con.setRemoteConnectionURI(remoteConnectionURI);
     connectionRepository.save(con);
   }

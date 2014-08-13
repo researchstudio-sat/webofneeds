@@ -1,11 +1,6 @@
 package won.owner.web.need;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.DC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import won.owner.linkeddata.NeedPojoNeedModelBuilder;
 import won.owner.pojo.NeedPojo;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
@@ -25,11 +21,9 @@ import won.protocol.repository.FacetRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.ProjectingIterator;
-import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.WON;
 import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
 import won.protocol.ws.fault.NoSuchConnectionFault;
 
@@ -126,7 +120,9 @@ public class NeedController
     model.addAttribute("command", new NeedPojo());
     return "createNeed";
   }
+  public void configureNeedModel(NeedPojo needPojo){
 
+  }
   //TODO use NeedModelBuilder here instead
   @RequestMapping(value = "/create", method = RequestMethod.POST)
   public String createNeedPost(@ModelAttribute("SpringWeb") NeedPojo needPojo, Model model) throws Exception {
@@ -135,76 +131,12 @@ public class NeedController
     try {
       URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
 
-      com.hp.hpl.jena.rdf.model.Model needModel = ModelFactory.createDefaultModel();
 
-      Resource needResource = needModel.createResource("no:uri", WON.NEED);
+
+      NeedPojoNeedModelBuilder needPojoNeedModelBuilder = new NeedPojoNeedModelBuilder(needPojo);
+      needPojoNeedModelBuilder.setUri("no:uri");
+      com.hp.hpl.jena.rdf.model.Model needModel = needPojoNeedModelBuilder.build();
       needModel.setNsPrefix("","no:uri");
-
-      // need type
-      needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(needPojo.getBasicNeedType())));
-
-      // need content
-      Resource needContent = needModel.createResource(WON.NEED_CONTENT);
-      if (!needPojo.getTitle().isEmpty())
-        needContent.addProperty(DC.title, needPojo.getTitle(), XSDDatatype.XSDstring);
-      if (!needPojo.getTextDescription().isEmpty())
-        needContent.addProperty(WON.HAS_TEXT_DESCRIPTION, needPojo.getTextDescription(), XSDDatatype.XSDstring);
-      if (!needPojo.getContentDescription().isEmpty())
-        attachRdfToModelViaBlanknode(needPojo.getContentDescription(), "TTL", needContent, WON.HAS_CONTENT_DESCRIPTION, needModel);
-      if (!needPojo.getTags().isEmpty()) {
-        String[] tags = needPojo.getTags().split(",");
-        for (String tag : tags) {
-          needModel.add(needModel.createStatement(needContent, WON.HAS_TAG, tag.trim()));
-        }
-      }
-
-      needModel.add(needModel.createStatement(needResource, WON.HAS_CONTENT, needContent));
-
-      for(String ft : needPojo.getFacetTypes()) {
-          needModel.add(needModel.createStatement(needResource, WON.HAS_FACET, needModel.createResource(ft)));
-      }
-
-
-      // need modalities
-      Resource needModality = needModel.createResource(WON.NEED_MODALITY);
-
-      //price and currency
-      if (needPojo.getUpperPriceLimit() != null || needPojo.getLowerPriceLimit() != null) {
-        Resource priceSpecification = needModel.createResource(WON.PRICE_SPECIFICATION);
-        if (needPojo.getLowerPriceLimit() != null)
-          priceSpecification.addProperty(WON.HAS_LOWER_PRICE_LIMIT, Double.toString(needPojo.getLowerPriceLimit()), XSDDatatype.XSDfloat);
-        if (needPojo.getUpperPriceLimit() != null)
-          priceSpecification.addProperty(WON.HAS_UPPER_PRICE_LIMIT, Double.toString(needPojo.getUpperPriceLimit()), XSDDatatype.XSDfloat);
-        if (!needPojo.getCurrency().isEmpty())
-          priceSpecification.addProperty(WON.HAS_CURRENCY, needPojo.getCurrency(), XSDDatatype.XSDstring);
-
-        needModel.add(needModel.createStatement(needModality, WON.HAS_PRICE_SPECIFICATION, priceSpecification));
-      }
-
-      if (needPojo.getLatitude() != null && needPojo.getLongitude() != null) {
-        Resource location = needModel.createResource(GEO.POINT)
-            .addProperty(GEO.LATITUDE, Double.toString(needPojo.getLatitude()))
-            .addProperty(GEO.LONGITUDE, Double.toString(needPojo.getLongitude()));
-
-        needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_LOCATION, location));
-      }
-
-      // time constraint
-      if (!needPojo.getStartTime().isEmpty() || !needPojo.getEndTime().isEmpty()) {
-        Resource timeConstraint = needModel.createResource(WON.TIME_SPECIFICATION)
-            .addProperty(WON.HAS_RECUR_INFINITE_TIMES, Boolean.toString(needPojo.getRecurInfiniteTimes()), XSDDatatype.XSDboolean);
-        if (!needPojo.getStartTime().isEmpty())
-          timeConstraint.addProperty(WON.HAS_START_TIME, needPojo.getStartTime(), XSDDatatype.XSDdateTime);
-        if (!needPojo.getEndTime().isEmpty())
-          timeConstraint.addProperty(WON.HAS_END_TIME, needPojo.getEndTime(), XSDDatatype.XSDdateTime);
-        if (needPojo.getRecurIn() != null)
-          timeConstraint.addProperty(WON.HAS_RECURS_IN, Long.toString(needPojo.getRecurIn()));
-        if (needPojo.getRecurTimes() != null)
-          timeConstraint.addProperty(WON.HAS_RECURS_TIMES, Integer.toString(needPojo.getRecurTimes()));
-        needModel.add(needModel.createStatement(needModality, WON.HAS_TIME_SPECIFICATION, timeConstraint));
-      }
-
-      needModel.add(needModel.createStatement(needResource, WON.HAS_NEED_MODALITY, needModality));
 
       if (needPojo.getWonNode().equals("")) {
           ListenableFuture<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
@@ -226,12 +158,6 @@ public class NeedController
     model.addAttribute("command", new NeedPojo());
 
     return "createNeed";
-  }
-
-  private void attachRdfToModelViaBlanknode(final String rdfAsString, final String rdfLanguage, final Resource resourceToLinkTo, final Property propertyToLinkThrough, final com.hp.hpl.jena.rdf.model.Model modelToModify)
-  {
-    com.hp.hpl.jena.rdf.model.Model model = RdfUtils.readRdfSnippet(rdfAsString, rdfLanguage);
-    RdfUtils.attachModelByBaseResource(resourceToLinkTo,propertyToLinkThrough, model);
   }
 
   @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -354,13 +280,10 @@ public class NeedController
 
       Need need1 = needs.get(0);
 
-      com.hp.hpl.jena.rdf.model.Model facetModel = ModelFactory.createDefaultModel();
-
-      facetModel.setNsPrefix("", "no:uri");
-      Resource baseRes = facetModel.createResource(facetModel.getNsPrefixURI(""));
-      baseRes.addProperty(WON.HAS_FACET, facetModel.createResource(needPojo.getOwnFacetURI()));
-      baseRes.addProperty(WON.HAS_REMOTE_FACET, facetModel.createResource(needPojo.getRemoteFacetURI()));
-
+      com.hp.hpl.jena.rdf.model.Model facetModel =
+        WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
+          URI.create(needPojo.getOwnFacetURI()),
+          URI.create(needPojo.getRemoteFacetURI()));
       ownerService.connect(need1.getNeedURI(), new URI(needPojo.getNeedURI()), facetModel);
       return "redirect:/need/" + need1.getId().toString();//viewNeed(need1.getId().toString(), model);
     } catch (URISyntaxException e) {
@@ -376,9 +299,7 @@ public class NeedController
     } catch (ExecutionException e) {
         logger.warn("caught ExcutionException", e);
     } catch (CamelConfigurationFailedException e) {
-
-        logger.warn("caught CameConfigurationException", e);  //To change body of catch statement use File | Settings | File Templates.
-
+        logger.warn("caught CameConfigurationException", e);
         logger.warn("caught CamelConfigurationFailedException",e);
     } catch (Exception e) {
         logger.warn("caught Exception",e);
@@ -419,9 +340,15 @@ public class NeedController
       if (!matches.isEmpty()) {
         Match match = matches.get(0);
         List<Need> needs = needRepository.findByNeedURI(match.getFromNeed());
-        if (!needs.isEmpty())
+        if (!needs.isEmpty()){
           ret = "redirect:/need/" + needs.get(0).getId().toString();//viewNeed(needs.get(0).getId().toString(), model);
-        ownerService.connect(match.getFromNeed(), match.getToNeed(), null);
+        }
+        //TODO: match object does not contain facet info, assume OwnerFacet.
+        com.hp.hpl.jena.rdf.model.Model facetModel =
+          WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
+            FacetType.OwnerFacet.getURI(),
+            FacetType.OwnerFacet.getURI());
+        ownerService.connect(match.getFromNeed(), match.getToNeed(), facetModel);
       }
     } catch (ConnectionAlreadyExistsException e) {
       logger.warn("caught ConnectionAlreadyExistsException:", e);

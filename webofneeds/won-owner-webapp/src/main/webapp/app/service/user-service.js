@@ -25,7 +25,7 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 		},
 		registerUser : function(user) {
 			return $http.post(
-					'/owner/rest/user/',
+					'/owner/rest/users/',
 					user
 			).then(
 				function() {
@@ -49,7 +49,7 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 		},
 		logIn : function(user) {
 			return $http.post(
-					'/owner/rest/user/login',
+					'/owner/rest/users/signin',
 					user
 			).then(
 				function () {
@@ -71,7 +71,7 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 		},
 		logOut : function() {
 			return $http.post(
-					'/owner/rest/user/logout'
+					'/owner/rest/users/signout'
 			).then(
 				function (data, status) {
 					return {status:"OK"};

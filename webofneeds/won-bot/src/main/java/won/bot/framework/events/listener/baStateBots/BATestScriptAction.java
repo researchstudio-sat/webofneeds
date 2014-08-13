@@ -2,6 +2,7 @@ package won.bot.framework.events.listener.baStateBots;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+import won.node.facet.impl.WON_TX;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -39,7 +40,7 @@ public class BATestScriptAction {
     public BATestScriptAction(boolean senderIsParticipant, URI coordinationMessageUriToBeSent,URI stateOfSenderBeforeSending) {
         this.senderIsParticipant = senderIsParticipant;
         this.stateOfSenderBeforeSending = stateOfSenderBeforeSending;
-        this.messageToBeSent = WonRdfUtils.MessageUtils.genericMessage(WON_BA.COORDINATION_MESSAGE, new ResourceImpl(coordinationMessageUriToBeSent.toString()));
+        this.messageToBeSent = WonRdfUtils.MessageUtils.genericMessage(WON_TX.COORDINATION_MESSAGE, new ResourceImpl(coordinationMessageUriToBeSent.toString()));
     }
 
     public boolean isSenderIsParticipant() {

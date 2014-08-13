@@ -25,7 +25,10 @@ import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
+import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolNeedService;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.NeedRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.ApplicationManagementService;
 import won.protocol.service.NeedInformationService;
@@ -46,6 +49,10 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     private NeedManagementService needManagementService;
     private NeedInformationService needInformationService;
     private ApplicationManagementService ownerManagementService;
+    @Autowired
+    private ConnectionRepository connectionRepository;
+    @Autowired
+    private NeedRepository needRepository;
 
     @Autowired
     private OwnerApplicationRepository ownerApplicationRepository;
@@ -113,7 +120,17 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(final URI connectionURI, final Model content)
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
+        List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
+        if(cons.size()!=0){
+          Connection con = cons.get(0);
+          List<Need> needs = needRepository.findByNeedURI(con.getNeedURI());
+
+          if (needs.get(0).getState() != NeedState.ACTIVE)
+            throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(),"open",needs.get(0).getState());
+        }
+
         this.connectionCommunicationService.open(connectionURI, content);
     }
 
@@ -125,8 +142,8 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        this.connectionCommunicationService.textMessage(connectionURI, message);
+    public void sendMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        this.connectionCommunicationService.sendMessage(connectionURI, message);
     }
 
     @Override

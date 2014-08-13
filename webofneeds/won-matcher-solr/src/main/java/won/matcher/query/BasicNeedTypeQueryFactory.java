@@ -47,14 +47,14 @@ public class BasicNeedTypeQueryFactory extends AbstractQueryFactory
 
   protected String getMatchingNeedType(String needType)
   {
-    if (needType.equals(WON.BASIC_NEED_TYPE_SUPPLY.toString()))
-      return WON.BASIC_NEED_TYPE_DEMAND.toString();
-    else if (needType.equals(WON.BASIC_NEED_TYPE_DEMAND.toString()))
-      return WON.BASIC_NEED_TYPE_SUPPLY.toString();
-    else if (needType.equals(WON.BASIC_NEED_TYPE_DO_TOGETHER.toString()))
-      return WON.BASIC_NEED_TYPE_DO_TOGETHER.toString();
-    else if (needType.equals(WON.BASIC_NEED_TYPE_CRITIQUE.toString()))
-      return WON.BASIC_NEED_TYPE_CRITIQUE.toString();
+    if (needType.equals(WON.BASIC_NEED_TYPE_SUPPLY.getURI().toString()))
+      return WON.BASIC_NEED_TYPE_DEMAND.getURI().toString();
+    else if (needType.equals(WON.BASIC_NEED_TYPE_DEMAND.getURI().toString()))
+      return WON.BASIC_NEED_TYPE_SUPPLY.getURI().toString();
+    else if (needType.equals(WON.BASIC_NEED_TYPE_DO_TOGETHER.getURI().toString()))
+      return WON.BASIC_NEED_TYPE_DO_TOGETHER.getURI().toString();
+    else if (needType.equals(WON.BASIC_NEED_TYPE_CRITIQUE.getURI().toString()))
+      return WON.BASIC_NEED_TYPE_CRITIQUE.getURI().toString();
     else
       return null;
   }

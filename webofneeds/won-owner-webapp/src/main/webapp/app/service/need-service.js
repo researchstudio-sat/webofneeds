@@ -77,12 +77,12 @@ CategorizedNeeds = function() {
 	}
 }
 
-angular.module('won.owner').factory('needService', function ($http, $q, connectionService) {
+angular.module('won.owner').factory('needService', function ($http, $q, connectionService, messageService) {
 
 	var needService = {};
 
 	needService.getNeedById = function (needId) {
-		return $http.get('/owner/rest/need/' + needId);
+		return $http.get('/owner/rest/needs/' + needId);
 	};
 
 	needService.getIdFromUri = function(needUri) {
@@ -186,7 +186,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 	}
 
 	needService.getAllNeeds = function() {
-		return $http.get('/owner/rest/need/').then(
+		return $http.get('/owner/rest/needs/').then(
 			function(response) {
 				return response.data;
 			},
@@ -195,6 +195,31 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 			}
 		);
 	}
+
+    needService.saveDraft = function(need, currentStep,userName){
+        var needToSave = angular.copy(need);
+        needToSave.currentStep = currentStep+'';
+        needToSave.userName = userName;
+        needToSave.tags = need.tags.join(",");
+        delete needToSave.binaryFolder;
+        /*return $http({
+            method:'POST',
+            url:'/owner/rest/needs/drafts',
+            data:needToSave,
+            success:function(content){
+                console.log(content);
+            }
+        }).then(
+            function () {
+                // success
+                return {status:"OK"};
+            },
+            function (response) {
+                console.log("FATAL ERROR");
+            }
+        );   */
+        messageService.sendMessage("createNeed",needToSave);
+    }
 
 	needService.save = function(need) {
 		var needToSave = angular.copy(need);
@@ -212,7 +237,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 		delete needToSave.binaryFolder;
 		return $http({
 			method:'POST',
-			url:'/owner/rest/need/create',
+			url:'/owner/rest/needs/',
 			data:needToSave,
 			success:function (content) {
 				console.log(content);
@@ -225,7 +250,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 				function (response) {
 					console.log("FATAL ERROR");
 				}
-		);;
+		);
 	};
 
 	return needService;

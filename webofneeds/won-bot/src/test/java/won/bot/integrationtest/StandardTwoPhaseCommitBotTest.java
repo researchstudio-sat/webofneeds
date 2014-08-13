@@ -123,9 +123,18 @@ public class StandardTwoPhaseCommitBotTest {
       //28 Participants creator
       Assert.assertEquals(noOfNeeds-1, this.participantNeedCreator.getEventCount());
       Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
+      //creation waiter
+      Assert.assertEquals(noOfNeeds, this.creationWaiter.getEventCount());
+      Assert.assertEquals(0, this.creationWaiter.getExceptionCount());
       //Coordinator - Participants connector
-      Assert.assertEquals(noOfNeeds, this.needConnector.getEventCount());
+      Assert.assertEquals(1, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
+      //Participants deactivator
+      Assert.assertEquals(noOfNeeds-1, this.participantDeactivator.getEventCount());
+      Assert.assertEquals(0, this.participantDeactivator.getExceptionCount());
+      //Coordinator deactivator
+      Assert.assertEquals(1, this.coordinatorDeactivator.getEventCount());
+      Assert.assertEquals(0, this.coordinatorDeactivator.getExceptionCount());
 
       Assert.assertEquals(noOfNeeds, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());

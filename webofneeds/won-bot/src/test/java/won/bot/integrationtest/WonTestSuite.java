@@ -28,8 +28,6 @@ import org.junit.runners.Suite;
         {ConversationBotTest.class,
          GroupingBotTest.class,
          CommentBotTest.class,
-         BACCBotTest.class,
-         BAPCBotTest.class,
          MatcherBotTest.class,
          BAAtomicCCActiveExitingBotTest.class,
          BAAtomicCCActiveFailingBotTest.class,
@@ -37,10 +35,13 @@ import org.junit.runners.Suite;
          BAAtomicCCBotTest.class,
          BAAtomicCCCompletingFailingBotTest.class,
          BAAtomicCCCompletingNotCompletingBotTest.class,
+         StandardTwoPhaseCommitBotTest.class,
          BAAtomicPCActiveExitingBotTest.class,
          BAAtomicPCActiveFailingBotTest.class,
          BAAtomicPCActiveNotCompletingBotTest.class,
-         BAAtomicPCBotTest.class
+         BAAtomicPCBotTest.class,
+         BACCBotTest.class,
+         BAPCBotTest.class
         })
 public class WonTestSuite
 {

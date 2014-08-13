@@ -68,7 +68,8 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   }
 
     @Override
-    public void open(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(final Connection connection, final Model content)
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
         try {
             NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
             proxy.open(connection.getRemoteConnectionURI(), RdfUtils.toString(content));
@@ -97,12 +98,12 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   }
 
   @Override
-  public void textMessage(final Connection connection, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void sendMessage(final Connection connection, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
       String messageConvert = RdfUtils.toString(message);
-      proxy.textMessage(connection.getRemoteConnectionURI(), messageConvert);
+      proxy.sendMessage(connection.getRemoteConnectionURI(), messageConvert);
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {

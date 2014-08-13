@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.WonProtocolException;
+import won.protocol.message.WonMessage;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ChatMessageRepository;
@@ -28,7 +30,6 @@ import won.protocol.vocabulary.WON;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 /**
@@ -89,7 +90,17 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     delegate.deactivate(needURI);
     Need need = needs.get(0);
     need.setState(NeedState.INACTIVE);
+
     needRepository.save(need);
+    List<Connection> cons = connectionRepository.findByNeedURI(needURI);
+    if (cons.size() >= 1){
+      for(Connection con : cons){
+        con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
+        connectionRepository.save(con);
+      }
+    }
+
+
 
   }
 
@@ -100,9 +111,16 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
       logger.debug("owner to need: OPEN called for connection {} with content {}", connectionURI,
         StringUtils.abbreviate(RdfUtils.toString(content), 200));
     }
+
     List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
     if (cons.size() != 1)
       throw new NoSuchConnectionException(connectionURI);
+
+    URI needURI = cons.get(0).getNeedURI();
+    List<Need> needs = needRepository.findByNeedURI(needURI);
+    Need need = needs.get(0);
+    if(need.getState()==NeedState.INACTIVE)
+      throw new WonProtocolException("Need is inactive");
 
     delegate.open(connectionURI, content);
 
@@ -131,7 +149,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void textMessage(final URI connectionURI, final Model message)
+  public void sendMessage(final URI connectionURI, final Model message)
     throws Exception {
     logger.debug("owner to need: MESSAGE called for connection {} with message {}", connectionURI, message);
 
@@ -140,22 +158,13 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
       throw new NoSuchConnectionException(connectionURI);
     Connection con = cons.get(0);
     //todo: text message shall be returned
-    delegate.textMessage(connectionURI, message);
+    delegate.sendMessage(connectionURI, message);
     //todo: the parameter for setMessage method shall be set by retrieving the result of delegate.textMessage method
     ChatMessage chatMessage = new ChatMessage();
     chatMessage.setCreationDate(new Date());
     chatMessage.setLocalConnectionURI(connectionURI);
 
-    Resource baseRes = message.getResource(message.getNsPrefixURI(""));
-    StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
-    String textMessage = null;
-    while (stmtIterator.hasNext()) {
-      RDFNode obj = stmtIterator.nextStatement().getObject();
-      if (obj.isLiteral()) {
-        textMessage = obj.asLiteral().getLexicalForm();
-        break;
-      }
-    }
+    String textMessage = WonRdfUtils.MessageUtils.getTextMessage(message);
     if (textMessage == null) {
       logger.debug("could not extract text message from RDF content of message");
       textMessage = "[could not extract text message]";
@@ -169,6 +178,12 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     chatMessageRepository.save(chatMessage);
 
 
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public void processMessage(final WonMessage wonMessage) {
+    delegate.processMessage(wonMessage);
   }
 
   @Override

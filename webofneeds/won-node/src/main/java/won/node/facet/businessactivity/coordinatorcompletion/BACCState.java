@@ -2,7 +2,7 @@ package won.node.facet.businessactivity.coordinatorcompletion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.vocabulary.WON;
+import won.node.facet.impl.WON_TX;
 
 import java.net.URI;
 
@@ -353,7 +353,7 @@ public enum BACCState {
 
     public URI getURI()
     {
-        return URI.create(WON.BASE_URI + name);
+        return URI.create(WON_TX.BASE_URI+ name);
     }
 
     public Phase getPhase() {
@@ -376,9 +376,25 @@ public enum BACCState {
         for (BACCState state : values())
             if (state.getURI().toString().equals(fragment))
                 return state;
-        logger.warn("No enum could be matched for: {}", fragment);
         return null;
     }
+
+  public static Phase parsePhase(final String fragment)
+  {
+    String comparedString = fragment;
+    comparedString = fragment.substring(fragment.lastIndexOf("#baPhase")+8);
+    for(Phase phase : Phase.values())
+    {
+      if (phase.toString().equals(comparedString))
+        return phase;
+    }
+    return null;
+  }
+
+  public static URI getPhaseURI(Phase phase)
+  {
+    return URI.create(WON_TX.BASE_URI + "baPhase"+phase.toString());
+  }
 
 
 

@@ -10,11 +10,11 @@
         <th>Connect</th>
         <th>Feedback</th>
     </tr>
-    <c:forEach var="match" items="${matches}">
+    <c:forEach var="match" items="${matches}" varStatus="i">
         <tr>
             <td>
                 <DL>
-                    <c:forEach var="remoteNeed" items="${remoteNeeds}">
+                    <c:set var="remoteNeed" value="${remoteNeeds[i.index]}" />
                     <c:if test="${remoteNeed.basicNeedType != null}">
                         <DT>Type:</DT>
                         <DD>${remoteNeed.basicNeedType}</DD>
@@ -31,7 +31,6 @@
                         <DT>Tags:</DT>
                         <DD>${remoteNeed.tags}</DD>
                     </c:if>
-                    </c:forEach>
                 </DL>
                 <a href="${match.toNeed}" target="_blank"> visit </a>
             </td>

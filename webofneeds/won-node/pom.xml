@@ -29,6 +29,12 @@
         -->
         <dependency>
             <groupId>webofneeds</groupId>
+            <artifactId>won-facets-tx</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>webofneeds</groupId>
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
         </dependency>

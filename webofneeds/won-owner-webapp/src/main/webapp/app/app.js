@@ -1,10 +1,10 @@
-app = angular.module('won.owner', ['ui.bootstrap', 'ui.map', 'blueimp.fileupload']).config(function ($routeProvider, $httpProvider, $provide) {
+app = angular.module('won.owner', ['ui.bootstrap', 'ui.map', 'blueimp.fileupload', 'ngMockE2E']).config(function ($routeProvider, $httpProvider, $provide) {
 	$routeProvider.
 			when('/', {controller : 'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
 			when('/signin', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
 			when('/register', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
-			when('/create-need', {controller : 'CreateNeedCtrl', templateUrl:'app/create-need/create-need.partial.html'}).
-			when('/need-list', {controller : 'NeedListCtrl', templateUrl:'app/need-list/need-list.partial.html'}).
+            when('/create-need/:step', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
+            when('/need-list', {controller : 'NeedListCtrl', templateUrl:'app/need-list/need-list.partial.html'}).
 			when('/need-detail/:needId', {controller:'NeedDetailCtrl', templateUrl:'app/need-detail/need-detail.partial.html'}).
 			otherwise({redirectTo : '/'});
 
@@ -12,7 +12,7 @@ app.directive('header', function(){
     return {
         restrict: 'A',
         replace: true,
-        tempalteUrl:'templates/header.html'
+        templateUrl:'templates/header.html'
     }
 })
 	var interceptor = function ($rootScope, $q, $location, $window) {
@@ -46,7 +46,7 @@ app.directive('header', function(){
 		};
 	};
 	$httpProvider.responseInterceptors.push(interceptor);
-
+   // $provide.decorator('$httpBackend', angular.mock.e2e.$httpBackendDecorator);
 	/* http://stackoverflow.com/questions/18888104/angularjs-q-wait-for-all-even-when-1-rejected */
 	$provide.decorator('$q', ['$delegate', function ($delegate) {
 		var $q = $delegate;
@@ -106,7 +106,41 @@ app.directive('header', function(){
 		return $q;
 	}]);
 });
+app.run(function($httpBackend){
 
+        //$httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
+
+       /* $httpBackend.whenPOST('/owner/rest/needs').respond(function(method, url, data){
+
+            return [200, 'text',{}];
+        });   */
+       /* $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').respond(function(method, url, data){
+
+            return [200, 'text',{}];
+        });*/
+        $httpBackend.whenPOST('/owner/rest/needs/').passThrough();
+        $httpBackend.whenGET('/owner/rest/needs/drafts').passThrough();
+        $httpBackend.whenPOST('/owner/rest/needs/drafts').passThrough();
+        $httpBackend.whenDELETE('/owner/rest/needs/drafts').passThrough();
+        $httpBackend.whenGET('/owner/rest/needs/drafts/.+').passThrough();
+        $httpBackend.whenDELETE('/owner/rest/needs/drafts/.+').passThrough();
+       // $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').passThrough();
+        $httpBackend.whenGET(/.*/).passThrough();
+        $httpBackend.whenPOST(/.*/).passThrough();
+       // $httpBackend.whenPOST(/\/owner\/rest\/user\/.*/).passThrough();
+        $httpBackend.whenPOST('/owner').passThrough();
+        $httpBackend.whenGET('/').passThrough();
+        $httpBackend.whenGET('/signin').passThrough();
+        $httpBackend.whenGET('/register').passThrough();
+        $httpBackend.whenGET('/create-need').passThrough();
+        $httpBackend.whenGET('/need-list').passThrough();
+        $httpBackend.whenGET('/need-detail/:needId').passThrough();
+        $httpBackend.whenGET('app/home/home.partial.html').passThrough();
+        $httpBackend.whenGET('app/home/home.partial.html').passThrough();
+       // $httpBackend.whenGET(/app\/.*/).passThrough();
+       // $httpBackend.whenGET('/app.*/').passThrough();
+    }
+);
 angular.resetForm = function (scope, formName, defaults) {
 	$('form[name=' + formName + '], form[name=' + formName + '] .ng-dirty').removeClass('ng-dirty').addClass('ng-pristine');
 	var form = scope[formName];

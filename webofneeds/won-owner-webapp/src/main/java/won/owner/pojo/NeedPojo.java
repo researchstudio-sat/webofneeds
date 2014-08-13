@@ -83,8 +83,10 @@ public class NeedPojo
   {
     this.needURI = needUri.toString();
     Resource need = model.getResource(needUri.toString());
-    creationDate = need.getProperty(DCTerms.created).getString();
-
+    Statement creationDateStat = need.getProperty(DCTerms.created);
+    if (creationDateStat!=null){
+      creationDate = creationDateStat.getString();
+    }
     Statement basicNeedStat = need.getProperty(WON.HAS_BASIC_NEED_TYPE);
     if (basicNeedStat != null) {
       URI uri = URI.create(basicNeedStat.getResource().getURI());

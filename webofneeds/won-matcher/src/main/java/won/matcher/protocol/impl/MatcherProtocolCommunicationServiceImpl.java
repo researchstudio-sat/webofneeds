@@ -19,14 +19,9 @@ package won.matcher.protocol.impl;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchNeedException;
 import won.protocol.jms.*;
-import won.protocol.repository.NeedRepository;
-import won.protocol.repository.WonNodeRepository;
-import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.Set;
@@ -41,10 +36,6 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
 
   private MatcherActiveMQService activeMQService;
 
-  @Autowired
-  private NeedRepository needRepository;
-  @Autowired
-  private WonNodeRepository wonNodeRepository;
 
   private String componentName;
 
@@ -63,7 +54,7 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
       {
         camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.getEndpoint(needBrokerUri));
       } else {
-        //matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,needBrokerUri);
+        matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,needBrokerUri);
         matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(needUri);
         camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(needBrokerUri,
                                                                                                          matcherProtocolQueueName));
@@ -77,7 +68,7 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
 
       matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
       camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(brokerUri,matcherProtocolQueueName));
-      //matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,brokerUri);
+      matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,brokerUri);
       camelConfiguration.setBrokerComponentName(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
       ActiveMQComponent activeMQComponent = (ActiveMQComponent)matcherProtocolCamelConfigurator.getCamelContext().getComponent(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
       logger.info("ActiveMQ Service Status : {}",activeMQComponent.getStatus().toString());
@@ -85,11 +76,6 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
     }
     return camelConfiguration;
   }
-
-    @Override
-    public URI getWonNodeUriWithNeedUri(URI needUri) throws NoSuchNeedException {
-        return DataAccessUtils.loadNeed(needRepository, needUri).getWonNodeURI();
-    }
 
   @Override
   public synchronized Set<String> getMatcherProtocolOutTopics(URI wonNodeURI) {

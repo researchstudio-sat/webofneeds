@@ -3,7 +3,7 @@ package won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBo
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.BATestScriptAction;
 import won.bot.framework.events.listener.baStateBots.NopAction;
-import won.bot.framework.events.listener.baStateBots.WON_BA;
+import won.node.facet.impl.WON_TX;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class CompletingSPCancelingBot extends BATestBotScript
     //actions.add(new BATestScriptAction(false, "MESSAGE_CANCEL", URI.create(WON_BA.STATE_COMPLETING.getURI()));
 
     actions.add(new NopAction());
-    actions.add(new BATestScriptAction(true, "MESSAGE_CANCELED", URI.create(WON_BA.STATE_CANCELING_COMPLETING.getURI())));
+    actions.add(new BATestScriptAction(true, "MESSAGE_CANCELED", URI.create(WON_TX.STATE_CANCELING_COMPLETING.getURI())));
 
     return actions;
   }

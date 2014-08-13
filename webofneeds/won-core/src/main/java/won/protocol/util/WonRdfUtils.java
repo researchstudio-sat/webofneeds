@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
+
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -68,6 +69,19 @@ public class WonRdfUtils
       feedbackNode.addProperty(WON.HAS_BINARY_RATING, isFeedbackPositive ? WON.GOOD : WON.BAD);
       feedbackNode.addProperty(WON.FOR_RESOURCE, messageModel.createResource(forResource.toString()));
       return messageModel;
+    }
+
+    /**
+     * Returns the first won:hasTextMessage object, or null if none is found.
+     * @param model
+     * @return
+     */
+    public static String getTextMessage(Model model){
+      Statement stmt = model.getProperty(RdfUtils.getBaseResource(model),WON.HAS_TEXT_MESSAGE);
+      if (stmt != null) {
+        return stmt.getObject().asLiteral().getLexicalForm();
+      }
+      return null;
     }
 
   }

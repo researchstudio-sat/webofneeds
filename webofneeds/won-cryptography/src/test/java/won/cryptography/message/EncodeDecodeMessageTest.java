@@ -7,9 +7,11 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.Test;
+import won.protocol.message.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 
 /**
  * User: ypanchenko
@@ -31,14 +33,14 @@ public class EncodeDecodeMessageTest
       RESOURCE_DATA_FILE);
 
     String encoded = WonMessageEncoder.encode(wonmsg, lang);
-    //System.out.println(encoded);
+    System.out.println(encoded);
     //System.out.println();
 
     WonMessage wonmsgDecoded = WonMessageDecoder.decode(lang, encoded);
     // for debugging
-    //StringWriter sw = new StringWriter();
-    //RDFDataMgr.write(sw, wonmsgDecoded.asDataset(), RDFFormat.TRIG.getLang());
-    //System.out.println(sw.toString());
+    StringWriter sw = new StringWriter();
+    RDFDataMgr.write(sw, WonMessageEncoder.encodeAsDataset(wonmsgDecoded), RDFFormat.TRIG.getLang());
+    System.out.println(sw.toString());
 
     Assert.assertTrue(wonmsg.getProtocol().equals(wonmsgDecoded.getProtocol()));
     Assert.assertTrue(wonmsg.getMethod().equals(wonmsgDecoded.getMethod()));

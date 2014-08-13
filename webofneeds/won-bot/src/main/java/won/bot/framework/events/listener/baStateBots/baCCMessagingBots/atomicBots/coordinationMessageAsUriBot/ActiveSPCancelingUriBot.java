@@ -3,7 +3,7 @@ package won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBo
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;
 import won.bot.framework.events.listener.baStateBots.BATestScriptAction;
 import won.bot.framework.events.listener.baStateBots.NopAction;
-import won.bot.framework.events.listener.baStateBots.WON_BA;
+import won.node.facet.impl.WON_TX;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -24,7 +24,8 @@ public class ActiveSPCancelingUriBot extends BATestBotScript
     //actions.add(new BATestScriptAction(true, "MESSAGE_CANCEL", URI.create(WON_BA.STATE_ACTIVE.getURI()), 3));
 
     actions.add(new NopAction());
-    actions.add(new BATestScriptAction(true, URI.create(WON_BA.MESSAGE_CANCELED.getURI()), URI.create(WON_BA.STATE_CANCELING_ACTIVE.getURI())));
+    actions.add(new BATestScriptAction(true, URI.create(WON_TX
+      .MESSAGE_CANCELED.getURI()), URI.create(WON_TX.STATE_CANCELING_ACTIVE.getURI())));
 
     return actions;
   }

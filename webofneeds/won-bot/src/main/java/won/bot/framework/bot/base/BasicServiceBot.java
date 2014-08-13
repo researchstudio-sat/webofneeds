@@ -26,6 +26,8 @@ import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
+import java.net.URI;
+
 /**
  * Base class for bots containing basic services.
  */
@@ -33,6 +35,7 @@ public abstract class BasicServiceBot extends BaseBot
 {
   private NodeURISource nodeURISource;
   private MatcherNodeURISource matcherNodeURISource;
+  private URI solrServerURI;
   private NeedProducer needProducer;
   private OwnerProtocolNeedServiceClientSide ownerService;
   private MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient;
@@ -76,7 +79,13 @@ public abstract class BasicServiceBot extends BaseBot
   protected MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService(){
     return matcherProtocolMatcherService;
   }
+  public URI getSolrServerURI() {
+    return solrServerURI;
+  }
 
+  public void setSolrServerURI(final URI solrServerURI) {
+    this.solrServerURI = solrServerURI;
+  }
 
 
   @Qualifier("default")

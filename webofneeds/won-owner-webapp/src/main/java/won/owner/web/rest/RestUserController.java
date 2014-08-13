@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +17,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
@@ -38,7 +42,7 @@ import javax.servlet.http.HttpServletResponse;
  * Date: 11/12/13
  */
 @Controller
-@RequestMapping("/rest/user")
+@RequestMapping("/rest/users")
 public class RestUserController {
 
 	private WONUserDetailService wonUserDetailService;
@@ -58,6 +62,12 @@ public class RestUserController {
 		this.userRegisterValidator = userRegisterValidator;
 	}
 
+  /**
+   * registers user
+   * @param user registration data of a user
+   * @param errors
+   * @return ResponseEntity with Http Status Code
+   */
 	@ResponseBody
 	@RequestMapping(
 			value = "/",
@@ -71,10 +81,10 @@ public class RestUserController {
 			if (errors.hasErrors()) {
 				if (errors.getFieldErrorCount() > 0) {
 					// someone trying to go around js validation
-					return new ResponseEntity(HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
 				} else {
 					// username is already in database
-					return new ResponseEntity(HttpStatus.CONFLICT);
+					return new ResponseEntity("Cannot create user: name is already in use.",HttpStatus.CONFLICT);
 				}
 			} else {
 				PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -82,41 +92,79 @@ public class RestUserController {
 			}
 		} catch (DataIntegrityViolationException e) {
 			// username is already in database
-			return new ResponseEntity(HttpStatus.CONFLICT);
+			return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
 		}
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity("New user was created", HttpStatus.CREATED);
 	}
 
+  /**
+   * check authentication and returrn ResponseEntity with HTTP status code
+   * @param user user object
+   * @param request
+   * @param response
+   * @return
+   */
 	@RequestMapping(
-			value = "/login",
+			value = "/signin",
 			method = RequestMethod.POST
 	)
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
 	public ResponseEntity logIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
+    SecurityContext context = SecurityContextHolder.getContext();
 		UsernamePasswordAuthenticationToken token =	new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
 		try {
 			Authentication auth = authenticationManager.authenticate(token);
-			SecurityContextHolder.getContext().setAuthentication(auth);
-			securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
-			return new ResponseEntity(HttpStatus.OK);
+      SecurityContextHolder.getContext().setAuthentication(auth);
+      securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+			return new ResponseEntity("Signed in.", HttpStatus.OK);
 		} catch (BadCredentialsException ex) {
-			return new ResponseEntity(HttpStatus.FORBIDDEN);
+			return new ResponseEntity("No such username/password combination registered.", HttpStatus.FORBIDDEN);
 		}
 	}
 
+  /**
+   *
+   * @return
+   */
 	@RequestMapping(
-			value = "/logout",
+			value = "/signout",
 			method = RequestMethod.POST
 	)
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
-	public ResponseEntity logOut() {
+	public ResponseEntity logOut(HttpServletRequest request, HttpServletResponse response) {
 		SecurityContext context = SecurityContextHolder.getContext();
-		if(context != null) {
-			context.setAuthentication(null);
-		}
-		return new ResponseEntity(HttpStatus.OK);
+    if (context.getAuthentication() == null) {
+      return new ResponseEntity("No user is signed in, ignoring this request.", HttpStatus.NOT_MODIFIED);
+    }
+    myLogoff(request, response);
+    return new ResponseEntity("Signed out", HttpStatus.OK);
 	}
+
+  @RequestMapping(
+    value = "/{userId}/favourites",
+    method = RequestMethod.POST
+  )
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity saveAsFavourite(){
+    return null;
+  }
+  @RequestMapping(
+    value="/{userId}/resetPassword",
+    method = RequestMethod.POST
+  )
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity resetPassword(@RequestBody String password){
+     return null;
+  }
+
+  private static void myLogoff(HttpServletRequest request, HttpServletResponse response) {
+    CookieClearingLogoutHandler cookieClearingLogoutHandler = new CookieClearingLogoutHandler(
+      AbstractRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY);
+    SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
+    cookieClearingLogoutHandler.logout(request, response, null);
+    securityContextLogoutHandler.logout(request, response, null);
+  }
 
 }

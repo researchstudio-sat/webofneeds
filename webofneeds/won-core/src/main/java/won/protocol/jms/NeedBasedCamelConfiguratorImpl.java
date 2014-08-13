@@ -20,6 +20,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
+import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ import java.net.URI;
  * User: LEIH-NB
  * Date: 26.02.14
  */
-public class NeedBasedCamelConfiguratorImpl implements NeedProtocolCamelConfigurator {
+public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCamelConfigurator {
 
     private BiMap<URI, String> endpointMap = HashBiMap.create();
     protected BiMap<URI,String> brokerComponentMap = HashBiMap.create();
@@ -85,12 +86,20 @@ public class NeedBasedCamelConfiguratorImpl implements NeedProtocolCamelConfigur
         brokerComponentMap.put(brokerUri,brokerComponentName);
     }
 
-    @Override
-    public void addRouteForEndpoint(String startingEndpoint, URI wonNodeURI) throws CamelConfigurationFailedException {
-        //To change body of implemented methods use File | Settings | File Templates.
+  @Override
+  public synchronized void addRouteForEndpoint(String startingEndpoint,URI brokerUri) throws CamelConfigurationFailedException {
+    if (getCamelContext().getRoute(startingEndpoint)==null){
+      try {
+        getCamelContext().addRoutes(createRoutesBuilder(startingEndpoint, brokerUri));
+      } catch (Exception e) {
+        throw new CamelConfigurationFailedException("adding route to camel context failed",e);
+      }
     }
+  }
 
-    @Override
+  protected abstract RoutesBuilder createRoutesBuilder(final String startingComponent, final URI brokerUri);
+
+  @Override
     public void setCamelContext(CamelContext camelContext) {
         this.camelContext=camelContext;
     }

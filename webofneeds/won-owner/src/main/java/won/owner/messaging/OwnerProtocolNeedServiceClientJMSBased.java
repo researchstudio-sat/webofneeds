@@ -29,6 +29,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import won.protocol.exception.*;
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MessagingService;
+import won.protocol.message.WonMessage;
 import won.protocol.model.WonNode;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.WonNodeRepository;
@@ -153,7 +154,14 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         logger.debug("sending activate message: " + needURI.toString());
 
     }
-    /**
+
+  @Override
+  public void processMessage(final WonMessage wonMessage) {
+    wonMessage.getMethod().getMethodUri();
+    //URI wonNodeUri ownerProtocolCommunicationServiceImpl
+  }
+
+  /**
      * registers the owner application at a won node.
      *
      * @return ownerApplicationId
@@ -226,7 +234,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public void textMessage(URI connectionURI, Model message) throws Exception {
+    public void sendMessage(URI connectionURI, Model message) throws Exception {
         String messageConvert = RdfUtils.toString(message);
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithConnectionUri(connectionURI);
@@ -237,7 +245,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         Map<String, Object> headerMap = new HashMap<>();
         headerMap.put("connectionURI",connectionURI.toString());
         headerMap.put("message",messageConvert);
-        headerMap.put("methodName","textMessage");
+        headerMap.put("methodName","sendMessage");
         headerMap.put("remoteBrokerEndpoint", endpoint);
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);

@@ -46,9 +46,6 @@ public class MatcherProtocolMatcherServiceImplJMSBased
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private WonNodeRepository wonNodeRepository;
-
-  @Autowired
   private MatcherNodeURISource matcherNodeURISource;
 
   @Autowired

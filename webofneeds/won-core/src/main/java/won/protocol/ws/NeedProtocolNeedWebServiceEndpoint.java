@@ -16,6 +16,7 @@
 
 package won.protocol.ws;
 
+import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.ws.fault.ConnectionAlreadyExistsFault;
 import won.protocol.ws.fault.IllegalMessageForConnectionStateFault;
@@ -50,14 +51,15 @@ public interface NeedProtocolNeedWebServiceEndpoint
 
   @WebMethod
   void open(@WebParam(name = "connectionURI") URI connectionURI,
-               @WebParam(name = "content") String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
+               @WebParam(name = "content") String content)
+    throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault, IllegalMessageForNeedStateException;
 
   @WebMethod
   void close(@WebParam(name = "connectionURI") URI connectionURI,
           @WebParam(name = "content") String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 
   @WebMethod
-  void textMessage(
-          @WebParam(name = "connectionURI") URI connectionURI,
-          @WebParam(name = "content") String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
+  void sendMessage(
+    @WebParam(name = "connectionURI") URI connectionURI,
+    @WebParam(name = "content") String message) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault;
 }

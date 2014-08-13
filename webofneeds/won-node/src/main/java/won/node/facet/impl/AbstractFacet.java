@@ -9,7 +9,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.node.rdfstorage.RDFStorageService;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.node.service.DataAccessService;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
@@ -128,19 +128,20 @@ public abstract class AbstractFacet implements Facet
    * It is used to indicate the sending of a chat message with by the specified connection object con
    * to the remote partner.
    *
+   *
    * @param con the connection object
    * @param message  the chat message
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
   @Override
-  public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void sendMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
     executorService.execute(new Runnable() {
       @Override
       public void run() {
         try {
-            needFacingConnectionClient.textMessage(con, message);
+            needFacingConnectionClient.sendMessage(con, message);
         } catch (Exception e) {
             logger.warn("caught Exception in textMessageFromOwner: ",e);
         }
@@ -209,19 +210,20 @@ public abstract class AbstractFacet implements Facet
    * It is used to indicate the sending of a chat message with by the specified connection object con
    * to the remote partner.
    *
+   *
    * @param con the connection object
    * @param message  the chat message
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
   @Override
-  public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void sendMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //send to the need side
     executorService.execute(new Runnable() {
       @Override
       public void run() {
         try {
-          ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+          ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message);
         } catch (Exception e) {
           logger.warn("caught Exception in textMessageFromNeed:", e);
         }
@@ -324,30 +326,39 @@ public abstract class AbstractFacet implements Facet
 
     final Connection connectionForRunnable = con;
     //send to need
-    executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
-          dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
 
-        } catch (WonProtocolException e) {
-          // we can't connect the connection. we send a close back to the owner
-          // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
-          // For now, we call the close method as if it had been called from the remote side
-          // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
-          logger.warn("could not connectFromOwner, sending close back. Exception was: ",e);
-          try {
-            needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI(), content);
-          } catch (Exception e1) {
-            logger.warn("caught Exception sending close back from connectFromOwner::", e1);
+    try {
+      final ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),
+        con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
+      this.executorService.execute(new Runnable(){
+        @Override
+        public void run() {
+          try{
+            if (logger.isDebugEnabled()) {
+              logger.debug("saving remote connection URI");
+            }
+            dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
+          } catch (Exception e) {
+            logger.warn("Error saving connection {}. Stacktrace follows", con);
+            logger.warn("Error saving connection ", e);
           }
-        } catch (Exception e) {
-            logger.warn("caught Exception in connectFromOwner: ",e);
         }
-      }
-    });
+      });
 
+    } catch (WonProtocolException e) {
+      // we can't connect the connection. we send a close back to the owner
+      // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
+      // For now, we call the close method as if it had been called from the remote side
+      // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
+      logger.warn("could not connectFromOwner, sending close back. Exception was: ",e);
+      try {
+        needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI(), content);
+      } catch (Exception e1) {
+        logger.warn("caught Exception sending close back from connectFromOwner::", e1);
+      }
+    } catch (Exception e) {
+        logger.warn("caught Exception in connectFromOwner: ",e);
+    }
   }
 
   /**

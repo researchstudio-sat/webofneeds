@@ -33,8 +33,8 @@ public class NeedProtocolStaticRoutes extends RouteBuilder {
                 .to("bean:needProtocolNeedServiceJMSBased?method=open")
                 .when(header("methodName").isEqualTo("close"))
                 .to("bean:needProtocolNeedServiceJMSBased?method=close")
-                .when(header("methodName").isEqualTo("textMessage"))
-                .to("bean:needProtocolNeedServiceJMSBased?method=textMessage")
+                .when(header("methodName").isEqualTo("sendMessage"))
+                .to("bean:needProtocolNeedServiceJMSBased?method=sendMessage")
                 .otherwise()
                 .wireTap("bean:messagingService?method=inspectMessage")
                 .to("activemq:queue:ActiveMQ.NeedProtocol.In.DLQ");
