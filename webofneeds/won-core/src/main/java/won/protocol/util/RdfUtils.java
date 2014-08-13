@@ -2,6 +2,8 @@ package won.protocol.util;
 
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.shared.Lock;
@@ -12,17 +14,16 @@ import com.hp.hpl.jena.util.FileUtils;
 import com.hp.hpl.jena.util.ResourceUtils;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.vocabulary.WON;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -50,7 +51,49 @@ public class RdfUtils
     return readRdfSnippet(content, FileUtils.langTurtle);
   }
 
-  /**
+    /**
+     * Converts a Jena Dataset into a TriG string
+     *
+     * @param dataset Dataset containing RDF which will be converted
+     * @return <code>String</code> containing TriG serialized RDF from the dataset
+     */
+    public static String toString(Dataset dataset) {
+
+        String result = "";
+
+        if (dataset != null) {
+            StringWriter sw = new StringWriter();
+            RDFDataMgr.write(sw, dataset, RDFFormat.TRIG.getLang());
+            result = sw.toString();
+        }
+        return result;
+    }
+
+    /**
+     * Converts a <code>String</code> containing TriG formatted RDF into a Jena Dataset
+     *
+     * @param content String with the TriG formatted RDF
+     * @return Jena Dataset containing the RDF from content
+     */
+    public static Dataset toDataset(String content) {
+
+        Dataset dataset = DatasetFactory.createMem();
+
+        if (content != null) {
+            InputStream is = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+            RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
+            try {
+                is.close();
+            } catch (IOException ex) {
+                logger.warn ("An exception occurred.", ex);
+            }
+        }
+        return dataset;
+    }
+
+
+
+    /**
    * Clones the specified model (its statements and ns prefixes) and returns the clone.
    * @param original
    * @return
