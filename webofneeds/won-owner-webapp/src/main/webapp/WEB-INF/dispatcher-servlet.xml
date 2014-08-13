@@ -43,7 +43,7 @@ http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd">
 		<property name="suffix" value=".jsp"/>
 	</bean>
     <websocket:handlers>
-        <websocket:mapping path="/msgr" handler="wonWebSocketHandler"/>
+        <websocket:mapping path="/msg" handler="wonWebSocketHandler"/>
         <websocket:sockjs/>
     </websocket:handlers>
 
