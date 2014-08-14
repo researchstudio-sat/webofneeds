@@ -1,5 +1,6 @@
 package won.node.messaging;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.Exchange;
 import org.apache.camel.Header;
@@ -62,33 +63,48 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
             @Header("model") String content,
             @Header("activate") boolean activate,
             @Header("ownerApplicationID") String ownerApplicationID,
+            @Header("messageEvent") String messageEventString,
             Exchange exchange) throws IllegalNeedContentException, JMSException {
 
         URI needURI = null;
         URI ownerURIconvert = URI.create(ownerURI);
         Model contentconvert = RdfUtils.toModel(content);
+        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
 
         logger.debug("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
-        needURI = delegate.createNeed(ownerURIconvert, contentconvert, activate,ownerApplicationID );
+        needURI = delegate.createNeed(
+                ownerURIconvert,
+                contentconvert,
+                activate,
+                ownerApplicationID,
+                messageEvent);
         exchange.getOut().setBody(needURI);
 
        return needURI;
     }
 
     public void activate(
-            @Header("needURI") String needURI) throws NoSuchNeedException {
+            @Header("needURI") String needURI,
+            @Header("messageEvent") String messageEventString)
+            throws NoSuchNeedException {
         logger.debug("activateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
-        delegate.activate(needURIconvert);
+        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+
+        delegate.activate(needURIconvert, messageEvent);
     }
 
     public void deactivate(
-            @Header("needURI") String needURI) throws NoSuchNeedException, NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            @Header("needURI") String needURI,
+            @Header("messageEvent") String messageEventString)
+            throws NoSuchNeedException, NoSuchConnectionException, IllegalMessageForConnectionStateException {
         logger.debug("deactivateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
-        delegate.deactivate(needURIconvert);
+        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+
+        delegate.deactivate(needURIconvert, messageEvent);
     }
 
     //@Override
@@ -148,41 +164,58 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
 
     public void open(
             @Header("connectionURI")String connectionURI,
-            @Header("content")String content)
+            @Header("content")String content,
+            @Header("messageEvent") String messageEventString)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
+
         URI connectionURIConvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(content);
-        delegate.open(connectionURIConvert, contentConvert);
+        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+
+        delegate.open(connectionURIConvert, contentConvert, messageEvent);
     }
 
     public void close(
             @Header("connectionURI")String connectionURI,
-            @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            @Header("content")String content,
+            @Header("messageEvent") String messageEventString)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
         URI connectionURIConvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(content);
-        delegate.close(connectionURIConvert, contentConvert);
+        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+
+        delegate.close(connectionURIConvert, contentConvert, messageEvent);
     }
 
     public void sendMessage(
       @Header("connectionURI") String connectionURI,
-      @Header("message") String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+      @Header("message") String message,
+      @Header("messageEvent") String messageEventString)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
         URI connectionURIconvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(message);
-        delegate.sendMessage(connectionURIconvert, contentConvert);
+        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+
+        delegate.sendMessage(connectionURIconvert, contentConvert, messageEvent);
     }
 
     public URI connect(
             @Header("needURI") String needURI,
             @Header("otherNeedURI") String otherNeedURI,
-            @Header("content") String content, Exchange exchange) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+            @Header("content") String content, Exchange exchange,
+            @Header("messageEvent") String messageEventString)
+            throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
         logger.debug("connectNeed: message received: {}", content);
 
         URI result = null;
         URI needURIConvert = URI.create(needURI);
         URI otherNeedURIConvert = URI.create(otherNeedURI);
         Model contentConvert = RdfUtils.toModel(content);
-        result = delegate.connect(needURIConvert,otherNeedURIConvert,contentConvert);
+        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+
+        result = delegate.connect(needURIConvert,otherNeedURIConvert,contentConvert, messageEvent);
        // result = needCommunicationService.connect(needURIConvert, otherNeedURIConvert, contentConvert);
 
         return result;

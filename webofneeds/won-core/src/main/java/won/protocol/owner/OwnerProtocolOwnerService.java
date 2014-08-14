@@ -16,6 +16,7 @@
 
 package won.protocol.owner;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
@@ -44,7 +45,10 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    * @param content
    * @throws NoSuchNeedException if ownNeedURI is not a known need URI
    */
-  public void hint(String ownNeedURI, String otherNeedURI, String score, String originatorURI, String content) throws NoSuchNeedException, IllegalMessageForNeedStateException;
+  public void hint(String ownNeedURI, String otherNeedURI,
+                   String score, String originatorURI,
+                   String content, Dataset messageEvent)
+          throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
   /**
    * Informs the owner of a connection initiated by the need identified by otherNeedURI to the
@@ -67,7 +71,10 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    * @throws ConnectionAlreadyExistsException
    *                             if the two needs are already connected
    */
-  public void connect(String ownNeedURI, String otherNeedURI, String ownConnectionURI, String content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
+  public void connect(String ownNeedURI, String otherNeedURI,
+                      String ownConnectionURI, String content,
+                      Dataset messageEvent)
+          throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
   //TODO move to another interface maybe?
 }

@@ -17,6 +17,7 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.graph.TripleBoundary;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -56,7 +57,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   private URIService URIService;
 
   @Override
-  public void open(final URI connectionURI, final Model content)
+  public void open(final URI connectionURI, final Model content, Dataset messageEvent)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
 
@@ -72,7 +73,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   }
 
   @Override
-  public void close(final URI connectionURI, final Model content)
+  public void close(final URI connectionURI, final Model content, Dataset messageEvent)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("CLOSE received from the owner side for connection {} with content {}", connectionURI, content);
 
@@ -88,7 +89,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   }
 
   @Override
-  public void sendMessage(final URI connectionURI, final Model message)
+  public void sendMessage(final URI connectionURI, final Model message, Dataset messageEvent)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);

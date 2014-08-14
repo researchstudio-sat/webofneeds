@@ -1,5 +1,6 @@
 package won.node.facet.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +27,11 @@ public class OwnerFacetImpl extends AbstractFacet
   }
 
   @Override
-  public void connectFromNeed(final Connection con, final Model content) throws NoSuchNeedException,
+  public void connectFromNeed(final Connection con, final Model content, final Dataset messageEvent)
+          throws NoSuchNeedException,
     IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
-    super.connectFromNeed(con, content);
+    super.connectFromNeed(con, content, messageEvent);
     /* when connected change linked data*/
 
 

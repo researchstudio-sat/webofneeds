@@ -16,6 +16,7 @@
 
 package won.node.service.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
@@ -68,24 +69,27 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   private URIService uriService;
 
   @Override
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void open(final URI connectionURI, final Model content, Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_OPEN);
     ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_OPEN);
     dataService.saveAdditionalContentForEvent(content, con, event);
     //invoke facet implementation
-    reg.get(con).openFromNeed(con, content);
+    reg.get(con).openFromNeed(con, content, messageEvent);
   }
 
   @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void close(final URI connectionURI, final Model content, Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
     ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_CLOSE);
     dataService.saveAdditionalContentForEvent(content, con, event);
     //invoke facet implementation
-    reg.get(con).closeFromNeed(con, content);
+    reg.get(con).closeFromNeed(con, content, messageEvent);
   }
     @Override
-    public void sendMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void sendMessage(final URI connectionURI, final Model message, Dataset messageEvent)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
       //create ConnectionEvent in Database
         ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_MESSAGE);
@@ -98,7 +102,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
           logger.debug("message after saving:\n{}",writer.toString());
         }
         //invoke facet implementation
-        reg.get(con).sendMessageFromNeed(con, message);
+        reg.get(con).sendMessageFromNeed(con, message, messageEvent);
     }
 
   private void replaceBaseURIWithEventURI(final Model message, final Connection con, final ConnectionEvent event) {

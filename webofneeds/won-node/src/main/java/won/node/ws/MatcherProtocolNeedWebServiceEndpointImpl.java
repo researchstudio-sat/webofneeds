@@ -59,7 +59,8 @@ public class MatcherProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAut
         wireDependenciesLazily();
 
       try {
-        matcherProtocolNeedService.hint(needURI, otherNeedURI, score, originatorURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
+        matcherProtocolNeedService.hint(needURI, otherNeedURI, score,
+                originatorURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), null);
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (IllegalMessageForNeedStateException e) {

@@ -21,6 +21,7 @@ package won.node.service.impl;
  * Date: 28.10.13
  */
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.javasimon.SimonManager;
@@ -82,7 +83,12 @@ public class NeedManagementServiceImpl implements NeedManagementService
     private OwnerApplicationRepository ownerApplicationRepository;
 
   @Override
-  public URI createNeed(final URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException
+  public URI createNeed(
+          final URI ownerURI,
+          final Model content,
+          final boolean activate,
+          String ownerApplicationID,
+          Dataset messageEvent) throws IllegalNeedContentException
   {
     String stopwatchName = getClass().getName()+".createNeed";
 
@@ -136,7 +142,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     split = stopwatch.start();
     authorizeOwnerApplicationForNeed(ownerApplicationID, need);
     split.stop();
-    matcherProtocolMatcherClient.needCreated(need.getNeedURI(),content);
+    matcherProtocolMatcherClient.needCreated(need.getNeedURI(), content, messageEvent);
 
     return need.getNeedURI();
   }
@@ -184,7 +190,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   }
 
   @Override
-    public void activate(final URI needURI) throws NoSuchNeedException
+    public void activate(final URI needURI, Dataset messageEvent) throws NoSuchNeedException
     {
 
       logger.debug("ACTIVATING need. needURI:{}",needURI);
@@ -194,12 +200,13 @@ public class NeedManagementServiceImpl implements NeedManagementService
       logger.debug("Setting Need State: "+ need.getState());
       needRepository.save(need);
 
-      matcherProtocolMatcherClient.needActivated(need.getNeedURI());
+      matcherProtocolMatcherClient.needActivated(need.getNeedURI(), messageEvent);
 
     }
 
     @Override
-    public void deactivate(final URI needURI) throws NoSuchNeedException, NoSuchConnectionException {
+    public void deactivate(final URI needURI, Dataset messageEvent)
+            throws NoSuchNeedException, NoSuchConnectionException {
         logger.debug("DEACTIVATING need. needURI:{}",needURI);
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
         Need need = DataAccessUtils.loadNeed(needRepository, needURI);
@@ -210,13 +217,14 @@ public class NeedManagementServiceImpl implements NeedManagementService
           (), ConnectionState.CLOSED);
         for (URI connURI : connectionURIs) {
             try {
-                  ownerFacingConnectionCommunicationService.close(connURI, null);
+                // ToDo (FS): create appropriate messageEvent
+                  ownerFacingConnectionCommunicationService.close(connURI, null, messageEvent);
             } catch (IllegalMessageForConnectionStateException e) {
                 logger.warn("wrong connection state",e);
             }
 
         }
-      matcherProtocolMatcherClient.needDeactivated(need.getNeedURI());
+      matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), messageEvent);
     }
 
     private boolean isNeedActive(final Need need)

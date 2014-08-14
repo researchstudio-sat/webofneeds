@@ -53,7 +53,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
         wireDependenciesLazily();
       try {
         Model messageConvert = RdfUtils.toModel(message);
-        ownerProtocolNeedService.sendMessage(connectionURI, messageConvert);
+        ownerProtocolNeedService.sendMessage(connectionURI, messageConvert, null);
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {
@@ -66,7 +66,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
       throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault, IllegalMessageForNeedStateException {
         wireDependenciesLazily();
       try {
-        ownerProtocolNeedService.open(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
+        ownerProtocolNeedService.open(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), null);
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {
@@ -78,7 +78,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     public void close(@WebParam(name = "connectionURI") final URI connectionURI, @WebParam(name = "content") final String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         wireDependenciesLazily();
       try {
-        ownerProtocolNeedService.close(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
+        ownerProtocolNeedService.close(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), null);
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {
@@ -91,7 +91,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     {
         wireDependenciesLazily();
       try {
-        return ownerProtocolNeedService.createNeed(ownerURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), activate, null);
+        return ownerProtocolNeedService.createNeed(ownerURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), activate, null, null);
       } catch (IllegalNeedContentException e) {
         throw IllegalNeedContentFault.fromException(e);
       }
@@ -101,7 +101,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     public URI connect(@WebParam(name = "needURI") final URI needURI, @WebParam(name = "otherNeedURI") final URI otherNeedURI, @WebParam(name = "content") final String content) throws NoSuchNeedFault, IllegalMessageForNeedStateFault, ConnectionAlreadyExistsFault {
         wireDependenciesLazily();
       try {
-        return ownerProtocolNeedService.connect(needURI, otherNeedURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
+        return ownerProtocolNeedService.connect(needURI, otherNeedURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), null);
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (IllegalMessageForNeedStateException e) {
@@ -115,7 +115,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     public void deactivate(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedFault, NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         wireDependenciesLazily();
       try {
-        ownerProtocolNeedService.deactivate(needURI);
+        ownerProtocolNeedService.deactivate(needURI, null);
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (NoSuchConnectionException e) {
@@ -129,7 +129,7 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     public void activate(@WebParam(name = "needURI") final URI needURI) throws NoSuchNeedFault {
         wireDependenciesLazily();
       try {
-        ownerProtocolNeedService.activate(needURI);
+        ownerProtocolNeedService.activate(needURI, null);
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       }

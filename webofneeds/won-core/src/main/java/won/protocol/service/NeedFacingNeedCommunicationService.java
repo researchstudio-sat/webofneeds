@@ -16,6 +16,7 @@
 
 package won.protocol.service;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
@@ -46,7 +47,9 @@ public interface NeedFacingNeedCommunicationService
    * @throws won.protocol.exception.ConnectionAlreadyExistsException if there already is a connection between the specified needs
    * @return the URI of the newly created connection
    */
-  public URI connect(URI needURI, URI otherNeedURI, URI otherConnectionURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+  public URI connect(URI needURI, URI otherNeedURI, URI otherConnectionURI,
+                     Model content, Dataset messageEvent)
+          throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
 
 }
