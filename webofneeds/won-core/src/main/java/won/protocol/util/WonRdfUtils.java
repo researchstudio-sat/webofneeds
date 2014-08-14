@@ -19,6 +19,9 @@ import java.util.LinkedList;
  */
 public class WonRdfUtils
 {
+
+  public static final String NAMED_GRAPH_SUFFIX = "#data";
+
   private static final Logger logger = LoggerFactory.getLogger(WonRdfUtils.class);
   public static class MessageUtils {
     /**

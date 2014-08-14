@@ -2,10 +2,13 @@ package won.protocol.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import won.protocol.util.RdfUtils;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -20,7 +23,7 @@ import java.util.List;
 public class WonMessageDecoder
 {
 
-  private static final RDFNode NULL_NODE = null;
+  //private static final RDFNode NULL_NODE = null;
 
   public static WonMessage decodeFromJsonLd(String message) {
     return decode(Lang.JSONLD, message);
@@ -36,85 +39,31 @@ public class WonMessageDecoder
   public static WonMessage decodeFromDataset(Dataset message) {
     // TODO how to handle copying properly...?
     Model defaultModel = message.getDefaultModel();
-    Model messageMeta = ModelFactory.createDefaultModel();
+    //Model messageMeta = ModelFactory.createDefaultModel();
+    String msgEventURI = null;
     StmtIterator stmtIterator = defaultModel.listStatements();
     while (stmtIterator.hasNext()) {
       Statement stmt = stmtIterator.nextStatement();
-      if (isMessageMeta(stmt)) {
-        messageMeta.add(stmt);
+      if (isMessageEventPointer(stmt)) {
+        msgEventURI = stmt.getObject().asResource().getURI();
+        break;
       }
     }
 
-    Model defaultModelDiff = defaultModel.difference(messageMeta);
+    MessageEventMapper mapper = new MessageEventMapper();
+    MessageEvent msgEvent = mapper.fromModel(message.getNamedModel(msgEventURI));
+
 
     Dataset dataset = DatasetFactory.createMem();
-    dataset.setDefaultModel(defaultModelDiff);
     List<String> names = getModelNames(message);
     for (String name : names) {
-      dataset.addNamedModel(name, message.getNamedModel(name));
+      if (!msgEventURI.equals(name)) {
+        dataset.addNamedModel(name, message.getNamedModel(name));
+      }
     }
-    // TODO add all prefixes or somehow check and add only relevant (e.g. no wonmessage ontology prefix)?
-    for (String prefix : message.getDefaultModel().getNsPrefixMap().keySet()) {
-      dataset.getDefaultModel().setNsPrefix(prefix, message.getDefaultModel().getNsPrefixMap().get(prefix));
-    }
-    Resource msgBnode = extractMessageBnode(messageMeta);
-    WonMessageMethod method = extractMethod(msgBnode, messageMeta);
-    String protocolUri = extractProtocol(msgBnode, messageMeta);
+    RdfUtils.addPrefixMapping(dataset.getDefaultModel(), message.getDefaultModel());
 
-    return new WonMessage(protocolUri, method, dataset);
-  }
-
-  private static Resource extractMessageBnode(final Model messageMeta) {
-
-    StmtIterator stmtIter = messageMeta.listStatements(null, RDF.type, WonMessageOntology.MESSAGE_TYPE_RESOURCE);
-
-    while (stmtIter.hasNext()) {
-      Statement stmt = stmtIter.next();
-      return stmt.getSubject().asResource();
-      // not more than one type is allowed
-    }
-    return null;
-  }
-
-  private static WonMessageMethod extractMethod(final Resource msgBnode, final Model messageMeta) {
-    WonMessageMethod method = new WonMessageMethod();
-
-    // set method uri
-    Property methodProp = messageMeta.createProperty(WonMessageOntology.MESSAGE_ONTOLOGY_URI,
-                                                     WonMessageOntology.METHOD_PROPERTY);
-    StmtIterator stmtIter = messageMeta.listStatements(msgBnode, methodProp, NULL_NODE);
-    String methodName = null;
-    Resource methodResource = null;
-    while (stmtIter.hasNext()) {
-      Statement stmt = stmtIter.next();
-      methodResource = stmt.getObject().asResource();
-      method.setMethodUri(methodResource.getURI());
-      break; // not more than one method is allowed, if it changes in spec,
-      // then the structure of WonMessage or MessageMethod has to be changed...
-    }
-
-    // TODO set method parameters
-//    if (methodResource != null) {
-//      StmtIterator stmtIter = messageMeta.listStatements(methodResource, methodProp, NULL_NODE);
-//
-//    }
-
-    return method;
-  }
-
-  private static String extractProtocol(final Resource msgBnode, final Model messageMeta) {
-    Property protocolProp = messageMeta.createProperty(WonMessageOntology.MESSAGE_ONTOLOGY_URI,
-                                                       WonMessageOntology.PROTOCOL_PROPERTY);
-    StmtIterator stmtIter = messageMeta.listStatements(msgBnode, protocolProp, NULL_NODE);
-
-    String protocol = null;
-    while (stmtIter.hasNext()) {
-      Statement stmt = stmtIter.next();
-      protocol = stmt.getObject().asResource().getURI();
-      break; // not more than one protocol is allowed
-    }
-
-    return protocol;
+    return new WonMessage(msgEvent, dataset);
   }
 
   // TODO move to a GateUtils...
@@ -128,18 +77,10 @@ public class WonMessageDecoder
     return modelNames;
   }
 
-  private static boolean isMessageMeta(final Statement stmt) {
+  private static boolean isMessageEventPointer(final Statement stmt) {
     Property prop = stmt.getPredicate();
-    if (prop.isResource()) {
-      String uri = prop.getURI();
-      if (uri.startsWith(WonMessageOntology.MESSAGE_ONTOLOGY_URI)) {
-        return true;
-      } else if (uri.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
-        if (stmt.getObject().isURIResource() && stmt.getObject().asResource().getURI().startsWith(WonMessageOntology
-                                                                                                    .MESSAGE_ONTOLOGY_URI)) {
-          return true;
-        }
-      }
+    if (prop.equals(WONMSG.MESSAGE_POINTER_PROPERTY)) {
+      return true;
     }
     return false;
   }

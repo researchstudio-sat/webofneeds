@@ -26,7 +26,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import won.protocol.exception.*;
+import won.protocol.exception.CamelConfigurationFailedException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
@@ -157,7 +158,7 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
 
   @Override
   public void processMessage(final WonMessage wonMessage) {
-    wonMessage.getMethod().getMethodUri();
+    wonMessage.getMessageEvent().getMessageType();
     //URI wonNodeUri ownerProtocolCommunicationServiceImpl
   }
 

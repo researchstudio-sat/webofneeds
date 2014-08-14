@@ -1,17 +1,16 @@
-package won.cryptography.message;
+package won.protocol.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.util.FileUtils;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import won.protocol.util.RdfUtils;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * User: ypanchenko
@@ -41,24 +40,11 @@ public class TestUtils
 
   }
 
-  public static List<String> getModelNames(Dataset dataset) {
-    List<String> modelNames = new ArrayList<String>();
-    Iterator<String> names = dataset.listNames();
-    while (names.hasNext()) {
-      modelNames.add(names.next());
-    }
-    return modelNames;
-  }
-
   public static void print(Model model) {
-    StringWriter sw = new StringWriter();
-    model.write(sw, FileUtils.langTurtle);
-    System.out.println(sw.toString());
+    System.out.println(RdfUtils.writeModelToString(model, Lang.TURTLE));
   }
 
   public static void print(Dataset dataset) {
-    StringWriter sw = new StringWriter();
-    RDFDataMgr.write(sw, dataset, RDFFormat.TRIG.getLang());
-    System.out.println(sw.toString());
+    System.out.println(RdfUtils.writeDatasetToString(dataset, Lang.TRIG));
   }
 }

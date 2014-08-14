@@ -2,6 +2,8 @@ package won.protocol.util;
 
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.shared.Lock;
@@ -30,6 +32,9 @@ import java.util.*;
  */
 public class RdfUtils
 {
+  public static final RDFNode EMPTY_RDF_NODE = null;
+
+
   private static final Logger logger = LoggerFactory.getLogger(RdfUtils.class);
 
   public static String toString(Model model)
@@ -536,5 +541,59 @@ public class RdfUtils
       RdfUtils.replaceBaseResource(extraDataModel, eventNode);
     }
     return extraDataModel;
+  }
+
+
+  public static void addAllStatements(Model toModel, Model fromModel) {
+    StmtIterator stmtIterator = fromModel.listStatements();
+    while (stmtIterator.hasNext()) {
+      toModel.add(stmtIterator.nextStatement());
+    }
+  }
+
+  public static void addPrefixMapping(Model toModel, Model fromModel) {
+    for (String prefix : fromModel.getNsPrefixMap().keySet()) {
+      String uri = toModel.getNsPrefixURI(prefix);
+      if (uri == null) { // if no such prefix-uri yet, add it
+        toModel.setNsPrefix(prefix, fromModel.getNsPrefixURI(prefix));
+      } else {
+        if (uri.equals(fromModel.getNsPrefixURI(prefix))) {
+          // prefix-uri is already there, do nothing
+        } else {
+          // prefix-uri collision, redefine prefix
+          int counter = 2;
+          while (!toModel.getNsPrefixMap().containsKey(prefix + counter)) {
+            counter++;
+          }
+          toModel.setNsPrefix(prefix + counter, fromModel.getNsPrefixURI(prefix));
+        }
+      }
+    }
+  }
+
+
+  public static List<String> getModelNames(Dataset dataset) {
+    List<String> modelNames = new ArrayList<String>();
+    Iterator<String> names = dataset.listNames();
+    while (names.hasNext()) {
+      modelNames.add(names.next());
+    }
+    return modelNames;
+  }
+
+
+  public static String writeDatasetToString(final Dataset dataset, final Lang lang)
+  {
+    StringWriter sw = new StringWriter();
+    RDFDataMgr.write(sw, dataset, lang);
+    return sw.toString();
+  }
+
+  public static Dataset readDatasetFromString(final String data, final Lang lang)
+  {
+    StringReader sr = new StringReader(data);
+    Dataset dataset = DatasetFactory.createMem();
+    RDFDataMgr.read(dataset, sr, "no:uri", lang);
+    return dataset;
   }
 }
