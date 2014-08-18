@@ -1,5 +1,6 @@
 package won.node.facet.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,8 @@ public class GroupFacetImpl extends AbstractFacet
   }
 
   @Override
-  public void sendMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void sendMessageFromNeed(final Connection con, final Model message, final Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     final List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
       ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
       //inform the other side
@@ -43,7 +45,7 @@ public class GroupFacetImpl extends AbstractFacet
           for (final Connection c : cons) {
             try {
               if(! c.equals(con)) {
-                needFacingConnectionClient.sendMessage(c, message);
+                needFacingConnectionClient.sendMessage(c, message, messageEvent);
               }
           } catch (Exception e) {
             logger.warn("caught Exception:", e);

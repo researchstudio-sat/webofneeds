@@ -16,6 +16,7 @@
 
 package won.node.protocol.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -59,8 +60,15 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public URI createNeed(URI ownerURI, final Model content, final boolean activate, String ownerApplicationID) throws IllegalNeedContentException {
-        URI needURI = this.needManagementService.createNeed(ownerURI, content, activate, ownerApplicationID);
+    public URI createNeed(
+            URI ownerURI,
+            final Model content,
+            final boolean activate,
+            String ownerApplicationID,
+            Dataset messageEvent
+            )
+            throws IllegalNeedContentException {
+        URI needURI = this.needManagementService.createNeed(ownerURI, content, activate, ownerApplicationID, messageEvent);
         return needURI;
     }
 
@@ -102,25 +110,30 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
 
     // @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void activate(final URI needURI) throws NoSuchNeedException {
-        this.needManagementService.activate(needURI);
+    public void activate(final URI needURI, Dataset messageEvent) throws NoSuchNeedException {
+        this.needManagementService.activate(needURI, messageEvent);
     }
 
    // @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void deactivate(final URI needURI) throws NoSuchNeedException, NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        this.needManagementService.deactivate(needURI);
+    public void deactivate(final URI needURI, Dataset messageEvent) throws NoSuchNeedException, NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        this.needManagementService.deactivate(needURI, messageEvent);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public URI connect(final URI need, final URI otherNeedURI, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-        return this.needCommunicationService.connect(need, otherNeedURI, content);
+    public URI connect(
+            final URI need,
+            final URI otherNeedURI,
+            final Model content,
+            Dataset messageEvent)
+            throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+        return this.needCommunicationService.connect(need, otherNeedURI, content, messageEvent);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void open(final URI connectionURI, final Model content)
+    public void open(final URI connectionURI, final Model content, Dataset messageEvent)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
         if(cons.size()!=0){
@@ -131,19 +144,21 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
             throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(),"open",needs.get(0).getState());
         }
 
-        this.connectionCommunicationService.open(connectionURI, content);
+        this.connectionCommunicationService.open(connectionURI, content, messageEvent);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        this.connectionCommunicationService.close(connectionURI, content);
+    public void close(final URI connectionURI, final Model content, Dataset messageEvent)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        this.connectionCommunicationService.close(connectionURI, content, messageEvent);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void sendMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        this.connectionCommunicationService.sendMessage(connectionURI, message);
+    public void sendMessage(final URI connectionURI, final Model message, Dataset messageEvent)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        this.connectionCommunicationService.sendMessage(connectionURI, message, messageEvent);
     }
 
     @Override

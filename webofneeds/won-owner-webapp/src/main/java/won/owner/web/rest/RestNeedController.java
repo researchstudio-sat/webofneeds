@@ -524,10 +524,12 @@ public class RestNeedController {
 
     ConnectionPojo fullConnection = null;
     try {
-      ListenableFuture<URI> futureResult = ownerService.connect(URI.create(connectionPojo.getNeedURI()),
-                                     URI.create(connectionPojo.getRemoteNeedURI()),
-                           WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(FacetType.OwnerFacet.getURI(),
-                                                                                   FacetType.OwnerFacet.getURI()));
+      ListenableFuture<URI> futureResult = ownerService.connect(
+              URI.create(connectionPojo.getNeedURI()),
+              URI.create(connectionPojo.getRemoteNeedURI()),
+              WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(FacetType.OwnerFacet.getURI(),
+                    FacetType.OwnerFacet.getURI()),
+              null);
       URI connectionURI = futureResult.get();
       Connection connection = DataAccessUtils.loadConnection(connectionRepository,connectionURI);
       if (connection != null){
@@ -586,7 +588,7 @@ public class RestNeedController {
       if (!needs.isEmpty()) {
         logger.warn("Deactivating old need");
         try {
-          ownerService.deactivate(needs.get(0).getNeedURI());
+          ownerService.deactivate(needs.get(0).getNeedURI(), null);
         } catch (Exception e) {
           logger.warn("Could not deactivate old Need: " + needs.get(0).getNeedURI());
         }
@@ -603,10 +605,19 @@ public class RestNeedController {
       needModel.setNsPrefix("","no:uri");
 
       if (needPojo.getWonNode() == null || needPojo.getWonNode().equals("")) {
-        ListenableFuture<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+        ListenableFuture<URI> futureResult = ownerService.createNeed(
+                ownerURI,
+                needModel,
+                needPojo.getState() == NeedState.ACTIVE,
+                null);
         needURI = futureResult.get();
       } else {
-        ListenableFuture<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, URI.create(needPojo.getWonNode()));
+        ListenableFuture<URI> futureResult = ownerService.createNeed(
+                ownerURI,
+                needModel,
+                needPojo.getState() == NeedState.ACTIVE,
+                URI.create(needPojo.getWonNode()),
+                null);
         needURI = futureResult.get();
       }
 

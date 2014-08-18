@@ -1,5 +1,6 @@
 package won.matcher.protocol.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class MatcherProtocolNeedServiceClientWSBased implements MatcherProtocolN
   private MatcherProtocolNeedClientFactory clientFactory;
 
   @Override
-  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content)
+  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content, Dataset messageEvent)
             throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
         logger.info("need-facing: HINT called for needURI {} and otherNeed {} " +

@@ -139,10 +139,19 @@ public class NeedController
       needModel.setNsPrefix("","no:uri");
 
       if (needPojo.getWonNode().equals("")) {
-          ListenableFuture<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+          ListenableFuture<URI> futureResult = ownerService.createNeed(
+                  ownerURI,
+                  needModel,
+                  needPojo.getState() == NeedState.ACTIVE,
+                  null);
           needURI = futureResult.get();
       } else {
-          ListenableFuture<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, URI.create(needPojo.getWonNode()));
+          ListenableFuture<URI> futureResult = ownerService.createNeed(
+                  ownerURI,
+                  needModel,
+                  needPojo.getState() == NeedState.ACTIVE,
+                  URI.create(needPojo.getWonNode()),
+                  null);
           needURI = futureResult.get();
       }
 
@@ -284,7 +293,7 @@ public class NeedController
         WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
           URI.create(needPojo.getOwnFacetURI()),
           URI.create(needPojo.getRemoteFacetURI()));
-      ownerService.connect(need1.getNeedURI(), new URI(needPojo.getNeedURI()), facetModel);
+      ownerService.connect(need1.getNeedURI(), new URI(needPojo.getNeedURI()), facetModel, null);
       return "redirect:/need/" + need1.getId().toString();//viewNeed(need1.getId().toString(), model);
     } catch (URISyntaxException e) {
       logger.warn("caught URISyntaxException:", e);
@@ -317,9 +326,9 @@ public class NeedController
     Need need = needs.get(0);
     try {
       if (need.getState() == NeedState.ACTIVE) {
-        ownerService.deactivate(need.getNeedURI());
+        ownerService.deactivate(need.getNeedURI(), null);
       } else {
-        ownerService.activate(need.getNeedURI());
+        ownerService.activate(need.getNeedURI(), null);
       }
     } catch (NoSuchNeedException e) {
       logger.warn("caught NoSuchNeedException:", e);
@@ -348,7 +357,7 @@ public class NeedController
           WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
             FacetType.OwnerFacet.getURI(),
             FacetType.OwnerFacet.getURI());
-        ownerService.connect(match.getFromNeed(), match.getToNeed(), facetModel);
+        ownerService.connect(match.getFromNeed(), match.getToNeed(), facetModel, null);
       }
     } catch (ConnectionAlreadyExistsException e) {
       logger.warn("caught ConnectionAlreadyExistsException:", e);

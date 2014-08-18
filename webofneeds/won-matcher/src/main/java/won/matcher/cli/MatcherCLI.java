@@ -53,7 +53,7 @@ public class MatcherCLI implements CommandLineRunner
 
       try {
           //TODO: Add rdf content
-          client.hint(new URI(need1), new URI(need2), score, new URI(org), null);
+          client.hint(new URI(need1), new URI(need2), score, new URI(org), null, null);
       } catch (URISyntaxException e) {
           logger.error("Exception caught:", e);
       } catch (IllegalMessageForNeedStateException e) {
@@ -90,7 +90,7 @@ public class MatcherCLI implements CommandLineRunner
 
         try {
             //TODO: Add rdf content
-            client.hint(new URI(need1), new URI(need2), score, new URI(org), null);
+            client.hint(new URI(need1), new URI(need2), score, new URI(org), null, null);
         } catch (URISyntaxException e) {
             logger.error("Exception caught:", e);
         } catch (IllegalMessageForNeedStateException e) {

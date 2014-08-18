@@ -44,14 +44,14 @@ public class OpenConnectionAction extends BaseEventBotAction
     if (event instanceof ConnectFromOtherNeedEvent) {
       ConnectionSpecificEvent connectEvent = (ConnectionSpecificEvent) event;
       logger.debug("auto-replying to connect for connection {}", connectEvent.getConnectionURI() );
-      getEventListenerContext().getOwnerService().open(connectEvent.getConnectionURI(), null);
+      getEventListenerContext().getOwnerService().open(connectEvent.getConnectionURI(), null, null);
       return;
     } else if (event instanceof OpenFromOtherNeedEvent){
       ConnectionSpecificEvent connectEvent = (ConnectionSpecificEvent) event;
       if (((OpenFromOtherNeedEvent) event).getCon().getState() == ConnectionState.REQUEST_RECEIVED) {
         logger.debug("auto-replying to open(REQUEST_RECEIVED) with open for connection {}",
           connectEvent.getConnectionURI());
-        getEventListenerContext().getOwnerService().open(connectEvent.getConnectionURI(), null);
+        getEventListenerContext().getOwnerService().open(connectEvent.getConnectionURI(), null, null);
       }
       return;
     } else if (event instanceof HintFromMatcherEvent) {
@@ -61,7 +61,7 @@ public class OpenConnectionAction extends BaseEventBotAction
       logger.debug("opening connection based on hint {}", event);
       getEventListenerContext().getOwnerService().connect(hintEvent.getMatch().getFromNeed(),
         hintEvent.getMatch().getToNeed(), WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(FacetType
-        .OwnerFacet.getURI(), FacetType.OwnerFacet.getURI()));
+        .OwnerFacet.getURI(), FacetType.OwnerFacet.getURI()), null);
     }
   }
 }

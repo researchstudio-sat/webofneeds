@@ -108,7 +108,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction
           if (connectHook != null){
             connectHook.onConnect(fromUri, toUri);
           }
-          getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet));
+          getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet), null);
         } catch (Exception e) {
           logger.warn("could not connect {} and {}", fromUri, toUri);  //throws
           logger.warn("caught exception", e);

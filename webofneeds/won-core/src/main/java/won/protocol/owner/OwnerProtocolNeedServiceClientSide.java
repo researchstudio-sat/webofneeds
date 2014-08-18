@@ -17,10 +17,10 @@
 package won.protocol.owner;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.context.ApplicationContextAware;
 import won.protocol.exception.*;
-import won.protocol.message.WonMessage;
 
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
@@ -31,52 +31,66 @@ import java.util.concurrent.ExecutionException;
  */
 public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAware{
 
-  public void processMessage(WonMessage wonMessage);
     /**
      * registers the owner application on WON Node and receive client ID
      *
      * @param endpointURI
      * */
-    public String register(URI endpointURI) throws Exception;
+    // ToDo (FS): this one shouldn't be here, right?
+     public String register(URI endpointURI) throws Exception;
 
     /**
      * Creates a new need with the specified content, ownerURI and active state.
      *
-     *
      * @param ownerURI
      * @param content
      * @param activate
+     * @param messageEvent contains the whole message as messageEvent RDF
      * @return the URI of the newly created need
      */
-    public ListenableFuture<URI> createNeed(final URI ownerURI, Model content, final boolean activate) throws Exception;
+    public ListenableFuture<URI> createNeed(
+            final URI ownerURI,
+            Model content,
+            final boolean activate,
+            Dataset messageEvent) throws Exception;
 
     /**
      * Activates the need object.
      *
      * @param needURI
+     * @param messageEvent contains the whole message as messageEvent RDF
      * @throws won.protocol.exception.NoSuchNeedException if needURI does not refer to an existing need
      */
-    public void activate(URI needURI) throws Exception;
+    public void activate(URI needURI, Dataset messageEvent) throws Exception;
 
     /**
      * Deactivates the need object, closing all its established connections.
      *
      * @param needURI
+     * @param messageEvent contains the whole message as messageEvent RDF
      * @throws NoSuchNeedException if needURI does not refer to an existing need
      */
-    public void deactivate(URI needURI) throws NoSuchNeedException, Exception;
+    public void deactivate(URI needURI, Dataset messageEvent)
+            throws NoSuchNeedException, Exception;
 
-    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeUri) throws Exception;
+    public ListenableFuture<URI> createNeed(
+            URI ownerURI,
+            Model content,
+            boolean activate,
+            URI wonNodeUri,
+            Dataset messageEvent) throws Exception;
     /**
      * Opens a connection identified by connectionURI. A rdf graph can be sent along with the request.
      *
      * @param connectionURI the URI of the connection
      * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
      *                as well as the base URI of the graph will be attached to the resource identifying the event.
+     * @param messageEvent contains the whole message as messageEvent RDF
      * @throws won.protocol.exception.NoSuchConnectionException if connectionURI does not refer to an existing connection
      * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
      */
-    public void open(URI connectionURI, Model content) throws Exception;
+    public void open(URI connectionURI, Model content, Dataset messageEvent)
+            throws Exception;
 
     /**
      * Closes the connection identified by the specified URI.
@@ -84,25 +98,33 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      * @param connectionURI the URI of the connection
      * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
      *                as well as the base URI of the graph will be attached to the resource identifying the event.
+     * @param messageEvent contains the whole message as messageEvent RDF
      * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
      * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
      */
-    public void close(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException, Exception;
+    public void close(URI connectionURI, Model content, Dataset messageEvent)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException, Exception;
 
     /**
      * Sends a chat message via the local connection identified by the specified connectionURI
      * to the remote partner.
      * TODO: text messages are currently being saved on the owner side without checking whether the messages are succesfully processed on the node side. should be changed.
      *
-     *
-     *
      * @param connectionURI the local connection
      * @param message       the chat message
+     * @param messageEvent contains the whole message as messageEvent RDF
      * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
      * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
      */
-    public void sendMessage(URI connectionURI, Model message) throws Exception;
+    public void sendMessage(URI connectionURI, Model message, Dataset messageEvent) throws Exception;
 
-    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException, ExecutionException, InterruptedException, CamelConfigurationFailedException, Exception;
+    public ListenableFuture<URI> connect(
+            URI needURI,
+            URI otherNeedURI,
+            Model content,
+            Dataset messageEvent)
+            throws NoSuchNeedException,
+            IllegalMessageForNeedStateException, ConnectionAlreadyExistsException,
+            ExecutionException, InterruptedException, CamelConfigurationFailedException, Exception;
 
 }

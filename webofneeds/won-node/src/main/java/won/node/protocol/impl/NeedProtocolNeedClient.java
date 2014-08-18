@@ -17,6 +17,7 @@
 package won.node.protocol.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,31 +42,34 @@ public class NeedProtocolNeedClient implements NeedProtocolNeedClientSide
   private NeedProtocolNeedClientSide delegate;
 
   @Override
-  public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws Exception {
+  public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri,
+                                       final URI otherConnectionUri,
+                                       final Model content, final Dataset messageEvent) throws Exception {
 
     logger.debug("need to need: CONNECT called for other need {}, own need {}, own connection {}, and content {}",
         new Object[]{needUri, otherNeedUri, otherConnectionUri, content});
-     return delegate.connect(needUri, otherNeedUri, otherConnectionUri,content);
+     return delegate.connect(needUri, otherNeedUri, otherConnectionUri, content, messageEvent);
 
   }
 
     @Override
-  public void open(final Connection connection, final Model content) throws Exception {
+  public void open(final Connection connection, final Model content, final Dataset messageEvent) throws Exception {
       logger.debug("need to need: OPEN called for connection {}", connection);
-      delegate.open(connection,content);
+      delegate.open(connection, content, messageEvent);
   }
 
   @Override
-  public void close(final Connection connection, final Model content) throws Exception {
+  public void close(final Connection connection, final Model content, final Dataset messageEvent) throws Exception {
     logger.debug("need to need: CLOSE called for connection {}", connection);
-    delegate.close(connection,content);
+    delegate.close(connection, content, messageEvent);
 
   }
 
   @Override
-  public void sendMessage(final Connection connection, final Model message) throws Exception {
+  public void sendMessage(final Connection connection, final Model message, final Dataset messageEvent)
+          throws Exception {
     logger.debug("need to need: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
-    delegate.sendMessage(connection, message);
+    delegate.sendMessage(connection, message, messageEvent);
 
   }
 

@@ -45,7 +45,8 @@ public class HintSender implements MatchProcessor
   {
     try {
       logger.debug("sending hint from {} to {}", from, to);
-      client.hint(from, to, score, originator, explanation);
+        // ToDo (FS): provide fitting messageEvent
+      client.hint(from, to, score, originator, explanation, null);
     } catch (NoSuchNeedException e) {
       logger.debug("hint failed: no need found with URI {}", e.getUnknownNeedURI());
     } catch (IllegalMessageForNeedStateException e) {

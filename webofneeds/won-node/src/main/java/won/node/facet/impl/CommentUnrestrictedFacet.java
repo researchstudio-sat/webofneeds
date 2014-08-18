@@ -1,5 +1,6 @@
 package won.node.facet.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
@@ -24,11 +25,13 @@ public class CommentUnrestrictedFacet extends AbstractFacet
   }
 
     @Override
-  public void connectFromNeed(Connection con, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    super.connectFromNeed(con, content);
+  public void connectFromNeed(Connection con, Model content, Dataset messageEvent)
+            throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+    super.connectFromNeed(con, content, messageEvent);
     /* send a connect back */
     try {
-      needFacingConnectionClient.open(con, content);
+        // ToDo: replace null with fitting messageEvent
+      needFacingConnectionClient.open(con, content, null);
       Model needContent = rdfStorageService.loadContent(con.getNeedURI());
       PrefixMapping prefixMapping = PrefixMapping.Factory.create();
 //    prefixMapping.setNsPrefix(SIOC.getURI(),"sioc");
