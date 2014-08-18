@@ -314,7 +314,12 @@ public abstract class AbstractBAFacet implements Facet
       @Override
       public void run() {
         try {
-          ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
+          ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(
+                  con.getRemoteNeedURI(),
+                  con.getNeedURI(),
+                  connectionForRunnable.getConnectionURI(),
+                  remoteFacetModel,
+                  messageEvent);
           dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
 
         } catch (WonProtocolException e) {

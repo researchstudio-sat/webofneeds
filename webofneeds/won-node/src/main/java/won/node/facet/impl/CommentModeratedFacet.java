@@ -1,5 +1,6 @@
 package won.node.facet.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
@@ -27,8 +28,8 @@ public class CommentModeratedFacet extends AbstractFacet
   }
 
   @Override
-  public void connectFromOwner(Connection con, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    super.connectFromOwner(con, content);
+  public void connectFromOwner(Connection con, Model content, Dataset messageEvent) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+    super.connectFromOwner(con, content, messageEvent);
     /* when connected change linked data*/
     PrefixMapping prefixMapping = PrefixMapping.Factory.create();
     prefixMapping.setNsPrefix(SIOC.getURI(),"sioc");

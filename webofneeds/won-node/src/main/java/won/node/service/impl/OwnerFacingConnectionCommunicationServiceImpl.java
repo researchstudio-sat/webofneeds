@@ -69,7 +69,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     dataService.saveAdditionalContentForEvent(content, con, event);
 
     //invoke facet implementation
-    reg.get(con).openFromOwner(con, content);
+    reg.get(con).openFromOwner(con, content, messageEvent);
   }
 
   @Override
@@ -85,7 +85,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     dataService.saveAdditionalContentForEvent(content, con, event);
 
     //invoke facet implementation
-    reg.get(con).closeFromOwner(con, content);
+    reg.get(con).closeFromOwner(con, content, messageEvent);
   }
 
   @Override
@@ -113,7 +113,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       //a feedback message is not forwarded to the remote connection, and facets cannot react to it.
       //invoke facet implementation
       //TODO: this may be much more responsive if done asynchronously. We dont return anything here anyway.
-      reg.get(con).sendMessageFromOwner(con, message);
+      reg.get(con).sendMessageFromOwner(con, message, messageEvent);
     }
       //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.
       //return con.getConnectionURI();
