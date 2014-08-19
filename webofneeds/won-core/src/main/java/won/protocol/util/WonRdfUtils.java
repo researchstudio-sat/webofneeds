@@ -1,16 +1,20 @@
 package won.protocol.util;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.PropertyImpl;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.protocol.exception.MultipleQueryResultsFoundException;
+import won.protocol.model.NeedState;
 import won.protocol.vocabulary.WON;
 
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -169,6 +173,95 @@ public class WonRdfUtils
       return model;
     }
 
+  }
+
+  // ToDo (FS): after the whole system has been adapted to the new message format check if the following methods are still in use and if they are make them pretty!
+  public static class NeedUtils {
+
+    public static URI queryOwner(Dataset content)
+        throws MultipleQueryResultsFoundException
+    {
+
+      URI ownerURI = null;
+      final String queryString =
+          "PREFIX won: <http://purl.org/webofneeds/model#> " +
+              "SELECT * { ?s won:hasOwner ?owner }";
+      Query query = QueryFactory.create(queryString);
+      try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
+        ResultSet results = qexec.execSelect();
+        boolean foundOneResult = false;
+        for (; results.hasNext(); ) {
+          if (foundOneResult)
+            throw new MultipleQueryResultsFoundException();
+          foundOneResult = true;
+          QuerySolution solution = results.nextSolution();
+          Resource r = solution.getResource("owner");
+          try {
+            ownerURI = new URI(r.getURI());
+          } catch (URISyntaxException e) {
+            logger.warn("caught URISyntaxException:", e);
+            return null;
+          }
+        }
+      }
+      return ownerURI;
+    }
+
+    public static URI queryWonNode(Dataset content)
+        throws MultipleQueryResultsFoundException
+    {
+
+      URI wonNodeURI = null;
+      final String queryString =
+          "PREFIX won: <http://purl.org/webofneeds/model#> " +
+              "SELECT * { ?s won:hasWonNode ?wonNode }";
+      Query query = QueryFactory.create(queryString);
+      try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
+        ResultSet results = qexec.execSelect();
+        boolean foundOneResult = false;
+        for (; results.hasNext(); ) {
+          if (foundOneResult)
+            throw new MultipleQueryResultsFoundException();
+          foundOneResult = true;
+          QuerySolution solution = results.nextSolution();
+          Resource r = solution.getResource("wonNode");
+          try {
+            wonNodeURI = new URI(r.getURI());
+          } catch (URISyntaxException e) {
+            logger.warn("caught URISyntaxException:", e);
+            return null;
+          }
+        }
+      }
+      return wonNodeURI;
+    }
+
+    public static Boolean queryActiveStatus(Dataset content)
+        throws MultipleQueryResultsFoundException
+    {
+
+      Boolean active = null;
+      final String queryString =
+          "PREFIX won: <http://purl.org/webofneeds/model#> " +
+              "SELECT * { ?s won:isInState ?activeState }";
+      Query query = QueryFactory.create(queryString);
+      try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
+        ResultSet results = qexec.execSelect();
+        boolean foundOneResult = false;
+        for (; results.hasNext(); ) {
+          if (foundOneResult)
+            throw new MultipleQueryResultsFoundException();
+          foundOneResult = true;
+          QuerySolution solution = results.nextSolution();
+          Resource r = solution.getResource("activeState");
+          if (r.getURI().equals(NeedState.ACTIVE.getURI()))
+            return true;
+          else if (r.getURI().equals(NeedState.INACTIVE.getURI()))
+            return false;
+        }
+      }
+      return null;
+    }
   }
 
     private static Model createModelWithBaseResource() {
