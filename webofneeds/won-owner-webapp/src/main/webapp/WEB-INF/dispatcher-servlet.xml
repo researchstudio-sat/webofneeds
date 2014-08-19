@@ -48,4 +48,6 @@ http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd">
     </websocket:handlers>
 
     <bean id="wonWebSocketHandler" class="won.owner.web.websocket.WonWebSocketHandler"/>
+    <bean id="webSocketSessionService" class="won.owner.web.websocket.WebSocketSessionService"/>
+    <bean id="ownerService" class="won.owner.service.impl.OwnerService"/>
 </beans>
