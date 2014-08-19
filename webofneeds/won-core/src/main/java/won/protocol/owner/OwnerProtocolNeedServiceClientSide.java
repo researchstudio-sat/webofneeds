@@ -21,6 +21,7 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.context.ApplicationContextAware;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
@@ -126,5 +127,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
             throws NoSuchNeedException,
             IllegalMessageForNeedStateException, ConnectionAlreadyExistsException,
             ExecutionException, InterruptedException, CamelConfigurationFailedException, Exception;
+
+    public void sendWonMessage(WonMessage wonMessage) throws Exception;
 
 }

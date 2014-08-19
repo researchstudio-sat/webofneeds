@@ -19,6 +19,7 @@ package won.owner.messaging;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -31,6 +32,7 @@ import won.protocol.exception.*;
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.WonNode;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.WonNodeRepository;
@@ -295,6 +297,24 @@ public class OwnerProtocolNeedServiceClientJMSBased
         logger.debug("sending open message: ");
 
     }
+
+  public void sendWonMessage(WonMessage wonMessage) throws Exception
+  {
+    // ToDo (FS): change it to won node URI and create method in the MessageEvent class
+    URI wonNodeUri = wonMessage.getMessageEvent().getSenderURI();
+
+    CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
+    String endpoint = camelConfiguration.getEndpoint();
+
+    Map<String, Object> headerMap = new HashMap<>();
+    // ToDo (FS): make Lang.x configurable
+    headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+    headerMap.put("methodName", "wonMessage");
+    headerMap.put("remoteBrokerEndpoint", endpoint);
+
+    messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
+    logger.debug("sending WonMessage: ");
+  }
 
     @Override
     public synchronized ListenableFuture<URI> createNeed(

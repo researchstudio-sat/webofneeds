@@ -308,6 +308,10 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     return result;
   }
 
+  public void sendWonMessage(WonMessage wonMessage) throws Exception {
+    delegate.sendWonMessage(wonMessage);
+  }
+
   public void setDelegate(OwnerProtocolNeedServiceClientSide delegate) {
     this.delegate = delegate;
   }
