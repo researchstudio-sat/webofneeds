@@ -91,6 +91,12 @@ public class MessageEventMapper implements ModelMapper<MessageEvent>
            type = WonMessageType.CONNECT;
         } else if (stmt.getObject().equals(WONMSG.TYPE_NEED_STATE)) {
           type = WonMessageType.NEED_STATE;
+        } else if (stmt.getObject().equals(WONMSG.TYPE_OPEN)) {
+          type = WonMessageType.OPEN;
+        } else if (stmt.getObject().equals(WONMSG.TYPE_CLOSE)) {
+          type = WonMessageType.CLOSE;
+        } else if (stmt.getObject().equals(WONMSG.TYPE_CONNECTION_MESSAGE)) {
+          type = WonMessageType.CONNECTION_MESSAGE;
         }
         if (type != null) {
           eventRes = stmt.getSubject();
