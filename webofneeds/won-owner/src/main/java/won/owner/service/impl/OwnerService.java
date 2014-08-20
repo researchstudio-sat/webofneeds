@@ -10,8 +10,11 @@ import won.protocol.exception.MultipleQueryResultsFoundException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageType;
+import won.protocol.model.Connection;
 import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.NeedRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
@@ -30,6 +33,13 @@ public class OwnerService
   @Autowired
   @Qualifier("default")
   private OwnerProtocolNeedServiceClientSide ownerProtocolService;
+
+  @Autowired
+  private ConnectionRepository connectionRepository;
+
+  @Autowired
+  private NeedRepository needRepository;
+
 
   // ToDo (FS): add security layer
 
@@ -93,14 +103,15 @@ public class OwnerService
 
       case CONNECT:
         try {
-        URI needURI;
-        URI otherNeedURI;
+          URI needURI;
+          URI otherNeedURI;
 
-        needURI = wonMessage.getMessageEvent().getSenderURI();
-        otherNeedURI = wonMessage.getMessageEvent().getReceiverURI();
+          needURI = wonMessage.getMessageEvent().getSenderURI();
+          otherNeedURI = wonMessage.getMessageEvent().getReceiverURI();
 
-        content = wonMessage.getMessageEvent().getModel();
+          content = wonMessage.getMessageEvent().getModel();
 
+          // ToDo (FS): change connect code such that the connectionID of the messageEvent will be used
           ownerProtocolService.connect(needURI, otherNeedURI, content, null);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
@@ -119,6 +130,63 @@ public class OwnerService
             case INACTIVE:
               ownerProtocolService.deactivate(needURI, null);
           }
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
+        break;
+
+      case OPEN:
+        try {
+
+          senderURI = wonMessage.getMessageEvent().getSenderURI();
+          URI receiverURI = wonMessage.getMessageEvent().getReceiverURI();
+
+          List<Connection> connections =
+              connectionRepository.findByNeedURIAndRemoteNeedURI(senderURI, receiverURI);
+
+          URI connectionURI = connections.get(0).getConnectionURI();
+
+          content = wonMessage.getMessageEvent().getModel();
+
+          ownerProtocolService.open(connectionURI, content, null);
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
+        break;
+
+      case CLOSE:
+        try {
+
+          senderURI = wonMessage.getMessageEvent().getSenderURI();
+          URI receiverURI = wonMessage.getMessageEvent().getReceiverURI();
+
+          List<Connection> connections =
+              connectionRepository.findByNeedURIAndRemoteNeedURI(senderURI, receiverURI);
+
+          URI connectionURI = connections.get(0).getConnectionURI();
+
+          content = wonMessage.getMessageEvent().getModel();
+
+          ownerProtocolService.close(connectionURI, content, null);
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
+        break;
+
+      case CONNECTION_MESSAGE:
+        try {
+
+          senderURI = wonMessage.getMessageEvent().getSenderURI();
+          URI receiverURI = wonMessage.getMessageEvent().getReceiverURI();
+
+          List<Connection> connections =
+              connectionRepository.findByNeedURIAndRemoteNeedURI(senderURI, receiverURI);
+
+          URI connectionURI = connections.get(0).getConnectionURI();
+
+          content = wonMessage.getMessageEvent().getModel();
+
+          ownerProtocolService.sendMessage(connectionURI, content, null);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
         }
