@@ -77,6 +77,8 @@ public class MessageEventMapper implements ModelMapper<MessageEvent>
     {
       MessageEvent msgEvent = new MessageEvent();
 
+      msgEvent.setModel(model);
+
       // extract message event URI and message type
       WonMessageType type = null;
       Resource eventRes = null;
