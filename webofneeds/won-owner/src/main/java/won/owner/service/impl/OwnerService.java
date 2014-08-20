@@ -10,6 +10,7 @@ import won.protocol.exception.MultipleQueryResultsFoundException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageType;
+import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -107,6 +108,20 @@ public class OwnerService
         break;
 
       case NEED_STATE:
+        try {
+          URI needURI;
+          needURI = wonMessage.getMessageEvent().getSenderURI();
+
+          switch (wonMessage.getMessageEvent().getNewNeedState()) {
+            case ACTIVE:
+              ownerProtocolService.activate(needURI, null);
+              break;
+            case INACTIVE:
+              ownerProtocolService.deactivate(needURI, null);
+          }
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
         break;
 
       default:

@@ -26,6 +26,8 @@ public class MessageEvent
   private URI senderURI;
   private URI receiverURI;
   private List<URI> refersTo = new ArrayList<>();
+
+  // ToDo (FS): move such properties into specialized sub classes?
   // are there other param that should be part of the messageEvent object?
   private NeedState newNeedState;
 
