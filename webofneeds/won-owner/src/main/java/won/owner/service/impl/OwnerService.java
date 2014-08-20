@@ -11,9 +11,11 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  * User: fsalcher
@@ -89,6 +91,19 @@ public class OwnerService
         break;
 
       case CONNECT:
+        try {
+        URI needURI;
+        URI otherNeedURI;
+
+        needURI = wonMessage.getMessageEvent().getSenderURI();
+        otherNeedURI = wonMessage.getMessageEvent().getReceiverURI();
+
+        content = wonMessage.getMessageEvent().getModel();
+
+          ownerProtocolService.connect(needURI, otherNeedURI, content, null);
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
         break;
 
       case NEED_STATE:
