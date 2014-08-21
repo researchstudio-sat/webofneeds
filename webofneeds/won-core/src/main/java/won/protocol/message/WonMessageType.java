@@ -1,6 +1,7 @@
 package won.protocol.message;
 
 import com.hp.hpl.jena.rdf.model.Resource;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * User: ypanchenko

@@ -9,6 +9,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WONMSG;
 
 import java.io.StringReader;
 import java.util.ArrayList;
