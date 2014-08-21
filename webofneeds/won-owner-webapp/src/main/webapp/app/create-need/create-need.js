@@ -171,6 +171,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     }
 
     $scope.saveDraft = function(){
+       ld = new window.NeedBuilder().needURI("http://needURI").hasBasicNeedType("won:Demand").title('test').build();
+       // messageFactory.generateCreateNeedMessage($scope.need);
+        console.log(ld.jsonld);
         needService.saveDraft($scope.need, $scope.currentStep,userService.getUserName()).then(function(){
            $scope.successShow = true;
 
@@ -187,6 +190,28 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 	$scope.cancel = function () {
 		$location.path("/");
 	};
+
+    $scope.handleFileSelect = function(evt){
+        var files = evt.target.files;
+
+
+        var output = [];
+        for(var i = 0, f; f= files[i];i++){
+            var reader = new FileReader();
+
+            reader.onload = (function(theFile){
+                return function(e){
+                    var inputText =  reader.result;
+                    window.jsonld.fromRDF(inputText,{format:'application/trig'},function(err,doc){
+                        console.log(doc);
+                    });
+                    console.log(inputText);
+                }
+            })(f);
+            reader.readAsText(f);
+        }
+    }
+    document.getElementById('fileInput').addEventListener('change',$scope.handleFileSelect, false);
 
 
 

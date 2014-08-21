@@ -15,8 +15,8 @@ public class EncodeDecodeMessageTest
 {
 
   //TODO Lang.JSONLD is replaced temporarily by Lang.TRIG due to the bug with JSONLD
-  //private static final Lang LANG =  Lang.JSONLD;
-  private static final Lang LANG =  Lang.TRIG;
+  private static final Lang LANG =  Lang.JSONLD;
+  //private static final Lang LANG =  Lang.TRIG;
 
   private static final String RESOURCE_DIR = "/need-lifecycle_with_message_02adj/";
   private static final String RESOURCE_FILE =
