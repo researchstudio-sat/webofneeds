@@ -247,6 +247,12 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
         throw new UnsupportedOperationException("not implemented");
     }
 
+  public void sendWonMessage(WonMessage wonMessage) throws Exception
+  {
+    // not supported by WS implementation
+    // ToDo (FS): implement sendWonMessage method in WS implementations?
+  }
+
     public void setClientFactory(OwnerProtocolNeedClientFactory clientFactory) {
         //To change body of created methods use File | Settings | File Templates.
     }

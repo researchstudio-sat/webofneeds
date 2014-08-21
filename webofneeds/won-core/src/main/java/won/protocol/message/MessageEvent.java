@@ -16,6 +16,8 @@ import java.util.Map;
 public class MessageEvent
 {
 
+  // ToDo (FS): now we also store the model so either each setter method also modifies the model or we only allow the setting of the properties by a constructor
+
   private URI messageURI;
   private WonMessageType messageType; // ConnectMessage, CreateMessage, NeedStateMessage
   // TODO can Connection event be a message event???
@@ -24,8 +26,13 @@ public class MessageEvent
   private URI senderURI;
   private URI receiverURI;
   private List<URI> refersTo = new ArrayList<>();
+
+  // ToDo (FS): move such properties into specialized sub classes?
   // are there other param that should be part of the messageEvent object?
   private NeedState newNeedState;
+
+  // the RDF model representing the MessageEvent
+  private Model model;
 
   //TODO should signature be stored inside the object or otside?
   //if inside - as Model or as Signature object (to be implemented or used the one from signingframework)
@@ -107,6 +114,16 @@ public class MessageEvent
 
   public void setNewNeedState(final NeedState newNeedState) {
     this.newNeedState = newNeedState;
+  }
+
+  public void setModel(final Model model)
+  {
+    this.model = model;
+  }
+
+  public Model getModel()
+  {
+    return model;
   }
 
   @Override
