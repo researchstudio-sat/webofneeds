@@ -1,4 +1,4 @@
-package won.protocol.message;
+package won.protocol.vocabulary;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -44,5 +44,11 @@ public class WONMSG
   //public static final String MESSAGE_HAS_CONTENT_PROPERTY = "hasContent";
   //public static final String MESSAGE_REFERS_TO_PROPERTY = "refersTo";
   //public static final String MESSAGE_NEW_NEED_STATE_PROPERTY = "newNeedState";
+
+  public static final String GRAPH_URI_FRAGMENT = "data";
+  public static String getGraphURI(String uri)
+  {
+    return uri + "#" + GRAPH_URI_FRAGMENT;
+  }
 
 }

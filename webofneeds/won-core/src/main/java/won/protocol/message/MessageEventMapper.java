@@ -6,6 +6,7 @@ import won.protocol.model.NeedState;
 import won.protocol.util.ModelMapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.List;

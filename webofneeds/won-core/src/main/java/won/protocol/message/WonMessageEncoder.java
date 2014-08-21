@@ -9,6 +9,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WONMSG;
 
 import java.io.StringWriter;
 import java.util.Iterator;
