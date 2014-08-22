@@ -214,10 +214,21 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <!-- JSON-LD / Jena -->
+
             <dependency>
                 <groupId>com.github.jsonld-java</groupId>
-                <artifactId>jsonld-java-jena</artifactId>
+                <artifactId>jsonld-java</artifactId>
                 <version>${com.github.jsonld-java.version}</version>
+            </dependency>
+
+
+            <!-- Signingframework - doesn't exist in the public repository -->
+            <dependency>
+                <groupId>de.uni_koblenz.aggrimm.icp</groupId>
+                <artifactId>signingframework</artifactId>
+                <version>${de.uni_koblenz.aggrimm.icp.version}</version>
             </dependency>
 
             <!-- Servlet API -->
@@ -254,6 +265,19 @@
                         <artifactId>commons-codec</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <!-- security related stuff -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
 
             <!-- spring stuff -->
@@ -465,13 +489,6 @@
                 <version>${org.hsqldb.version}</version>
             </dependency>
 
-
-            <dependency>
-                <groupId>com.github.jsonld-java</groupId>
-                <artifactId>jsonld-java</artifactId>
-                <version>${com.github.jsonld-java.version}</version>
-            </dependency>
-
             <!-- dreaded XML stuff -->
             <dependency>
                 <groupId>xml-apis</groupId>
@@ -556,6 +573,11 @@
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>1.7.3</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.3</version>
             </dependency>
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
@@ -780,10 +802,12 @@
         <dependencies.scope>compile</dependencies.scope>
         <!-- versions for various dependencies -->
         <aspectj.version>1.5.4</aspectj.version>
+        <bouncycastle.version>1.50</bouncycastle.version>
         <commons-collections.version>3.2.1</commons-collections.version>
         <commons-fileupload.version>1.2.2</commons-fileupload.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <commons-io.version>2.4</commons-io.version>
+        <de.uni_koblenz.aggrimm.icp.version>1.0</de.uni_koblenz.aggrimm.icp.version>
         <solr.version>3.5.0</solr.version>
         <camel.version>2.12.1</camel.version>
         <qpid.version>0.24</qpid.version>
@@ -793,11 +817,10 @@
         <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed-->
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>
-        <com.github.jsonld-java.version>0.3-SNAPSHOT</com.github.jsonld-java.version>
         <com.google.guava.version>15.0</com.google.guava.version>
         <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
         <com.fasterxml.classmate.version>1.0.0</com.fasterxml.classmate.version>
-        <com.github.jsonld-java.version>0.3</com.github.jsonld-java.version>
+        <com.github.jsonld-java.version>0.5.0</com.github.jsonld-java.version>
         <com.mchange.c3p0.version>0.9.5-pre8</com.mchange.c3p0.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
