@@ -27,6 +27,16 @@ public class WONMSG
   public static final Resource TYPE_OPEN = m.createResource(BASE_URI + "OpenMessage");
   public static final Resource TYPE_CLOSE = m.createResource(BASE_URI + "CloseMessage");
   public static final Resource TYPE_CONNECTION_MESSAGE = m.createResource(BASE_URI + "ConnectionMessage");
+
+  // response types
+  public static final Resource TYPE_CREATE_RESPONSE = m.createResource(BASE_URI + "CreateResponseMessage");
+  public static final Resource TYPE_CONNECT_RESPONSE = m.createResource(BASE_URI + "ConnectResponseMessage");
+  public static final Resource TYPE_NEED_STATE_RESPONSE = m.createResource(BASE_URI + "NeedStateResponseMessage");
+  public static final Resource TYPE_CLOSE_RESPONSE = m.createResource(BASE_URI + "CloseResponseMessage");
+  public static final Resource TYPE_OPEN_RESPONSE = m.createResource(BASE_URI + "OpenResponseMessage");
+  public static final Resource TYPE_CONNECTION_MESSAGE_RESPONSE =
+      m.createResource(BASE_URI + "ConnectionMessageResponseMessage");
+
   //public static final String MESSAGE_TYPE_CREATE_RESOURCE = BASE_URI + "CreateMessage";
   //public static final String MESSAGE_TYPE_CONNECT_RESOURCE = BASE_URI + "ConnectMessage";
   //public static final String MESSAGE_TYPE_NEED_STATE_RESOURCE = BASE_URI + "NeedStateMessage";
