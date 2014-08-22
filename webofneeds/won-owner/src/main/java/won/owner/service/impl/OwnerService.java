@@ -6,16 +6,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import won.owner.messaging.OwnerClientOut;
 import won.protocol.exception.MultipleQueryResultsFoundException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageType;
+import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
-import won.protocol.model.NeedState;
+import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -35,6 +36,9 @@ public class OwnerService
   private OwnerProtocolNeedServiceClientSide ownerProtocolService;
 
   @Autowired
+  private OwnerClientOut ownerClientOut;
+
+  @Autowired
   private ConnectionRepository connectionRepository;
 
   @Autowired
@@ -50,8 +54,6 @@ public class OwnerService
 
   public void handleMessageEventFromClient(WonMessage wonMessage)
   {
-
-    // ToDo (FS): implement
 
     // ToDo (FS): don't convert messages to the old protocol interfaces instead use the new message format
 
@@ -205,8 +207,37 @@ public class OwnerService
   public void handleMessageEventFromWonNode(WonMessage wonMessage)
   {
 
-    // ToDo (FS): implement
+    // ToDo (FS): handle messages
+
+    ownerClientOut.sendMessage(wonMessage);
 
   }
+
+  // ToDo (FS): methods only used until the messaging system is completely refactored
+  public void handleHintMessageEventFromWonNode (Match match, final Model content)
+  {
+    // ToDo (FS): implement
+  }
+
+  public void handleConnectMessageEventFromWonNode (Connection con, final Model content)
+  {
+    // ToDo (FS): implement
+  }
+
+  public void handleOpenMessageEventFromWonNode (Connection con, final Model content)
+  {
+    // ToDo (FS): implement
+  }
+
+  public void handleCloseMessageEventFromWonNode (Connection con, final Model content)
+  {
+    // ToDo (FS): implement
+  }
+
+  public void handleTextMessageEventFromWonNode (Connection con, ChatMessage message, final Model content)
+  {
+    // ToDo (FS): implement
+  }
+
 
 }

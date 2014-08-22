@@ -24,6 +24,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import won.owner.messaging.OwnerClientOut;
 import won.owner.service.impl.OwnerService;
 import won.protocol.message.MessageEvent;
 import won.protocol.message.WonMessage;
@@ -38,7 +39,9 @@ import java.util.Set;
  * User: syim
  * Date: 06.08.14
  */
-public class WonWebSocketHandler extends TextWebSocketHandler
+public class WonWebSocketHandler
+    extends TextWebSocketHandler
+    implements OwnerClientOut
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
