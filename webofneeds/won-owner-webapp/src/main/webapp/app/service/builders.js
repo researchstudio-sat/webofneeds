@@ -10,7 +10,7 @@
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
+ *    See the License for the specific laAnguage governing permissions and
  *    limitations under the License.
  */
 
@@ -33,49 +33,82 @@
             }
         }
     }
+    var url = "http://localhost:8080/owner/msg";
 
+    var options = {debug: true};
+
+   socket =  new SockJS(url, null, options);
+
+    socket.onmessage = function (event) {
+        console.log("Received data: "+event.data);
+
+        writeOutput('Received data: ' + event.data);
+    };
+
+    socket.onclose = function () {
+        console.log("Lost connection")
+        writeOutput('Lost connection!');
+    };
 // attaches wonmessagebuilder API to the given object
     var wrapper = function(wonmessagebuilder) {
+
+        wonmessagebuilder.clone = function(obj){
+            return JSON.parse(JSON.stringify(obj));
+        }
+
+        wonmessagebuilder.sendMessage = function(dataset){
+            socket.onopen = function () {
+                console.log("connection has been established!")
+                writeOutput("connection has been established!");
+                socket.send(JSON.stringify(dataset));
+            }
+
+
+        }
         /*
          * Creates a JSON-LD representation of the need data provided through builder functions.
          * e.g.:
          * jsonLD = new NeedBuilder().title("taxi").description("need a taxi").build();
          */
-        wonmessagebuilder.NeedBuilder = function NeedBuilder() {
-            this.data =
-            {
-                "@context": {
-                    "@base": "http://www.example.com/resource/need/randomNeedID_1",
-                    "webID": "http://www.example.com/webids/",
-                    "msg": "http://purl.org/webofneeds/message#",
-                    "dc": "http://purl.org/dc/elements/1.1/",
-                    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-                    "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
-                    "xsd": "http://www.w3.org/2001/XMLSchema#",
-                    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                    "won": "http://purl.org/webofneeds/model#",
-                    "gr": "http://purl.org/goodrelations/v1#",
-                    "ldp": "http://www.w3.org/ns/ldp#",
-                    "containsMessage": {
-                        "@id": "http://purl.org/webofneeds/message#containsMessage",
-                        "@type": "@id"
-                    }
-                },
-                "@graph": [
-                    {
-                        "@graph": [
-                            {
-                                "@type": "won:Need",
-                                "won:hasContent": "_:n01"
-                            },
-                            {
-                                "@id": "_:n01",
-                                "@type": "won:NeedContent"
-                            }
-                        ]
-                    }
-                ]
-            };
+        wonmessagebuilder.NeedBuilder = function NeedBuilder(data) {
+            if (data != null && data != undefined) {
+                this.data = wonmessagebuilder.clone(data);
+            } else {
+                this.data =
+                {
+                    "@context": {
+                        "@base": "http://www.example.com/resource/need/randomNeedID_1",
+                        "webID": "http://www.example.com/webids/",
+                        "msg": "http://purl.org/webofneeds/message#",
+                        "dc": "http://purl.org/dc/elements/1.1/",
+                        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+                        "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+                        "xsd": "http://www.w3.org/2001/XMLSchema#",
+                        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                        "won": "http://purl.org/webofneeds/model#",
+                        "gr": "http://purl.org/goodrelations/v1#",
+                        "ldp": "http://www.w3.org/ns/ldp#",
+                        "containsMessage": {
+                            "@id": "http://purl.org/webofneeds/message#containsMessage",
+                            "@type": "@id"
+                        }
+                    },
+                    "@graph": [
+                        {
+                            "@graph": [
+                                {
+                                    "@type": "won:Need",
+                                    "won:hasContent": "_:n01"
+                                },
+                                {
+                                    "@id": "_:n01",
+                                    "@type": "won:NeedContent"
+                                }
+                            ]
+                        }
+                    ]
+                };
+            }
         }
 
         wonmessagebuilder.NeedBuilder.prototype = {
@@ -130,7 +163,8 @@
        // window.NeedBuilder = NeedBuilder;
 
         wonmessagebuilder.CreateMessageBuilder = function CreateMessageBuilder(dataset) {
-            this.data = dataset;
+            this.data = wonmessagebuilder.clone(dataset);
+            this.socket;
         };
 
         wonmessagebuilder.CreateMessageBuilder.prototype = {
@@ -147,30 +181,38 @@
                     ]
                 };
                 this.data['@graph'][2] = {
-                    "@id": ":/event/0#data",
                     "@graph": [
                         {
-                            "@id": ":/event/0",
                             "@type": "msg:CreateMessage",
                             "msg:hasContent": [
                                 {
-                                    "@id": ":/core#data"
+                                    "@id": "core#data"
                                 },
                                 {
-                                    "@id": ":/transient#data"
+                                    "@id": "transient#data"
                                 }
                             ]
+
                         }
                     ]
                 }
                 return this;
             },
             eventURI: function (eventId) {
-                this.getDefaultGraphNode()['msg:containsMessage'] = this.data["@context"]["@base"] + "/event/" + eventId + "#data";  //TODO: abstract class
+                this.getDefaultGraphNode()['msg:containsMessage'] = { "@id": this.data["@context"]["@base"] + "/event/" + eventId + "#data" };  //TODO: abstract class
+                this.getMessageEventNode()['@id'] =this.data["@context"]["@base"] +"/event/"+eventId;
+                this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] +"/event/"+eventId+"#data";
+                return this;
+            },
+            receiver: function(receiverURI){
+                this.getMessageEventNode()["msg:receiver"]={"@id":receiverURI};
                 return this;
             },
             getDefaultGraphNode: function () {
                 return this.data["@graph"][1]["@graph"][0];
+            },
+            getMessageEventGraph: function (){
+                return this.data["@graph"][2];
             },
             getMessageEventNode: function () {
                 return this.data["@graph"][2]["@graph"][0]
@@ -213,48 +255,12 @@ needJson = new window.wonmessagebuilder.NeedBuilder()
 messageJson = new window.wonmessagebuilder.CreateMessageBuilder(needJson)
     .addMessageGraph()
     .eventURI("34543242134")
+    .receiver("http://localhost:8080/won")
     .build();
 
-var socket;
+//expanded = window.jsonld.expand(messageJson,null,null);
+
+//console.log("expanded: "+expanded);
+sender = window.wonmessagebuilder.sendMessage(messageJson);
 
 
-var connect = function () {
-
-    var url = document.getElementById("targetAddress").value;
-
-    var options = {debug: true};
-
-    socket = new SockJS(url, null, options);
-
-    socket.onopen = function () {
-        console.log("connection has been established!")
-        writeOutput("connection has been established!");
-    }
-
-    socket.onmessage = function (event) {
-        console.log("Received data: "+event.data);
-
-        writeOutput('Received data: ' + event.data);
-    };
-
-    socket.onclose = function () {
-        console.log("Lost connection")
-        writeOutput('Lost connection!');
-    };
-};
-
-var sendMessage = function () {
-
-    var message = document.getElementById("messageText").value;
-
-    socket.send(message);
-}
-
-var closeConnection = function () {
-    socket.close;
-}
-
-var writeOutput = function (output) {
-    var outputDIV = document.getElementById("output");
-    outputDIV.value = outputDIV.innerHTML + output + "<br />";
-}
