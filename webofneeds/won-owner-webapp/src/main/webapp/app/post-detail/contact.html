@@ -1,0 +1,118 @@
+<div class="col-lg-12">
+    <div ng-show="showPublic()" class="col-lg-12">
+        <form ng-show="!sendStatus" class="form-horizontal container" novalidate name="contactAuthForm" ng-submit="sendMessage()">
+            <div class="well">
+                <fieldset>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <textarea style="resize: none;" class="form-control" rows="8" id="textMessageAuth"
+                                      ng-model="message"
+                                      placeholder="Write you message here..."
+                                      required>
+                            </textarea>
+                            <!--<span class="label label-warning" ng-show="contactAuthForm.textMessage.$invalid">Please write a message</span>  -->
+                        </div>
+                        <!--<span class="help-block">Message mustn't be empty</span> -->
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12" style="font-size: 1.6em;">
+                            Do you want to connect this post with one of your post?
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="pull-left" style="font-size: 1.6em;">
+                                If yes
+                            </div>
+                            <div class="pull-left">
+                                <button type="button" class="btn dropdown-toggle" id="selectYourPost"
+                                        data-toggle="dropdown">Select you post<span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="choosePost">
+                                    <li role="presentation">
+                                        <a role="menuitem" tabindex="0" href="" onclick="changeSortBy()">Post 1</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a role="menuitem" tabindex="1" href="">Post 2</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a role="menuitem" tabindex="2" href="">Post 3</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="pull-right">
+                                <button ng-disabled="contactAuthForm.$invalid" type="submit" class="btn btn-primary">Send message</button>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </form>
+        <div ng-show="sendStatus">
+            <div class="col-md-12" style="font-size: 1.6em;">
+                <strong>Your message was sent!</strong><span class="glyphicon glyphicon-ok" style="color: green;"></span><br/>
+                You can see your conversations with <bold>{{postTitle}}</bold> in your <a href="TODO PUT HERE LINK">Postbox Page</a>.
+            </div>
+        </div>
+    </div>
+    <div ng-show="!showPublic()" class="col-lg-12">
+        <form ng-show="!sendStatus" class="form-horizontal container" novalidate name="contactNotAuthForm" ng-submit="sendMessage()">
+            <div class="well">
+                <fieldset>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <textarea style="resize: none;" class="form-control" rows="8" id="textMessageNotAuth"
+                                      ng-model="message"
+                                      placeholder="Write you message here..."
+                                      required>
+                            </textarea>
+                            <!--<span class="label label-warning" ng-show="contactAuthForm.textMessage.$invalid">Please write a message</span>  -->
+                        </div>
+                        <!--<span class="help-block">Message mustn't be empty</span> -->
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12" style="font-size: 1.6em;">
+                            <strong>Email address </strong><br/>
+                            We will send you the link for reading new messages for this post to this address. NO Web of Needs account will be created.
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="pull-left">
+                                <input type="email" class="form-control" name="email" id="email" ng-model="email"
+                                       placeholder="Email"
+                                       required>
+                                <span class="label label-warning" ng-show="contactNotAuthForm.email.$invalid">Please write valid email address</span>
+                            </div>
+                            <div class="pull-right">
+                                <button ng-disabled="contactNotAuthForm.$invalid" type="submit" class="btn btn-primary">Send message</button>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </form>
+        <div ng-show="sendStatus">
+            <div class="col-md-12" style="font-size: 1.6em;">
+                <div class="col-md-10">
+                    <strong>Your message was sent!</strong><span class="glyphicon glyphicon-ok" style="color: green;"></span><br/>
+                    <span class="glyphicon glyphicon-lock"></span>Private link<br/>
+                    The private link for your conversation with <bold>{{postTitle}}</bold> was sent to {{email}}.<br/><br/>
+                    Access it to see your messages with the owner of this post. You shouldn’t give it away.
+                </div>
+                <div class="col-md-2">
+                    <img src="/images/messageWasSent.PNG"/>
+                </div>
+
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-10">
+                    <input type="text" class="form-control" name="privateLink" id="privateLink" ng-model="privateLink" readonly>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary" ng-click="copyLinkToClipboard()"><!--<span class="glyphicon glyphicon-floppy-disk"></span>--><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Copy link</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

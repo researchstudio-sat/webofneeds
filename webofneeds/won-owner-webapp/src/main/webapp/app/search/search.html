@@ -1,0 +1,126 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<div style="padding-top: 40px;padding-bottom: 8em;">
+    <div ng-show="results.length > 0">
+        <div class="row">
+            <div class="col-md-12" style="font-size: 1.8em;">
+                <strong>What others offer:</strong>
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-4">
+                    <div class="pull-left">
+                        Not found what you need?
+                    </div>
+                    <div class="pull-right">
+                        <button type="button" class="btn dropdown-toggle" id="newPostSearchMenu"
+                                data-toggle="dropdown">
+                            New post
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="0" href="#">I want to have something</a>
+                            </li>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="1" href="#">I offer something</a>
+                            </li>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="2" href="#">I want to do something together</a>
+                            </li>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="3" href="#">I want to change something</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="pull-left">
+                        Sort by
+                    </div>
+                    <div class="pull-right">
+                        <button type="button" class="btn dropdown-toggle" id="newSearchSortByChange"
+                                data-toggle="dropdown">{{newPostSearchSortMenu.item1}}<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="0" href="" onclick="changeSortBy()">{{newPostSearchSortMenu.item1}}</a>
+                            </li>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="1" href="">{{newPostSearchSortMenu.item2}}</a>
+                            </li>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="2" href="">{{newPostSearchSortMenu.item3}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                </div>
+            </div>
+        </div>
+
+        <div class="container col-md-12">
+            <div class="well col-md-4">
+                <div class="row">
+                    <div class="pull-left">
+                        <a href="#/search/1" class="thumbnail">
+                            <img src="/images/thumbnail_demo.jpg"
+                                 alt="Generic placeholder thumbnail">
+                        </a>
+                    </div>
+                    <div class="pull-right">
+                        <a href="#/search/1" class="thumbnail">
+                            <img src="/images/thumbnail_demo.jpg"
+                                 alt="Generic placeholder thumbnail">
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="pull-left">
+                        <a href="#/search/1" class="thumbnail">
+                            <img src="/images/thumbnail_demo.jpg"
+                                 alt="Generic placeholder thumbnail">
+                        </a>
+                    </div>
+                    <div class="pull-right">
+                        <a href="#/search/1" class="thumbnail">
+                            <img src="/images/thumbnail_demo.jpg"
+                                 alt="Generic placeholder thumbnail">
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <won-Post-Detail class="well col-md-8" ng-controller="PostDetailCtrl"></won-Post-Detail>
+
+        </div>
+    </div>
+    <div ng-show="results.length == 0">
+        <div>
+            What {{searching.type}}. {{searching.title}}
+        </div>
+        <div>
+            Sorry, we didn’t find results with this term
+        </div>
+        <div>
+            But <a href="" ng-click="createNewPost()">create a new post</a> and get matches and notifications!
+        </div>
+        <div>
+            <button type="submit" ng-click="createNewPost()" class="btn btn-primary button-top-margin">Create Post</button>
+        </div>
+    </div>
+</div>

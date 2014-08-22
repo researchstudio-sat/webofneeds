@@ -1,0 +1,58 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<div style="padding-top: 40px;padding-bottom: 8em;" xmlns="http://www.w3.org/1999/html">
+     <div ng-show="!sendStatus">
+        <div style="font-size: 1.8em;">
+            <strong>Reset your password</strong><br/>Please enter a new password for your account with the email address {{user.email}}.
+            Strong passwords include numbers, letters and special characters.
+        </div>
+
+        <form class="form-horizontal container" novalidate name="rememberPwdForm" ng-submit="send()">
+            <fieldset>
+                <div class="form-group">
+                    <div class="col-md-4">
+                        <label for="newPassword">Type your new password</label>
+                        <input type="password" class="form-control" name="newPassword" id="newPassword" ng-model="user.password"
+                               placeholder="Password" required>
+                        <span class="label label-warning" ng-show="user.password.length > 0 && user.password.length < 6">Password must be at least 6 characters</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-4">
+                        <label for="newPasswordAgain">Type your new password one more time</label>
+                        <input type="password" class="form-control" name="newPasswordAgain" id="newPasswordAgain" ng-model="user.passwordAgain"
+                               placeholder="Password again" required>
+                        <span class="label label-warning" ng-show="rememberPwdForm.newPasswordAgain.$invalid && user.password.length > 0">Please repeat password</span>
+                        <span class="label label-warning" ng-show="!isSamePassword() && user.passwordAgain.length > 0">Passwords are not equal</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-4">
+                        <button ng-disabled="rememberPwdForm.$invalid" type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div ng-show="sendStatus">
+        <div style="font-size: 1.8em;">
+            <strong>Password was successfully changed</strong>
+        </div>
+
+
+    </div>
+</div>

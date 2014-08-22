@@ -1,0 +1,366 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<div style="padding-top: 40px;padding-bottom: 8em;" xmlns="http://www.w3.org/1999/html">
+    <div>
+        <div style="font-size: 1.8em; text-align: center ;">
+            <img ng-show="!postClosed" src="{{img_path}}" alt="Generic placeholder thumbnail" style="z-index: 0">
+            <!--TODO put here second layer on the first layer picture--><img ng-show="postClosed" src="/images/closed.PNG" alt="Generic placeholder thumbnail">
+            <strong>{{title}}</strong>
+        </div>
+        <div style="text-align: center ;">
+            <a href="#/post-detail/">Go to full description</a>
+        </div>
+
+        <!--Messages Area-->
+        <div id="messagsAreaCollapse" class="well div-table col-lg-12">
+            <div class="div-table-row">
+                <div class="div-table-cell pull-left additional-info-title">Messages</div>
+                <div class="div-table-cell pull-right">
+                    <span >
+                        <a href="" ng-show="mesagesCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="messagesCollapseClick()"></a>
+                    </span>
+                    <span >
+                        <a href="" ng-show="!mesagesCollapsed" class="glyphicon glyphicon-chevron-down" ng-click="messagesCollapseClick()"></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div id="messageArea" ng-show="!mesagesCollapsed" class="div-table col-lg-12">
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-6">
+                    <div class="row col-lg-12 text-center">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Conversations 1</h3>  <!--todo pur here number of new messages-->
+                            </div>
+                            <div class="row panel-body">
+                                <strong>{{conversation.title}}</strong>
+                            </div>
+                            <div class="row panel-body">
+                                {{conversation.body}}
+                            </div>
+
+                             <span >
+                                <a href="" ng-show="conversationCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="conversationType0CollapseClick()"></a>
+                            </span>
+                            <span >
+                                <a href="" ng-show="!conversationCollapsed" class="glyphicon glyphicon-chevron-down" ng-click="conversationType0CollapseClick()"></a>
+                            </span>
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Conversations Request</h3>
+                            </div>
+                            <div class="row panel-body">
+                                <strong>{{conversationRequest.title}}</strong>
+                            </div>
+                            <div class="row panel-body">
+                                {{conversationRequest.body}}
+                            </div>
+
+                             <span >
+                                <a href="" ng-show="conversationRequestCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="conversationType1CollapseClick()"></a>
+                            </span>
+                            <span >
+                                <a href="" ng-show="!conversationRequestCollapsed" class="glyphicon glyphicon-chevron-down" ng-click="conversationType1CollapseClick()"></a>
+                            </span>
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Matches</h3>
+                            </div>
+                            <div class="row panel-body">
+                                <strong>{{matches.title}}</strong>
+                            </div>
+                            <div class="row panel-body">
+                                {{matches.body}}
+                            </div>
+
+                             <span >
+                                <a href="" ng-show="matchesCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="conversationType2CollapseClick()"></a>
+                            </span>
+                            <span >
+                                <a href="" ng-show="!matchesCollapsed" class="glyphicon glyphicon-chevron-down" ng-click="conversationType2CollapseClick()"></a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="div-table-cell col-lg-6">
+                    <div style="font-size: 1.8em; text-align: center;" ng-show="messageTypeColapsed == -1">Click on conversation to show more details</div>
+                    <div ng-show="messageTypeColapsed == 0">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Conversation with {{conversation.title}}</h3>  <!--TODO put here icon depends on type-->
+                            </div>
+                            <table class="table table-hover">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="row col-lg-3">
+                                                <img src="/images/house.gif" width="50" height="50"> <!--TODO change size-->
+                                                </br>24/04/2014</br>14:30 <!--TODO put here time-->
+                                            </div>
+                                            <div class="row col-lg-9">
+                                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+                                            dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+                                            Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
+                                            consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="row col-lg-11">
+                                                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+                                                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+                                                Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
+                                                consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                                            </div>
+                                            <div class="row col-lg-1">
+                                                <img src="/images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
+                                                </br>24/04/2014</br>14:35 <!--TODO put here time-->
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <form class="form-horizontal container" novalidate name="sendMessageForm" ng-submit="sendMessage()">
+                                                <fieldset>
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">
+                                                            <textarea style="resize: none;" class="form-control" rows="8" id="textMessage" name="textMessage"
+                                                                          ng-model="newMessage"
+                                                                          placeholder="Write a reply..."
+                                                                          required>
+                                                            </textarea>
+                                                            <!--<span class="label label-warning" ng-show="contactAuthForm.textMessage.$invalid">Please write a message</span>  -->
+                                                        </div>
+                                                        <!--<span class="help-block">Message mustn't be empty</span> -->
+                                                    </div>
+                                                    <div class="pull-right">
+                                                        <button ng-disabled="sendMessageForm.$invalid" type="submit" class="btn btn-primary">Send</button>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Settings Area-->
+        <div id="settingsAreaCollapse" class="well div-table col-lg-12">
+            <div class="div-table-row">
+                <div class="div-table-cell pull-left additional-info-title">Settings</div>
+                <div class="div-table-cell pull-right">
+                    <span >
+                        <a href="" ng-show="settingsCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="settingsCollapseClick()"></a>
+                    </span>
+                    <span >
+                        <a href="" ng-show="!settingsCollapsed" class="glyphicon glyphicon-chevron-down" ng-click="settingsCollapseClick()"></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div id="settingsArea" ng-show="!settingsCollapsed" class="div-table col-lg-12">
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-6">
+                    <div class="row col-lg-12">
+                        <div class="col-lg-11 pull-left">
+                            <span class="glyphicon glyphicon-lock"></span><strong>Private link:</strong><br/>
+                            Bookmark or otherwise save this link. Access it to chat or browse matches to your post. You shouldn’t give it away.
+                        </div>
+                        <div class="col-lg-1 pull-right">
+                            <img src="/images/messageWasSent.PNG"/>
+                        </div>
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-11">
+                            <input type="text" class="form-control" name="privateLink" id="privateLink" ng-model="privateLink" readonly>
+                        </div>
+                        <div class="col-lg-1">
+                            <!--<span class="glyphicon glyphicon-floppy-disk" style="font-size: 2.8em;" data-toggle="copy link to clipboard"></span>-->
+                            <i class="fa fa-file-text-o fa-lg" style="font-size: 2.8em;"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="div-table-cell col-lg-6">
+                </div>
+            </div>
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-12">
+                    <br/><br/>
+                </div>
+            </div>
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-6">
+                    <div class="row col-lg-12">
+                            <span class="glyphicon glyphicon-envelope"></span><strong> Email Notifications:</strong><br/>
+                            We’ll send you a link to this page and notifications for:
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-1">
+                            <input type="checkbox" id='emailNotif1'>
+                        </div>
+                        <div class="col-lg-11">
+                            new conversation messages
+                        </div>
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-1">
+                            <input type="checkbox" id='emailNotif2'>
+                        </div>
+                        <div class="col-lg-11">
+                            new conversation requests
+                        </div>
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-1">
+                            <input type="checkbox" id='emailNotif3'>
+                        </div>
+                        <div class="col-lg-11">
+                            new matches (~ search results)
+                        </div>
+                    </div>
+                    <form ng-show="!notificationEmailValide" class="form-horizontal container col-lg-12" novalidate name="validateEmail" ng-submit="notifyMe()">
+                        <fieldset>
+                            <div class="row col-lg-12">
+                                <div class="col-lg-1 pull-left">to: </div>
+                                <div class="col-lg-11 pull-right">
+                                    <input type="email" class="form-control col-lg-8" name="notificationInput" id="notificationInput" ng-model="notificationEmail" required>
+                                    <span class="label label-warning" ng-show="validateEmail.notificationInput.$invalid">Please write valid email address</span>
+                                </div>
+                            </div>
+                            <div class="row col-lg-12">
+                                <div class="col-lg-12">
+                                    <button ng-disabled="validateEmail.$invalid" type="submit" class="btn btn-primary pull-right">Notify me!</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <div ng-show="notificationEmailValide" class="row col-lg-12">
+                        <div class="col-lg-12">
+                            to: {{notificationEmail}} <a href="" ng-click="changeEmailAddress()">change email address</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="div-table-cell col-lg-6">
+                    <div class="row col-lg-12">
+                        <span class=""><!--TODO put here sharing icon--></span><strong>Public Link (Sharing):</strong><br/>
+                        This link is what other people will see of your post on the web of needs. Use the sharing options to spread it beyond that.
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-11">
+                            <input type="text" class="form-control" name="publicLink" id="publicLink" ng-model="publicLink" readonly>
+                        </div>
+                        <div class="col-lg-1">
+                            <!--<span class="glyphicon glyphicon-floppy-disk" style="font-size: 2.8em;" data-toggle="copy link to clipboard"></span>-->
+                            <i class="fa fa-file-text-o fa-lg" style="font-size: 2.8em;"></i>
+                        </div>
+                    </div>
+                    <div class="row col-lg-12">
+                        <br/>
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-1">
+                            <!--<img src="/images/social_icons_32x32/32-facebook.png" href="" facebook class="facebookShare" data-url='http://google.com' data-shares='shares'/>     -->
+                            <!--<a facebook     class="facebookShare" data-url='http://google.com' data-shares='shares'></a> -->
+
+                            <a href="">
+                                <img src="/images/social_icons_32x32/32-facebook.png"
+                                   onclick="
+                                        window.open(
+                                          'https://www.facebook.com/sharer/sharer.php?u={{publicLink}}', //+encodeURIComponent(location.href),
+                                          'facebook-share-dialog',
+                                          'width=626,height=436');
+                                        return false;">
+                                <img>
+                            </a>
+                        </div>
+                        <!--<div class="col-lg-1">
+                            <img src="/images/social_icons_32x32/32-twitter.png" href=""/>
+                        </div>  -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Post Options Area-->
+        <div id="postOptionsAreaCollapse" class="well div-table col-lg-12">
+            <div class="div-table-row">
+                <div class="div-table-cell pull-left additional-info-title">Post Options</div>
+                <div class="div-table-cell pull-right">
+                    <span >
+                        <a href="" ng-show="postOptionsCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="postOptionsCollapseClick()"></a>
+                    </span>
+                    <span >
+                        <a href="" ng-show="!postOptionsCollapsed" class="glyphicon glyphicon-chevron-down" ng-click="postOptionsCollapseClick()"></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div id="postOptionsArea" ng-show="!postOptionsCollapsed" class="div-table col-lg-12">
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-6">
+                    <div class="row col-lg-12 text-center" ng-show="!postClosed">
+                        <strong>Close Post</strong><br/>
+                        If you don’t want to receive matches or messages for this post any longer, you can close it. If you need the post again, you can reopen it here anytime.
+                    </div>
+                    <div class="row col-lg-12 text-center" ng-show="postClosed">
+                        <strong>Reopen Post</strong><br/>
+                        If you want to receive matches or messages for this post, you can reopen it again
+                    </div>
+                    <div class="row col-lg-12">
+                        <button type="button" ng-show="!postClosed" ng-click="onClosePostClick()" class="btn btn-primary col-lg-12">Close Post</button>
+                        <button type="button" ng-show="postClosed" ng-click="onReopenPostClick()" class="btn btn-primary col-lg-12">Reopen Post</button>
+                    </div>
+                </div>
+                <div class="div-table-cell col-lg-6">
+                    <div class="row col-lg-12 text-center">
+                        <strong>Copy & Publish Post</strong><br/>
+                        If you have or want something similar to this post, you can copy the information from this post and publish it as new post.
+                    </div>
+                    <div class="row col-lg-12">
+                        <button type="button" ng-click="onCopyAndPublishPostClick()" class="btn btn-primary col-lg-12">Copy & Publish Post</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="panel-register" ng-controller="CloseAndReopenPostCtrl" ng-show="postShouldBeClosed || postShouldBeReopened">
+    <form class="form-horizontal container">
+        <div class="col-md-5 col-md-offset-4">
+            <div class="well">
+                <fieldset>
+                    <legend ng-show="postShouldBeClosed && !postShouldBeReopened">Close this post?</legend>
+                    <legend ng-show="!postShouldBeClosed && postShouldBeReopened">Reopen this post?</legend>
+                    <div class="row col-lg-12">
+                        <button type="button" ng-click="onClickNo()" class="btn btn-primary col-lg-6">No</button>
+                        <button type="button" ng-click="onClickYes()" class="btn btn-primary col-lg-6">Yes</button>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </form>
+</div>

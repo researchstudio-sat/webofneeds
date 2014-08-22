@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
  * Date: 11/12/13
  */
 @Controller
-@RequestMapping("/rest/user")
+@RequestMapping("/owner/rest/user")
 public class RestUserController {
 
 	private WONUserDetailService wonUserDetailService;

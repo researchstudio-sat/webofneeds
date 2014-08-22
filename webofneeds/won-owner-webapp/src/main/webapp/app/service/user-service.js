@@ -15,6 +15,10 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 		getUserName:function () {
 			return user.username;
 		},
+        getUnescapeUserName:function() {
+            if(user.username != null) return user.username.replace("&#64;", '@').replace("&#46;", '.');
+            else return null;
+        },
         getRegistered:function (){
             return registered;
         },
