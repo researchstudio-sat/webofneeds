@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import won.owner.messaging.OwnerClientOut;
 import won.protocol.exception.MultipleQueryResultsFoundException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.ChatMessage;
@@ -20,6 +21,7 @@ import won.protocol.repository.NeedRepository;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -101,6 +103,10 @@ public class OwnerService
         } catch (Exception e) {
           logger.warn("caught Exception:", e);
         }
+
+        // ToDo (FS): WON Node should do this
+        sendBackResponseMessageToClient(wonMessage);
+
         break;
 
       case CONNECT:
@@ -239,5 +245,27 @@ public class OwnerService
     // ToDo (FS): implement
   }
 
+
+  // ToDo (FS): most (all?) of the response messages should be send back from the WON node
+  private void sendBackResponseMessageToClient (WonMessage wonMessage)
+  {
+
+    URI responseMessageURI = null;
+    try {
+      responseMessageURI = new URI("http://example.com/responseMessage/837ddj/");
+    } catch (URISyntaxException e)  {
+      logger.warn("caught URISyntaxException:", e);
+    }
+
+    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+    WonMessage responseWonMessage = wonMessageBuilder
+        .setWonMessageType(WonMessageType.CREATE_RESPONSE)
+        .setMessageURI(responseMessageURI)
+        .setReceiverURI(wonMessage.getMessageEvent().getSenderURI())
+        .addRefersToURI(wonMessage.getMessageEvent().getMessageURI())
+        .build();
+
+    ownerClientOut.sendMessage(responseWonMessage);
+  }
 
 }
