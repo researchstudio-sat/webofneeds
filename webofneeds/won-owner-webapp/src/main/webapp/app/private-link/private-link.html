@@ -28,7 +28,7 @@
         <!--Messages Area-->
         <div id="messagsAreaCollapse" class="well div-table col-lg-12">
             <div class="div-table-row">
-                <div class="div-table-cell pull-left additional-info-title">Messages</div>
+                <div class="div-table-cell pull-left additional-info-title">Messaging</br>View all messages concerning this post and use filters to refine</div>
                 <div class="div-table-cell pull-right">
                     <span >
                         <a href="" ng-show="mesagesCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="messagesCollapseClick()"></a>
@@ -39,7 +39,89 @@
                 </div>
             </div>
         </div>
+
         <div id="messageArea" ng-show="!mesagesCollapsed" class="div-table col-lg-12">
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-12">
+                    <div class="row col-lg-12 text-center">
+                        <div class="panel panel-default">
+                            <div class="btn-group">
+                                <!--TODO change buttons size and put pictures-->
+                                <button type="button" class="btn btn-default">Conversations</button>
+                                <button type="button" class="btn btn-default">Requests</button>
+                                <button type="button" class="btn btn-default">Matches</button>
+                            </div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a href="" ng-click="messagingTypeClick()">
+                                                Type
+                                                <span >
+                                                    <a href="" ng-show="messagingSortDesc" class="glyphicon glyphicon-chevron-up" ng-click="messagingTypeClick()"></a>
+                                                </span>
+                                                <span >
+                                                    <a href="" ng-show="!messagingSortDesc" class="glyphicon glyphicon-chevron-down" ng-click="messagingTypeClick()"></a>
+                                                </span>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="titleClick()">
+                                                Title
+                                                <span >
+                                                    <a href="" ng-show="titleSortDesc" class="glyphicon glyphicon-chevron-up" ng-click="titleClick()"></a>
+                                                </span>
+                                                <span >
+                                                    <a href="" ng-show="!titleSortDesc" class="glyphicon glyphicon-chevron-down" ng-click="titleClick()"></a>
+                                                </span>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="dateClick()">
+                                                Date
+                                                <span >
+                                                    <a href="" ng-show="dateSortDesc" class="glyphicon glyphicon-chevron-up" ng-click="dateClick()"></a>
+                                                </span>
+                                                <span >
+                                                    <a href="" ng-show="!dateSortDesc" class="glyphicon glyphicon-chevron-down" ng-click="dateClick()"></a>
+                                                </span>
+                                            </a>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="message in messages"> <!--TODO ADD filtering. 3 kinds from buttons-->
+                                        <td>
+                                            <img src="{{getTypePicURIs(message.type)}}"/>
+                                        </td>
+                                        <td><a style="font-weight:bold;" href="">{{message.title}}</a></td>
+                                        <td>{{message.datetime}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!--Messages Area-->
+        <div id="messagsAreaCollapseOLD" class="well div-table col-lg-12">
+            <div class="div-table-row">
+                <div class="div-table-cell pull-left additional-info-title">Old Implementation of Messages</div>
+                <div class="div-table-cell pull-right">
+                    <span >
+                        <a href="" ng-show="mesagesCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="messagesCollapseClick()"></a>
+                    </span>
+                    <span >
+                        <a href="" ng-show="!mesagesCollapsed" class="glyphicon glyphicon-chevron-down" ng-click="messagesCollapseClick()"></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div id="messageAreaOLD" ng-show="!mesagesCollapsed" class="div-table col-lg-12">
             <div class="div-table-row col-lg-12">
                 <div class="div-table-cell col-lg-6">
                     <div class="row col-lg-12 text-center">

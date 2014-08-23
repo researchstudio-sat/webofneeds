@@ -65,9 +65,13 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
     };
 
     //Messages Options
-    $scope.conversationCollapseClick = function() {
-        $scope.conversationCollapsed = !$scope.conversationCollapsed;
-    };
+    $scope.messages = [
+        {type:'message', title:'Car sharing to Prague', datetime:'Yesterday'},
+        {type:'request', title:'Moved recently ...', datetime:'Yesterday'},
+        {type:'request', title:'Let\'s clean ...', datetime:'Mon, 28.6. 2014'},
+        {type:'request', title:'Friendly Bicycle ...', datetime:'April 2014'},
+        {type:'match', title:'Old children\'s clothes ..', datetime:'Sep 2013'}
+    ];
 
     $scope.messageTypeColapsed = -1;
     $scope.conversationType0CollapseClick = function() {
@@ -83,6 +87,38 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
     $scope.conversationType2CollapseClick = function() {
         if($scope.messageTypeColapsed != 2) $scope.messageTypeColapsed = 2;
         else $scope.messageTypeColapsed = -1;
+    };
+
+    /*$scope.getFilter = function() {
+        alert($scope.messageTypeColapsed ) ;
+        if($scope.messageTypeColapsed == -1) return "";
+        else if($scope.messageTypeColapsed == 0) return "| filter: {type: message}";
+        else if($scope.messageTypeColapsed == 1) return "| filter: {type: request}";
+        else return "| filter: {type: match}";
+    };   */
+
+    //TODO put logic
+    $scope.getTypePicURIs = function(type) {
+       return "/images/type_posts/want.png";
+    };
+
+    $scope.messagingSortDesc = false;
+    $scope.messagingTypeClick = function() {
+        $scope.messagingSortDesc = !$scope.messagingSortDesc;
+    };
+
+    $scope.titleSortDesc = false;
+    $scope.titleClick = function() {
+        $scope.titleSortDesc = !$scope.titleSortDesc;
+    };
+
+    $scope.dateSortDesc = false;
+    $scope.dateClick = function() {
+        $scope.dateSortDesc = !$scope.dateSortDesc;
+    };
+
+    $scope.conversationCollapseClick = function() {
+        $scope.conversationCollapsed = !$scope.conversationCollapsed;
     };
 
     $scope.conversation = {
