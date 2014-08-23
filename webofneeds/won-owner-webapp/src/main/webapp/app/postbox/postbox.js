@@ -40,6 +40,14 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
 		{type:4, title:'Collect items for Caritas asylum', time:'1 day'}
 	];
 
+    $scope.getTypePicURI = function (type) {
+        if(type==1) return "/images/type_posts/want.png";
+        else if(type==2) return "/images/type_posts/change.png";
+        else if(type==3) return "/images/type_posts/offer.png";
+        else return "/images/type_posts/todo.png";
+    };
+
+
 	$scope.clickOnMessage = function () {
 		//TODO Put here logic
 	};
@@ -56,8 +64,39 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
 		return userService.isAuth();
 	};
 
+    $scope.undreadSortDesc = false;
+    $scope.undreadClick = function () {
+        $scope.undreadSortDesc = !$scope.undreadSortDesc;
+    };
+
+    $scope.createdOnSortDesc = false;
+    $scope.createdOnClick = function () {
+        $scope.createdOnSortDesc = !$scope.createdOnSortDesc;
+    };
+
+    $scope.closedOnSortDesc = false;
+    $scope.closedOnClick = function () {
+        $scope.closedOnSortDesc = !$scope.closedOnSortDesc;
+    };
+
     $scope.inboxCollapsed = false;
     $scope.inboxCollapseClick = function () {
         $scope.inboxCollapsed = !$scope.inboxCollapsed;
     };
+
+    $scope.draftsCollapsed = true;
+    $scope.draftsCollapseClick = function () {
+        $scope.draftsCollapsed = !$scope.draftsCollapsed;
+    };
+
+    $scope.closedCollapsed = true;
+    $scope.closedCollapseClick = function () {
+        $scope.closedCollapsed = !$scope.closedCollapsed;
+    };
+
+    $scope.closedList = [
+        {type:1, title:'Playing soccer together', time:'1 days'},
+        {type:2, title:'Looking for a flatscreen TV', time:'3 days'}
+    ];
+
 });

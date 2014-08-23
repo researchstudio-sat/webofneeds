@@ -38,4 +38,11 @@ angular.module('won.owner').controller('DraftsCtrl', function ($scope, $location
 			$scope.drafts.splice(index, 1);
 		}
 	}
+
+    $scope.getTypePicURI = function (type) {
+        if(type=='Want') return "/images/type_posts/want.png";
+        else if(type=='Change') return "/images/type_posts/change.png";
+        else if(type=='Offer') return "/images/type_posts/offer.png";
+        else return "/images/type_posts/todo.png";
+    };
 });
