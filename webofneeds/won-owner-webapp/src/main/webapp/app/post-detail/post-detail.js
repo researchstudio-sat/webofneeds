@@ -21,10 +21,10 @@
  * Time: 10:01 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $rootScope, $routeParams) {
+angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $rootScope, $routeParams) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
-
+    var imagesPerPage = 6;
 
     $rootScope.carouselActiv = false;
     //TODO fix carousel
@@ -39,7 +39,11 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
         {url: '/images/thumbnail_demo_brown.jpg'},
         {url: '/images/thumbnail_demo_green.jpg'},
         {url: '/images/thumbnail_demo_red.jpg'},
-        {url: '/images/thumbnail_demo_yellow.jpg'}];
+        {url: '/images/thumbnail_demo_yellow.jpg'},
+        {url: '/images/thumbnail_demo.jpg'},
+        {url: '/images/thumbnail_demo_blue.jpg'},
+        {url: '/images/thumbnail_demo_brown.jpg'},
+        {url: '/images/thumbnail_demo_green.jpg'}];
 
     // just simple for now
     $scope.bigImage = $scope.images[0];
@@ -61,12 +65,41 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
                 if (i < index) {
                     $('#bigImage').before(lightboxElement);
                 } else {
-                    // verified only in firefox
                     $('#bigImageArea').append(lightboxElement);
                 }
             }
         }
     }
+
+    function displayFirstPageOfGallery(imagesPerPage) {
+        var imageElements = '';
+        for(var i = 0; i < imagesPerPage; i++) {
+            imageElements += '<a href="" ng-click="clickOnThumbnail(' + i + ');" ><img class="galleryImage" src="' + $scope.images[i].url + '" ng-click="clickOnThumbnail(' + i + ');"></a>';
+        }
+        $(".gallery").html($compile(imageElements)($scope));
+    }
+
+    $scope.createPaginatedGallery = function(imagesPerPage) {
+        displayFirstPageOfGallery(imagesPerPage);
+        var totalPages = Math.floor($scope.images.length / imagesPerPage) + (($scope.images.length % imagesPerPage > 0)? 1 : 0);
+        $('.pager').bootpag({
+            total: totalPages,
+            page: 1,
+            maxVisible: imagesPerPage
+        }).on("page", function(event, num){
+                $('.galleryImage').remove();
+                var startIndex = (num - 1) * imagesPerPage;
+                var lastIndex = (startIndex + imagesPerPage) > $scope.images.length ? $scope.images.length : startIndex + imagesPerPage;
+                var imageElements = "";
+                for(var i = startIndex; i < lastIndex; i++) {
+                    imageElements += '<a href="" ng-click="clickOnThumbnail(' + i + ');" ><img class="galleryImage" src="' + $scope.images[i].url + '" ng-click="clickOnThumbnail(' + i + ');"></a>';
+                }
+                $(".gallery").html($compile(imageElements)($scope));
+                $(this).bootpag({total: totalPages, maxVisible: imagesPerPage});
+            });
+    };
+
+    $scope.createPaginatedGallery(imagesPerPage);
 
     $('#time_from').datepicker({
         changeMonth:true,

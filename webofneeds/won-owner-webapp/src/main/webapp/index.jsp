@@ -48,6 +48,7 @@
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
         <script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
         <script type="text/javascript" src="scripts/lightbox.min.js"></script>
+        <script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
 
 		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
