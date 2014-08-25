@@ -16,6 +16,7 @@ import won.protocol.message.WonMessageType;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
+import won.protocol.model.OwnerApplication;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -24,6 +25,7 @@ import won.protocol.util.WonRdfUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Random;
 
 /**
  * User: fsalcher
@@ -39,7 +41,8 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   private OwnerProtocolNeedServiceClientSide ownerProtocolService;
 
   @Autowired
-  private OwnerApplicationServiceCallback ownerApplicationServiceCallback = new NopOwnerApplicationServiceCallback();
+  private OwnerApplicationServiceCallback ownerApplicationServiceCallbackToClient =
+      new NopOwnerApplicationServiceCallback();
 
   @Autowired
   private ConnectionRepository connectionRepository;
@@ -216,38 +219,11 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
     // ToDo (FS): handle messages
 
-    ownerApplicationServiceCallback.onMessage(wonMessage);
+    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
 
   }
 
-  // ToDo (FS): methods only used until the messaging system is completely refactored
-  public void handleHintMessageEventFromWonNode (Match match, final Model content)
-  {
-    // ToDo (FS): implement
-  }
-
-  public void handleConnectMessageEventFromWonNode (Connection con, final Model content)
-  {
-    // ToDo (FS): implement
-  }
-
-  public void handleOpenMessageEventFromWonNode (Connection con, final Model content)
-  {
-    // ToDo (FS): implement
-  }
-
-  public void handleCloseMessageEventFromWonNode (Connection con, final Model content)
-  {
-    // ToDo (FS): implement
-  }
-
-  public void handleTextMessageEventFromWonNode (Connection con, ChatMessage message, final Model content)
-  {
-    // ToDo (FS): implement
-  }
-
-
-  // ToDo (FS): most (all?) of the response messages should be send back from the WON node
+  // ToDo (FS): most (all?) of the response messages should be send back from the WON node (this is only temporary)
   private void sendBackResponseMessageToClient (WonMessage wonMessage)
   {
 
@@ -266,31 +242,139 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .addRefersToURI(wonMessage.getMessageEvent().getMessageURI())
         .build();
 
-    ownerApplicationServiceCallback.onMessage(responseWonMessage);
+    ownerApplicationServiceCallbackToClient.onMessage(responseWonMessage);
+  }
+
+
+  // ToDo (FS): methods only used until the messaging system is completely refactored then only one callback method will be used
+  @Override
+  public void onHint(final Match match, final Model content)
+  {
+
+    // since we have no message URI at this point we just generate one
+    Random rand = new Random();
+    URI messageURI = null;
+    URI contentURI = null;
+    try {
+      messageURI = new URI(match.getOriginator().toString() + "/hintMessage/" + rand.nextInt());
+      contentURI = new URI(match.getOriginator().toString() + "/hint/" + rand.nextInt());
+    } catch (URISyntaxException e) {
+      logger.warn("caught URISyntaxException:", e);
+    }
+
+    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+    WonMessage wonMessage = wonMessageBuilder
+        .setWonMessageType(WonMessageType.HINT_MESSAGE)
+        .setMessageURI(messageURI)
+        .setSenderURI(match.getOriginator())
+        .setReceiverURI(match.getToNeed())
+        .addContent(contentURI, content, null)
+        .build();
+
+    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
   }
 
   @Override
-  public void onHint(final Match match, final Model content) {
+  public void onConnect(final Connection con, final Model content)
+  {
 
+    // since we have no message URI at this point we just generate one
+    Random rand = new Random();
+    URI messageURI = null;
+    URI contentURI = null;
+    try {
+      messageURI = new URI(con.getRemoteConnectionURI().toString() + "/event/" + rand.nextInt());
+      contentURI = new URI(con.getRemoteConnectionURI().toString() + "/eventContent/" + rand.nextInt());
+    } catch (URISyntaxException e) {
+      logger.warn("caught URISyntaxException:", e);
+    }
+
+    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+    WonMessage wonMessage = wonMessageBuilder
+        .setWonMessageType(WonMessageType.CONNECT)
+        .setMessageURI(messageURI)
+        .setReceiverURI(con.getNeedURI())
+        .addContent(contentURI, content, null)
+        .build();
+
+    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
   }
 
   @Override
-  public void onConnect(final Connection con, final Model content) {
+  public void onOpen(final Connection con, final Model content)
+  {
+    // since we have no message URI at this point we just generate one
+    Random rand = new Random();
+    URI messageURI = null;
+    URI contentURI = null;
+    try {
+      messageURI = new URI(con.getRemoteConnectionURI().toString() + "/event/" + rand.nextInt());
+      contentURI = new URI(con.getRemoteConnectionURI().toString() + "/eventContent/" + rand.nextInt());
+    } catch (URISyntaxException e) {
+      logger.warn("caught URISyntaxException:", e);
+    }
 
+    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+    WonMessage wonMessage = wonMessageBuilder
+        .setWonMessageType(WonMessageType.OPEN)
+        .setMessageURI(messageURI)
+        .setReceiverURI(con.getConnectionURI())
+        .addContent(contentURI, content, null)
+        .build();
+
+    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
   }
 
   @Override
-  public void onOpen(final Connection con, final Model content) {
+  public void onClose(final Connection con, final Model content)
+  {
+    // since we have no message URI at this point we just generate one
+    Random rand = new Random();
+    URI messageURI = null;
+    URI contentURI = null;
+    try {
+      messageURI = new URI(con.getRemoteConnectionURI().toString() + "/event/" + rand.nextInt());
+      contentURI = new URI(con.getRemoteConnectionURI().toString() + "/eventContent/" + rand.nextInt());
+    } catch (URISyntaxException e) {
+      logger.warn("caught URISyntaxException:", e);
+    }
 
+    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+    WonMessage wonMessage = wonMessageBuilder
+        .setWonMessageType(WonMessageType.CLOSE)
+        .setMessageURI(messageURI)
+        .setReceiverURI(con.getConnectionURI())
+        .addContent(contentURI, content, null)
+        .build();
+
+    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
   }
 
   @Override
-  public void onClose(final Connection con, final Model content) {
+  public void onTextMessage(final Connection con, final ChatMessage message, final Model content)
+  {
+    // since we have no message URI at this point we just generate one
+    Random rand = new Random();
+    URI messageURI = null;
+    URI contentURI = null;
+    try {
+      messageURI = new URI(con.getRemoteConnectionURI().toString() + "/event/" + rand.nextInt());
+      contentURI = new URI(con.getRemoteConnectionURI().toString() + "/eventContent/" + rand.nextInt());
+    } catch (URISyntaxException e) {
+      logger.warn("caught URISyntaxException:", e);
+    }
 
+    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+    WonMessage wonMessage = wonMessageBuilder
+        .setWonMessageType(WonMessageType.CONNECTION_MESSAGE)
+        .setMessageURI(messageURI)
+        .setReceiverURI(con.getConnectionURI())
+        .addContent(contentURI, content, null)
+        .build();
+
+    // ToDo (FS): if ChatMessage content is not in the content add ChatMessage to wonMessage
+
+    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
   }
 
-  @Override
-  public void onTextMessage(final Connection con, final ChatMessage message, final Model content) {
-
-  }
 }

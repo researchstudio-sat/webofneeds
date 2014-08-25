@@ -122,7 +122,8 @@ public class WonMessageBuilder
   public WonMessageBuilder addContent(URI contentURI, Model content, Model signature)
   {
     contentMap.put(contentURI, content);
-    signatureMap.put(contentURI, signature);
+    if (signature != null)
+      signatureMap.put(contentURI, signature);
     return this;
   }
 
