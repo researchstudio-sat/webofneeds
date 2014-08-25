@@ -103,6 +103,10 @@
                         "won:isInState":{
                             "@id":"http://purl.org/webofneeds/model#isInState",
                             "@type":"@id"
+                        },
+                        "won:hasContentDescription":{
+                            "@id":"http://purl.org/webofneeds/model#hasContentDescription",
+                            "@type":"@id"
                         }
                     },
                     "@graph": [
@@ -180,6 +184,9 @@
             title: function (title) {
                 this.getContentNode()["dc:title"] = title;
                 return this;
+            },
+            hasContentDescription: function(){
+                this.getContentNode()["won:hasContentDescription"]="_:contentDescription";
             },
             hasTag: function(tags){
                 this.getContentNode()["won:hasTag"] = tags;
