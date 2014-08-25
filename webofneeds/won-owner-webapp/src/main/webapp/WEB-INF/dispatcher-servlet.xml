@@ -30,8 +30,7 @@ http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd">
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
 	<context:component-scan base-package="won.owner.web"/>
-    <context:component-scan base-package="won.protocol.owner" />
-    <context:component-scan base-package="won.protocol.service" />
+
 	<mvc:default-servlet-handler />
 
 	<mvc:annotation-driven/>
