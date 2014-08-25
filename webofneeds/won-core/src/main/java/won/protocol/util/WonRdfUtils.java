@@ -240,6 +240,8 @@ public class WonRdfUtils
         throws MultipleQueryResultsFoundException
     {
 
+      logger.debug("queryActiveStatus - content: " + RdfUtils.toString(content));
+
       Boolean active = null;
       final String queryString =
           "PREFIX won: <http://purl.org/webofneeds/model#> " +

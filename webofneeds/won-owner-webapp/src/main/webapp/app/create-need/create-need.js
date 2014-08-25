@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService, messageService) {
 
 	$scope.uploadOptions = {
 		maxFileSize:5000000,
@@ -171,9 +171,30 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     }
 
     $scope.saveDraft = function(){
-       ld = new window.NeedBuilder().needURI("http://needURI").hasBasicNeedType("won:Demand").title('test').build();
+      // ld = new window.NeedBuilder().needURI("http://needURI").hasBasicNeedType("won:Demand").title('test').build();
+        needJson = new window.wonmessagebuilder.NeedBuilder()
+            .title("testneed")
+            .demand()
+            .needURI("http://localhost:8080/won/resource/need/lk234njkhsdjfgb4l25rtj34")
+            .description("just a test")
+            .active()
+            .supply()
+            .build();
+
+        messageJson = new window.wonmessagebuilder.CreateMessageBuilder(needJson)
+            .addMessageGraph()
+            .eventURI("34543242134")
+            .sender()
+            .receiver("http://localhost:8080/won")
+            .build();
+
+//expanded = window.jsonld.expand(messageJson,null,null);
+
+//console.log("expanded: "+expanded);
+
+        sender = messageService.sendMessage(messageJson);
        // messageFactory.generateCreateNeedMessage($scope.need);
-        console.log(ld.jsonld);
+       // console.log("expandedJson: "+expandedJson);
         needService.saveDraft($scope.need, $scope.currentStep,userService.getUserName()).then(function(){
            $scope.successShow = true;
 

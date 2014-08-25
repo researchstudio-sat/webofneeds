@@ -49,16 +49,16 @@ angular.module('won.owner').factory('messageService', function ($http, $q) {
         socket.close;
     }
 
-    messageService.sendMessage = function(methodName, messageBody){
+    messageService.sendMessage = function(dataset){
 
-        var message = {
+      /*  var message = {
             method:methodName,
             body: messageBody
         }
         if(socket==null||socket.readyState==3){
             socket.connect();
-        }
-        socket.send(message);
+        }             */
+        socket.send(JSON.stringify(dataset));
 
     };
     return messageService;

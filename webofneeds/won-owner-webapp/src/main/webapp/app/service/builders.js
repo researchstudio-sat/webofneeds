@@ -33,7 +33,7 @@
             }
         }
     }
-    var url = "http://localhost:8080/owner/msg";
+  /*  var url = "http://localhost:8080/owner/msg";
 
     var options = {debug: true};
 
@@ -48,7 +48,7 @@
     socket.onclose = function () {
         console.log("Lost connection")
         writeOutput('Lost connection!');
-    };
+    };        */
 // attaches wonmessagebuilder API to the given object
     var wrapper = function(wonmessagebuilder) {
 
@@ -56,7 +56,7 @@
             return JSON.parse(JSON.stringify(obj));
         }
 
-        wonmessagebuilder.sendMessage = function(dataset){
+    /*    wonmessagebuilder.sendMessage = function(dataset){
             socket.onopen = function () {
                 console.log("connection has been established!")
                 writeOutput("connection has been established!");
@@ -64,7 +64,7 @@
             }
 
 
-        }
+        }         */
         /*
          * Creates a JSON-LD representation of the need data provided through builder functions.
          * e.g.:
@@ -88,9 +88,21 @@
                         "won": "http://purl.org/webofneeds/model#",
                         "gr": "http://purl.org/goodrelations/v1#",
                         "ldp": "http://www.w3.org/ns/ldp#",
-                        "containsMessage": {
+                        "msg:containsMessage": {
                             "@id": "http://purl.org/webofneeds/message#containsMessage",
                             "@type": "@id"
+                        },
+                        "won:hasBasicNeedType":{
+                            "@id":"http://purl.org/webofneeds/model#hasBasicNeedType",
+                            "@type":"@id"
+                        },
+                        "won:hasContent":{
+                            "@id":"http://purl.org/webofneeds/model#hasContent",
+                            "@type":"@id"
+                        },
+                        "won:isInState":{
+                            "@id":"http://purl.org/webofneeds/model#isInState",
+                            "@type":"@id"
                         }
                     },
                     "@graph": [
@@ -285,6 +297,6 @@ messageJson = new window.wonmessagebuilder.CreateMessageBuilder(needJson)
 //expanded = window.jsonld.expand(messageJson,null,null);
 
 //console.log("expanded: "+expanded);
-sender = window.wonmessagebuilder.sendMessage(messageJson);
+//sender = window.wonmessagebuilder.sendMessage(messageJson);
 
 
