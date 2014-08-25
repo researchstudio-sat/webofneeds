@@ -183,9 +183,10 @@ public class WonRdfUtils
     {
 
       URI ownerURI = null;
+      // ToDo (FS): add as much as possible to vocabulary stuff
       final String queryString =
           "PREFIX won: <http://purl.org/webofneeds/model#> " +
-              "SELECT * { ?s won:hasOwner ?owner }";
+              "SELECT * { { ?s won:hasOwner ?owner } UNION { GRAPH ?g { ?s won:hasOwner ?owner } } }";
       Query query = QueryFactory.create(queryString);
       try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
         ResultSet results = qexec.execSelect();
@@ -212,9 +213,10 @@ public class WonRdfUtils
     {
 
       URI wonNodeURI = null;
+      // ToDo (FS): add as much as possible to vocabulary stuff
       final String queryString =
           "PREFIX won: <http://purl.org/webofneeds/model#> " +
-              "SELECT * { ?s won:hasWonNode ?wonNode }";
+              "SELECT * { { ?s won:hasWonNode ?wonNode } UNION { GRAPH ?g { ?s won:hasWonNode ?wonNod } } }";
       Query query = QueryFactory.create(queryString);
       try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
         ResultSet results = qexec.execSelect();
@@ -240,12 +242,11 @@ public class WonRdfUtils
         throws MultipleQueryResultsFoundException
     {
 
-      logger.debug("queryActiveStatus - content: " + RdfUtils.toString(content));
-
       Boolean active = null;
+      // ToDo (FS): add as much as possible to vocabulary stuff
       final String queryString =
           "PREFIX won: <http://purl.org/webofneeds/model#> " +
-              "SELECT * { ?s won:isInState ?activeState }";
+              "SELECT * { { ?s won:isInState ?activeState } UNION { GRAPH ?g { ?s won:isInState ?activeState } } }";
       Query query = QueryFactory.create(queryString);
       try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
         ResultSet results = qexec.execSelect();
@@ -256,9 +257,9 @@ public class WonRdfUtils
           foundOneResult = true;
           QuerySolution solution = results.nextSolution();
           Resource r = solution.getResource("activeState");
-          if (r.getURI().equals(NeedState.ACTIVE.getURI()))
+          if (r.getURI().equals(NeedState.ACTIVE.getURI().toString()))
             return true;
-          else if (r.getURI().equals(NeedState.INACTIVE.getURI()))
+          else if (r.getURI().equals(NeedState.INACTIVE.getURI().toString()))
             return false;
         }
       }
