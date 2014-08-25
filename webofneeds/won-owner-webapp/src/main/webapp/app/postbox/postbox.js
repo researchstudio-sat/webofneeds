@@ -33,7 +33,6 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
 
     $scope.displayConfirmationDialog = false;
     var indexOfChosenDraft;
-    $scope.postTypes = ['', 'Want', 'Change', 'Offer', 'Together'];
 	$scope.search = '';
 
     // TODO call here backend method
@@ -45,31 +44,33 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
 
 	// TODO call backend method here
 	$scope.posts = [
-		{type:1, title:'Playing soccer together', time:'2 days'},
-		{type:2, title:'Looking for a flatscreen TV', time:'6 days'},
-		{type:3, title:'Offering IKEA couch', time:'5 min'},
-		{type:4, title:'Collect items for Caritas asylum', time:'1 day'}
+		{type:'Want', title:'Playing soccer together', time:'2 days'},
+		{type:'Change', title:'Looking for a flatscreen TV', time:'6 days'},
+		{type:'Offer', title:'Offering IKEA couch', time:'5 min'},
+		{type:'Together', title:'Collect items for Caritas asylum', time:'1 day'}
 	];
 
     $scope.getTypePicURI = function (type) {
-        if(type==1) return "/images/type_posts/want.png";
-        else if(type==2) return "/images/type_posts/change.png";
-        else if(type==3) return "/images/type_posts/offer.png";
+        if(type=='Want') return "/images/type_posts/want.png";
+        else if(type=='Change') return "/images/type_posts/change.png";
+        else if(type=='Offer') return "/images/type_posts/offer.png";
         else return "/images/type_posts/todo.png";
     };
 
     // TODO call backend method here
     $scope.drafts = [
-        {type:4, title:'Car sharing to Prague', datetime:'Yesterday'},
-        {type:1, title:'Moved recently ...', datetime:'Yesterday'},
-        {type:2, title:'Let\'s clean ...', datetime:'Mon, 28.6. 2014'},
-        {type:3, title:'Friendly Bicycle ...', datetime:'April 2014'},
-        {type:3, title:'Old children\'s clothes ..', datetime:'Sep 2013'}
+        {type:'Together', title:'Car sharing to Prague', datetime:'Yesterday'},
+        {type:'Want', title:'Moved recently ...', datetime:'Yesterday'},
+        {type:'Change', title:'Let\'s clean ...', datetime:'Mon, 28.6. 2014'},
+        {type:'Offer', title:'Friendly Bicycle ...', datetime:'April 2014'},
+        {type:'Offer', title:'Old children\'s clothes ..', datetime:'Sep 2013'}
     ];
 
-    $scope.getTypeRepresentation = function(num) {
-        return $scope.postTypes[num];
-    }
+    // TODO call backend method here
+    $scope.closedList = [
+        {type:'Want', title:'Playing soccer together', time:'1 days'},
+        {type:'Change', title:'Looking for a flatscreen TV', time:'3 days'}
+    ];
 
 	$scope.clickOnMessage = function () {
 		//TODO Put here logic
@@ -116,11 +117,6 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
     $scope.closedCollapseClick = function () {
         $scope.closedCollapsed = !$scope.closedCollapsed;
     };
-
-    $scope.closedList = [
-        {type:1, title:'Playing soccer together', time:'1 days'},
-        {type:2, title:'Looking for a flatscreen TV', time:'3 days'}
-    ];
 
     $scope.clickOnRemoveButton = function (index) {
         $scope.displayConfirmationDialog = true;

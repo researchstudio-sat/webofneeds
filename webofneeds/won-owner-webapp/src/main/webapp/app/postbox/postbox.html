@@ -23,7 +23,7 @@
 		<div class="row"></br></div>
 
 		<div class="col-md-4 col-md-offset-4">
-			<input class="form-control" type="search" ng-model="search" style="padding-right: 30px;"/>
+			<input class="form-control" type="search" ng-model="search.$" style="padding-right: 30px;"/>
             <span class="glyphicon glyphicon-search" style="position: absolute;right: 0;padding: 8px 27px;"></span>
 		</div>
 
@@ -65,14 +65,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="post in posts | filter: {title: search}">
-                            <td class="col-lg-1">        <!--TODO-->
-                                <img src="{{getTypePicURI(post.type)}}" tooltip="{{getTypeRepresentation(post.type)}} (click to filter)"/>
+                        <tr ng-repeat="post in posts | filter: search">
+                            <td class="col-lg-1">
+                                <span style="display: none;">{{post.type}}</span>
+                                <img src="{{getTypePicURI(post.type)}}" tooltip="{{post.type}} (click to filter)"/>
                             </td>
                            <!-- <td>{{post.type}}</td> -->
                             <td><a style="font-weight:bold;" href="#/private-link">{{post.title}}</a></td>
                             <td>
-                                <i class="fa fa-comment-o fa-lg">&nbsp;3</i>
+                                <i class="fa fa-comment-o fa-lg"></i>&nbsp;3</i>
                                 <i class="fa fa-male fa-lg"></i>&nbsp;2</i>
                                 <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;1</i>
                             </td>
@@ -119,9 +120,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="draft in drafts | filter: {title: search}">
-                            <td class="col-lg-1">        <!--TODO-->
-                                <img src="{{getTypePicURI(draft.type)}}" tooltip="{{getTypeRepresentation(draft.type)}} (click to filter)"/>
+                        <tr ng-repeat="draft in drafts | filter: search">
+                            <td class="col-lg-1">
+                                <span style="display: none;">{{draft.type}}</span>
+                                <img src="{{getTypePicURI(draft.type)}}" tooltip="{{draft.type}} (click to filter)"/>
                             </td>
                             <!-- TODO step in create need needs to be specified -->
                             <td><a href="#/create-need/1" style="font-weight:bold;">{{draft.title}}</a></td>
@@ -169,9 +171,10 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="closed in closedList">
-                            <td class="col-lg-1">        <!--TODO-->
-                                <img src="{{getTypePicURI(closed.type)}}" tooltip="{{getTypeRepresentation(closed.type)}} (click to filter)"/>
+                        <tr ng-repeat="closed in closedList | filter: search">
+                            <td class="col-lg-1">
+                                <span style="display: none;">{{closed.type}}</span>
+                                <img src="{{getTypePicURI(closed.type)}}" tooltip="{{closed.type}} (click to filter)"/>
                             </td>
                             <!-- <td>{{post.type}}</td> -->
                             <td>{{closed.title}}</a></td>
