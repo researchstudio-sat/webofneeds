@@ -67,7 +67,7 @@
                     <tbody>
                         <tr ng-repeat="post in posts | filter: {title: search}">
                             <td class="col-lg-1">        <!--TODO-->
-                                <img src="{{getTypePicURI(post.type)}}"/>
+                                <img src="{{getTypePicURI(post.type)}}" tooltip="{{getTypeRepresentation(post.type)}} (click to filter)"/>
                             </td>
                            <!-- <td>{{post.type}}</td> -->
                             <td><a style="font-weight:bold;" href="#/private-link">{{post.title}}</a></td>
@@ -121,7 +121,7 @@
                     <tbody>
                         <tr ng-repeat="draft in drafts | filter: {title: search}">
                             <td class="col-lg-1">        <!--TODO-->
-                                <img src="{{getTypePicURI(draft.type)}}"/>
+                                <img src="{{getTypePicURI(draft.type)}}" tooltip="{{getTypeRepresentation(draft.type)}} (click to filter)"/>
                             </td>
                             <!-- TODO step in create need needs to be specified -->
                             <td><a href="#/create-need/1" style="font-weight:bold;">{{draft.title}}</a></td>
@@ -171,7 +171,7 @@
                     <tbody>
                         <tr ng-repeat="closed in closedList">
                             <td class="col-lg-1">        <!--TODO-->
-                                <img src="{{getTypePicURI(closed.type)}}"/>
+                                <img src="{{getTypePicURI(closed.type)}}" tooltip="{{getTypeRepresentation(closed.type)}} (click to filter)"/>
                             </td>
                             <!-- <td>{{post.type}}</td> -->
                             <td>{{closed.title}}</a></td>

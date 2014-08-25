@@ -77,6 +77,8 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         }
     }
 
+    $scope.tooltipText = 'Required so other people can find the post.';
+
 	$scope.uploadOptions = {
 		maxFileSize:5000000,
 		acceptFileTypes:/(\.|\/)(gif|jpe?g|png)$/i
