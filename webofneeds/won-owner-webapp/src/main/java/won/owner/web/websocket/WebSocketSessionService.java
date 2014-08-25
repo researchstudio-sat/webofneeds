@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+// ToDo (FS): mapping is not limited to Need URIs (but they may all be handled the same way
+
 /**
  * This service stores the connection between the WebSocket sessions and the
  * Need URIs. If a OA client authenticates to a OA server it sends a list of
