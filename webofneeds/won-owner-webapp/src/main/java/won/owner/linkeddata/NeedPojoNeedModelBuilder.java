@@ -59,6 +59,9 @@ public class NeedPojoNeedModelBuilder extends NeedBuilderBase<Model>
       .getEndTime().isEmpty()){
       this.addInterval(Long.valueOf(needPojo.getStartTime()),Long.valueOf(needPojo.getEndTime()));
     }
+    if (needPojo.getCurrency()!=null&&!needPojo.getCurrency().isEmpty()){
+      this.setCurrency(needPojo.getCurrency());
+    }
     this.setRecurInfiniteTimes(needPojo.getRecurInfiniteTimes());
     if (needPojo.getRecurIn()!=null)
      this.setRecurIn(needPojo.getRecurIn());

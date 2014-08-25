@@ -30,7 +30,8 @@ http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd">
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
 	<context:component-scan base-package="won.owner.web"/>
-
+    <context:component-scan base-package="won.protocol.owner" />
+    <context:component-scan base-package="won.protocol.service" />
 	<mvc:default-servlet-handler />
 
 	<mvc:annotation-driven/>
@@ -47,7 +48,10 @@ http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd">
         <websocket:sockjs/>
     </websocket:handlers>
 
-    <bean id="wonWebSocketHandler" class="won.owner.web.websocket.WonWebSocketHandler"/>
+    <bean id="ownerApplicationService" class="won.owner.service.impl.OwnerApplicationService"/>
+
+    <bean id="wonWebSocketHandler" class="won.owner.web.websocket.WonWebSocketHandler">
+        <property name="ownerApplicationService" ref="ownerApplicationService"/>
+    </bean>
     <bean id="webSocketSessionService" class="won.owner.web.websocket.WebSocketSessionService"/>
-    <bean id="ownerService" class="won.owner.service.impl.OwnerService"/>
-</beans>
+ </beans>

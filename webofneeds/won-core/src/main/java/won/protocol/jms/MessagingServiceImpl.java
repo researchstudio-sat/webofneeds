@@ -141,4 +141,6 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
+
+
 }

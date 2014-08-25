@@ -19,18 +19,15 @@ package won.owner.web.websocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import won.owner.messaging.OwnerClientOut;
-import won.owner.service.impl.OwnerService;
-import won.protocol.message.MessageEvent;
+import won.owner.service.OwnerApplicationServiceCallback;
+import won.owner.service.impl.OwnerApplicationService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageEncoder;
-import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 
 import java.io.IOException;
 import java.util.Set;
@@ -41,12 +38,11 @@ import java.util.Set;
  */
 public class WonWebSocketHandler
     extends TextWebSocketHandler
-    implements OwnerClientOut
+    implements OwnerApplicationServiceCallback
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
-  private OwnerService ownerService;
+  private OwnerApplicationService ownerApplicationService;
 
   @Autowired
   private WebSocketSessionService webSocketSessionService;
@@ -62,19 +58,24 @@ public class WonWebSocketHandler
         wonMessage.getMessageEvent().getSenderURI(),
         session);
 
-    ownerService.handleMessageEventFromClient(wonMessage);
+    ownerApplicationService.handleMessageEventFromClient(wonMessage);
   }
 
   // ToDo (FS): replace return value with something meaningful
   public void sendMessage(WonMessage wonMessage)
   {
+
+  }
+
+  @Override
+  public void onMessage(final WonMessage wonMessage) {
     String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
     logger.debug("OA Server - sending WebSocket message: {}", wonMessageJsonLdString);
 
     WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
 
     Set<WebSocketSession> webSocketSessions =
-        webSocketSessionService.getWebSocketSessions(wonMessage.getMessageEvent().getReceiverURI());
+      webSocketSessionService.getWebSocketSessions(wonMessage.getMessageEvent().getReceiverURI());
 
     for (WebSocketSession session : webSocketSessions)
       try {
@@ -84,4 +85,13 @@ public class WonWebSocketHandler
         logger.info("caught IOException:", e);
       }
   }
+
+  public OwnerApplicationService getOwnerApplicationService() {
+    return ownerApplicationService;
+  }
+
+  public void setOwnerApplicationService(final OwnerApplicationService ownerApplicationService) {
+    this.ownerApplicationService = ownerApplicationService;
+  }
+
 }

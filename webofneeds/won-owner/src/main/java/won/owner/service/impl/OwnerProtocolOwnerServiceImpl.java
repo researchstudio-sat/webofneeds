@@ -52,8 +52,8 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     @Autowired(required = false)
     private OwnerProtocolOwnerServiceCallback ownerServiceCallback = new NopOwnerProtocolOwnerServiceCallback();
 
-  @Autowired
-  private OwnerService ownerService;
+ // @Autowired
+ // private OwnerApplicationService ownerService;
 
     //TODO: refactor this to use DataAccessService
 
@@ -92,7 +92,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         match.setScore(scoreConvert);
         matchRepository.save(match);
         ownerServiceCallback.onHint(match, contentConvert);
-      ownerService.handleHintMessageEventFromWonNode(match, contentConvert);
+      //ownerService.handleHintMessageEventFromWonNode(match, contentConvert);
     }
 
     private boolean isNeedActive(final Need need) {
@@ -165,7 +165,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
           //TODO: do we save the connection content? where? as a chat content?
         }
         ownerServiceCallback.onConnect(con, contentConvert);
-      ownerService.handleConnectMessageEventFromWonNode(con, contentConvert);
+      //ownerService.handleConnectMessageEventFromWonNode(con, contentConvert);
     }
 
     @Override
@@ -181,7 +181,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //save in the db
         connectionRepository.save(con);
         ownerServiceCallback.onOpen(con, content);
-      ownerService.handleOpenMessageEventFromWonNode(con, content);
+      //ownerService.handleOpenMessageEventFromWonNode(con, content);
     }
 
     @Override
@@ -198,7 +198,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //save in the db
         connectionRepository.save(con);
         ownerServiceCallback.onClose(con, content);
-      ownerService.handleCloseMessageEventFromWonNode(con, content);
+      //ownerService.handleCloseMessageEventFromWonNode(con, content);
     }
 
     @Override
@@ -255,7 +255,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //save in the db
         chatMessageRepository.save(chatMessage);
         ownerServiceCallback.onTextMessage(con, chatMessage, message);
-      ownerService.handleTextMessageEventFromWonNode(con, chatMessage, message);
+      //ownerService.handleTextMessageEventFromWonNode(con, chatMessage, message);
     }
 
     //url -> Message

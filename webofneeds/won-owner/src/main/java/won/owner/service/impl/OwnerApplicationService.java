@@ -6,7 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import won.owner.messaging.OwnerClientOut;
+import won.owner.service.OwnerApplicationServiceCallback;
+import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.exception.MultipleQueryResultsFoundException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -28,17 +29,17 @@ import java.util.List;
  * User: fsalcher
  * Date: 18.08.2014
  */
-public class OwnerService
+public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallback
 {
 
-  private static final Logger logger = LoggerFactory.getLogger(OwnerService.class);
+  private static final Logger logger = LoggerFactory.getLogger(OwnerApplicationService.class);
 
   @Autowired
   @Qualifier("default")
   private OwnerProtocolNeedServiceClientSide ownerProtocolService;
 
   @Autowired
-  private OwnerClientOut ownerClientOut;
+  private OwnerApplicationServiceCallback ownerApplicationServiceCallback = new NopOwnerApplicationServiceCallback();
 
   @Autowired
   private ConnectionRepository connectionRepository;
@@ -83,7 +84,7 @@ public class OwnerService
         Model content = wonMessage.getMessageContent(coreModelURIString);
 
         // get the active status
-        Boolean active = null;
+        boolean active = false;
         try {
           active = WonRdfUtils.NeedUtils.queryActiveStatus(messageContent);
         } catch (MultipleQueryResultsFoundException e) {
@@ -215,7 +216,7 @@ public class OwnerService
 
     // ToDo (FS): handle messages
 
-    ownerClientOut.sendMessage(wonMessage);
+    ownerApplicationServiceCallback.onMessage(wonMessage);
 
   }
 
@@ -265,7 +266,31 @@ public class OwnerService
         .addRefersToURI(wonMessage.getMessageEvent().getMessageURI())
         .build();
 
-    ownerClientOut.sendMessage(responseWonMessage);
+    ownerApplicationServiceCallback.onMessage(responseWonMessage);
   }
 
+  @Override
+  public void onHint(final Match match, final Model content) {
+
+  }
+
+  @Override
+  public void onConnect(final Connection con, final Model content) {
+
+  }
+
+  @Override
+  public void onOpen(final Connection con, final Model content) {
+
+  }
+
+  @Override
+  public void onClose(final Connection con, final Model content) {
+
+  }
+
+  @Override
+  public void onTextMessage(final Connection con, final ChatMessage message, final Model content) {
+
+  }
 }

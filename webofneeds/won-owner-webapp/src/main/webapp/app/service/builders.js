@@ -140,6 +140,20 @@
                 this.getMainNode()["won:hasBasicNeedType"] = type;
                 return this;
             },
+            active: function(){
+                return this.inState("won:Active")
+            },
+            inactive: function(){
+                return this.inState("won:Inactive")
+            },
+            inState: function(state){
+                this.getMainNode()["won:isInState"] = state;
+                return this;
+            },
+          /*  facets: function(facets){
+                this.getMainNode()["won:hasFacet"]=
+            }     */
+
 
             description: function (description) {
                 this.getContentNode()["won:hasTextDescription"] = description;
@@ -154,6 +168,9 @@
             title: function (title) {
                 this.getContentNode()["dc:title"] = title;
                 return this;
+            },
+            hasTag: function(tags){
+                this.getContentNode()["won:hasTag"] = tags;
             },
             build: function () {
                 console.log("built this data:" + JSON.stringify(this.data));
@@ -204,6 +221,10 @@
                 this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] +"/event/"+eventId+"#data";
                 return this;
             },
+            sender: function(){
+                this.getMessageEventNode()["msg:sender"]={"@id":this.data["@context"]["@base"]};
+                return this;
+            },
             receiver: function(receiverURI){
                 this.getMessageEventNode()["msg:receiver"]={"@id":receiverURI};
                 return this;
@@ -247,14 +268,17 @@
 
 needJson = new window.wonmessagebuilder.NeedBuilder()
     .title("testneed")
+    .demand()
     .needURI("http://localhost:8080/won/resource/need/lk234njkhsdjfgb4l25rtj34")
     .description("just a test")
+    .active()
     .supply()
     .build();
 
 messageJson = new window.wonmessagebuilder.CreateMessageBuilder(needJson)
     .addMessageGraph()
     .eventURI("34543242134")
+    .sender()
     .receiver("http://localhost:8080/won")
     .build();
 
