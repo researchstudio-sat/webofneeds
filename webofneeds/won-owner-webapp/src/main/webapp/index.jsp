@@ -142,7 +142,7 @@
                                 <li class="divider"></li>
                                 <li><a href="#"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/images/type_posts/offer.png"/>&nbsp;I <strong>offer</strong> something</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I <strong>want</strong> to do something together</a></li>
+                                <li><a href="#"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I want to do something <strong>together</strong></a></li>
                                 <li class="divider"></li>
                                 <li><a href="#"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/images/type_posts/change.png"/>&nbsp;I want to <strong>change</strong> something</a></li>
                                 <li class="divider"></li>
@@ -165,7 +165,7 @@
                                 <li class="divider"></li>
                                 <li><a href="#"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/images/type_posts/offer.png"/>&nbsp;I <strong>offer</strong> something</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I <strong>want</strong> to do something together</a></li>
+                                <li><a href="#"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I want to do something <strong>together</strong></a></li>
                                 <li class="divider"></li>
                                 <li><a href="#"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/images/type_posts/change.png"/>&nbsp;I want to <strong>change</strong> something</a></li>
                             </ul>
