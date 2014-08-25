@@ -31,7 +31,18 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
 		date:''
 	};
 
+    $scope.displayConfirmationDialog = false;
+    var indexOfChosenDraft;
+
 	$scope.search = '';
+
+    // TODO call here backend method
+    function deleteDraft(index) {
+        if (index >= 0) {
+            $scope.drafts.splice(index, 1);
+        }
+    }
+
 	// TODO call backend method here
 	$scope.posts = [
 		{type:1, title:'Playing soccer together', time:'2 days'},
@@ -46,6 +57,15 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
         else if(type==3) return "/images/type_posts/offer.png";
         else return "/images/type_posts/todo.png";
     };
+
+    // TODO call backend method here
+    $scope.drafts = [
+        {type:'Together', title:'Car sharing to Prague', datetime:'Yesterday'},
+        {type:'Want', title:'Moved recently ...', datetime:'Yesterday'},
+        {type:'Change', title:'Let\'s clean ...', datetime:'Mon, 28.6. 2014'},
+        {type:'Offer', title:'Friendly Bicycle ...', datetime:'April 2014'},
+        {type:'Offer', title:'Old children\'s clothes ..', datetime:'Sep 2013'}
+    ];
 
 
 	$scope.clickOnMessage = function () {
@@ -99,4 +119,17 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
         {type:2, title:'Looking for a flatscreen TV', time:'3 days'}
     ];
 
+    $scope.clickOnRemoveButton = function (index) {
+        $scope.displayConfirmationDialog = true;
+        indexOfChosenDraft = index;
+    }
+
+    $scope.clickOnYesButton = function() {
+        deleteDraft(indexOfChosenDraft);
+        $scope.displayConfirmationDialog = false;
+    }
+
+    $scope.clickOnNoButton = function() {
+        $scope.displayConfirmationDialog = false;
+    }
 });

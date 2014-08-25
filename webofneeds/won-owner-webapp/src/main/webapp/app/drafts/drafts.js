@@ -16,6 +16,16 @@
 
 angular.module('won.owner').controller('DraftsCtrl', function ($scope, $location, userService) {
 	$scope.search = '';
+    $scope.displayConfirmationDialog = false;
+    var indexOfChosenDraft;
+
+    // TODO call here backend method
+    function deleteDraft(index) {
+        if (index >= 0) {
+            $scope.drafts.splice(index, 1);
+        }
+    }
+
 	// TODO call backend method here
 	$scope.drafts = [
 		{type:'Together', title:'Car sharing to Prague', datetime:'Yesterday'},
@@ -34,9 +44,8 @@ angular.module('won.owner').controller('DraftsCtrl', function ($scope, $location
 	]
 
 	$scope.clickOnRemoveButton = function (index) {
-		if (index >= 0) {
-			$scope.drafts.splice(index, 1);
-		}
+        $scope.displayConfirmationDialog = true;
+        indexOfChosenDraft = index;
 	}
 
     $scope.getTypePicURI = function (type) {
@@ -45,4 +54,13 @@ angular.module('won.owner').controller('DraftsCtrl', function ($scope, $location
         else if(type=='Offer') return "/images/type_posts/offer.png";
         else return "/images/type_posts/todo.png";
     };
+
+    $scope.clickOnYesButton = function() {
+        deleteDraft(indexOfChosenDraft);
+        $scope.displayConfirmationDialog = false;
+    }
+
+    $scope.clickOnNoButton = function() {
+        $scope.displayConfirmationDialog = false;
+    }
 });
