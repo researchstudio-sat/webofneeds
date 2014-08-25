@@ -26,13 +26,6 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     //alert($routeParams.postId);
     var imagesPerPage = 6;
 
-    $rootScope.carouselActiv = false;
-    //TODO fix carousel
-    /*$scope.carouselActivateClick = function () {
-        $rootScope.carouselActiv = true;
-        $('.carousel').carousel()
-    }; */
-
     <!-- TODO call here backend to load images of the post -->
     $scope.images = [{url: '/images/thumbnail_demo.jpg'},
         {url: '/images/thumbnail_demo_blue.jpg'},
@@ -206,19 +199,4 @@ angular.module('won.owner').directive('wonContact',function factory(userService)
         }
     }
 });
-    /*
-angular.module('won.owner').controller('wonCarousel', function ($scope,$route,$window,$location,userService, $rootScope) {
 
-    //$scope.photosUrl = {"/images/create.PNG", "/images/match.PNG"};
-    $scope.error = '';
-
-
-
-    $scope.onClickPrevius = function () {
-
-
-    }
-
-    $scope.onClickNext = function () {
-    }
-});   */

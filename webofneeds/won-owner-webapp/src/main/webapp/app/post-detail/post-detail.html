@@ -55,25 +55,25 @@
             </div>
 
             <div class="row">
-                <div id="locationInfoCollapsed" ng-show="locationOutputFieldCollapsed"
-                     class="well div-table col-lg-12">
+                <div id="locationInfoCollapsed" class="well div-table col-lg-12">
                     <div class="div-table-row">
                         <div class="col-lg-8 div-table centered-text additional-info-title">{{location}}</div>
                         <div class="col-lg-1 div-table-cell centered-text pull-right">
-                                <span><a href="" class="glyphicon glyphicon-chevron-right"
-                                         ng-click="outputLocationCollapseClick()"></a></span>
+                                <span>
+                                    <a href="" class="glyphicon glyphicon-chevron-right"
+                                         ng-click="outputLocationCollapseClick()" ng-show="locationOutputFieldCollapsed"></a>
+                                </span>
+                                <span>
+                                    <a href="" class="glyphicon glyphicon-chevron-down"
+                                         ng-click="outputLocationCollapseClick()" ng-show="!locationOutputFieldCollapsed"></a>
+                                </span>
                         </div>
                     </div>
                 </div>
+
                 <div id="locationInfoOutputFields" ng-show="!locationOutputFieldCollapsed"
-                     class="well div-table col-lg-12">
-                    <div class="div-table-row">
-                        <div class="col-lg-8 div-table centered-text additional-info-title">{{location}}</div>
-                        <div class="col-lg-1 div-table-cell centered-text pull-right">
-                                <span><a href="" class="glyphicon glyphicon-chevron-down"
-                                         ng-click="outputLocationCollapseClick()"></a></span>
-                        </div>
-                    </div>
+                     class="div-table col-lg-12">
+
                     <div class="div-table-row">
                         <section id="map" class="col-lg-8 col-lg-offset-2">
                             <div ui-map="myMap" ui-options="mapOptions" class="map-canvas"
@@ -84,25 +84,21 @@
             </div>
 
             <div class="row">
-                <div id="timeInfoCollapsed" ng-show="timeInputFieldCollapsed" class="well div-table col-lg-12">
+                <div id="timeInfoCollapsed" class="well div-table col-lg-12">
                     <div class="div-table-row">
                         <div class="col-lg-8 div-table centered-text additional-info-title">{{time}}</div>
                         <div class="col-lg-1 div-table-cell centered-text pull-right">
-                            <span><a href="" class="glyphicon glyphicon-chevron-right" ng-click="timeInputFieldCollapsedClick()"></a></span>
+                            <span>
+                                <a href="" class="glyphicon glyphicon-chevron-right" ng-click="timeInputFieldCollapsedClick()" ng-show="timeInputFieldCollapsed"></a>
+                            </span>
+                            <span>
+                                <a href="" class="glyphicon glyphicon-chevron-down" ng-click="timeInputFieldCollapsedClick()" ng-show="!timeInputFieldCollapsed"></a>
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <div id="timeInputFields" ng-show="!timeInputFieldCollapsed" class="well div-table col-lg-12">
-                    <div class="div-table-row">
-                        <div class="col-lg-8 div-table centered-text additional-info-title">
-                            {{time}}
-                        </div>
-                        <div class="col-lg-1 div-table-cell centered-text pull-right">
-                            <span><a href="" class="glyphicon glyphicon-chevron-down" ng-click="timeInputFieldCollapsedClick()"></a></span>
-                        </div>
-                    </div>
-
+                <div id="timeInputFields" ng-show="!timeInputFieldCollapsed" class="div-table col-lg-12">
                     <div class="div-table-row">
                         <div id="time_from" data-date-format=
                                 "mm/dd/yyyy" data-date-start-date="08/13/2014" data-date=
@@ -139,17 +135,4 @@
         </div>
     </div>
 </div>
- <!--
-<div id="panel-register" ng-controller="wonCarousel" ng-show="carouselActiv">
-    <form class="form-horizontal container">
-        <div class="row">
-            <div>previous</div>
-            <div><img src="/images/streetScene.PNG"/></div>
-            <div>next</div>
-        </div>
-        <div class="row col-lg-4">
-            Image 1 of 20   x
-        </div>
 
-    </form>
-</div>     -->
