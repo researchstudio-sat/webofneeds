@@ -72,14 +72,6 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
         URI senderURI = wonMessage.getMessageEvent().getSenderURI();
 
-        URI ownerURI = null;
-        try {
-          ownerURI = WonRdfUtils.NeedUtils.queryOwner(messageContent);
-        } catch (MultipleQueryResultsFoundException e) {
-          logger.warn("caught MultipleOwnersFoundException:", e);
-        }
-
-
         // ToDo (FS): maybe sender should be included in each message to retrieve the needURI
 
         // get the core graph of the message for the need model
@@ -103,7 +95,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         }
 
         try {
-          ownerProtocolService.createNeed(ownerURI, content, active, wonNodeURI, null);
+          ownerProtocolService.createNeed(content, active, wonNodeURI, null);
         } catch (Exception e) {
           logger.warn("caught Exception:", e);
         }

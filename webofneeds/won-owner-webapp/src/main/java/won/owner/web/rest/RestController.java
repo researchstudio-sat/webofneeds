@@ -329,10 +329,10 @@ public class RestController
 
         //TODO: here, need creation is synchronous. Make asynchronous.
 		    if (needPojo.getWonNode().equals("")) {
-			    needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, null).get();
+			    needURI = ownerService.createNeed(needModel, needPojo.getState() == NeedState.ACTIVE, null).get();
 		    } else {
 			    needURI = ((OwnerProtocolNeedServiceClient) ownerService)
-					    .createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE,
+					    .createNeed(needModel, needPojo.getState() == NeedState.ACTIVE,
                 URI.create(needPojo.getWonNode()), null).get();
 		    }
 

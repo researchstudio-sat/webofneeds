@@ -606,14 +606,12 @@ public class RestNeedController {
 
       if (needPojo.getWonNode() == null || needPojo.getWonNode().equals("")) {
         ListenableFuture<URI> futureResult = ownerService.createNeed(
-                ownerURI,
                 needModel,
                 needPojo.getState() == NeedState.ACTIVE,
                 null);
         needURI = futureResult.get();
       } else {
         ListenableFuture<URI> futureResult = ownerService.createNeed(
-                ownerURI,
                 needModel,
                 needPojo.getState() == NeedState.ACTIVE,
                 URI.create(needPojo.getWonNode()),

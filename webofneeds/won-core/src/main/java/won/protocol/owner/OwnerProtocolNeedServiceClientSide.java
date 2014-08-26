@@ -43,14 +43,12 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
     /**
      * Creates a new need with the specified content, ownerURI and active state.
      *
-     * @param ownerURI
      * @param content
      * @param activate
      * @param messageEvent contains the whole message as messageEvent RDF
      * @return the URI of the newly created need
      */
     public ListenableFuture<URI> createNeed(
-            final URI ownerURI,
             Model content,
             final boolean activate,
             Dataset messageEvent) throws Exception;
@@ -75,7 +73,6 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
             throws NoSuchNeedException, Exception;
 
     public ListenableFuture<URI> createNeed(
-            URI ownerURI,
             Model content,
             boolean activate,
             URI wonNodeUri,

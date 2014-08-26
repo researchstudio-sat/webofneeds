@@ -61,14 +61,13 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public URI createNeed(
-            URI ownerURI,
             final Model content,
             final boolean activate,
             String ownerApplicationID,
             Dataset messageEvent
             )
             throws IllegalNeedContentException {
-        URI needURI = this.needManagementService.createNeed(ownerURI, content, activate, ownerApplicationID, messageEvent);
+        URI needURI = this.needManagementService.createNeed(content, activate, ownerApplicationID, messageEvent);
         return needURI;
     }
 
