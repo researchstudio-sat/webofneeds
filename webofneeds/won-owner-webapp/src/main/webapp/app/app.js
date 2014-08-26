@@ -25,7 +25,6 @@ app = angular.module('won.owner', ['ui.bootstrap', 'ui.map', 'blueimp.fileupload
             when('/why-use', {controller:'WhyUseCtrl', templateUrl:'app/why-use/why-use.html'}).
             when('/impressum', {controller:'ImpressumCtrl', templateUrl:'app/impressum/impressum.html'}).
             when('/search', {controller:'SearchCtrl', templateUrl:'app/search/search.html'}).
-            when('/drafts', {controller:'DraftsCtrl', templateUrl:'app/drafts/drafts.html'}).
             when('/faq', {controller:'FaqCtrl', templateUrl:'app/faq/faq.html'}).
             when('/forgot-pwd', {controller:'ForgotPwdCtrl', templateUrl:'app/forgot-pwd/forgot-pwd.html'}).
             when('/new-pwd', {controller:'EnterNewPwdCtrl', templateUrl:'app/forgot-pwd/enter-new-pwd.html'}).

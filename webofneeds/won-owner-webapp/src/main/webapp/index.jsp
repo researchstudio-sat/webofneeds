@@ -67,7 +67,6 @@
         <script type="text/javascript" src="<c:url value="/app/forgot-pwd/enter-new-pwd.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/postbox/postbox.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/private-link/private-link.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/drafts/drafts.js"/>"></script>
 
         <script type="text/javascript" src="<c:url value="/app/search/search.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/post-detail/post-detail.js"/>"></script>
@@ -148,10 +147,10 @@
                                 <li class="divider"></li>
                                 <li class="dropdown-submenu">
                                     <a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
-                                    <ul class="dropdown-menu" ng-controller="DraftsCtrl">
+                                    <ul class="dropdown-menu" ng-controller="PostBoxCtrl">
                                         <li ng-repeat="draft in recent4drafts"><a href="#/create-need/1"><i class="fa fa-file-o fa-lg">&nbsp;{{draft.title}}</i></a></li>
                                         <li class="divider"></li>
-                                        <li><a href="#/drafts"><i class="fa fa-list fa-lg"></i>&nbsp;II Others (go to full list)</a></li>
+                                        <li><a href="#/postbox"><i class="fa fa-list fa-lg"></i>&nbsp;II Others (go to full list)</a></li>
                                     </ul>
                                 </li>
                             </ul>

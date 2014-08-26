@@ -95,6 +95,14 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
     ];
 
     // TODO call backend method here
+    $scope.recent4drafts = [
+        {type:'Together', title:'Car sharing to Prague', datetime:'Yesterday'},
+        {type:'Want', title:'Moved recently ...', datetime:'Yesterday'},
+        {type:'Change', title:'Let\'s clean ...', datetime:'Mon, 28.6. 2014'},
+        {type:'Offer', title:'Friendly Bicycle ...', datetime:'April 2014'}
+    ];
+
+    // TODO call backend method here
     $scope.closedList = [
         {type:'Want', title:'Playing soccer together', time:'1 days'},
         {type:'Change', title:'Looking for a flatscreen TV', time:'3 days'}
