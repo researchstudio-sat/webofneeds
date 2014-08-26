@@ -85,7 +85,7 @@
                                     <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{post.msg.matches}}
                                 </span>
                             </td>
-                            <td>{{post.time}}</td>
+                            <td>{{post.time}} day</td>
                         </tr>
                         <tr>
 
@@ -109,12 +109,13 @@
                 </div>
             </div>
             <div id="draftsArea" ng-show="!draftsCollapsed" class="div-table col-lg-12">
-                <table id="draft-table" class="table table-hover table-striped" ng-init="resizableColumns('draft-table');">
+                <table id="draft-table" st-table="drafts" class="table table-hover table-striped" ng-init="resizableColumns('draft-table');">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Title</th>
-                            <th>
+                            <th st-sort="type">Type</th>
+                            <th st-sort="title">Title</th>
+                            <th st-sort="datetime">
+                                <!--
                                 <a href="" ng-click="createdOnClick()">
                                     Created on
                                         <span >
@@ -124,6 +125,8 @@
                                             <a href="" ng-show="!createdOnSortDesc" class="glyphicon glyphicon-chevron-down" ng-click="createdOnClick()"></a>
                                         </span>
                                 </a>
+                                -->
+                                Created on
                             </th>
                         </tr>
                     </thead>
@@ -135,7 +138,7 @@
                             </td>
                             <!-- TODO step in create need needs to be specified -->
                             <td><a href="#/create-need/1" style="font-weight:bold;">{{draft.title}}</a></td>
-                            <td>{{draft.datetime}}</td>
+                            <td>{{draft.datetime | date}}</td>
                             <td><a href="" ng-click="clickOnRemoveButton($index);"><i class="fa fa-times-circle-o fa-lg"></i></a></td>
                         </tr>
                         <tr>
@@ -160,12 +163,14 @@
                 </div>
             </div>
             <div id="closedArea" ng-show="!closedCollapsed" class="div-table col-lg-12">
-                <table id="closed-table" class="table table-hover table-striped" ng-init="resizableColumns('closed-table');">
+                <table id="closed-table" st-table="closedList" class="table table-hover table-striped" ng-init="resizableColumns('closed-table');">
                     <thead>
                     <tr>
-                        <th>Type</th>
-                        <th>Title</th>
-                        <th>
+                        <th st-sort="type">Type</th>
+                        <th st-sort="type">Title</th>
+                        <th st-sort="datetime">
+                            Closed on
+                            <!--
                             <a href="" ng-click="closedOnClick()">
                                 Closed on
                                 <span >
@@ -175,6 +180,7 @@
                                     <a href="" ng-show="!closedOnSortDesc" class="glyphicon glyphicon-chevron-down" ng-click="closedOnClick()"></a>
                                 </span>
                             </a>
+                            -->
                         </th>
                     </tr>
                     </thead>
@@ -184,12 +190,8 @@
                                 <span style="display: none;">{{closed.type}}</span>
                                 <img src="{{getTypePicURI(closed.type)}}" tooltip="{{closed.type}} (click to filter)"/>
                             </td>
-                            <!-- <td>{{post.type}}</td> -->
                             <td>{{closed.title}}</a></td>
-                            <td>{{closed.time}}</td>
-                        </tr>
-                        <tr>
-
+                            <td>{{closed.datetime | date}}</td>
                         </tr>
                     </tbody>
                 </table>

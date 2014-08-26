@@ -73,10 +73,14 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
     // TODO call backend method here
     // for filtering: when number of unread notifications is 0 set appropriate value (convText, reqText or matchText) to empty string
 	$scope.posts = [
-		{type:'Want', title:'Playing soccer together', msg:{convText: 'unread conversations', conversations : 6, reqText: 'unread requests', requests: 1, matchText: '', matches: 0}, time:'2 days'},
-		{type:'Change', title:'Looking for a flatscreen TV', msg:{convText: 'unread conversations', conversations : 3, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, time:'6 days'},
-		{type:'Offer', title:'Offering IKEA couch', msg:{convText: 'unread conversations', conversations : 1, reqText: '', requests: 0, matchText: 'unread matches', matches: 5}, time:'5 min'},
-		{type:'Together', title:'Collect items for Caritas asylum', msg:{convText: '', conversations : 0, reqText: 'unread requests', requests: 4, matchText: 'unread matches', matches: 1}, time:'1 day'}
+		{type:'Want', title:'Want PS 4', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: '', matches: 0}, time: 2},
+		{type:'Change', title:'Looking for a flatscreen TV', msg:{convText: 'unread conversations', conversations : 3, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, time: 6},
+		{type:'Offer', title:'Offering IKEA couch', msg:{convText: 'unread conversations', conversations : 1, reqText: '', requests: 0, matchText: 'unread matches', matches: 5}, time: 5},
+		{type:'Together', title:'Collect items for Caritas asylum', msg:{convText: '', conversations : 0, reqText: 'unread requests', requests: 4, matchText: 'unread matches', matches: 1}, time: 4},
+        {type:'Change', title:'I want to change my mobile', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: '', matches: 0}, time: 3},
+        {type:'Together', title:'Clean the forest', msg:{convText: 'unread conversations', conversations : 10, reqText: '', requests: 0, matchText: '', matches: 0}, time: 1},
+        {type:'Offer', title:'Selling old laptop', msg:{convText: '', conversations : 0, reqText: 'unread requests', requests: 7, matchText: '', matches: 0}, time: 8},
+        {type:'Want', title:'Want a plane', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, time: 7}
 	];
 
     $scope.getTypePicURI = function (type) {
@@ -88,25 +92,26 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
 
     // TODO call backend method here
     $scope.drafts = [
-        {type:'Together', title:'Car sharing to Prague', datetime:'Yesterday'},
-        {type:'Want', title:'Moved recently ...', datetime:'Yesterday'},
-        {type:'Change', title:'Let\'s clean ...', datetime:'Mon, 28.6. 2014'},
-        {type:'Offer', title:'Friendly Bicycle ...', datetime:'April 2014'},
-        {type:'Offer', title:'Old children\'s clothes ..', datetime:'Sep 2013'}
+        {type:'Together', title:'Car sharing to Prague', datetime: new Date('2014-08-20')},
+        {type:'Want', title:'Moved recently ...', datetime: new Date('2014-08-25')},
+        {type:'Change', title:'Let\'s clean ...', datetime: new Date('2014-05-01')},
+        {type:'Offer', title:'Friendly Bicycle ...', datetime: new Date('2014-07-10')},
+        {type:'Offer', title:'Old children\'s clothes ..', datetime: new Date('2013-09-09')}
     ];
 
     // TODO call backend method here
     $scope.recent4drafts = [
-        {type:'Together', title:'Car sharing to Prague', datetime:'Yesterday'},
-        {type:'Want', title:'Moved recently ...', datetime:'Yesterday'},
-        {type:'Change', title:'Let\'s clean ...', datetime:'Mon, 28.6. 2014'},
-        {type:'Offer', title:'Friendly Bicycle ...', datetime:'April 2014'}
+        {type:'Together', title:'Car sharing to Prague', datetime: new Date('2014-08-22')},
+        {type:'Want', title:'Moved recently ...', datetime: new Date('2014-08-25')},
+        {type:'Change', title:'Let\'s clean ...', datetime: new Date('2014-07-15')},
+        {type:'Offer', title:'Friendly Bicycle ...', datetime: new Date('2014-04-14')}
     ];
 
     // TODO call backend method here
     $scope.closedList = [
-        {type:'Want', title:'Playing soccer together', time:'1 days'},
-        {type:'Change', title:'Looking for a flatscreen TV', time:'3 days'}
+        {type:'Want', title:'Playing soccer together', datetime: new Date('2014-08-23')},
+        {type:'Change', title:'Looking for a flatscreen TV', datetime: new Date('2014-08-20')},
+        {type:'Together', title:'Go to the cinema', datetime: new Date('2014-07-14')}
     ];
 
 	$scope.clickOnMessage = function () {
