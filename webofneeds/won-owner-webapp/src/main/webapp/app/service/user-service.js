@@ -28,52 +28,19 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 			}
 		},
 		registerUser : function(user) {
-			return $http.post(
+            var response = $http.post(
 					'/owner/rest/user/',
-					user
-			).then(
-				function() {
-					// success
-                    registered = true;
-					return {status : "OK"};
-				},
-				function(response) {
-					switch (response.status) {
-					case 409:
-						// normal error
-						return {status:"ERROR", message: "Username is already used"};
-					break;
-					default:
-						// system error
-						console.log("FATAL ERROR");
-					break;
-					}
-				}
-			);
+					user);
+            response.success(function() {registered = true;}); //will be called in addition to any other success handler
+            return response;
 		},
 		logIn : function(user) {
 			return $http.post(
 					'/owner/rest/user/login',
 					user
-			).then(
-				function () {
-					return {status:"OK"};
-				},
-				function (response) {
-					switch (response.status) {
-						case 403:
-							// normal error
-							return {status:"ERROR", message:"Bad username or password"};
-						break;
-						default:
-							// system error
-							console.log("FATAL ERROR");
-						break;
-					}
-				}
-			);
+			)
 		},
-		logOut : function() {
+		logOut : function() { //TODO directly pass promise
 			return $http.post(
 					'/owner/rest/user/logout'
 			).then(
