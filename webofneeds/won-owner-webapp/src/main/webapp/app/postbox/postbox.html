@@ -70,12 +70,20 @@
                                 <span style="display: none;">{{post.type}}</span>
                                 <img src="{{getTypePicURI(post.type)}}" tooltip="{{post.type}} (click to filter)"/>
                             </td>
-                           <!-- <td>{{post.type}}</td> -->
                             <td><a style="font-weight:bold;" href="#/private-link">{{post.title}}</a></td>
                             <td>
-                                <i class="fa fa-comment-o fa-lg"></i>&nbsp;3</i>
-                                <i class="fa fa-male fa-lg"></i>&nbsp;2</i>
-                                <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;1</i>
+                                <span ng-show="post.msg.conversations > 0">
+                                    <span style="display: none;">{{post.msg.convText}}</span>
+                                    <i class="fa fa-comment-o fa-lg"></i>&nbsp;{{post.msg.conversations}}
+                                </span>
+                                <span ng-show="post.msg.requests > 0">
+                                    <span style="display: none;">{{post.msg.reqText}}</span>
+                                    <i class="fa fa-male fa-lg"></i>&nbsp;{{post.msg.requests}}
+                                </span>
+                                <span ng-show="post.msg.matches > 0">
+                                    <span style="display: none;">{{post.msg.matchText}}</span>
+                                    <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{post.msg.matches}}
+                                </span>
                             </td>
                             <td>{{post.time}}</td>
                         </tr>

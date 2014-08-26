@@ -71,11 +71,12 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
     }
 
     // TODO call backend method here
+    // for filtering: when number of unread notifications is 0 set appropriate value (convText, reqText or matchText) to empty string
 	$scope.posts = [
-		{type:'Want', title:'Playing soccer together', time:'2 days'},
-		{type:'Change', title:'Looking for a flatscreen TV', time:'6 days'},
-		{type:'Offer', title:'Offering IKEA couch', time:'5 min'},
-		{type:'Together', title:'Collect items for Caritas asylum', time:'1 day'}
+		{type:'Want', title:'Playing soccer together', msg:{convText: 'unread conversations', conversations : 6, reqText: 'unread requests', requests: 1, matchText: '', matches: 0}, time:'2 days'},
+		{type:'Change', title:'Looking for a flatscreen TV', msg:{convText: 'unread conversations', conversations : 3, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, time:'6 days'},
+		{type:'Offer', title:'Offering IKEA couch', msg:{convText: 'unread conversations', conversations : 1, reqText: '', requests: 0, matchText: 'unread matches', matches: 5}, time:'5 min'},
+		{type:'Together', title:'Collect items for Caritas asylum', msg:{convText: '', conversations : 0, reqText: 'unread requests', requests: 4, matchText: 'unread matches', matches: 1}, time:'1 day'}
 	];
 
     $scope.getTypePicURI = function (type) {
