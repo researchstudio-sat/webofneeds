@@ -42,7 +42,35 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
         }
     }
 
-	// TODO call backend method here
+
+    $scope.resizableColumns = function (id) {
+        var pressed = false;
+        var start = undefined;
+        var startX, startWidth;
+
+        $('#' + id + ' th').mousedown(function(e) {
+            start = $(this);
+            pressed = true;
+            startX = e.pageX;
+            startWidth = $(this).width();
+            $(start).addClass("resizing");
+        });
+
+        $(document).mousemove(function(e) {
+            if(pressed) {
+                $(start).width(startWidth+(e.pageX-startX));
+            }
+        });
+
+        $(document).mouseup(function() {
+            if(pressed) {
+                $(start).removeClass("resizing");
+                pressed = false;
+            }
+        });
+    }
+
+    // TODO call backend method here
 	$scope.posts = [
 		{type:'Want', title:'Playing soccer together', time:'2 days'},
 		{type:'Change', title:'Looking for a flatscreen TV', time:'6 days'},

@@ -422,3 +422,8 @@ http://stackoverflow.com/questions/18023493/bootstrap-3-dropdown-sub-menu-missin
     left:-100%;
     margin-left:10px;
 }
+
+/** resizable columns */
+table th.resizing {
+    cursor: col-resize;
+}
