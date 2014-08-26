@@ -300,31 +300,92 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
     $scope.registered = false;
     $scope.mail_s = false;
 
-	onRegisterResponse = function(result) {
-		if(result.status == "OK") {
-			$scope.error = '';
-			$scope.success = '';
+    onRegisterSuccessful = function(response) {
+        /*        console.log("FOOOOOO");
+         console.log(result);*/
+        //if (response.status == "OK") {
+        console.log("TEST OK got asdfdfajif;");
 
-			angular.resetForm($scope, "registerForm");
-		//	$scope.success = 'You\'ve been successfully registered. Please try to Sign in';
-            $scope.registered = true;
-            userService.logIn($scope.registerUser).then(onLoginResponse);
-            $scope.registerUser.reset();
-            //$location.path("/");
-        } else {
-			$scope.error = result.message;
-		}
-	}
+        $scope.error = '';
+        $scope.success = '';
 
-    onLoginResponse = function(result) {
-        if (result.status == 'OK') {
-            userService.setAuth($scope.username);
-            $window.location.href = '/';
+        angular.resetForm($scope, "registerForm");
+        //	$scope.success = 'You\'ve
+        // been successfully registered. Please try to Sign in';
+        $scope.registered = true;
 
-        } else {
-            $scope.error = result.message;
+        //TODO causes digest already in progress error:
+        userService.logIn($scope.registerUser).then(onLoginSuccessful, onLoginError);
+        /*$scope.$apply(function () {
+         userService.logIn($scope.registerUser).then(onLoginResponse);
+         });*/
+
+
+        //$scope.registerUser.reset();
+        //$location.path("/");
+        console.log("End of onRegister 4099uqgjfakl");
+    };
+
+    onRegisterError = function (response) {
+        $scope.error = response.message;
+
+        switch (response.status) {
+            case 403:
+                // normal error
+                alert(response.message);
+                break;
+            default:
+                // system error
+                console.log("FATAL ERROR while registering " , response.status, " - q3afujjsdafl");
+                console.log(response);
+                alert("Couldn't sign up at the moment. Please try again later.");
+                //TODO alert's a dirty hack to notify the user
+                break;
         }
     }
+
+//					registering:
+//                  case 409:
+//						// normal error
+//						return {status:"ERROR", message: "Username is already used"};
+                    /* logging in:
+					switch (response.status) {
+						case 403:
+							// normal error
+							return {status:"ERROR", message:"Bad username or password"};
+			);*/
+
+    onLoginSuccessful = function(result) {
+        //if (result.status == 'OK') {
+        userService.setAuth($scope.username);
+        $window.location.href = '/';
+
+    }
+    onLoginError = function(response) {
+        $scope.error = result.message;
+        console.log("LOGIN ERROR q509qriafjlkj");
+        console.log(response);
+    }
+
+    /*.then(
+     function () {
+     return {status:"OK", message: "Successful"};
+     },
+     function (response) {
+     switch (response.status) {
+     case 403:
+     // normal error
+     return {status:"ERROR", message:"Bad username or password"};
+     break;
+     default:
+     // system error
+     var msg = "FATAL ERROR during login";
+     console.log(msg);
+     return {status:"ERROR", message: msg};
+     break;
+     }
+     }
+     );*/
 
 	$scope.onClickRegister = function () {
 		var validPass = true;
@@ -340,9 +401,20 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
         }
 
 		if ($scope.registerForm.$valid && validPass) {
-			userService.registerUser($scope.registerUser).then(onRegisterResponse);
+//			userService.registerUser($scope.registerUser)
+//                .success(onRegisterSuccessful)
+//                .error(onRegisterError);
+            userService.registerUser($scope.registerUser).then(onRegisterSuccessful, onRegisterError);
 		}
 	}
+
+    $scope.cancelRegister = function() {
+        $scope.forms.register = false;
+        // TODO breaks the view (the url doesn't change, the sign-up button is still pressed)
+        // // since this fn executes async in a future turn of the event loop, we need to wrap
+        // // our code into an $apply call so that the model changes are properly observed.
+        //scope.$apply(function() {
+    }
 
 });
 
