@@ -56,15 +56,6 @@
             return JSON.parse(JSON.stringify(obj));
         }
 
-    /*    wonmessagebuilder.sendMessage = function(dataset){
-            socket.onopen = function () {
-                console.log("connection has been established!")
-                writeOutput("connection has been established!");
-                socket.send(JSON.stringify(dataset));
-            }
-
-
-        }         */
         /*
          * Creates a JSON-LD representation of the need data provided through builder functions.
          * e.g.:
@@ -94,6 +85,10 @@
                         },
                         "won:hasBasicNeedType":{
                             "@id":"http://purl.org/webofneeds/model#hasBasicNeedType",
+                            "@type":"@id"
+                        },
+                        "won:hasFacet":{
+                            "@id":"http://purl.org/webofneeds/model#hasFacet",
                             "@type":"@id"
                         },
                         "won:hasContent":{
@@ -179,6 +174,52 @@
                 this.getMainNode()["won:hasBasicNeedType"] = type;
                 return this;
             },
+            ownerFacet: function(){
+                return this.hasFacet("won:OwnerFacet");
+            },
+            groupFacet: function(){
+                return this.hasFacet("won:GroupFacet");
+            },
+            coordinatorFacet: function(){
+                return this.hasFacet("won:coordinatorFacet");
+            },
+            participantFacet: function(){
+                return this.hasFacet("won:ParticipantFacet");
+            },
+            commentFacet: function(){
+                return this.hasFacet("won:CommentFacet");
+            },
+            commentModeratedFacet: function(){
+                return this.hasFacet("won:CommentModeratedFacet");
+            },
+            commentUnrestrictedFacet: function(){
+                return this.hasFacet("won:CommentUnrestrictedFacet");
+            },
+            controlFacet: function(){
+                return this.hasFacet("won:ControlFacet");
+            },
+            BAPCCoordinatorFacet: function(){
+                return this.hasFacet("won:BAPCCordinatorFacet");
+            },
+            BAPCParticipantFacet: function(){
+                return this.hasFacet("won:BAPCParticipantFacet");
+            },
+            BACCCoordinatorFacet: function(){
+                return this.hasFacet("won:BACCCoordinatorFacet");
+            },
+            BACCParticipantFacet: function(){
+                return this.hasFacet("won:BACCParticipantFacet");
+            },
+            BAAtomicPCCoordinatorFacet: function(){
+                return this.hasFacet("won:BAAtomicPCCoordinatorFacet");
+            },
+            BAAtomicCCCoordinatorFacet: function(){
+                return this.hasFacet("won:BAAtomicCCCoordinatorFacet");
+            },
+            hasFacet: function(facetType){
+                this.getMainNode()["won:hasFacet"]=facetType;
+                return this;
+            },
             active: function(){
                 return this.inState("won:Active")
             },
@@ -208,6 +249,9 @@
                 this.getContentNode()["dc:title"] = title;
                 return this;
             },
+            /**
+             * in order to add price, location, time description hasContentDescription() shall be called first. then use getContentDescriptionNode()
+             */
             hasContentDescription: function(){
                 this.getContentNode()["won:hasContentDescription"]="_:contentDescription";
                 this.getNeedGraph()[2]={
@@ -322,9 +366,6 @@
                 return this.data;
             }
         }
-      //  window.CreateMessageBuilder = CreateMessageBuilder;
-
-//}
         return wonmessagebuilder;
     };
     var factory = function() {
@@ -343,22 +384,5 @@
         }
     }
 })();
-
-
-needJson = new window.wonmessagebuilder.NeedBuilder()
-    .title("testneed")
-    .demand()
-    .needURI("http://localhost:8080/won/resource/need/lk234njkhsdjfgb4l25rtj34")
-    .description("just a test")
-    .active()
-    .supply()
-    .build();
-
-messageJson = new window.wonmessagebuilder.CreateMessageBuilder(needJson)
-    .addMessageGraph()
-    .eventURI("34543242134")
-    .sender()
-    .receiver("http://localhost:8080/won")
-    .build();
 
 
