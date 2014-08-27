@@ -23,8 +23,13 @@ _:message msg:containsMessage
 
     <http://www.remote-example.com/resource/need/randomNeedID_2/connection/randomConnectionID_2_1/event/randomEventID_2_2>
         a msg:ConnectMessage ;
-        msg:sender remote: ;
-        msg:receiver : ;
+
+        msg:sender <http://www.remote-example.com/resource/need/randomNeedID_2/connection/randomConnectionID_2_1> ;
+        msg:senderNeed <http://www.remote-example.com/resource/need/randomNeedID_2> ;
+        msg:senderNode <http://www.remote-example.com> ;
+        msg:receiver <http://www.example.com/resource/need/randomNeedID_1/facets#owner> ;
+        msg:receiverNeed <http://www.example.com/resource/need/randomNeedID_1> ;
+        msg:receiverNode <http://www.example.com> ;
 
         msg:refersTo
             # a hint event within the same connection
