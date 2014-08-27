@@ -138,13 +138,13 @@
                                 <i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="#"><!--<i class="fa fa-circle fa-lg"></i>--><img src="/images/type_posts/want.png"/>&nbsp;I want to <strong>have</strong> something</a></li>
+                                <li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img src="/images/type_posts/want.png"/>&nbsp;I want to <strong>have</strong> something</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/images/type_posts/offer.png"/>&nbsp;I <strong>offer</strong> something</a></li>
+                                <li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/images/type_posts/offer.png"/>&nbsp;I <strong>offer</strong> something</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I want to do something <strong>together</strong></a></li>
+                                <li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I want to do something <strong>together</strong></a></li>
                                 <li class="divider"></li>
-                                <li><a href="#"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/images/type_posts/change.png"/>&nbsp;I want to <strong>change</strong> something</a></li>
+                                <li><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/images/type_posts/change.png"/>&nbsp;I want to <strong>change</strong> something</a></li>
                                 <li class="divider"></li>
                                 <li class="dropdown-submenu">
                                     <a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
@@ -161,13 +161,13 @@
                                 <i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="#"><!--<i class="fa fa-circle fa-lg"></i>--><img src="/images/type_posts/want.png"/>&nbsp;I want to <strong>have</strong> something</a></li>
+                                <li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img src="/images/type_posts/want.png"/>&nbsp;I want to <strong>have</strong> something</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/images/type_posts/offer.png"/>&nbsp;I <strong>offer</strong> something</a></li>
+                                <li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/images/type_posts/offer.png"/>&nbsp;I <strong>offer</strong> something</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I want to do something <strong>together</strong></a></li>
+                                <li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I want to do something <strong>together</strong></a></li>
                                 <li class="divider"></li>
-                                <li><a href="#"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/images/type_posts/change.png"/>&nbsp;I want to <strong>change</strong> something</a></li>
+                                <li><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/images/type_posts/change.png"/>&nbsp;I want to <strong>change</strong> something</a></li>
                             </ul>
                         </li>
                         <li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
