@@ -427,3 +427,12 @@ http://stackoverflow.com/questions/18023493/bootstrap-3-dropdown-sub-menu-missin
 table th.resizing {
     cursor: col-resize;
 }
+
+/** classes for sortable tables */
+.st-sort-ascent:after{
+    content: '\25B2';
+}
+
+.st-sort-descent:after{
+    content: '\25BC';
+}

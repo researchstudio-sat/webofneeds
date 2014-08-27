@@ -44,62 +44,38 @@
             <div class="div-table-row col-lg-12">
                 <div class="div-table-cell col-lg-12">
                     <div class="row col-lg-12 text-center">
-                        <div class="panel panel-default">
+                        <!--<div class="panel panel-default"> -->
                             <div class="btn-group">
-                                <!--TODO change buttons size and put pictures-->
-                                <button type="button" class="btn btn-default">Conversations</button>
-                                <button type="button" class="btn btn-default">Requests</button>
-                                <button type="button" class="btn btn-default">Matches</button>
+                                <button id="1" ng-click="clickOnMessageButton(1)" type="button" class="btn btn-success"><img src="/images/conversations.svg">Conversations</button>
+                                <button id="2" ng-click="clickOnMessageButton(2)" type="button" class="btn btn-success"><img src="/images/requests.svg">Requests</button>
+                                <button id="3" ng-click="clickOnMessageButton(3)" type="button" class="btn btn-success"><img src="/images/matches.svg">Matches</button>
                             </div>
-                            <table class="table table-bordered">
+                            <table st-table="messages" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
-                                        <th>
-                                            <a href="" ng-click="messagingTypeClick()">
-                                                Type
-                                                <span >
-                                                    <a href="" ng-show="messagingSortDesc" class="glyphicon glyphicon-chevron-up" ng-click="messagingTypeClick()"></a>
-                                                </span>
-                                                <span >
-                                                    <a href="" ng-show="!messagingSortDesc" class="glyphicon glyphicon-chevron-down" ng-click="messagingTypeClick()"></a>
-                                                </span>
-                                            </a>
+                                        <th st-sort="typeText">
+                                            Type
                                         </th>
-                                        <th>
-                                            <a href="" ng-click="titleClick()">
-                                                Title
-                                                <span >
-                                                    <a href="" ng-show="titleSortDesc" class="glyphicon glyphicon-chevron-up" ng-click="titleClick()"></a>
-                                                </span>
-                                                <span >
-                                                    <a href="" ng-show="!titleSortDesc" class="glyphicon glyphicon-chevron-down" ng-click="titleClick()"></a>
-                                                </span>
-                                            </a>
+                                        <th st-sort="title">
+                                            Title
                                         </th>
-                                        <th>
-                                            <a href="" ng-click="dateClick()">
-                                                Date
-                                                <span >
-                                                    <a href="" ng-show="dateSortDesc" class="glyphicon glyphicon-chevron-up" ng-click="dateClick()"></a>
-                                                </span>
-                                                <span >
-                                                    <a href="" ng-show="!dateSortDesc" class="glyphicon glyphicon-chevron-down" ng-click="dateClick()"></a>
-                                                </span>
-                                            </a>
+                                        <th st-sort="datetime">
+                                            Date
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="message in messages"> <!--TODO ADD filtering. 3 kinds from buttons-->
+                                    <tr ng-repeat="message in messages | filter: messageFilter">
                                         <td>
-                                            <img src="{{getTypePicURIs(message.type)}}"/>
+                                            <span style="display: none;">{{message.typeText}}</span>
+                                            <i ng-class="getIconClass(message.typeText)" tooltip="{{message.typeText}}"/>
                                         </td>
                                         <td><a style="font-weight:bold;" href="">{{message.title}}</a></td>
-                                        <td>{{message.datetime}}</td>
+                                        <td>{{message.datetime | date}}</td>
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
+                        <!--</div> -->
                     </div>
                 </div>
             </div>

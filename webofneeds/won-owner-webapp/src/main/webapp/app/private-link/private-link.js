@@ -27,6 +27,9 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         val3 : false
     };
 
+    // all types of messages will be shown when the page is loaded
+    var msgFilterCriteria = [1, 2, 3];
+
     $scope.copyLinkToClipboard = function() {
         //todo maybe we can use http://zeroclipboard.org/
     };
@@ -66,11 +69,14 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
 
     //Messages Options
     $scope.messages = [
-        {type:'message', title:'Car sharing to Prague', datetime:'Yesterday'},
-        {type:'request', title:'Moved recently ...', datetime:'Yesterday'},
-        {type:'request', title:'Let\'s clean ...', datetime:'Mon, 28.6. 2014'},
-        {type:'request', title:'Friendly Bicycle ...', datetime:'April 2014'},
-        {type:'match', title:'Old children\'s clothes ..', datetime:'Sep 2013'}
+        {type: 1, typeText:'Conversation', title:'Car sharing to Prague', datetime: new Date('2014-08-25')},
+        {type: 2, typeText:'Incoming Request', title:'Moved recently ...', datetime:new Date('2014-08-20')},
+        {type: 2, typeText:'Outgoing Request', title:'Let\'s clean ...', datetime:new Date('2014-06-28')},
+        {type: 1, typeText:'Conversation', title:'Friendly Bicycle ...', datetime:new Date('2014-04-15')},
+        {type: 3, typeText:'Matches', title:'Old children\'s clothes ..', datetime:new Date('2013-09-10')},
+        {type: 2, typeText:'Incoming Request', title:'Bought new car ...', datetime:new Date('2014-03-01')},
+        {type: 2, typeText:'Outgoing Request', title:'Let\'s grill ...', datetime:new Date('2014-06-19')},
+        {type: 3, typeText:'Matches', title:'Old men\'s clothes ..', datetime:new Date('2014-02-10')}
     ];
 
     $scope.messageTypeColapsed = -1;
@@ -97,25 +103,33 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         else return "| filter: {type: match}";
     };   */
 
-    //TODO put logic
-    $scope.getTypePicURIs = function(type) {
-       return "/images/type_posts/want.png";
+    $scope.getIconClass = function (typeText) {
+        if (typeText=='Conversation') return 'fa fa-comment-o fa-lg';
+        else if (typeText=='Incoming Request') return 'fa fa-share fa-lg';
+        else if (typeText=='Outgoing Request') return 'fa fa-reply fa-lg';
+        else return 'fa fa-puzzle-piece fa-lg';
     };
 
-    $scope.messagingSortDesc = false;
-    $scope.messagingTypeClick = function() {
-        $scope.messagingSortDesc = !$scope.messagingSortDesc;
-    };
+    $scope.messageFilter = function(msg) {
+        return msgFilterCriteria.indexOf(msg.type) >= 0 ? true : false;
+    }
 
-    $scope.titleSortDesc = false;
-    $scope.titleClick = function() {
-        $scope.titleSortDesc = !$scope.titleSortDesc;
-    };
+    $scope.clickOnMessageButton = function(buttonId) {
+        // configuring message filter
+        var critIndex = msgFilterCriteria.indexOf(buttonId);
+        if (critIndex == -1) {
+            msgFilterCriteria.push(buttonId);
+        } else {
+            msgFilterCriteria.splice(critIndex, 1);
+        }
 
-    $scope.dateSortDesc = false;
-    $scope.dateClick = function() {
-        $scope.dateSortDesc = !$scope.dateSortDesc;
-    };
+        var button = $('#' + buttonId);
+        if (button.hasClass('btn-success')) {
+            button.removeClass('btn-success').addClass('btn-default');
+        } else {
+            button.removeClass('btn-default').addClass('btn-success');
+        }
+    }
 
     $scope.conversationCollapseClick = function() {
         $scope.conversationCollapsed = !$scope.conversationCollapsed;
