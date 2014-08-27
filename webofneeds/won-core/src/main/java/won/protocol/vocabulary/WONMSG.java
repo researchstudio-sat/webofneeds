@@ -48,6 +48,10 @@ public class WONMSG
   public static final Resource TYPE_RESPONSE_STATE_DUPLICATE_MESSAGE_ID =
     m.createResource(BASE_URI + "DuplicateMessageIdResponse");
 
+  public static final Property HAS_RESPONSE_STATE_PROPERTY =
+    m.createProperty(BASE_URI + "hasResponseStateProperty");
+
+
   //public static final String MESSAGE_TYPE_CREATE_RESOURCE = BASE_URI + "CreateMessage";
   //public static final String MESSAGE_TYPE_CONNECT_RESOURCE = BASE_URI + "ConnectMessage";
   //public static final String MESSAGE_TYPE_NEED_STATE_RESOURCE = BASE_URI + "NeedStateMessage";
