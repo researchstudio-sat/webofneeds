@@ -85,8 +85,13 @@
 
     <http://www.example.com/resource/need/randomNeedID_1/connection/randomConnectionID_1_1/event/randomEventID_1_1_1>
         a msg:CloseMessage ;
-        msg:sender : ;
-        msg:receiver remote: ;
+
+        msg:sender <http://www.example.com/resource/need/randomNeedID_1/connection/randomConnectionID_1_1> ;
+        msg:senderNeed <http://www.example.com/resource/need/randomNeedID_1> ;
+        msg:senderNode <http://www.example.com> ;
+        msg:receiver remote: <http://www.remote-example.com/resource/need/randomNeedID_2/connection/randomConnectionID_2_1> ;
+        msg:receiverNeed <http://www.remote-example.com/resource/need/randomNeedID_2> ;
+        msg:receiverNode <http://www.remote-example.com> ;
 
         msg:refersTo
           <http://www.example.com/resource/need/randomNeedID_1/connection/randomConnectionID_1_1/event/0> ,

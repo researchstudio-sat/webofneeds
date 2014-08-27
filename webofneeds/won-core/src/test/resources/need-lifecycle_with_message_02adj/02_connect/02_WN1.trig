@@ -75,10 +75,16 @@
 
 <http://www.example.com/resource/need/randomNeedID_1/connection/randomConnectionID_1_1/event/0#data> {
 
-    <http://www.example.com/resource/need/randomNeedID_1/connection/randomConnectionID_1_1/event/0>
-        a msg:ConnectMessage ;
-        msg:sender : ;
-        msg:receiver remote: .
+  <http://www.example.com/resource/need/randomNeedID_1/connection/randomConnectionID_1_1/event/0>
+    a msg:ConnectMessage ;
+
+    msg:sender <http://www.example.com/resource/need/randomNeedID_1/connection/randomConnectionID_1_1> ;
+    msg:senderNeed <http://www.example.com/resource/need/randomNeedID_1> ;
+    msg:senderNode <http://www.example.com>;
+    msg:receiver <http://www.remote-example.com/resource/need/randomNeedID_2/facets#owner> ;
+    msg:receiverNeed <http://www.remote-example.com/resource/need/randomNeedID_2> ;
+    msg:receiverNode <http://www.remote-example.com> .
+
 }
 
 <http://www.example.com/resource/need/randomNeedID_1/connection/randomConnectionID_1_1/event/0#data>

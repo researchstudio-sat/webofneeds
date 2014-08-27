@@ -31,8 +31,11 @@ _:message msg:containsMessage
 
     <http://www.won-matcher.com/resource/messages/randomMatchMessageID_1>
         a msg:HintMessage ;
-        msg:sender matcher:webID ;
+
+        msg:senderNode <http://www.won-matcher.com/webID> ;
         msg:receiver <http://www.example.com/resource/need/randomNeedID_1/facets#ownerFacet> ;
+        msg:receiverNeed <http://www.example.com/resource/need/randomNeedID_1> ;
+        msg:receiverNode <http://www.example.com> ;
 
         msg:refersTo :core .
 

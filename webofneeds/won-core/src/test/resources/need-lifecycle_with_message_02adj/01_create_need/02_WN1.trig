@@ -93,9 +93,14 @@
 #GRAPH 
 <http://www.example.com/resource/need/randomNeedID_1/event/0#data> {
   <http://www.example.com/resource/need/randomNeedID_1/event/0>
-   a msg:CreateMessage ;
+    a msg:CreateMessage ;
+
+    msg:hasSenderNeed <http://www.example.com/resource/need/randomNeedID_1> ;
+    msg:hasReceiverNode <http://www.example.com> ;
+
     msg:hasContent <http://www.example.com/resource/need/randomNeedID_1/core> ;
     msg:hasContent <http://www.example.com/resource/need/randomNeedID_1/transient> .
+
   <http://www.example.com/resource/need/randomNeedID_1/core#data> crypt:hasSignature
       [
         a crypt:WonSignature ;
