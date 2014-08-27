@@ -107,6 +107,27 @@
                         "won:hasContentDescription":{
                             "@id":"http://purl.org/webofneeds/model#hasContentDescription",
                             "@type":"@id"
+                        },
+                        "won:hasCurrency":{
+                            "@type":"xsd:string"
+                        },
+                        "won:hasLowerPriceLimit":{
+                            "@type":"xsd:float"
+                        },
+                        "won:hasUpperPriceLimit":{
+                            "@type":"xsd:float"
+                        },
+                        "geo:latitude":{
+                            "@type":"xsd:float"
+                        },
+                        "geo:longitude":{
+                            "@type":"xsd:float"
+                        },
+                        "won:hasEndTime":{
+                            "@type":"xsd:dateTime"
+                        },
+                        "won:hasStartTime":{
+                            "@type":"xsd:dateTime"
                         }
                     },
                     "@graph": [
@@ -129,7 +150,9 @@
 
         wonmessagebuilder.NeedBuilder.prototype = {
             constructor: wonmessagebuilder.NeedBuilder,
-
+            getNeedGraph: function(){
+                return this.data["@graph"][0]["@graph"];
+            },
             getContentNode: function () {
                 return this.data["@graph"][0]["@graph"][1];
             },
@@ -187,6 +210,43 @@
             },
             hasContentDescription: function(){
                 this.getContentNode()["won:hasContentDescription"]="_:contentDescription";
+                this.getNeedGraph()[2]={
+                    "@id":this.getContentNode()["won:hasContentDescription"],
+                    "@type":"won:NeedModality"
+                }
+                this.getContentDescriptionNode = function(){
+                    return this.getNeedGraph()[2];
+                }
+                return this;
+            },
+            hasPriceSpecification: function(currency, lowerLimit, upperLimit){
+                this.getContentDescriptionNode()["won:hasPriceSpecification"]= {
+                    "@id":"_:priceSpecification",
+                    "@type":"won:PriceSpecification",
+                    "won:hasCurrency":currency,
+                    "won:hasLowerPriceLimit":lowerLimit,
+                    "won:hasUpperPriceLimit":upperLimit
+                }
+                return this;
+            },
+            hasLocationSpecification: function(latitude, longitude){
+                this.getContentDescriptionNode()["won:hasLocationSpecification"]={
+                    "@id":"_:locationSpecification",
+                    "@type":"geo:Point",
+                    "geo:latitude":latitude,
+                    "geo:longitude":longitude
+                }
+                return this;
+            },
+            hasTimeSpecification: function(startTime, endTime, recurInfinite, recursIn, recurTimes){
+                this.getContentDescriptionNode()["won:hasTimespecification"]={
+                    "@type":"won:TimeSpecification",
+                    "won:hasRecurInfiniteTimes":recurInfinite,
+                    "won:hasRecursIn":recursIn,
+                    "won:hasStartTime":startTime,
+                    "won:hasEndTime":endTime
+                }
+                return this;
             },
             hasTag: function(tags){
                 this.getContentNode()["won:hasTag"] = tags;
@@ -300,10 +360,5 @@ messageJson = new window.wonmessagebuilder.CreateMessageBuilder(needJson)
     .sender()
     .receiver("http://localhost:8080/won")
     .build();
-
-//expanded = window.jsonld.expand(messageJson,null,null);
-
-//console.log("expanded: "+expanded);
-//sender = window.wonmessagebuilder.sendMessage(messageJson);
 
 

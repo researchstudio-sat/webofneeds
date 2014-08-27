@@ -177,6 +177,10 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             .demand()
             .needURI("http://localhost:8080/won/resource/need/lk234njkhsdjfgb4l25rtj34")
             .description("just a test")
+            .hasContentDescription()
+            .hasPriceSpecification("EUR",5.0,10.0)
+            .hasLocationSpecification(10,20)
+            .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
             .active()
             .supply()
             .build();

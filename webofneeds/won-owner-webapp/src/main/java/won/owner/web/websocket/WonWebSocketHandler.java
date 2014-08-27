@@ -81,6 +81,7 @@ public class WonWebSocketHandler
       try {
         session.sendMessage(webSocketMessage);
       } catch (IOException e) {
+        webSocketSessions.remove(session);
         // ToDo (FS): proper handling when message could not be send (remove session from list; inform someone)
         logger.info("caught IOException:", e);
       }

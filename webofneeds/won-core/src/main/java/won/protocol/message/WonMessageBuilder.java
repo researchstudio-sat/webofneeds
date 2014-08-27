@@ -42,7 +42,7 @@ public class WonMessageBuilder
 
     // message URI
     Resource messageEventResource = messageEvent.createResource(
-        messageURI.toString(), wonMessageType.getResource());
+        WONMSG.getGraphURI(messageURI.toString()), wonMessageType.getResource());
 
     // ToDo (FS): also add the signatures
     for (URI contentURI : contentMap.keySet()) {

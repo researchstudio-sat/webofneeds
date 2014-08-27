@@ -46,7 +46,7 @@ public class WonMessageDecoder
     while (stmtIterator.hasNext()) {
       Statement stmt = stmtIterator.nextStatement();
       if (isMessageEventPointer(stmt)) {
-        msgEventURI = stmt.getObject().asResource().getURI();
+        msgEventURI = stmt.getObject().asResource().getURI().toString();
         break;
       }
     }

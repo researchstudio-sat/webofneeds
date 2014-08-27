@@ -6,6 +6,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.DC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.owner.pojo.NeedPojo;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.Interval;
@@ -15,8 +17,11 @@ import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
-import java.sql.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,8 +30,9 @@ import java.util.List;
  */
 public class NeedPojoNeedModelBuilder extends NeedBuilderBase<Model>
 {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  public NeedPojoNeedModelBuilder(NeedPojo needPojo){
+  public NeedPojoNeedModelBuilder(NeedPojo needPojo) throws ParseException {
     if (!needPojo.getTitle().isEmpty())
       this.setTitle(needPojo.getTitle());
     if (needPojo.getContentDescription() != null && !needPojo.getContentDescription().isEmpty())
@@ -35,8 +41,13 @@ public class NeedPojoNeedModelBuilder extends NeedBuilderBase<Model>
       this.setState(needPojo.getState());
     if (needPojo.getBasicNeedType()!=null)
       this.setBasicNeedType(needPojo.getBasicNeedType());
-    if (needPojo.getCreationDate()!=null)
-      this.setCreationDate(Date.valueOf(needPojo.getCreationDate()));
+    if (needPojo.getCreationDate()!=null){
+      DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+      Date creationDate = format.parse(needPojo.getCreationDate());
+      this.setCreationDate(creationDate);
+
+    }
+
 
     List<URI> facetURIs = new ArrayList<>();
     for (String facet : needPojo.getFacetTypes()){
@@ -46,9 +57,9 @@ public class NeedPojoNeedModelBuilder extends NeedBuilderBase<Model>
     this.setFacetTypes(facetURIs);
     if (needPojo.getLatitude()!=null && needPojo.getLongitude()!=null)
       this.setAvailableAtLocation(needPojo.getLatitude().toString(),needPojo.getLongitude().toString());
-    if ((needPojo.getStartTime()!=null && needPojo.getEndTime()!=null)&&(!needPojo.getEndTime().isEmpty()&&!needPojo
+    /*if ((needPojo.getStartTime()!=null && needPojo.getEndTime()!=null)&&(!needPojo.getEndTime().isEmpty()&&!needPojo
       .getStartTime().isEmpty()))
-      this.addInterval(Long.valueOf(needPojo.getStartTime()), Long.valueOf(needPojo.getEndTime()));
+      this.addInterval(Long.valueOf(needPojo.getStartTime()), Long.valueOf(needPojo.getEndTime()));     */
     if (needPojo.getTags()!=null && !needPojo.getTags().isEmpty())
       this.addTag(needPojo.getTags());
     if(needPojo.getLowerPriceLimit()!=null && needPojo.getUpperPriceLimit()!=null)
@@ -57,7 +68,15 @@ public class NeedPojoNeedModelBuilder extends NeedBuilderBase<Model>
       this.setUri(needPojo.getNeedURI());
     if (needPojo.getStartTime()!=null&&!needPojo.getStartTime().isEmpty() && needPojo.getEndTime()!=null && !needPojo
       .getEndTime().isEmpty()){
-      this.addInterval(Long.valueOf(needPojo.getStartTime()),Long.valueOf(needPojo.getEndTime()));
+      try{
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        Date startTime = format.parse(needPojo.getStartTime());
+        Date endTime = format.parse(needPojo.getEndTime());
+        this.addInterval(startTime.getTime(),endTime.getTime());
+      } catch (ParseException e) {
+         logger.debug("parsing date failed");
+      }
+
     }
     if (needPojo.getCurrency()!=null&&!needPojo.getCurrency().isEmpty()){
       this.setCurrency(needPojo.getCurrency());

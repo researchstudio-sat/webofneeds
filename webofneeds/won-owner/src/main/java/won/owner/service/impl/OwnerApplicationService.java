@@ -16,7 +16,6 @@ import won.protocol.message.WonMessageType;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
-import won.protocol.model.OwnerApplication;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -228,17 +227,16 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   {
 
     URI responseMessageURI = null;
-    try {
-      responseMessageURI = new URI("http://example.com/responseMessage/837ddj/");
-    } catch (URISyntaxException e)  {
-      logger.warn("caught URISyntaxException:", e);
-    }
+
+    responseMessageURI = URI.create("http://example.com/responseMessage/837ddj");//new URI(WONMSG.getGraphURI(msgURI.toString()).toString());
 
     WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
     WonMessage responseWonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.CREATE_RESPONSE)
         .setMessageURI(responseMessageURI)
+        .setSenderURI(wonMessage.getMessageEvent().getReceiverURI())
         .setReceiverURI(wonMessage.getMessageEvent().getSenderURI())
+        .setWonMessageType(WonMessageType.CREATE_RESPONSE)
         .addRefersToURI(wonMessage.getMessageEvent().getMessageURI())
         .build();
 

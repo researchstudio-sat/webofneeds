@@ -218,7 +218,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
                 console.log("FATAL ERROR");
             }
         );   */
-        messageService.sendMessage("createNeed",needToSave);
+        //messageService.sendMessage("createNeed",needToSave);
     }
 
 	needService.save = function(need) {
