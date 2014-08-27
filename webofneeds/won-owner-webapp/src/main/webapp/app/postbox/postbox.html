@@ -45,23 +45,13 @@
                 </div>
             </div>
             <div id="inboxArea" ng-show="!inboxCollapsed" class="div-table col-lg-12">
-                <table id="post-table" class="table table-hover table-striped" ng-init="resizableColumns('post-table');">
+                <table id="post-table" st-table="posts" class="table table-hover table-striped" ng-init="resizableColumns('post-table');">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Title</th>
-                            <th>
-                                <a href="" ng-click="undreadClick()">
-                                    Unread
-                                    <span >
-                                        <a href="" ng-show="undreadSortDesc" class="glyphicon glyphicon-chevron-up" ng-click="undreadClick()"></a>
-                                    </span>
-                                    <span >
-                                        <a href="" ng-show="!undreadSortDesc" class="glyphicon glyphicon-chevron-down" ng-click="undreadClick()"></a>
-                                    </span>
-                                </a>
-                            </th>
-                            <th>Created on</th>
+                            <th st-sort="type">Type</th>
+                            <th st-sort="title">Title</th>
+                            <th>Unread</th> <!-- TODO sorting for conversations -->
+                            <th st-sort="datetime">Created on</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,10 +75,7 @@
                                     <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{post.msg.matches}}
                                 </span>
                             </td>
-                            <td>{{post.time}} day</td>
-                        </tr>
-                        <tr>
-
+                            <td>{{post.datetime | date}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -115,17 +102,6 @@
                             <th st-sort="type">Type</th>
                             <th st-sort="title">Title</th>
                             <th st-sort="datetime">
-                                <!--
-                                <a href="" ng-click="createdOnClick()">
-                                    Created on
-                                        <span >
-                                            <a href="" ng-show="createdOnSortDesc" class="glyphicon glyphicon-chevron-up" ng-click="createdOnClick()"></a>
-                                        </span>
-                                        <span >
-                                            <a href="" ng-show="!createdOnSortDesc" class="glyphicon glyphicon-chevron-down" ng-click="createdOnClick()"></a>
-                                        </span>
-                                </a>
-                                -->
                                 Created on
                             </th>
                         </tr>
@@ -140,9 +116,6 @@
                             <td><a href="#/create-need/1" style="font-weight:bold;">{{draft.title}}</a></td>
                             <td>{{draft.datetime | date}}</td>
                             <td><a href="" ng-click="clickOnRemoveButton($index);"><i class="fa fa-times-circle-o fa-lg"></i></a></td>
-                        </tr>
-                        <tr>
-
                         </tr>
                     </tbody>
                 </table>
@@ -170,17 +143,6 @@
                         <th st-sort="type">Title</th>
                         <th st-sort="datetime">
                             Closed on
-                            <!--
-                            <a href="" ng-click="closedOnClick()">
-                                Closed on
-                                <span >
-                                    <a href="" ng-show="closedOnSortDesc" class="glyphicon glyphicon-chevron-up" ng-click="closedOnClick()"></a>
-                                </span>
-                                <span >
-                                    <a href="" ng-show="!closedOnSortDesc" class="glyphicon glyphicon-chevron-down" ng-click="closedOnClick()"></a>
-                                </span>
-                            </a>
-                            -->
                         </th>
                     </tr>
                     </thead>

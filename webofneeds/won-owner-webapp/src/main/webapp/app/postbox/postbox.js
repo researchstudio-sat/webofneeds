@@ -73,14 +73,14 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
     // TODO call backend method here
     // for filtering: when number of unread notifications is 0 set appropriate value (convText, reqText or matchText) to empty string
 	$scope.posts = [
-		{type:'Want', title:'Want PS 4', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: '', matches: 0}, time: 2},
-		{type:'Change', title:'Looking for a flatscreen TV', msg:{convText: 'unread conversations', conversations : 3, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, time: 6},
-		{type:'Offer', title:'Offering IKEA couch', msg:{convText: 'unread conversations', conversations : 1, reqText: '', requests: 0, matchText: 'unread matches', matches: 5}, time: 5},
-		{type:'Together', title:'Collect items for Caritas asylum', msg:{convText: '', conversations : 0, reqText: 'unread requests', requests: 4, matchText: 'unread matches', matches: 1}, time: 4},
-        {type:'Change', title:'I want to change my mobile', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: '', matches: 0}, time: 3},
-        {type:'Together', title:'Clean the forest', msg:{convText: 'unread conversations', conversations : 10, reqText: '', requests: 0, matchText: '', matches: 0}, time: 1},
-        {type:'Offer', title:'Selling old laptop', msg:{convText: '', conversations : 0, reqText: 'unread requests', requests: 7, matchText: '', matches: 0}, time: 8},
-        {type:'Want', title:'Want a plane', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, time: 7}
+		{type:'Want', title:'Want PS 4', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: '', matches: 0}, datetime: new Date('2014-08-25')},
+		{type:'Change', title:'Looking for a flatscreen TV', msg:{convText: 'unread conversations', conversations : 3, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, datetime: new Date('2014-08-20')},
+		{type:'Offer', title:'Offering IKEA couch', msg:{convText: 'unread conversations', conversations : 1, reqText: '', requests: 0, matchText: 'unread matches', matches: 5}, datetime: new Date('2014-08-15')},
+		{type:'Together', title:'Collect items for Caritas asylum', msg:{convText: '', conversations : 0, reqText: 'unread requests', requests: 4, matchText: 'unread matches', matches: 1}, datetime: new Date('2014-07-14')},
+        {type:'Change', title:'I want to change my mobile', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: '', matches: 0}, datetime: new Date('2014-05-25')},
+        {type:'Together', title:'Clean the forest', msg:{convText: 'unread conversations', conversations : 10, reqText: '', requests: 0, matchText: '', matches: 0}, datetime: new Date('2014-08-26')},
+        {type:'Offer', title:'Selling old laptop', msg:{convText: '', conversations : 0, reqText: 'unread requests', requests: 7, matchText: '', matches: 0}, datetime: new Date('2014-03-01')},
+        {type:'Want', title:'Want a plane', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, datetime: new Date('2014-02-22')}
 	];
 
     $scope.getTypePicURI = function (type) {
@@ -129,21 +129,6 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
 	$scope.showPublic = function () {
 		return userService.isAuth();
 	};
-
-    $scope.undreadSortDesc = false;
-    $scope.undreadClick = function () {
-        $scope.undreadSortDesc = !$scope.undreadSortDesc;
-    };
-
-    $scope.createdOnSortDesc = false;
-    $scope.createdOnClick = function () {
-        $scope.createdOnSortDesc = !$scope.createdOnSortDesc;
-    };
-
-    $scope.closedOnSortDesc = false;
-    $scope.closedOnClick = function () {
-        $scope.closedOnSortDesc = !$scope.closedOnSortDesc;
-    };
 
     $scope.inboxCollapsed = false;
     $scope.inboxCollapseClick = function () {
