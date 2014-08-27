@@ -162,6 +162,11 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
      $scope.need.latitude = $params[0].latLng.lat();
      $scope.need.longitude = $params[0].latLng.lng();
      };      */
+
+    $scope.previewRegime = false;
+    $scope.previewRegimeOn = function(){
+        $scope.previewRegime = true;
+    }
 });
 
 angular.module('won.owner').directive('wonContact',function factory(userService){
