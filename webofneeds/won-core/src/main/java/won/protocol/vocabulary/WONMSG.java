@@ -38,6 +38,16 @@ public class WONMSG
   public static final Resource TYPE_CONNECTION_MESSAGE_RESPONSE =
       m.createResource(BASE_URI + "ConnectionMessageResponseMessage");
 
+  // response states
+  public static final Resource TYPE_RESPONSE_STATE_SUCCESS = m.createResource(BASE_URI + "SuccessResponse");
+  public static final Resource TYPE_RESPONSE_STATE_FAILURE = m.createResource(BASE_URI + "FailureResponse");
+  public static final Resource TYPE_RESPONSE_STATE_DUPLICATE_NEED_ID =
+    m.createResource(BASE_URI + "DuplicateNeedIdResponse");
+  public static final Resource TYPE_RESPONSE_STATE_DUPLICATE_CONNECTION_ID =
+    m.createResource(BASE_URI + "DuplicateConnectionIdResponse");
+  public static final Resource TYPE_RESPONSE_STATE_DUPLICATE_MESSAGE_ID =
+    m.createResource(BASE_URI + "DuplicateMessageIdResponse");
+
   //public static final String MESSAGE_TYPE_CREATE_RESOURCE = BASE_URI + "CreateMessage";
   //public static final String MESSAGE_TYPE_CONNECT_RESOURCE = BASE_URI + "ConnectMessage";
   //public static final String MESSAGE_TYPE_NEED_STATE_RESOURCE = BASE_URI + "NeedStateMessage";
@@ -45,9 +55,11 @@ public class WONMSG
   public static final Property MESSAGE_POINTER_PROPERTY = m.createProperty(BASE_URI, "containsMessage");
 
   public static final Property RECEIVER_PROPERTY = m.createProperty(BASE_URI, "receiver");
+  public static final Property RECEIVER_NEED_PROPERTY = m.createProperty(BASE_URI, "receiverNeed");
+  public static final Property RECEIVER_NODE_PROPERTY = m.createProperty(BASE_URI, "receiverNode");
   public static final Property SENDER_PROPERTY = m.createProperty(BASE_URI, "sender");
-  //public static final String MESSAGE_RECEIVER_PROPERTY = "receiver";
-  //public static final String MESSAGE_SENDER_PROPERTY = "sender";
+  public static final Property SENDER_NEED_PROPERTY = m.createProperty(BASE_URI, "senderNeed");
+  public static final Property SENDER_NODE_PROPERTY = m.createProperty(BASE_URI, "senderNode");
 
   public static final Property HAS_CONTENT_PROPERTY = m.createProperty(BASE_URI, "hasContent");
   public static final Property REFERS_TO_PROPERTY = m.createProperty(BASE_URI, "refersTo");
