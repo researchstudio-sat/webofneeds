@@ -69,14 +69,14 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
 
     //Messages Options
     $scope.messages = [
-        {type: 1, typeText:'Conversation', title:'Car sharing to Prague', datetime: new Date('2014-08-25')},
-        {type: 2, typeText:'Incoming Request', title:'Moved recently ...', datetime:new Date('2014-08-20')},
-        {type: 2, typeText:'Outgoing Request', title:'Let\'s clean ...', datetime:new Date('2014-06-28')},
-        {type: 1, typeText:'Conversation', title:'Friendly Bicycle ...', datetime:new Date('2014-04-15')},
-        {type: 3, typeText:'Matches', title:'Old children\'s clothes ..', datetime:new Date('2013-09-10')},
-        {type: 2, typeText:'Incoming Request', title:'Bought new car ...', datetime:new Date('2014-03-01')},
-        {type: 2, typeText:'Outgoing Request', title:'Let\'s grill ...', datetime:new Date('2014-06-19')},
-        {type: 3, typeText:'Matches', title:'Old men\'s clothes ..', datetime:new Date('2014-02-10')}
+        {id:1, type: 1, typeText:'Conversation', title:'Car sharing to Prague', datetime: new Date('2014-08-25 14:30'), msg:'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'},
+        {id:2, type: 2, typeText:'Incoming Request', title:'Moved recently ...', datetime:new Date('2014-08-20')},
+        {id:3, type: 2, typeText:'Outgoing Request', title:'Let\'s clean ...', datetime:new Date('2014-06-28')},
+        {id:4, type: 1, typeText:'Conversation', title:'Friendly Bicycle ...', datetime:new Date('2014-04-15 10:11'), msg:'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'},
+        {id:5, type: 3, typeText:'Matches', title:'Old children\'s clothes ..', datetime:new Date('2013-09-10')},
+        {id:6, type: 2, typeText:'Incoming Request', title:'Bought new car ...', datetime:new Date('2014-03-01')},
+        {id:7, type: 2, typeText:'Outgoing Request', title:'Let\'s grill ...', datetime:new Date('2014-06-19')},
+        {id:8, type: 3, typeText:'Matches', title:'Old men\'s clothes ..', datetime:new Date('2014-02-10')}
     ];
 
     $scope.messageTypeColapsed = -1;
@@ -135,21 +135,6 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         $scope.conversationCollapsed = !$scope.conversationCollapsed;
     };
 
-    $scope.conversation = {
-        title : 'Couch to give away',
-        body : 'IKEA booshelf 4 chars and 1 table couch'
-    };
-
-    $scope.conversationRequest = {
-        title : 'Sofa',
-        body : 'PC chair mint new Holsten bed'
-    };
-
-    $scope.matches = {
-        title : 'Couch Couch Couch',
-        body : 'Couch table. Offer dinner table'
-    };
-
     $scope.mesagesCollapsed = false;
     $scope.messagesCollapseClick = function() {
         $scope.mesagesCollapsed = !$scope.mesagesCollapsed;
@@ -161,6 +146,33 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         //TODO logic
         $scope.newMessage = '';
     };
+
+    $scope.currentMessageIndex = null;
+    //TODO FIX BUG with indexing when we filtering by message types
+    $scope.clickOnTitle = function(id) {
+        $scope.currentMessageIndex = id;
+        //alert($scope.currentMessageIndex);
+    }
+
+    $scope.showConversation = function() {
+        if($scope.currentMessageIndex != null){
+            if($scope.messages[$scope.currentMessageIndex].type == 1) return true;
+        }else return false;
+    }
+
+    $scope.showRequest = function() {
+        if($scope.currentMessageIndex != null){
+            if($scope.messages[$scope.currentMessageIndex].type == 2) return true;
+        }else return false;
+    }
+
+    $scope.showMatch = function() {
+        if($scope.currentMessageIndex != null){
+            if($scope.messages[$scope.currentMessageIndex].type == 3) return true;
+        }else return false;
+    }
+
+
 });
 
 angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService, $rootScope) {

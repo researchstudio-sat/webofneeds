@@ -70,7 +70,7 @@
                                             <span style="display: none;">{{message.typeText}}</span>
                                             <i ng-class="getIconClass(message.typeText)" tooltip="{{message.typeText}}"/>
                                         </td>
-                                        <td><a style="font-weight:bold;" href="">{{message.title}}</a></td>
+                                        <td><a style="font-weight:bold;" href="" ng-click="clickOnTitle($index)">{{message.title}}</a></td>
                                         <td>{{message.datetime | date}}</td>
                                     </tr>
                                 </tbody>
@@ -79,145 +79,59 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-
-
-        <!--Messages Area-->
-        <div id="messagsAreaCollapseOLD" class="well div-table col-lg-12">
-            <div class="div-table-row">
-                <div class="div-table-cell pull-left additional-info-title">Old Implementation of Messages</div>
-                <div class="div-table-cell pull-right">
-                    <span >
-                        <a href="" ng-show="mesagesCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="messagesCollapseClick()"></a>
-                    </span>
-                    <span >
-                        <a href="" ng-show="!mesagesCollapsed" class="glyphicon glyphicon-chevron-down" ng-click="messagesCollapseClick()"></a>
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div id="messageAreaOLD" ng-show="!mesagesCollapsed" class="div-table col-lg-12">
             <div class="div-table-row col-lg-12">
-                <div class="div-table-cell col-lg-6">
+                <div class="div-table-cell col-lg-12">
                     <div class="row col-lg-12 text-center">
-                        <div class="panel panel-default">
+                        <div class="panel panel-default" ng-show="showConversation()">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Conversations 1</h3>  <!--todo pur here number of new messages-->
-                            </div>
-                            <div class="row panel-body">
-                                <strong>{{conversation.title}}</strong>
-                            </div>
-                            <div class="row panel-body">
-                                {{conversation.body}}
-                            </div>
-
-                             <span >
-                                <a href="" ng-show="conversationCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="conversationType0CollapseClick()"></a>
-                            </span>
-                            <span >
-                                <a href="" ng-show="!conversationCollapsed" class="glyphicon glyphicon-chevron-down" ng-click="conversationType0CollapseClick()"></a>
-                            </span>
-                        </div>
-
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Conversations Request</h3>
-                            </div>
-                            <div class="row panel-body">
-                                <strong>{{conversationRequest.title}}</strong>
-                            </div>
-                            <div class="row panel-body">
-                                {{conversationRequest.body}}
-                            </div>
-
-                             <span >
-                                <a href="" ng-show="conversationRequestCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="conversationType1CollapseClick()"></a>
-                            </span>
-                            <span >
-                                <a href="" ng-show="!conversationRequestCollapsed" class="glyphicon glyphicon-chevron-down" ng-click="conversationType1CollapseClick()"></a>
-                            </span>
-                        </div>
-
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Matches</h3>
-                            </div>
-                            <div class="row panel-body">
-                                <strong>{{matches.title}}</strong>
-                            </div>
-                            <div class="row panel-body">
-                                {{matches.body}}
-                            </div>
-
-                             <span >
-                                <a href="" ng-show="matchesCollapsed" class="glyphicon glyphicon-chevron-up" ng-click="conversationType2CollapseClick()"></a>
-                            </span>
-                            <span >
-                                <a href="" ng-show="!matchesCollapsed" class="glyphicon glyphicon-chevron-down" ng-click="conversationType2CollapseClick()"></a>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="div-table-cell col-lg-6">
-                    <div style="font-size: 1.8em; text-align: center;" ng-show="messageTypeColapsed == -1">Click on conversation to show more details</div>
-                    <div ng-show="messageTypeColapsed == 0">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Conversation with {{conversation.title}}</h3>  <!--TODO put here icon depends on type-->
+                                <h3 class="panel-title">Conversation with {{messages[currentMessageIndex].title}}</h3>  <!--TODO put here icon depends on type-->
                             </div>
                             <table class="table table-hover">
                                 <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="row col-lg-3">
-                                                <img src="/images/house.gif" width="50" height="50"> <!--TODO change size-->
-                                                </br>24/04/2014</br>14:30 <!--TODO put here time-->
-                                            </div>
-                                            <div class="row col-lg-9">
-                                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-                                            dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-                                            Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
-                                            consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="row col-lg-11">
-                                                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-                                                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-                                                Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
-                                                consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                                            </div>
-                                            <div class="row col-lg-1">
-                                                <img src="/images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
-                                                </br>24/04/2014</br>14:35 <!--TODO put here time-->
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <form class="form-horizontal container" novalidate name="sendMessageForm" ng-submit="sendMessage()">
-                                                <fieldset>
-                                                    <div class="form-group">
-                                                        <div class="col-md-12">
-                                                            <textarea style="resize: none;" class="form-control" rows="8" id="textMessage" name="textMessage"
-                                                                          ng-model="newMessage"
-                                                                          placeholder="Write a reply..."
-                                                                          required>
-                                                            </textarea>
-                                                            <!--<span class="label label-warning" ng-show="contactAuthForm.textMessage.$invalid">Please write a message</span>  -->
-                                                        </div>
-                                                        <!--<span class="help-block">Message mustn't be empty</span> -->
+                                <tr>
+                                    <td>
+                                        <div class="row col-lg-3">
+                                            <img src="/images/house.gif" width="50" height="50"> <!--TODO change size-->
+                                            </br>{{messages[currentMessageIndex].datetime | date}}</br>{{messages[currentMessageIndex].datetime | date:'HH:mm'}} <!--TODO put here time-->
+                                        </div>
+                                        <div class="row col-lg-9">
+                                            {{messages[currentMessageIndex].msg}}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="row col-lg-11">
+                                            {{messages[currentMessageIndex].msg}}
+                                        </div>
+                                        <div class="row col-lg-1">
+                                            <img src="/images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
+                                            </br>{{messages[currentMessageIndex].datetime | date}}</br>{{messages[currentMessageIndex].datetime | date:'HH:mm'}} <!--TODO put here time-->
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <form class="form-horizontal container" novalidate name="sendMessageForm" ng-submit="sendMessage()">
+                                            <fieldset>
+                                                <div class="form-group">
+                                                    <div class="col-md-12">
+                                                        <textarea style="resize: none;" class="form-control" rows="8" id="textMessage" name="textMessage"
+                                                                  ng-model="newMessage"
+                                                                  placeholder="Write a reply..."
+                                                                  required>
+                                                        </textarea>
+                                                        <!--<span class="label label-warning" ng-show="contactAuthForm.textMessage.$invalid">Please write a message</span>  -->
                                                     </div>
-                                                    <div class="pull-right">
-                                                        <button ng-disabled="sendMessageForm.$invalid" type="submit" class="btn btn-primary">Send</button>
-                                                    </div>
-                                                </fieldset>
-                                            </form>
-                                        </td>
-                                    </tr>
+                                                    <!--<span class="help-block">Message mustn't be empty</span> -->
+                                                </div>
+                                                <div class="pull-right">
+                                                    <button ng-disabled="sendMessageForm.$invalid" type="submit" class="btn btn-primary">Send</button>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
