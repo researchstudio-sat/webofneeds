@@ -106,8 +106,10 @@ app.directive('header', function(){
 		return $q;
 	}]);
 });
-app.run(function($httpBackend){
-
+app.run(function($httpBackend,$rootScope){
+        $rootScope.wonNodeURI = "http://localhost:8080/won";
+        $rootScope.needURIPath = "/resource/need";
+        $rootScope.connectionURIPath = "";
         //$httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
 
        /* $httpBackend.whenPOST('/owner/rest/needs').respond(function(method, url, data){

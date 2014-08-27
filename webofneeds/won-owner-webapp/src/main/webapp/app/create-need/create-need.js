@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService, messageService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService, messageService, utilService) {
 
 	$scope.uploadOptions = {
 		maxFileSize:5000000,
@@ -172,10 +172,13 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
     $scope.saveDraft = function(){
       // ld = new window.NeedBuilder().needURI("http://needURI").hasBasicNeedType("won:Demand").title('test').build();
+        needRandomId = utilService.getRandomInt(1,9223372036854775807);
+        needURI = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId;
         needJson = new window.wonmessagebuilder.NeedBuilder()
             .title("testneed")
             .demand()
-            .needURI("http://localhost:8080/won/resource/need/lk234njkhsdjfgb4l25rtj34")
+            .needURI(needURI)
+            .ownerFacet()
             .description("just a test")
             .hasContentDescription()
             .hasPriceSpecification("EUR",5.0,10.0)
