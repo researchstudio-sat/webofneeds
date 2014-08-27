@@ -70,6 +70,8 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
         Dataset messageEvent = RdfUtils.toDataset(messageEventString);
 
         logger.debug("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
+        logger.debug("createNeed: message event received: {} with ownerApp ID {}", messageEventString,ownerApplicationID);
+
         needURI = delegate.createNeed(
                 contentconvert,
                 activate,

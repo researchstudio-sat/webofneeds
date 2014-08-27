@@ -51,6 +51,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import javax.ws.rs.core.MediaType;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -278,7 +279,7 @@ public class RestNeedController {
   )
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
-  public DraftPojo createDraft(@RequestBody DraftPojo draftPojo) {
+  public DraftPojo createDraft(@RequestBody DraftPojo draftPojo) throws ParseException {
 
     User user = getCurrentUser();
 
@@ -550,7 +551,7 @@ public class RestNeedController {
     return fullConnection;
   }
 
-  private DraftPojo resolveDraft(DraftPojo draftPojo, User user){
+  private DraftPojo resolveDraft(DraftPojo draftPojo, User user) throws ParseException {
     URI needURI;
     //Draft needDraft2 = new Draft();
 

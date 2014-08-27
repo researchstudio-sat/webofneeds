@@ -74,7 +74,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         // ToDo (FS): maybe sender should be included in each message to retrieve the needURI
 
         // get the core graph of the message for the need model
-        String coreModelURIString = senderURI.toString() + "#core";
+        String coreModelURIString = senderURI.toString() + "/core#data";
         Model content = wonMessage.getMessageContent(coreModelURIString);
 
         // get the active status
@@ -94,7 +94,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         }
 
         try {
-          ownerProtocolService.createNeed(content, active, wonNodeURI, null);
+          ownerProtocolService.createNeed(content, active, wonNodeURI, messageContent);
         } catch (Exception e) {
           logger.warn("caught Exception:", e);
         }
