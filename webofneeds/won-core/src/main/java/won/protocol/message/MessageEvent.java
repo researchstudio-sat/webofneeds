@@ -24,8 +24,13 @@ public class MessageEvent
   private List<URI> hasContent = new ArrayList<>();
   private Map<URI,Model> signatures = new HashMap<>();
   private URI senderURI;
+  private URI senderNeedURI;
+  private URI senderNodeURI;
   private URI receiverURI;
+  private URI receiverNeedURI;
+  private URI receiverNodeURI;
   private List<URI> refersTo = new ArrayList<>();
+  private URI responseState;
 
   // ToDo (FS): move such properties into specialized sub classes?
   // are there other param that should be part of the messageEvent object?
@@ -88,12 +93,44 @@ public class MessageEvent
     this.senderURI = senderURI;
   }
 
+  public URI getSenderNeedURI() {
+    return senderNeedURI;
+  }
+
+  public void setSenderNeedURI(final URI senderNeedURI) {
+    this.senderNeedURI = senderNeedURI;
+  }
+
+  public URI getSenderNodeURI() {
+    return senderNodeURI;
+  }
+
+  public void setSenderNodeURI(final URI senderNodeURI) {
+    this.senderNodeURI = senderNodeURI;
+  }
+
   public URI getReceiverURI() {
     return receiverURI;
   }
 
   public void setReceiverURI(final URI receiverURI) {
     this.receiverURI = receiverURI;
+  }
+
+  public URI getReceiverNeedURI() {
+    return receiverNeedURI;
+  }
+
+  public void setReceiverNeedURI(final URI receiverNeedURI) {
+    this.receiverNeedURI = receiverNeedURI;
+  }
+
+  public URI getReceiverNodeURI() {
+    return receiverNodeURI;
+  }
+
+  public void setReceiverNodeURI(final URI receiverNodeURI) {
+    this.receiverNodeURI = receiverNodeURI;
   }
 
   public List<URI> getRefersTo() {
@@ -106,6 +143,14 @@ public class MessageEvent
 
   public void addRefersTo(URI refersToURI) {
     this.refersTo.add(refersToURI);
+  }
+
+  public URI getResponseState() {
+    return responseState;
+  }
+
+  public void setResponseState(final URI responseState) {
+    this.responseState = responseState;
   }
 
   public NeedState getNewNeedState() {

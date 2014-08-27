@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import won.owner.service.OwnerApplicationServiceCallback;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.exception.MultipleQueryResultsFoundException;
+import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDecoder;
@@ -48,7 +49,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
   @Autowired
   private OwnerApplicationServiceCallback ownerApplicationServiceCallbackToClient =
-      new NopOwnerApplicationServiceCallback();
+    new NopOwnerApplicationServiceCallback();
 
   @Autowired
   private ConnectionRepository connectionRepository;
@@ -63,13 +64,11 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
   // ToDo (FS): add security layer
 
-  public void handleMessageEventFromClient(Dataset wonMessage)
-  {
+  public void handleMessageEventFromClient(Dataset wonMessage) {
     handleMessageEventFromClient(WonMessageDecoder.decodeFromDataset(wonMessage));
   }
 
-  public void handleMessageEventFromClient(WonMessage wonMessage)
-  {
+  public void handleMessageEventFromClient(WonMessage wonMessage) {
 
     // ToDo (FS): don't convert messages to the old protocol interfaces instead use the new message format
 
@@ -80,14 +79,13 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
         Dataset messageContent = wonMessage.getMessageContent();
 
-        URI senderURI = wonMessage.getMessageEvent().getSenderURI();
-
-        // ToDo (FS): maybe sender should be included in each message to retrieve the needURI
+        URI senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
 
         // get the core graph of the message for the need model
-        String coreModelURIString = senderURI.toString() + "/core#data";
+        String coreModelURIString = senderNeedURI.toString() + "/core#data";
         Model content = wonMessage.getMessageContent(coreModelURIString);
 
+        // ToDo (FS): this should be encapsulated in an own subclass of WonMessage
         // get the active status
         boolean active = false;
         try {
@@ -140,8 +138,8 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
           URI needURI;
           URI otherNeedURI;
 
-          needURI = wonMessage.getMessageEvent().getSenderURI();
-          otherNeedURI = wonMessage.getMessageEvent().getReceiverURI();
+          needURI = wonMessage.getMessageEvent().getSenderNeedURI();
+          otherNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
 
           content = wonMessage.getMessageEvent().getModel();
 
@@ -155,7 +153,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       case NEED_STATE:
         try {
           URI needURI;
-          needURI = wonMessage.getMessageEvent().getSenderURI();
+          needURI = wonMessage.getMessageEvent().getSenderNeedURI();
 
           switch (wonMessage.getMessageEvent().getNewNeedState()) {
             case ACTIVE:
@@ -172,11 +170,11 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       case OPEN:
         try {
 
-          senderURI = wonMessage.getMessageEvent().getSenderURI();
-          URI receiverURI = wonMessage.getMessageEvent().getReceiverURI();
+          senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
+          URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
 
           List<Connection> connections =
-              connectionRepository.findByNeedURIAndRemoteNeedURI(senderURI, receiverURI);
+            connectionRepository.findByNeedURIAndRemoteNeedURI(senderNeedURI, receiverNeedURI);
 
           URI connectionURI = connections.get(0).getConnectionURI();
 
@@ -191,11 +189,11 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       case CLOSE:
         try {
 
-          senderURI = wonMessage.getMessageEvent().getSenderURI();
-          URI receiverURI = wonMessage.getMessageEvent().getReceiverURI();
+          senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
+          URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
 
           List<Connection> connections =
-              connectionRepository.findByNeedURIAndRemoteNeedURI(senderURI, receiverURI);
+            connectionRepository.findByNeedURIAndRemoteNeedURI(senderNeedURI, receiverNeedURI);
 
           URI connectionURI = connections.get(0).getConnectionURI();
 
@@ -210,11 +208,11 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       case CONNECTION_MESSAGE:
         try {
 
-          senderURI = wonMessage.getMessageEvent().getSenderURI();
-          URI receiverURI = wonMessage.getMessageEvent().getReceiverURI();
+          senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
+          URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
 
           List<Connection> connections =
-              connectionRepository.findByNeedURIAndRemoteNeedURI(senderURI, receiverURI);
+            connectionRepository.findByNeedURIAndRemoteNeedURI(senderNeedURI, receiverNeedURI);
 
           URI connectionURI = connections.get(0).getConnectionURI();
 
@@ -231,13 +229,11 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
     }
   }
 
-  public void handleMessageEventFromWonNode(Dataset wonMessage)
-  {
+  public void handleMessageEventFromWonNode(Dataset wonMessage) {
     handleMessageEventFromWonNode(WonMessageDecoder.decodeFromDataset(wonMessage));
   }
 
-  public void handleMessageEventFromWonNode(WonMessage wonMessage)
-  {
+  public void handleMessageEventFromWonNode(WonMessage wonMessage) {
 
     // ToDo (FS): handle messages
 
@@ -246,46 +242,49 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   }
 
   // ToDo (FS): most (all?) of the response messages should be send back from the WON node (this is only temporary)
+  // this is only a CREATE RESPONSE
   private void sendBackResponseMessageToClient(WonMessage wonMessage, Resource responseType) {
 
-    URI responseMessageURI = null;
+    try {
+      URI responseMessageURI = null;
 
-    responseMessageURI = URI
-      .create("http://example.com/responseMessage/837ddj");//new URI(WONMSG.getGraphURI(msgURI.toString()).toString());
+      responseMessageURI = URI
+        .create(
+          "http://example.com/responseMessage/837ddj");//new URI(WONMSG.getGraphURI(msgURI.toString()).toString());
 
-    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-    WonMessage responseWonMessage = wonMessageBuilder
-      .setWonMessageType(WonMessageType.CREATE_RESPONSE)
-      .setMessageURI(responseMessageURI)
-      .setSenderURI(wonMessage.getMessageEvent().getReceiverURI())
-      .setReceiverURI(wonMessage.getMessageEvent().getSenderURI())
-      .setWonMessageType(WonMessageType.CREATE_RESPONSE)
-      .setResponseMessageState(responseType)
-      .addRefersToURI(wonMessage.getMessageEvent().getMessageURI())
-      .build();
+      WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+      WonMessage responseWonMessage = wonMessageBuilder
+        .setWonMessageType(WonMessageType.CREATE_RESPONSE)
+        .setMessageURI(responseMessageURI)
+        .setSenderNodeURI(wonMessage.getMessageEvent().getReceiverNodeURI())
+        .setReceiverNeedURI(wonMessage.getMessageEvent().getSenderNeedURI())
+        .setWonMessageType(WonMessageType.CREATE_RESPONSE)
+        .setResponseMessageState(responseType)
+        .addRefersToURI(wonMessage.getMessageEvent().getMessageURI())
+        .build();
 
-    ownerApplicationServiceCallbackToClient.onMessage(responseWonMessage);
+      ownerApplicationServiceCallbackToClient.onMessage(responseWonMessage);
+    } catch (WonMessageBuilderException e) {
+      logger.warn("caught WonMessageBuilderException:", e);
+    }
   }
 
 
   // ToDo (FS): methods only used until the messaging system is completely refactored then only one callback method will be used
   @Override
-  public void onHint(final Match match, final Model content)
-  {
+  public void onHint(final Match match, final Model content) {
 
-    // since we have no message URI at this point we just generate one
-    Random rand = new Random();
-    URI messageURI = null;
-    URI contentURI = null;
     try {
+
+      // since we have no message URI at this point we just generate one
+      Random rand = new Random();
+      URI messageURI = null;
+      URI contentURI = null;
       messageURI = new URI(match.getOriginator().toString() + "/hintMessage/" + rand.nextInt());
       contentURI = new URI(match.getOriginator().toString() + "/hint/" + rand.nextInt());
-    } catch (URISyntaxException e) {
-      logger.warn("caught URISyntaxException:", e);
-    }
 
-    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-    WonMessage wonMessage = wonMessageBuilder
+      WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+      WonMessage wonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.HINT_MESSAGE)
         .setMessageURI(messageURI)
         .setSenderURI(match.getOriginator())
@@ -293,110 +292,134 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .addContent(contentURI, content, null)
         .build();
 
-    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+
+    } catch (URISyntaxException e) {
+      logger.warn("caught URISyntaxException:", e);
+    } catch (WonMessageBuilderException e) {
+      logger.warn("caught WonMessageBuilderException:", e);
+    }
   }
 
   @Override
-  public void onConnect(final Connection con, final Model content)
-  {
+  public void onConnect(final Connection con, final Model content) {
 
-    // since we have no message URI at this point we just generate one
-    Random rand = new Random();
-    URI messageURI = null;
-    URI contentURI = null;
     try {
+
+      // since we have no message URI at this point we just generate one
+      Random rand = new Random();
+      URI messageURI = null;
+      URI contentURI = null;
+
       messageURI = new URI(con.getRemoteConnectionURI().toString() + "/event/" + rand.nextInt());
       contentURI = new URI(con.getRemoteConnectionURI().toString() + "/eventContent/" + rand.nextInt());
-    } catch (URISyntaxException e) {
-      logger.warn("caught URISyntaxException:", e);
-    }
 
-    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-    WonMessage wonMessage = wonMessageBuilder
+      WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+      WonMessage wonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.CONNECT)
         .setMessageURI(messageURI)
         .setReceiverURI(con.getNeedURI())
         .addContent(contentURI, content, null)
         .build();
 
-    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+    } catch (URISyntaxException e) {
+      logger.warn("caught URISyntaxException:", e);
+    } catch (WonMessageBuilderException e) {
+      logger.warn("caught WonMessageBuilderException:", e);
+    }
   }
 
   @Override
-  public void onOpen(final Connection con, final Model content)
-  {
-    // since we have no message URI at this point we just generate one
-    Random rand = new Random();
-    URI messageURI = null;
-    URI contentURI = null;
+  public void onOpen(final Connection con, final Model content) {
+
     try {
+
+      // since we have no message URI at this point we just generate one
+      Random rand = new Random();
+      URI messageURI = null;
+      URI contentURI = null;
+
       messageURI = new URI(con.getRemoteConnectionURI().toString() + "/event/" + rand.nextInt());
       contentURI = new URI(con.getRemoteConnectionURI().toString() + "/eventContent/" + rand.nextInt());
-    } catch (URISyntaxException e) {
-      logger.warn("caught URISyntaxException:", e);
-    }
 
-    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-    WonMessage wonMessage = wonMessageBuilder
+      WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+      WonMessage wonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.OPEN)
         .setMessageURI(messageURI)
         .setReceiverURI(con.getConnectionURI())
         .addContent(contentURI, content, null)
         .build();
 
-    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+
+    } catch (URISyntaxException e) {
+      logger.warn("caught URISyntaxException:", e);
+    } catch (WonMessageBuilderException e) {
+      logger.warn("caught WonMessageBuilderException:", e);
+    }
   }
 
   @Override
-  public void onClose(final Connection con, final Model content)
-  {
-    // since we have no message URI at this point we just generate one
-    Random rand = new Random();
-    URI messageURI = null;
-    URI contentURI = null;
+  public void onClose(final Connection con, final Model content) {
+
     try {
+
+      // since we have no message URI at this point we just generate one
+      Random rand = new Random();
+      URI messageURI = null;
+      URI contentURI = null;
       messageURI = new URI(con.getRemoteConnectionURI().toString() + "/event/" + rand.nextInt());
       contentURI = new URI(con.getRemoteConnectionURI().toString() + "/eventContent/" + rand.nextInt());
-    } catch (URISyntaxException e) {
-      logger.warn("caught URISyntaxException:", e);
-    }
 
-    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-    WonMessage wonMessage = wonMessageBuilder
+      WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+      WonMessage wonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.CLOSE)
         .setMessageURI(messageURI)
         .setReceiverURI(con.getConnectionURI())
         .addContent(contentURI, content, null)
         .build();
 
-    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+
+    } catch (URISyntaxException e) {
+      logger.warn("caught URISyntaxException:", e);
+    } catch (WonMessageBuilderException e) {
+      logger.warn("caught WonMessageBuilderException:", e);
+    }
   }
 
   @Override
-  public void onTextMessage(final Connection con, final ChatMessage message, final Model content)
-  {
-    // since we have no message URI at this point we just generate one
-    Random rand = new Random();
-    URI messageURI = null;
-    URI contentURI = null;
+  public void onTextMessage(final Connection con, final ChatMessage message, final Model content) {
+
     try {
+
+      // since we have no message URI at this point we just generate one
+      Random rand = new Random();
+      URI messageURI = null;
+      URI contentURI = null;
+
       messageURI = new URI(con.getRemoteConnectionURI().toString() + "/event/" + rand.nextInt());
       contentURI = new URI(con.getRemoteConnectionURI().toString() + "/eventContent/" + rand.nextInt());
-    } catch (URISyntaxException e) {
-      logger.warn("caught URISyntaxException:", e);
-    }
 
-    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-    WonMessage wonMessage = wonMessageBuilder
+
+      WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+      WonMessage wonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.CONNECTION_MESSAGE)
         .setMessageURI(messageURI)
         .setReceiverURI(con.getConnectionURI())
         .addContent(contentURI, content, null)
         .build();
 
-    // ToDo (FS): if ChatMessage content is not in the content add ChatMessage to wonMessage
+      // ToDo (FS): if ChatMessage content is not in the content add ChatMessage to wonMessage
 
-    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+
+    } catch (URISyntaxException e) {
+      logger.warn("caught URISyntaxException:", e);
+    } catch (WonMessageBuilderException e) {
+      logger.warn("caught WonMessageBuilderException:", e);
+    }
   }
 
 }

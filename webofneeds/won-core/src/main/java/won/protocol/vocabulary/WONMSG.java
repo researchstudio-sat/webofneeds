@@ -38,6 +38,18 @@ public class WONMSG
   public static final Resource TYPE_CONNECTION_MESSAGE_RESPONSE =
       m.createResource(BASE_URI + "ConnectionMessageResponseMessage");
 
+  public static boolean isResponseMessageType(Resource resource) {
+    if (resource.equals(TYPE_CREATE_RESPONSE) ||
+      resource.equals(TYPE_CONNECT_RESPONSE) ||
+      resource.equals(TYPE_NEED_STATE_RESPONSE) ||
+      resource.equals(TYPE_CLOSE_RESPONSE) ||
+      resource.equals(TYPE_OPEN_RESPONSE) ||
+      resource.equals(TYPE_CONNECTION_MESSAGE_RESPONSE))
+      return true;
+    else
+      return false;
+  }
+
   // response states
   public static final Resource TYPE_RESPONSE_STATE_SUCCESS = m.createResource(BASE_URI + "SuccessResponse");
   public static final Resource TYPE_RESPONSE_STATE_FAILURE = m.createResource(BASE_URI + "FailureResponse");

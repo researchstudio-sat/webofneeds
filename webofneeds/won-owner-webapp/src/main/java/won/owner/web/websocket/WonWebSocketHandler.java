@@ -54,17 +54,13 @@ public class WonWebSocketHandler
 
     WonMessage wonMessage = WonMessageDecoder.decodeFromJsonLd(message.getPayload());
 
+    // each message coming from the browser must contain a senderNeedURI
+    // which is here connected to the webSocket session
     webSocketSessionService.addMapping(
-        wonMessage.getMessageEvent().getSenderURI(),
+        wonMessage.getMessageEvent().getSenderNeedURI(),
         session);
 
     ownerApplicationService.handleMessageEventFromClient(wonMessage);
-  }
-
-  // ToDo (FS): replace return value with something meaningful
-  public void sendMessage(WonMessage wonMessage)
-  {
-
   }
 
   @Override
@@ -75,7 +71,7 @@ public class WonWebSocketHandler
     WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
 
     Set<WebSocketSession> webSocketSessions =
-      webSocketSessionService.getWebSocketSessions(wonMessage.getMessageEvent().getReceiverURI());
+      webSocketSessionService.getWebSocketSessions(wonMessage.getMessageEvent().getReceiverNeedURI());
 
     for (WebSocketSession session : webSocketSessions)
       try {

@@ -37,6 +37,7 @@ public class WonMessageDecoder
     return decodeFromDataset(dataset);
   }
 
+  // ToDo (FS): build the WonMessage and MessageEvent with the Builder in order to avoid redundant code
   public static WonMessage decodeFromDataset(Dataset message) {
     // TODO how to handle copying properly...?
     Model defaultModel = message.getDefaultModel();

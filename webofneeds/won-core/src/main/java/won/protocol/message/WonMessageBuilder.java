@@ -5,6 +5,7 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -26,7 +27,12 @@ public class WonMessageBuilder
 
   private URI messageURI;
   private URI senderURI;
+  private URI senderNeedURI;
+  private URI senderNodeURI;
   private URI receiverURI;
+  private URI receiverNeedURI;
+  private URI receiverNodeURI;
+
   private WonMessageType wonMessageType;
   private Resource responseMessageState;
 
@@ -35,7 +41,8 @@ public class WonMessageBuilder
   private Map<URI, Model> contentMap = new HashMap<>();
   private Map<URI, Model> signatureMap = new HashMap<>();
 
-  public WonMessage build() {
+  public WonMessage build()
+    throws WonMessageBuilderException {
 
     Model messageEvent = ModelFactory.createDefaultModel();
     DefaultPrefixUtils.setDefaultPrefixes(messageEvent);
@@ -52,14 +59,32 @@ public class WonMessageBuilder
     }
 
     // add sender
-    messageEventResource.addProperty(
-      WONMSG.SENDER_PROPERTY,
-      messageEvent.createResource(senderURI.toString()));
+    if (senderURI != null)
+      messageEventResource.addProperty(
+        WONMSG.SENDER_PROPERTY,
+        messageEvent.createResource(senderURI.toString()));
+    if (senderNeedURI != null)
+      messageEventResource.addProperty(
+        WONMSG.SENDER_NEED_PROPERTY,
+        messageEvent.createResource(senderNeedURI.toString()));
+    if (senderNodeURI != null)
+      messageEventResource.addProperty(
+        WONMSG.SENDER_NODE_PROPERTY,
+        messageEvent.createResource(senderNodeURI.toString()));
 
     // add receiver
-    messageEventResource.addProperty(
-      WONMSG.RECEIVER_PROPERTY,
-      messageEvent.createResource(receiverURI.toString()));
+    if (receiverURI != null)
+      messageEventResource.addProperty(
+        WONMSG.RECEIVER_PROPERTY,
+        messageEvent.createResource(receiverURI.toString()));
+    if (receiverNeedURI != null)
+      messageEventResource.addProperty(
+        WONMSG.RECEIVER_NEED_PROPERTY,
+        messageEvent.createResource(receiverNeedURI.toString()));
+    if (receiverNodeURI != null)
+      messageEventResource.addProperty(
+        WONMSG.RECEIVER_NODE_PROPERTY,
+        messageEvent.createResource(receiverNodeURI.toString()));
 
     // add refersTo
     for (URI refersToURI : refersToURIs) {
@@ -69,9 +94,17 @@ public class WonMessageBuilder
     }
 
     // add responseMessageState
-    messageEventResource.addProperty(
-      WONMSG.HAS_RESPONSE_STATE_PROPERTY,
-      messageEvent.createResource(responseMessageState.toString()));
+    if (responseMessageState != null) {
+      messageEventResource.addProperty(
+        WONMSG.HAS_RESPONSE_STATE_PROPERTY,
+        messageEvent.createResource(responseMessageState.toString()));
+    } else {
+      if (WONMSG.isResponseMessageType(wonMessageType.getResource())) {
+        throw new WonMessageBuilderException(
+          "Message type is " + wonMessageType.getResource().toString() +
+            " but no response message state has been provided.");
+      }
+    }
 
 
     // create the default model
@@ -110,8 +143,28 @@ public class WonMessageBuilder
     return this;
   }
 
+  public WonMessageBuilder setSenderNeedURI(URI senderNeedURI) {
+    this.senderNeedURI = senderNeedURI;
+    return this;
+  }
+
+  public WonMessageBuilder setSenderNodeURI(URI senderNodeURI) {
+    this.senderNodeURI = senderNodeURI;
+    return this;
+  }
+
   public WonMessageBuilder setReceiverURI(URI receiverURI) {
     this.receiverURI = receiverURI;
+    return this;
+  }
+
+  public WonMessageBuilder setReceiverNeedURI(URI receiverNeedURI) {
+    this.receiverNeedURI = receiverNeedURI;
+    return this;
+  }
+
+  public WonMessageBuilder setReceiverNodeURI(URI receiverNodeURI) {
+    this.receiverNodeURI = receiverNodeURI;
     return this;
   }
 
