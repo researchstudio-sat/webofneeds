@@ -84,7 +84,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
   @Override
   public URI createNeed(
-          final URI ownerURI,
           final Model content,
           final boolean activate,
           String ownerApplicationID,
@@ -94,11 +93,9 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
     Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase1");
     Split split = stopwatch.start();
-    logger.debug("CREATING need. OwnerURI:{}, OwnerApplicationId:{}",ownerURI, ownerApplicationID);
-    if (ownerURI == null) throw new IllegalArgumentException("ownerURI is not set");
+    logger.debug("CREATING need. OwnerApplicationId:{}", ownerApplicationID);
     Need need = new Need();
     need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
-    need.setOwnerURI(ownerURI);
     need = needRepository.save(need);
     split.stop();
 

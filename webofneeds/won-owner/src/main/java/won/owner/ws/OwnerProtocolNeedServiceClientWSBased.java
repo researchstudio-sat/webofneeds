@@ -113,17 +113,15 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
 
     //@Override
     public ListenableFuture<URI> createNeed(
-            URI ownerURI,
             Model content,
             boolean activate,
             Dataset messageEvent)
             throws IllegalNeedContentException {
-        return createNeed(ownerURI, content, activate, null, messageEvent);
+        return createNeed(content, activate, null, messageEvent);
     }
 
     //@Override
     public ListenableFuture<URI> createNeed(
-            URI ownerURI,
             Model content,
             boolean activate,
             URI wonNodeUri,
@@ -133,9 +131,9 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
         //TODO: make asynchonous
         try {
             OwnerProtocolNeedWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpoint(wonNodeUri);
-            content.setNsPrefix("",ownerURI.toString());
+            //content.setNsPrefix("",ownerURI.toString());
             String modelAsString = RdfUtils.toString(content);
-            URI result = proxy.createNeed(ownerURI, modelAsString , activate);
+            URI result = proxy.createNeed(modelAsString , activate);
             SettableFuture<URI> futureResult = SettableFuture.create();
             futureResult.set(result);
             return  futureResult;

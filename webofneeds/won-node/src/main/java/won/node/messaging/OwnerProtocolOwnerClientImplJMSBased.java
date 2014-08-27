@@ -93,7 +93,6 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
         StringWriter sw = new StringWriter();
         content.write(sw, "TTL");
 
-        URI ownerURI = clientFactory.getOwnerProtocolOwnerURI(ownNeedURI);
         Map headerMap = new HashMap<String, String>();
         Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
 
@@ -104,7 +103,6 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
         headerMap.put("ownConnectionURI", ownConnectionURI.toString()) ;
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("messageEvent",RdfUtils.toString(messageEvent));
-        headerMap.put("ownerURI", ownerURI.toString());
         headerMap.put("ownerApplications", ownerApplications);
 
         headerMap.put("protocol","OwnerProtocol");

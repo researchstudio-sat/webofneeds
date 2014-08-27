@@ -87,11 +87,11 @@ public class OwnerProtocolNeedWebServiceEndpointImpl extends LazySpringBeanAutow
     }
 
     @WebMethod
-    public URI createNeed(@WebParam(name = "ownerURI") final URI ownerURI, @WebParam(name = "content") final String content, @WebParam(name = "activate") final boolean activate) throws IllegalNeedContentFault
+    public URI createNeed(@WebParam(name = "content") final String content, @WebParam(name = "activate") final boolean activate) throws IllegalNeedContentFault
     {
         wireDependenciesLazily();
       try {
-        return ownerProtocolNeedService.createNeed(ownerURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), activate, null, null);
+        return ownerProtocolNeedService.createNeed(RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), activate, null, null);
       } catch (IllegalNeedContentException e) {
         throw IllegalNeedContentFault.fromException(e);
       }

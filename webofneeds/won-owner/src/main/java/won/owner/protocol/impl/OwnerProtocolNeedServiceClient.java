@@ -189,25 +189,24 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, Dataset messageEvent)
+  public ListenableFuture<URI> createNeed(Model content, boolean activate, Dataset messageEvent)
           throws Exception {
-    return createNeed(ownerURI, content, activate, null, messageEvent);
+    return createNeed(content, activate, null, messageEvent);
   }
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
   public synchronized ListenableFuture<URI> createNeed(
-          final URI ownerURI,
           final Model content,
           final boolean activate,
           final URI wonNodeUri,
           Dataset messageEvent)
     throws Exception {
     if (logger.isDebugEnabled()) {
-      logger.debug("owner to need: CREATE_NEED called for owner URI {}, activate {}, with content {}",
-        new Object[]{ownerURI, activate, StringUtils.abbreviate(RdfUtils.toString(content), 200)});
+      logger.debug("owner to need: CREATE_NEED activate {}, with content {}",
+        new Object[]{activate, StringUtils.abbreviate(RdfUtils.toString(content), 200)});
     }
-    final ListenableFuture<URI> uri = delegate.createNeed(ownerURI, content, activate, wonNodeUri, messageEvent);
+    final ListenableFuture<URI> uri = delegate.createNeed(content, activate, wonNodeUri, messageEvent);
     //asynchronously wait for the result and update the local database.
     //meanwhile, create our own ListenableFuture to pass the result back
     final SettableFuture<URI> result = SettableFuture.create();
@@ -222,7 +221,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
             need.setNeedURI(uri.get());
             // logger.debug(need.getNeedURI().toString());
             need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
-            need.setOwnerURI(ownerURI);
 
             if (wonNodeUri == null) need.setWonNodeURI(URI.create(wonNodeDefault));
             else need.setWonNodeURI(wonNodeUri);

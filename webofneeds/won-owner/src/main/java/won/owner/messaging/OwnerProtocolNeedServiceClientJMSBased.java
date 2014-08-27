@@ -233,10 +233,10 @@ public class OwnerProtocolNeedServiceClientJMSBased
     }
 
     @Override
-    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, Dataset messageEvent)
+    public ListenableFuture<URI> createNeed(Model content, boolean activate, Dataset messageEvent)
             throws Exception {
 
-        return createNeed(ownerURI, content, activate, defaultNodeURI, messageEvent);
+        return createNeed(content, activate, defaultNodeURI, messageEvent);
     }
 
     @Override
@@ -318,7 +318,6 @@ public class OwnerProtocolNeedServiceClientJMSBased
 
     @Override
     public synchronized ListenableFuture<URI> createNeed(
-            URI ownerURI,
             Model content,
             boolean activate,
             URI wonNodeUri,
@@ -356,7 +355,6 @@ public class OwnerProtocolNeedServiceClientJMSBased
             ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
         }
         Map<String, Object> headerMap = new HashMap<>();
-        headerMap.put("ownerUri", ownerURI.toString());
         headerMap.put("model", RdfUtils.toString(content));
         headerMap.put("activate",activate);
         headerMap.put("methodName","createNeed");
