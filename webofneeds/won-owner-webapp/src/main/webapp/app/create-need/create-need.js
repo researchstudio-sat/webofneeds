@@ -57,8 +57,8 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     $scope.getCurrentTypeOfOffer = function(){
         if($rootScope.iPost.menuposition == 0) return "Want - I'm looking for...";
         if($rootScope.iPost.menuposition == 1) return "Offer - I'm offering...";
-        if($rootScope.iPost.menuposition == 2) return "Activity - Looking for people to...";
-        if($rootScope.iPost.menuposition == 3) return "Critique - Let's do something about...";
+        if($rootScope.iPost.menuposition == 2) return "Together - Looking for people to...";
+        if($rootScope.iPost.menuposition == 3) return "Change - Let's do something about...";
     }
 
     $scope.showPublicChangeTypeOfNeed = false;
@@ -74,6 +74,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             }
             $rootScope.iPost.menuposition = item;
             $('#changePostMenuItem' + $rootScope.iPost.menuposition).addClass('active');
+            $scope.showPublicChangeTypeOfNeed = false;
         }
     }
 
