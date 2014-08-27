@@ -14,7 +14,11 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService, $rootScope) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService) {
+    $scope.menuposition = $routeParams.menuposition;
+    $scope.title = $routeParams.title;
+
+
     /*Text constants for new Need form*/
     /*$rootScope.createNewPost = {
 
@@ -55,25 +59,25 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     }          */
     /*Block for working with checking another post type */
     $scope.getCurrentTypeOfOffer = function(){
-        if($rootScope.iPost.menuposition == 0) return "Want - I'm looking for...";
-        if($rootScope.iPost.menuposition == 1) return "Offer - I'm offering...";
-        if($rootScope.iPost.menuposition == 2) return "Together - Looking for people to...";
-        if($rootScope.iPost.menuposition == 3) return "Change - Let's do something about...";
+        if($scope.menuposition == 0) return "Want - I'm looking for...";
+        if($scope.menuposition == 1) return "Offer - I'm offering...";
+        if($scope.menuposition == 2) return "Together - Looking for people to...";
+        if($scope.menuposition == 3) return "Change - Let's do something about...";
     }
 
     $scope.showPublicChangeTypeOfNeed = false;
     $scope.clickOnChangeTypeOfNeed = function(){
         $scope.showPublicChangeTypeOfNeed = !$scope.showPublicChangeTypeOfNeed;
-        $('#changePostMenuItem' + $rootScope.iPost.menuposition).addClass('active');
+        $('#changePostMenuItem' + $scope.menuposition).addClass('active');
     }
 
     $scope.onClickChangePostMenuItem = function(item) {
         if(item > -1){
-            if($rootScope.iPost.menuposition > -1){
-                $('#changePostMenuItem' + $rootScope.iPost.menuposition).removeClass('active');
+            if($scope.menuposition > -1){
+                $('#changePostMenuItem' + $scope.menuposition).removeClass('active');
             }
-            $rootScope.iPost.menuposition = item;
-            $('#changePostMenuItem' + $rootScope.iPost.menuposition).addClass('active');
+            $scope.menuposition = item;
+            $('#changePostMenuItem' + $scope.menuposition).addClass('active');
             $scope.showPublicChangeTypeOfNeed = false;
         }
     }
@@ -145,13 +149,13 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     }       */
 
     $scope.needType = function(){
-        if($rootScope.iPost.menuposition == 0){
+        if($scope.menuposition == 0){
             return "DEMAND";
-        }else if($rootScope.iPost.menuposition == 1){
+        }else if($scope.menuposition == 1){
             return "SUPPLY";
-        } else if($rootScope.iPost.menuposition == 2){
+        } else if($scope.menuposition == 2){
             return "DO_TOGETHER";
-        } else if($rootScope.iPost.menuposition == 3){
+        } else if($scope.menuposition == 3){
             return "CRITIQUE";
         }
     }
@@ -179,7 +183,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
 	$scope.getCleanNeed = function() {
 		return {
-			title               :$rootScope.iPost.title,
+			title               :$scope.title,
 			textDescription     :'',
 			contentDescription  :'',
 			state               : 'ACTIVE',
@@ -381,7 +385,10 @@ angular.module('won.owner').directive('wonGallery', function factory() {
 		}
 	};
 });
-angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  $location, $http, $routeParams, needService, mapService, userService, $rootScope){
+angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  $location, $http, $routeParams, needService, mapService, userService){
+    $scope.menuposition = $routeParams.menuposition;
+
+
     $scope.imageInputFieldCollapsed = true;
     $scope.locationInputFieldCollapsed = true;
     $scope.timeInputFieldCollapsed = true;
@@ -399,10 +406,10 @@ angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  
     };
 
     $scope.getImagesComment = function(){
-        if($rootScope.iPost.menuposition == 0) return "Add photos of similar things or sketches to give people a better idea what you have in mind."
-        if($rootScope.iPost.menuposition == 1) return "Add photos or sketches to give people a better idea what you're offering.";
-        if($rootScope.iPost.menuposition == 2) return "If you want you can add an image or photo here to illustrate the activity.";
-        if($rootScope.iPost.menuposition == 3) return "Add a photo, sketch (or screenshot) of the problem you want to point out.";
+        if($scope.menuposition == 0) return "Add photos of similar things or sketches to give people a better idea what you have in mind."
+        if($scope.menuposition == 1) return "Add photos or sketches to give people a better idea what you're offering.";
+        if($scope.menuposition == 2) return "If you want you can add an image or photo here to illustrate the activity.";
+        if($scope.menuposition == 3) return "Add a photo, sketch (or screenshot) of the problem you want to point out.";
     }
 });
 

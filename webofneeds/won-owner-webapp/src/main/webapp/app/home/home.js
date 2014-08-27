@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('HomeCtrl', function ($scope, $location, userService, $rootScope) {
+angular.module('won.owner').controller('HomeCtrl', function ($scope, $location, userService) {
     var firstDisplay = true;
     var time = 400;
 
@@ -145,7 +145,7 @@ angular.module('won.owner').controller('HomeCtrl', function ($scope, $location, 
     $scope.iChooseTypeText = 'Choose type of need';
     $scope.iGivePostTitlText = 'Give your post a title';
     $scope.iPostBtnText = 'New post';
-    $rootScope.iPost = new function(){
+    $scope.iPost = new function(){
         this.reset = function() {
             if(this.menuposition > -1){
                 $('#IMenuItem' + this.menuposition).removeClass('active');
@@ -160,37 +160,37 @@ angular.module('won.owner').controller('HomeCtrl', function ($scope, $location, 
     $scope.onClickIMenuItem = function(item) {
         if(item > -1){
 
-            if($rootScope.iPost.menuposition == item){
-                $('#IMenuItem' + $rootScope.iPost.menuposition).removeClass('active');
-                $rootScope.iPost.menuposition = -1;
+            if($scope.iPost.menuposition == item){
+                $('#IMenuItem' + $scope.iPost.menuposition).removeClass('active');
+                $scope.iPost.menuposition = -1;
             }else{
-                if($rootScope.iPost.menuposition > -1){
-                    $('#IMenuItem' + $rootScope.iPost.menuposition).removeClass('active');
+                if($scope.iPost.menuposition > -1){
+                    $('#IMenuItem' + $scope.iPost.menuposition).removeClass('active');
                 }
-                $rootScope.iPost.menuposition = item;
-                $('#IMenuItem' + $rootScope.iPost.menuposition).addClass('active');
+                $scope.iPost.menuposition = item;
+                $('#IMenuItem' + $scope.iPost.menuposition).addClass('active');
             }
         }
     }
     $scope.onClickOnNewPost = function() {
         //$location.path('/create-need/2');
         var validPanel = true;
-        $rootScope.iPost.firstattempt = false;
+        $scope.iPost.firstattempt = false;
 
         //Title mustn't be empty
-        if($rootScope.iPost.title.length < 1){
+        if($scope.iPost.title.length < 1){
             $scope.iNewPost.iPostTitle.$invalid = true;
             validPanel = false;
         }
 
-        if($rootScope.iPost.menuposition < 0){
+        if($scope.iPost.menuposition < 0){
             validPanel = false;
         }
 
         if ($scope.iNewPost.$valid && validPanel) {
             //userService.registerUser($scope.registerUser).then(onRegisterResponse);
 
-            $location.path('/create-need/1');
+            $location.path('/create-need/1/'+$scope.iPost.menuposition+'/'+$scope.iPost.title);
         }
     }
 
