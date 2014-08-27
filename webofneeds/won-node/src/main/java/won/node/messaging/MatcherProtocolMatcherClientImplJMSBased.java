@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.node.service.impl.URIService;
 import won.protocol.jms.MessagingService;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Need;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -62,7 +63,7 @@ public class MatcherProtocolMatcherClientImplJMSBased implements MatcherProtocol
   }
 
   @Override
-  public void needCreated(final URI needURI, final Model content, final Dataset messageEvent)
+  public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage)
   {
 
       StringWriter sw = new StringWriter();
@@ -74,7 +75,7 @@ public class MatcherProtocolMatcherClientImplJMSBased implements MatcherProtocol
       Map headerMap = new HashMap<String, String>();
       headerMap.put("needUri", needURI.toString());
       headerMap.put("content",RdfUtils.toString(content));
-      headerMap.put("messageEvent",RdfUtils.toString(messageEvent));
+      headerMap.put("messageEvent",RdfUtils.toString(wonMessage.getMessageContent()));
       headerMap.put("protocol","MatcherProtocol");
       headerMap.put("methodName", "needCreated");
       headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix()+"/resource");

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.jms.MessagingService;
+import won.protocol.message.WonMessage;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 
@@ -50,10 +51,10 @@ public class MatcherProtocolMatcherClientImpl implements MatcherProtocolMatcherS
   }
 
   @Override
-  public void needCreated(final URI needURI, final Model content, final Dataset messageEvent)
+  public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage)
   {
     logger.debug("calling needCreated for needURI {}", needURI);
-    delegate.needCreated(needURI, content, messageEvent);
+    delegate.needCreated(needURI, content, wonMessage);
 
   }
   @Override

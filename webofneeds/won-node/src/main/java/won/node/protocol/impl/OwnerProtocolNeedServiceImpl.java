@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
@@ -64,10 +65,10 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
             final Model content,
             final boolean activate,
             String ownerApplicationID,
-            Dataset messageEvent
+            WonMessage wonMessage
             )
             throws IllegalNeedContentException {
-        URI needURI = this.needManagementService.createNeed(content, activate, ownerApplicationID, messageEvent);
+        URI needURI = this.needManagementService.createNeed(content, activate, ownerApplicationID, wonMessage);
         return needURI;
     }
 

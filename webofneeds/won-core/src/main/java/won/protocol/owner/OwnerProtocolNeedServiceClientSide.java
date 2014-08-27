@@ -45,13 +45,13 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      *
      * @param content
      * @param activate
-     * @param messageEvent contains the whole message as messageEvent RDF
+     * @param wonMessage contains the whole message as messageEvent RDF
      * @return the URI of the newly created need
      */
     public ListenableFuture<URI> createNeed(
             Model content,
             final boolean activate,
-            Dataset messageEvent) throws Exception;
+            WonMessage wonMessage) throws Exception;
 
     /**
      * Activates the need object.
@@ -76,7 +76,7 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
             Model content,
             boolean activate,
             URI wonNodeUri,
-            Dataset messageEvent) throws Exception;
+            WonMessage wonMessage) throws Exception;
     /**
      * Opens a connection identified by connectionURI. A rdf graph can be sent along with the request.
      *

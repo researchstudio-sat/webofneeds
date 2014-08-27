@@ -94,7 +94,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         }
 
         try {
-          ownerProtocolService.createNeed(content, active, wonNodeURI, messageContent);
+          ownerProtocolService.createNeed(content, active, wonNodeURI, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception:", e);
         }

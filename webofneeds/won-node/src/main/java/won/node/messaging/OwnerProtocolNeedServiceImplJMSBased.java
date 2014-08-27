@@ -5,10 +5,13 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.Exchange;
 import org.apache.camel.Header;
 import org.apache.camel.ProducerTemplate;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDecoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
@@ -62,21 +65,23 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
             @Header("model") String content,
             @Header("activate") boolean activate,
             @Header("ownerApplicationID") String ownerApplicationID,
-            @Header("messageEvent") String messageEventString,
+            @Header("wonMessage") String wonMessageString,
             Exchange exchange) throws IllegalNeedContentException, JMSException {
 
         URI needURI = null;
         Model contentconvert = RdfUtils.toModel(content);
-        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
-
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
+        //Dataset messageEvent = RdfUtils.toDataset(messageEventString);
         logger.debug("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
-        logger.debug("createNeed: message event received: {} with ownerApp ID {}", messageEventString,ownerApplicationID);
+        logger.debug("createNeed: message event received: {} with ownerApp ID {}",
+                     RdfUtils.toString(wonMessage.getMessageContent()),
+                     ownerApplicationID);
 
         needURI = delegate.createNeed(
                 contentconvert,
                 activate,
                 ownerApplicationID,
-                messageEvent);
+                wonMessage);
         exchange.getOut().setBody(needURI);
 
        return needURI;

@@ -11,6 +11,7 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.List;
  * User: ypanchenko
  * Date: 04.08.2014
  */
-public class WonMessage
+public class WonMessage implements Serializable
 {
 
   final Logger logger = LoggerFactory.getLogger(getClass());

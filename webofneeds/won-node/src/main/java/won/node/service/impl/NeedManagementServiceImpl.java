@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
+import won.protocol.message.WonMessage;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.IllegalNeedContentException;
@@ -82,12 +83,13 @@ public class NeedManagementServiceImpl implements NeedManagementService
   @Autowired
     private OwnerApplicationRepository ownerApplicationRepository;
 
+  //TODO: remove 'active' parameter, make need active by default, and look into RDF for an optional 'isInState' triple.
   @Override
   public URI createNeed(
           final Model content,
           final boolean activate,
           String ownerApplicationID,
-          Dataset messageEvent) throws IllegalNeedContentException
+          WonMessage wonMessage) throws IllegalNeedContentException
   {
     String stopwatchName = getClass().getName()+".createNeed";
 
@@ -102,7 +104,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase2");
     split = stopwatch.start();
     //now, create the need URI and save again
-    need.setNeedURI(URIService.createNeedURI(need));
+    need.setNeedURI(wonMessage.getMessageEvent().getSenderURI());
     need.setWonNodeURI(URI.create(URIService.getGeneralURIPrefix()));
     need = needRepository.save(need);
     split.stop();
@@ -139,7 +141,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     split = stopwatch.start();
     authorizeOwnerApplicationForNeed(ownerApplicationID, need);
     split.stop();
-    matcherProtocolMatcherClient.needCreated(need.getNeedURI(), content, messageEvent);
+    matcherProtocolMatcherClient.needCreated(need.getNeedURI(), content, wonMessage);
 
     return need.getNeedURI();
   }

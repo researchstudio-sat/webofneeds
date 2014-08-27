@@ -28,7 +28,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import won.protocol.exception.*;
+import won.protocol.exception.CamelConfigurationFailedException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
@@ -233,10 +234,10 @@ public class OwnerProtocolNeedServiceClientJMSBased
     }
 
     @Override
-    public ListenableFuture<URI> createNeed(Model content, boolean activate, Dataset messageEvent)
+    public ListenableFuture<URI> createNeed(Model content, boolean activate, WonMessage wonMessage)
             throws Exception {
 
-        return createNeed(content, activate, defaultNodeURI, messageEvent);
+        return createNeed(content, activate, defaultNodeURI, wonMessage);
     }
 
     @Override
@@ -321,7 +322,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
             Model content,
             boolean activate,
             URI wonNodeUri,
-            Dataset messageEvent)
+            WonMessage wonMessage)
             throws Exception {
 
         //camelContext.getShutdownStrategy().setSuppressLoggingOnTimeout(true);
@@ -354,13 +355,14 @@ public class OwnerProtocolNeedServiceClientJMSBased
             //camelContext.getComponent()
             ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
         }
+
         Map<String, Object> headerMap = new HashMap<>();
         headerMap.put("model", RdfUtils.toString(content));
         headerMap.put("activate",activate);
         headerMap.put("methodName","createNeed");
         headerMap.put("remoteBrokerEndpoint",wonNodeList.get(0).getOwnerProtocolEndpoint());
         headerMap.put("ownerApplicationID",ownerApplicationId);
-        headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
+        headerMap.put("wonMessage",WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         return messagingService.sendInOutMessageGeneric(null, headerMap,null,startingEndpoint);
     }

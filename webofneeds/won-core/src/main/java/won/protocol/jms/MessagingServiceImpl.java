@@ -47,7 +47,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
         //exchange.getIn().getHeaders().put("CamelJmsRequestTimeout",DEFAULT_JMS_EXPIRATION_TIME);
         //exchange.setProperty("JMSExpiration",DEFAULT_JMS_EXPIRATION_TIME);
         exchange.getIn().setBody(body);
-
+        //exchange.getOut().setBody(body);
         exchange.setPattern(ExchangePattern.InOut);
         final SettableFuture<T> result = SettableFuture.create();
         logger.debug("sending inout message");
@@ -90,6 +90,9 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
             logger.debug("key: "+pairs.getKey()+" value: "+pairs.getValue());
           }
         }
+    }
+    public void inspectBody(Exchange exchange){
+      exchange.getIn().getBody();
     }
 
     public void inspectHeaders(Exchange exchange){

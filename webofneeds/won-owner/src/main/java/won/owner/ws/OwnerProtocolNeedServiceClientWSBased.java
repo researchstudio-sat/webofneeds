@@ -115,9 +115,9 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
     public ListenableFuture<URI> createNeed(
             Model content,
             boolean activate,
-            Dataset messageEvent)
+            WonMessage wonMessage)
             throws IllegalNeedContentException {
-        return createNeed(content, activate, null, messageEvent);
+        return createNeed(content, activate, null, wonMessage);
     }
 
     //@Override
@@ -125,7 +125,7 @@ public class OwnerProtocolNeedServiceClientWSBased implements OwnerProtocolNeedS
             Model content,
             boolean activate,
             URI wonNodeUri,
-            Dataset messageEvent)
+            WonMessage wonMessage)
             throws IllegalNeedContentException {
 
         //TODO: make asynchonous

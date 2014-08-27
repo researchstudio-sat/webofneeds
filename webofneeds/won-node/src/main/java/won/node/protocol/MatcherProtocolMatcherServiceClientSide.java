@@ -18,6 +18,7 @@ package won.node.protocol;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
+import won.protocol.message.WonMessage;
 
 import java.net.URI;
 
@@ -30,7 +31,7 @@ public interface MatcherProtocolMatcherServiceClientSide
 
   public void matcherRegistered(final URI wonNodeURI, final Dataset messageEvent);
 
-  public void needCreated(final URI needURI, final Model content, final Dataset messageEvent);
+  public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage);
 
   public void needActivated(final URI needURI, final Dataset messageEvent);
 

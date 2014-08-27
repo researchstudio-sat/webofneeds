@@ -189,9 +189,9 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public ListenableFuture<URI> createNeed(Model content, boolean activate, Dataset messageEvent)
+  public ListenableFuture<URI> createNeed(Model content, boolean activate, WonMessage wonMessage)
           throws Exception {
-    return createNeed(content, activate, null, messageEvent);
+    return createNeed(content, activate, null, wonMessage);
   }
 
   @Override
@@ -200,13 +200,13 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
           final Model content,
           final boolean activate,
           final URI wonNodeUri,
-          Dataset messageEvent)
+          WonMessage wonMessage)
     throws Exception {
     if (logger.isDebugEnabled()) {
       logger.debug("owner to need: CREATE_NEED activate {}, with content {}",
         new Object[]{activate, StringUtils.abbreviate(RdfUtils.toString(content), 200)});
     }
-    final ListenableFuture<URI> uri = delegate.createNeed(content, activate, wonNodeUri, messageEvent);
+    final ListenableFuture<URI> uri = delegate.createNeed(content, activate, wonNodeUri, wonMessage);
     //asynchronously wait for the result and update the local database.
     //meanwhile, create our own ListenableFuture to pass the result back
     final SettableFuture<URI> result = SettableFuture.create();
