@@ -173,30 +173,41 @@
                         <li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
                             <i class="fa fa-clipboard fa-lg"></i>&nbsp;Post box</a>
                         </li>
-                        <li ng-show="!showPublic()" ng-cloak>
-                            <a href="" class="dropdown-toggle" data-toggle="dropdown">
-                                <i class="fa fa-comment-o fa-lg"></i>&nbsp;6
+                        <li ng-show="!showPublic()">
+                            <a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
+                                <!-- TODO provide here the total number of messages -->
+                                <i class="fa fa-comment-o fa-lg"></i>&nbsp;{{21}}
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#"><!--<i class="fa fa-circle fa-lg"></i>--><img src="/images/type_posts/want.png"/>&nbsp;Need Couch</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/images/type_posts/change.png"/>&nbsp;Clean Park</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/images/type_posts/offer.png"/>&nbsp;Bla bla blas</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;Car Sharing</a></li>
-
+                            <ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 250px;">
+                                <li class="text-center grey-item">{{21}}&nbsp;new messages</li>
+                                <!-- TODO put real parameters into url -->
+                                <li ng-repeat="conv in conversations"><a href="#/private-link"><img src="{{getTypePicURI(conv.type)}}"/>&nbsp;{{conv.title}}&nbsp;<span class="badge pull-right">{{conv.msgs}}</span></a></li>
+                                <li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a></li>
                             </ul>
                         </li>
                         <li ng-show="!showPublic()" ng-cloak>
-                            <a href="">
-                                <i class="fa fa-male fa-lg"></i>&nbsp;6
+                            <a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
+                                <!-- TODO provide here the total number of messages -->
+                                <i class="fa fa-male fa-lg"></i>&nbsp;{{11}}
                             </a>
+                            <ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 250px;">
+                                <li class="text-center grey-item">{{11}}&nbsp;new messages</li>
+                                <!-- TODO put real parameters into url -->
+                                <li ng-repeat="req in requests"><a href="#/private-link"><img src="{{getTypePicURI(req.type)}}"/>&nbsp;{{req.title}}&nbsp;<span class="badge pull-right">{{req.msgs}}</span></a></li>
+                                <li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a></li>
+                            </ul>
                         </li>
                         <li ng-show="!showPublic()" ng-cloak>
-                            <a href="">
-                                <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;1
+                            <a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
+                                <!-- TODO provide here the total number of messages -->
+                                <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{5}}
                             </a>
+                            <ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 250px;">
+                                <li class="text-center grey-item">{{5}}&nbsp;new messages</li>
+                                <!-- TODO put real parameters into url -->
+                                <li ng-repeat="match in matches"><a href="#/private-link"><img src="{{getTypePicURI(req.type)}}"/>&nbsp;{{match.title}}&nbsp;<span class="badge pull-right">{{match.msgs}}</span></a></li>
+                                <li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a></li>
+                            </ul>
                         </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right" ng-cloak>

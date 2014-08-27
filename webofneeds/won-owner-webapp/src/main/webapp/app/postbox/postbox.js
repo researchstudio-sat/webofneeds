@@ -114,6 +114,28 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
         {type:'Together', title:'Go to the cinema', datetime: new Date('2014-07-14')}
     ];
 
+    // data for notifications in menu, TODO call backend methods here and maybe more convenient controller
+    $scope.conversations = [
+        {type: 'Together', title:'Car sharing to Prague', msgs: 5},
+        {type: 'Offer', title:'Friendly Bicycle ...', msgs: 4},
+        {type: 'Want', title:'I want smartphone ...', msgs: 6},
+        {type: 'Change', title:'Change my stamps ...', msgs: 3},
+        {type: 'Together', title:'Study together ...', msgs: 2},
+        {type: 'Offer', title:'Good guitar ...', msgs: 1}
+    ];
+
+    $scope.requests = [
+        {type: 'Want', typeText:'Incoming Request', title:'Moved recently ...', msgs: 2},
+        {type: 'Change', typeText:'Outgoing Request', title:'Let\'s clean ...', msgs: 3},
+        {type: 'Together', typeText:'Incoming Request', title:'Bought new car ...', msgs: 1},
+        {type: 'Offer', typeText:'Outgoing Request', title:'Let\'s grill ...', msgs: 5}
+    ];
+
+    $scope.matches = [
+        {type: 'Change', title:'Old children\'s clothes ..', msgs: 3},
+        {type: 'Offer', title:'Old men\'s clothes ..', msgs: 2}
+    ];
+
 	$scope.clickOnMessage = function () {
 		//TODO Put here logic
 	};

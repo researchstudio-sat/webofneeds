@@ -423,6 +423,10 @@ http://stackoverflow.com/questions/18023493/bootstrap-3-dropdown-sub-menu-missin
     margin-left:10px;
 }
 
+.grey-item {
+    background-color: #D4D8D1;
+}
+
 /** resizable columns */
 table th.resizing {
     cursor: col-resize;
