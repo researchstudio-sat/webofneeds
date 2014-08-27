@@ -8,8 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-// ToDo (FS): mapping is not limited to Need URIs (but they may all be handled the same way
-
 /**
  * This service stores the connection between the WebSocket sessions and the
  * Need URIs. If a OA client authenticates to a OA server it sends a list of
@@ -25,8 +23,7 @@ public class WebSocketSessionService
   // ToDo (FS): make this persistent
   private Map<URI, Set<WebSocketSession>> mapping = new HashMap<URI, Set<WebSocketSession>>();
 
-  public void addMapping(URI needURI, WebSocketSession session)
-  {
+  public void addMapping(URI needURI, WebSocketSession session) {
     if (!mapping.containsKey(needURI)) {
       mapping.put(needURI, new HashSet<WebSocketSession>());
     }
@@ -35,11 +32,10 @@ public class WebSocketSessionService
 
   public void removeMapping(URI needURI, WebSocketSession session) {
     if (mapping.containsKey(needURI))
-        mapping.get(needURI).remove(session);
+      mapping.get(needURI).remove(session);
   }
 
-  public Set<WebSocketSession> getWebSocketSessions(URI needURI)
-  {
+  public Set<WebSocketSession> getWebSocketSessions(URI needURI) {
     if (mapping.containsKey(needURI))
       return mapping.get(needURI);
     else

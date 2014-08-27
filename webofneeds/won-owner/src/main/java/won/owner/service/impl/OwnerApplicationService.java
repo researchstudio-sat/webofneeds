@@ -1,7 +1,9 @@
 package won.owner.service.impl;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +22,16 @@ import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 /**
  * User: fsalcher
@@ -49,6 +56,10 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   @Autowired
   private NeedRepository needRepository;
 
+  @Autowired
+  private Executor executor;
+
+  final private Map<URI, WonMessage> wonMessageMap = new HashMap<>();
 
   // ToDo (FS): add security layer
 
@@ -93,15 +104,35 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
           logger.warn("caught MultipleOwnersFoundException:", e);
         }
 
+        final ListenableFuture<URI> newNeedURI;
         try {
-          ownerProtocolService.createNeed(content, active, wonNodeURI, wonMessage);
+          wonMessageMap.put(wonMessage.getMessageEvent().getMessageURI(), wonMessage);
+          newNeedURI = ownerProtocolService.createNeed(content, active, wonNodeURI,wonMessage);
+
+          newNeedURI.addListener(new Runnable()
+          {
+            @Override
+            public void run() {
+              // ToDo (FS): WON Node should return the response message
+              try {
+                if (newNeedURI.isDone()) {
+                  sendBackResponseMessageToClient(
+                    wonMessageMap.get(newNeedURI.get()), WONMSG.TYPE_RESPONSE_STATE_SUCCESS);
+                } else if (newNeedURI.isCancelled()) {
+                  sendBackResponseMessageToClient(
+                    wonMessageMap.get(newNeedURI.get()), WONMSG.TYPE_RESPONSE_STATE_FAILURE);
+                }
+              } catch (InterruptedException e) {
+                logger.warn("caught InterruptedException:", e);
+              } catch (ExecutionException e) {
+                logger.warn("caught ExecutionException:", e);
+              }
+            }
+          }, executor);
         } catch (Exception e) {
           logger.warn("caught Exception:", e);
         }
-
-        // ToDo (FS): WON Node should do this
-        sendBackResponseMessageToClient(wonMessage);
-
+        
         break;
 
       case CONNECT:
@@ -215,22 +246,23 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   }
 
   // ToDo (FS): most (all?) of the response messages should be send back from the WON node (this is only temporary)
-  private void sendBackResponseMessageToClient (WonMessage wonMessage)
-  {
+  private void sendBackResponseMessageToClient(WonMessage wonMessage, Resource responseType) {
 
     URI responseMessageURI = null;
 
-    responseMessageURI = URI.create("http://example.com/responseMessage/837ddj");//new URI(WONMSG.getGraphURI(msgURI.toString()).toString());
+    responseMessageURI = URI
+      .create("http://example.com/responseMessage/837ddj");//new URI(WONMSG.getGraphURI(msgURI.toString()).toString());
 
     WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
     WonMessage responseWonMessage = wonMessageBuilder
-        .setWonMessageType(WonMessageType.CREATE_RESPONSE)
-        .setMessageURI(responseMessageURI)
-        .setSenderURI(wonMessage.getMessageEvent().getReceiverURI())
-        .setReceiverURI(wonMessage.getMessageEvent().getSenderURI())
-        .setWonMessageType(WonMessageType.CREATE_RESPONSE)
-        .addRefersToURI(wonMessage.getMessageEvent().getMessageURI())
-        .build();
+      .setWonMessageType(WonMessageType.CREATE_RESPONSE)
+      .setMessageURI(responseMessageURI)
+      .setSenderURI(wonMessage.getMessageEvent().getReceiverURI())
+      .setReceiverURI(wonMessage.getMessageEvent().getSenderURI())
+      .setWonMessageType(WonMessageType.CREATE_RESPONSE)
+      .setResponseMessageState(responseType)
+      .addRefersToURI(wonMessage.getMessageEvent().getMessageURI())
+      .build();
 
     ownerApplicationServiceCallbackToClient.onMessage(responseWonMessage);
   }
