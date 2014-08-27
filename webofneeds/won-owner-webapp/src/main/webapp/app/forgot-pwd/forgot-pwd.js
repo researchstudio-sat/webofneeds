@@ -15,13 +15,18 @@
  */
 
 angular.module('won.owner').controller('ForgotPwdCtrl', function ($scope, $location, userService) {
-    $scope.user = {
-        email:''
-    };
-    $scope.sendStatus = false;
+	$scope.user = {
+		email:''
+	};
+	$scope.sendStatus = false;
 
-    $scope.send = function() {
-        //TODO Put here logic
-        if(!$scope.sendStatus)$scope.sendStatus = true;
-    };
+	$scope.send = function () {
+		//TODO Put here logic
+		if (!$scope.sendStatus)$scope.sendStatus = true;
+	};
+
+	$scope.recentPwd = function () {
+		//TODO Put here logic
+		$scope.sendStatus = false;
+	};
 });
