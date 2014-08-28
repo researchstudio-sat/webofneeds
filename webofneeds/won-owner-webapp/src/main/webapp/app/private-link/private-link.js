@@ -157,6 +157,25 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         // should not get here
     }
 
+    $scope.initRater = function() {
+        $("#rater").rating({
+            starCaptions: function(val) {
+                if (val < 3) {
+                    return val;
+                } else {
+                    return 'high';
+                }
+            },
+            starCaptionClasses: function(val) {
+                if (val < 3) {
+                    return 'label label-danger';
+                } else {
+                    return 'label label-success';
+                }
+            }
+        });
+    }
+
     $scope.clickOnTitle = function(msgId) {
         // msgId can't be null here
         if ($scope.prevMessageId == msgId) {

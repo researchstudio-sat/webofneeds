@@ -440,3 +440,7 @@ table th.resizing {
 .st-sort-descent:after{
     content: '\25BC';
 }
+
+.underline {
+    text-decoration: underline;
+}

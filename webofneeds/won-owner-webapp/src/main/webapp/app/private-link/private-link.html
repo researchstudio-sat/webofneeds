@@ -86,7 +86,10 @@
                         <!-- Conversations -->
                         <div class="panel panel-default" ng-show="showConversations()">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Conversation with {{chosenMessage.title}}</h3>  <!--TODO put here icon depends on type-->
+                                <div class="row">
+                                    <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
+                                    <h3 class="panel-title col-md-9">Conversation with <a href="#/post-detail" class="underline">{{chosenMessage.title}}</a></h3>  <!--TODO put parameter into url -->
+                                </div>
                             </div>
                             <table class="table table-hover">
                                 <tbody>
@@ -141,24 +144,159 @@
                         <!-- Incoming requests -->
                         <div class="panel panel-default" ng-show="showIncomingRequests()">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Incoming requests</h3>  <!--TODO put here icon depends on type-->
-                                Content TODO
+                                <div class="row">
+                                    <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
+                                    <h3 class="panel-title col-md-9">Request for conversation</h3>
+                                    <div class="col-md-2">{{chosenMessage.datetime | date}}</div>
+                                </div>
+                            </div>
+
+                            <!-- Post exists IMPLICITLY DISPLAYED -->
+                            <div ng-show="true">
+                                <h5><a href="#/post-detail" class="underline">{{chosenMessage.title}}</a>&nbsp;has sent you a request:</h5>
+                                <div>
+                                    Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
+                                    Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
+                                    pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                    Pellentesque sollicitudin nec sem ut porttitor
+                                </div>
+
+                                <div class="row">
+                                    <h5 class="col-md-offset-1 col-md-11"><a href="#/post-detail" class="underline">{{chosenMessage.title}}</a>&nbsp;wants to connect to this post:</h5>
+                                </div>
+                                <div class="row">
+                                    <img src="images/need.jpg" style="float: left; width: 150px; height: 150px;"/>
+                                    <div>
+                                        <a href="#/post-detail" class="underline">{{chosenMessage.title}}</a>
+                                    </div>
+                                    <div>
+                                        Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
+                                        Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
+                                        pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                        Pellentesque sollicitudin nec sem ut porttitor eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
+                                        pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                        Pellentesque sollicitudin nec sem ut porttitor (<a href="">go to full description</a>).
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div>
+                                        What to do with this conversation request?
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <button class="btn btn-default">Decline</button>
+                                    <button class="btn btn-default">Accept</button>
+                                </div>
+                            </div>
+
+
+                            <!-- Post does not exist NOT DISPLAYED NOW -->
+                            <div ng-show="false">
+                                <h5>Re:&nbsp;{{chosenMessage.title}}&nbsp;has sent you a request:</h5>
+                                <div>
+                                    Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
+                                    Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
+                                    pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                </div>
+
+                                <div class="row">
+                                    <div>
+                                        What to do with this conversation request?
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <!-- TODO make the buttons working -->
+                                    <button class="btn btn-default">Decline</button>
+                                    <button class="btn btn-default">Accept</button>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Outgoing requests -->
                         <div class="panel panel-default" ng-show="showOutgoingRequests()">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Outgoing requests</h3>  <!--TODO put here icon depends on type-->
-                                Content TODO
+                                <div class="row">
+                                    <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
+                                    <h3 class="panel-title col-md-9">Request for conversation</h3>
+                                    <div clss="col-md-2">{{chosenMessage.datetime | date}}</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h5>Waiting for reply from&nbsp;<a href="#/post-detail" class="underline">{{chosenMessage.title}}</a></h5>
+                                <!-- TODO make it editable -->
+                                <div>
+                                    Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
+                                    Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
+                                    pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                </div>
+                                You want to connect with this post:
+                                <div class="row">
+                                    <img src="images/need.jpg" style="float: left; width: 150px; height: 150px;"/>
+                                    <div>
+                                        <a href="#/post-detail" class="underline">{{chosenMessage.title}}</a>
+                                    </div>
+                                    <div>
+                                        Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
+                                        Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
+                                        pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                        Pellentesque sollicitudin nec sem ut porttitor eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
+                                        pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                        Pellentesque sollicitudin nec sem ut porttitor (<a href="">go to full description</a>).
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <!-- TODO make the button working -->
+                                    <button class="btn btn-default">Cancel Request</button>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Matches -->
                         <div class="panel panel-default" ng-show="showMatches()">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Matches</h3>  <!--TODO put here icon depends on type-->
-                                Content TODO
+                                <div class="row">
+                                    <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
+                                    <h3 class="panel-title col-md-9">New match found!</h3>
+                                    <div class="col-md-2">{{chosenMessage.datetime | date}}</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="row">
+                                    <img src="images/need.jpg" style="float: left; width: 150px; height: 150px;"/>
+                                    <div>
+                                        <a href="#/post-detail" class="underline">{{chosenMessage.title}}</a>
+                                    </div>
+                                    <div>
+                                        Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
+                                        Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
+                                        pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                        Pellentesque sollicitudin nec sem ut porttitor eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
+                                        pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                        Pellentesque sollicitudin nec sem ut porttitor (<a href="">go to full description</a>).
+                                    </div>
+
+                                    <div class="row">
+                                        <h5>Match rating</h5>
+                                        Please reate how good this match is so we can provide you the best possible matches:
+                                        <input id="rater" ng-init="initRater()" type="number" class="rating" min="0" max="5" step="1" data-size="xs"
+                                               data-symbol="&#xe005;" data-default-caption="{rating}" data-star-captions="{}">
+                                    </div>
+
+                                    <div class="row">
+                                        <div>
+                                            What to do with this match?
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <!-- TODO make the buttons working -->
+                                        <button class="btn btn-default">Remove</button>
+                                        <button class="btn btn-default">Request  conversation</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
