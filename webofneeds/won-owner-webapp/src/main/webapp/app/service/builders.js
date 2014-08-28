@@ -52,51 +52,11 @@
                 "won": "http://purl.org/webofneeds/model#",
                 "gr": "http://purl.org/goodrelations/v1#",
                 "ldp": "http://www.w3.org/ns/ldp#",
-                "msg:containsMessage": {
-                    "@id": "http://purl.org/webofneeds/message#containsMessage",
-                    "@type": "@id"
-                },
-                "won:hasBasicNeedType":{
-                    "@id":"http://purl.org/webofneeds/model#hasBasicNeedType",
-                    "@type":"@id"
-                },
-                "won:hasFacet":{
-                    "@id":"http://purl.org/webofneeds/model#hasFacet",
-                    "@type":"@id"
-                },
                 "won:hasContent":{
                     "@id":"http://purl.org/webofneeds/model#hasContent",
                     "@type":"@id"
-                },
-                "won:isInState":{
-                    "@id":"http://purl.org/webofneeds/model#isInState",
-                    "@type":"@id"
-                },
-                "won:hasContentDescription":{
-                    "@id":"http://purl.org/webofneeds/model#hasContentDescription",
-                    "@type":"@id"
-                },
-                "won:hasCurrency":{
-                    "@type":"xsd:string"
-                },
-                "won:hasLowerPriceLimit":{
-                    "@type":"xsd:float"
-                },
-                "won:hasUpperPriceLimit":{
-                    "@type":"xsd:float"
-                },
-                "geo:latitude":{
-                    "@type":"xsd:float"
-                },
-                "geo:longitude":{
-                    "@type":"xsd:float"
-                },
-                "won:hasEndTime":{
-                    "@type":"xsd:dateTime"
-                },
-                "won:hasStartTime":{
-                    "@type":"xsd:dateTime"
                 }
+
         }
 
         /*
@@ -132,7 +92,11 @@
             constructor: won.NeedBuilder,
             setContext: function(){
                 this.data["@context"] = won.defaultContext;
+
                 return this;
+            },
+            getContext: function () {               //TODO inherit from base buiilder
+                return this.data["@context"];
             },
             getNeedGraph: function(){
                 return this.data["@graph"][0]["@graph"];
@@ -143,9 +107,7 @@
             getMainNode: function () {
                 return this.data["@graph"][0]["@graph"][0];
             },
-            getContext: function () {
-                return this.data["@context"];
-            },
+
             supply: function () {
                 return this.basicNeedType("won:Supply");
             },
@@ -159,6 +121,10 @@
                 return this.basicNeedType("won:Critique");
             },
             basicNeedType: function (type) {
+                this.getContext()["won:hasBasicNeedType"]= {
+                    "@id":"http://purl.org/webofneeds/model#hasBasicNeedType",
+                        "@type":"@id"
+                },
                 this.getMainNode()["won:hasBasicNeedType"] = type;
                 return this;
             },
@@ -205,6 +171,10 @@
                 return this.hasFacet("won:BAAtomicCCCoordinatorFacet");
             },
             hasFacet: function(facetType){
+                this.getContext()["won:hasFacet"]={
+                    "@id":"http://purl.org/webofneeds/model#hasFacet",
+                        "@type":"@id"
+                },
                 this.getMainNode()["won:hasFacet"]=facetType;
                 return this;
             },
@@ -215,6 +185,10 @@
                 return this.inState("won:Inactive")
             },
             inState: function(state){
+                this.getContext()["won:isInState"]={
+                    "@id":"http://purl.org/webofneeds/model#isInState",
+                    "@type":"@id"
+                },
                 this.getMainNode()["won:isInState"] = state;
                 return this;
             },
@@ -241,6 +215,10 @@
              * in order to add price, location, time description hasContentDescription() shall be called first. then use getContentDescriptionNode()
              */
             hasContentDescription: function(){
+                this.getContext()["won:hasContentDescription"]={
+                    "@id":"http://purl.org/webofneeds/model#hasContentDescription",
+                    "@type":"@id"
+                },
                 this.getContentNode()["won:hasContentDescription"]="_:contentDescription";
                 this.getNeedGraph()[2]={
                     "@id":this.getContentNode()["won:hasContentDescription"],
@@ -252,6 +230,15 @@
                 return this;
             },
             hasPriceSpecification: function(currency, lowerLimit, upperLimit){
+                this.getContext()["won:hasCurrency"]={
+                    "@type":"xsd:string"
+                },
+                    this.getContext()["won:hasLowerPriceLimit"]={
+                    "@type":"xsd:float"
+                },
+                    this.getContext()["won:hasUpperPriceLimit"]={
+                    "@type":"xsd:float"
+                },
                 this.getContentDescriptionNode()["won:hasPriceSpecification"]= {
                     "@id":"_:priceSpecification",
                     "@type":"won:PriceSpecification",
@@ -262,6 +249,12 @@
                 return this;
             },
             hasLocationSpecification: function(latitude, longitude){
+                this.getContext()["geo:latitude"]={
+                    "@type":"xsd:float"
+                },
+                this.getContext()["geo:latitude"]={
+                    "@type":"xsd:float"
+                },
                 this.getContentDescriptionNode()["won:hasLocationSpecification"]={
                     "@id":"_:locationSpecification",
                     "@type":"geo:Point",
@@ -271,6 +264,12 @@
                 return this;
             },
             hasTimeSpecification: function(startTime, endTime, recurInfinite, recursIn, recurTimes){
+                this.getContext()["won:hasStartTime"]= {
+                    "@type":"xsd:dateTime"
+                }
+                this.getContext()["won:hasEndTime"]={
+                    "@type":"xsd:dateTime"
+                }
                 this.getContentDescriptionNode()["won:hasTimespecification"]={
                     "@type":"won:TimeSpecification",
                     "won:hasRecurInfiniteTimes":recurInfinite,
@@ -327,10 +326,17 @@
                 return this;
             },
             eventURI: function (eventId) {
+                this.getContext()["msg:containsMessage"]= {
+                    "@id": "http://purl.org/webofneeds/message#containsMessage",
+                    "@type": "@id"
+                },
                 this.getDefaultGraphNode()['msg:containsMessage'] = { "@id": this.data["@context"]["@base"] + "/event/" + eventId + "#data" };  //TODO: abstract class
                 this.getMessageEventNode()['@id'] =this.data["@context"]["@base"] +"/event/"+eventId;
                 this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] +"/event/"+eventId+"#data";
                 return this;
+            },
+            getContext :  function () {               //TODO inherit from base buiilder
+                return this.data["@context"];
             },
             hasSenderNeed: function(){
                 this.getMessageEventNode()["msg:senderNeed"]={"@id":this.data["@context"]["@base"]};
