@@ -70,7 +70,7 @@
                                             <span style="display: none;">{{message.typeText}}</span>
                                             <i ng-class="getIconClass(message.typeText)" tooltip="{{message.typeText}}"/>
                                         </td>
-                                        <td><a style="font-weight:bold;" href="" ng-click="clickOnTitle($index)">{{message.title}}</a></td>
+                                        <td><a style="font-weight:bold;" href="" ng-click="clickOnTitle(message.id)">{{message.title}}</a></td>
                                         <td>{{message.datetime | date}}</td>
                                     </tr>
                                 </tbody>
@@ -82,9 +82,11 @@
             <div class="div-table-row col-lg-12">
                 <div class="div-table-cell col-lg-12">
                     <div class="row col-lg-12 text-center">
-                        <div class="panel panel-default" ng-show="showConversation()">
+
+                        <!-- Conversations -->
+                        <div class="panel panel-default" ng-show="showConversations()">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Conversation with {{messages[currentMessageIndex].title}}</h3>  <!--TODO put here icon depends on type-->
+                                <h3 class="panel-title">Conversation with {{chosenMessage.title}}</h3>  <!--TODO put here icon depends on type-->
                             </div>
                             <table class="table table-hover">
                                 <tbody>
@@ -92,21 +94,21 @@
                                     <td>
                                         <div class="row col-lg-3">
                                             <img src="/images/house.gif" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{messages[currentMessageIndex].datetime | date}}</br>{{messages[currentMessageIndex].datetime | date:'HH:mm'}} <!--TODO put here time-->
+                                            </br>{{chosenMessage.datetime | date}}</br>{{chosenMessage.datetime | date:'HH:mm'}} <!--TODO put here time-->
                                         </div>
                                         <div class="row col-lg-9">
-                                            {{messages[currentMessageIndex].msg}}
+                                            {{chosenMessage.msg}}
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <div class="row col-lg-11">
-                                            {{messages[currentMessageIndex].msg}}
+                                            {{chosenMessage.msg}}
                                         </div>
                                         <div class="row col-lg-1">
                                             <img src="/images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{messages[currentMessageIndex].datetime | date}}</br>{{messages[currentMessageIndex].datetime | date:'HH:mm'}} <!--TODO put here time-->
+                                            </br>{{chosenMessage.datetime | date}}</br>{{chosenMessage.datetime | date:'HH:mm'}} <!--TODO put here time-->
                                         </div>
                                     </td>
                                 </tr>
@@ -135,6 +137,31 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Incoming requests -->
+                        <div class="panel panel-default" ng-show="showIncomingRequests()">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Incoming requests</h3>  <!--TODO put here icon depends on type-->
+                                Content TODO
+                            </div>
+                        </div>
+
+                        <!-- Outgoing requests -->
+                        <div class="panel panel-default" ng-show="showOutgoingRequests()">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Outgoing requests</h3>  <!--TODO put here icon depends on type-->
+                                Content TODO
+                            </div>
+                        </div>
+
+                        <!-- Matches -->
+                        <div class="panel panel-default" ng-show="showMatches()">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Matches</h3>  <!--TODO put here icon depends on type-->
+                                Content TODO
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

@@ -147,32 +147,49 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         $scope.newMessage = '';
     };
 
-    $scope.currentMessageIndex = null;
-    //TODO FIX BUG with indexing when we filtering by message types
-    $scope.clickOnTitle = function(id) {
-        $scope.currentMessageIndex = id;
-        //alert($scope.currentMessageIndex);
+    $scope.prevMessageId = null;
+    $scope.chosenMessage = null;
+    // helper function to get message according to its id from messages
+    function getMessageById(msgId) {
+        for(var i = 0; i < $scope.messages.length; i++) {
+            if ($scope.messages[i].id == msgId) return $scope.messages[i];
+        }
+        // should not get here
     }
 
-    $scope.showConversation = function() {
-        if($scope.currentMessageIndex != null){
-            if($scope.messages[$scope.currentMessageIndex].type == 1) return true;
+    $scope.clickOnTitle = function(msgId) {
+        // msgId can't be null here
+        if ($scope.prevMessageId == msgId) {
+            $scope.chosenMessage = $scope.chosenMessage == null ? getMessageById(msgId) : null;
+        } else {
+            $scope.chosenMessage = getMessageById(msgId);
+        }
+        $scope.prevMessageId = msgId;
+    }
+
+    $scope.showConversations = function() {
+        if($scope.chosenMessage != null){
+            if($scope.chosenMessage.typeText == 'Conversation') return true;
         }else return false;
     }
 
-    $scope.showRequest = function() {
-        if($scope.currentMessageIndex != null){
-            if($scope.messages[$scope.currentMessageIndex].type == 2) return true;
+    $scope.showIncomingRequests = function() {
+        if($scope.chosenMessage != null){
+            if($scope.chosenMessage.typeText == 'Incoming Request') return true;
         }else return false;
     }
 
-    $scope.showMatch = function() {
-        if($scope.currentMessageIndex != null){
-            if($scope.messages[$scope.currentMessageIndex].type == 3) return true;
+    $scope.showOutgoingRequests = function() {
+        if($scope.chosenMessage != null){
+            if($scope.chosenMessage.typeText == 'Outgoing Request') return true;
         }else return false;
     }
 
-
+    $scope.showMatches = function() {
+        if($scope.chosenMessage != null){
+            if($scope.chosenMessage.typeText == 'Matches') return true;
+        }else return false;
+    }
 });
 
 angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService, $rootScope) {
