@@ -104,7 +104,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase2");
     split = stopwatch.start();
     //now, create the need URI and save again
-    need.setNeedURI(wonMessage.getMessageEvent().getSenderURI());
+    need.setNeedURI(wonMessage.getMessageEvent().getSenderNeedURI());
     need.setWonNodeURI(URI.create(URIService.getGeneralURIPrefix()));
     need = needRepository.save(need);
     split.stop();

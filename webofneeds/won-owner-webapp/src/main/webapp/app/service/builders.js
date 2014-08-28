@@ -33,27 +33,70 @@
             }
         }
     }
-  /*  var url = "http://localhost:8080/owner/msg";
 
-    var options = {debug: true};
-
-   socket =  new SockJS(url, null, options);
-
-    socket.onmessage = function (event) {
-        console.log("Received data: "+event.data);
-
-        writeOutput('Received data: ' + event.data);
-    };
-
-    socket.onclose = function () {
-        console.log("Lost connection")
-        writeOutput('Lost connection!');
-    };        */
 // attaches wonmessagebuilder API to the given object
-    var wrapper = function(wonmessagebuilder) {
+    var wrapper = function(won) {
 
-        wonmessagebuilder.clone = function(obj){
+        won.clone = function(obj){
             return JSON.parse(JSON.stringify(obj));
+        }
+        won.defaultContext = {
+                "@base": "http://www.example.com/resource/need/randomNeedID_1",
+                "webID": "http://www.example.com/webids/",
+                "msg": "http://purl.org/webofneeds/message#",
+                "dc": "http://purl.org/dc/elements/1.1/",
+                "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+                "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+                "xsd": "http://www.w3.org/2001/XMLSchema#",
+                "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                "won": "http://purl.org/webofneeds/model#",
+                "gr": "http://purl.org/goodrelations/v1#",
+                "ldp": "http://www.w3.org/ns/ldp#",
+                "msg:containsMessage": {
+                    "@id": "http://purl.org/webofneeds/message#containsMessage",
+                    "@type": "@id"
+                },
+                "won:hasBasicNeedType":{
+                    "@id":"http://purl.org/webofneeds/model#hasBasicNeedType",
+                    "@type":"@id"
+                },
+                "won:hasFacet":{
+                    "@id":"http://purl.org/webofneeds/model#hasFacet",
+                    "@type":"@id"
+                },
+                "won:hasContent":{
+                    "@id":"http://purl.org/webofneeds/model#hasContent",
+                    "@type":"@id"
+                },
+                "won:isInState":{
+                    "@id":"http://purl.org/webofneeds/model#isInState",
+                    "@type":"@id"
+                },
+                "won:hasContentDescription":{
+                    "@id":"http://purl.org/webofneeds/model#hasContentDescription",
+                    "@type":"@id"
+                },
+                "won:hasCurrency":{
+                    "@type":"xsd:string"
+                },
+                "won:hasLowerPriceLimit":{
+                    "@type":"xsd:float"
+                },
+                "won:hasUpperPriceLimit":{
+                    "@type":"xsd:float"
+                },
+                "geo:latitude":{
+                    "@type":"xsd:float"
+                },
+                "geo:longitude":{
+                    "@type":"xsd:float"
+                },
+                "won:hasEndTime":{
+                    "@type":"xsd:dateTime"
+                },
+                "won:hasStartTime":{
+                    "@type":"xsd:dateTime"
+                }
         }
 
         /*
@@ -61,70 +104,12 @@
          * e.g.:
          * jsonLD = new NeedBuilder().title("taxi").description("need a taxi").build();
          */
-        wonmessagebuilder.NeedBuilder = function NeedBuilder(data) {
+        won.NeedBuilder = function NeedBuilder(data) {
             if (data != null && data != undefined) {
-                this.data = wonmessagebuilder.clone(data);
+                this.data = won.clone(data);
             } else {
                 this.data =
                 {
-                    "@context": {
-                        "@base": "http://www.example.com/resource/need/randomNeedID_1",
-                        "webID": "http://www.example.com/webids/",
-                        "msg": "http://purl.org/webofneeds/message#",
-                        "dc": "http://purl.org/dc/elements/1.1/",
-                        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-                        "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
-                        "xsd": "http://www.w3.org/2001/XMLSchema#",
-                        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                        "won": "http://purl.org/webofneeds/model#",
-                        "gr": "http://purl.org/goodrelations/v1#",
-                        "ldp": "http://www.w3.org/ns/ldp#",
-                        "msg:containsMessage": {
-                            "@id": "http://purl.org/webofneeds/message#containsMessage",
-                            "@type": "@id"
-                        },
-                        "won:hasBasicNeedType":{
-                            "@id":"http://purl.org/webofneeds/model#hasBasicNeedType",
-                            "@type":"@id"
-                        },
-                        "won:hasFacet":{
-                            "@id":"http://purl.org/webofneeds/model#hasFacet",
-                            "@type":"@id"
-                        },
-                        "won:hasContent":{
-                            "@id":"http://purl.org/webofneeds/model#hasContent",
-                            "@type":"@id"
-                        },
-                        "won:isInState":{
-                            "@id":"http://purl.org/webofneeds/model#isInState",
-                            "@type":"@id"
-                        },
-                        "won:hasContentDescription":{
-                            "@id":"http://purl.org/webofneeds/model#hasContentDescription",
-                            "@type":"@id"
-                        },
-                        "won:hasCurrency":{
-                            "@type":"xsd:string"
-                        },
-                        "won:hasLowerPriceLimit":{
-                            "@type":"xsd:float"
-                        },
-                        "won:hasUpperPriceLimit":{
-                            "@type":"xsd:float"
-                        },
-                        "geo:latitude":{
-                            "@type":"xsd:float"
-                        },
-                        "geo:longitude":{
-                            "@type":"xsd:float"
-                        },
-                        "won:hasEndTime":{
-                            "@type":"xsd:dateTime"
-                        },
-                        "won:hasStartTime":{
-                            "@type":"xsd:dateTime"
-                        }
-                    },
                     "@graph": [
                         {
                             "@graph": [
@@ -143,8 +128,12 @@
             }
         }
 
-        wonmessagebuilder.NeedBuilder.prototype = {
-            constructor: wonmessagebuilder.NeedBuilder,
+        won.NeedBuilder.prototype = {
+            constructor: won.NeedBuilder,
+            setContext: function(){
+                this.data["@context"] = won.defaultContext;
+                return this;
+            },
             getNeedGraph: function(){
                 return this.data["@graph"][0]["@graph"];
             },
@@ -160,7 +149,6 @@
             supply: function () {
                 return this.basicNeedType("won:Supply");
             },
-
             demand: function () {
                 return this.basicNeedType("won:Demand");
             },
@@ -302,13 +290,13 @@
         }
        // window.NeedBuilder = NeedBuilder;
 
-        wonmessagebuilder.CreateMessageBuilder = function CreateMessageBuilder(dataset) {
-            this.data = wonmessagebuilder.clone(dataset);
+        won.CreateMessageBuilder = function CreateMessageBuilder(dataset) {
+            this.data = won.clone(dataset);
             this.socket;
         };
 
-        wonmessagebuilder.CreateMessageBuilder.prototype = {
-            constructor: wonmessagebuilder.CreateMessageBuilder,
+        won.CreateMessageBuilder.prototype = {
+            constructor: won.CreateMessageBuilder,
 
             addMessageGraph: function () {
                 this.data['@graph'][1] =
@@ -344,12 +332,12 @@
                 this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] +"/event/"+eventId+"#data";
                 return this;
             },
-            sender: function(){
-                this.getMessageEventNode()["msg:sender"]={"@id":this.data["@context"]["@base"]};
+            hasSenderNeed: function(){
+                this.getMessageEventNode()["msg:senderNeed"]={"@id":this.data["@context"]["@base"]};
                 return this;
             },
-            receiver: function(receiverURI){
-                this.getMessageEventNode()["msg:receiver"]={"@id":receiverURI};
+            hasReceiverNode: function(receiverURI){
+                this.getMessageEventNode()["msg:receiverNode"]={"@id":receiverURI};
                 return this;
             },
             getDefaultGraphNode: function () {
@@ -366,7 +354,7 @@
                 return this.data;
             }
         }
-        return wonmessagebuilder;
+        return won;
     };
     var factory = function() {
         return wrapper(function() {
@@ -377,10 +365,10 @@
     wrapper(factory);
    if(_browser) {
         // export simple browser API
-        if(typeof wonmessagebuilder === 'undefined') {
-            wonmessagebuilder = wonmessagebuilderjs = factory;
+        if(typeof won === 'undefined') {
+            won = wonjs = factory;
         } else {
-            wonmessagebuilder = factory;
+            won = factory;
         }
     }
 })();

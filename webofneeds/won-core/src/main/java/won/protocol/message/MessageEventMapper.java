@@ -160,7 +160,10 @@ public class MessageEventMapper implements ModelMapper<MessageEvent>
       }
       msgEvent.setMessageType(type);
       msgEvent.setMessageURI(URI.create(eventRes.getURI()));
-      msgEvent.setResponseState(URI.create(responseState.getURI()));
+      if(responseState!=null){
+        msgEvent.setResponseState(URI.create(responseState.getURI()));
+
+      }
 
       stmtIterator = model.listStatements(eventRes, null, RdfUtils.EMPTY_RDF_NODE);
       while (stmtIterator.hasNext()) {

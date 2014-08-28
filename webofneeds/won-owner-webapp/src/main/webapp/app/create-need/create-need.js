@@ -174,8 +174,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
       // ld = new window.NeedBuilder().needURI("http://needURI").hasBasicNeedType("won:Demand").title('test').build();
         needRandomId = utilService.getRandomInt(1,9223372036854775807);
         needURI = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId;
-        needJson = new window.wonmessagebuilder.NeedBuilder()
+        needJson = new window.won.NeedBuilder()
             .title("testneed")
+            .setContext()
             .demand()
             .needURI(needURI)
             .ownerFacet()
@@ -188,16 +189,13 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             .supply()
             .build();
 
-        messageJson = new window.wonmessagebuilder.CreateMessageBuilder(needJson)
+        messageJson = new window.won.CreateMessageBuilder(needJson)
             .addMessageGraph()
             .eventURI("34543242134")
-            .sender()
-            .receiver("http://localhost:8080/won")
+            .hasSenderNeed()
+            .hasReceiverNode("http://localhost:8080/won")
             .build();
 
-//expanded = window.jsonld.expand(messageJson,null,null);
-
-//console.log("expanded: "+expanded);
 
         sender = messageService.sendMessage(messageJson);
        // messageFactory.generateCreateNeedMessage($scope.need);
