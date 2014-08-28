@@ -15,25 +15,25 @@
  */
 
 angular.module('won.owner').controller('SearchCtrl', function ($scope, $location, mapService) {
-	$scope.results = [
-		{id:1},
-		{id:2},
-		{id:3}
-	];
+    $scope.results = [
+        {id:1},
+        {id:2},
+        {id:3}
+    ];
 
-	//TODO LOGIC
-	$scope.searching = {type:'others offer', title:'Frilly pink cat unicorn'};
+    //TODO LOGIC
+    $scope.searching = {type:'others offer', title:'Frilly pink cat unicorn'};
 
-	$scope.createNewPost = function () {
-		//TODO put title from search
-		$location.path('/create-need/1//' + $scope.searching.title);
-	}
+    $scope.createNewPost = function () {
+        //TODO put title from search
+        $location.path('/create-need/1//' + $scope.searching.title);
+    }
 });
 
 angular.module('won.owner').directive('wonPostDetail', function factory(userService) {
-	return {
-		restrict:'AE',
-		templateUrl:"app/post-detail/post-detail.html",
-		scope:{}
-	}
+    return {
+        restrict:'AE',
+        templateUrl:"app/post-detail/post-detail.html",
+        scope:{}
+    }
 });
