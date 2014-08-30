@@ -444,3 +444,7 @@ table th.resizing {
 .underline {
     text-decoration: underline;
 }
+
+.text-justify {
+    text-align: justify;
+}
