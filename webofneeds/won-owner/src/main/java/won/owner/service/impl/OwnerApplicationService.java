@@ -290,8 +290,10 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       WonMessage wonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.HINT_MESSAGE)
         .setMessageURI(messageURI)
-        .setSenderURI(match.getOriginator())
-        .setReceiverURI(match.getToNeed())
+        .setSenderNodeURI(match.getOriginator())
+        .setReceiverURI(match.getToNeed()) // ToDo (FS): is this the need facet?
+        .setReceiverNeedURI(match.getToNeed())
+        .setReceiverNodeURI(new URI("www.coming-soon.org")) // ToDo (FS): add local WON node
         .addContent(contentURI, content, null)
         .build();
 
@@ -321,7 +323,12 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       WonMessage wonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.CONNECT)
         .setMessageURI(messageURI)
-        .setReceiverURI(con.getNeedURI())
+        .setReceiverURI(con.getNeedURI()) // ToDo (FS): this should be the facet
+        .setReceiverNeedURI(con.getNeedURI())
+        .setReceiverNodeURI(new URI("www.coming-soon.org")) // ToDo (FS): replace with local WON node
+        .setSenderURI(con.getRemoteConnectionURI())
+        .setSenderNeedURI(con.getRemoteNeedURI())
+        .setSenderNodeURI(new URI("www.coming-soon.org")) // ToDo (FS): replace with remote WON node
         .addContent(contentURI, content, null)
         .build();
 
@@ -351,6 +358,11 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .setWonMessageType(WonMessageType.OPEN)
         .setMessageURI(messageURI)
         .setReceiverURI(con.getConnectionURI())
+        .setReceiverNeedURI(con.getNeedURI())
+        .setReceiverNodeURI(new URI("www.coming-soon.org")) // ToDo (FS): replace by remote WON node
+        .setSenderURI(con.getRemoteConnectionURI())
+        .setSenderNeedURI(con.getRemoteNeedURI())
+        .setSenderNodeURI(new URI("www.coming-soon.org")) // ToDo (FS): replace by local WON node
         .addContent(contentURI, content, null)
         .build();
 
@@ -380,6 +392,11 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .setWonMessageType(WonMessageType.CLOSE)
         .setMessageURI(messageURI)
         .setReceiverURI(con.getConnectionURI())
+        .setReceiverNeedURI(con.getNeedURI())
+        .setReceiverNodeURI(new URI("www.coming-soon.org")) // ToDo (FS): replace by remote WON node
+        .setSenderURI(con.getRemoteConnectionURI())
+        .setSenderNeedURI(con.getRemoteNeedURI())
+        .setSenderNodeURI(new URI("www.coming-soon.org")) // ToDo (FS): replace by local WON node
         .addContent(contentURI, content, null)
         .build();
 
@@ -411,6 +428,11 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .setWonMessageType(WonMessageType.CONNECTION_MESSAGE)
         .setMessageURI(messageURI)
         .setReceiverURI(con.getConnectionURI())
+        .setReceiverNeedURI(con.getNeedURI())
+        .setReceiverNodeURI(new URI("www.coming-soon.org")) // ToDo (FS): replace by remote WON node
+        .setSenderURI(con.getRemoteConnectionURI())
+        .setSenderNeedURI(con.getRemoteNeedURI())
+        .setSenderNodeURI(new URI("www.coming-soon.org")) // ToDo (FS): replace by local WON node
         .addContent(contentURI, content, null)
         .build();
 
