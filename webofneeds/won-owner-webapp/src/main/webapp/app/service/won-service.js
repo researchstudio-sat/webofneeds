@@ -21,7 +21,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q) 
 
     wonService = {};
     /**
-     * Creates a need and returns the URI of the newly created need (which may differ from the one
+     * Creates a need and returns a Promise to the URI of the newly created need (which may differ from the one
      * specified in the need object here.
      * @param needAsJsonLd
      * @returns {*}
