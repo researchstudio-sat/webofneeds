@@ -17,29 +17,57 @@
 /**
  * Created by syim on 08.08.2014.
  */
-angular.module('won.owner').factory('wonService', function (messageService) {
+angular.module('won.owner').factory('wonService', function (messageService, $q) {
 
-    function createNeeed(needAsJsonLd) {
-        var message = new window.wonmessagebuilder.CreateMessageBuilder(needAsJsonLd).build();
-        var messageURI = messageService.utils.getMessageURI(message);
+    wonService = {};
+    /**
+     * Creates a need and returns the URI of the newly created need (which may differ from the one
+     * specified in the need object here.
+     * @param needAsJsonLd
+     * @returns {*}
+     */
+    wonService.createNeed = function(needAsJsonLd) {
+        var deferred = $q.defer();
+        var message = new won.CreateMessageBuilder(needAsJsonLd)
+            .addMessageGraph()
+            .eventURI("34543242134")//TODO: generate event URI here
+            .hasSenderNeed()
+            .hasReceiverNode("http://localhost:8080/won")//TODO: pass node to function
+            .build();
+        //TODO: obtain message URI so we can wait for a dedicated response
+        //var messageURI = messageService.utils.getMessageURI(message);
         var callback = new messageService.MessageCallback(
-            function(msg){
-                this.done = true;
-            },
-            function(msg){
+            function (msg) {
                 //check if the message we got (the create need response message) indicates that all went well
-                return true;
-                    //WON.CreateResponse.equals(messageService.utils.getMessageType(msg)) &&
-                    //messageService.utils.getRefersToURIs(msg).contains(messageURI)
-            },
-            function(msg){
-                return this.done;
+                console.log("got create need message response!");
+                //TODO: if negative, use alternative need URI and send again
+                //TODO: if positive, propagate positive response back to caller
+                //TODO: fetch need data and store in local RDF store
+                this.done = true;
+                //WON.CreateResponse.equals(messageService.utils.getMessageType(msg)) &&
+                //messageService.utils.getRefersToURIs(msg).contains(messageURI)
+
+                //assume we can obtain a need URI and return it
+                var needURI = "sadf"; //TODO: get needURI from result
+                deferred.resolve(needURI);
             });
         callback.done = false;
+        callback.shouldHandleTest = function (msg) {
+            return true;
+        };
+        callback.shouldUnregisterTest = function(msg) {
+            return this.done;
+        };
 
-        messageService.sendMessage(message);
+        messageService.addMessageCallback(callback);
+        try {
+            messageService.sendMessage(message);
+        } catch (e) {
+            deferred.reject(e);
+        }
+        return deferred.promise;
     }
 
 
-
+    return wonService;
 });

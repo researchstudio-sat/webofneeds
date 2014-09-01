@@ -43,8 +43,8 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         newsocket.onmessage = function (msg) {
             //first, run callbacks registered inside the service:
             console.log("SockJS message received!")
-            for(callback in callbacks) {
-                callback.handleMessage(msg);
+            for(var i = 0; i < callbacks.length; i++) {
+                callbacks[i].handleMessage(msg);
             }
             console.log("Received data: "+msg);
             $rootScope.$apply(function () {
@@ -120,30 +120,34 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
 
 
     messageService.addMessageCallback = function(callback) {
-        if (callback.prototype != messageService.MessageCallback.prototype) {
-            throw new TypeError("callback must be a messageService.MessageCallback!");
+        if (typeof callback.handleMessage !== 'function') {
+            throw new TypeError("callback must provide function 'handleMessage(object)'");
         }
         callbacks.push(callback);
     }
 
-    messageService.MessageCallback = function(action, shouldUnregisterTest, shouldHandleTest){
-        /**
-         * Callback class for receiving WoN messages via the messaging service.
-         * @param action required. Callback that is called with the message as only parameter.
-         * @param shouldHandleTest optional. Function that gets the message as only parameter and returns a boolean.
-         *  action will only be executed if shouldHandleTest returns true or is omitted.
-         * * @param shouldUnregisterTest optional. Function that gets the message as only parameter and returns a boolean.
-         *  callback will be unregistered if shouldUnregisterTest returns true or is omitted.
-         * @constructor
-         */
+    /**
+     * Callback class for receiving WoN messages via the messaging service. Will be called to handle each
+     * message until the unregister() function is called.
+     *
+     * @param action required. Callback that is called with the message as only parameter.
+     *
+     * Additional callbacks can be set:
+     * shouldHandleTest: . Function that gets the message as only parameter and returns a boolean.
+     *  action will only be executed if shouldHandleTest returns true or is omitted.
+     * shouldUnregisterTest: . Function that gets the message as only parameter and returns a boolean.
+     *  callback will be unregistered if shouldUnregisterTest returns true or is omitted.
+     * @constructor
+     */
+    messageService.MessageCallback = function MessageCallback(action){
         this.action = action;
-        this.shouldHandleTest = shouldHandleTest;
-        this.shouldUnregisterTest = shouldUnregisterTest;
+        this.shouldUnregisterTest = function(msg){ return false; };
+        this.shouldHandleTest = function(msg){ return true; };
     }
 
     messageService.MessageCallback.prototype = {
-        constructor: messageService.WonMessagingCallback,
-        interestedInMessage: function(msg) {
+        constructor: messageService.MessageCallback,
+        shouldHandle: function(msg) {
             var ret = this.shouldHandleTest(msg);
             console.log("interested in message: " + ret)
             return ret;
@@ -158,18 +162,22 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             return ret;
         },
         handleMessage: function(msg) {
-            if (this.interestedInMessage == null || this.interestedInMessage(msg)) {
-                this.action(msg);
+            if (this.shouldHandle(msg)) {
+                this.performAction(msg);
             }
-            if (this.shouldUnregister == null || this.shouldUnregister(msg)){
-                //remove the callback
-                var index = callbacks.indexOf(this);
-                if (index > -1) {
-                    callbacks = callbacks.splice(index, 1);
-                }
+            if (this.shouldUnregister(msg)){
+               this.unregister();
+            }
+        },
+        unregister: function() {
+            console.log("removing message callback: " + this);
+            //remove the callback
+            var index = callbacks.indexOf(this);
+            if (index > -1) {
+                callbacks = callbacks.splice(index, 1);
             }
         }
-    }
+    };
 
     return messageService;
 });
