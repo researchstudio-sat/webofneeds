@@ -81,6 +81,23 @@
                 </table>
             </div>
 
+            <!-- Confirmation dialog for deleting a draft -->
+            <div ng-show="displayConfirmationDialog">
+                <form class="form-horizontal container">
+                    <div class="col-md-5 col-md-offset-4">
+                        <div class="well">
+                            <fieldset>
+                                <legend>Do you really want to delete chosen draft?</legend>
+                                <div class="row col-lg-12">
+                                    <button type="button" ng-click="clickOnNoButton();" class="btn btn-primary col-lg-6">No</button>
+                                    <button type="button" ng-click="clickOnYesButton();" class="btn btn-primary col-lg-6">Yes</button>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
             <!--Drafts-->
             <div id="draftsCollapse" class="well div-table col-lg-12">
                 <div class="div-table-row">
@@ -104,6 +121,7 @@
                             <th st-sort="datetime">
                                 Created on
                             </th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -160,20 +178,4 @@
             </div>
 		</div>
 	</div>
-</div>
-
-<div ng-show="displayConfirmationDialog">
-    <form class="form-horizontal container">
-        <div class="col-md-5 col-md-offset-4">
-            <div class="well">
-                <fieldset>
-                    <legend>Do you really want to delete chosen draft?</legend>
-                    <div class="row col-lg-12">
-                        <button type="button" ng-click="clickOnNoButton();" class="btn btn-primary col-lg-6">No</button>
-                        <button type="button" ng-click="clickOnYesButton();" class="btn btn-primary col-lg-6">Yes</button>
-                    </div>
-                </fieldset>
-            </div>
-        </div>
-    </form>
 </div>

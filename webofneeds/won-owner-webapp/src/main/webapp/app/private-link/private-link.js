@@ -209,6 +209,81 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
             if($scope.chosenMessage.typeText == 'Matches') return true;
         }else return false;
     }
+
+    // Incoming Requests
+    $scope.showConfirmationDialogForDeclineRequest = false;
+
+    $scope.clickOnDeclineForInRequest = function() {
+        console.log('decline clicked');
+        $scope.showConfirmationDialogForDeclineRequest = true;
+    }
+
+    $scope.clickOnAcceptForInRequest = function() {
+        console.log('accept clicked');
+        // TODO add parameter for displaying specific stuff on private-link page
+        console.log('redirect: /private-link');
+        $location.path('/private-link');
+    }
+
+    $scope.clickOnNoForDeclineRequest = function() {
+        console.log('no');
+        $scope.showConfirmationDialogForDeclineRequest = false;
+    }
+
+    $scope.clickOnYesForDeclineRequest = function() {
+        console.log('yes');
+        $scope.showConfirmationDialogForDeclineRequest = false;
+        // TODO add parameter for displaying specific stuff on private-link page
+        console.log('redirect: /private-link');
+        $location.path('/private-link');
+    }
+
+    // Outgoing Requests
+    $scope.showConfirmationDialogForCancelRequest = false;
+
+    $scope.clickOnCancelRequest = function() {
+        console.log('cancel clicked');
+        $scope.showConfirmationDialogForCancelRequest = true;
+    }
+
+    $scope.clickOnNoForCancelRequest = function() {
+        console.log('no');
+        $scope.showConfirmationDialogForCancelRequest = false;
+    }
+
+    $scope.clickOnYesForCancelRequest = function() {
+        console.log('yes');
+        $scope.showConfirmationDialogForCancelRequest = false;
+        // TODO add parameter for displaying specific stuff on private-link page
+        console.log('redirect: /private-link');
+        $location.path('/private-link');
+    }
+
+    // Matches
+    $scope.showConfirmationDialogForRemoveMatch = false;
+
+    $scope.clickOnRemoveMatch = function() {
+        console.log('remove clicked');
+        $scope.showConfirmationDialogForRemoveMatch = true;
+    }
+
+    $scope.clickOnNoForRemoveMatch = function() {
+        console.log('no');
+        $scope.showConfirmationDialogForRemoveMatch = false;
+    }
+
+    $scope.clickOnYesForRemoveMatch = function() {
+        console.log('yes');
+        $scope.showConfirmationDialogForRemoveMatch = false;
+        // TODO add parameter for displaying specific stuff on private-link page
+        console.log('redirect: /private-link');
+        $location.path('/private-link');
+    }
+
+    $scope.clickOnRequestConversation = function() {
+        // TODO display textfield
+        console.log('request conversation');
+    }
 });
 
 angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService, $rootScope) {
