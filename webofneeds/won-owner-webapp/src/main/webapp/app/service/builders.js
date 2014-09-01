@@ -301,11 +301,7 @@
                 this.data['@graph'][1] =
                 {
                     "@id": "urn:x-arq:DefaultGraphNode",
-                    "@graph": [
-                        {
-                            "@id": "_:b0"
-                        }
-                    ]
+                    "@graph": []
                 };
                 this.data['@graph'][2] = {
                     "@graph": [
@@ -326,11 +322,11 @@
                 return this;
             },
             eventURI: function (eventId) {
-                this.getContext()["msg:containsMessage"]= {
-                    "@id": "http://purl.org/webofneeds/message#containsMessage",
+                this.getContext()["msg:EnvelopeGraph"]= {
+                    "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
                     "@type": "@id"
                 },
-                this.getDefaultGraphNode()['msg:containsMessage'] = { "@id": this.data["@context"]["@base"] + "/event/" + eventId + "#data" };  //TODO: abstract class
+                this.getDefaultGraphNode().push({"@id":this.data["@context"]["@base"] + "/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
                 this.getMessageEventNode()['@id'] =this.data["@context"]["@base"] +"/event/"+eventId;
                 this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] +"/event/"+eventId+"#data";
                 return this;
@@ -339,15 +335,15 @@
                 return this.data["@context"];
             },
             hasSenderNeed: function(){
-                this.getMessageEventNode()["msg:senderNeed"]={"@id":this.data["@context"]["@base"]};
+                this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":this.data["@context"]["@base"]};
                 return this;
             },
             hasReceiverNode: function(receiverURI){
-                this.getMessageEventNode()["msg:receiverNode"]={"@id":receiverURI};
+                this.getMessageEventNode()["msg:hasReceiverNode"]={"@id":receiverURI};
                 return this;
             },
             getDefaultGraphNode: function () {
-                return this.data["@graph"][1]["@graph"][0];
+                return this.data["@graph"][1]["@graph"];
             },
             getMessageEventGraph: function (){
                 return this.data["@graph"][2];

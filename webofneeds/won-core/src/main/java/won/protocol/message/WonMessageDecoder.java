@@ -2,10 +2,8 @@ package won.protocol.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import won.protocol.util.RdfUtils;
@@ -43,14 +41,11 @@ public class WonMessageDecoder
     Model defaultModel = message.getDefaultModel();
     //Model messageMeta = ModelFactory.createDefaultModel();
     String msgEventURI = null;
-    StmtIterator stmtIterator = defaultModel.listStatements();
-    while (stmtIterator.hasNext()) {
-      Statement stmt = stmtIterator.nextStatement();
-      if (isMessageEventPointer(stmt)) {
-        msgEventURI = stmt.getObject().asResource().getURI().toString();
-        break;
-      }
-    }
+    ResIterator resIterator = defaultModel.listResourcesWithProperty(RDF.type, WONMSG.ENVELOPE_GRAPH);
+    if (!resIterator.hasNext()) throw new IllegalArgumentException("no envelope graph found!");
+    Resource res = resIterator.nextResource();
+    msgEventURI = res.getURI().toString();
+    if (resIterator.hasNext()) throw  new IllegalArgumentException("more than one envelope graph URIs found!");
 
     MessageEventMapper mapper = new MessageEventMapper();
     MessageEvent msgEvent = mapper.fromModel(message.getNamedModel(msgEventURI));
@@ -79,11 +74,4 @@ public class WonMessageDecoder
     return modelNames;
   }
 
-  private static boolean isMessageEventPointer(final Statement stmt) {
-    Property prop = stmt.getPredicate();
-    if (prop.equals(WONMSG.MESSAGE_POINTER_PROPERTY)) {
-      return true;
-    }
-    return false;
-  }
 }

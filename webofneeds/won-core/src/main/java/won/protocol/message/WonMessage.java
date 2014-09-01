@@ -5,6 +5,7 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.util.RdfUtils;
@@ -48,11 +49,10 @@ public class WonMessage implements Serializable
   }
 
   private void initMessageMetadata() {
-    Model messageMetadata = ModelFactory.createDefaultModel();
-    messageMetadata.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.BASE_URI);
-    Resource msgBnode = messageMetadata.createResource();
-    Resource messageEventResource = messageMetadata.createResource(messageEvent.getMessageURI().toString());
-    msgBnode.addProperty(WONMSG.MESSAGE_POINTER_PROPERTY, messageEventResource);
+    Model defaultModel = ModelFactory.createDefaultModel();
+    defaultModel.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.BASE_URI);
+    Resource messageEventResource = defaultModel.createResource(messageEvent.getMessageURI().toString());
+    defaultModel.createStatement(messageEventResource, RDF.type, WONMSG.ENVELOPE_GRAPH);
     //TODO own message event signature
   }
 

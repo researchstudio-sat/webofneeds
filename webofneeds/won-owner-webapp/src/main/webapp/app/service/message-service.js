@@ -17,49 +17,159 @@
 /**
  * Created by syim on 08.08.2014.
  */
-angular.module('won.owner').factory('messageService', function ($http, $q) {
+angular.module('won.owner').factory('messageService', function ($http, $q, $rootScope) {
+    //the service object we're constructing here
     var messageService = {};
-    // Keep all pending requests here until they get responses
-    var callbacks ={};
-    //Create a unique callback ID to map requests to responses
-    var currentCallbackId = 0;
-    var options = {debug: true};
-    var url = 'http://localhost:8080/owner/msg';
-    var socket = new SockJS(url, null, options);
-  /*  var sendMessage = function () {
 
-        var message = document.getElementById("messageText").value;
+    //currently registered callbacks
+    var callbacks = [];
 
-        socket.send(message);
-    };         */
-    socket.onopen = function () {
-        console.log("connection has been established!")
+    //array holding messages waiting to be sent. The sendMessage function never
+    //blocks, but when the socket isn't connected, the service will try to connect
+    //and send the message later.
+    var pendingOutMessages = [];
+
+    attachListenersToSocket = function(newsocket){
+        newsocket.onopen = function () {
+            console.log("SockJS connection has been established!")
+            var i = 0;
+            while (pendingOutMessages.length > 0){
+                var msg = pendingOutMessages.pop();
+                console.log("sending pending message no " + (++i));
+                socket.send(msg);
+            }
+        }
+
+        newsocket.onmessage = function (msg) {
+            //first, run callbacks registered inside the service:
+            console.log("SockJS message received!")
+            for(callback in callbacks) {
+                callback.handleMessage(msg);
+            }
+            console.log("Received data: "+msg);
+            $rootScope.$apply(function () {
+                $rootScope.$broadcast("WonMessageReceived", msg);
+            });
+        };
+
+        newsocket.onclose = function () {
+            console.log("SockJS connection closed");
+        };
     }
 
-    socket.onmessage = function (event) {
-        console.log("Received data: "+event.data);
+    isConnected = function(){
+        return socket != null && socket.readyState == SockJS.OPEN ;
+    }
 
-    };
+    isConnecting = function(){
+        return socket != null && socket.readyState == SockJS.CONNECTING;
+    }
 
-    socket.onclose = function () {
-        console.log("Lost connection")
-    };
+    isConnectedOrConnecting = function(){
+        return socket != null && (socket.readyState == SockJS.OPEN || socket.readyState == SockJS.CONNECTING) ;
+    }
+
+    isClosingOrClosed= function(){
+        return socket != null && (socket.readyState == SockJS.CLOSED || socket.readyState == SockJS.CLOSING) ;
+    }
+
+    isConnecting = function(){
+        return socket != null && socket.readyState == SockJS.CONNECTING;
+    }
+
+    createSocket = function() {
+        var options = {debug: true};
+        var url = 'http://localhost:8080/owner/msg'; //TODO: get socket URI from server through JSP
+        socket = new SockJS(url, null, options);
+        attachListenersToSocket(socket);
+    }
+
+    getSocket = function(){
+        if (isConnectedOrConnecting()) {
+            return socket;
+        }
+        return createSocket();
+    }
+
+    enqueueMessage = function(msg) {
+        if (isConnected()) {
+            //just to be sure, test if the connection is established now and send instead of enqueue
+            socket.send(msg);
+        } else {
+            pendingOutMessages.push(msg);
+        }
+    }
+
+    var socket = getSocket();
 
     messageService.closeConnection = function () {
-        socket.close;
+        if (socket != null && ! isClosingOrClosed()) {
+            socket.close();
+        }
     }
 
-    messageService.sendMessage = function(dataset){
-
-      /*  var message = {
-            method:methodName,
-            body: messageBody
+    messageService.sendMessage = function(msg) {
+        var jsonMsg = JSON.stringify(msg);
+        if (isConnected()) {
+            getSocket().send(jsonMsg);
+        } else {
+            createSocket();
+            enqueueMessage(jsonMsg);
         }
-        if(socket==null||socket.readyState==3){
-            socket.connect();
-        }             */
-        socket.send(JSON.stringify(dataset));
-
     };
+
+
+    messageService.addMessageCallback = function(callback) {
+        if (callback.prototype != messageService.MessageCallback.prototype) {
+            throw new TypeError("callback must be a messageService.MessageCallback!");
+        }
+        callbacks.push(callback);
+    }
+
+    messageService.MessageCallback = function(action, shouldUnregisterTest, shouldHandleTest){
+        /**
+         * Callback class for receiving WoN messages via the messaging service.
+         * @param action required. Callback that is called with the message as only parameter.
+         * @param shouldHandleTest optional. Function that gets the message as only parameter and returns a boolean.
+         *  action will only be executed if shouldHandleTest returns true or is omitted.
+         * * @param shouldUnregisterTest optional. Function that gets the message as only parameter and returns a boolean.
+         *  callback will be unregistered if shouldUnregisterTest returns true or is omitted.
+         * @constructor
+         */
+        this.action = action;
+        this.shouldHandleTest = shouldHandleTest;
+        this.shouldUnregisterTest = shouldUnregisterTest;
+    }
+
+    messageService.MessageCallback.prototype = {
+        constructor: messageService.WonMessagingCallback,
+        interestedInMessage: function(msg) {
+            var ret = this.shouldHandleTest(msg);
+            console.log("interested in message: " + ret)
+            return ret;
+        },
+        performAction: function(msg) {
+            console.log("performing action for message " + JSON.stringify(msg));
+            this.action(msg);
+        },
+        shouldUnregister: function(msg) {
+            var ret = this.shouldUnregisterTest(msg);
+            console.log("should unregister: " + ret);
+            return ret;
+        },
+        handleMessage: function(msg) {
+            if (this.interestedInMessage == null || this.interestedInMessage(msg)) {
+                this.action(msg);
+            }
+            if (this.shouldUnregister == null || this.shouldUnregister(msg)){
+                //remove the callback
+                var index = callbacks.indexOf(this);
+                if (index > -1) {
+                    callbacks = callbacks.splice(index, 1);
+                }
+            }
+        }
+    }
+
     return messageService;
 });

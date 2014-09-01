@@ -5,6 +5,7 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import won.protocol.util.RdfUtils;
@@ -38,16 +39,15 @@ public class WonMessageEncoder
     messageMetadata.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.BASE_URI);
 
     // add pointer to the message event
-    Resource msgBnode = messageMetadata.createResource();
-    Resource messageEventResource = messageMetadata.createResource(
-      wonMessage.getMessageEvent().getMessageURI().toString() + WonRdfUtils.NAMED_GRAPH_SUFFIX);
-    msgBnode.addProperty(WONMSG.MESSAGE_POINTER_PROPERTY, messageEventResource);
+    Resource envelopeGraphResource = messageMetadata.createResource(
+      wonMessage.getMessageEvent().getMessageURI().toString()+ WonRdfUtils.NAMED_GRAPH_SUFFIX);
+    envelopeGraphResource.addProperty(RDF.type, WONMSG.ENVELOPE_GRAPH);
     //TODO own message event signature
 
     // add event of the message
     MessageEventMapper mapper = new MessageEventMapper();
     Model eventModel = mapper.toModel(wonMessage.getMessageEvent());
-    dataset.addNamedModel(messageEventResource.getURI().toString(), eventModel);
+    dataset.addNamedModel(envelopeGraphResource.getURI().toString(), eventModel);
 
     // add other content of the message
     // TODO create clone instead?

@@ -49,13 +49,13 @@ public class WonMessageBuilder
 
     // message URI
     Resource messageEventResource = messageEvent.createResource(
-      WONMSG.getGraphURI(messageURI.toString()), wonMessageType.getResource());
+      messageURI.toString(), wonMessageType.getResource());
 
     // ToDo (FS): also add the signatures
     for (URI contentURI : contentMap.keySet()) {
       messageEventResource.addProperty(
         WONMSG.HAS_CONTENT_PROPERTY,
-        messageEvent.createResource(WONMSG.getGraphURI(contentURI.toString())));
+        messageEvent.createResource(contentURI.toString()));
     }
 
     // add sender
@@ -90,7 +90,7 @@ public class WonMessageBuilder
     for (URI refersToURI : refersToURIs) {
       messageEventResource.addProperty(
         WONMSG.REFERS_TO_PROPERTY,
-        messageEvent.createResource(WONMSG.getGraphURI(refersToURI.toString())));
+        messageEvent.createResource(refersToURI.toString()));
     }
 
     // add responseMessageState
@@ -107,13 +107,10 @@ public class WonMessageBuilder
     }
 
 
-    // create the default model
+    // create the default model, containing a triple that denotes the message graph as
+    // envelope graph
     Model defaultModel = ModelFactory.createDefaultModel();
-    Resource defaultResource = defaultModel.createResource();
-    defaultResource.addProperty(
-      WONMSG.MESSAGE_POINTER_PROPERTY,
-      messageEventResource);
-
+    defaultModel.createResource(WONMSG.getGraphURI(messageURI.toString()), WONMSG.ENVELOPE_GRAPH);
 
     // create the graphs
     Dataset wonMessageDataSet = DatasetFactory.create(defaultModel);
@@ -121,9 +118,10 @@ public class WonMessageBuilder
 
     for (URI contentURI : contentMap.keySet()) {
       wonMessageDataSet.addNamedModel(
-        WONMSG.getGraphURI(contentURI.toString()),
+        contentURI.toString(),
         contentMap.get(contentURI));
     }
+    wonMessageDataSet.setDefaultModel(defaultModel);
 
     // ToDo (FS): add signature of the whole message
 

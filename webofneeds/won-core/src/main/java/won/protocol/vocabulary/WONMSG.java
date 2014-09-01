@@ -68,14 +68,14 @@ public class WONMSG
   //public static final String MESSAGE_TYPE_CONNECT_RESOURCE = BASE_URI + "ConnectMessage";
   //public static final String MESSAGE_TYPE_NEED_STATE_RESOURCE = BASE_URI + "NeedStateMessage";
 
-  public static final Property MESSAGE_POINTER_PROPERTY = m.createProperty(BASE_URI, "containsMessage");
+  public static final Resource ENVELOPE_GRAPH = m.createResource(BASE_URI+ "EnvelopeGraph");
 
-  public static final Property RECEIVER_PROPERTY = m.createProperty(BASE_URI, "receiver");
-  public static final Property RECEIVER_NEED_PROPERTY = m.createProperty(BASE_URI, "receiverNeed");
-  public static final Property RECEIVER_NODE_PROPERTY = m.createProperty(BASE_URI, "receiverNode");
-  public static final Property SENDER_PROPERTY = m.createProperty(BASE_URI, "sender");
-  public static final Property SENDER_NEED_PROPERTY = m.createProperty(BASE_URI, "senderNeed");
-  public static final Property SENDER_NODE_PROPERTY = m.createProperty(BASE_URI, "senderNode");
+  public static final Property RECEIVER_PROPERTY = m.createProperty(BASE_URI, "hasReceiver");
+  public static final Property RECEIVER_NEED_PROPERTY = m.createProperty(BASE_URI, "hasReceiverNeed");
+  public static final Property RECEIVER_NODE_PROPERTY = m.createProperty(BASE_URI, "hasReceiverNode");
+  public static final Property SENDER_PROPERTY = m.createProperty(BASE_URI, "hasSender");
+  public static final Property SENDER_NEED_PROPERTY = m.createProperty(BASE_URI, "hasSenderNeed");
+  public static final Property SENDER_NODE_PROPERTY = m.createProperty(BASE_URI, "hasSenderNode");
 
   public static final Property HAS_CONTENT_PROPERTY = m.createProperty(BASE_URI, "hasContent");
   public static final Property REFERS_TO_PROPERTY = m.createProperty(BASE_URI, "refersTo");
