@@ -156,7 +156,7 @@
 						<li class="dropdown-submenu">
 							<a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
 							<ul class="dropdown-menu" ng-controller="PostBoxCtrl">
-								<li ng-repeat="draft in recent4drafts"><a href="#/create-need/1"><i class="fa fa-file-o fa-lg">
+								<li ng-repeat="draft in drafts | orderBy: '-datetime' | limitTo: recordsToDisplay"><a href="#/create-need/1"><i class="fa fa-file-o fa-lg">
 									&nbsp;{{draft.title}}</i></a></li>
 								<li class="divider"></li>
 								<li><a href="#/postbox"><i class="fa fa-list fa-lg"></i>&nbsp;II Others (go to full list)</a></li>
@@ -190,7 +190,7 @@
 						<!-- TODO provide here the total number of messages -->
 						<i class="fa fa-comment-o fa-lg"></i>&nbsp;{{21}}
 					</a>
-					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 250px;">
+					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
 						<li class="text-center grey-item">{{21}}&nbsp;new messages</li>
 						<!-- TODO put real parameters into url -->
 						<li ng-repeat="conv in conversations"><a href="#/private-link"><img src="{{getTypePicURI(conv.type)}}"/>&nbsp;{{conv.title}}&nbsp;<span
@@ -204,7 +204,7 @@
 						<!-- TODO provide here the total number of messages -->
 						<i class="fa fa-male fa-lg"></i>&nbsp;{{11}}
 					</a>
-					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 250px;">
+					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
 						<li class="text-center grey-item">{{11}}&nbsp;new messages</li>
 						<!-- TODO put real parameters into url -->
 						<li ng-repeat="req in requests"><a href="#/private-link"><img
@@ -219,7 +219,7 @@
 						<!-- TODO provide here the total number of messages -->
 						<i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{5}}
 					</a>
-					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 250px;">
+					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
 						<li class="text-center grey-item">{{5}}&nbsp;new messages</li>
 						<!-- TODO put real parameters into url -->
 						<li ng-repeat="match in matches"><a href="#/private-link"><img

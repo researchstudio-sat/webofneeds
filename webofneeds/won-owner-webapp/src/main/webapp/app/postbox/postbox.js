@@ -31,6 +31,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
 		date:''
 	};
 
+    $scope.recordsToDisplay = 4;
     $scope.displayConfirmationDialog = false;
     var indexOfChosenDraft;
 	$scope.search = '';
@@ -97,14 +98,6 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
         {type:'Change', title:'Let\'s clean ...', datetime: new Date('2014-05-01')},
         {type:'Offer', title:'Friendly Bicycle ...', datetime: new Date('2014-07-10')},
         {type:'Offer', title:'Old children\'s clothes ..', datetime: new Date('2013-09-09')}
-    ];
-
-    // TODO call backend method here
-    $scope.recent4drafts = [
-        {type:'Together', title:'Car sharing to Prague', datetime: new Date('2014-08-22')},
-        {type:'Want', title:'Moved recently ...', datetime: new Date('2014-08-25')},
-        {type:'Change', title:'Let\'s clean ...', datetime: new Date('2014-07-15')},
-        {type:'Offer', title:'Friendly Bicycle ...', datetime: new Date('2014-04-14')}
     ];
 
     // TODO call backend method here
