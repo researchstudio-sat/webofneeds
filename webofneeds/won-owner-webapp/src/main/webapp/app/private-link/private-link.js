@@ -157,21 +157,12 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         // should not get here
     }
 
+    $scope.rateValue = 0;
     $scope.initRater = function() {
         $("#rater").rating({
             starCaptions: function(val) {
-                if (val < 3) {
-                    return val;
-                } else {
-                    return 'high';
-                }
-            },
-            starCaptionClasses: function(val) {
-                if (val < 3) {
-                    return 'label label-danger';
-                } else {
-                    return 'label label-success';
-                }
+                $scope.rateValue = val;
+                return val;
             }
         });
     }
@@ -259,6 +250,31 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         $location.path('/private-link');
     }
 
+    // for editable text box
+    $scope.showEditButtons = false;
+    $scope.showPencil = true;
+    $scope.textAreaContent = '';
+    $scope.changeToEditable = function() {
+        $('#textboxInRequest').removeAttr('disabled');
+        $scope.textAreaContent = $('#textboxInRequest').val();
+        $scope.showEditButtons = true;
+        $scope.showPencil = false;
+    }
+
+    $scope.clickOnCancelWhenEdit = function() {
+        // fill text area with previous content
+        $('#textboxInRequest').val($scope.textAreaContent).attr('disabled', '');
+        $scope.showEditButtons = false;
+        $scope.showPencil = true;
+    }
+
+    $scope.clickOnFinishedWhenEdit = function() {
+        // TODO send a new request
+        console.log('send a new request');
+        $('#textboxInRequest').attr('disabled', '');
+        $scope.showEditButtons = false;
+    }
+
     // Matches
     $scope.showConfirmationDialogForRemoveMatch = false;
 
@@ -280,9 +296,24 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         $location.path('/private-link');
     }
 
+    $scope.showWarningForRating = false;
+    $scope.showMatchControl = false;
     $scope.clickOnRequestConversation = function() {
-        // TODO display textfield
         console.log('request conversation');
+        if ($scope.rateValue > 0) {
+            $scope.showMatchControl = true;
+            $scope.showWarningForRating = false;
+        } else {
+            $scope.showWarningForRating = true;
+        }
+    }
+
+    $scope.clickOnSendRequestMessage = function() {
+        console.log('send request message');
+        $scope.showMatchControl = false;
+        // TODO add parameter for displaying specific stuff on private-link page
+        console.log('redirect: /private-link');
+        $location.path('/private-link');
     }
 });
 

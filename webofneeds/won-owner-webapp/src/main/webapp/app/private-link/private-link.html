@@ -261,13 +261,15 @@
                                     <h4 class="pull-left">Waiting for reply from&nbsp;<a href="#/post-detail" class="underline">{{chosenMessage.title}}</a></h4>
                                 </div>
 
-                                <!-- TODO make it editable -->
                                 <div class="row col-lg-12">
-                                    <p class="text-justify">
-                                        Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
-                                        Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
-                                        pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
-                                    </p>
+                                    <a id="pencil" href="" ng-click="changeToEditable()" ng-show="showPencil"><i class="fa fa-pencil pull-right"></i></a>
+                                    <textarea id="textboxInRequest" class="col-lg-12" style="resize: none;" rows=8 disabled>Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat. Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                    </textarea>
+                                </div>
+
+                                <div id="edit-buttons" class="row col-lg-12" ng-show="showEditButtons">
+                                    <button type="button" class="btn btn-default" ng-click="clickOnCancelWhenEdit()">Cancel</button>
+                                    <button type="button" class="btn btn-default" ng-click="clickOnFinishedWhenEdit()">Finished editing</button>
                                 </div>
 
                                 <div class="row col-lg-12">
@@ -349,9 +351,13 @@
                                 </div>
 
                                 <div class="row col-lg-12">
-                                    <!-- TODO align to left -->
-                                    <input id="rater" ng-init="initRater()" type="number" class="rating" min="0" max="5" step="1" data-size="xs"
-                                           data-symbol="&#xe005;" data-default-caption="{rating}" data-star-captions="{}">
+                                    <div class="pull-left">
+                                        <input id="rater" ng-init="initRater()" type="number" class="rating" min="0" max="5" step="1" data-size="xs"
+                                               data-symbol="&#x2605;">
+                                    </div>
+                                </div>
+                                <div class="row col-lg-12">
+                                    <p class="text-warning pull-left" ng-show="showWarningForRating">Please give rating.</p>
                                 </div>
 
                                 <!-- Confirmation dialog for removing a match -->
@@ -379,6 +385,17 @@
                                     <div class="text-center">
                                         <button class="btn btn-default" ng-click="clickOnRemoveMatch()">Remove</button>
                                         <button class="btn btn-default" ng-click="clickOnRequestConversation()">Request  conversation</button>
+                                    </div>
+                                </div>
+
+                                <div id="matchControl" ng-show="showMatchControl">
+                                    <textarea id="textboxInMatch"
+                                              class="col-lg-12"
+                                              style="resize: none;" rows="8"
+                                              placeholder="Write your message here ..."
+                                              required></textarea>
+                                    <div class="row col-lg-12">
+                                        <button class="btn btn-default pull-right" ng-click="clickOnSendRequestMessage()">Send message</button>
                                     </div>
                                 </div>
 
