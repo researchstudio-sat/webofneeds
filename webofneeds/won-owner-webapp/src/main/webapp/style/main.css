@@ -448,3 +448,8 @@ table th.resizing {
 .text-justify {
     text-align: justify;
 }
+
+.thumbnail-size {
+    width: 150px;
+    height: 150px;"
+}
