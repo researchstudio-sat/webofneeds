@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService, utilService, wonService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService, utilService, messageService, wonService) {
 
 	$scope.uploadOptions = {
 		maxFileSize:5000000,
@@ -201,13 +201,59 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
          sender = messageService.sendMessage(messageJson);
         */
 
+        needRandomId_2 = utilService.getRandomInt(1,9223372036854775807);
+        needURI_2 = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId;
+        needJson_2 = new window.won.NeedBuilder()
+            .title("testneed")
+            .setContext()
+            .demand()
+            .needURI(needURI_2)
+            .ownerFacet()
+            .description("just a test")
+            .hasContentDescription()
+            .hasPriceSpecification("EUR",5.0,10.0)
+            .hasLocationSpecification(10,20)
+            .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
+            .active()
+            .supply()
+            .build();
+        newNeedUriPromise_2 = wonService.createNeed(needJson_2);
 
+        /*messageJson_2 = new window.won.CreateMessageBuilder(needJson_2)
+            .addMessageGraph()
+            .eventURI("34543242134")
+            .hasSenderNeed()
+            .hasReceiverNode("http://localhost:8080/won")
+            .build();
+        sender = messageService.sendMessage(messageJson_2);
+       */
        // messageFactory.generateCreateNeedMessage($scope.need);
+        connectionRandomId = utilService.getRandomInt(1,9223372036854775807);
+        connectionURI = needJson["@context"]["@base"]+$scope.connectionURIPath+"/"+connectionRandomId;
+        connectionJson = new window.won.ConnectionBuilder()
+            .setContext()
+            .connectionURI(connectionURI)
+            .build();
+        //wonService.connect(connectionJson);
+        /*connectMessage = new window.won.ConnectMessageBuilder(connectionJson)
+            .addMessageGraph()
+            .eventURI("2345432343")
+            .hasSenderNeed(needJson_2["@context"]["@base"])
+            .hasSenderNode("http://localhost:8080/won")
+            .hasReceiverNeed(needJson["@context"]["@base"])
+            .hasReceiverNode("http://localhost:8080/won")
+            .sender()
+            .receiver()
+            .build();
+
+        sender = messageService.sendMessage(connectMessage);  */
+        // messageFactory.generateCreateNeedMessage($scope.need);
        // console.log("expandedJson: "+expandedJson);
-        needService.saveDraft($scope.need, $scope.currentStep,userService.getUserName()).then(function(){
+        /*needService.saveDraft($scope.need, $scope.currentStep,userService.getUserName()).then(function(){
            $scope.successShow = true;
 
-        });
+        }
+        );       */
     }
 	$scope.save = function () {
 		needService.save($scope.need).then(function() {

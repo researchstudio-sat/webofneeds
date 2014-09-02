@@ -362,7 +362,10 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("methodName","createNeed");
         headerMap.put("remoteBrokerEndpoint",wonNodeList.get(0).getOwnerProtocolEndpoint());
         headerMap.put("ownerApplicationID",ownerApplicationId);
-        headerMap.put("wonMessage",WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+        if (wonMessage!=null){
+          headerMap.put("wonMessage",WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+
+        }
 
         return messagingService.sendInOutMessageGeneric(null, headerMap,null,startingEndpoint);
     }

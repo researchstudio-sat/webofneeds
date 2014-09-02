@@ -21,30 +21,41 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
     //the service object we're constructing here
     var messageService = {};
 
+    //private data of the service
+    var privateData = {};
+
     //currently registered callbacks
-    var callbacks = [];
+    privateData.callbacks = [];
 
     //array holding messages waiting to be sent. The sendMessage function never
     //blocks, but when the socket isn't connected, the service will try to connect
     //and send the message later.
-    var pendingOutMessages = [];
+    privateData.pendingOutMessages = [];
 
+    enqueueMessage = function(msg) {
+        if (isConnected()) {
+            //just to be sure, test if the connection is established now and send instead of enqueue
+            privateData.socket.send(msg);
+        } else {
+            privateData.pendingOutMessages.push(msg);
+        }
+    }
     attachListenersToSocket = function(newsocket){
         newsocket.onopen = function () {
             console.log("SockJS connection has been established!")
             var i = 0;
-            while (pendingOutMessages.length > 0){
-                var msg = pendingOutMessages.pop();
+            while (privateData.pendingOutMessages.length > 0){
+                var msg = privateData.pendingOutMessages.pop();
                 console.log("sending pending message no " + (++i));
-                socket.send(msg);
+                privateData.socket.send(msg);
             }
         }
 
         newsocket.onmessage = function (msg) {
             //first, run callbacks registered inside the service:
             console.log("SockJS message received!")
-            for(var i = 0; i < callbacks.length; i++) {
-                callbacks[i].handleMessage(msg);
+            for(var i = 0; i < privateData.callbacks.length; i++) {
+                privateData.callbacks[i].handleMessage(msg);
             }
             console.log("Received data: "+msg);
             $rootScope.$apply(function () {
@@ -58,62 +69,48 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
     }
 
     isConnected = function(){
-        return socket != null && socket.readyState == SockJS.OPEN ;
+        return privateData.socket != null && privateData.socket.readyState == SockJS.OPEN ;
     }
 
     isConnecting = function(){
-        return socket != null && socket.readyState == SockJS.CONNECTING;
+        return privateData.socket != null && privateData.socket.readyState == SockJS.CONNECTING;
     }
 
     isConnectedOrConnecting = function(){
-        return socket != null && (socket.readyState == SockJS.OPEN || socket.readyState == SockJS.CONNECTING) ;
+        return privateData.socket != null && (privateData.socket.readyState == SockJS.OPEN || privateData.socket.readyState == SockJS.CONNECTING) ;
     }
 
     isClosingOrClosed= function(){
-        return socket != null && (socket.readyState == SockJS.CLOSED || socket.readyState == SockJS.CLOSING) ;
+        return privateData.socket != null && (privateData.socket.readyState == SockJS.CLOSED || privateData.socket.readyState == SockJS.CLOSING) ;
     }
 
     isConnecting = function(){
-        return socket != null && socket.readyState == SockJS.CONNECTING;
+        return privateData.socket != null && privateData.socket.readyState == SockJS.CONNECTING;
     }
-
     createSocket = function() {
         var options = {debug: true};
         var url = 'http://localhost:8080/owner/msg'; //TODO: get socket URI from server through JSP
-        socket = new SockJS(url, null, options);
+        privateData.socket = new SockJS(url, null, options);
         attachListenersToSocket(socket);
     }
 
-    getSocket = function(){
-        if (isConnectedOrConnecting()) {
-            return socket;
-        }
-        return createSocket();
-    }
 
-    enqueueMessage = function(msg) {
-        if (isConnected()) {
-            //just to be sure, test if the connection is established now and send instead of enqueue
-            socket.send(msg);
-        } else {
-            pendingOutMessages.push(msg);
-        }
-    }
 
-    var socket = getSocket();
 
     messageService.closeConnection = function () {
-        if (socket != null && ! isClosingOrClosed()) {
-            socket.close();
+        if (privateData.socket != null && ! isClosingOrClosed()) {
+            privateData.socket.close();
         }
     }
 
     messageService.sendMessage = function(msg) {
         var jsonMsg = JSON.stringify(msg);
         if (isConnected()) {
-            getSocket().send(jsonMsg);
+            privateData.socket.send(jsonMsg);
         } else {
-            createSocket();
+            if (!isConnecting()) {
+                createSocket();
+            }
             enqueueMessage(jsonMsg);
         }
     };
@@ -123,7 +120,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         if (typeof callback.handleMessage !== 'function') {
             throw new TypeError("callback must provide function 'handleMessage(object)'");
         }
-        callbacks.push(callback);
+        privateData.callbacks.push(callback);
     }
 
     /**
@@ -172,9 +169,9 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         unregister: function() {
             console.log("removing message callback: " + this);
             //remove the callback
-            var index = callbacks.indexOf(this);
+            var index = privateData.callbacks.indexOf(this);
             if (index > -1) {
-                callbacks = callbacks.splice(index, 1);
+                privateData.callbacks = privateData.callbacks.splice(index, 1);
             }
         }
     };

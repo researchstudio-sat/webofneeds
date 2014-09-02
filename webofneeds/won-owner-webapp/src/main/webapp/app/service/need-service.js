@@ -77,7 +77,7 @@ CategorizedNeeds = function() {
 	}
 }
 
-angular.module('won.owner').factory('needService', function ($http, $q, connectionService, messageService) {
+angular.module('won.owner').factory('needService', function ($http, $q, connectionService) {
 
 	var needService = {};
 
@@ -218,7 +218,6 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
                 console.log("FATAL ERROR");
             }
         );   */
-        //messageService.sendMessage("createNeed",needToSave);
     }
 
 	needService.save = function(need) {

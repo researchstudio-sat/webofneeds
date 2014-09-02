@@ -205,6 +205,9 @@
                 this.getContext()["@base"] = needURI;
                 this.getMainNode()["@id"] = needURI;
                 this.data["@graph"][0]["@id"] = needURI + "/core#data";
+                this.getNeedURI = function (){
+                    return this.getContext()["@base"];
+                }
                 return this;
             },
             title: function (title) {
@@ -214,6 +217,7 @@
             /**
              * in order to add price, location, time description hasContentDescription() shall be called first. then use getContentDescriptionNode()
              */
+
             hasContentDescription: function(){
                 this.getContext()["won:hasContentDescription"]={
                     "@id":"http://purl.org/webofneeds/model#hasContentDescription",
@@ -334,8 +338,132 @@
             getContext :  function () {               //TODO inherit from base buiilder
                 return this.data["@context"];
             },
+            hasSenderNeed: function(needURI){
+                this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":this.data["@context"]["@base"]};
+                return this;
+            },
+
+            hasReceiverNode: function(receiverNodeURI){
+                this.getMessageEventNode()["msg:hasReceiverNode"]={"@id":receiverNodeURI};
+                return this;
+            },
+            getDefaultGraphNode: function () {
+                return this.data["@graph"][1]["@graph"];
+            },
+            getMessageEventGraph: function (){
+                return this.data["@graph"][2];
+            },
+            getMessageEventNode: function () {
+                return this.data["@graph"][2]["@graph"][0]
+            },
+            build: function () {
+                console.log("built this message:" + JSON.stringify(this.data));
+                return this.data;
+            }
+        }
+
+        won.ConnectionBuilder = function ConnectionBuilder(data){
+            if (data != null && data != undefined) {
+                this.data = won.clone(data);
+            } else {
+                this.data =
+                {
+                    "@graph": [
+                        {
+                            "@graph": [
+                                {
+                                    "@type": "won:Connection"
+                                }
+                            ]
+                        }
+                    ]
+                };
+            }
+        }
+
+        won.ConnectionBuilder.prototype = {
+            constructor: won.ConnectionBuilder,
+            setContext: function(){
+                this.data["@context"] = won.defaultContext;
+
+                return this;
+            },
+            getContext: function () {               //TODO inherit from base buiilder
+                return this.data["@context"];
+            },
+            getConnectionGraph: function(){
+                return this.data["@graph"][0]["@graph"];
+            },
+            getMainNode: function () {
+                return this.data["@graph"][0]["@graph"][0];
+            },
+            connectionURI: function (connectionURI) {
+                this.getContext()["@base"] = connectionURI;
+                this.getMainNode()["@id"] = connectionURI;
+                this.data["@graph"][0]["@id"] = connectionURI + "/core#data";
+                return this;
+            },
+            build: function () {
+                console.log("built this data:" + JSON.stringify(this.data));
+                return this.data;
+            }
+        }
+
+        won.ConnectMessageBuilder = function ConnectMessageBuilder(dataset){
+            this.data = won.clone(dataset);
+            this.socket;
+
+        };
+
+        won.ConnectMessageBuilder.prototype = {
+            constructor: won.ConnectMessageBuilder,
+
+                addMessageGraph: function () {
+                this.data['@graph'][1] =
+                {
+                    "@id": "urn:x-arq:DefaultGraphNode",
+                    "@graph": []
+                };
+                this.data['@graph'][2] = {
+                    "@graph": [
+                        {
+                            "@type": "msg:ConnectMessage"
+                        }
+                    ]
+                }
+                return this;
+            },
+            eventURI: function (eventId) {      //TODO: inherit from base class
+                this.getContext()["msg:EnvelopeGraph"]= {
+                    "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
+                    "@type": "@id"
+                },
+                    this.getDefaultGraphNode().push({"@id":this.data["@context"]["@base"] + "/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
+                this.getMessageEventNode()['@id'] =this.data["@context"]["@base"] +"/event/"+eventId;
+                this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] +"/event/"+eventId+"#data";
+                return this;
+            },
+            getContext :  function () {               //TODO inherit from base buiilder
+                return this.data["@context"];
+            },
             hasSenderNeed: function(){
                 this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":this.data["@context"]["@base"]};
+                return this;
+            },
+            hasSenderNode: function(senderNodeURI){
+                this.getMessageEventNode()["msg:hasSenderNode"]={"@id":senderNodeURI};
+                return this;
+            },
+            sender: function(){
+                this.getMessageEventNode()["msg:sender"]={"@id":this.getContext()["@base"]};
+                return this;
+            },
+            receiver: function(){
+                this.getMessageEventNode()["msg:receiver"]={"@id":this.getMessageEventNode()["msg:hasReceiverNeed"]+"/facets#owner"};
+                return this;
+            },
+            hasReceiverNeed: function(receiverNeedURI){
+                this.getMessageEventNode()["msg:hasReceiverNeed"]={"@id":receiverNeedURI};
                 return this;
             },
             hasReceiverNode: function(receiverURI){
@@ -355,7 +483,7 @@
                 console.log("built this message:" + JSON.stringify(this.data));
                 return this.data;
             }
-        }
+        };
         return won;
     };
     var factory = function() {
