@@ -17,6 +17,7 @@
 package won.node.messaging;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
@@ -49,14 +50,17 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
     private String connectStartingEndpoint;
     private String openStartingEndpoint;
     private String closeStartingEndpoint;
-    private String textMessageStartingEndpoint;
+    private String sendMessageStartingEndpoint;
 
     @Autowired
     private NeedProtocolCommunicationService protocolCommunicationService;
 
     //TODO: debugging needed. when a established connection is closed then reconnected, both connections are in state "request sent"
   @Override
-  public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws Exception {
+  public ListenableFuture<URI> connect(
+          final URI needUri, final URI otherNeedUri,
+          final URI otherConnectionUri, final Model content,
+          final Dataset messageEvent) throws Exception {
 
 
 
@@ -71,46 +75,54 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       headerMap.put("otherNeedURI", otherNeedUri.toString());
       headerMap.put("otherConnectionURI", otherConnectionUri.toString()) ;
       headerMap.put("content",RdfUtils.toString(content));
+      headerMap.put("messageEvent",RdfUtils.toString(messageEvent));
       headerMap.put("methodName","connect");
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
 
       return messagingService.sendInOutMessageGeneric(null,headerMap,null,connectStartingEndpoint);
   }
 
-    public void open(final Connection connection, final Model content) throws Exception {
+    public void open(final Connection connection, final Model content, final Dataset messageEvent)
+            throws Exception {
         CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),openStartingEndpoint);
         Map headerMap = new HashMap<String, String>();
         headerMap.put("protocol","NeedProtocol");
         headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
         headerMap.put("content", RdfUtils.toString(content));
+        headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
         headerMap.put("methodName","open");
         headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
         messagingService.sendInOnlyMessage(null,headerMap,null, openStartingEndpoint );
     }
 
 
-  public void close(final Connection connection, final Model content) throws Exception {
+  public void close(final Connection connection, final Model content, final Dataset messageEvent)
+          throws Exception {
       CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),closeStartingEndpoint);
       Map headerMap = new HashMap<String, String>();
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
       headerMap.put("content", RdfUtils.toString(content));
+      headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
       headerMap.put("methodName","close");
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
       messagingService.sendInOnlyMessage(null,headerMap,null, closeStartingEndpoint ) ;
   }
 
 
-  public void textMessage(final Connection connection, final Model message) throws Exception {
+  public void sendMessage(final Connection connection, final Model message, final Dataset messageEvent)
+          throws Exception {
       String messageConvert = RdfUtils.toString(message);
-      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),textMessageStartingEndpoint);
+      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),
+                                                                                                  sendMessageStartingEndpoint);
       Map headerMap = new HashMap<String, String>();
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
       headerMap.put("content", messageConvert);
-      headerMap.put("methodName","textMessage");
+      headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
+      headerMap.put("methodName","sendMessage");
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-      messagingService.sendInOnlyMessage(null,headerMap,null, textMessageStartingEndpoint );
+      messagingService.sendInOnlyMessage(null,headerMap,null, sendMessageStartingEndpoint);
   }
 
 
@@ -140,8 +152,8 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
         this.closeStartingEndpoint = closeStartingEndpoint;
     }
 
-    public void setTextMessageStartingEndpoint(String textMessageStartingEndpoint) {
-        this.textMessageStartingEndpoint = textMessageStartingEndpoint;
+    public void setSendMessageStartingEndpoint(String sendMessageStartingEndpoint) {
+        this.sendMessageStartingEndpoint = sendMessageStartingEndpoint;
     }
 
 }

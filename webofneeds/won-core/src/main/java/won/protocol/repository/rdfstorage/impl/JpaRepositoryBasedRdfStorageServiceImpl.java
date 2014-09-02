@@ -61,6 +61,16 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
     return modelHolder == null ? null : modelHolder.getModel();
   }
 
+  @Override
+  public boolean removeContent(final URI resourceURI) {
+    try{
+      modelHolderRepostory.delete(resourceURI);
+    }catch (Exception e){
+      return false;
+    }
+    return true;
+  }
+
   /**
    * Helper method that creates a URI for the specified ConnectionEvent.
    * TODO: replace by more principled approach for generating event URIs. Do they get a publicly dereferencable URI?

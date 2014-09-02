@@ -51,7 +51,7 @@ public class QueueManagementServiceImpl implements QueueManagementService {
     @Override
     public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication) {
 
-        logger.info(ownerApplication.getOwnerApplicationId());
+        logger.debug(ownerApplication.getOwnerApplicationId());
         List<String> queueNames = new ArrayList<>();
         queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol.Out."+ownerApplication.getOwnerApplicationId());
 
@@ -62,8 +62,8 @@ public class QueueManagementServiceImpl implements QueueManagementService {
         queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"close"+".Out."+ownerApplication.getOwnerApplicationId());
         */
         ownerApplication.setQueueNames(queueNames);
-        //logger.info(ownerApplication.getQueueNames().get(0));
-        //logger.info(ownerApplication.getQueueNames().get(1));
+        //logger.debug(ownerApplication.getQueueNames().get(0));
+        //logger.debug(ownerApplication.getQueueNames().get(1));
 
         return ownerApplication.getQueueNames();
     }

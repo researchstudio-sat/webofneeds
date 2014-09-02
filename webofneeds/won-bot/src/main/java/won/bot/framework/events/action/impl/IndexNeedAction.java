@@ -50,7 +50,7 @@ public class IndexNeedAction extends BaseEventBotAction
 
   private void init(){
     try {
-      this.server = new CommonsHttpSolrServer("http://sat001:8080/siren");
+      this.server = new CommonsHttpSolrServer(getEventListenerContext().getSolrServerURI().toString());
     } catch (MalformedURLException e) {
       logger.warn("could not create solr server",e);
     }

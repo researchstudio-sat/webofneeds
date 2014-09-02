@@ -35,8 +35,18 @@ public class MatcherProtocolNeedServiceImplJMSBased// implements MatcherProtocol
   private Logger logger = LoggerFactory.getLogger(this.getClass());
   private MatcherProtocolNeedService delegate;
 
-  public void hint(@Header("needURI")final String needURI,@Header("otherNeedURI") final String  otherNeedURI, @Header("score")final String score, @Header("originator")final String originator, @Header("content") final String content) throws Exception {
-    delegate.hint(URI.create(needURI), URI.create(otherNeedURI), Double.valueOf(score), URI.create(originator), RdfUtils.toModel(content));
+  public void hint(
+          @Header("needURI")final String needURI,
+          @Header("otherNeedURI") final String  otherNeedURI,
+          @Header("score")final String score,
+          @Header("originator")final String originator,
+          @Header("content") final String content,
+          @Header("messageEvent") final String messageEvent)
+        throws Exception {
+
+    delegate.hint(URI.create(needURI), URI.create(otherNeedURI),
+            Double.valueOf(score), URI.create(originator),
+            RdfUtils.toModel(content), RdfUtils.toDataset(messageEvent));
   }
 
     public void setDelegate(MatcherProtocolNeedService delegate) {

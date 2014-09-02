@@ -17,9 +17,11 @@
 package won.matcher.messaging;
 
 import org.apache.activemq.camel.component.ActiveMQComponent;
+import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.matcher.camel.routes.MatcherApplicationListenerRouteBuilder;
+import won.matcher.camel.routes.Matcher2NodeDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.MatcherProtocolCamelConfigurator;
 import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
@@ -65,9 +67,15 @@ public class MatcherProtocolCamelConfiguratorImpl extends NeedBasedCamelConfigur
       try {
         activeMQComponent.start();
       } catch (Exception e) {
-        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        logger.warn("could not start activemq", e);
       }
     }
     brokerComponentMap.put(brokerUri,brokerComponentName);
+  }
+
+  @Override
+  protected RoutesBuilder createRoutesBuilder(final String startingEndpoint, final URI brokerUri) {
+    return new Matcher2NodeDynamicRoutes(getCamelContext(),startingEndpoint);
+
   }
 }

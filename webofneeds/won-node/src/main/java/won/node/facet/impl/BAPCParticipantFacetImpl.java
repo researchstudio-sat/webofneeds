@@ -1,6 +1,7 @@
 package won.node.facet.impl;
 
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,8 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
     }
 
     // Participant -> accept
-    public void openFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void openFromOwner(final Connection con, final Model content, final Dataset messageEvent)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //inform the other side
         if (con.getRemoteConnectionURI() != null) {
             executorService.execute(new Runnable() {
@@ -46,7 +48,7 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
                     try {
                         logger.debug("*** Participant sends open");
 
-                        needFacingConnectionClient.open(con, content);
+                        needFacingConnectionClient.open(con, content, messageEvent);
                         //needFacingConnectionClient.open(con.getRemoteConnectionURI(), content);
 
                         stateManager.setStateForNeedUri(BAPCState.ACTIVE.getURI(), con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI());
@@ -62,7 +64,8 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
     }
 
     // Participant sends message to Coordinator
-    public void textMessageFromOwner(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void sendMessageFromOwner(final Connection con, final Model message, final Dataset messageEvent)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         final URI remoteConnectionURI = con.getRemoteConnectionURI();
 
 
@@ -123,7 +126,7 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
                             r = myContent.createResource(eventType.getURI().toString());
                             baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
 
-                            needFacingConnectionClient.textMessage(con, myContent);
+                            needFacingConnectionClient.sendMessage(con, myContent, messageEvent);
 
                             logger.debug("Participant sent the message.");
                         }
@@ -146,7 +149,8 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
     }
 
     // Participant receives message from Coordinator
-    public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void sendMessageFromNeed(final Connection con, final Model message, final Dataset messageEvent)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //send to the need side
         executorService.execute(new Runnable() {
             @Override
@@ -185,7 +189,7 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
                     logger.debug("New state = coordinator:"+con.getRemoteNeedURI()+ " participant:"+con.getNeedURI()+
                       " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString());
 
-                    ownerFacingConnectionClient.textMessage(con.getConnectionURI(), message);
+                    ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, messageEvent);
 
                     logger.debug("The message is received");
 
@@ -213,7 +217,7 @@ public class BAPCParticipantFacetImpl extends AbstractBAFacet
                             // eventType -> URI Resource
                             Resource r = myContent.createResource(resendEventType.getURI().toString());
                             baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                            needFacingConnectionClient.textMessage(con, myContent);
+                            needFacingConnectionClient.sendMessage(con, myContent, messageEvent);
                         }
                         else
                         {

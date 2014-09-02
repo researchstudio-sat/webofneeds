@@ -1,0 +1,21 @@
+# Root level triples, unnamed graph and named graph
+# Purpose: Testing multiple graphs and named graphs
+
+@prefix eg: <http://www.example.org/#> .
+
+eg:subject1 eg:predicateA eg:object1 .
+eg:subject2 eg:predicateB eg:object2 .
+eg:subject3 eg:predicateC eg:object3 .
+
+{
+	eg:triple eg:isin eg:unnamedgraph .
+}
+
+eg:namedgraph {
+	eg:triple eg:isin eg:namedgraph .
+	eg:subjectA eg:predicateA eg:objectA .
+	eg:subjectB eg:predicateA eg:objectB .
+	eg:subjectC eg:predicateA eg:objectC .
+	eg:subjectD eg:hasBN _:firstBN .
+	_:firstBN eg:type eg:blankNode .
+}

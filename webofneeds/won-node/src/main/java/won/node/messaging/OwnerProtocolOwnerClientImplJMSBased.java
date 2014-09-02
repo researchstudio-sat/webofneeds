@@ -16,6 +16,7 @@
 
 package won.node.messaging;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,10 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
     private ConnectionRepository connectionRepository;
 
     @Override
-  public void hint(final URI ownNeedUri, final URI otherNeedUri, final double score, final URI originatorUri, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
+  public void hint(final URI ownNeedUri, final URI otherNeedUri,
+                   final double score, final URI originatorUri,
+                   final Model content, final Dataset messageEvent)
+            throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
 
       StringWriter sw = new StringWriter();
@@ -72,6 +76,7 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
       headerMap.put("score",String.valueOf(score));
       headerMap.put("originatorUri",originatorUri.toString());
       headerMap.put("content",RdfUtils.toString(content));
+      headerMap.put("messageEvent",RdfUtils.toString(messageEvent));
       headerMap.put("ownerApplications", ownerApplications);
       headerMap.put("protocol","OwnerProtocol");
       headerMap.put("methodName", "hint");
@@ -80,12 +85,14 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
   }
 
     @Override
-    public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
+    public void connect(final URI ownNeedURI, final URI otherNeedURI,
+                        final URI ownConnectionURI, final Model content,
+                        final Dataset messageEvent)
+            throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
         StringWriter sw = new StringWriter();
         content.write(sw, "TTL");
 
-        URI ownerURI = clientFactory.getOwnerProtocolOwnerURI(ownNeedURI);
         Map headerMap = new HashMap<String, String>();
         Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURI);
 
@@ -95,9 +102,8 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
         headerMap.put("otherNeedURI", otherNeedURI.toString());
         headerMap.put("ownConnectionURI", ownConnectionURI.toString()) ;
         headerMap.put("content",RdfUtils.toString(content));
-        headerMap.put("ownerURI", ownerURI.toString());
+        headerMap.put("messageEvent",RdfUtils.toString(messageEvent));
         headerMap.put("ownerApplications", ownerApplications);
-
 
         headerMap.put("protocol","OwnerProtocol");
         headerMap.put("methodName", "connect");
@@ -105,7 +111,8 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
     }
 
     @Override
-    public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    public void open(final URI connectionURI, final Model content, final Dataset messageEvent)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
       Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
       URI needURI = con.getNeedURI();
@@ -115,6 +122,7 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
       Map headerMap = new HashMap<String, String>();
       headerMap.put("connectionURI", connectionURI.toString()) ;
       headerMap.put("content",RdfUtils.toString(content));
+      headerMap.put("messageEvent",RdfUtils.toString(messageEvent));
       headerMap.put("ownerApplications", ownerApplicationList);
       headerMap.put("protocol","OwnerProtocol");
       headerMap.put("methodName", "open");
@@ -122,7 +130,8 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
     }
 
     @Override
-    public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    public void close(final URI connectionURI, final Model content, final Dataset messageEvent)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
       Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
       URI needURI = con.getNeedURI();
@@ -132,6 +141,7 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
       Map headerMap = new HashMap<String, String>();
       headerMap.put("connectionURI", connectionURI.toString()) ;
       headerMap.put("content",RdfUtils.toString(content));
+      headerMap.put("messageEvent",RdfUtils.toString(messageEvent));
       headerMap.put("ownerApplications", ownerApplicationList);
       headerMap.put("protocol","OwnerProtocol");
       headerMap.put("methodName", "close");
@@ -151,7 +161,8 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
   }
 
   @Override
-    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+    public void sendMessage(final URI connectionURI, final Model message, final Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         String messageConvert = RdfUtils.toString(message);
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
@@ -161,9 +172,10 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
         Map headerMap = new HashMap<String, String>();
         headerMap.put("connectionURI", connectionURI.toString()) ;
         headerMap.put("message",messageConvert);
+        headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
         headerMap.put("ownerApplications", ownerApplicationList);
         headerMap.put("protocol","OwnerProtocol");
-        headerMap.put("methodName", "textMessage");
+        headerMap.put("methodName", "sendMessage");
         messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
     }
   public void setClientFactory(final OwnerProtocolOwnerClientFactory clientFactory)

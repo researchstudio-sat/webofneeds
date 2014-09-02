@@ -123,10 +123,12 @@ public class LinkedDataServiceImpl implements LinkedDataService
     if (page >= 0) {
       connections = createPage(model, this.connectionResourceURIPrefix, page, uris.size());
     } else {
-      connections = model.createResource(this.connectionResourceURIPrefix);
+      connections = model.createResource(this.connectionResourceURIPrefix,LDP.CONTAINER);
     }
     for (URI connectionURI : uris) {
-      model.add(model.createStatement(connections, RDFS.member, model.createResource(connectionURI.toString())));
+      model.add(model.createStatement(connections, RDFS.member, model.createResource(connectionURI.toString(),
+                                                                                     WON.CONNECTION) ));
+
     }
     return model;
   }
@@ -147,7 +149,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Resource needResource = model.getResource(needUri.toString());
 
     // add connections
-    Resource connectionsContainer = model.createResource(need.getNeedURI().toString() + "/connections/", LDP.CONTAINER);
+    Resource connectionsContainer = model.createResource(need.getNeedURI().toString() + "/connections/");
     model.add(model.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
     // add WON node link
     needResource.addProperty(WON.HAS_WON_NODE, model.createResource(this.resourceURIPrefix));

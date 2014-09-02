@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import won.protocol.model.Need;
 
 import javax.persistence.*;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -113,6 +115,18 @@ public class User implements UserDetails{
 	public List<Need> getNeeds() {
 		return needs;
 	}
+  public boolean removeNeeds(List<Need> needsToRemove){
+    return needs.removeAll(needsToRemove);
+
+  }
+  public List<URI> getNeedURIs(){
+    List<Need> needs = getNeeds();
+    List<URI> needURIs = new ArrayList <>();
+    for(Need need : needs){
+      needURIs.add(need.getNeedURI());
+    }
+    return needURIs;
+  }
   /*
   public List<Need> getDrafts(){
     return drafts;

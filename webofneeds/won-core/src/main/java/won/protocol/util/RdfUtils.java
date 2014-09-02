@@ -2,35 +2,38 @@ package won.protocol.util;
 
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.eval.PathEval;
+import com.hp.hpl.jena.sparql.util.Context;
 import com.hp.hpl.jena.util.FileUtils;
 import com.hp.hpl.jena.util.ResourceUtils;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.vocabulary.WON;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * Utilities for RDF manipulation with Jena.
  */
 public class RdfUtils
 {
+  public static final RDFNode EMPTY_RDF_NODE = null;
+
+
   private static final Logger logger = LoggerFactory.getLogger(RdfUtils.class);
 
   public static String toString(Model model)
@@ -51,7 +54,49 @@ public class RdfUtils
     return readRdfSnippet(content, FileUtils.langTurtle);
   }
 
-  /**
+    /**
+     * Converts a Jena Dataset into a TriG string
+     *
+     * @param dataset Dataset containing RDF which will be converted
+     * @return <code>String</code> containing TriG serialized RDF from the dataset
+     */
+    public static String toString(Dataset dataset) {
+
+        String result = "";
+
+        if (dataset != null) {
+            StringWriter sw = new StringWriter();
+            RDFDataMgr.write(sw, dataset, RDFFormat.TRIG.getLang());
+            result = sw.toString();
+        }
+        return result;
+    }
+
+    /**
+     * Converts a <code>String</code> containing TriG formatted RDF into a Jena Dataset
+     *
+     * @param content String with the TriG formatted RDF
+     * @return Jena Dataset containing the RDF from content
+     */
+    public static Dataset toDataset(String content) {
+
+        Dataset dataset = DatasetFactory.createMem();
+
+        if (content != null) {
+            InputStream is = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+            RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
+            try {
+                is.close();
+            } catch (IOException ex) {
+                logger.warn ("An exception occurred.", ex);
+            }
+        }
+        return dataset;
+    }
+
+
+
+    /**
    * Clones the specified model (its statements and ns prefixes) and returns the clone.
    * @param original
    * @return
@@ -428,6 +473,20 @@ public class RdfUtils
     return toURI(getNodeForPropertyPath(model, resourceURI, propertyPath));
   }
 
+  public static List<URI> getURIListForPropertyPath(final Model model, final URI resourceURI, Path propertyPath)
+  {
+    Iterator<Node> nodeIterator = getNodesForPropertyPath(model,resourceURI,propertyPath);
+    List<URI> nodeURIList = new ArrayList<>();
+    if (nodeIterator==null) return nodeURIList;
+    if (!nodeIterator.hasNext()) return null;
+
+    while(nodeIterator.hasNext()){
+      nodeURIList.add(toURI(nodeIterator.next()));
+    }
+    return nodeURIList;
+  }
+
+
   /**
    * Evaluates the path on the model obtained by dereferencing the specified resourceURI.
    * If the path resolves to multiple resources, only the first one is returned.
@@ -478,10 +537,24 @@ public class RdfUtils
    * @return
    */
   public static Node getNodeForPropertyPath(final Model model, URI resourceURI, Path propertyPath) {
-    Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(), propertyPath);
+    //Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
+    //                                        propertyPath);
+    Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
+                                           propertyPath, Context.emptyContext);
+
     if (!result.hasNext()) return null;
     return result.next();
   }
+
+  public static Iterator<Node> getNodesForPropertyPath(final Model model, URI resourceURI, Path propertyPath) {
+    Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
+                                           propertyPath, Context.emptyContext);
+    logger.debug("running path eval: "+ RdfUtils.toString(model));
+    if (!result.hasNext()) return null;
+    return result;
+  }
+
+
 
 
   /**
@@ -509,5 +582,59 @@ public class RdfUtils
       RdfUtils.replaceBaseResource(extraDataModel, eventNode);
     }
     return extraDataModel;
+  }
+
+
+  public static void addAllStatements(Model toModel, Model fromModel) {
+    StmtIterator stmtIterator = fromModel.listStatements();
+    while (stmtIterator.hasNext()) {
+      toModel.add(stmtIterator.nextStatement());
+    }
+  }
+
+  public static void addPrefixMapping(Model toModel, Model fromModel) {
+    for (String prefix : fromModel.getNsPrefixMap().keySet()) {
+      String uri = toModel.getNsPrefixURI(prefix);
+      if (uri == null) { // if no such prefix-uri yet, add it
+        toModel.setNsPrefix(prefix, fromModel.getNsPrefixURI(prefix));
+      } else {
+        if (uri.equals(fromModel.getNsPrefixURI(prefix))) {
+          // prefix-uri is already there, do nothing
+        } else {
+          // prefix-uri collision, redefine prefix
+          int counter = 2;
+          while (!toModel.getNsPrefixMap().containsKey(prefix + counter)) {
+            counter++;
+          }
+          toModel.setNsPrefix(prefix + counter, fromModel.getNsPrefixURI(prefix));
+        }
+      }
+    }
+  }
+
+
+  public static List<String> getModelNames(Dataset dataset) {
+    List<String> modelNames = new ArrayList<String>();
+    Iterator<String> names = dataset.listNames();
+    while (names.hasNext()) {
+      modelNames.add(names.next());
+    }
+    return modelNames;
+  }
+
+
+  public static String writeDatasetToString(final Dataset dataset, final Lang lang)
+  {
+    StringWriter sw = new StringWriter();
+    RDFDataMgr.write(sw, dataset, lang);
+    return sw.toString();
+  }
+
+  public static Dataset readDatasetFromString(final String data, final Lang lang)
+  {
+    StringReader sr = new StringReader(data);
+    Dataset dataset = DatasetFactory.createMem();
+    RDFDataMgr.read(dataset, sr, "no:uri", lang);
+    return dataset;
   }
 }

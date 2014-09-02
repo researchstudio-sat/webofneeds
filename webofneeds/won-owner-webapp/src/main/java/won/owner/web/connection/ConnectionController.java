@@ -97,7 +97,10 @@ public class ConnectionController {
             return "noConnectionFound";
         Connection con = cons.get(0);
         try {
-          ownerService.textMessage(con.getConnectionURI(), WonRdfUtils.MessageUtils.textMessage(text.getText()));
+          ownerService.sendMessage(
+                  con.getConnectionURI(),
+                  WonRdfUtils.MessageUtils.textMessage(text.getText()),
+                  null);
         } catch (Exception e) {
             logger.warn("error sending text message");
             return "error sending text message: " + e.getMessage();
@@ -115,9 +118,10 @@ public class ConnectionController {
     }
     Connection con = cons.get(0);
     try {
-      ownerService.textMessage(
+      ownerService.sendMessage(
         con.getConnectionURI(),
-        WonRdfUtils.MessageUtils.binaryFeedbackMessage(con.getConnectionURI(), isFeedbackPositive));
+        WonRdfUtils.MessageUtils.binaryFeedbackMessage(con.getConnectionURI(), isFeedbackPositive),
+              null);
     } catch (Exception e) {
       logger.warn("error sending text message",e);
     }
@@ -140,7 +144,7 @@ public class ConnectionController {
         Connection con = cons.get(0);
         try {
             //TODO: add rdf content here as soon as we support its creation in the owner app
-            ownerService.open(con.getConnectionURI(), null);
+            ownerService.open(con.getConnectionURI(), null, null);
         } catch (Exception e) {
           logger.warn("error during accept", e);
           return "error during accept: " + e.getMessage();
@@ -157,7 +161,7 @@ public class ConnectionController {
       Connection con = cons.get(0);
       try {
         //TODO: add rdf content here as soon as we support its creation in the owner app
-        ownerService.open(con.getConnectionURI(), null);
+        ownerService.open(con.getConnectionURI(), null, null);
       } catch (Exception e) {
         logger.warn("error during open", e);
         return "error during open: " + e.getMessage();
@@ -174,7 +178,7 @@ public class ConnectionController {
         Connection con = cons.get(0);
         try {
           //TODO: add rdf content here as soon as we support its creation in the owner app
-            ownerService.close(con.getConnectionURI(), null);
+            ownerService.close(con.getConnectionURI(), null, null);
         } catch (Exception e) {
           logger.warn("error during deny", e);
           return "error during deny: " + e.getMessage();
@@ -191,7 +195,7 @@ public class ConnectionController {
         Connection con = cons.get(0);
         try {
           //TODO: add rdf content here as soon as we support its creation in the owner app
-            ownerService.close(con.getConnectionURI(), null);
+            ownerService.close(con.getConnectionURI(), null, null);
         } catch (Exception e) {
           logger.warn("error during close", e);
           return "error during close: " + e.getMessage();

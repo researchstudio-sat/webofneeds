@@ -35,7 +35,6 @@
         <property name="camelContext" ref="wonMatcherCamel" />
         <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
-    <bean id="needProtocolCamelConfigurator" class="won.protocol.jms.NeedBasedCamelConfiguratorImpl"/>
 
     <bean id="matcherNodeURISource" class="won.matcher.component.MatcherNodeURISourceImpl"/>
 

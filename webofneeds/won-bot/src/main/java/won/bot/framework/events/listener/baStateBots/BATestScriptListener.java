@@ -18,6 +18,7 @@ package won.bot.framework.events.listener.baStateBots;
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
@@ -51,8 +52,8 @@ public class BATestScriptListener extends AbstractFinishingListener
   private URI coordinatorSideConnectionURI = null;
   private URI participantSideConnectionURI = null;
   private int messagesInFlight = 0;
-  private Object countMonitor = new Object();
-  private Object filterChangeMonitor = new Object();
+  private final Object countMonitor = new Object();
+  private final Object filterChangeMonitor = new Object();
   private long millisBetweenMessages = 10;
 
   public BATestScriptListener(final EventListenerContext context, final BATestBotScript script,
@@ -162,9 +163,7 @@ public class BATestScriptListener extends AbstractFinishingListener
       } else {
         URI fromCon = getConnectionToSendFrom(action.isSenderIsCoordinator());
         logger.debug("sending message for action {} on connection {}", action, fromCon);
-        //check if the connection is really in the state required for the action
-        assert connectionBAStateAllowsAction(fromCon, action) : "connection state of connection " + fromCon +" does " +
-          "not allow next action " + action;
+        assertCorrectConnectionState(fromCon, action);
         sendMessage(action, fromCon, new Date(System.currentTimeMillis() + millisBetweenMessages));
         synchronized (countMonitor){
           this.messagesInFlight++;
@@ -186,7 +185,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     }
   }
 
-  private boolean connectionBAStateAllowsAction(final URI fromCon, final BATestScriptAction action) {
+  private void assertCorrectConnectionState(final URI fromCon, final BATestScriptAction action) {
 
     LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
     if (linkedDataSource instanceof CachingLinkedDataSource) {
@@ -217,9 +216,25 @@ public class BATestScriptListener extends AbstractFinishingListener
     Query query = QueryFactory.create(queryString);
     QueryExecution qExec = QueryExecutionFactory.create(query, dataModel, binding);
     boolean result = qExec.execAsk();
-
-
-    return result;
+    //check if the connection is really in the state required for the action
+    if (result) return;
+    //we detected an error. Throw an exception.
+    //query again, this time fetch the state so we can display an informaitive error message
+    queryString = sparqlPrefix +
+      "SELECT ?state WHERE { ?con wontx:hasBAState ?state }";
+    binding = new QuerySolutionMap();
+    binding.add("con", new ResourceImpl(fromCon.toString()));
+    query = QueryFactory.create(queryString);
+    qExec = QueryExecutionFactory.create(query, dataModel, binding);
+    ResultSet res = qExec.execSelect();
+    if (! res.hasNext()) {
+      throw new IllegalStateException("connection state of connection " + fromCon +" does " +
+        "not allow next action " + action +". Could not determine actual connection state: not found");
+    }
+    QuerySolution solution = res.next();
+    RDFNode state = solution.get("state");
+    throw new IllegalStateException("connection state " + state + " of connection " + fromCon +" does " +
+      "not allow next action " + action);
   }
 
   private boolean bothConnectionURIsAreKnown() {
@@ -236,7 +251,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     {
       public void run() {
         try {
-          getEventListenerContext().getOwnerService().textMessage(fromCon, action.getMessageToBeSent());
+          getEventListenerContext().getOwnerService().sendMessage(fromCon, action.getMessageToBeSent(), null);
         } catch (Exception e) {
           logger.warn("could not send message from {} ", fromCon);
           logger.warn("caught exception", e);
@@ -247,14 +262,14 @@ public class BATestScriptListener extends AbstractFinishingListener
 
   private void sendOpen(final URI connectionURI, Date when) throws Exception {
     assert connectionURI != null : "connectionURI must not be null";
-    assert connectionURI != null : "when must not be null";
+    assert when != null : "when must not be null";
     logger.debug("scheduling connection message for date {}",when);
     getEventListenerContext().getTaskScheduler().schedule(new Runnable()
     {
       public void run()
       {
         try {
-          getEventListenerContext().getOwnerService().open(connectionURI, null);
+          getEventListenerContext().getOwnerService().open(connectionURI, null, null);
         } catch (Exception e) {
           logger.warn("could not send open from {} ", connectionURI);
           logger.warn("caught exception", e);

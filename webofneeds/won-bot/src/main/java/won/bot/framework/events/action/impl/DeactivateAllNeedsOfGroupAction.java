@@ -40,7 +40,7 @@ public class DeactivateAllNeedsOfGroupAction extends BaseEventBotAction
   protected void doRun(Event event) throws Exception {
     List<URI> toDeactivate = getEventListenerContext().getBotContext().getNamedNeedUriList(groupName);
     for (URI uri: toDeactivate){
-      getEventListenerContext().getOwnerService().deactivate(uri);
+      getEventListenerContext().getOwnerService().deactivate(uri, null);
       getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
     }
   }

@@ -153,6 +153,7 @@
     <bean id="needProtocolNeedService" class="won.node.protocol.impl.NeedProtocolNeedServiceImpl">
         <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService"/>
         <property name="needFacingNeedCommunicationService" ref="needCommunicationService"/>
+        <property name="needFacingConnectionClient"    ref="needProtocolNeedClient"/>
     </bean>
 
     <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClient">

@@ -86,7 +86,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction
                   for (URI toUri:toNeeds) {
                       try{
                         count ++;
-                        logger.info("tmp: Connect {} with {}",fromUri.toString(), toUri.toString());
+                        logger.debug("tmp: Connect {} with {}",fromUri.toString(), toUri.toString());
                         performConnect(fromUri, toUri, new Date(start + count * millisBetweenCalls));
                       } catch (Exception e) {
                           logger.warn("could not connect {} and {}", new Object[]{fromUri, toUri}, e);
@@ -105,11 +105,10 @@ public class ConnectFromListToListAction extends BaseEventBotAction
       {
         try {
           logger.debug("connecting needs {} and {}",fromUri,toUri);
-          logger.info("tmp: connecting needs {} and {}",fromUri,toUri);
           if (connectHook != null){
             connectHook.onConnect(fromUri, toUri);
           }
-          getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet));
+          getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet), null);
         } catch (Exception e) {
           logger.warn("could not connect {} and {}", fromUri, toUri);  //throws
           logger.warn("caught exception", e);

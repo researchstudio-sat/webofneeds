@@ -37,7 +37,9 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     {
         wireDependenciesLazily();
       try {
-        ownerProtocolOwnerService.hint(ownNeedURI.toString(), otherNeedURI.toString(), String.valueOf(score), originatorURI.toString(), RdfUtils.readRdfSnippet(content, FileUtils.langTurtle).toString());
+        ownerProtocolOwnerService.hint(ownNeedURI.toString(), otherNeedURI.toString(),
+                String.valueOf(score), originatorURI.toString(),
+                RdfUtils.readRdfSnippet(content, FileUtils.langTurtle).toString(), null);
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (IllegalMessageForNeedStateException e) {
@@ -49,7 +51,9 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     public void connect(@WebParam(name = "ownNeedURI") URI ownNeedURI, @WebParam(name = "otherNeedURI") URI otherNeedURI, @WebParam(name = "ownConnectionURI") URI ownConnectionURI, @WebParam(name = "content") String content) throws NoSuchNeedFault, ConnectionAlreadyExistsFault, IllegalMessageForNeedStateFault {
         wireDependenciesLazily();
       try {
-        ownerProtocolOwnerService.connect(ownNeedURI.toString(), otherNeedURI.toString(), ownConnectionURI.toString(), RdfUtils.readRdfSnippet(content, FileUtils.langTurtle).toString());
+        ownerProtocolOwnerService.connect(ownNeedURI.toString(), otherNeedURI.toString(),
+                ownConnectionURI.toString(),
+                RdfUtils.readRdfSnippet(content, FileUtils.langTurtle).toString(), null);
       } catch (NoSuchNeedException e) {
         throw NoSuchNeedFault.fromException(e);
       } catch (ConnectionAlreadyExistsException e) {
@@ -60,10 +64,12 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     }
 
     @Override
-    public void open(@WebParam(name = "connectionURI") URI connectionURI, @WebParam(name = "content") String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
+    public void open(@WebParam(name = "connectionURI") URI connectionURI, @WebParam(name = "content") String content)
+      throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault, IllegalMessageForNeedStateException {
         wireDependenciesLazily();
       try {
-        ownerProtocolOwnerService.open(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
+        ownerProtocolOwnerService.open(
+                connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), null);
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {
@@ -75,7 +81,8 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     public void close(@WebParam(name = "connectionURI") URI connectionURI, @WebParam(name = "content") String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         wireDependenciesLazily();
       try {
-        ownerProtocolOwnerService.close(connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle));
+        ownerProtocolOwnerService.close(
+                connectionURI, RdfUtils.readRdfSnippet(content, FileUtils.langTurtle), null);
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {
@@ -84,11 +91,12 @@ public class OwnerProtocolOwnerWebServiceEndpointImpl extends LazySpringBeanAuto
     }
 
     @Override
-    public void textMessage(@WebParam(name = "connectionURI") URI connectionURI, @WebParam(name = "content") String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
+    public void sendMessage(@WebParam(name = "connectionURI") URI connectionURI, @WebParam(
+      name = "content") String content) throws NoSuchConnectionFault, IllegalMessageForConnectionStateFault {
         wireDependenciesLazily();
       try {
           Model contentConvert = RdfUtils.toModel(content);
-        ownerProtocolOwnerService.textMessage(connectionURI, contentConvert);
+        ownerProtocolOwnerService.sendMessage(connectionURI, contentConvert, null);
       } catch (NoSuchConnectionException e) {
         throw NoSuchConnectionFault.fromException(e);
       } catch (IllegalMessageForConnectionStateException e) {

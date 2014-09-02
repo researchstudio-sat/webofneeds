@@ -16,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import won.bot.PropertyPathConfigurator;
 import won.bot.framework.events.event.impl.WorkDoneEvent;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
@@ -222,8 +223,9 @@ public class BAAtomicCCBotTest
 
       List<URI> crawled = new ArrayList<>();
 
-      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,30,8);
-
+      Model dataModel = linkedDataSource.getModelForResourceWithPropertyPath(needs.get(0),
+                                                                             PropertyPathConfigurator.configurePropertyPaths
+                                                                                 (), 300,4);
       logger.debug("1crawled dataset: {}", RdfUtils.toString(dataModel));
 
       String queryString = sparqlPrefix +
@@ -273,7 +275,9 @@ public class BAAtomicCCBotTest
 
       List<URI> crawled = new ArrayList<>();
 
-      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,4);
+      Model dataModel = linkedDataSource.getModelForResourceWithPropertyPath(needs.get(0),
+                                                                             PropertyPathConfigurator.configurePropertyPaths
+                                                                               (), 300,4);
 
       logger.info("2crawled dataset: {}", RdfUtils.toString(dataModel));
 

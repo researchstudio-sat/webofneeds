@@ -71,7 +71,7 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
         }
         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
-        final ListenableFuture<URI> futureNeedUri = getEventListenerContext().getOwnerService().createNeed(URI.create("we://dont.need.this/anymore"), needModel, true, wonNodeUri);
+        final ListenableFuture<URI> futureNeedUri = getEventListenerContext().getOwnerService().createNeed(needModel, true, wonNodeUri, null);
         //add a listener that adds the need URI to the botContext
         futureNeedUri.addListener(new Runnable()
         {

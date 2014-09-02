@@ -45,7 +45,7 @@ public class CloseConnectionAction extends BaseEventBotAction
       logger.debug("Extracted connection uri {}", connectionURI);
       if (connectionURI != null) {
         logger.debug("closing connection {}", connectionURI);
-        getEventListenerContext().getOwnerService().close(connectionURI, null);
+        getEventListenerContext().getOwnerService().close(connectionURI, null, null);
       }
     } catch (Exception e){
       logger.warn("error trying to close connection", e);

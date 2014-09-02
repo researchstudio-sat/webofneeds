@@ -32,4 +32,6 @@ public interface RDFStorageService
   public void storeContent(URI resourceURI, Model model);
 
   public Model loadContent(URI resourceURI);
+
+  public boolean removeContent(URI resourceURI);
 }

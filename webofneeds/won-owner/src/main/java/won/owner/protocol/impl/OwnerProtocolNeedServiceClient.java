@@ -2,6 +2,7 @@ package won.owner.protocol.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.commons.lang3.StringUtils;
@@ -13,9 +14,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import won.node.facet.impl.WON_TX;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.WonProtocolException;
+import won.protocol.message.WonMessage;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ChatMessageRepository;
@@ -67,12 +69,12 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void activate(URI needURI) throws Exception {
+  public void activate(URI needURI, Dataset messageEvent) throws Exception {
     logger.debug("owner to need: ACTIVATE called for need {}", needURI);
     List<Need> needs = needRepository.findByNeedURI(needURI);
     if (needs.size() != 1)
       throw new NoSuchNeedException(needURI);
-    delegate.activate(needURI);
+    delegate.activate(needURI, messageEvent);
     Need need = needs.get(0);
     need.setState(NeedState.ACTIVE);
     needRepository.save(need);
@@ -80,31 +82,48 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void deactivate(URI needURI) throws Exception {
+  public void deactivate(URI needURI, Dataset messageEvent) throws Exception {
     logger.debug("owner to need: DEACTIVATE called for need {}", needURI);
 
     List<Need> needs = needRepository.findByNeedURI(needURI);
     if (needs.size() != 1)
       throw new NoSuchNeedException(needURI);
-    delegate.deactivate(needURI);
+    delegate.deactivate(needURI, messageEvent);
     Need need = needs.get(0);
     need.setState(NeedState.INACTIVE);
+
     needRepository.save(need);
+    List<Connection> cons = connectionRepository.findByNeedURI(needURI);
+    if (cons.size() >= 1){
+      for(Connection con : cons){
+        con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
+        connectionRepository.save(con);
+      }
+    }
+
+
 
   }
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void open(URI connectionURI, Model content) throws Exception {
+  public void open(URI connectionURI, Model content, Dataset messageEvent) throws Exception {
     if (logger.isDebugEnabled()) {
       logger.debug("owner to need: OPEN called for connection {} with content {}", connectionURI,
         StringUtils.abbreviate(RdfUtils.toString(content), 200));
     }
+
     List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
     if (cons.size() != 1)
       throw new NoSuchConnectionException(connectionURI);
 
-    delegate.open(connectionURI, content);
+    URI needURI = cons.get(0).getNeedURI();
+    List<Need> needs = needRepository.findByNeedURI(needURI);
+    Need need = needs.get(0);
+    if(need.getState()==NeedState.INACTIVE)
+      throw new WonProtocolException("Need is inactive");
+
+    delegate.open(connectionURI, content, messageEvent);
 
     Connection con = cons.get(0);
     con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
@@ -114,7 +133,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void close(final URI connectionURI, Model content) throws Exception {
+  public void close(final URI connectionURI, Model content, Dataset messageEvent) throws Exception {
     if (logger.isDebugEnabled()) {
       logger.debug("owner to need: CLOSE called for connection {} with model {}", connectionURI,
         StringUtils.abbreviate(RdfUtils.toString(content), 200));
@@ -122,7 +141,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
     if (cons.size() != 1)
       throw new NoSuchConnectionException(connectionURI);
-    delegate.close(connectionURI, content);
+    delegate.close(connectionURI, content, messageEvent);
     Connection con = cons.get(0);
     con.setState(con.getState().transit(ConnectionEventType.OWNER_CLOSE));
     connectionRepository.save(con);
@@ -131,7 +150,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void textMessage(final URI connectionURI, final Model message)
+  public void sendMessage(final URI connectionURI, final Model message, Dataset messageEvent)
     throws Exception {
     logger.debug("owner to need: MESSAGE called for connection {} with message {}", connectionURI, message);
 
@@ -140,7 +159,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
       throw new NoSuchConnectionException(connectionURI);
     Connection con = cons.get(0);
     //todo: text message shall be returned
-    delegate.textMessage(connectionURI, message);
+    delegate.sendMessage(connectionURI, message, messageEvent);
     //todo: the parameter for setMessage method shall be set by retrieving the result of delegate.textMessage method
     ChatMessage chatMessage = new ChatMessage();
     chatMessage.setCreationDate(new Date());
@@ -170,19 +189,24 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate) throws Exception {
-    return createNeed(ownerURI, content, activate, null);
+  public ListenableFuture<URI> createNeed(Model content, boolean activate, WonMessage wonMessage)
+          throws Exception {
+    return createNeed(content, activate, null, wonMessage);
   }
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public synchronized ListenableFuture<URI> createNeed(final URI ownerURI, final Model content, final boolean activate, final URI wonNodeUri)
+  public synchronized ListenableFuture<URI> createNeed(
+          final Model content,
+          final boolean activate,
+          final URI wonNodeUri,
+          WonMessage wonMessage)
     throws Exception {
     if (logger.isDebugEnabled()) {
-      logger.debug("owner to need: CREATE_NEED called for owner URI {}, activate {}, with content {}",
-        new Object[]{ownerURI, activate, StringUtils.abbreviate(RdfUtils.toString(content), 200)});
+      logger.debug("owner to need: CREATE_NEED activate {}, with content {}",
+        new Object[]{activate, StringUtils.abbreviate(RdfUtils.toString(content), 200)});
     }
-    final ListenableFuture<URI> uri = delegate.createNeed(ownerURI, content, activate, wonNodeUri);
+    final ListenableFuture<URI> uri = delegate.createNeed(content, activate, wonNodeUri, wonMessage);
     //asynchronously wait for the result and update the local database.
     //meanwhile, create our own ListenableFuture to pass the result back
     final SettableFuture<URI> result = SettableFuture.create();
@@ -197,7 +221,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
             need.setNeedURI(uri.get());
             // logger.debug(need.getNeedURI().toString());
             need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
-            need.setOwnerURI(ownerURI);
 
             if (wonNodeUri == null) need.setWonNodeURI(URI.create(wonNodeDefault));
             else need.setWonNodeURI(wonNodeUri);
@@ -234,14 +257,18 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public ListenableFuture<URI> connect(final URI needURI, final URI otherNeedURI, final Model content)
+  public ListenableFuture<URI> connect(
+          final URI needURI,
+          final URI otherNeedURI,
+          final Model content,
+          Dataset messageEvent)
     throws Exception {
     if (logger.isDebugEnabled()) {
       logger.debug("owner to need: CONNECT called for need {}, other need {} and content {}",
         new Object[]{needURI, otherNeedURI, StringUtils.abbreviate(RdfUtils.toString(content), 200)});
     }
 
-    final ListenableFuture<URI> uri = delegate.connect(needURI, otherNeedURI, content);
+    final ListenableFuture<URI> uri = delegate.connect(needURI, otherNeedURI, content, messageEvent);
     //asynchronously wait for the result and update the local database.
     //meanwhile, create our own ListenableFuture to pass the result back
     final SettableFuture<URI> result = SettableFuture.create();
@@ -277,6 +304,10 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     });
 
     return result;
+  }
+
+  public void sendWonMessage(WonMessage wonMessage) throws Exception {
+    delegate.sendWonMessage(wonMessage);
   }
 
   public void setDelegate(OwnerProtocolNeedServiceClientSide delegate) {

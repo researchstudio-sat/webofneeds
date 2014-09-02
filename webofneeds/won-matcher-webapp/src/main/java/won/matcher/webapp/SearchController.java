@@ -27,6 +27,12 @@ public class SearchController
   private SearchResultModelMapper searchResultModelMapper = new SearchResultModelMapper();
   private static final String DEFAULT_NUM_RESULTS = "10";
 
+  /**
+   * takes keywords and number of results to be returned and performs the search.
+   * @param keywords keywords to search
+   * @param numResults number of results to be returned
+   * @return RDF model of search results
+   */
   @RequestMapping(value="search",
       method = RequestMethod.GET,
       produces={"application/rdf+xml","application/x-turtle","text/turtle","text/rdf+n3","application/ld+json"})
@@ -38,6 +44,13 @@ public class SearchController
     return searchResultModelMapper.toModel(searchService.search(keywords, numResults));
   }
 
+  /**
+   *
+   * @param keywords keywords to search
+   * @param needModel
+   * @param numResults number of results to be returned
+   * @return
+   */
   @RequestMapping(
       value="search",
       method = RequestMethod.POST,

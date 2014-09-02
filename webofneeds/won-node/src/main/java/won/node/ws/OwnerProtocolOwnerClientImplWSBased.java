@@ -16,6 +16,7 @@
 
 package won.node.ws;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,10 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
     private ConnectionRepository connectionRepository;
 
     @Override
-  public void hint(final URI ownNeedUri, final URI otherNeedUri, final double score, final URI originatorUri, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException
+  public void hint(final URI ownNeedUri, final URI otherNeedUri,
+                   final double score, final URI originatorUri,
+                   final Model content, final Dataset messageEvent)
+            throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(ownNeedUri);
@@ -69,7 +73,10 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
 
 
     @Override
-    public void connect(final URI ownNeedURI, final URI otherNeedURI, final URI ownConnectionURI, final Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
+    public void connect(final URI ownNeedURI, final URI otherNeedURI,
+                        final URI ownConnectionURI, final Model content,
+                        final Dataset messageEvent)
+            throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
       try {
         OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForNeed(ownNeedURI);
@@ -87,7 +94,8 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
       }
     }
     @Override
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void open(final URI connectionURI, final Model content, final Dataset messageEvent)
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
       proxy.open(connectionURI, RdfUtils.toString(content));
@@ -104,7 +112,8 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
 
 
   @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void close(final URI connectionURI, final Model content, final Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
       proxy.close(connectionURI, RdfUtils.toString(content));
@@ -120,11 +129,12 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
   }
 
   @Override
-  public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void sendMessage(final URI connectionURI, final Model message, final Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
       String messageConvert = RdfUtils.toString(message);
-      proxy.textMessage(connectionURI, messageConvert);
+      proxy.sendMessage(connectionURI, messageConvert);
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (NoSuchNeedException e) {

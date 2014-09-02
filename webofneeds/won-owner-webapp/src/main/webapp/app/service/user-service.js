@@ -28,21 +28,38 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 			}
 		},
 		registerUser : function(user) {
-            var response = $http.post(
-					'/owner/rest/user/',
-					user);
-            response.success(function() {registered = true;}); //will be called in addition to any other success handler
-            return response;
+			return $http.post(
+					'/owner/rest/users/',
+					user
+			).then(
+				function() {
+					// success
+                    registered = true;
+					return {status : "OK"};
+				},
+				function(response) {
+					switch (response.status) {
+					case 409:
+						// normal error
+						return {status:"ERROR", message: "Username is already used"};
+					break;
+					default:
+						// system error
+						console.log("FATAL ERROR");
+					break;
+					}
+				}
+			);
 		},
 		logIn : function(user) {
 			return $http.post(
-					'/owner/rest/user/login',
+					'/owner/rest/users/signin',
 					user
 			)
 		},
 		logOut : function() { //TODO directly pass promise
 			return $http.post(
-					'/owner/rest/user/logout'
+					'/owner/rest/users/signout'
 			).then(
 				function (data, status) {
 					return {status:"OK"};

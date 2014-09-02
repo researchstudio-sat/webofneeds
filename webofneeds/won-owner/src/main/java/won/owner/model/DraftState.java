@@ -43,15 +43,21 @@ public class DraftState{
 	private Long id;
 
 
+  @Column(name ="userName")
+  private String userName;
 
   @Column( name = "draftURI", unique = true)
   private URI draftURI;
 
   private int currentStep;
 
-  public DraftState(URI draftURI, int currentStep){
+  public DraftState(){
+  }
+
+  public DraftState(URI draftURI, int currentStep, String userName){
     this.draftURI = draftURI;
     this.currentStep = currentStep;
+    this.userName = userName;
   }
 
   public Long getId() {
@@ -72,6 +78,13 @@ public class DraftState{
 
   public void setDraftURI(final URI draftURI) {
     this.draftURI = draftURI;
+  }
+
+  public String getUserName() {
+    return userName;
+  }
+  public void setUserName(final String userName) {
+    this.userName = userName;
   }
 
 

@@ -82,7 +82,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 	var needService = {};
 
 	needService.getNeedById = function (needId) {
-		return $http.get('/owner/rest/need/' + needId);
+		return $http.get('/owner/rest/needs/' + needId);
 	};
 
 	needService.getIdFromUri = function(needUri) {
@@ -186,7 +186,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 	}
 
 	needService.getAllNeeds = function() {
-		return $http.get('/owner/rest/need/').then(
+		return $http.get('/owner/rest/needs/').then(
 			function(response) {
 				return response.data;
 			},
@@ -202,9 +202,9 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
         needToSave.userName = userName;
         needToSave.tags = need.tags.join(",");
         delete needToSave.binaryFolder;
-        return $http({
+        /*return $http({
             method:'POST',
-            url:'/owner/rest/need/create/saveDraft',
+            url:'/owner/rest/needs/drafts',
             data:needToSave,
             success:function(content){
                 console.log(content);
@@ -217,7 +217,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
             function (response) {
                 console.log("FATAL ERROR");
             }
-        );
+        );   */
     }
 
 	needService.save = function(need) {
@@ -236,7 +236,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 		delete needToSave.binaryFolder;
 		return $http({
 			method:'POST',
-			url:'/owner/rest/need/create',
+			url:'/owner/rest/needs/',
 			data:needToSave,
 			success:function (content) {
 				console.log(content);

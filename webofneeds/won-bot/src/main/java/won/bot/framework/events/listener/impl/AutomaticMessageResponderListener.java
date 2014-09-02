@@ -79,7 +79,7 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
         URI connectionUri = messageEvent.getConnectionURI();
         logger.debug("sending message " + message);
         try {
-          getEventListenerContext().getOwnerService().textMessage(connectionUri, messageContent);
+          getEventListenerContext().getOwnerService().sendMessage(connectionUri, messageContent, null);
         } catch (Exception e) {
           logger.warn("could not send message via connection {}", connectionUri, e);
         }

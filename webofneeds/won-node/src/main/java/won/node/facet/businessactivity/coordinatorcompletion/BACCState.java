@@ -376,7 +376,6 @@ public enum BACCState {
         for (BACCState state : values())
             if (state.getURI().toString().equals(fragment))
                 return state;
-        logger.warn("No enum could be matched for: {}", fragment);
         return null;
     }
 
@@ -389,7 +388,6 @@ public enum BACCState {
       if (phase.toString().equals(comparedString))
         return phase;
     }
-    logger.warn("No enum could be matched for: {}", fragment);
     return null;
   }
 

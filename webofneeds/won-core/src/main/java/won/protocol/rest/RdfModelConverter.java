@@ -16,7 +16,6 @@
 
 package won.protocol.rest;
 
-import com.github.jsonldjava.jena.JenaJSONLD;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.jena.atlas.web.ContentType;
@@ -34,6 +33,8 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -41,11 +42,6 @@ import java.util.Collection;
  */
 public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
     private static final Logger logger = LoggerFactory.getLogger(RdfModelConverter.class);
-
-    static {
-      JenaJSONLD.init();
-    }
-
 
     public RdfModelConverter() {
       this(buildMediaTypeArray());
@@ -88,17 +84,16 @@ public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
     private static MediaType[] buildMediaTypeArray(){
       // now register the media types this converter can handle
       Collection<Lang> languages = RDFLanguages.getRegisteredLanguages();
-      MediaType[] mediatypes = new MediaType[languages.size()+1];
-
-      mediatypes[0] = new MediaType(JenaJSONLD.JSONLD.getContentType().getType(), JenaJSONLD.JSONLD.getContentType().getSubType());
-      int i = 1;
+      Set<MediaType> mediaTypeSet = new HashSet<MediaType>();
+      //make sure we support JSONLD
+      mediaTypeSet.add(new MediaType(Lang.JSONLD.getContentType().getType(),Lang.JSONLD.getContentType().getSubType()));
       for(Lang lang: languages){
         ContentType ct = lang.getContentType();
         logger.debug("registering converter for rdf content type {}", lang.getContentType());
         MediaType mt = new MediaType(ct.getType(), ct.getSubType());
-        mediatypes[i++] = mt;
+        mediaTypeSet.add(mt);
       }
-      return mediatypes;
+      return mediaTypeSet.toArray(new MediaType[mediaTypeSet.size()]);
     }
 
 

@@ -41,6 +41,12 @@ public class MatchNeedsAction extends BaseEventBotAction
     logger.debug("matching needs {} and {}",need1,need2);
     logger.debug("getEventListnerContext():"+getEventListenerContext());
     logger.debug("getMatcherService(): "+getEventListenerContext().getMatcherProtocolNeedServiceClient());
-    getEventListenerContext().getMatcherProtocolNeedServiceClient().hint(need1,need2,1.0, URI.create("http://localhost:8080/matcher"),null);
+    getEventListenerContext().getMatcherProtocolNeedServiceClient().hint(
+            need1,
+            need2,
+            1.0,
+            URI.create("http://localhost:8080/matcher"),
+            null,
+            null);
   }
 }

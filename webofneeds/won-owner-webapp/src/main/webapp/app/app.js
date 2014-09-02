@@ -131,23 +131,30 @@ app.directive('header', function(){
 		return $q;
 	}]);
 });
-app.run(function($httpBackend){
+app.run(function($httpBackend,$rootScope){
+        $rootScope.wonNodeURI = "http://localhost:8080/won";
+        $rootScope.needURIPath = "/resource/need";
+        $rootScope.connectionURIPath = "connection";
+        //$httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
 
-        $httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
-
-        $httpBackend.whenPOST('/owner/rest/need/create').respond(function(method, url, data){
+       /* $httpBackend.whenPOST('/owner/rest/needs').respond(function(method, url, data){
 
             return [200, 'text',{}];
-        });
+        });   */
        /* $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').respond(function(method, url, data){
 
             return [200, 'text',{}];
         });*/
-
-        $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').passThrough();
+        $httpBackend.whenPOST('/owner/rest/needs/').passThrough();
+        $httpBackend.whenGET('/owner/rest/needs/drafts').passThrough();
+        $httpBackend.whenPOST('/owner/rest/needs/drafts').passThrough();
+        $httpBackend.whenDELETE('/owner/rest/needs/drafts').passThrough();
+        $httpBackend.whenGET('/owner/rest/needs/drafts/.+').passThrough();
+        $httpBackend.whenDELETE('/owner/rest/needs/drafts/.+').passThrough();
+       // $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').passThrough();
         $httpBackend.whenGET(/.*/).passThrough();
         $httpBackend.whenPOST(/.*/).passThrough();
-        $httpBackend.whenPOST(/\/owner\/rest\/user\/.*/).passThrough();
+       // $httpBackend.whenPOST(/\/owner\/rest\/user\/.*/).passThrough();
         $httpBackend.whenPOST('/owner').passThrough();
         $httpBackend.whenGET('/').passThrough();
         $httpBackend.whenGET('/signin').passThrough();
@@ -158,8 +165,8 @@ app.run(function($httpBackend){
         $httpBackend.whenGET('/need-detail/:needId').passThrough();
         $httpBackend.whenGET('app/home/home.partial.html').passThrough();
         $httpBackend.whenGET('app/home/home.partial.html').passThrough();
-        $httpBackend.whenGET(/app\/.*/).passThrough();
-        $httpBackend.whenGET('/app.*/').passThrough();
+       // $httpBackend.whenGET(/app\/.*/).passThrough();
+       // $httpBackend.whenGET('/app.*/').passThrough();
     }
 );
 angular.resetForm = function (scope, formName, defaults) {

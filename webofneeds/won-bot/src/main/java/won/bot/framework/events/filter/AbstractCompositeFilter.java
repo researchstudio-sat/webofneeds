@@ -46,7 +46,7 @@ public abstract class AbstractCompositeFilter implements CompositeFilter
   /**
    * Returns a shallow copy of the filters.
    */
-  public List<EventFilter> getFilters()
+  public synchronized List<EventFilter> getFilters()
   {
     ArrayList<EventFilter> copy = new ArrayList<>(filters.size());
     copy.addAll(filters);

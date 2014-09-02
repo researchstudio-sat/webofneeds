@@ -20,6 +20,7 @@ import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.eval.PathEval;
+import com.hp.hpl.jena.sparql.util.Context;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.WebResource;
@@ -159,8 +160,12 @@ public class LinkedDataRestClient
 
     private Node getNodeForPropertyPath(URI resourceURI, Path propertyPath) {
         Model rdfModel = readResourceData(resourceURI);
-        Iterator<Node> result =  PathEval.eval(rdfModel.getGraph(), rdfModel.getResource(resourceURI.toString()).asNode(), propertyPath);
-        if (!result.hasNext()) return null;
+//        Iterator<Node> result =  PathEval.eval(rdfModel.getGraph(), rdfModel.getResource(resourceURI.toString())
+//                                                                             .asNode(), propertyPath);
+//
+      Iterator<Node> result =  PathEval.eval(rdfModel.getGraph(), rdfModel.getResource(resourceURI.toString())
+                                                                          .asNode(), propertyPath, Context.emptyContext);
+      if (!result.hasNext()) return null;
         return result.next();
     }
 }

@@ -45,7 +45,7 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction
   {
     List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
     try {
-      getEventListenerContext().getOwnerService().connect(needs.get(0), needs.get(1), WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(localFacet, remoteFacet));
+      getEventListenerContext().getOwnerService().connect(needs.get(0), needs.get(1), WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(localFacet, remoteFacet), null);
     } catch (Exception e) {
       logger.warn("could not connect {} and {}", new Object[]{needs.get(0), needs.get(1)}, e);
     }

@@ -23,6 +23,7 @@ import won.protocol.model.NeedState;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Builder interface for building Need objects.
@@ -36,9 +37,17 @@ public interface NeedBuilder<T>
 
   public void copyValuesFromProduct(T product);
 
+  public NeedBuilder<T> setRecurTimes(int recurTimes);
+
+  public NeedBuilder<T> setRecurInfiniteTimes(boolean recurIniniteTimes);
+
+  public NeedBuilder<T> setFacetTypes(List<URI> facetTypes);
+
   public NeedBuilder<T> setUri(URI uri);
 
   public NeedBuilder<T> setUri(String uri);
+
+  public NeedBuilder<T> setRecurIn(Long recurIn);
 
   public NeedBuilder<T> setBasicNeedType(URI type);
 

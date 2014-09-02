@@ -20,12 +20,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <html>
-<head>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Web Of Needs</title>
-	<link rel="stylesheet" href="style/bootstrap.min.css"/>
-	<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>
-	<link rel="stylesheet" href="style/main.css"/>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Web Of Needs</title>
+		<link rel="stylesheet" href="style/bootstrap.min.css" />
+		<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>
+		<link rel="stylesheet" href="style/main.css"/>
 	<link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	<link rel="stylesheet" href="style/datepicker.css"/>
 	<link rel="stylesheet" href="../font-awesome-4.1.0/css/font-awesome.min.css">
@@ -33,21 +33,22 @@
 	<link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
     <link rel="stylesheet" href="style/star-rating.css"/>
 
-	<script src="scripts/jquery.10.2.js"></script>
+		<script src="scripts/jquery.10.2.js"></script>
 	<script src="scripts/jquery.fs.scroller.min.js"></script>
-	<script src="bower_components/angular/angular.js"></script>
-	<script src="bower_components/angular-mocks/angular-mocks.js"></script>
-	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+		<script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-mocks/angular-mocks.js"></script>
+		<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
-	<script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
-	<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
-	<script type="text/javascript" src="<c:url value="/bower_components/js-md5/js/md5.js"/>"></script>
-
-	<script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
-	<script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
-	<script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
-	<script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
-	<script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
+		<script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
+		<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
+		<script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
+        <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
+        <script type="text/javascript" src="bower_components/jsonld.js/js/jsonld.js"></script>
+		<script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
+		<script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
+		<script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
+		<script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
+		<script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
 	<script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
 	<script type="text/javascript" src="scripts/lightbox.min.js"></script>
 	<script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
@@ -55,17 +56,23 @@
 	<script type="text/javascript" src="scripts/bootstrap-tagsinput.min.js"></script>
     <script type="text/javascript" src="scripts/star-rating.min.js"></script>
 
-	<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
+		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
+		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
+		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/won-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/message-factory-service.js"/>"></script>
+		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/builders.js"/>"></script>
 
-	<script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
+		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
+		<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
+
+        <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
+		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
+		<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
 
 	<script type="text/javascript" src="<c:url value="/app/why-use/why-use.js"/>"></script>
 	<script type="text/javascript" src="<c:url value="/app/forgot-pwd/forgot-pwd.js"/>"></script>
@@ -76,12 +83,12 @@
 	<script type="text/javascript" src="<c:url value="/app/search/search.js"/>"></script>
 	<script type="text/javascript" src="<c:url value="/app/post-detail/post-detail.js"/>"></script>
 
-</head>
-<body>
-<span ng-init=""></span>
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>
-<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
-	<div class="container" style="padding:0">
+	</head>
+	<body>
+		<span ng-init=""></span>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>
+		<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
+			<div class="container" style="padding:0">
 		<!--<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
 							<ul class="nav navbar-nav">
 								<li ng-class="isActive()"><a href="#">
@@ -109,28 +116,28 @@
 
 		<!--<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
 							<div class="container" style="padding:0">
-								<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
-									<ul class="nav navbar-nav">
-										<li ng-class="isActive()"><a href="#/">
+				<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
+					<ul class="nav navbar-nav">
+						<li ng-class="isActive()"><a href="#/">
 											<span class="glyphicon glyphicon-transfer"></span>&nbsp;WoN</a>
-										</li>
+						</li>
 									</ul>          -->
 
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
 			<!--<ul class="nav navbar-nav">
-									<li ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak><a
-											href="#/create-need/1/">
-										<span class="glyphicon glyphicon-plus"></span>&nbsp;New	Post</a>
-									</li>
-									<li ng-show="!showPublic()" ng-class="isActive('need-list')" ng-cloak><a href="#/need-list/">
+						<li ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak><a
+                                href="#/create-need/1/">
+							<span class="glyphicon glyphicon-plus"></span>&nbsp;New	Post</a>
+						</li>
+						<li ng-show="!showPublic()" ng-class="isActive('need-list')" ng-cloak><a href="#/need-list/">
 										<span class="glyphicon glyphicon-globe"></span>&nbsp;My Posts</a>
-									</li>
+						</li>
 								</ul>       -->
 			<ul class="nav navbar-nav">
 				<li ng-class="isActive()"><a href="#">
 					<i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
 				</li>
-			</ul>
+					</ul>
 			<ul class="nav navbar-nav">
 				<!--<li ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak><a
 												href="#/create-need/1/">
@@ -230,8 +237,8 @@
 					</ul>
 				</li>
 			</ul>
-			<ul class="nav navbar-nav navbar-right" ng-cloak>
-				<li><span ng-show="checkRegistered()">{{message}}</span></li>
+					<ul class="nav navbar-nav navbar-right" ng-cloak>
+                        <li><span ng-show="checkRegistered()">{{message}}</span></li>
 				<li ng-show="showPublic()" ng-class="isActive('register')"><a href="#/register">Sign up&nbsp;<span class="caret"/></a></li>
 				<li ng-show="showPublic()" ng-class="isActive('signin')"><a href="#/signin">Sign in&nbsp;<span class="caret"/></a></li>
 				<!--<li ng-show="!showPublic()"><a href="#/need-list">{{userdata.username}}</a></li>
@@ -246,13 +253,13 @@
 					</ul>
 				</li>
 			</ul>
+				</div>
+			</div>
+		</nav>
+
+		<div ng-view id="content" class="container">
 		</div>
-	</div>
-</nav>
-
-<div ng-view id="content" class="container">
-</div>
-
+		
 <nav class="navbar navbar-default" role="navigation">
 	<div class="container" style="padding:0">
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
@@ -265,21 +272,21 @@
 	</div>
 </nav>
 
-<script type="text/javascript">
-	window.user = {
-		<sec:authorize access="isAuthenticated()">
-		username:'<sec:authentication property="principal.username" />',
-		isAuth:true
-		</sec:authorize>
-		<sec:authorize access="!isAuthenticated()">
-		isAuth:false
-		</sec:authorize>
-	};
+		<script type="text/javascript">
+			window.user = {
+				<sec:authorize access="isAuthenticated()">
+				username : '<sec:authentication property="principal.username" />',
+				isAuth : true
+				</sec:authorize>
+				<sec:authorize access="!isAuthenticated()">
+				isAuth : false
+				</sec:authorize>
+			};
 
-	function onGoogleReady() {
-		angular.bootstrap(document.getElementsByTagName("html")[0], ['won.owner']);
-	}
-</script>
-</body>
+			function onGoogleReady() {
+				angular.bootstrap(document.getElementsByTagName("html")[0], ['won.owner']);
+			}
+		</script>
+	</body>
 </html>
 

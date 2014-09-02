@@ -250,7 +250,7 @@ public class RestController
 		  if (!needs.isEmpty()) {
 		    logger.warn("Deactivating old need");
 		    try {
-		      ownerService.deactivate(needs.get(0).getNeedURI());
+		      ownerService.deactivate(needs.get(0).getNeedURI(), null);
 		    } catch (Exception e) {
 		      logger.warn("Could not deactivate old Need: " + needs.get(0).getNeedURI());
 		    }
@@ -329,11 +329,11 @@ public class RestController
 
         //TODO: here, need creation is synchronous. Make asynchronous.
 		    if (needPojo.getWonNode().equals("")) {
-			    needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE).get();
+			    needURI = ownerService.createNeed(needModel, needPojo.getState() == NeedState.ACTIVE, null).get();
 		    } else {
 			    needURI = ((OwnerProtocolNeedServiceClient) ownerService)
-					    .createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE,
-                URI.create(needPojo.getWonNode())).get();
+					    .createNeed(needModel, needPojo.getState() == NeedState.ACTIVE,
+                URI.create(needPojo.getWonNode()), null).get();
 		    }
 
 		    List<Need> needs = needRepository.findByNeedURI(needURI);
@@ -425,7 +425,7 @@ public class RestController
           WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
             FacetType.OwnerFacet.getURI(),
             FacetType.OwnerFacet.getURI());
-				ownerService.connect(match.getFromNeed(), match.getToNeed(), facetModel);
+				ownerService.connect(match.getFromNeed(), match.getToNeed(), facetModel, null);
 			}
 		} catch (ConnectionAlreadyExistsException e) {
 			logger.warn("caught ConnectionAlreadyExistsException:", e);
@@ -537,7 +537,10 @@ public class RestController
 		Connection con = cons.get(0);
 
 		try {
-			ownerService.textMessage(con.getConnectionURI(), WonRdfUtils.MessageUtils.textMessage(text));
+			ownerService.sendMessage(
+                    con.getConnectionURI(),
+                    WonRdfUtils.MessageUtils.textMessage(text),
+                    null);
 		} catch (Exception e) {
 			logger.warn("error sending text message");
 			return "error sending text message: " + e.getMessage();
@@ -560,7 +563,7 @@ public class RestController
 		try {
       //changed from connect to open as we already have a connection object.
 			//ownerService.connect(con.getNeedURI(), con.getRemoteNeedURI(), facetModel);
-      ownerService.open(con.getConnectionURI(),null);
+      ownerService.open(con.getConnectionURI(),null, null);
 		} catch (Exception e) {
 			logger.warn("error during accept", e);
 			return "error during accept: " + e.getMessage();
@@ -579,7 +582,7 @@ public class RestController
 			return "noNeedFound";
 		Connection con = cons.get(0);
 		try {
-			ownerService.close(con.getConnectionURI(), null);
+			ownerService.close(con.getConnectionURI(), null, null);
 		} catch (Exception e) {
 			logger.warn("error during deny", e);
 			return "error during deny: " + e.getMessage();
@@ -598,7 +601,7 @@ public class RestController
 			return "noNeedFound";
 		Connection con = cons.get(0);
 		try {
-			ownerService.close(con.getConnectionURI(), null);
+			ownerService.close(con.getConnectionURI(), null, null);
 		} catch (Exception e) {
 			logger.warn("error during close", e);
 			return "error during close: " + e.getMessage();

@@ -1,5 +1,6 @@
 package won.node.facet.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
@@ -31,20 +32,22 @@ public class CommentFacet extends AbstractFacet
   }
 
   @Override
-  public void connectFromNeed(final Connection con, final Model content) throws NoSuchNeedException,
+  public void connectFromNeed(final Connection con, final Model content, final Dataset messageEvent)
+          throws NoSuchNeedException,
     IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
 
-    super.connectFromNeed(con, content);
+    super.connectFromNeed(con, content, messageEvent);
     addLinkedDataStatements(con, content);
     // Model content = rdfStorageService.loadContent(con.getNeedURI());
 
 
   }
   @Override
-  public void connectFromOwner(final Connection con, final Model content) throws NoSuchNeedException,
+  public void connectFromOwner(final Connection con, final Model content, final Dataset messageEvent)
+          throws NoSuchNeedException,
     IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    super.connectFromOwner(con, content);
+    super.connectFromOwner(con, content, messageEvent);
     addLinkedDataStatements(con, content);
   }
   private void addLinkedDataStatements(final Connection con, final Model content){

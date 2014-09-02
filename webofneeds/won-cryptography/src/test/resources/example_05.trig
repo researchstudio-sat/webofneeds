@@ -1,0 +1,91 @@
+# Multiple and encapsuled graphs
+# Purpose: Testing graph encapsulation and merging of graphs with same name/hierarchy
+# Loading with TriG+ parser should result in the following graph:
+#
+# eg:rootTriple eg:isin eg:root .
+#
+# {
+#  	eg:tripleA eg:isin eg:unnamedgraph .
+#	eg:tripleB eg:isin eg:unnamedgraph .
+#	eg:tripleC eg:isin eg:unnamedgraph .
+# }
+#
+# eg:g1 {
+#	eg:tripleG1a eg:isin eg:g1 .
+#	eg:tripleG1b eg:isin _:g1name .
+#	eg:tripleG1c eg:isin eg:g1 .
+#	_:g1name eg:haslabel "g1" .
+#	
+#	eg:g1sub1 {
+#		eg:tripleG1sub1a eg:isin eg:g1sub1 .
+#		eg:tripleG1sub1b eg:isin eg:g1sub1 .
+#	}
+#	
+#	eg:g1sub2 {
+#		eg:tripleG1sub2a eg:isin eg:g1sub2 .
+#		eg:tripleG1sub2b eg:isin eg:g1sub2 .
+#	}
+# }
+#
+# eg:g2 {
+#	eg:info eg:text "L1 encapsulation" .
+#
+#	eg:g2sub1 {
+#		eg:info eg:text "L2 encapsulation" .
+#	
+#		eg:g2sub1sub1 {
+#			eg:info eg:text "L3 encapsulation" .
+#		}
+#	}
+# }
+
+@prefix eg: <http://www.example.org/#> .
+
+eg:rootTriple eg:isin eg:root .
+
+{
+	eg:tripleA eg:isin eg:unnamedgraph .
+}
+
+{
+	eg:tripleB eg:isin eg:unnamedgraph .
+}
+
+eg:g1 {
+	eg:tripleG1a eg:isin eg:g1 .
+	eg:tripleG1b eg:isin _:g1name .
+	
+	eg:g1sub1 {
+		eg:tripleG1sub1a eg:isin eg:g1sub1 .
+		eg:tripleG1sub1b eg:isin eg:g1sub1 .
+	}
+	
+	eg:g1sub2 {
+		eg:tripleG1sub2a eg:isin eg:g1sub2 .
+	}
+}
+
+eg:g1 {
+	eg:tripleG1c eg:isin eg:g1 .
+	_:g1name eg:haslabel "g1" .
+
+	eg:g1sub2 {
+		eg:tripleG1sub2b eg:isin eg:g1sub2 .
+	}
+}
+
+eg:g2 {
+	eg:info eg:text "L1 encapsulation" .
+
+	eg:g2sub1 {
+		eg:info eg:text "L2 encapsulation" .
+	
+		eg:g2sub1sub1 {
+			eg:info eg:text "L3 encapsulation" .
+		}
+	}
+}
+
+{
+	eg:tripleC eg:isin eg:unnamedgraph .
+}

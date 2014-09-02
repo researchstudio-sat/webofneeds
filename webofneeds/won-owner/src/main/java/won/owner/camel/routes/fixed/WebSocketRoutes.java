@@ -14,23 +14,19 @@
  *    limitations under the License.
  */
 
-
-package won.matcher.camel.routes.fixed;
-import org.apache.camel.builder.RouteBuilder;
+package won.owner.camel.routes.fixed;
 
 /**
  * User: LEIH-NB
- * Date: 10.10.13
+ * Date: 27.11.13
  */
-
-//TODO: change to asyncronous processing maybe
-public class Matcher2Node extends RouteBuilder{
+/*
+public class WebSocketRoutes extends RouteBuilder {
     @Override
-    public void configure(){
-        from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=5").routeId("Matcher2NodeRoute")
-                .wireTap("bean:matcherMessagingService?method=inspectMessage")
-                .recipientList(header("remoteBrokerEndpoint"));
-
+    public void configure() throws Exception {
+      from("websocket://owner")
+        .wireTap("bean:messagingService?method=inspectMessage")
+        .log("${body}")
+        .to("websocket://owner");
     }
-
-}
+}         */
