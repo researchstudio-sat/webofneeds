@@ -17,7 +17,6 @@
 package won.protocol.owner;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.context.ApplicationContextAware;
 import won.protocol.exception.*;
@@ -57,19 +56,19 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      * Activates the need object.
      *
      * @param needURI
-     * @param messageEvent contains the whole message as messageEvent RDF
+     * @param wonMessage <code>WonMessage</code> object which represents the message event
      * @throws won.protocol.exception.NoSuchNeedException if needURI does not refer to an existing need
      */
-    public void activate(URI needURI, Dataset messageEvent) throws Exception;
+    public void activate(URI needURI, WonMessage wonMessage) throws Exception;
 
     /**
      * Deactivates the need object, closing all its established connections.
      *
      * @param needURI
-     * @param messageEvent contains the whole message as messageEvent RDF
+     * @param wonMessage <code>WonMessage</code> object which represents the message event
      * @throws NoSuchNeedException if needURI does not refer to an existing need
      */
-    public void deactivate(URI needURI, Dataset messageEvent)
+    public void deactivate(URI needURI, WonMessage wonMessage)
             throws NoSuchNeedException, Exception;
 
     public ListenableFuture<URI> createNeed(
@@ -83,11 +82,11 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      * @param connectionURI the URI of the connection
      * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
      *                as well as the base URI of the graph will be attached to the resource identifying the event.
-     * @param messageEvent contains the whole message as messageEvent RDF
+     * @param wonMessage <code>WonMessage</code> representing the message event
      * @throws won.protocol.exception.NoSuchConnectionException if connectionURI does not refer to an existing connection
      * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
      */
-    public void open(URI connectionURI, Model content, Dataset messageEvent)
+    public void open(URI connectionURI, Model content, WonMessage wonMessage)
             throws Exception;
 
     /**
@@ -96,11 +95,11 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      * @param connectionURI the URI of the connection
      * @param content a rdf graph describing properties of the event. The null releative URI ('<>') inside that graph,
      *                as well as the base URI of the graph will be attached to the resource identifying the event.
-     * @param messageEvent contains the whole message as messageEvent RDF
+     * @param wonMessage <code>WonMessage</code> object which represents the message event
      * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
      * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
      */
-    public void close(URI connectionURI, Model content, Dataset messageEvent)
+    public void close(URI connectionURI, Model content, WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException, Exception;
 
     /**
@@ -110,17 +109,17 @@ public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAw
      *
      * @param connectionURI the local connection
      * @param message       the chat message
-     * @param messageEvent contains the whole message as messageEvent RDF
+     * @param wonMessage <code>WonMessage</code> object which represents the message event
      * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
      * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
      */
-    public void sendMessage(URI connectionURI, Model message, Dataset messageEvent) throws Exception;
+    public void sendConnectionMessage(URI connectionURI, Model message, WonMessage wonMessage) throws Exception;
 
     public ListenableFuture<URI> connect(
             URI needURI,
             URI otherNeedURI,
             Model content,
-            Dataset messageEvent)
+            WonMessage wonMessage)
             throws NoSuchNeedException,
             IllegalMessageForNeedStateException, ConnectionAlreadyExistsException,
             ExecutionException, InterruptedException, CamelConfigurationFailedException, Exception;

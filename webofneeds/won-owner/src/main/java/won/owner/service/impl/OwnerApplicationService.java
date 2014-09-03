@@ -107,7 +107,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         final ListenableFuture<URI> newNeedURI;
         try {
           wonMessageMap.put(wonMessage.getMessageEvent().getMessageURI(), wonMessage);
-          newNeedURI = ownerProtocolService.createNeed(content, active, wonNodeURI,wonMessage);
+          newNeedURI = ownerProtocolService.createNeed(content, active, wonNodeURI, wonMessage);
 
           newNeedURI.addListener(new Runnable()
           {
@@ -146,7 +146,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
           content = wonMessage.getMessageEvent().getModel();
 
           // ToDo (FS): change connect code such that the connectionID of the messageEvent will be used
-          ownerProtocolService.connect(needURI, otherNeedURI, content, null);
+          ownerProtocolService.connect(needURI, otherNeedURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
         }
@@ -159,10 +159,10 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
           switch (wonMessage.getMessageEvent().getNewNeedState()) {
             case ACTIVE:
-              ownerProtocolService.activate(needURI, null);
+              ownerProtocolService.activate(needURI, wonMessage);
               break;
             case INACTIVE:
-              ownerProtocolService.deactivate(needURI, null);
+              ownerProtocolService.deactivate(needURI, wonMessage);
           }
         } catch (Exception e) {
           logger.warn("caught Exception", e);
@@ -182,7 +182,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
           content = wonMessage.getMessageEvent().getModel();
 
-          ownerProtocolService.open(connectionURI, content, null);
+          ownerProtocolService.open(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
         }
@@ -201,7 +201,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
           content = wonMessage.getMessageEvent().getModel();
 
-          ownerProtocolService.close(connectionURI, content, null);
+          ownerProtocolService.close(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
         }
@@ -220,7 +220,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
           content = wonMessage.getMessageEvent().getModel();
 
-          ownerProtocolService.sendMessage(connectionURI, content, null);
+          ownerProtocolService.sendConnectionMessage(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
         }
