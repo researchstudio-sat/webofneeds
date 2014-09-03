@@ -39,7 +39,7 @@ public class DeactivateAllNeedsAction extends BaseEventBotAction
 
     List<URI> toDeactivate = getEventListenerContext().getBotContext().listNeedUris();
     for (URI uri: toDeactivate){
-      getEventListenerContext().getOwnerService().deactivate(uri);
+      getEventListenerContext().getOwnerService().deactivate(uri, null);
       getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
     }
   }

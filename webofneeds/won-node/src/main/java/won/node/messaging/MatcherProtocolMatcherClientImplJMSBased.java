@@ -16,6 +16,7 @@
 
 package won.node.messaging;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.node.service.impl.URIService;
 import won.protocol.jms.MessagingService;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Need;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -51,16 +53,17 @@ public class MatcherProtocolMatcherClientImplJMSBased implements MatcherProtocol
   private URIService uriService;
 
   @Override
-  public void matcherRegistered(final URI wonNodeURI) {
+  public void matcherRegistered(final URI wonNodeURI, final Dataset messageEvent) {
     Map headerMap = new HashMap<String, String>();
     headerMap.put("wonNodeURI", wonNodeURI.toString());
+    headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
     headerMap.put("protocol","MatcherProtocol");
     headerMap.put("methodName", "matcherRegistered");
     messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
   }
 
   @Override
-  public void needCreated(final URI needURI, final Model content)
+  public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage)
   {
 
       StringWriter sw = new StringWriter();
@@ -72,6 +75,7 @@ public class MatcherProtocolMatcherClientImplJMSBased implements MatcherProtocol
       Map headerMap = new HashMap<String, String>();
       headerMap.put("needUri", needURI.toString());
       headerMap.put("content",RdfUtils.toString(content));
+      headerMap.put("messageEvent",RdfUtils.toString(wonMessage.getMessageContent()));
       headerMap.put("protocol","MatcherProtocol");
       headerMap.put("methodName", "needCreated");
       headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix()+"/resource");
@@ -79,18 +83,20 @@ public class MatcherProtocolMatcherClientImplJMSBased implements MatcherProtocol
 
   }
   @Override
-  public void needActivated(final URI needURI){
+  public void needActivated(final URI needURI, final Dataset messageEvent){
     Map headerMap = new HashMap<String, String>();
     headerMap.put("needURI", needURI.toString());
+    headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
     headerMap.put("protocol","MatcherProtocol");
     headerMap.put("methodName","needActivated");
     headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix()+"/resource");
     messagingService.sendInOnlyMessage(null, headerMap,null,"outgoingMessages");
   }
   @Override
-  public void needDeactivated(final URI needURI){
+  public void needDeactivated(final URI needURI, final Dataset messageEvent){
     Map headerMap = new HashMap<String, String>();
     headerMap.put("needURI", needURI.toString());
+    headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
     headerMap.put("protocol","MatcherProtocol");
     headerMap.put("methodName","needDeactivated");
     headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix()+"/resource");

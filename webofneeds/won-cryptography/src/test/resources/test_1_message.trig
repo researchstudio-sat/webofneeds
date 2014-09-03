@@ -1,0 +1,48 @@
+@prefix :      <http://www.example.com/resource/need/100/v1#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sp:    <http://spinrdf.org/sp#> .
+@prefix acco:  <http://purl.org/acco/ns#> .
+@prefix tio:   <http://purl.org/tio/ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix wonmsg: <http://purl.org/webofneeds/message#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix gr:    <http://purl.org/goodrelations/v1#> .
+@prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+
+{ :OWN1   a                            signature:Signature ;
+          signature:hasGraphSigningMethod
+                  [ a                               signature:GraphSigningMethod ;
+                    signature:hasDigestMethod       signature:dm-sha-256 ;
+                    signature:hasGraphCanonicalizationMethod
+                            signature:gcm-fisteus-2010 ;
+                    signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
+                    signature:hasGraphSerializationMethod
+                            signature:gsm-trig ;
+                    signature:hasSignatureMethod    signature:sm-ecdsa
+                  ] ;
+          signature:hasSignatureValue  "MGQCMH9p9yO+drZ0ZZ/XJWANZ2aQlSSFURuav9i2FdA66Zb7lgf7maEMrcXBmCfP7YQfyAIwZglO\r\nPn41m+p2koCNd3+k+cQMcHWav/IECxFwjaxsJijB8Y+fkRgzj+278LZDCEkY" ;
+          signature:hasVerificationCertificate
+                  "cert" .
+
+  [ wonmsg:hasMethod    wonmsg:CreateNeed ;
+    wonmsg:hasProtocol  wonmsg:OSNPC
+  ] .
+}
+
+
+:OWN1 {
+    [ a                     won:Need ;
+      won:hasBasicNeedType  won:Supply ;
+      won:hasContent        [ a                          won:NeedContent ;
+                              won:hasContentDescription  [ a               tio:Taxi , gr:SomeItems ;
+                                                           gr:description  "Wherever you want to go, we'll take you there"@en ;
+                                                           gr:name         "Fastest taxi in town"@en
+                                                         ]
+                            ]
+    ] .
+}

@@ -16,12 +16,14 @@
 
 package won.node.messaging;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.jms.MessagingService;
+import won.protocol.message.WonMessage;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 
@@ -43,27 +45,27 @@ public class MatcherProtocolMatcherClientImpl implements MatcherProtocolMatcherS
   private MatcherProtocolMatcherServiceClientSide delegate;
 
   @Override
-  public void matcherRegistered(final URI wonNodeURI) {
+  public void matcherRegistered(final URI wonNodeURI, final Dataset messageEvent) {
     logger.debug("calling matcherRegistered");
-    delegate.matcherRegistered(wonNodeURI);
+    delegate.matcherRegistered(wonNodeURI, messageEvent);
   }
 
   @Override
-  public void needCreated(final URI needURI, final Model content)
+  public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage)
   {
     logger.debug("calling needCreated for needURI {}", needURI);
-    delegate.needCreated(needURI,content);
+    delegate.needCreated(needURI, content, wonMessage);
 
   }
   @Override
-  public void needActivated(final URI needURI){
+  public void needActivated(final URI needURI, final Dataset messageEvent){
     logger.debug("calling needActivated for needURI {}", needURI);
-    delegate.needActivated(needURI);
+    delegate.needActivated(needURI, messageEvent);
   }
   @Override
-  public void needDeactivated(final URI needURI){
+  public void needDeactivated(final URI needURI, final Dataset messageEvent){
     logger.debug("calling needDeactivated for needURI {}", needURI);
-    delegate.needDeactivated(needURI);
+    delegate.needDeactivated(needURI, messageEvent);
   }
 
 

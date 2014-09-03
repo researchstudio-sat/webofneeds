@@ -51,6 +51,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import javax.ws.rs.core.MediaType;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -278,7 +279,7 @@ public class RestNeedController {
   )
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
-  public DraftPojo createDraft(@RequestBody DraftPojo draftPojo) {
+  public DraftPojo createDraft(@RequestBody DraftPojo draftPojo) throws ParseException {
 
     User user = getCurrentUser();
 
@@ -524,10 +525,12 @@ public class RestNeedController {
 
     ConnectionPojo fullConnection = null;
     try {
-      ListenableFuture<URI> futureResult = ownerService.connect(URI.create(connectionPojo.getNeedURI()),
-                                     URI.create(connectionPojo.getRemoteNeedURI()),
-                           WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(FacetType.OwnerFacet.getURI(),
-                                                                                   FacetType.OwnerFacet.getURI()));
+      ListenableFuture<URI> futureResult = ownerService.connect(
+              URI.create(connectionPojo.getNeedURI()),
+              URI.create(connectionPojo.getRemoteNeedURI()),
+              WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(FacetType.OwnerFacet.getURI(),
+                    FacetType.OwnerFacet.getURI()),
+              null);
       URI connectionURI = futureResult.get();
       Connection connection = DataAccessUtils.loadConnection(connectionRepository,connectionURI);
       if (connection != null){
@@ -548,7 +551,7 @@ public class RestNeedController {
     return fullConnection;
   }
 
-  private DraftPojo resolveDraft(DraftPojo draftPojo, User user){
+  private DraftPojo resolveDraft(DraftPojo draftPojo, User user) throws ParseException {
     URI needURI;
     //Draft needDraft2 = new Draft();
 
@@ -586,7 +589,7 @@ public class RestNeedController {
       if (!needs.isEmpty()) {
         logger.warn("Deactivating old need");
         try {
-          ownerService.deactivate(needs.get(0).getNeedURI());
+          ownerService.deactivate(needs.get(0).getNeedURI(), null);
         } catch (Exception e) {
           logger.warn("Could not deactivate old Need: " + needs.get(0).getNeedURI());
         }
@@ -603,10 +606,17 @@ public class RestNeedController {
       needModel.setNsPrefix("","no:uri");
 
       if (needPojo.getWonNode() == null || needPojo.getWonNode().equals("")) {
-        ListenableFuture<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE);
+        ListenableFuture<URI> futureResult = ownerService.createNeed(
+                needModel,
+                needPojo.getState() == NeedState.ACTIVE,
+                null);
         needURI = futureResult.get();
       } else {
-        ListenableFuture<URI> futureResult = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE, URI.create(needPojo.getWonNode()));
+        ListenableFuture<URI> futureResult = ownerService.createNeed(
+                needModel,
+                needPojo.getState() == NeedState.ACTIVE,
+                URI.create(needPojo.getWonNode()),
+                null);
         needURI = futureResult.get();
       }
 

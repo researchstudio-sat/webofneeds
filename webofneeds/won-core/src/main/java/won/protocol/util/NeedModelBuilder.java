@@ -71,7 +71,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
       this.setState(needState.getURI());
     }
     Resource needContent = needResource.getPropertyResourceValue(WON.HAS_CONTENT);
-    if (needContent != null) {
+    if (needContent != null ) {
       copyValuesFromNeedContent(needContent);
     }
     Resource needModality = needResource.getPropertyResourceValue(WON.HAS_NEED_MODALITY);

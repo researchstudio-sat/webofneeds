@@ -1,5 +1,6 @@
 package won.node.facet.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -37,7 +38,7 @@ public class ParticipantFacetImpl extends AbstractFacet
     return FacetType.ParticipantFacet;
   }
 
-  public void connectFromNeed(final Connection con, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+  public void connectFromNeed(final Connection con, final Model content, final Dataset messageEvent) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     final Connection connectionForRunnable = con;
     logger.debug("Participant: ConnectFromNeed");
 
@@ -45,14 +46,17 @@ public class ParticipantFacetImpl extends AbstractFacet
       @Override
       public void run() {
         try {
-          ownerProtocolOwnerService.connect(con.getNeedURI(), con.getRemoteNeedURI(), connectionForRunnable.getConnectionURI(), content);
+          ownerProtocolOwnerService.connect(
+                  con.getNeedURI(), con.getRemoteNeedURI(),
+                  connectionForRunnable.getConnectionURI(), content, messageEvent);
         } catch (WonProtocolException e) {
           // we can't connect the connection. we send a deny back to the owner
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
           // For now, we call the close method as if it had been called from the owner side
           // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
           try {
-            ownerFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI(), content);
+            ownerFacingConnectionCommunicationService.close(
+                    connectionForRunnable.getConnectionURI(), content, messageEvent);
           } catch (NoSuchConnectionException e1) {
             logger.warn("caught NoSuchConnectionException:", e1);
           } catch (IllegalMessageForConnectionStateException e1) {
@@ -64,7 +68,8 @@ public class ParticipantFacetImpl extends AbstractFacet
   }
 
   @Override
-  public void openFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void openFromOwner(final Connection con, final Model content, final Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
     logger.debug("Participant: OpenFromOwner");
     if (con.getRemoteConnectionURI() != null) {
@@ -72,7 +77,7 @@ public class ParticipantFacetImpl extends AbstractFacet
         @Override
         public void run() {
           try {
-            needFacingConnectionClient.open(con, content);
+            needFacingConnectionClient.open(con, content, messageEvent);
           } catch (WonProtocolException e) {
             logger.debug("caught Exception:", e);
           } catch (Exception e) {
@@ -84,7 +89,8 @@ public class ParticipantFacetImpl extends AbstractFacet
   }
 
   @Override
-  public void closeFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void closeFromOwner(final Connection con, final Model content, final Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
     logger.debug("Participant: CloseFromOwner");
     if (con.getRemoteConnectionURI() != null) {
@@ -94,7 +100,7 @@ public class ParticipantFacetImpl extends AbstractFacet
         public void run()
         {
           try {
-            needFacingConnectionClient.close(con, content);
+            needFacingConnectionClient.close(con, content, messageEvent);
           } catch (WonProtocolException e) {
             logger.warn("caught WonProtocolException:", e);
           } catch (Exception e) {
@@ -105,7 +111,8 @@ public class ParticipantFacetImpl extends AbstractFacet
     }
   }
 
-  public void closeFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void closeFromNeed(final Connection con, final Model content, final Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
     logger.debug("Participant: CloseFromNeed");
     //TODO: create utilities for accessing addtional content
@@ -133,7 +140,7 @@ public class ParticipantFacetImpl extends AbstractFacet
             else {
               logger.debug("Committed: "+con.getConnectionURI()+" "+con.getNeedURI()+" "+con.getRemoteNeedURI() +" "+con.getState()+ " "+con.getTypeURI());
             }
-            ownerFacingConnectionClient.close(con.getConnectionURI(), content);
+            ownerFacingConnectionClient.close(con.getConnectionURI(), content, messageEvent);
           }
 
         } catch (WonProtocolException e) {
@@ -156,38 +163,9 @@ public class ParticipantFacetImpl extends AbstractFacet
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   @Override
-  public void connectFromOwner(final Connection con, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+  public void connectFromOwner(final Connection con, final Model content, final Dataset messageEvent)
+          throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     logger.debug("Participant: ConntectFromOwner");
 
     Resource baseRes = content.getResource(content.getNsPrefixURI(""));
@@ -212,7 +190,9 @@ public class ParticipantFacetImpl extends AbstractFacet
       public void run() {
 
         try {
-          Future<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
+          Future<URI> remoteConnectionURI = needProtocolNeedService.connect(
+                  con.getRemoteNeedURI(),con.getNeedURI(),
+                  connectionForRunnable.getConnectionURI(), remoteFacetModel, messageEvent);
           dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
 
         } catch (WonProtocolException e) {
@@ -221,7 +201,8 @@ public class ParticipantFacetImpl extends AbstractFacet
           // For now, we call the close method as if it had been called from the remote side
           // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
           try {
-            needFacingConnectionCommunicationService.close(connectionForRunnable.getConnectionURI(), content);
+            needFacingConnectionCommunicationService.close(
+                    connectionForRunnable.getConnectionURI(), content, messageEvent);
           } catch (NoSuchConnectionException e1) {
             logger.warn("caught NoSuchConnectionException:", e1);
           } catch (IllegalMessageForConnectionStateException e1) {

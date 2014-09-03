@@ -57,7 +57,7 @@ public interface OwnerProtocolNeedWebServiceEndpoint
   public void activate(@WebParam(name="needURI") final URI needURI) throws NoSuchNeedFault;
 
   @WebMethod
-  public URI createNeed(@WebParam(name="ownerURI")final URI ownerURI, @WebParam(name="content") final String content,
+  public URI createNeed(@WebParam(name="content") final String content,
                         @WebParam(name="activate")final boolean activate)
           throws IllegalNeedContentFault;
 

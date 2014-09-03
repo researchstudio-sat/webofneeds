@@ -1,6 +1,7 @@
 package won.node.facet.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -37,7 +38,8 @@ public class CoordinatorFacetImpl extends AbstractFacet
   }
 
   @Override
-  public void connectFromOwner(final Connection con, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+  public void connectFromOwner(final Connection con, final Model content, final Dataset messageEvent)
+          throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     logger.debug("Coordinator: ConntectFromOwner");
     Resource baseRes = content.getResource(content.getNsPrefixURI(""));
 
@@ -60,7 +62,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
 
     try {
       final ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),
-        con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel);
+        con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel, messageEvent);
       this.executorService.execute(new Runnable(){
         @Override
         public void run() {
@@ -82,7 +84,8 @@ public class CoordinatorFacetImpl extends AbstractFacet
       // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
       try {
         Connection c = closeConnectionLocally(connectionForRunnable, content);
-        needFacingConnectionCommunicationService.close(c.getConnectionURI(), content);
+          // ToDo (FS): should probably not be the same messageEvent!?
+        needFacingConnectionCommunicationService.close(c.getConnectionURI(), content, messageEvent);
       } catch (NoSuchConnectionException e1) {
         logger.warn("caught NoSuchConnectionException:", e1);
       } catch (IllegalMessageForConnectionStateException e1) {
@@ -98,7 +101,8 @@ public class CoordinatorFacetImpl extends AbstractFacet
     }
   }
 
-  public void openFromOwner(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void openFromOwner(final Connection con, final Model content, final Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
     logger.debug("Coordinator: OpenFromOwner");
 
@@ -107,7 +111,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
         @Override
         public void run() {
           try {
-            needFacingConnectionClient.open(con, content);
+            needFacingConnectionClient.open(con, content, messageEvent);
           } catch (WonProtocolException e) {
             logger.debug("caught Exception:", e);
           } catch (Exception e) {
@@ -119,7 +123,8 @@ public class CoordinatorFacetImpl extends AbstractFacet
   }
 
 
-  public void openFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void openFromNeed(final Connection con, final Model content, final Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
     logger.debug("Coordinator: OpenFromNeed");
 
@@ -139,7 +144,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
             myContent.setNsPrefix("","no:uri");
             Resource baseResource = myContent.createResource("no:uri");
             baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, WON_TX.COORDINATION_MESSAGE_COMMIT);
-            ownerFacingConnectionClient.open(con.getConnectionURI(), myContent);
+            ownerFacingConnectionClient.open(con.getConnectionURI(), myContent, messageEvent);
             globalCommit(con);
           }
           else{
@@ -148,7 +153,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
             {
               logger.debug("   " + c.getConnectionURI() + " " + c.getNeedURI() + " " + c.getRemoteNeedURI());
             }
-            ownerFacingConnectionClient.open(con.getConnectionURI(), content);
+            ownerFacingConnectionClient.open(con.getConnectionURI(), content, messageEvent);
           }
 
         } catch (WonProtocolException e) {
@@ -159,7 +164,8 @@ public class CoordinatorFacetImpl extends AbstractFacet
   }
 
   @Override
-  public void closeFromNeed(final Connection con, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void closeFromNeed(final Connection con, final Model content, final Dataset messageEvent)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
     logger.debug("Coordinator: closeFromOwner");
     executorService.execute(new Runnable()
@@ -169,7 +175,7 @@ public class CoordinatorFacetImpl extends AbstractFacet
       {
         try {
           //send close to the coordinator's owner (TODO: necessary?)
-          ownerFacingConnectionClient.close(con.getConnectionURI(), content);
+          ownerFacingConnectionClient.close(con.getConnectionURI(), content, messageEvent);
           globalAbort(con);
         } catch (WonProtocolException e) {
           logger.warn("caught WonProtocolException:", e);
@@ -215,7 +221,8 @@ public class CoordinatorFacetImpl extends AbstractFacet
             res.addProperty(WON_TX.COORDINATION_MESSAGE, WON_TX.COORDINATION_MESSAGE_ABORT);
           }
           closeConnectionLocally(c, content);
-          needFacingConnectionClient.close(c, myContent);  //Abort sent to participant
+            // ToDo (FS): replace null with close messageEvent
+          needFacingConnectionClient.close(c, myContent, null);  //Abort sent to participant
         }
       }
     }  catch (WonProtocolException e) {
@@ -237,7 +244,8 @@ public class CoordinatorFacetImpl extends AbstractFacet
           //emulate a close by owner
           c = closeConnectionLocally(c, content);
           //tell the partner
-          needFacingConnectionClient.close(c, content);
+            // ToDo (FS): replace null with close messageEvent
+          needFacingConnectionClient.close(c, content, null);
         }
       }
       logger.debug("Transaction commited!");

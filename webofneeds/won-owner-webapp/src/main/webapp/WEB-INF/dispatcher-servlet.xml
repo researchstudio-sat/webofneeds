@@ -19,10 +19,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:websocket="http://www.springframework.org/schema/websocket"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 http://www.springframework.org/schema/context
-http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
+http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+http://www.springframework.org/schema/websocket
+http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd">
 
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
@@ -39,5 +42,15 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.
 		<property name="prefix" value="/WEB-INF/jsp/"/>
 		<property name="suffix" value=".jsp"/>
 	</bean>
+    <websocket:handlers>
+        <websocket:mapping path="/msg" handler="wonWebSocketHandler"/>
+        <websocket:sockjs/>
+    </websocket:handlers>
 
-</beans>
+    <bean id="ownerApplicationService" class="won.owner.service.impl.OwnerApplicationService"/>
+
+    <bean id="wonWebSocketHandler" class="won.owner.web.websocket.WonWebSocketHandler">
+        <property name="ownerApplicationService" ref="ownerApplicationService"/>
+    </bean>
+    <bean id="webSocketSessionService" class="won.owner.web.websocket.WebSocketSessionService"/>
+ </beans>

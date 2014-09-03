@@ -60,7 +60,7 @@ public class RespondToMessageAction extends BaseEventBotAction
         URI connectionUri = messageEvent.getConnectionURI();
         logger.debug("sending message " + message);
         try {
-          getEventListenerContext().getOwnerService().sendMessage(connectionUri, messageContent);
+          getEventListenerContext().getOwnerService().sendMessage(connectionUri, messageContent, null);
         } catch (Exception e) {
           logger.warn("could not send message via connection {}", connectionUri, e);
         }

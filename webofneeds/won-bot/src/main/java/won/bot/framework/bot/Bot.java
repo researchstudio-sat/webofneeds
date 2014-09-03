@@ -43,6 +43,7 @@ public interface Bot
   public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Model needModel);
   public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
   public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+
   /**
    * Override this to be informed whenever the bot has created a new need successfully.
    * @param needUri
