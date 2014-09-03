@@ -67,6 +67,10 @@
 		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/builders.js"/>"></script>
 
+        <!-- TODO deletme -->
+        <script type="text/javascript" src="<c:url value="/app/cstm-directives/my-current-time-test.js"/>"></script>
+        <!-- TODO deleteme-end -->
+
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
 
