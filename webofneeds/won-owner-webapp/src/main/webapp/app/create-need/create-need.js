@@ -14,60 +14,129 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService, utilService, messageService, wonService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService) {
+    $scope.menuposition = $routeParams.menuposition;
+    $scope.title = $routeParams.title;
+
+
+    /*Text constants for new Need form*/
+    /*$rootScope.createNewPost = {
+
+        step1Texts :{
+            typeText : "Type *",
+            titleText : "Title *",
+            typeChangeText : "(change)",
+            titlePlaceholderText : "Roughly, what's it about?",
+            descriptionText : "Description *",
+            descriptionPlaceholderText : "And now with details! (By the way, there's specialised textboxes for things like pickup adress or time of availability",
+            tagsText : "Tags",
+            tagsPlaceholderText : "e.g. furniture, electronics, for children,...",
+            kindOfTypes : {
+                want : {title : "Want", comment : "I'm looking for..."},
+                offer : {title : "Offer", comment : "I'm offering..."},
+                activity : {title : "Activity", comment : "Looking for people to..."},
+                critique : {title : "Critique", comment : "Let's do something about..."}
+            }
+        },
+        step2Texts :{
+            comment1 : "Filling out the following categories makes it easier for people, who need what you have to offer, to find this post and start messaging with you.",
+            comment2 : "You can add ",
+            comment3 : "photos or sketches",
+            comment4 : " of the thing you're offering, or specify ",
+            comment5 : "where",
+            comment6 : "and ",
+            comment7 : "when",
+            comment8 : "it will be available.",
+            images : {
+                title : "Images",
+                commentWant : "Add photos of similar things or sketches to give people a better idea what you have in mind.",
+                commentOffer : "Add photos or sketches to give people a better idea what you're offering.",
+                commentActivity : "If you want you can add an image or photo here to illustrate the activity.",
+                commentCritique : "Add a photo, sketch (or screenshot) of the problem you want to point out."
+            }
+
+        }
+    }          */
+    /*Block for working with checking another post type */
+    $scope.getCurrentTypeOfOffer = function(){
+        if($scope.menuposition == 0) return "Want - I'm looking for...";
+        if($scope.menuposition == 1) return "Offer - I'm offering...";
+        if($scope.menuposition == 2) return "Together - Looking for people to...";
+        if($scope.menuposition == 3) return "Change - Let's do something about...";
+    }
+
+    $scope.showPublicChangeTypeOfNeed = false;
+    $scope.clickOnChangeTypeOfNeed = function(){
+        $scope.showPublicChangeTypeOfNeed = !$scope.showPublicChangeTypeOfNeed;
+        $('#changePostMenuItem' + $scope.menuposition).addClass('active');
+    }
+
+    $scope.onClickChangePostMenuItem = function(item) {
+        if(item > -1){
+            if($scope.menuposition > -1){
+                $('#changePostMenuItem' + $scope.menuposition).removeClass('active');
+            }
+            $scope.menuposition = item;
+            $('#changePostMenuItem' + $scope.menuposition).addClass('active');
+            $scope.showPublicChangeTypeOfNeed = false;
+        }
+    }
+
+    $scope.tooltipText = 'Required so other people can find the post.';
 
 	$scope.uploadOptions = {
 		maxFileSize:5000000,
 		acceptFileTypes:/(\.|\/)(gif|jpe?g|png)$/i
 	};
 
-    $scope.descriptionPlaceholder = "And now with details!" +
-        "(By the way, there's specialised textboxes for things like pickup adress or time of availability";
-
     $scope.currentStep = 1;
-    $scope.numberOfSteps = 4;
+    $scope.numberOfSteps = 3;
     $scope.toJump = 0;
 	$scope.successShow = false;
 
     $scope.previousButton = false;
-    $scope.saveButton = false;
-    $scope.saveDraftButton = false;
-    $scope.nextButton = false;
-    $scope.previewButton = false;
+    $scope.saveDraftButton = true;
+    $scope.nextButton = true;
+    $scope.previewButton = true;
+    $scope.publishButton = false;
     $scope.collapsed = false;
-    $scope.needURI = {};
-    $scope.needURI2 = {};
+
     $scope.setShowButtons = function(step){
-        if(step == 1){
+        /*if(step == 1){
             $scope.previousButton = false;
             $scope.saveDraftButton = false;
             $scope.nextButton = false;
             $scope.previewButton = false;
-            $scope.saveButton = false;
-        }else if(step == 2  ){
-            $scope.previousButton = true;
+        }else*/ if(step == 1){//2  ){
+            $scope.previousButton = false;
             $scope.saveDraftButton = true;
             $scope.nextButton = true;
             $scope.previewButton = true;
-            $scope.saveButton = true;
-        } else if(step == 3){
+            $scope.publishButton = false;
+        } else if(step == 2){//3){
             if($scope.collapsed == true){
-                $scope.previousButton = false;
+                $scope.previousButton = true;
                 $scope.saveDraftButton = true;
                 $scope.nextButton = false;
-                $scope.previewButton = true;
-                $scope.saveButton = true;
-
+                $scope.previewButton = false;
+                $scope.publishButton = true;
             } else {
                 $scope.previousButton = true;
                 $scope.saveDraftButton = true;
                 $scope.nextButton = false;
                 $scope.previewButton = true;
-                $scope.saveButton = true;
+                $scope.publishButton = false;
             }
+        }else if(step == 3){
+            $scope.previousButton = true;
+            $scope.saveDraftButton = true;
+            $scope.nextButton = false;
+            $scope.previewButton = false;
+            $scope.publishButton = true;
         }
+
     }
-    $scope.needType = function($routeParams){
+    /*$scope.needType = function($routeParams){
         if($routeParams.needType == "want"){
             return "DEMAND";
         }else if($routeParams.needType == "offer"){
@@ -77,8 +146,21 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         } else if($routeParams.needType == "critique"){
             return "CRITIQUE";
         }
+    }       */
+
+    $scope.needType = function(){
+        if($scope.menuposition == 0){
+            return "DEMAND";
+        }else if($scope.menuposition == 1){
+            return "SUPPLY";
+        } else if($scope.menuposition == 2){
+            return "DO_TOGETHER";
+        } else if($scope.menuposition == 3){
+            return "CRITIQUE";
+        }
     }
-	$scope.marker = null;
+
+    $scope.marker = null;
 
     $scope.getMapOptions = function(){
 
@@ -101,21 +183,22 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
 	$scope.getCleanNeed = function() {
 		return {
-			title:'',
-			textDescription:'',
-			contentDescription:'',
-			state:'ACTIVE',
-			basicNeedType:'DEMAND',
-			tags:[],
-			startTime:'',
-			endTime:'',
-			wonNode:'',
-			binaryFolder:md5((new Date().getTime() + Math.random(1)).toString())
+			title               :$scope.title,
+			textDescription     :'',
+			contentDescription  :'',
+			state               : 'ACTIVE',
+			basicNeedType       : $scope.needType(),
+			tags                :[],
+			startTime           :'',
+			endTime             :'',
+			wonNode             :'',
+			binaryFolder        :md5((new Date().getTime() + Math.random(1)).toString())
 		};
 	};
 
 	$scope.need = $scope.getCleanNeed();
-    $scope.need.basicNeedType = $scope.needType($routeParams);
+    $scope.need.basicNeedType = $scope.needType();
+
 	$scope.onClickMap = function($event, $params) {
 		if (this.marker == null) {
 			this.marker = new google.maps.Marker({
@@ -142,6 +225,12 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 		$scope.need.tags.splice($scope.need.tags.indexOf(tagName),1);
 	};
 
+    /*$scope.saveDraft = function () {
+      //  needService.saveDraft($scope.need);
+        if($scope.currentStep <= $scope.numberOfSteps) {
+            $scope.currentStep ++;
+        }
+    };  */
     $scope.nextStep = function(){
         if($scope.currentStep <= $scope.numberOfSteps) {
 
@@ -264,33 +353,24 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 			$scope.successShow = true;
 		});    */
 	//};
+    $scope.saveDraft = function(){
+        needService.saveDraft($scope.need, $scope.currentStep,userService.getUnescapeUserName()).then(function(){
+            $scope.successShow = true;
+
+        });
+    }
+    $scope.publish = function () {
+        //TODO logic
+        /*needService.save($scope.need).then(function() {
+         $scope.need = $scope.getCleanNeed();
+         $scope.successShow = true;
+         }); */
+    };
 
 
-	$scope.cancel = function () {
+    $scope.cancel = function () {
 		$location.path("/");
 	};
-
-    $scope.handleFileSelect = function(evt){
-        var files = evt.target.files;
-
-
-        var output = [];
-        for(var i = 0, f; f= files[i];i++){
-            var reader = new FileReader();
-
-            reader.onload = (function(theFile){
-                return function(e){
-                    var inputText =  reader.result;
-                    window.jsonld.fromRDF(inputText,{format:'application/trig'},function(err,doc){
-                        console.log(doc);
-                    });
-                    console.log(inputText);
-                }
-            })(f);
-            reader.readAsText(f);
-        }
-    }
-    document.getElementById('fileInput').addEventListener('change',$scope.handleFileSelect, false);
 
 
 
@@ -318,9 +398,9 @@ angular.module('won.owner').directive('wonProgressTracker',function factory(){
                     $scope.processSteps.secondStep = true;
                 }else if(currentStep == 3) {
                     $scope.processSteps.thirdStep = true;
-                }else if(currentStep == 4){
+                }/*else if(currentStep == 4){
                     $scope.processSteps.fourthStep = true;
-                }
+                } */
             };
             $scope.showPublic = function(num) {
                 if($scope.currentStep != num){
@@ -399,16 +479,31 @@ angular.module('won.owner').directive('wonGallery', function factory() {
 	};
 });
 angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  $location, $http, $routeParams, needService, mapService, userService){
-  $scope.imageInputFieldCollapsed = true;
-  $scope.locationInputFieldCollapsed = true;
-  $scope.timeInputFieldCollapsed = true;
+    $scope.menuposition = $routeParams.menuposition;
 
-  $scope.imageCollapseClick = function(){
+
+    $scope.imageInputFieldCollapsed = true;
+    $scope.locationInputFieldCollapsed = true;
+    $scope.timeInputFieldCollapsed = true;
+
+    $scope.imageCollapseClick = function(){
         $scope.imageInputFieldCollapsed = !$scope.imageInputFieldCollapsed;
     };
 
     $scope.locationCollapseClick = function(){
         $scope.locationInputFieldCollapsed = !$scope.locationInputFieldCollapsed;
     };
+
+    $scope.timeCollapseClick = function(){
+        $scope.timeInputFieldCollapsed = !$scope.timeInputFieldCollapsed;
+    };
+
+    $scope.getImagesComment = function(){
+        if($scope.menuposition == 0) return "Add photos of similar things or sketches to give people a better idea what you have in mind."
+        if($scope.menuposition == 1) return "Add photos or sketches to give people a better idea what you're offering.";
+        if($scope.menuposition == 2) return "If you want you can add an image or photo here to illustrate the activity.";
+        if($scope.menuposition == 3) return "Add a photo, sketch (or screenshot) of the problem you want to point out.";
+    }
 });
+
 

@@ -110,49 +110,10 @@ public class MessageEventMapper implements ModelMapper<MessageEvent>
       // extract message event URI and message type
       WonMessageType type = null;
       Resource eventRes = null;
-      Resource responseState = null;
       StmtIterator stmtIterator = model.listStatements(null, RDF.type, RdfUtils.EMPTY_RDF_NODE);
       while (stmtIterator.hasNext()) {
         Statement stmt = stmtIterator.nextStatement();
-        if (stmt.getObject().equals(WONMSG.TYPE_CREATE)) {
-          type = WonMessageType.CREATE_NEED;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_CREATE_RESPONSE)) {
-           type = WonMessageType.CREATE_RESPONSE;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_CONNECT)) {
-           type = WonMessageType.CONNECT;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_CONNECT_RESPONSE)) {
-           type = WonMessageType.CONNECT_RESPONSE;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_NEED_STATE)) {
-          type = WonMessageType.NEED_STATE;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_NEED_STATE_RESPONSE)) {
-          type = WonMessageType.NEED_STATE_RESPONSE;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_OPEN)) {
-          type = WonMessageType.OPEN;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_OPEN_RESPONSE)) {
-          type = WonMessageType.OPEN_RESPONSE;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_CLOSE)) {
-          type = WonMessageType.CLOSE;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_CLOSE_RESPONSE)) {
-          type = WonMessageType.CLOSE_RESPONSE;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_CONNECTION_MESSAGE)) {
-          type = WonMessageType.CONNECTION_MESSAGE;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_CONNECTION_MESSAGE_RESPONSE)) {
-          type = WonMessageType.CONNECTION_MESSAGE_RESPONSE;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_CREATE_RESPONSE)) {
-          type = WonMessageType.CREATE_RESPONSE;
-        }
-        // ToDo (FS): also check if the predicate is msg:hasResponseState
-        else if (stmt.getObject().equals(WONMSG.TYPE_RESPONSE_STATE_SUCCESS)) {
-          responseState = WONMSG.TYPE_RESPONSE_STATE_SUCCESS;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_RESPONSE_STATE_FAILURE)) {
-          responseState = WONMSG.TYPE_RESPONSE_STATE_FAILURE;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_NEED_ID)) {
-          responseState = WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_NEED_ID;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_CONNECTION_ID)) {
-          responseState = WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_CONNECTION_ID;
-        } else if (stmt.getObject().equals(WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_MESSAGE_ID)) {
-          responseState = WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_MESSAGE_ID;
-        }
+        type = WonMessageType.getWonMessageType(stmt.getObject().asResource());
         if (type != null) {
           eventRes = stmt.getSubject();
           break;
@@ -160,9 +121,21 @@ public class MessageEventMapper implements ModelMapper<MessageEvent>
       }
       msgEvent.setMessageType(type);
       msgEvent.setMessageURI(URI.create(eventRes.getURI()));
-      if(responseState!=null){
-        msgEvent.setResponseState(URI.create(responseState.getURI()));
 
+      ResponseState responseState = null;
+      stmtIterator =
+        model.listStatements(null, WONMSG.HAS_RESPONSE_STATE_PROPERTY, RdfUtils.EMPTY_RDF_NODE);
+      while (stmtIterator.hasNext()) {
+        Statement stmt = stmtIterator.nextStatement();
+
+        responseState = ResponseState.getResponseState(stmt.getObject().asResource());
+        if (responseState != null) {
+          break;
+        }
+      }
+
+      if(responseState != null){
+        msgEvent.setResponseState(URI.create(responseState.getResource().getURI()));
       }
 
       stmtIterator = model.listStatements(eventRes, null, RdfUtils.EMPTY_RDF_NODE);

@@ -1,0 +1,117 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<div style="padding-top: 40px;padding-bottom: 8em;">
+    <div ng-show="results.length > 0">
+        <div class="row">
+            <div class="col-md-12" style="font-size: 1.8em;">
+                <strong>What others offer:</strong> {{searching.title}}
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-2">Related Tags:</div>
+                <div><input class="col-md-10" type="text" value="Amsterdam,Washington,Sydney,Beijing,Cairo" data-role="tagsinput"/></div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-4 pull-left">
+                    <div class="row">
+                        <div class="pull-left">
+                            Searching result on this server?
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="pull-left">
+                            Location:
+                        </div>
+                        <div class="pull-left">
+                            <button type="button" class="btn dropdown-toggle" id="newPostSearchMenu"
+                                    data-toggle="dropdown">
+                                Select your location
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="0" href="#">Searching by address, zip, county, etc</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="1" href="#">Current location</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="row col-md-8">
+                    <div class="pull-left">
+                        <button type="button" ng-click="createNewPost()" class="btn btn-primary button-top-margin">Matches are better!</button>
+                    </div>
+                    <div class="pull-left">
+                        <a href="" tooltip="Creating a post will bring you alerts if matches were found: 24/7 and from all connected servers">Why
+                            ?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container col-md-12">
+            <div class="well col-md-4">
+                <div class="row">
+                    <div class="pull-left">
+                        <a href="#/search/1" class="thumbnail">
+                            <img src="/images/thumbnail_demo.jpg"
+                                 alt="Generic placeholder thumbnail">
+                        </a>
+                    </div>
+                    <div class="pull-right">
+                        <a href="#/search/1" class="thumbnail">
+                            <img src="/images/thumbnail_demo.jpg"
+                                 alt="Generic placeholder thumbnail">
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="pull-left">
+                        <a href="#/search/1" class="thumbnail">
+                            <img src="/images/thumbnail_demo.jpg"
+                                 alt="Generic placeholder thumbnail">
+                        </a>
+                    </div>
+                    <div class="pull-right">
+                        <a href="#/search/1" class="thumbnail">
+                            <img src="/images/thumbnail_demo.jpg"
+                                 alt="Generic placeholder thumbnail">
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <won-Post-Detail class="col-md-8" ng-controller="PostDetailCtrl"></won-Post-Detail>
+
+        </div>
+    </div>
+    <div ng-show="results.length == 0">
+        <div>
+            What {{searching.type}}. {{searching.title}}
+        </div>
+        <div>
+            Sorry, we didn’t find results with this term
+        </div>
+        <div>
+            But <a href="" ng-click="createNewPost()">create a new post</a> and get matches and notifications!
+        </div>
+        <div>
+            <button type="submit" ng-click="createNewPost()" class="btn btn-primary button-top-margin">Create Post</button>
+        </div>
+    </div>
+</div>
