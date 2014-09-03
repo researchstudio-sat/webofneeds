@@ -39,4 +39,38 @@ public enum WonMessageType
     return resource;
   }
 
+  public static WonMessageType getWonMessageType(Resource resource) {
+
+    if (WONMSG.TYPE_CREATE.equals(resource))
+      return CREATE_NEED;
+    if (WONMSG.TYPE_CONNECT.equals(resource))
+      return CONNECT;
+    if (WONMSG.TYPE_NEED_STATE.equals(resource))
+      return NEED_STATE;
+    if (WONMSG.TYPE_OPEN.equals(resource))
+      return OPEN;
+    if (WONMSG.TYPE_CLOSE.equals(resource))
+      return CLOSE;
+    if (WONMSG.TYPE_CONNECTION_MESSAGE.equals(resource))
+      return CONNECTION_MESSAGE;
+    if (WONMSG.TYPE_HINT.equals(resource))
+      return HINT_MESSAGE;
+
+    // response classes
+    if (WONMSG.TYPE_CREATE_RESPONSE.equals(resource))
+      return CREATE_RESPONSE;
+    if (WONMSG.TYPE_CONNECT_RESPONSE.equals(resource))
+      return CONNECT_RESPONSE;
+    if (WONMSG.TYPE_NEED_STATE_RESPONSE.equals(resource))
+      return NEED_STATE_RESPONSE;
+    if (WONMSG.TYPE_CLOSE_RESPONSE.equals(resource))
+      return CLOSE_RESPONSE;
+    if (WONMSG.TYPE_OPEN_RESPONSE.equals(resource))
+      return OPEN_RESPONSE;
+    if (WONMSG.TYPE_CONNECTION_MESSAGE_RESPONSE.equals(resource))
+      return CONNECT_RESPONSE;
+
+    return null;
+  }
+
 }
