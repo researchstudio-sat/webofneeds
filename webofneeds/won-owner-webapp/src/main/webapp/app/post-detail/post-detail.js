@@ -26,17 +26,19 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     //alert($routeParams.postId);
     var imagesPerPage = 6;
 
+    $scope.tags = ['Tv', 'mint', 'free', 'black', '720p'];
+
     <!-- TODO call here backend to load images of the post -->
-    $scope.images = [{url: '/images/thumbnail_demo.jpg'},
-        {url: '/images/thumbnail_demo_blue.jpg'},
-        {url: '/images/thumbnail_demo_brown.jpg'},
-        {url: '/images/thumbnail_demo_green.jpg'},
-        {url: '/images/thumbnail_demo_red.jpg'},
-        {url: '/images/thumbnail_demo_yellow.jpg'},
-        {url: '/images/thumbnail_demo.jpg'},
-        {url: '/images/thumbnail_demo_blue.jpg'},
-        {url: '/images/thumbnail_demo_brown.jpg'},
-        {url: '/images/thumbnail_demo_green.jpg'}];
+    $scope.images = [{url: 'images/thumbnail_demo.jpg'},
+        {url: 'images/thumbnail_demo_blue.jpg'},
+        {url: 'images/thumbnail_demo_brown.jpg'},
+        {url: 'images/thumbnail_demo_green.jpg'},
+        {url: 'images/thumbnail_demo_red.jpg'},
+        {url: 'images/thumbnail_demo_yellow.jpg'},
+        {url: 'images/thumbnail_demo.jpg'},
+        {url: 'images/thumbnail_demo_blue.jpg'},
+        {url: 'images/thumbnail_demo_brown.jpg'},
+        {url: 'images/thumbnail_demo_green.jpg'}];
 
     // just simple for now
     $scope.bigImage = $scope.images[0];

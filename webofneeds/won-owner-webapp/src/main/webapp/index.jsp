@@ -28,7 +28,7 @@
 		<link rel="stylesheet" href="style/main.css"/>
 	<link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	<link rel="stylesheet" href="style/datepicker.css"/>
-	<link rel="stylesheet" href="../font-awesome-4.1.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="font-awesome-4.1.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="style/lightbox.css"/>
 	<link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
     <link rel="stylesheet" href="style/star-rating.css"/>
@@ -148,16 +148,16 @@
 						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
 					</a>
 					<ul class="dropdown-menu">
-						<li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img src="/images/type_posts/want.png"/>&nbsp;I want
+						<li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img src="images/type_posts/want.png"/>&nbsp;I want
 							to <strong>have</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/images/type_posts/offer.png"/>&nbsp;I
+						<li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="images/type_posts/offer.png"/>&nbsp;I
 							<strong>offer</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I
+						<li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="images/type_posts/todo.png"/>&nbsp;I
 							want to do something <strong>together</strong></a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/images/type_posts/change.png"/>&nbsp;I
+						<li><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="images/type_posts/change.png"/>&nbsp;I
 							want to <strong>change</strong> something</a></li>
 						<li class="divider"></li>
 						<li class="dropdown-submenu">
@@ -176,16 +176,16 @@
 						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
 					</a>
 					<ul class="dropdown-menu">
-						<li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img src="/images/type_posts/want.png"/>&nbsp;I want
+						<li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img src="images/type_posts/want.png"/>&nbsp;I want
 							to <strong>have</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/images/type_posts/offer.png"/>&nbsp;I
+						<li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="images/type_posts/offer.png"/>&nbsp;I
 							<strong>offer</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I
+						<li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="images/type_posts/todo.png"/>&nbsp;I
 							want to do something <strong>together</strong></a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/images/type_posts/change.png"/>&nbsp;I
+						<li><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="images/type_posts/change.png"/>&nbsp;I
 							want to <strong>change</strong> something</a></li>
 					</ul>
 				</li>

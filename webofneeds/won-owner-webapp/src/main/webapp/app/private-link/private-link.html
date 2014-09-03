@@ -19,7 +19,7 @@
     <div>
         <div style="font-size: 1.8em; text-align: center ;">
             <img ng-show="!postClosed" src="{{img_path}}" alt="Generic placeholder thumbnail" style="z-index: 0">
-            <!--TODO put here second layer on the first layer picture--><img ng-show="postClosed" src="/images/closed.PNG" alt="Generic placeholder thumbnail">
+            <!--TODO put here second layer on the first layer picture--><img ng-show="postClosed" src="images/closed.PNG" alt="Generic placeholder thumbnail">
             <strong>{{title}}</strong>
         </div>
         <div style="text-align: center ;">
@@ -48,9 +48,9 @@
                     <div class="row col-lg-12 text-center">
                         <!--<div class="panel panel-default"> -->
                             <div class="btn-group">
-                                <button id="1" ng-click="clickOnMessageButton(1)" type="button" class="btn btn-success"><img src="/images/conversations.svg">Conversations</button>
-                                <button id="2" ng-click="clickOnMessageButton(2)" type="button" class="btn btn-success"><img src="/images/requests.svg">Requests</button>
-                                <button id="3" ng-click="clickOnMessageButton(3)" type="button" class="btn btn-success"><img src="/images/matches.svg">Matches</button>
+                                <button id="1" ng-click="clickOnMessageButton(1)" type="button" class="btn btn-success"><img src="images/conversations.svg">Conversations</button>
+                                <button id="2" ng-click="clickOnMessageButton(2)" type="button" class="btn btn-success"><img src="images/requests.svg">Requests</button>
+                                <button id="3" ng-click="clickOnMessageButton(3)" type="button" class="btn btn-success"><img src="images/matches.svg">Matches</button>
                             </div>
                             <table st-table="messages" class="table table-bordered table-striped">
                                 <thead>
@@ -98,7 +98,7 @@
                                 <tr>
                                     <td>
                                         <div class="row col-lg-3">
-                                            <img src="/images/house.gif" width="50" height="50"> <!--TODO change size-->
+                                            <img src="images/house.gif" width="50" height="50"> <!--TODO change size-->
                                             </br>{{chosenMessage.datetime | date}}</br>{{chosenMessage.datetime | date:'HH:mm'}} <!--TODO put here time-->
                                         </div>
                                         <p class="row col-lg-9 text-justify">
@@ -112,7 +112,7 @@
                                             {{chosenMessage.msg}}
                                         </p>
                                         <div class="row col-lg-1">
-                                            <img src="/images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
+                                            <img src="images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
                                             </br>{{chosenMessage.datetime | date}}</br>{{chosenMessage.datetime | date:'HH:mm'}} <!--TODO put here time-->
                                         </div>
                                     </td>
@@ -434,7 +434,7 @@
                             Bookmark or otherwise save this link. Access it to chat or browse matches to your post. You shouldn’t give it away.
                         </div>
                         <div class="col-lg-1 pull-right">
-                            <img src="/images/messageWasSent.PNG"/>
+                            <img src="images/messageWasSent.PNG"/>
                         </div>
                     </div>
                     <div class="row col-lg-12">
@@ -526,11 +526,11 @@
                     </div>
                     <div class="row col-lg-12">
                         <div class="col-lg-1">
-                            <!--<img src="/images/social_icons_32x32/32-facebook.png" href="" facebook class="facebookShare" data-url='http://google.com' data-shares='shares'/>     -->
+                            <!--<img src="images/social_icons_32x32/32-facebook.png" href="" facebook class="facebookShare" data-url='http://google.com' data-shares='shares'/>     -->
                             <!--<a facebook     class="facebookShare" data-url='http://google.com' data-shares='shares'></a> -->
 
                             <a href="">
-                                <img src="/images/social_icons_32x32/32-facebook.png"
+                                <img src="images/social_icons_32x32/32-facebook.png"
                                    onclick="
                                         window.open(
                                           'https://www.facebook.com/sharer/sharer.php?u={{publicLink}}', //+encodeURIComponent(location.href),
@@ -541,7 +541,7 @@
                             </a>
                         </div>
                         <!--<div class="col-lg-1">
-                            <img src="/images/social_icons_32x32/32-twitter.png" href=""/>
+                            <img src="images/social_icons_32x32/32-twitter.png" href=""/>
                         </div>  -->
                     </div>
                 </div>

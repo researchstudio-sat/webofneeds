@@ -258,21 +258,38 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
 
 	$scope.error = '';
 
-
+    // not used for login now
+    /*
 	onLoginResponse = function(result) {
 		if (result.status == 'OK') {
+            alert('signed');
 			userService.setAuth($scope.username);
-			$location.path('/');
+			$location.path('/owner');
 
 		} else {
+            alert('error');
 			$scope.error = result.message;
 		}
 	}
+	*/
+
+    onLoginSuccessful = function(result) {
+        userService.setAuth($scope.username);
+        $window.location.href = '/owner';
+
+    }
+    onLoginError = function(response) {
+        $scope.error = result.message;
+        console.log("LOGIN ERROR q509qriafjlkj");
+        console.log(response);
+    }
+
 
 	$scope.onClickSignIn = function () {
 		$scope.error = '';
 		if($scope.signInForm.$valid) {
-			userService.logIn($scope.user).then(onLoginResponse);
+            alert('signing');
+			userService.logIn($scope.user).then(onLoginSuccessful, onLoginError);
 		}
 	}
 
@@ -358,7 +375,7 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
     onLoginSuccessful = function(result) {
         //if (result.status == 'OK') {
         userService.setAuth($scope.username);
-        $window.location.href = '/';
+        $window.location.href = '/owner';
 
     }
     onLoginError = function(response) {

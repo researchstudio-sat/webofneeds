@@ -8,7 +8,7 @@
 angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope) {
 
     $scope.title = 'New Flat, Need Furniture';
-    $scope.img_path = '/images/thumbnail_demo.jpg';
+    $scope.img_path = 'images/thumbnail_demo.jpg';
     $rootScope.postClosed = false;
     $rootScope.postShouldBeClosed = false;
     $rootScope.postShouldBeReopened = false;

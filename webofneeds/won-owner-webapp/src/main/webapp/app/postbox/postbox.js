@@ -85,10 +85,10 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
 	];
 
     $scope.getTypePicURI = function (type) {
-        if(type=='Want') return "/images/type_posts/want.png";
-        else if(type=='Change') return "/images/type_posts/change.png";
-        else if(type=='Offer') return "/images/type_posts/offer.png";
-        else return "/images/type_posts/todo.png";
+        if(type=='Want') return "images/type_posts/want.png";
+        else if(type=='Change') return "images/type_posts/change.png";
+        else if(type=='Offer') return "images/type_posts/offer.png";
+        else return "images/type_posts/todo.png";
     };
 
     // TODO call backend method here
