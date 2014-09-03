@@ -35,7 +35,8 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     $scope.nextButton = false;
     $scope.previewButton = false;
     $scope.collapsed = false;
-
+    $scope.needURI = {};
+    $scope.needURI2 = {};
     $scope.setShowButtons = function(step){
         if(step == 1){
             $scope.previousButton = false;
@@ -169,7 +170,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         }
 
     }
-
+    /*
     $scope.saveDraft = function(){
       // ld = new window.NeedBuilder().needURI("http://needURI").hasBasicNeedType("won:Demand").title('test').build();
         needRandomId = utilService.getRandomInt(1,9223372036854775807);
@@ -188,9 +189,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             .active()
             .supply()
             .build();
-
+        $scope.needURI = needURI;
         newNeedUriPromise = wonService.createNeed(needJson);
-
+        */
         /**
         messageJson = new window.won.CreateMessageBuilder(needJson)
             .addMessageGraph()
@@ -200,9 +201,10 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             .build();
          sender = messageService.sendMessage(messageJson);
         */
-
+        /*
         needRandomId_2 = utilService.getRandomInt(1,9223372036854775807);
-        needURI_2 = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId;
+        needURI_2 = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId_2;
+        $scope.needURI2 = needURI_2;
         needJson_2 = new window.won.NeedBuilder()
             .title("testneed")
             .setContext()
@@ -218,7 +220,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             .supply()
             .build();
         newNeedUriPromise_2 = wonService.createNeed(needJson_2);
-
+         */
         /*messageJson_2 = new window.won.CreateMessageBuilder(needJson_2)
             .addMessageGraph()
             .eventURI("34543242134")
@@ -228,13 +230,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         sender = messageService.sendMessage(messageJson_2);
        */
        // messageFactory.generateCreateNeedMessage($scope.need);
-        connectionRandomId = utilService.getRandomInt(1,9223372036854775807);
-        connectionURI = needJson["@context"]["@base"]+$scope.connectionURIPath+"/"+connectionRandomId;
-        connectionJson = new window.won.ConnectionBuilder()
-            .setContext()
-            .connectionURI(connectionURI)
-            .build();
-        //wonService.connect(connectionJson);
+
         /*connectMessage = new window.won.ConnectMessageBuilder(connectionJson)
             .addMessageGraph()
             .eventURI("2345432343")
@@ -254,13 +250,20 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
         }
         );       */
-    }
-	$scope.save = function () {
-		needService.save($scope.need).then(function() {
+   // }
+	/*$scope.save = function () {
+        connectionRandomId = utilService.getRandomInt(1,9223372036854775807);
+        connectionURI = needJson["@context"]["@base"]+$scope.connectionURIPath+"/"+connectionRandomId;
+        connectionJson = new window.won.ConnectionBuilder()
+            .setContext()
+            .connectionURI(connectionURI)
+            .build();
+        wonService.connect(connectionJson, $scope.needURI2, $scope.needURI);    */
+		/*needService.save($scope.need).then(function() {
 			$scope.need = $scope.getCleanNeed();
 			$scope.successShow = true;
-		});
-	};
+		});    */
+	//};
 
 
 	$scope.cancel = function () {

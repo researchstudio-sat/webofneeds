@@ -446,8 +446,8 @@
             getContext :  function () {               //TODO inherit from base buiilder
                 return this.data["@context"];
             },
-            hasSenderNeed: function(){
-                this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":this.data["@context"]["@base"]};
+            hasSenderNeed: function(senderNeedURI){
+                this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":senderNeedURI};
                 return this;
             },
             hasSenderNode: function(senderNodeURI){
@@ -459,7 +459,7 @@
                 return this;
             },
             receiver: function(){
-                this.getMessageEventNode()["msg:receiver"]={"@id":this.getMessageEventNode()["msg:hasReceiverNeed"]+"/facets#owner"};
+                this.getMessageEventNode()["msg:receiver"]={"@id":this.getMessageEventNode()["msg:hasReceiverNeed"]["@id"]+"/facets#owner"};
                 return this;
             },
             hasReceiverNeed: function(receiverNeedURI){

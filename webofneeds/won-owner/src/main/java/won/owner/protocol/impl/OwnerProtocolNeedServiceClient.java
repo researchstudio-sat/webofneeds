@@ -64,6 +64,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
   private NeedRepository needRepository;
   @Autowired
   private Executor executor;
+
   //ref=ownerProtocolNeedServiceClientJMSBased
   private OwnerProtocolNeedServiceClientSide delegate;
 
@@ -200,7 +201,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
           final Model content,
           final boolean activate,
           final URI wonNodeUri,
-          WonMessage wonMessage)
+          final WonMessage wonMessage)
     throws Exception {
     if (logger.isDebugEnabled()) {
       logger.debug("owner to need: CREATE_NEED activate {}, with content {}",
@@ -218,6 +219,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
           //TODO: move the DB part into its own layer or something, because the owner webapp is designed to be syncronous, but the code below may slow down the web-app.
           Need need = new Need();
           try {
+
+            //TODO: this is a temporary solution. owner shall process won messages sent by node.
             need.setNeedURI(uri.get());
             // logger.debug(need.getNeedURI().toString());
             need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);

@@ -66,5 +66,4 @@
     </bean>
 
 	<bean id="wonUserDetailService" class="won.owner.service.impl.WONUserDetailService" />
-
 </beans>

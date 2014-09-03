@@ -18,6 +18,7 @@ import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
+import won.protocol.model.FacetType;
 import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
@@ -106,7 +107,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
         final ListenableFuture<URI> newNeedURI;
         try {
-          wonMessageMap.put(wonMessage.getMessageEvent().getMessageURI(), wonMessage);
+          wonMessageMap.put(wonMessage.getMessageEvent().getSenderNeedURI(), wonMessage);
           newNeedURI = ownerProtocolService.createNeed(content, active, wonNodeURI,wonMessage);
 
           newNeedURI.addListener(new Runnable()
@@ -144,9 +145,37 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
           otherNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
 
           content = wonMessage.getMessageEvent().getModel();
+          com.hp.hpl.jena.rdf.model.Model facetModel =
+            WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
+              FacetType.OwnerFacet.getURI(),
+              FacetType.OwnerFacet.getURI());
+          content.add(facetModel);
 
+          final ListenableFuture<URI> newConnectionURI;
+
+          wonMessageMap.put(wonMessage.getMessageEvent().getSenderNeedURI(), wonMessage);
+          newConnectionURI = ownerProtocolService.connect(needURI, otherNeedURI, content, null);
+
+          newConnectionURI.addListener(new Runnable(){
+            @Override
+            public void run(){
+              try {
+                if (newConnectionURI.isDone()) {
+                  sendBackResponseMessageToClient(
+                    wonMessageMap.get(newConnectionURI.get()), WONMSG.TYPE_RESPONSE_STATE_SUCCESS);
+                } else if (newConnectionURI.isCancelled()) {
+                  sendBackResponseMessageToClient(
+                    wonMessageMap.get(newConnectionURI.get()), WONMSG.TYPE_RESPONSE_STATE_FAILURE);
+                }
+              } catch (InterruptedException e) {
+                logger.warn("caught InterruptedException:", e);
+              } catch (ExecutionException e) {
+                logger.warn("caught ExecutionException:", e);
+              }
+            }
+          },executor);
           // ToDo (FS): change connect code such that the connectionID of the messageEvent will be used
-          ownerProtocolService.connect(needURI, otherNeedURI, content, null);
+
         } catch (Exception e) {
           logger.warn("caught Exception", e);
         }
@@ -407,6 +436,9 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
     } catch (WonMessageBuilderException e) {
       logger.warn("caught WonMessageBuilderException:", e);
     }
+  }
+  public WonMessage getWonMessageWithMessageURI(URI messageURI ){
+    return wonMessageMap.get(messageURI);
   }
 
   @Override
