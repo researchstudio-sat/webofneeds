@@ -67,8 +67,31 @@
 		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/builders.js"/>"></script>
 
+        <script type="text/javascript" src="<c:url value="/app/cstm-directives/topnav.js"/>"></script>
         <!-- TODO deletme -->
         <script type="text/javascript" src="<c:url value="/app/cstm-directives/my-current-time-test.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/cstm-directives/zippy-test.js"/>"></script>
+        <style>
+            .ng-invalid { border: 1px solid red;}
+            .zippy {
+              border: 1px solid black;
+              display: inline-block;
+              width: 250px;
+            }
+            .zippy.opened > .title:before { content: '▼ '; }
+            .zippy.opened > .body { display: block; }
+            .zippy.closed > .title:before { content: '► '; }
+            .zippy.closed > .body { display: none; }
+            .zippy > .title {
+              background-color: black;
+              color: white;
+              padding: .1em .3em;
+              cursor: pointer;
+            }
+            .zippy > .body {
+              padding: .1em .3em;
+            }
+        </style>
         <!-- TODO deleteme-end -->
 
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
@@ -263,7 +286,7 @@
 
 		<div ng-view id="content" class="container">
 		</div>
-		
+
 <nav class="navbar navbar-default" role="navigation">
 	<div class="container" style="padding:0">
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">

@@ -1,0 +1,122 @@
+<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
+    <div class="container" style="padding:0">
+        <div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
+            <ul class="nav navbar-nav">
+                <li ng-class="isActive()"><a href="#">
+                    <i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav">
+                <li class="dropdown" ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img src="/images/type_posts/want.png"/>&nbsp;I want
+                            to <strong>have</strong> something</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/images/type_posts/offer.png"/>&nbsp;I
+                            <strong>offer</strong> something</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I
+                            want to do something <strong>together</strong></a></li>
+                        <li class="divider"></li>
+                        <li><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/images/type_posts/change.png"/>&nbsp;I
+                            want to <strong>change</strong> something</a></li>
+                        <li class="divider"></li>
+                        <li class="dropdown-submenu">
+                            <a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
+                            <ul class="dropdown-menu" ng-controller="PostBoxCtrl">
+                                <li ng-repeat="draft in drafts | orderBy: '-datetime' | limitTo: recordsToDisplay"><a href="#/create-need/1"><i class="fa fa-file-o fa-lg">
+                                    &nbsp;{{draft.title}}</i></a></li>
+                                <li class="divider"></li>
+                                <li><a href="#/postbox"><i class="fa fa-list fa-lg"></i>&nbsp;II Others (go to full list)</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown" ng-show="showPublic()" ng-class="isActive('create-need')" ng-cloak>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img src="/images/type_posts/want.png"/>&nbsp;I want
+                            to <strong>have</strong> something</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/images/type_posts/offer.png"/>&nbsp;I
+                            <strong>offer</strong> something</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/images/type_posts/todo.png"/>&nbsp;I
+                            want to do something <strong>together</strong></a></li>
+                        <li class="divider"></li>
+                        <li><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/images/type_posts/change.png"/>&nbsp;I
+                            want to <strong>change</strong> something</a></li>
+                    </ul>
+                </li>
+                <li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
+                    <i class="fa fa-clipboard fa-lg"></i>&nbsp;Post box</a>
+                </li>
+                <li ng-show="!showPublic()">
+                    <a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
+                        <!-- TODO provide here the total number of messages -->
+                        <i class="fa fa-comment-o fa-lg"></i>&nbsp;{{21}}
+                    </a>
+                    <ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
+                        <li class="text-center grey-item">{{21}}&nbsp;new messages</li>
+                        <!-- TODO put real parameters into url -->
+                        <li ng-repeat="conv in conversations"><a href="#/private-link"><img src="{{getTypePicURI(conv.type)}}"/>&nbsp;{{conv.title}}&nbsp;<span
+                                class="badge pull-right">{{conv.msgs}}</span></a></li>
+                        <li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
+                        </li>
+                    </ul>
+                </li>
+                <li ng-show="!showPublic()" ng-cloak>
+                    <a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
+                        <!-- TODO provide here the total number of messages -->
+                        <i class="fa fa-male fa-lg"></i>&nbsp;{{11}}
+                    </a>
+                    <ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
+                        <li class="text-center grey-item">{{11}}&nbsp;new messages</li>
+                        <!-- TODO put real parameters into url -->
+                        <li ng-repeat="req in requests"><a href="#/private-link"><img
+                                src="{{getTypePicURI(req.type)}}"/>&nbsp;{{req.title}}&nbsp;<span class="badge pull-right">{{req.msgs}}</span></a>
+                        </li>
+                        <li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
+                        </li>
+                    </ul>
+                </li>
+                <li ng-show="!showPublic()" ng-cloak>
+                    <a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
+                        <!-- TODO provide here the total number of messages -->
+                        <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{5}}
+                    </a>
+                    <ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
+                        <li class="text-center grey-item">{{5}}&nbsp;new messages</li>
+                        <!-- TODO put real parameters into url -->
+                        <li ng-repeat="match in matches"><a href="#/private-link"><img
+                                src="{{getTypePicURI(req.type)}}"/>&nbsp;{{match.title}}&nbsp;<span class="badge pull-right">{{match.msgs}}</span></a>
+                        </li>
+                        <li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" ng-cloak>
+                <li><span ng-show="checkRegistered()">{{message}}</span></li>
+                <li ng-show="showPublic()" ng-class="isActive('register')"><a href="#/register">Sign up&nbsp;<span class="caret"/></a></li>
+                <li ng-show="showPublic()" ng-class="isActive('signin')"><a href="#/signin">Sign in&nbsp;<span class="caret"/></a></li>
+                <!--<li ng-show="!showPublic()"><a href="#/need-list">{{userdata.username}}</a></li>
+                                        <li ng-show="!showPublic()"><a href="" ng-click="onClickSignOut()">Sign out</a></li>     -->
+
+                <li class="dropdown" ng-show="!showPublic()" ng-cloak>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="">
+                        {{userdata.username}}&nbsp;<span class="caret"/>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="" ng-click="onClickSignOut()">Sign out</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -16,10 +16,18 @@
 
 <div style="padding-top: 40px;padding-bottom: 8em;">
 
+    <won-Top-Nav>Top-navigation not loaded!</won-Top-Nav>
     <!--TODO delemete-->
     <div ng-controller="TimeCtrl2">
         Date format: <input ng-model="format"> <hr/>
         Current time is: <span my-current-time="format"></span>
+    </div>
+
+    <div ng-controller="ZippyCtrl">
+        Title: <input ng-model="title"> <br>
+        Text: <textarea ng-model="text"></textarea>
+        <hr>
+        <div class="zippy" zippy-title="Details: {{title}}...">{{text}}</div>
     </div>
     <!--TODO delemete-end-->
 
