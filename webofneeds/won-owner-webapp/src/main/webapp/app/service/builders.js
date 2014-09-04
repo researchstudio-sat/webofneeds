@@ -37,6 +37,16 @@
 // attaches wonmessagebuilder API to the given object
     var wrapper = function(won) {
 
+        /**
+         *  Constants
+         *
+         */
+
+        won.WONMSG = {};
+        won.WONMSG.baseUri = "http://purl.org/webofneeds/message#";
+        won.WONMSG.prefix = "wonmsg";
+        won.WONMSG.hasReceiverNeed = won.WONMSG.baseUri + "hasReceiverNeed";
+
         won.clone = function(obj){
             return JSON.parse(JSON.stringify(obj));
         }

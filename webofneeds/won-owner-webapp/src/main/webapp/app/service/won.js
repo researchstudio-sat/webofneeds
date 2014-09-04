@@ -39,8 +39,8 @@
 
 
     // attaches wonutils API to the given object
-    var wrapper = function (wonutils) {
-        return wonutils;
+    var wrapper = function (WON) {
+        return WON;
     };
 
     var factory = function () {
@@ -53,8 +53,8 @@
     wrapper(factory);
     if (_browser) {
         // export simple browser API
-        if (typeof wonutils === 'undefined') {
-            wonutils = wonutilsjs = factory;
+        if (typeof WON === 'undefined') {
+            WON = wonutilsjs = factory;
         } else {
             wonutils = factory;
         }
