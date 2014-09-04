@@ -16,9 +16,9 @@
 
 package won.node.facet.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 
@@ -33,30 +33,30 @@ public interface Facet
 
   FacetType getFacetType();
 
-  void openFromOwner(Connection con, Model content, Dataset messageEvent)
+  void openFromOwner(Connection con, Model content, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void closeFromOwner(Connection con, Model content, Dataset messageEvent)
+  void closeFromOwner(Connection con, Model content, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void sendMessageFromOwner(Connection con, Model message, Dataset messageEvent)
+  void sendMessageFromOwner(Connection con, Model message, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void openFromNeed(Connection con, Model content, Dataset messageEvent)
+  void openFromNeed(Connection con, Model content, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void closeFromNeed(Connection con, Model content, Dataset messageEvent)
+  void closeFromNeed(Connection con, Model content, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void sendMessageFromNeed(Connection con, Model message, Dataset messageEvent)
+  void sendMessageFromNeed(Connection con, Model message, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void hint(Connection con, double score, URI originator, Model content, Dataset messageEvent)
+  void hint(Connection con, double score, URI originator, Model content, WonMessage wonMessage)
       throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
-  void connectFromNeed(Connection con, Model content, Dataset messageEvent)
+  void connectFromNeed(Connection con, Model content, WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
-  void connectFromOwner(Connection con, Model content, Dataset messageEvent)
+  void connectFromOwner(Connection con, Model content, WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 }

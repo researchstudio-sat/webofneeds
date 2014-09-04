@@ -18,13 +18,13 @@ package won.node.ws;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.protocol.impl.NeedProtocolNeedClientFactory;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.util.RdfUtils;
@@ -51,7 +51,7 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   @Override
   public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri,
                                        final URI otherConnectionUri, final Model content,
-                                       final Dataset messageEvent)
+                                       final WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
     try {
@@ -72,7 +72,7 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   }
 
     @Override
-    public void open(final Connection connection, final Model content, final Dataset messageEvent)
+    public void open(final Connection connection, final Model content, final WonMessage wonMessage)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
         try {
             NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
@@ -87,7 +87,7 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
     }
 
   @Override
-  public void close(final Connection connection, final Model content, final Dataset messageEvent)
+  public void close(final Connection connection, final Model content, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     try {
@@ -103,7 +103,7 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   }
 
   @Override
-  public void sendMessage(final Connection connection, final Model message, final Dataset messageEvent)
+  public void sendMessage(final Connection connection, final Model message, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     try {

@@ -1,6 +1,5 @@
 package won.node.facet.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
@@ -9,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.util.RdfUtils;
@@ -32,22 +32,22 @@ public class CommentFacet extends AbstractFacet
   }
 
   @Override
-  public void connectFromNeed(final Connection con, final Model content, final Dataset messageEvent)
+  public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException,
     IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
 
-    super.connectFromNeed(con, content, messageEvent);
+    super.connectFromNeed(con, content, wonMessage);
     addLinkedDataStatements(con, content);
     // Model content = rdfStorageService.loadContent(con.getNeedURI());
 
 
   }
   @Override
-  public void connectFromOwner(final Connection con, final Model content, final Dataset messageEvent)
+  public void connectFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException,
     IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    super.connectFromOwner(con, content, messageEvent);
+    super.connectFromOwner(con, content, wonMessage);
     addLinkedDataStatements(con, content);
   }
   private void addLinkedDataStatements(final Connection con, final Model content){

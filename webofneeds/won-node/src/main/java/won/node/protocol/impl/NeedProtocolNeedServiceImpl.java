@@ -16,7 +16,6 @@
 
 package won.node.protocol.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +24,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
@@ -59,16 +59,16 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   @Transactional(propagation = Propagation.SUPPORTS)
   public URI connect(final URI need, final URI otherNeedURI,
                      final URI otherConnectionURI,
-                     final Model content, final Dataset messageEvent)
+                     final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     logger.debug("need from need: CONNECT received for need {} referring to need {} with content {}", new Object[]{need, otherNeedURI, content});
     return this.needFacingNeedCommunicationService.connect(
-            need, otherNeedURI, otherConnectionURI, content, messageEvent);
+            need, otherNeedURI, otherConnectionURI, content, wonMessage);
   }
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void open(final URI connectionURI, final Model content, final Dataset messageEvent)
+  public void open(final URI connectionURI, final Model content, final WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
     logger.debug("need from need: OPEN received for connection {} with content {}", connectionURI, content);
 
@@ -77,29 +77,29 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
     List<Need> needs = needRepository.findByNeedURI(con.getNeedURI());
     if (needs.size()>0 && needs.get(0).getState()!= NeedState.ACTIVE){
       try {
-        needFacingConnectionClient.close(con, content, messageEvent);
+        needFacingConnectionClient.close(con, content, wonMessage);
       } catch (Exception e) {
         logger.warn("caught Exception in closeFromOwner: ",e);
       }
       throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(),"open",needs.get(0).getState());
     }
-    connectionCommunicationService.open(connectionURI, content, messageEvent);
+    connectionCommunicationService.open(connectionURI, content, wonMessage);
   }
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void close(final URI connectionURI, final Model content, final Dataset messageEvent)
+  public void close(final URI connectionURI, final Model content, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("need from need: CLOSE received for connection {} with content {}", connectionURI, content);
-    connectionCommunicationService.close(connectionURI, content, messageEvent);
+    connectionCommunicationService.close(connectionURI, content, wonMessage);
   }
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void sendMessage(final URI connectionURI, final Model message, final Dataset messageEvent)
+  public void sendMessage(final URI connectionURI, final Model message, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("need from need: MESSAGE received for connection {} with content {}", connectionURI, message);
-    connectionCommunicationService.sendMessage(connectionURI, message, messageEvent);
+    connectionCommunicationService.sendMessage(connectionURI, message, wonMessage);
   }
 
 

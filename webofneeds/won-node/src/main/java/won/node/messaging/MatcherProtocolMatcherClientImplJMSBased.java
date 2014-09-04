@@ -16,7 +16,6 @@
 
 package won.node.messaging;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
@@ -55,10 +54,10 @@ public class MatcherProtocolMatcherClientImplJMSBased implements MatcherProtocol
   private URIService uriService;
 
   @Override
-  public void matcherRegistered(final URI wonNodeURI, final Dataset messageEvent) {
+  public void matcherRegistered(final URI wonNodeURI, final WonMessage wonMessage) {
     Map headerMap = new HashMap<String, String>();
     headerMap.put("wonNodeURI", wonNodeURI.toString());
-    headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
+    headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
     headerMap.put("protocol","MatcherProtocol");
     headerMap.put("methodName", "matcherRegistered");
     messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
@@ -85,20 +84,20 @@ public class MatcherProtocolMatcherClientImplJMSBased implements MatcherProtocol
 
   }
   @Override
-  public void needActivated(final URI needURI, final Dataset messageEvent){
+  public void needActivated(final URI needURI, final WonMessage wonMessage){
     Map headerMap = new HashMap<String, String>();
     headerMap.put("needURI", needURI.toString());
-    headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
+    headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
     headerMap.put("protocol","MatcherProtocol");
     headerMap.put("methodName","needActivated");
     headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix()+"/resource");
     messagingService.sendInOnlyMessage(null, headerMap,null,"outgoingMessages");
   }
   @Override
-  public void needDeactivated(final URI needURI, final Dataset messageEvent){
+  public void needDeactivated(final URI needURI, final WonMessage wonMessage){
     Map headerMap = new HashMap<String, String>();
     headerMap.put("needURI", needURI.toString());
-    headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
+    headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
     headerMap.put("protocol","MatcherProtocol");
     headerMap.put("methodName","needDeactivated");
     headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix()+"/resource");

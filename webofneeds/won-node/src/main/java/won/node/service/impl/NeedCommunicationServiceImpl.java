@@ -16,7 +16,6 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.facet.impl.Facet;
 import won.node.facet.impl.FacetRegistry;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.node.service.DataAccessService;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
@@ -38,6 +37,7 @@ import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
@@ -93,7 +93,7 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public void hint(final URI needURI, final URI otherNeedURI,
                    final double score, final URI originator,
-                   final Model content, final Dataset messageEvent)
+                   final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException {
     if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
     if (originator == null) throw new IllegalArgumentException("originator is not set");
@@ -124,11 +124,11 @@ public class NeedCommunicationServiceImpl implements
     dataService.saveAdditionalContentForEvent(content, con, event, score);
 
     //invoke facet implementation
-    reg.get(con).hint(con, score, originator, content, messageEvent);
+    reg.get(con).hint(con, score, originator, content, wonMessage);
   }
 
   @Override
-  public URI connect(final URI needURI, final URI otherNeedURI, final Model content, final Dataset messageEvent)
+  public URI connect(final URI needURI, final URI otherNeedURI, final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException,
     IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     //create Connection in Database
@@ -144,7 +144,7 @@ public class NeedCommunicationServiceImpl implements
 
     //invoke facet implementation
     Facet facet = reg.get(con);
-    facet.connectFromOwner(con, content, messageEvent);
+    facet.connectFromOwner(con, content, wonMessage);
     //reg.get(con).connectFromOwner(con, content);
 
     return con.getConnectionURI();
@@ -153,7 +153,7 @@ public class NeedCommunicationServiceImpl implements
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI,
                      final URI otherConnectionURI, final Model content,
-                     final Dataset messageEvent)
+                     final WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     logger.debug("CONNECT received for need {} referring to need {} (connection {}) with content '{}'",
       new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
@@ -172,7 +172,7 @@ public class NeedCommunicationServiceImpl implements
 
     //invoke facet implementation
     Facet facet = reg.get(con);
-    facet.connectFromNeed(con, content, messageEvent);
+    facet.connectFromNeed(con, content, wonMessage);
 
     return con.getConnectionURI();
   }

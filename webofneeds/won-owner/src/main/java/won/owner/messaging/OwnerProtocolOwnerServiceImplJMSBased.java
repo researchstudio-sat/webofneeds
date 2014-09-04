@@ -18,10 +18,12 @@ package won.owner.messaging;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.Header;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessageDecoder;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolOwnerService;
@@ -72,7 +74,7 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
             @Header("score") final String score,
             @Header("originatorUri")final String originatorURI,
             @Header("content")final String content,
-            @Header("messageEvent") final String messageEvent)
+            @Header("wonMessage") final String wonMessageString)
             throws NoSuchNeedException, IllegalMessageForNeedStateException {
 
         if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
@@ -82,7 +84,8 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
         if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
         logger.debug("owner from need (jms): HINT called for own need {}, other need {}, with score {} from originator {} and content {}",
           new Object[]{ownNeedURI, otherNeedURI, score, originatorURI, content});
-        delegate.hint(ownNeedURI, otherNeedURI, score, originatorURI, content, RdfUtils.toDataset(messageEvent));
+        delegate.hint(ownNeedURI, otherNeedURI, score, originatorURI, content, 
+                      WonMessageDecoder.decode(Lang.TRIG, wonMessageString));
     }
 
     private boolean isNeedActive(final Need need) {
@@ -93,7 +96,7 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
                         @Header("otherNeedURI")final String otherNeedURI,
                         @Header("ownConnectionURI")final String ownConnectionURI,
                         @Header("content")final String content,
-                        @Header("messageEvent") final String messageEvent)
+                        @Header("wonMessage") final String wonMessageString)
             throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
 
@@ -102,36 +105,40 @@ public class OwnerProtocolOwnerServiceImplJMSBased {//implements OwnerProtocolOw
       if (ownConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
       if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
       logger.debug("owner from need (jms): CONNECT called for own need {}, other need {}, own connection {} and content {}", new Object[]{ownNeedURI,otherNeedURI,ownConnectionURI, content});
-      delegate.connect(ownNeedURI, otherNeedURI, ownConnectionURI, content, RdfUtils.toDataset(messageEvent));
+      delegate.connect(ownNeedURI, otherNeedURI, ownConnectionURI, content,
+                       WonMessageDecoder.decode(Lang.TRIG, wonMessageString));
     }
 
     public void open(@Header("connectionURI")String connectionURI,
                      @Header("content")String content,
-                     @Header("messageEvent") final String messageEvent)
+                     @Header("wonMessage") final String wonMessageString)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
       if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
       logger.debug("owner from need (jms): OPEN called for connection {} with content {}.", connectionURI, content);
-      delegate.open(URI.create(connectionURI), RdfUtils.toModel(content), RdfUtils.toDataset(messageEvent));
+      delegate.open(URI.create(connectionURI), RdfUtils.toModel(content),
+                    WonMessageDecoder.decode(Lang.TRIG, wonMessageString));
     }
 
     public void close(@Header("connectionURI")final String connectionURI,
                       @Header("content")String content,
-                      @Header("messageEvent") final String messageEvent)
+                      @Header("wonMessage") final String wonMessageString)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
       if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
       logger.debug("owner from need (jms): CLOSE called for connection {}", connectionURI);
-      delegate.close(URI.create(connectionURI), RdfUtils.toModel(content), RdfUtils.toDataset(messageEvent));
+      delegate.close(URI.create(connectionURI), RdfUtils.toModel(content),
+                     WonMessageDecoder.decode(Lang.TRIG, wonMessageString));
     }
 
     public void sendMessage(@Header("connectionURI") final String connectionURI,
                             @Header("message") final String message,
-                            @Header("messageEvent") final String messageEvent)
+                            @Header("wonMessage") final String wonMessageString)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         if (message == null) throw new IllegalArgumentException("message is not set");
         logger.debug("owner from need (jms): SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         Model messageConvert = RdfUtils.toModel(message);
-        delegate.sendMessage(URI.create(connectionURI), messageConvert, RdfUtils.toDataset(messageEvent));
+        delegate.sendMessage(URI.create(connectionURI), messageConvert,
+                             WonMessageDecoder.decode(Lang.TRIG, wonMessageString));
     }
 
 

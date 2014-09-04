@@ -274,7 +274,12 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
   // ToDo (FS): methods only used until the messaging system is completely refactored then only one callback method will be used
   @Override
-  public void onHint(final Match match, final Model content) {
+  public void onHint(final Match match, final Model content, final WonMessage wonMessage) {
+
+    if (wonMessage != null) {
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      return;
+    }
 
     try {
 
@@ -287,7 +292,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       contentURI = new URI(match.getOriginator().toString() + "/hint/" + rand.nextInt());
 
       WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-      WonMessage wonMessage = wonMessageBuilder
+      WonMessage newWonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.HINT_MESSAGE)
         .setMessageURI(messageURI)
         .setSenderNodeURI(match.getOriginator())
@@ -297,7 +302,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .addContent(contentURI, content, null)
         .build();
 
-      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      ownerApplicationServiceCallbackToClient.onMessage(newWonMessage);
 
     } catch (URISyntaxException e) {
       logger.warn("caught URISyntaxException:", e);
@@ -307,7 +312,12 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   }
 
   @Override
-  public void onConnect(final Connection con, final Model content) {
+  public void onConnect(final Connection con, final Model content, final WonMessage wonMessage) {
+
+    if (wonMessage != null) {
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      return;
+    }
 
     try {
 
@@ -320,7 +330,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       contentURI = new URI(con.getRemoteConnectionURI().toString() + "/eventContent/" + rand.nextInt());
 
       WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-      WonMessage wonMessage = wonMessageBuilder
+      WonMessage newWonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.CONNECT)
         .setMessageURI(messageURI)
         .setReceiverURI(con.getNeedURI()) // ToDo (FS): this should be the facet
@@ -332,7 +342,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .addContent(contentURI, content, null)
         .build();
 
-      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      ownerApplicationServiceCallbackToClient.onMessage(newWonMessage);
     } catch (URISyntaxException e) {
       logger.warn("caught URISyntaxException:", e);
     } catch (WonMessageBuilderException e) {
@@ -341,7 +351,12 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   }
 
   @Override
-  public void onOpen(final Connection con, final Model content) {
+  public void onOpen(final Connection con, final Model content, final WonMessage wonMessage) {
+
+    if (wonMessage != null) {
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      return;
+    }
 
     try {
 
@@ -354,7 +369,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       contentURI = new URI(con.getRemoteConnectionURI().toString() + "/eventContent/" + rand.nextInt());
 
       WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-      WonMessage wonMessage = wonMessageBuilder
+      WonMessage newWonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.OPEN)
         .setMessageURI(messageURI)
         .setReceiverURI(con.getConnectionURI())
@@ -366,7 +381,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .addContent(contentURI, content, null)
         .build();
 
-      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      ownerApplicationServiceCallbackToClient.onMessage(newWonMessage);
 
     } catch (URISyntaxException e) {
       logger.warn("caught URISyntaxException:", e);
@@ -376,7 +391,12 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   }
 
   @Override
-  public void onClose(final Connection con, final Model content) {
+  public void onClose(final Connection con, final Model content, final WonMessage wonMessage) {
+
+    if (wonMessage != null) {
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      return;
+    }
 
     try {
 
@@ -388,7 +408,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       contentURI = new URI(con.getRemoteConnectionURI().toString() + "/eventContent/" + rand.nextInt());
 
       WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-      WonMessage wonMessage = wonMessageBuilder
+      WonMessage newWonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.CLOSE)
         .setMessageURI(messageURI)
         .setReceiverURI(con.getConnectionURI())
@@ -400,7 +420,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .addContent(contentURI, content, null)
         .build();
 
-      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      ownerApplicationServiceCallbackToClient.onMessage(newWonMessage);
 
     } catch (URISyntaxException e) {
       logger.warn("caught URISyntaxException:", e);
@@ -410,7 +430,13 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   }
 
   @Override
-  public void onTextMessage(final Connection con, final ChatMessage message, final Model content) {
+  public void onTextMessage(final Connection con, final ChatMessage message,
+                            final Model content, final WonMessage wonMessage) {
+
+    if (wonMessage != null) {
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      return;
+    }
 
     try {
 
@@ -424,7 +450,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
 
       WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-      WonMessage wonMessage = wonMessageBuilder
+      WonMessage newWonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.CONNECTION_MESSAGE)
         .setMessageURI(messageURI)
         .setReceiverURI(con.getConnectionURI())
@@ -436,9 +462,9 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .addContent(contentURI, content, null)
         .build();
 
-      // ToDo (FS): if ChatMessage content is not in the content add ChatMessage to wonMessage
+      // ToDo (FS): if ChatMessage content is not in the content add ChatMessage to newWonMessage
 
-      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+      ownerApplicationServiceCallbackToClient.onMessage(newWonMessage);
 
     } catch (URISyntaxException e) {
       logger.warn("caught URISyntaxException:", e);

@@ -16,11 +16,11 @@
 
 package won.protocol.owner;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessage;
 import won.protocol.service.ConnectionCommunicationService;
 
 import java.net.URI;
@@ -39,7 +39,7 @@ public interface OwnerProtocolOwnerServiceClientSide extends ConnectionCommunica
    *@param score
    * @param originatorUri  @throws won.protocol.exception.NoSuchNeedException if ownNeedURI is not a known need URI
    */
-  public void hint(URI ownNeedUri, URI otherNeedUri, double score, URI originatorUri, Model content, Dataset messageEvent)
+  public void hint(URI ownNeedUri, URI otherNeedUri, double score, URI originatorUri, Model content, WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
   /**
@@ -60,7 +60,7 @@ public interface OwnerProtocolOwnerServiceClientSide extends ConnectionCommunica
    * @throws won.protocol.exception.ConnectionAlreadyExistsException
    *                             if the two needs are already connected
    */
-  public void connect(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI, Model content, Dataset messageEvent)
+  public void connect(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI, Model content, WonMessage wonMessage)
           throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
   //TODO move to another interface maybe?

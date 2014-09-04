@@ -100,26 +100,26 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
 
     public void activate(
             @Header("needURI") String needURI,
-            @Header("messageEvent") String messageEventString)
+            @Header("wonMessage") String wonMessageString)
             throws NoSuchNeedException {
         logger.debug("activateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
-        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
 
-        delegate.activate(needURIconvert, messageEvent);
+        delegate.activate(needURIconvert, wonMessage);
     }
 
     public void deactivate(
             @Header("needURI") String needURI,
-            @Header("messageEvent") String messageEventString)
+            @Header("wonMessage") String wonMessageString)
             throws NoSuchNeedException, NoSuchConnectionException, IllegalMessageForConnectionStateException {
         logger.debug("deactivateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
-        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
 
-        delegate.deactivate(needURIconvert, messageEvent);
+        delegate.deactivate(needURIconvert, wonMessage);
     }
 
     //@Override
@@ -180,47 +180,47 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
     public void open(
             @Header("connectionURI")String connectionURI,
             @Header("content")String content,
-            @Header("messageEvent") String messageEventString)
+            @Header("wonMessage") String wonMessageString)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
 
         URI connectionURIConvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(content);
-        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
 
-        delegate.open(connectionURIConvert, contentConvert, messageEvent);
+        delegate.open(connectionURIConvert, contentConvert, wonMessage);
     }
 
     public void close(
             @Header("connectionURI")String connectionURI,
             @Header("content")String content,
-            @Header("messageEvent") String messageEventString)
+            @Header("wonMessage") String wonMessageString)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
         URI connectionURIConvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(content);
-        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
 
-        delegate.close(connectionURIConvert, contentConvert, messageEvent);
+        delegate.close(connectionURIConvert, contentConvert, wonMessage);
     }
 
     public void sendMessage(
       @Header("connectionURI") String connectionURI,
       @Header("message") String message,
-      @Header("messageEvent") String messageEventString)
+      @Header("wonMessage") String wonMessageString)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
         URI connectionURIconvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(message);
-        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
 
-        delegate.sendMessage(connectionURIconvert, contentConvert, messageEvent);
+        delegate.sendMessage(connectionURIconvert, contentConvert, wonMessage);
     }
 
     public URI connect(
             @Header("needURI") String needURI,
             @Header("otherNeedURI") String otherNeedURI,
             @Header("content") String content, Exchange exchange,
-            @Header("messageEvent") String messageEventString)
+            @Header("wonMessage") String wonMessageString)
             throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
         logger.debug("connectNeed: message received: {}", content);
 
@@ -228,9 +228,9 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
         URI needURIConvert = URI.create(needURI);
         URI otherNeedURIConvert = URI.create(otherNeedURI);
         Model contentConvert = RdfUtils.toModel(content);
-        Dataset messageEvent = RdfUtils.toDataset(messageEventString);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
 
-        result = delegate.connect(needURIConvert,otherNeedURIConvert,contentConvert, messageEvent);
+        result = delegate.connect(needURIConvert,otherNeedURIConvert,contentConvert, wonMessage);
        // result = needCommunicationService.connect(needURIConvert, otherNeedURIConvert, contentConvert);
 
         return result;

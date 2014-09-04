@@ -125,7 +125,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","connect");
         headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
-        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         return messagingService.sendInOutMessageGeneric(null,headerMap,null,startingEndpoint);
     }
@@ -141,7 +141,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("needURI",needURI.toString());
         headerMap.put("methodName","deactivate");
         headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
-        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending deactivate message: " + needURI.toString());
@@ -159,7 +159,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("needURI",needURI.toString());
         headerMap.put("methodName","activate");
         headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending activate message: " + needURI.toString());
@@ -253,7 +253,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("message",messageConvert);
         headerMap.put("methodName","sendMessage");
         headerMap.put("remoteBrokerEndpoint", endpoint);
-        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending text message: ");
@@ -272,7 +272,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","close");
         headerMap.put("remoteBrokerEndpoint", endpoint);
-        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint);
         logger.debug("sending close message: ");
@@ -291,7 +291,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","open");
         headerMap.put("remoteBrokerEndpoint", endpoint);
-        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending open message: ");

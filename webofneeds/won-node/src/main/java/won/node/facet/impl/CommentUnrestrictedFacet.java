@@ -1,12 +1,12 @@
 package won.node.facet.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.util.RdfUtils;
@@ -25,12 +25,12 @@ public class CommentUnrestrictedFacet extends AbstractFacet
   }
 
     @Override
-  public void connectFromNeed(Connection con, Model content, Dataset messageEvent)
+  public void connectFromNeed(Connection con, Model content, WonMessage wonMessage)
             throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    super.connectFromNeed(con, content, messageEvent);
+    super.connectFromNeed(con, content, wonMessage);
     /* send a connect back */
     try {
-        // ToDo: replace null with fitting messageEvent
+        // ToDo: replace null with fitting wonMessage
       needFacingConnectionClient.open(con, content, null);
       Model needContent = rdfStorageService.loadContent(con.getNeedURI());
       PrefixMapping prefixMapping = PrefixMapping.Factory.create();
