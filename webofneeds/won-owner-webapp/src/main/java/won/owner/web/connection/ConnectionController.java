@@ -97,10 +97,10 @@ public class ConnectionController {
             return "noConnectionFound";
         Connection con = cons.get(0);
         try {
-          ownerService.sendMessage(
-                  con.getConnectionURI(),
-                  WonRdfUtils.MessageUtils.textMessage(text.getText()),
-                  null);
+          ownerService.sendConnectionMessage(
+            con.getConnectionURI(),
+            WonRdfUtils.MessageUtils.textMessage(text.getText()),
+            null);
         } catch (Exception e) {
             logger.warn("error sending text message");
             return "error sending text message: " + e.getMessage();
@@ -118,10 +118,10 @@ public class ConnectionController {
     }
     Connection con = cons.get(0);
     try {
-      ownerService.sendMessage(
+      ownerService.sendConnectionMessage(
         con.getConnectionURI(),
         WonRdfUtils.MessageUtils.binaryFeedbackMessage(con.getConnectionURI(), isFeedbackPositive),
-              null);
+        null);
     } catch (Exception e) {
       logger.warn("error sending text message",e);
     }

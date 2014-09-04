@@ -17,7 +17,6 @@
 package won.owner.messaging;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
@@ -113,7 +112,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
     }
 
     @Override
-    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content, Dataset messageEvent)
+    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content, WonMessage wonMessage)
             throws Exception {
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithNeedUri(needURI);
@@ -126,13 +125,13 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","connect");
         headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
-        headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
+        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         return messagingService.sendInOutMessageGeneric(null,headerMap,null,startingEndpoint);
     }
 
     @Override
-    public void deactivate(URI needURI, Dataset messageEvent) throws Exception {
+    public void deactivate(URI needURI, WonMessage wonMessage) throws Exception {
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithNeedUri(needURI);
 
@@ -142,14 +141,14 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("needURI",needURI.toString());
         headerMap.put("methodName","deactivate");
         headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
-        headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
+        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending deactivate message: " + needURI.toString());
     }
 
     @Override
-    public void activate(URI needURI, Dataset messageEvent) throws Exception {
+    public void activate(URI needURI, WonMessage wonMessage) throws Exception {
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithNeedUri(needURI);
         List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
@@ -160,7 +159,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("needURI",needURI.toString());
         headerMap.put("methodName","activate");
         headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-        headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
+        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending activate message: " + needURI.toString());
@@ -241,7 +240,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
     }
 
     @Override
-    public void sendMessage(URI connectionURI, Model message, Dataset messageEvent) throws Exception {
+    public void sendConnectionMessage(URI connectionURI, Model message, WonMessage wonMessage) throws Exception {
         String messageConvert = RdfUtils.toString(message);
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithConnectionUri(connectionURI);
@@ -254,14 +253,14 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("message",messageConvert);
         headerMap.put("methodName","sendMessage");
         headerMap.put("remoteBrokerEndpoint", endpoint);
-        headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
+        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending text message: ");
     }
 
     @Override
-    public void close(URI connectionURI, Model content, Dataset messageEvent) throws Exception {
+    public void close(URI connectionURI, Model content, WonMessage wonMessage) throws Exception {
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithConnectionUri(connectionURI);
 
@@ -273,14 +272,14 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","close");
         headerMap.put("remoteBrokerEndpoint", endpoint);
-        headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
+        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint);
         logger.debug("sending close message: ");
     }
 
     @Override
-    public void open(URI connectionURI, Model content, Dataset messageEvent) throws Exception {
+    public void open(URI connectionURI, Model content, WonMessage wonMessage) throws Exception {
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithConnectionUri(connectionURI);
 
@@ -292,7 +291,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","open");
         headerMap.put("remoteBrokerEndpoint", endpoint);
-        headerMap.put("messageEvent", RdfUtils.toString(messageEvent));
+        headerMap.put("messageEvent", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending open message: ");
@@ -362,10 +361,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
         headerMap.put("methodName","createNeed");
         headerMap.put("remoteBrokerEndpoint",wonNodeList.get(0).getOwnerProtocolEndpoint());
         headerMap.put("ownerApplicationID",ownerApplicationId);
-        if (wonMessage!=null){
-          headerMap.put("wonMessage",WonMessageEncoder.encode(wonMessage, Lang.TRIG));
-
-        }
+        headerMap.put("wonMessage",WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         return messagingService.sendInOutMessageGeneric(null, headerMap,null,startingEndpoint);
     }

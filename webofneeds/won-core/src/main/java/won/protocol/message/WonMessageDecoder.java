@@ -29,6 +29,8 @@ public class WonMessageDecoder
   }
 
   public static WonMessage decode(Lang lang, String message) {
+    if (message == null || message.equals(""))
+      return null;
     Dataset dataset = DatasetFactory.createMem();
     StringReader sr = new StringReader(message);
     RDFDataMgr.read(dataset, sr, null, lang);

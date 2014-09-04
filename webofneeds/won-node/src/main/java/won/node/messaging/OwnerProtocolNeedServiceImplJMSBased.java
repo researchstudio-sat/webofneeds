@@ -61,6 +61,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
         return ownerApplicationId;
     }
 
+    // ToDo (FS): remove "wonMessage == null" checks after complete restructuring
     public URI createNeed(
             @Header("model") String content,
             @Header("activate") boolean activate,
@@ -71,20 +72,30 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
         URI needURI = null;
         Model contentconvert = RdfUtils.toModel(content);
         WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
-        //Dataset messageEvent = RdfUtils.toDataset(messageEventString);
         logger.debug("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
+        String debugString;
+
+        if (wonMessage == null)
+          debugString = content;
+        else
+          debugString = RdfUtils.toString(wonMessage.getMessageContent());
         logger.debug("createNeed: message event received: {} with ownerApp ID {}",
-                     RdfUtils.toString(wonMessage.getMessageContent()),
+                     debugString,
                      ownerApplicationID);
 
         needURI = delegate.createNeed(
-                contentconvert,
-                activate,
-                ownerApplicationID,
-                wonMessage);
+          contentconvert,
+          activate,
+          ownerApplicationID,
+          wonMessage);
+        if (wonMessage != null)
+        needURI = wonMessage.getMessageEvent().getMessageURI();
         exchange.getOut().setBody(needURI);
 
-       return needURI;
+      if (wonMessage == null)
+        return needURI;
+      else
+        return wonMessage.getMessageEvent().getMessageURI();
     }
 
     public void activate(
