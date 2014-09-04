@@ -21,6 +21,7 @@ import com.hp.hpl.jena.query.Dataset;
 /**
  * Maintains thread-local dataset objects.
  */
+@Deprecated
 public abstract class AbstractOneDatasetPerThreadRdfStorageService extends AbstractDatasetBasedRdfStorageService
 {
   ThreadLocal<Dataset> datasetThreadLocal = new ThreadLocal<Dataset>();

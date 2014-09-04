@@ -24,7 +24,6 @@ import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.MatcherProtocolMatcherService;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.MatcherProtocolCommunicationService;
-import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
@@ -56,18 +55,21 @@ public class MatcherProtocolMatcherServiceImplJMSBased
   private URI defaultNodeURI;
 
 
-    public void needCreated(@Header("wonNodeURI") final String wonNodeURI, @Header("needURI") final String needURI,
+    public void needCreated(@Header("wonNodeURI") final String wonNodeURI,
+                            @Header("needURI") final String needURI,
                             @Header("content") final String content) {
         logger.debug("new need received: {} with content {}", needURI, content);
 
         delegate.onNewNeed(URI.create(wonNodeURI), URI.create(needURI), RdfUtils.toModel(content));
     }
-    public void needActivated(@Header("wonNodeURI") final String wonNodeURI,@Header("needURI") final String needURI) {
+    public void needActivated(@Header("wonNodeURI") final String wonNodeURI,
+                              @Header("needURI") final String needURI) {
       logger.debug("need activated message received: {}", needURI);
 
       delegate.onNeedActivated(URI.create(wonNodeURI), URI.create(needURI) );
     }
-    public void needDeactivated(@Header("wonNodeURI") final String wonNodeURI,@Header("needURI") final String needURI) {
+    public void needDeactivated(@Header("wonNodeURI") final String wonNodeURI,
+                                @Header("needURI") final String needURI) {
       logger.debug("need deactivated message received: {}", needURI);
 
       delegate.onNeedDeactivated(URI.create(wonNodeURI), URI.create(needURI) );

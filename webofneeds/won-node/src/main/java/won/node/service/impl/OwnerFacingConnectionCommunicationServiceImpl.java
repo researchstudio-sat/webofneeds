@@ -17,7 +17,6 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.graph.TripleBoundary;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -28,10 +27,13 @@ import won.node.facet.impl.FacetRegistry;
 import won.node.service.DataAccessService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
@@ -55,10 +57,19 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   private ConnectionRepository connectionRepository;
   @Autowired
   private URIService URIService;
+  @Autowired
+  private RDFStorageService rdfStorageService;
 
   @Override
-  public void open(final URI connectionURI, final Model content, Dataset messageEvent)
+  public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
+
     logger.debug("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
@@ -69,12 +80,19 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     dataService.saveAdditionalContentForEvent(content, con, event);
 
     //invoke facet implementation
-    reg.get(con).openFromOwner(con, content, messageEvent);
+    reg.get(con).openFromOwner(con, content, wonMessage);
   }
 
   @Override
-  public void close(final URI connectionURI, final Model content, Dataset messageEvent)
+  public void close(final URI connectionURI, final Model content, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
+
     logger.debug("CLOSE received from the owner side for connection {} with content {}", connectionURI, content);
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
@@ -85,12 +103,18 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     dataService.saveAdditionalContentForEvent(content, con, event);
 
     //invoke facet implementation
-    reg.get(con).closeFromOwner(con, content, messageEvent);
+    reg.get(con).closeFromOwner(con, content, wonMessage);
   }
 
   @Override
-  public void sendMessage(final URI connectionURI, final Model message, Dataset messageEvent)
+  public void sendMessage(final URI connectionURI, final Model message, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
 
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
 
@@ -113,7 +137,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       //a feedback message is not forwarded to the remote connection, and facets cannot react to it.
       //invoke facet implementation
       //TODO: this may be much more responsive if done asynchronously. We dont return anything here anyway.
-      reg.get(con).sendMessageFromOwner(con, message, messageEvent);
+      reg.get(con).sendMessageFromOwner(con, message, wonMessage);
     }
       //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.
       //return con.getConnectionURI();

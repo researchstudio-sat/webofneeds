@@ -16,7 +16,6 @@
 
 package won.node.protocol.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.protocol.matcher.MatcherProtocolNeedService;
+import won.protocol.message.WonMessage;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 
 import javax.jws.WebMethod;
@@ -43,9 +43,9 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
   @Transactional(propagation = Propagation.SUPPORTS)
   public void hint(final URI needURI, final URI otherNeed,
                    final double score, final URI originator,
-                   Model content, Dataset messageEvent) throws Exception {
+                   Model content, WonMessage wonMessage) throws Exception {
     logger.debug("need from matcher: HINT received for need {} referring to need {} with score {} from originator {} and content {}", new Object[]{needURI, otherNeed, score, originator, content});
-    matcherFacingNeedCommunicationService.hint(needURI, otherNeed, score, originator, content, messageEvent);
+    matcherFacingNeedCommunicationService.hint(needURI, otherNeed, score, originator, content, wonMessage);
   }
 
   @WebMethod(exclude = true)

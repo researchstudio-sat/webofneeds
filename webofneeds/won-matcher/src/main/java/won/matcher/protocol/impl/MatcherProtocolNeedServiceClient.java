@@ -1,10 +1,10 @@
 package won.matcher.protocol.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.protocol.message.WonMessage;
 import won.protocol.model.FacetType;
 import won.protocol.util.WonRdfUtils;
 
@@ -20,12 +20,12 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
 
     MatcherProtocolNeedServiceClientSide delegate;
 
-    public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content, Dataset messageEvent)
+    public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content, WonMessage wonMessage)
             throws Exception {
         logger.info("need-facing: HINT called for needURI {} and otherNeed {} " +
                 "with score {} from originator {}.", new Object[]{needURI, otherNeed, score, originator});
         Model facetModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI());
-        delegate.hint(needURI, otherNeed, score, originator, facetModel, messageEvent);
+        delegate.hint(needURI, otherNeed, score, originator, facetModel, wonMessage);
     }
 
 

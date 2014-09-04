@@ -7,6 +7,7 @@ import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
+import won.protocol.message.WonMessage;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -25,7 +26,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   TaskScheduler taskScheduler;
 
   @Override
-  public void onClose(final Connection con, final Model content) {
+  public void onClose(final Connection con, final Model content, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
@@ -39,7 +40,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   }
 
   @Override
-  public void onHint(final Match match, final Model content) {
+  public void onHint(final Match match, final Model content, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
@@ -52,7 +53,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   }
 
   @Override
-  public void onConnect(final Connection con, final Model content) {
+  public void onConnect(final Connection con, final Model content, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
@@ -66,7 +67,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   }
 
   @Override
-  public void onOpen(final Connection con, final Model content) {
+  public void onOpen(final Connection con, final Model content, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
@@ -79,7 +80,8 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   }
 
   @Override
-  public void onTextMessage(final Connection con, final ChatMessage message, final Model content) {
+  public void onTextMessage(final Connection con, final ChatMessage message,
+                            final Model content, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {

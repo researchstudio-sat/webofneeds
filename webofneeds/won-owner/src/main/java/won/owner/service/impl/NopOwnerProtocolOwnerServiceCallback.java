@@ -18,6 +18,7 @@ package won.owner.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
+import won.protocol.message.WonMessage;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -29,31 +30,31 @@ import won.protocol.model.Match;
 public class NopOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerServiceCallback
 {
   @Override
-  public void onHint(final Match match, final Model content)
+  public void onHint(final Match match, final Model content, final WonMessage wonMessage)
   {
 
   }
 
   @Override
-  public void onConnect(final Connection con, final Model content)
+  public void onConnect(final Connection con, final Model content, final WonMessage wonMessage)
   {
 
   }
 
   @Override
-  public void onOpen(final Connection con, final Model content)
+  public void onOpen(final Connection con, final Model content, final WonMessage wonMessage)
   {
 
   }
 
   @Override
-  public void onClose(final Connection con, final Model content)
+  public void onClose(final Connection con, final Model content, final WonMessage wonMessage)
   {
 
   }
 
   @Override
-  public void onTextMessage(Connection con, final ChatMessage message, final Model content)
+  public void onTextMessage(Connection con, final ChatMessage message, final Model content, final WonMessage wonMessage)
   {
 
   }

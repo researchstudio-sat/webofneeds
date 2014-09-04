@@ -1,7 +1,6 @@
 package won.node.facet.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -10,16 +9,17 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.node.service.DataAccessService;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
@@ -76,7 +76,7 @@ public abstract class AbstractBAFacet implements Facet
    * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
   @Override
-  public void openFromOwner(final Connection con, final Model content, final Dataset messageEvent)
+  public void openFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
     if (con.getRemoteConnectionURI() != null) {
@@ -84,7 +84,7 @@ public abstract class AbstractBAFacet implements Facet
         @Override
         public void run() {
           try {
-            needFacingConnectionClient.open(con, content, messageEvent);
+            needFacingConnectionClient.open(con, content, wonMessage);
           } catch (Exception e) {
             logger.warn("caught Exception in openFromOwner",e);
           }
@@ -105,7 +105,7 @@ public abstract class AbstractBAFacet implements Facet
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
   @Override
-  public void closeFromOwner(final Connection con, final Model content, final Dataset messageEvent)
+  public void closeFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
     if (con.getRemoteConnectionURI() != null) {
@@ -115,7 +115,7 @@ public abstract class AbstractBAFacet implements Facet
         public void run()
         {
           try {
-            needFacingConnectionClient.close(con, content, messageEvent);
+            needFacingConnectionClient.close(con, content, wonMessage);
           } catch (Exception e) {
             logger.warn("caught Exception in closeFromOwner: ",e);
           }
@@ -136,7 +136,7 @@ public abstract class AbstractBAFacet implements Facet
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
   @Override
-  public void openFromNeed(final Connection con, final Model content, final Dataset messageEvent)
+  public void openFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
     executorService.execute(new Runnable()
@@ -145,7 +145,7 @@ public abstract class AbstractBAFacet implements Facet
       public void run()
       {
         try {
-          ownerFacingConnectionClient.open(con.getConnectionURI(), content, messageEvent);
+          ownerFacingConnectionClient.open(con.getConnectionURI(), content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception in openFromNeed:", e);
         }
@@ -166,7 +166,7 @@ public abstract class AbstractBAFacet implements Facet
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
   @Override
-  public void closeFromNeed(final Connection con, final Model content, final Dataset messageEvent)
+  public void closeFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
     executorService.execute(new Runnable()
@@ -175,7 +175,7 @@ public abstract class AbstractBAFacet implements Facet
       public void run()
       {
         try {
-          ownerFacingConnectionClient.close(con.getConnectionURI(), content, messageEvent);
+          ownerFacingConnectionClient.close(con.getConnectionURI(), content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception in closeFromNeed:", e);
         }
@@ -191,7 +191,7 @@ public abstract class AbstractBAFacet implements Facet
     baseResource.addProperty(WON_TX.BA_STATE, connectionBAStateContent.createResource(stateUri.toString()));
 
     logger.debug("linked data:"+ RdfUtils.toString(connectionBAStateContent));
-    rdfStorageService.storeContent(con.getConnectionURI(), connectionBAStateContent);
+    rdfStorageService.storeModel(con.getConnectionURI(), connectionBAStateContent);
   }
 
 
@@ -218,7 +218,7 @@ public abstract class AbstractBAFacet implements Facet
           final double score,
           final URI originator,
           final Model content,
-          final Dataset messageEvent)
+          final WonMessage wonMessage)
     throws NoSuchNeedException, IllegalMessageForNeedStateException {
 
     final Model remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
@@ -234,7 +234,7 @@ public abstract class AbstractBAFacet implements Facet
                   score,
                   originator,
                   remoteFacetModel,
-                  messageEvent);
+                  wonMessage);
         } catch (NoSuchNeedException e) {
           logger.warn("error sending hint message to owner - no such need:", e);
         } catch (IllegalMessageForNeedStateException e) {
@@ -258,7 +258,7 @@ public abstract class AbstractBAFacet implements Facet
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
   @Override
-  public void connectFromNeed(final Connection con, final Model content, final Dataset messageEvent)
+  public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
 
@@ -272,7 +272,7 @@ public abstract class AbstractBAFacet implements Facet
                   con.getRemoteNeedURI(),
                   connectionForRunnable.getConnectionURI(),
                   content,
-                  messageEvent);
+                  wonMessage);
         } catch (WonProtocolException e) {
           // we can't connect the connection. we send a deny back to the owner
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
@@ -283,7 +283,7 @@ public abstract class AbstractBAFacet implements Facet
             ownerFacingConnectionCommunicationService.close(
                     connectionForRunnable.getConnectionURI(),
                     content,
-                    messageEvent);
+                    wonMessage);
           } catch (Exception e1) {
             logger.warn("caught Exception sending close back from connectFromNeed:", e1);
           }
@@ -304,7 +304,7 @@ public abstract class AbstractBAFacet implements Facet
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
   @Override
-  public void connectFromOwner(final Connection con, final Model content, final Dataset messageEvent)
+  public void connectFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
     final Model remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
@@ -319,7 +319,7 @@ public abstract class AbstractBAFacet implements Facet
                   con.getNeedURI(),
                   connectionForRunnable.getConnectionURI(),
                   remoteFacetModel,
-                  messageEvent);
+                  wonMessage);
           dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
 
         } catch (WonProtocolException e) {
@@ -332,7 +332,7 @@ public abstract class AbstractBAFacet implements Facet
             needFacingConnectionCommunicationService.close(
                     connectionForRunnable.getConnectionURI(),
                     content,
-                    messageEvent);
+                    wonMessage);
           } catch (Exception e1) {
             logger.warn("caught Exception sending close back from connectFromOwner::", e1);
           }

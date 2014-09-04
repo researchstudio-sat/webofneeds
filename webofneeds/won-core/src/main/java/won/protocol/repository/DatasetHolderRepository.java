@@ -17,14 +17,14 @@
 package won.protocol.repository;
 
 import org.springframework.data.repository.CrudRepository;
-import won.protocol.model.ModelHolder;
+import won.protocol.model.DatasetHolder;
 
 import java.net.URI;
 
 /**
- * Repository for jena models (wrapped in ModelHolders)
+ * Repository for jena datasets (wrapped in DatasetHolders)
  */
-public interface ModelHolderRepostory extends CrudRepository<ModelHolder, URI>
+public interface DatasetHolderRepository extends CrudRepository<DatasetHolder, URI>
 {
 
 }

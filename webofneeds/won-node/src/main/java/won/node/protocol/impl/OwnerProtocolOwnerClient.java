@@ -16,11 +16,11 @@
 
 package won.node.protocol.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 
 import java.net.URI;
@@ -34,44 +34,44 @@ public class OwnerProtocolOwnerClient implements OwnerProtocolOwnerServiceClient
     @Override
   public void hint(final URI ownNeedUri, final URI otherNeedUri,
                    final double score, final URI originatorUri,
-                   final Model content, final Dataset messageEvent)
+                   final Model content, final WonMessage wonMessage)
             throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
     logger.debug("need to owner: HINT for own need {}, other need {}, score {} from originator {}, content {}", new Object[]{ownNeedUri, otherNeedUri, score, originatorUri, content});
-    delegate.hint(ownNeedUri, otherNeedUri,score, originatorUri, content, messageEvent);
+    delegate.hint(ownNeedUri, otherNeedUri,score, originatorUri, content, wonMessage);
   }
 
 
   @Override
   public void connect(final URI ownNeedURI, final URI otherNeedURI,
                       final URI ownConnectionURI, final Model content,
-                      final Dataset messageEvent)
+                      final WonMessage wonMessage)
           throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
   {
     logger.debug("need to owner: CONNECT for own need {}, other need {}, own connection {} and content {}'", new Object[]{ownNeedURI, otherNeedURI, ownConnectionURI, content});
-    delegate.connect(ownNeedURI, otherNeedURI, ownConnectionURI, content, messageEvent);
+    delegate.connect(ownNeedURI, otherNeedURI, ownConnectionURI, content, wonMessage);
   }
   @Override
 
-  public void open(final URI connectionURI, final Model content, final Dataset messageEvent)
+  public void open(final URI connectionURI, final Model content, final WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
     logger.debug("need to owner: OPEN for connection {}", connectionURI);
-    delegate.open(connectionURI,content, messageEvent);
+    delegate.open(connectionURI,content, wonMessage);
   }
 
 
   @Override
-  public void close(final URI connectionURI, final Model content, final Dataset messageEvent)
+  public void close(final URI connectionURI, final Model content, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("need to owner: CLOSE for connection {}", connectionURI);
-    delegate.close(connectionURI,content, messageEvent);
+    delegate.close(connectionURI,content, wonMessage);
   }
 
   @Override
-  public void sendMessage(final URI connectionURI, final Model message, final Dataset messageEvent)
+  public void sendMessage(final URI connectionURI, final Model message, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     logger.debug("need to owner: MESSAGE for connection {} with message {}", connectionURI, message);
-    delegate.sendMessage(connectionURI, message, messageEvent);
+    delegate.sendMessage(connectionURI, message, wonMessage);
   }
 
     public void setDelegate(OwnerProtocolOwnerServiceClientSide delegate) {

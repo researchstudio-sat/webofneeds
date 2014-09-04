@@ -33,7 +33,7 @@ import java.net.URI;
  * Encapsulates a jena model for storing it in a relational db.
  */
 @Entity
-@Table(name = "rdf")
+@Table(name = "rdf_models")
 public class ModelHolder
 {
   private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;

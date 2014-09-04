@@ -1,6 +1,5 @@
 package won.node.facet.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
@@ -9,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.util.RdfUtils;
@@ -28,8 +28,8 @@ public class CommentModeratedFacet extends AbstractFacet
   }
 
   @Override
-  public void connectFromOwner(Connection con, Model content, Dataset messageEvent) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    super.connectFromOwner(con, content, messageEvent);
+  public void connectFromOwner(Connection con, Model content, WonMessage wonMessage) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+    super.connectFromOwner(con, content, wonMessage);
     /* when connected change linked data*/
     PrefixMapping prefixMapping = PrefixMapping.Factory.create();
     prefixMapping.setNsPrefix(SIOC.getURI(),"sioc");
@@ -39,6 +39,6 @@ public class CommentModeratedFacet extends AbstractFacet
     content.add(content.createStatement(content.getResource(con.getConnectionURI().toString()), SIOC.HAS_REPLY,
                                         content.getResource(con.getRemoteConnectionURI().toString())));
     logger.debug(RdfUtils.toString(content));
-    rdfStorageService.storeContent(con.getConnectionURI(),content);
+    rdfStorageService.storeModel(con.getConnectionURI(), content);
   }
 }
