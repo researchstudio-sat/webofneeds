@@ -29,9 +29,6 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
 
     var imagesPerPage = 6;
 
-    <!-- TODO take tags from need -->
-    $scope.tags = ['Tv', 'mint', 'free', 'black', '720p'];
-
     <!-- TODO call here backend to load images of the post -->
     $scope.images = [{url: '/owner/images/thumbnail_demo.jpg'},
         {url: '/owner/images/thumbnail_demo_blue.jpg'},
@@ -100,23 +97,35 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
 
     $scope.createPaginatedGallery(imagesPerPage);
 
+    // TODO fix start and end date
     $('#time_from').datepicker({
+        format:'dd.mm.yyyy',
+        todayHighlight:true,
         changeMonth:true,
         changeYear:true,
-        defaultDate:'08/11/2014'
+        startDate: $scope.need.startDate
     });
     $('#time_to').datepicker({
+        format:'dd.mm.yyyy',
         changeMonth:true,
         changeYear:true,
-        defaultDate:'08/13/2014'
+        endDate:$scope.need.endDate
     });
 
+    // TODO fixe when date is empty
+    $scope.toDateString = function(date) {
+        var d = date.split('.');
+        var datetime = new Date();
+        datetime.setFullYear(d[2]);
+        datetime.setMonth(d[1] - 1);
+        datetime.setDate(d[0]);
+        return datetime.toDateString();
+    }
 
     $scope.location = 'Thurngasse 8, 1080 Vienna, Austria';
     $scope.locationOutputFieldCollapsed = true;
-    $scope.time = 'Mon, Aug 11 - Wed, Aug 13 2014';
-    $scope.timeInputFieldCollapsed = true;
 
+    $scope.timeInputFieldCollapsed = true;
     $scope.outputLocationCollapseClick = function () {
         $scope.locationOutputFieldCollapsed = !$scope.locationOutputFieldCollapsed;
     };

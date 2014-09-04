@@ -48,7 +48,7 @@
                 <h4>Tagged with:</h4>
                 <span style="margin-right:5px;cursor:pointer;"
                       class="label label-primary btnTag"
-                      ng-repeat="tag in tags">{{tag}}
+                      ng-repeat="tag in need.tags.split(', ')">{{tag}}
                 </span>
             </div>
 
@@ -90,7 +90,7 @@
             <div class="row">
                 <div id="timeInfoCollapsed" class="well div-table col-lg-12">
                     <div class="div-table-row">
-                        <div class="col-lg-8 div-table centered-text additional-info-title">{{time}}</div>
+                        <div class="col-lg-8 div-table centered-text additional-info-title">{{toDateString(need.startDate)}} - {{toDateString(need.endDate)}}</div>
                         <div class="col-lg-1 div-table-cell centered-text pull-right">
                             <span>
                                 <a href="" class="glyphicon glyphicon-chevron-right" ng-click="timeInputFieldCollapsedClick()" ng-show="timeInputFieldCollapsed"></a>
@@ -104,12 +104,9 @@
 
                 <div id="timeInputFields" ng-show="!timeInputFieldCollapsed" class="div-table col-lg-12">
                     <div class="div-table-row">
-                        <div id="time_from" data-date-format=
-                                "mm/dd/yyyy" data-date-start-date="08/13/2014" data-date=
-                                "08/19/2014"
+                        <div id="time_from"
                              class="col-lg-4 col-lg-offset-2"></div>
-                        <div id="time_to" data-date-format=
-                                "mm/dd/yyyy" data-date-end-date="08/28/2014" class="col-lg-4"></div>
+                        <div id="time_to" class="col-lg-4"></div>
                     </div>
                 </div>
             </div>
