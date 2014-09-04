@@ -10,7 +10,7 @@
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific laAnguage governing permissions and
+ *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
 
@@ -285,6 +285,7 @@
             },
             hasTag: function(tags){
                 this.getContentNode()["won:hasTag"] = tags;
+                return this;
             },
             build: function () {
                 console.log("built this data:" + JSON.stringify(this.data));
@@ -446,8 +447,8 @@
             getContext :  function () {               //TODO inherit from base buiilder
                 return this.data["@context"];
             },
-            hasSenderNeed: function(){
-                this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":this.data["@context"]["@base"]};
+            hasSenderNeed: function(senderNeedURI){
+                this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":senderNeedURI};
                 return this;
             },
             hasSenderNode: function(senderNodeURI){
@@ -459,7 +460,7 @@
                 return this;
             },
             receiver: function(){
-                this.getMessageEventNode()["msg:receiver"]={"@id":this.getMessageEventNode()["msg:hasReceiverNeed"]+"/facets#owner"};
+                this.getMessageEventNode()["msg:receiver"]={"@id":this.getMessageEventNode()["msg:hasReceiverNeed"]["@id"]+"/facets#owner"};
                 return this;
             },
             hasReceiverNeed: function(receiverNeedURI){

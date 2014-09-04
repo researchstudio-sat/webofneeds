@@ -20,7 +20,7 @@
             <div class="row">
                 <div class="inline"><i class="fa fa-star fa-lg"></i></div>
                 <div class="inline"><i class="fa fa-circle fa-lg"></i></div>
-                <div class="inline" style="font-size: 1.8em;">TV mint condition to give away</div>
+                <div class="inline" style="font-size: 1.8em;">{{need.title}}</div>
                 <div class="inline pull-right"><i class="fa fa-copy fa-lg"></i></div>
             </div>
 
@@ -45,11 +45,16 @@
             </div>
 
             <div class="row">
+                <h4>Tagged with:</h4>
+                <span style="margin-right:5px;cursor:pointer;"
+                      class="label label-primary btnTag"
+                      ng-repeat="tag in tags">{{tag}}
+                </span>
+            </div>
+
+            <div class="row">
                 <p class="text-justify">
-                    Description Cras sodales tempor felis, vitae adipiscing nisl elementum in. Suspendisse in odio at purus tempus posuere eget ac lacus.
-                    Donec vitae commodo est, quis vehicula est. Fusce blandit congue orci sed semper. Etiam fermentum rutrum ipsum, in tempor risus.
-                    Phasellus ornare, enim at auctor cursus, tellus neque aliquam ligula, nec porta dui nulla ut felis. Nulla consequat dolor nulla. Sed
-                    non urna et ante tincidunt blandit in in tellus. Nam non lacus metus.
+                    {{need.textDescription}}
                 </p>
             </div>
 

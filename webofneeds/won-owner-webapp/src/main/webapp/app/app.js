@@ -134,7 +134,7 @@ app.directive('header', function(){
 app.run(function($httpBackend,$rootScope){
         $rootScope.wonNodeURI = "http://localhost:8080/won";
         $rootScope.needURIPath = "/resource/need";
-        $rootScope.connectionURIPath = "connection";
+        $rootScope.connectionURIPath = "/connection";
         //$httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
 
        /* $httpBackend.whenPOST('/owner/rest/needs').respond(function(method, url, data){

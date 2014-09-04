@@ -45,7 +45,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             console.log("SockJS connection has been established!")
             var i = 0;
             while (privateData.pendingOutMessages.length > 0){
-                var msg = privateData.pendingOutMessages.pop();
+                var msg = privateData.pendingOutMessages.shift();
                 console.log("sending pending message no " + (++i));
                 privateData.socket.send(msg);
             }
@@ -91,7 +91,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         var options = {debug: true};
         var url = 'http://localhost:8080/owner/msg'; //TODO: get socket URI from server through JSP
         privateData.socket = new SockJS(url, null, options);
-        attachListenersToSocket(socket);
+        attachListenersToSocket(privateData.socket);
     }
 
 

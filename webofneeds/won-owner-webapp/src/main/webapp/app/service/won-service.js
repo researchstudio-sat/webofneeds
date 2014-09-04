@@ -68,14 +68,14 @@ angular.module('won.owner').factory('wonService', function (messageService, $q) 
         }
         return deferred.promise;
     }
-    wonService.connect = function(connectionAsJsonLd){
+    wonService.connect = function(connectionAsJsonLd, need1, need2){
         var deferred = $q.defer();
         var message = new won.ConnectMessageBuilder(connectionAsJsonLd)
             .addMessageGraph()
             .eventURI("2345432343")  //TODO: generate event URI here
-            .hasSenderNeed(needJson_2["@context"]["@base"])
+            .hasSenderNeed(need1)
             .hasSenderNode("http://localhost:8080/won")
-            .hasReceiverNeed(needJson["@context"]["@base"])
+            .hasReceiverNeed(need2)
             .hasReceiverNode("http://localhost:8080/won")
             .sender()
             .receiver()

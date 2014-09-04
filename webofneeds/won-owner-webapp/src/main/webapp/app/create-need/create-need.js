@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService, utilService, wonService) {
     $scope.menuposition = $routeParams.menuposition;
     $scope.title = $routeParams.title;
 
@@ -181,20 +181,22 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
     }
 
-	$scope.getCleanNeed = function() {
-		return {
-			title               :$scope.title,
-			textDescription     :'',
-			contentDescription  :'',
-			state               : 'ACTIVE',
-			basicNeedType       : $scope.needType(),
-			tags                :[],
-			startTime           :'',
-			endTime             :'',
-			wonNode             :'',
-			binaryFolder        :md5((new Date().getTime() + Math.random(1)).toString())
-		};
-	};
+    $scope.getCleanNeed = function() {
+        return {
+            title               :$scope.title,
+            textDescription     :'',
+            contentDescription  :'',
+            state               : 'ACTIVE',
+            basicNeedType       : $scope.needType(),
+            tags                :'',
+            startDate           :'',
+            startTime           :'',
+            endDate             :'',
+            endTime             :'',
+            wonNode             :'',
+            binaryFolder        :md5((new Date().getTime() + Math.random(1)).toString())
+        };
+    };
 
 	$scope.need = $scope.getCleanNeed();
     $scope.need.basicNeedType = $scope.needType();
@@ -260,18 +262,91 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
     }
 
+        /*connectMessage = new window.won.ConnectMessageBuilder(connectionJson)
+            .addMessageGraph()
+            .eventURI("2345432343")
+            .hasSenderNeed(needJson_2["@context"]["@base"])
+            .hasSenderNode("http://localhost:8080/won")
+            .hasReceiverNeed(needJson["@context"]["@base"])
+            .hasReceiverNode("http://localhost:8080/won")
+            .sender()
+            .receiver()
+            .build();
+
+        sender = messageService.sendMessage(connectMessage);  */
+        // messageFactory.generateCreateNeedMessage($scope.need);
+       // console.log("expandedJson: "+expandedJson);
+        /*needService.saveDraft($scope.need, $scope.currentStep,userService.getUserName()).then(function(){
+           $scope.successShow = true;
+
+        }
+        );       */
+   // }
+	/*$scope.save = function () {
+        connectionRandomId = utilService.getRandomInt(1,9223372036854775807);
+        connectionURI = needJson["@context"]["@base"]+$scope.connectionURIPath+"/"+connectionRandomId;
+        connectionJson = new window.won.ConnectionBuilder()
+            .setContext()
+            .connectionURI(connectionURI)
+            .build();
+        wonService.connect(connectionJson, $scope.needURI2, $scope.needURI);    */
+		/*needService.save($scope.need).then(function() {
+			$scope.need = $scope.getCleanNeed();
+			$scope.successShow = true;
+		});    */
+	//};
     $scope.saveDraft = function(){
         needService.saveDraft($scope.need, $scope.currentStep,userService.getUnescapeUserName()).then(function(){
            $scope.successShow = true;
 
         });
     }
+
+    function createISODateTimeString(date, time) {
+        var d = date.split('.');
+        var t = time.split(':');
+        var datetime = new Date();
+        datetime.setFullYear(d[2]);
+        datetime.setMonth(d[1] - 1);
+        datetime.setDate(d[0]);
+        datetime.setHours(t[0]);
+        datetime.setMinutes(t[1]);
+        //datetime.setSeconds(0);
+        //datetime.setMilliseconds(0);
+        return datetime.toISOString();
+    }
+
 	$scope.publish = function () {
         //TODO logic
 		/*needService.save($scope.need).then(function() {
 			$scope.need = $scope.getCleanNeed();
 			$scope.successShow = true;
 		}); */
+
+        var needRandomId = utilService.getRandomInt(1,9223372036854775807);
+        var needURI = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId;
+        console.log(needURI);
+        var needJson = new window.won.NeedBuilder()
+            .title($scope.need.title)
+            .setContext()  //mandatory
+            //.demand()
+            .supply()//mandatory:supply, demand, doTogether, critique
+            .needURI(needURI)
+            .ownerFacet()//mandatory
+            .description($scope.need.textDescription)
+            .hasTag($scope.need.tags)
+            .hasContentDescription() //mandayoty
+            //.hasPriceSpecification("EUR",5.0,10.0)
+            // for now location is static
+            .hasLocationSpecification(48.218748, 16.360783)
+            .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
+            //.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime),false,2,3)
+            .active()//mandatory: active or inactive
+            .build();
+
+        var newNeedUriPromise = wonService.createNeed(needJson);
+        // TODO answer is not received - needs to be fixed
+        console.log('promised uri: ' + newNeedUriPromise);
 	};
 
 
