@@ -21,6 +21,10 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
         {id:3}
     ];
 
+
+    // TODO LOGIC
+    $scope.relatedTags = ['Sony', 'Tv', 'Samsung', 'LCD'];
+
     //TODO LOGIC
     $scope.searching = {type:'others offer', title:'Frilly pink cat unicorn'};
 

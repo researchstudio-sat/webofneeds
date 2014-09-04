@@ -26,6 +26,9 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     //alert($routeParams.postId);
     var imagesPerPage = 6;
 
+    <!-- TODO take tags from need -->
+    $scope.tags = ['Tv', 'mint', 'free', 'black', '720p'];
+
     <!-- TODO call here backend to load images of the post -->
     $scope.images = [{url: '/owner/images/thumbnail_demo.jpg'},
         {url: '/owner/images/thumbnail_demo_blue.jpg'},
