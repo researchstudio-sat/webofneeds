@@ -24,19 +24,25 @@
 angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $rootScope, $routeParams) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
+
+    $scope.need = $scope.$parent.need;
+
     var imagesPerPage = 6;
 
+    <!-- TODO take tags from need -->
+    $scope.tags = ['Tv', 'mint', 'free', 'black', '720p'];
+
     <!-- TODO call here backend to load images of the post -->
-    $scope.images = [{url: '/images/thumbnail_demo.jpg'},
-        {url: '/images/thumbnail_demo_blue.jpg'},
-        {url: '/images/thumbnail_demo_brown.jpg'},
-        {url: '/images/thumbnail_demo_green.jpg'},
-        {url: '/images/thumbnail_demo_red.jpg'},
-        {url: '/images/thumbnail_demo_yellow.jpg'},
-        {url: '/images/thumbnail_demo.jpg'},
-        {url: '/images/thumbnail_demo_blue.jpg'},
-        {url: '/images/thumbnail_demo_brown.jpg'},
-        {url: '/images/thumbnail_demo_green.jpg'}];
+    $scope.images = [{url: '/owner/images/thumbnail_demo.jpg'},
+        {url: '/owner/images/thumbnail_demo_blue.jpg'},
+        {url: '/owner/images/thumbnail_demo_brown.jpg'},
+        {url: '/owner/images/thumbnail_demo_green.jpg'},
+        {url: '/owner/images/thumbnail_demo_red.jpg'},
+        {url: '/owner/images/thumbnail_demo_yellow.jpg'},
+        {url: '/owner/images/thumbnail_demo.jpg'},
+        {url: '/owner/images/thumbnail_demo_blue.jpg'},
+        {url: '/owner/images/thumbnail_demo_brown.jpg'},
+        {url: '/owner/images/thumbnail_demo_green.jpg'}];
 
     // just simple for now
     $scope.bigImage = $scope.images[0];

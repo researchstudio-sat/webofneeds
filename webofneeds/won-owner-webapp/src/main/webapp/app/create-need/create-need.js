@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService, utilService, wonService) {
     $scope.menuposition = $routeParams.menuposition;
     $scope.title = $routeParams.title;
 
@@ -181,20 +181,22 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
     }
 
-	$scope.getCleanNeed = function() {
-		return {
-			title               :$scope.title,
-			textDescription     :'',
-			contentDescription  :'',
-			state               : 'ACTIVE',
-			basicNeedType       : $scope.needType(),
-			tags                :[],
-			startTime           :'',
-			endTime             :'',
-			wonNode             :'',
-			binaryFolder        :md5((new Date().getTime() + Math.random(1)).toString())
-		};
-	};
+    $scope.getCleanNeed = function() {
+        return {
+            title               :$scope.title,
+            textDescription     :'',
+            contentDescription  :'',
+            state               : 'ACTIVE',
+            basicNeedType       : $scope.needType(),
+            tags                :'',
+            startDate           :'',
+            startTime           :'',
+            endDate             :'',
+            endTime             :'',
+            wonNode             :'',
+            binaryFolder        :md5((new Date().getTime() + Math.random(1)).toString())
+        };
+    };
 
 	$scope.need = $scope.getCleanNeed();
     $scope.need.basicNeedType = $scope.needType();
@@ -259,66 +261,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         }
 
     }
-    /*
-    $scope.saveDraft = function(){
-      // ld = new window.NeedBuilder().needURI("http://needURI").hasBasicNeedType("won:Demand").title('test').build();
-        needRandomId = utilService.getRandomInt(1,9223372036854775807);
-        needURI = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId;
-        needJson = new window.won.NeedBuilder()
-            .title("testneed")
-            .setContext()
-            .demand()
-            .needURI(needURI)
-            .ownerFacet()
-            .description("just a test")
-            .hasContentDescription()
-            .hasPriceSpecification("EUR",5.0,10.0)
-            .hasLocationSpecification(10,20)
-            .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
-            .active()
-            .supply()
-            .build();
-        $scope.needURI = needURI;
-        newNeedUriPromise = wonService.createNeed(needJson);
-        */
-        /**
-        messageJson = new window.won.CreateMessageBuilder(needJson)
-            .addMessageGraph()
-            .eventURI("34543242134")
-            .hasSenderNeed()
-            .hasReceiverNode("http://localhost:8080/won")
-            .build();
-         sender = messageService.sendMessage(messageJson);
-        */
-        /*
-        needRandomId_2 = utilService.getRandomInt(1,9223372036854775807);
-        needURI_2 = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId_2;
-        $scope.needURI2 = needURI_2;
-        needJson_2 = new window.won.NeedBuilder()
-            .title("testneed")
-            .setContext()
-            .demand()
-            .needURI(needURI_2)
-            .ownerFacet()
-            .description("just a test")
-            .hasContentDescription()
-            .hasPriceSpecification("EUR",5.0,10.0)
-            .hasLocationSpecification(10,20)
-            .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
-            .active()
-            .supply()
-            .build();
-        newNeedUriPromise_2 = wonService.createNeed(needJson_2);
-         */
-        /*messageJson_2 = new window.won.CreateMessageBuilder(needJson_2)
-            .addMessageGraph()
-            .eventURI("34543242134")
-            .hasSenderNeed()
-            .hasReceiverNode("http://localhost:8080/won")
-            .build();
-        sender = messageService.sendMessage(messageJson_2);
-       */
-       // messageFactory.generateCreateNeedMessage($scope.need);
 
         /*connectMessage = new window.won.ConnectMessageBuilder(connectionJson)
             .addMessageGraph()
@@ -355,20 +297,60 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 	//};
     $scope.saveDraft = function(){
         needService.saveDraft($scope.need, $scope.currentStep,userService.getUnescapeUserName()).then(function(){
-            $scope.successShow = true;
+           $scope.successShow = true;
 
         });
     }
-    $scope.publish = function () {
+
+    function createISODateTimeString(date, time) {
+        var d = date.split('.');
+        var t = time.split(':');
+        var datetime = new Date();
+        datetime.setFullYear(d[2]);
+        datetime.setMonth(d[1] - 1);
+        datetime.setDate(d[0]);
+        datetime.setHours(t[0]);
+        datetime.setMinutes(t[1]);
+        //datetime.setSeconds(0);
+        //datetime.setMilliseconds(0);
+        return datetime.toISOString();
+    }
+
+	$scope.publish = function () {
         //TODO logic
-        /*needService.save($scope.need).then(function() {
-         $scope.need = $scope.getCleanNeed();
-         $scope.successShow = true;
-         }); */
-    };
+		/*needService.save($scope.need).then(function() {
+			$scope.need = $scope.getCleanNeed();
+			$scope.successShow = true;
+		}); */
+
+        var needRandomId = utilService.getRandomInt(1,9223372036854775807);
+        var needURI = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId;
+        console.log(needURI);
+        var needJson = new window.won.NeedBuilder()
+            .title($scope.need.title)
+            .setContext()  //mandatory
+            //.demand()
+            .supply()//mandatory:supply, demand, doTogether, critique
+            .needURI(needURI)
+            .ownerFacet()//mandatory
+            .description($scope.need.textDescription)
+            .hasTag($scope.need.tags)
+            .hasContentDescription() //mandayoty
+            //.hasPriceSpecification("EUR",5.0,10.0)
+            // for now location is static
+            .hasLocationSpecification(48.218748, 16.360783)
+            .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
+            //.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime),false,2,3)
+            .active()//mandatory: active or inactive
+            .build();
+
+        var newNeedUriPromise = wonService.createNeed(needJson);
+        // TODO answer is not received - needs to be fixed
+        console.log('promised uri: ' + newNeedUriPromise);
+	};
 
 
-    $scope.cancel = function () {
+	$scope.cancel = function () {
 		$location.path("/");
 	};
 
