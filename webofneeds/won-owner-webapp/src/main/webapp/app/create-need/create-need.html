@@ -145,6 +145,7 @@
                         Using tags improves results by a great deal.
                     </div>
                 </div>
+                <!--
 				<div class="row">
 					<div class="col-lg-8 col-lg-offset-2">
                                             <span style="margin-right:5px;cursor:pointer;" class="label label-primary btnTag"
@@ -153,9 +154,10 @@
                                             </span>
 					</div>
 				</div>
+				-->
 				<div class="row">
 					<div class="col-lg-8 col-lg-offset-2">
-						<input type="text" class="form-control" id="inputTagName"
+						<input type="text" class="form-control" id="inputTagName" ng-model="need.tags"
 						       placeholder="e.g. furniture, electronics, for children,...">
 					</div>
 				</div>
@@ -355,22 +357,22 @@
 
             <div class="col-lg-offset-1">
                 <div>
-                    <label for="from_date" style="width: 19em; margin-left: 1em;">From:</label>
-                    <label for="to_date">To:</label>
+                    <label for="start_date" style="width: 19em; margin-left: 1em;">From:</label>
+                    <label for="end_date">To:</label>
                 </div>
 
                 <div>
-                    <input type="text" class="form-control inline field-width field-right-margin" id="from_date"
+                    <input type="text" class="form-control inline field-width field-right-margin" id="start_date" ng-model="need.startDate"
                            placeholder="today" required/>
 
-                    <input type="text" class="form-control inline field-width" id="from_time"
+                    <input type="text" class="form-control inline field-width" id="start_time" ng-model="need.startTime"
                            placeholder="now" required/>
                     <span class="side-margins">-</span>
 
-                    <input type="text" class="form-control inline field-width field-right-margin" id="to_date"
+                    <input type="text" class="form-control inline field-width field-right-margin" id="end_date" ng-model="need.endDate"
                            placeholder="27.8.2013" required/>
 
-                    <input type="text" class="form-control inline field-width" id="to_time"
+                    <input type="text" class="form-control inline field-width" id="end_time" ng-model="need.endTime"
                            placeholder="23:59" required/>
                 </div>
 
@@ -408,12 +410,10 @@
         <div class="media well">
             <img class="thumbnail thumbnail-size media-object pull-left" src="/owner/images/need.jpg"/>
             <div class="media-body">
-                <h4 class="media-heading">Couch to give a way</h4>
+                <h4 class="media-heading">{{need.title}}</h4>
                 <p class="text-justify">
-                    Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
-                    Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
-                    pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
-                    Pellentesque sollicitudin nec sem ut porttitor (<a href="#/post-detail/">go to full description</a>).
+                    <!-- TODO shorten the text description -->
+                    {{need.textDescription}} (<a href="#/post-detail/">go to full description</a>).
                     <!-- TODO link needs to be extended by parameters -->
                 </p>
             </div>

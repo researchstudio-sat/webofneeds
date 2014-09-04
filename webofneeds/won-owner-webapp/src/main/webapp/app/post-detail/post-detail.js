@@ -24,6 +24,9 @@
 angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $rootScope, $routeParams) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
+
+    $scope.need = $scope.$parent.need;
+
     var imagesPerPage = 6;
 
     <!-- TODO take tags from need -->
