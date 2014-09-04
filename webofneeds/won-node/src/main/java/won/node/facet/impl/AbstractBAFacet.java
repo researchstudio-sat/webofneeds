@@ -191,7 +191,7 @@ public abstract class AbstractBAFacet implements Facet
     baseResource.addProperty(WON_TX.BA_STATE, connectionBAStateContent.createResource(stateUri.toString()));
 
     logger.debug("linked data:"+ RdfUtils.toString(connectionBAStateContent));
-    rdfStorageService.storeContent(con.getConnectionURI(), connectionBAStateContent);
+    rdfStorageService.storeModel(con.getConnectionURI(), connectionBAStateContent);
   }
 
 

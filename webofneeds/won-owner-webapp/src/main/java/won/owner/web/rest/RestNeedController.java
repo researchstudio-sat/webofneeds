@@ -256,7 +256,7 @@ public class RestNeedController {
     for (Need need : needs) {
 
       if (draftURIs.contains(need.getNeedURI())){
-        DraftPojo draftPojo = new DraftPojo(need.getNeedURI(), rdfStorage.loadContent(need.getNeedURI()),
+        DraftPojo draftPojo = new DraftPojo(need.getNeedURI(), rdfStorage.loadModel(need.getNeedURI()),
                                             draftStateRepository.findByDraftURI(need.getNeedURI()).get(0));
         draftPojo.setNeedId(need.getId());
         returnList.add(draftPojo);
@@ -346,7 +346,7 @@ public class RestNeedController {
     List<Need> draftList = needRepository.findById(draftId);
     Need need = draftList.get(0);
 
-    DraftPojo draftPojo = new DraftPojo(need.getNeedURI(),rdfStorage.loadContent(need.getNeedURI()),
+    DraftPojo draftPojo = new DraftPojo(need.getNeedURI(),rdfStorage.loadModel(need.getNeedURI()),
                                         draftStateRepository.findByDraftURI(need.getNeedURI()).get(0));
     draftPojo.setNeedURI(need.getNeedURI().toString());
     return draftPojo;
@@ -571,7 +571,7 @@ public class RestNeedController {
     needDraft.setOwnerURI(ownerURI);
     try{
       needRepository.save(needDraft);
-      rdfStorage.storeContent(needDraft.getNeedURI(),needModel);
+      rdfStorage.storeModel(needDraft.getNeedURI(), needModel);
     } catch(Exception e){
       e.printStackTrace();
       int size = needRepository.findByNeedURI(needDraft.getNeedURI()).size();

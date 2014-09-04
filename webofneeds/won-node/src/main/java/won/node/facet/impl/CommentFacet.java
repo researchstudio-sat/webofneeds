@@ -39,7 +39,7 @@ public class CommentFacet extends AbstractFacet
 
     super.connectFromNeed(con, content, wonMessage);
     addLinkedDataStatements(con, content);
-    // Model content = rdfStorageService.loadContent(con.getNeedURI());
+    // Model content = rdfStorageService.loadModel(con.getNeedURI());
 
 
   }
@@ -64,7 +64,7 @@ public class CommentFacet extends AbstractFacet
 
     // add WON node link
     logger.debug("linked data:"+ RdfUtils.toString(content));
-    rdfStorageService.storeContent(con.getNeedURI(),content);
+    rdfStorageService.storeModel(con.getNeedURI(), content);
   }
 
 }

@@ -39,6 +39,6 @@ public class CommentModeratedFacet extends AbstractFacet
     content.add(content.createStatement(content.getResource(con.getConnectionURI().toString()), SIOC.HAS_REPLY,
                                         content.getResource(con.getRemoteConnectionURI().toString())));
     logger.debug(RdfUtils.toString(content));
-    rdfStorageService.storeContent(con.getConnectionURI(),content);
+    rdfStorageService.storeModel(con.getConnectionURI(), content);
   }
 }

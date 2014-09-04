@@ -22,6 +22,7 @@ import com.hp.hpl.jena.query.DatasetFactory;
 /**
  * Simple in-memory RDF storage for testing/benchmarking purposes.
  */
+@Deprecated
 public class InMemoryRdfStorageImpl extends AbstractDatasetBasedRdfStorageService
 {
   private Dataset dataset;

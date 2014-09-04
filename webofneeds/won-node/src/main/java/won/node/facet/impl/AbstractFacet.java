@@ -311,6 +311,7 @@ public abstract class AbstractFacet implements Facet
           // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
           logger.warn("could not connectFromNeed, sending close back. Exception was: ",e);
           try {
+            // ToDo (FS): in this case a new wonMessage of type close should be generated and send
             ownerFacingConnectionCommunicationService.close(
                     connectionForRunnable.getConnectionURI(), content, wonMessage);
           } catch (Exception e1) {

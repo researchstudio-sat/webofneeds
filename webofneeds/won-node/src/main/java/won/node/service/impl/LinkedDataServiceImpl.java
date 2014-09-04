@@ -138,7 +138,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Need need = needInformationService.readNeed(needUri);
 
     // load the model from storage
-    Model model = rdfStorage.loadContent(need.getNeedURI());
+    Model model = rdfStorage.loadModel(need.getNeedURI());
     setNsPrefixes(model);
 
     Model needModel = needModelMapper.toModel(need);
@@ -198,7 +198,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     // load the model from storage
     Model model = connectionModelMapper.toModel(connection);
-    Model additionalData = rdfStorage.loadContent(connection.getConnectionURI());
+    Model additionalData = rdfStorage.loadModel(connection.getConnectionURI());
     setNsPrefixes(model);
     if (additionalData != null) {
       model.add(additionalData);
@@ -265,7 +265,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   private void addAdditionalData(final Model model, URI resourceToLoad, final Resource targetResource) {
-    Model additionalDataModel = rdfStorage.loadContent(resourceToLoad);
+    Model additionalDataModel = rdfStorage.loadModel(resourceToLoad);
     if (additionalDataModel != null && additionalDataModel.size() > 0) {
       Resource additionalData = additionalDataModel.createResource();
       //TODO: check if the statement below is now necessary

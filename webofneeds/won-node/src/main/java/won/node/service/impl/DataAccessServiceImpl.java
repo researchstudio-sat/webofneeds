@@ -100,7 +100,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   {
     List<URI> ret = new LinkedList<URI>();
     Need need = DataAccessUtils.loadNeed(needRepository, needUri);
-    Model content = rdfStorageService.loadContent(need.getNeedURI());
+    Model content = rdfStorageService.loadModel(need.getNeedURI());
     if (content == null) return ret;
     Resource baseRes = content.getResource(content.getNsPrefixURI(""));
     StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
@@ -212,7 +212,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     //TODO: concurrent modifications to the model for this resource result in side-effects.
     //think about locking.
     logger.debug("adding feedback to resource {}", forResource);
-    Model model = rdfStorageService.loadContent(forResource);
+    Model model = rdfStorageService.loadModel(forResource);
     if (model == null) {
       logger.debug("could not add feedback to resource {}: no such resource found", forResource );
       return false;
@@ -227,7 +227,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     ModelExtract extract = new ModelExtract(new StatementTripleBoundary(TripleBoundary.stopNowhere));
     model.add(extract.extract(feedback, feedback.getModel()));
     logger.debug("done adding feedback for resource {}, storing...", forResource);
-    rdfStorageService.storeContent(forResource, model);
+    rdfStorageService.storeModel(forResource, model);
     logger.debug("stored feedback");
     return true;
   }
@@ -240,9 +240,9 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   @Override
   public void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event,
     final Double score) {
-    rdfStorageService.storeContent(event,
-        RdfUtils.createContentForEvent(
-            this.URIService.createEventURI(con, event), content, con, event, score));
+    rdfStorageService.storeModel(event,
+                                 RdfUtils.createContentForEvent(
+                                   this.URIService.createEventURI(con, event), content, con, event, score));
   }
     /*
     public void saveAdditionalContentForEventReplace(final Model content, final Connection con, final ConnectionEvent event)
@@ -253,7 +253,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
         extraDataModel.setNsPrefix("",eventNode.getURI().toString());
         if (content != null) {
             RdfUtils.replaceBaseResource(content, eventNode);
-            rdfStorageService.storeContent(event, extraDataModel);
+            rdfStorageService.storeModel(event, extraDataModel);
         }
     }
     */

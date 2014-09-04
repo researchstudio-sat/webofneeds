@@ -32,7 +32,7 @@ public class CommentUnrestrictedFacet extends AbstractFacet
     try {
         // ToDo: replace null with fitting wonMessage
       needFacingConnectionClient.open(con, content, null);
-      Model needContent = rdfStorageService.loadContent(con.getNeedURI());
+      Model needContent = rdfStorageService.loadModel(con.getNeedURI());
       PrefixMapping prefixMapping = PrefixMapping.Factory.create();
 //    prefixMapping.setNsPrefix(SIOC.getURI(),"sioc");
       needContent.withDefaultMappings(prefixMapping);
@@ -44,7 +44,7 @@ public class CommentUnrestrictedFacet extends AbstractFacet
 
       // add WON node link
       logger.debug("linked data:"+ RdfUtils.toString(needContent));
-      rdfStorageService.storeContent(con.getNeedURI(),needContent);
+      rdfStorageService.storeModel(con.getNeedURI(), needContent);
     } catch (NoSuchConnectionException e) {
       e.printStackTrace();
     } catch (IllegalMessageForConnectionStateException e) {
