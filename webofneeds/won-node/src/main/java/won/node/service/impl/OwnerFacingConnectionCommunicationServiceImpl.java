@@ -28,10 +28,12 @@ import won.node.service.DataAccessService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
@@ -55,10 +57,19 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   private ConnectionRepository connectionRepository;
   @Autowired
   private URIService URIService;
+  @Autowired
+  private RDFStorageService rdfStorageService;
 
   @Override
   public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
+
     logger.debug("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
@@ -75,6 +86,13 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   @Override
   public void close(final URI connectionURI, final Model content, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
+
     logger.debug("CLOSE received from the owner side for connection {} with content {}", connectionURI, content);
 
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
@@ -91,6 +109,12 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   @Override
   public void sendMessage(final URI connectionURI, final Model message, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
 
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
 

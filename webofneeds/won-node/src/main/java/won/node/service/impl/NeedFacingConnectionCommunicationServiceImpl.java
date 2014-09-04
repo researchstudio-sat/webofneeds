@@ -29,6 +29,7 @@ import won.node.service.DataAccessService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
@@ -74,6 +75,13 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Override
   public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
+
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_OPEN);
     ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_OPEN);
     dataService.saveAdditionalContentForEvent(content, con, event);
@@ -84,6 +92,13 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Override
   public void close(final URI connectionURI, final Model content, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
+
     Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
     ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_CLOSE);
     dataService.saveAdditionalContentForEvent(content, con, event);
@@ -93,7 +108,14 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     @Override
     public void sendMessage(final URI connectionURI, final Model message, WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+
+      if (wonMessage != null) {
+        logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+        rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                       WonMessageEncoder.encodeAsDataset(wonMessage));
+      }
+
+      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
       //create ConnectionEvent in Database
         ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_MESSAGE);
         replaceBaseURIWithEventURI(message, con, event);

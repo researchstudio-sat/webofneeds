@@ -28,6 +28,7 @@ import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
@@ -95,6 +96,13 @@ public class NeedCommunicationServiceImpl implements
                    final double score, final URI originator,
                    final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException {
+
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
+
     if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
     if (originator == null) throw new IllegalArgumentException("originator is not set");
 
@@ -131,6 +139,13 @@ public class NeedCommunicationServiceImpl implements
   public URI connect(final URI needURI, final URI otherNeedURI, final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException,
     IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
+
     //create Connection in Database
     Connection con =  dataService.createConnection(needURI, otherNeedURI, null, content, ConnectionState.REQUEST_SENT, ConnectionEventType.OWNER_OPEN);
 
@@ -155,6 +170,13 @@ public class NeedCommunicationServiceImpl implements
                      final URI otherConnectionURI, final Model content,
                      final WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
+
     logger.debug("CONNECT received for need {} referring to need {} (connection {}) with content '{}'",
       new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
     if (otherConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");

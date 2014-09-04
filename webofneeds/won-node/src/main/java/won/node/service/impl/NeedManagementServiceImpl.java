@@ -36,6 +36,7 @@ import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
@@ -92,8 +93,17 @@ public class NeedManagementServiceImpl implements NeedManagementService
   {
     String stopwatchName = getClass().getName()+".createNeed";
 
-    Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase1");
+    Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase0");
     Split split = stopwatch.start();
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorage.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                              WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
+    split.stop();
+
+    stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase1");
+    split = stopwatch.start();
     logger.debug("CREATING need. OwnerApplicationId:{}", ownerApplicationID);
     Need need = new Need();
     need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
@@ -194,6 +204,12 @@ public class NeedManagementServiceImpl implements NeedManagementService
     public void activate(final URI needURI, WonMessage wonMessage) throws NoSuchNeedException
     {
 
+      if (wonMessage != null) {
+        logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+        rdfStorage.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                WonMessageEncoder.encodeAsDataset(wonMessage));
+      }
+
       logger.debug("ACTIVATING need. needURI:{}",needURI);
       if (needURI == null) throw new IllegalArgumentException("needURI is not set");
       Need need = DataAccessUtils.loadNeed(needRepository, needURI);
@@ -208,6 +224,13 @@ public class NeedManagementServiceImpl implements NeedManagementService
     @Override
     public void deactivate(final URI needURI, WonMessage wonMessage)
             throws NoSuchNeedException, NoSuchConnectionException {
+
+      if (wonMessage != null) {
+        logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+        rdfStorage.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                WonMessageEncoder.encodeAsDataset(wonMessage));
+      }
+
         logger.debug("DEACTIVATING need. needURI:{}",needURI);
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
         Need need = DataAccessUtils.loadNeed(needRepository, needURI);
