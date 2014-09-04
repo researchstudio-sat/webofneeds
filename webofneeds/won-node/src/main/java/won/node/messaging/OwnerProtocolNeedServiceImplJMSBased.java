@@ -88,14 +88,14 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
           activate,
           ownerApplicationID,
           wonMessage);
-        if (wonMessage != null)
-        needURI = wonMessage.getMessageEvent().getMessageURI();
+       // if (wonMessage != null)
+       // needURI = wonMessage.getMessageEvent().getMessageURI();
         exchange.getOut().setBody(needURI);
 
-      if (wonMessage == null)
+     // if (wonMessage == null)
         return needURI;
-      else
-        return wonMessage.getMessageEvent().getMessageURI();
+    //  else
+    //    return wonMessage.getMessageEvent().getMessageURI();
     }
 
     public void activate(
