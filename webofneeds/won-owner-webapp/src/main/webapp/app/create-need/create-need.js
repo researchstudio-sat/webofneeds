@@ -19,6 +19,10 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     $scope.title = $routeParams.title;
 
 
+    $scope.$on("CreateNeedResponseMessageReceived", onNeedCreated = function(event, msg){
+        $scope.need.needURI = msg.receiverNeed+"new";
+    })
+
     /*Text constants for new Need form*/
     /*$rootScope.createNewPost = {
 
@@ -186,6 +190,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     $scope.getCleanNeed = function() {
         return {
             title               :$scope.title,
+            needURI             :'',
             textDescription     :'',
             contentDescription  :'',
             state               : 'ACTIVE',
@@ -362,8 +367,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             //.hasPriceSpecification("EUR",5.0,10.0)
             // for now location is static
             .hasLocationSpecification(48.218748, 16.360783)
-            // start date and end date must be filled in GUI !!!    .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
-            .hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime),false,2,3)
+            // start date and end date must be filled in GUI !!!
+            .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
+            //.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime),false,2,3)
             .active()                   // mandatory: active or inactive
             .build();
 

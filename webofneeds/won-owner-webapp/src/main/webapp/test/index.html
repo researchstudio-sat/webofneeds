@@ -7,36 +7,20 @@
 <body>
 
 Zieladresse: <input type="text" id="targetAddress" />
-<button onclick="connect()">Verbinden!</button>
+<button onclick="testRdf()">Test Rdf!</button>
 <br />
-
-Text zum Versenden: <input type="text" id="messageText" />
-<button onclick="sendMessage()">Senden!</button>
-<br />
-
 
 <div id="output"></div>
-<input type="file" id="files" name="files[]" multiple />
-<output id="list"></output>
+
 
 <script type="text/javascript" src="./sockjs-0.3.js"></script>
-<script type="text/javascript" src="./websocket-test.js"></script>
+
 <script type="text/javascript" src="../app/service/builders.js"></script>
-<script>
-    function handleFileSelect(evt) {
-        var files = evt.target.files; // FileList object
+<script type="text/javascript" src="../scripts/jsonld-parser/jsonld-parser.js"></script>
 
-        // files is a FileList of File objects. List some properties.
-        var output = [];
-        for (var i = 0, f; f = files[i]; i++) {
-            output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                    f.size, ' bytes, last modified: ',
-                    f.lastModifiedDate.toLocaleDateString(), '</li>');
-        }
-        document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-    }
+<script type="text/javascript" src="../scripts/rdfstore-js/rdf_store_min.js"></script>
+<script type="text/javascript" src="./websocket-test.js"></script>
 
-    document.getElementById('files').addEventListener('change', handleFileSelect, false);
-</script>
+
 </body>
 </html>

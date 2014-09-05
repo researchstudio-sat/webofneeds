@@ -48,8 +48,9 @@ public class WonMessageBuilder
     DefaultPrefixUtils.setDefaultPrefixes(messageEvent);
 
     // message URI
-    Resource messageEventResource = messageEvent.createResource(
-      messageURI.toString(), wonMessageType.getResource());
+    Resource messageEventResource = messageEvent.createResource(messageURI.toString());
+
+    messageEventResource.addProperty(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, wonMessageType.getResource());
 
     // ToDo (FS): also add the signatures
     for (URI contentURI : contentMap.keySet()) {
