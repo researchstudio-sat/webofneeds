@@ -28,6 +28,7 @@ public class NeedCreatorBotApp implements CommandLineRunner
     SpringApplication app = new SpringApplication(
         new Object[]{"classpath:/spring/app/needCreatorBotApp.xml"}
     );
+    app.setWebEnvironment(false);
     app.run(args);
   }
 

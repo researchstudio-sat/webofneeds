@@ -93,9 +93,14 @@ public class NeedCreatorBot extends EventBot
     getEventBus().subscribe(NeedProducerExhaustedEvent.class, new ActionOnEventListener(ctx,
       new UnsubscribeListenerAction(ctx,groupMemberCreator)));
 
+
+    //also, keep track of what worked and what didn't
+    bus.subscribe(NeedCreationFailedEvent.class, new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationFailedCounter)));
+    bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationSuccessfulCounter)));
+
     //when a need is created (or it failed), decrement the halfCreatedNeed counter
     EventListener downCounter = new ActionOnEventListener(ctx, "downCounter",
-      new DecrementCounterAction(ctx, creationUnfinishedCounter));
+                                                          new DecrementCounterAction(ctx, creationUnfinishedCounter));
     //count a successful need creation
     bus.subscribe(NeedCreatedEvent.class, downCounter);
     //if a creation failed, we don't want to keep us from keeping the correct count
@@ -104,9 +109,6 @@ public class NeedCreatorBot extends EventBot
     //once for that, too.
     bus.subscribe(NeedProducerExhaustedEvent.class, downCounter);
 
-    //also, keep track of what worked and what didn't
-    bus.subscribe(NeedCreationFailedEvent.class, new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationFailedCounter)));
-    bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationSuccessfulCounter)));
 
     //wait for the targetCountReached event of the finishedCounter. We don't use
     //another target counter, so we don't need to do more filtering.
