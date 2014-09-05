@@ -1,7 +1,6 @@
 package won.protocol.message;
 
 import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.vocabulary.RDF;
 import won.protocol.model.NeedState;
 import won.protocol.util.ModelMapper;
 import won.protocol.util.RdfUtils;
@@ -26,7 +25,7 @@ public class MessageEventMapper implements ModelMapper<MessageEvent>
       // create message event resource and its type triple
       Model model = ModelFactory.createDefaultModel();
       Resource messageResource = model.createResource(messageEvent.getMessageURI().toString());
-      messageResource.addProperty(RDF.type, messageEvent.getMessageType().getResource());
+      messageResource.addProperty(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, messageEvent.getMessageType().getResource());
 
       // create sender triple
       if (messageEvent.getSenderURI() != null) {
@@ -110,7 +109,7 @@ public class MessageEventMapper implements ModelMapper<MessageEvent>
       // extract message event URI and message type
       WonMessageType type = null;
       Resource eventRes = null;
-      StmtIterator stmtIterator = model.listStatements(null, RDF.type, RdfUtils.EMPTY_RDF_NODE);
+      StmtIterator stmtIterator = model.listStatements(null, WONMSG.HAS_MESSAGE_TYPE_PROPERTY, RdfUtils.EMPTY_RDF_NODE);
       while (stmtIterator.hasNext()) {
         Statement stmt = stmtIterator.nextStatement();
         type = WonMessageType.getWonMessageType(stmt.getObject().asResource());

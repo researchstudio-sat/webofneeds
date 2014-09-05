@@ -288,7 +288,6 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .setMessageURI(responseMessageURI)
         .setSenderNodeURI(wonMessage.getMessageEvent().getReceiverNodeURI())
         .setReceiverNeedURI(wonMessage.getMessageEvent().getSenderNeedURI())
-        .setWonMessageType(WonMessageType.CREATE_RESPONSE)
         .setResponseMessageState(responseType)
         .addRefersToURI(wonMessage.getMessageEvent().getMessageURI())
         .build();

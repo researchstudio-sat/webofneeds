@@ -59,7 +59,39 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             }
             console.log("Received data: "+msg);
             $rootScope.$apply(function () {
-                $rootScope.$broadcast("WonMessageReceived", msg);
+                var store = new rdfstore.Store();
+                var event = window.won.clone(msg);
+
+                store.setPrefix("wonmsg","http://purl.org/webofneeds/message#");
+                store.load("application/ld+json", JSON.parse(msg.data), "ex:test", function(success, results) {
+                    console.log("success:" + success + ", results: " + results);
+                });
+                store.graph("ex:test", function(success, mygraph) {
+
+                    var receiverNeedTriples = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve('wonmsg:hasReceiverNeed')),null);
+                    var messageTypeTriple = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve(won.WONMSG.hasMessageTypePropertyCompacted)),null);
+                    var responseStateTriple = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve(won.WONMSG.hasResponseStatePropertyCompacted)),null);
+                    var hasSenderNodeTriple = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve(won.WONMSG.hasSenderNodeCompacted)));
+
+                    for (var i = 0; i < receiverNeedTriples.triples.length; i++) {
+                        event.receiverNeed = receiverNeedTriples.triples[i]["object"]["nominalValue"];
+                        console.log("receiverNeed:" +event.receiverNeed );
+                    }
+                    for(var i = 0; i< messageTypeTriple.triples.length; i++){
+                        event.messageType = messageTypeTriple.triples[i]["object"]["nominalValue"];
+                        console.log("messageType:"+ event.messageType);
+                    }
+                    for(var i = 0; i< responseStateTriple.triples.length; i++){
+                        event.responseState =responseStateTriple.triples[i]["object"]["nominalValue"];
+                        console.log("triple:"+event.responseState);
+                    }
+                    for(var i = 0; i< hasSenderNodeTriple.triples.length; i++){
+                        event.senderNode = hasSenderNodeTriple.triples[i]["object"]["nominalValue"];
+                        console.log("triple:"+event.senderNode);
+                    }
+                });
+                $rootScope.$broadcast("CreateNeedResponseMessageReceived",event);
+                $rootScope.$broadcast("WonMessageReceived", JSON.parse(msg.data));
             });
         };
 
