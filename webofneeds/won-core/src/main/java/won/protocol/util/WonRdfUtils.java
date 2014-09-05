@@ -9,14 +9,13 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.MultipleQueryResultsFoundException;
+import won.protocol.model.Facet;
 import won.protocol.model.NeedState;
 import won.protocol.vocabulary.WON;
 
-
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON application.
@@ -176,17 +175,17 @@ public class WonRdfUtils
   }
 
   // ToDo (FS): after the whole system has been adapted to the new message format check if the following methods are still in use and if they are make them pretty!
-  public static class NeedUtils {
+  public static class NeedUtils
+  {
 
     public static URI queryOwner(Dataset content)
-        throws MultipleQueryResultsFoundException
-    {
+      throws MultipleQueryResultsFoundException {
 
       URI ownerURI = null;
       // ToDo (FS): add as much as possible to vocabulary stuff
       final String queryString =
-          "PREFIX won: <http://purl.org/webofneeds/model#> " +
-              "SELECT * { { ?s won:hasOwner ?owner } UNION { GRAPH ?g { ?s won:hasOwner ?owner } } }";
+        "PREFIX won: <http://purl.org/webofneeds/model#> " +
+          "SELECT * { { ?s won:hasOwner ?owner } UNION { GRAPH ?g { ?s won:hasOwner ?owner } } }";
       Query query = QueryFactory.create(queryString);
       try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
         ResultSet results = qexec.execSelect();
@@ -209,14 +208,13 @@ public class WonRdfUtils
     }
 
     public static URI queryWonNode(Dataset content)
-        throws MultipleQueryResultsFoundException
-    {
+      throws MultipleQueryResultsFoundException {
 
       URI wonNodeURI = null;
       // ToDo (FS): add as much as possible to vocabulary stuff
       final String queryString =
-          "PREFIX won: <http://purl.org/webofneeds/model#> " +
-              "SELECT * { { ?s won:hasWonNode ?wonNode } UNION { GRAPH ?g { ?s won:hasWonNode ?wonNod } } }";
+        "PREFIX won: <http://purl.org/webofneeds/model#> " +
+          "SELECT * { { ?s won:hasWonNode ?wonNode } UNION { GRAPH ?g { ?s won:hasWonNode ?wonNod } } }";
       Query query = QueryFactory.create(queryString);
       try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
         ResultSet results = qexec.execSelect();
@@ -238,41 +236,155 @@ public class WonRdfUtils
       return wonNodeURI;
     }
 
-    public static Boolean queryActiveStatus(Dataset content)
-        throws MultipleQueryResultsFoundException
-    {
+    public static NeedState queryActiveStatus(Model model, URI needURI)
+      throws MultipleQueryResultsFoundException {
 
-      Boolean active = null;
-      // ToDo (FS): add as much as possible to vocabulary stuff
-      final String queryString =
-          "PREFIX won: <http://purl.org/webofneeds/model#> " +
-              "SELECT * { { ?s won:isInState ?activeState } UNION { GRAPH ?g { ?s won:isInState ?activeState } } }";
-      Query query = QueryFactory.create(queryString);
-      try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
-        ResultSet results = qexec.execSelect();
-        boolean foundOneResult = false;
-        for (; results.hasNext(); ) {
-          if (foundOneResult)
+      StmtIterator iterator = model.listStatements(model.createResource(needURI.toString()),
+                                                   WON.IS_IN_STATE,
+                                                   (RDFNode) null);
+      if (!iterator.hasNext())
+        return null;
+
+      NeedState result = null;
+      while (iterator.hasNext()) {
+        Statement s = iterator.nextStatement();
+        if (s.equals(WON.NEED_STATE_ACTIVE)) {
+          if (result != null && result.equals(NeedState.INACTIVE))
             throw new MultipleQueryResultsFoundException();
-          foundOneResult = true;
-          QuerySolution solution = results.nextSolution();
-          Resource r = solution.getResource("activeState");
-          if (r.getURI().equals(NeedState.ACTIVE.getURI().toString()))
-            return true;
-          else if (r.getURI().equals(NeedState.INACTIVE.getURI().toString()))
-            return false;
+          result = NeedState.ACTIVE;
+        } else if (s.equals(WON.NEED_STATE_INACTIVE)) {
+          if (result != null && result.equals(NeedState.ACTIVE))
+            throw new MultipleQueryResultsFoundException();
+          result = NeedState.INACTIVE;
         }
       }
-      return null;
+      return result;
     }
+
+    public static NeedState queryActiveStatus(Dataset content, URI needURI)
+      throws MultipleQueryResultsFoundException {
+      NeedState result = null;
+      result = queryActiveStatus(content.getDefaultModel(), needURI);
+
+      Iterator<String> nameIt = content.listNames();
+      while (nameIt.hasNext()) {
+        NeedState tempResult = queryActiveStatus(content.getNamedModel(nameIt.next()), needURI);
+        if (tempResult != null && result != null && !result.equals(tempResult))
+          throw new MultipleQueryResultsFoundException();
+        result = tempResult;
+      }
+
+      return result;
+    }
+
+    /**
+     * returns a list of Facet objects each set with the NeedURI and the TypeURI
+     *
+     * @param needURI URI which will be set to the facets
+     * @param dataset <code>Dataset</code> object which will be searched for the facets
+     * @return list of facets
+     */
+    public static List<Facet> getFacets(URI needURI, Dataset dataset) {
+      List<Facet> result = new ArrayList<Facet>();
+      Iterator<String> i = dataset.listNames();
+      while (i.hasNext()) {
+        result.addAll(getFacets(needURI, dataset.getNamedModel(i.next())));
+      }
+      result.addAll(getFacets(needURI, dataset.getDefaultModel()));
+      return result;
+    }
+
+    /**
+     * returns a list of Facet objects each set with the NeedURI and the TypeURI
+     *
+     * @param needURI URI which will be set to the facets
+     * @param model <code>Model</code> object which will be searched for the facets
+     * @return list of facets
+     */
+    public static List<Facet> getFacets(URI needURI, Model model) {
+      List<Facet> result = new ArrayList<Facet>();
+
+      StmtIterator iterator = model.listStatements(model.createResource(needURI.toString()),
+                                                   WON.HAS_FACET,
+                                                   (RDFNode) null);
+      while (iterator.hasNext()) {
+        Facet f = new Facet();
+        f.setNeedURI(needURI);
+        f.setTypeURI(URI.create(iterator.nextStatement().getObject().asResource().getURI()));
+        result.add(f);
+      }
+      return result;
+    }
+
+    /**
+     * searches for a subject of type won:Need and returns the NeedURI
+     *
+     * @param dataset <code>Dataset</code> object which will be searched for the NeedURI
+     * @return <code>URI</code> which is of type won:Need
+     */
+    public static URI getNeedURI(Dataset dataset)
+      throws MultipleQueryResultsFoundException {
+
+      List<URI> needURIs = new ArrayList<URI>();
+
+      Iterator<String> i = dataset.listNames();
+      while (i.hasNext()) {
+        needURIs.add(getNeedURI(dataset.getNamedModel(i.next())));
+      }
+      needURIs.add(getNeedURI(dataset.getDefaultModel()));
+
+      if (needURIs.size() == 0)
+        return null;
+      else if (needURIs.size() == 1)
+        return needURIs.get(0);
+      else if (needURIs.size() > 1) {
+        URI u = needURIs.get(0);
+        for (URI uri : needURIs) {
+          if (!uri.equals(u))
+            throw new MultipleQueryResultsFoundException();
+        }
+        return u;
+      }
+      else
+        return null;
+    }
+    /**
+     * searches for a subject of type won:Need and returns the NeedURI
+     *
+     * @param model <code>Model</code> object which will be searched for the NeedURI
+     * @return <code>URI</code> which is of type won:Need
+     */
+    public static URI getNeedURI(Model model)
+      throws MultipleQueryResultsFoundException {
+
+      List<URI> needURIs = new ArrayList<URI>();
+
+      ResIterator iterator = model.listSubjectsWithProperty(RDF.type, WON.NEED);
+      while (iterator.hasNext()) {
+        needURIs.add(URI.create(iterator.next().getURI()));
+      }
+
+      if (needURIs.size() == 0)
+        return null;
+      else if (needURIs.size() == 1)
+        return needURIs.get(0);
+      else if (needURIs.size() > 1) {
+        URI u = needURIs.get(0);
+        for (URI uri : needURIs) {
+          if (!uri.equals(u))
+            throw new MultipleQueryResultsFoundException();
+        }
+        return u;
+      }
+      else
+        return null;    }
+
   }
 
-    private static Model createModelWithBaseResource() {
-        Model model = ModelFactory.createDefaultModel();
-        model.setNsPrefix("", "no:uri");
-        model.createResource(model.getNsPrefixURI(""));
-        return model;
+  private static Model createModelWithBaseResource() {
+      Model model = ModelFactory.createDefaultModel();
+      model.setNsPrefix("", "no:uri");
+      model.createResource(model.getNsPrefixURI(""));
+      return model;
     }
-
-
 }

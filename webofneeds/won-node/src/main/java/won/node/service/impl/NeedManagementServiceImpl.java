@@ -21,6 +21,7 @@ package won.node.service.impl;
  * Date: 28.10.13
  */
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.javasimon.SimonManager;
@@ -31,10 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.IllegalNeedContentException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.*;
@@ -48,6 +46,7 @@ import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -91,71 +90,127 @@ public class NeedManagementServiceImpl implements NeedManagementService
           String ownerApplicationID,
           WonMessage wonMessage) throws IllegalNeedContentException
   {
-    String stopwatchName = getClass().getName()+".createNeed";
 
-    Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase0");
-    Split split = stopwatch.start();
+
+    // distinguish between the new message format (WonMessage) and the old parameters
+    // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
+
+      // store the wonMessage as it is
       logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
       rdfStorage.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                               WonMessageEncoder.encodeAsDataset(wonMessage));
-    }
-    split.stop();
 
-    stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase1");
-    split = stopwatch.start();
-    logger.debug("CREATING need. OwnerApplicationId:{}", ownerApplicationID);
-    Need need = new Need();
-    need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
-    need = needRepository.save(need);
-    split.stop();
 
-    stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase2");
-    split = stopwatch.start();
-    //now, create the need URI and save again
-    if (wonMessage == null)
-      need.setNeedURI(URIService.createNeedURI(need));
-    else
-      need.setNeedURI(wonMessage.getMessageEvent().getSenderNeedURI());
-    need.setWonNodeURI(URI.create(URIService.getGeneralURIPrefix()));
-    need = needRepository.save(need);
-    split.stop();
+      // the model where all the information created by the WON node is stored
+      Model needMeta = ModelFactory.createDefaultModel();
 
-    stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase3");
-    split = stopwatch.start();
-    String baseURI = need.getNeedURI().toString();
-    RdfUtils.replaceBaseURI(content, baseURI);
-    rdfStorage.storeModel(need.getNeedURI(), content);
-    split.stop();
+      // the dataset which contains the need model graphs from the owner application
+      Dataset needContent = wonMessage.getMessageContent();
 
-    stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase4");
-    split = stopwatch.start();
-    ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
-    if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
+      wonMessage.getMessageEvent().getReceiverNeedURI();
 
-    Resource needRes = needIt.next();
-    logger.debug("processing need resource {}", needRes.getURI());
+      URI needURI;
+      try {
+        needURI = WonRdfUtils.NeedUtils.getNeedURI(needContent);
+        if (needURI == null) {
+          throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
+        }
+      } catch (MultipleQueryResultsFoundException e) {
+        throw new IllegalArgumentException("there are multiple RDF nodes of type won:Need");
+      }
 
-    StmtIterator stmtIterator = content.listStatements(needRes, WON.HAS_FACET, (RDFNode) null);
-    if(!stmtIterator.hasNext())
+      if (!needURI.equals(wonMessage.getMessageEvent().getReceiverNeedURI()))
+        throw new IllegalArgumentException("receiverNeedURI and NeedURI of the content are not equal");
+
+      Need need = new Need();
+
+      need.setState(NeedState.ACTIVE);
+      need.setNeedURI(needURI);
+
+      // ToDo (FS) check if the WON node URI corresponds with the WON node (maybe earlier in the message layer)
+      need.setWonNodeURI(wonMessage.getMessageEvent().getReceiverNodeURI());
+
+      need = needRepository.save(need);
+
+      List<Facet> facets = WonRdfUtils.NeedUtils.getFacets(needURI, needContent);
+      if (facets.size() == 0)
         throw new IllegalArgumentException("at least one RDF node must be of type won:HAS_FACET");
-    else
-    //TODO: check if there is a implementation for the facet on the node
-    do {
-        Facet facet = new Facet();
-        facet.setNeedURI(need.getNeedURI());
-        facet.setTypeURI(URI.create(stmtIterator.next().getObject().asResource().getURI()));
-        facetRepository.save(facet);
-    } while(stmtIterator.hasNext());
-    split.stop();
+      for (Facet f : facets) {
+        // TODO: check if there is a implementation for the facet on the node
+        facetRepository.save(f);
+      }
 
-    stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase5");
-    split = stopwatch.start();
-    authorizeOwnerApplicationForNeed(ownerApplicationID, need);
-    split.stop();
-    matcherProtocolMatcherClient.needCreated(need.getNeedURI(), content, wonMessage);
 
-    return need.getNeedURI();
+      // ToDo (FS): add meta data to the needContent and store it in the RDFStore
+
+
+      authorizeOwnerApplicationForNeed(ownerApplicationID, need);
+
+      // ToDo (FS): send the same wonMessage or create a new one (with new type)?
+      matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(), wonMessage);
+
+      return needURI;
+
+    } else {
+
+      // do it the traditional way
+
+      String stopwatchName = getClass().getName() + ".createNeed";
+
+      Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase1");
+      Split split = stopwatch.start();
+      logger.debug("CREATING need. OwnerApplicationId:{}", ownerApplicationID);
+      Need need = new Need();
+      need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
+      need = needRepository.save(need);
+      split.stop();
+
+      stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase2");
+      split = stopwatch.start();
+      //now, create the need URI and save again
+      need.setNeedURI(URIService.createNeedURI(need));
+      need.setWonNodeURI(URI.create(URIService.getGeneralURIPrefix()));
+      need = needRepository.save(need);
+      split.stop();
+
+      stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase3");
+      split = stopwatch.start();
+      String baseURI = need.getNeedURI().toString();
+      RdfUtils.replaceBaseURI(content, baseURI);
+      rdfStorage.storeModel(need.getNeedURI(), content);
+      split.stop();
+
+      stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase4");
+      split = stopwatch.start();
+      ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
+      if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
+
+      Resource needRes = needIt.next();
+      logger.debug("processing need resource {}", needRes.getURI());
+
+      StmtIterator stmtIterator = content.listStatements(needRes, WON.HAS_FACET, (RDFNode) null);
+      if (!stmtIterator.hasNext())
+        throw new IllegalArgumentException("at least one RDF node must be of type won:HAS_FACET");
+      else
+        //TODO: check if there is a implementation for the facet on the node
+        do {
+          Facet facet = new Facet();
+          facet.setNeedURI(need.getNeedURI());
+          facet.setTypeURI(URI.create(stmtIterator.next().getObject().asResource().getURI()));
+          facetRepository.save(facet);
+        } while (stmtIterator.hasNext());
+      split.stop();
+
+      stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase5");
+      split = stopwatch.start();
+      authorizeOwnerApplicationForNeed(ownerApplicationID, need);
+      split.stop();
+      matcherProtocolMatcherClient.needCreated(need.getNeedURI(), content, wonMessage);
+      return need.getNeedURI();
+
+    }
+
   }
 
   @Override
