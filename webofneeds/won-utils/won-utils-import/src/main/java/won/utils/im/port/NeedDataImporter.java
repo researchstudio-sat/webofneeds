@@ -22,7 +22,7 @@ public class NeedDataImporter
       // TODO set reader parameters, e.g source, etc taken from args
       // can make extra arguments to specify which reader and writer
       // should be used
-      NeedDataReader reader = new NeedDataSmartEngineReader();
+      NeedDataReader reader = new NeedDataReaderImpl();
       // assumes output directory is the last argument
       NeedDataWriter writer = new ModelsRdfFolderWriter(args[args.length - 1])
     ) {

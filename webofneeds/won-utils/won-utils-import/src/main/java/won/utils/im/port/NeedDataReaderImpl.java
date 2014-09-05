@@ -8,7 +8,7 @@ import java.io.IOException;
  * User: ypanchenko
  * Date: 04.09.2014
  */
-public class NeedDataSmartEngineReader implements NeedDataReader<Model>
+public class NeedDataReaderImpl implements NeedDataReader<Model>
 {
   @Override
   public boolean hasNext() {
