@@ -16,7 +16,6 @@
 
 package won.node.ws;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.node.protocol.impl.OwnerProtocolOwnerClientFactory;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
+import won.protocol.message.WonMessage;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -54,7 +54,7 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
     @Override
   public void hint(final URI ownNeedUri, final URI otherNeedUri,
                    final double score, final URI originatorUri,
-                   final Model content, final Dataset messageEvent)
+                   final Model content, final WonMessage wonMessage)
             throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
     try {
@@ -75,7 +75,7 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
     @Override
     public void connect(final URI ownNeedURI, final URI otherNeedURI,
                         final URI ownConnectionURI, final Model content,
-                        final Dataset messageEvent)
+                        final WonMessage wonMessage)
             throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
       try {
@@ -94,7 +94,7 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
       }
     }
     @Override
-  public void open(final URI connectionURI, final Model content, final Dataset messageEvent)
+  public void open(final URI connectionURI, final Model content, final WonMessage wonMessage)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
@@ -112,7 +112,7 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
 
 
   @Override
-  public void close(final URI connectionURI, final Model content, final Dataset messageEvent)
+  public void close(final URI connectionURI, final Model content, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);
@@ -129,7 +129,7 @@ public class OwnerProtocolOwnerClientImplWSBased implements OwnerProtocolOwnerSe
   }
 
   @Override
-  public void sendMessage(final URI connectionURI, final Model message, final Dataset messageEvent)
+  public void sendMessage(final URI connectionURI, final Model message, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     try {
       OwnerProtocolOwnerWebServiceEndpoint proxy = clientFactory.getOwnerProtocolEndpointForConnection(connectionURI);

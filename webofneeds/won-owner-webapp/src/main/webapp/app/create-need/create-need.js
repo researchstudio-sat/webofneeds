@@ -79,6 +79,8 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             $scope.menuposition = item;
             $('#changePostMenuItem' + $scope.menuposition).addClass('active');
             $scope.showPublicChangeTypeOfNeed = false;
+            $scope.menuposition = item;
+            $scope.need.basicNeedType = $scope.needType();
         }
     }
 
@@ -302,6 +304,18 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         });
     }
 
+    // TODO does not update models
+    $('#start_date').datepicker({
+        format:'dd.mm.yyyy',
+        autoclose: true
+    });
+
+    $('#end_date').datepicker({
+        format:'dd.mm.yyyy',
+        autoclose: true
+    });
+
+    // TODO fix when date and time are empty
     function createISODateTimeString(date, time) {
         var d = date.split('.');
         var t = time.split(':');
@@ -326,27 +340,36 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         var needRandomId = utilService.getRandomInt(1,9223372036854775807);
         var needURI = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId;
         console.log(needURI);
-        var needJson = new window.won.NeedBuilder()
-            .title($scope.need.title)
-            .setContext()  //mandatory
-            //.demand()
-            .supply()//mandatory:supply, demand, doTogether, critique
+
+        // building need starts
+        var needBuilderObject = new window.won.NeedBuilder().setContext();
+        if ($scope.need.basicNeedType == 'DEMAND') {
+            needBuilderObject.demand();
+        } else if ($scope.need.basicNeedType == 'SUPPLY') {
+            needBuilderObject.supply();
+        } else if ($scope.need.basicNeedType == 'DO_TOGETHER') {
+            needBuilderObject.doTogether();
+        } else {
+            needBuilderObject.critique();
+        }
+
+        var needJson = needBuilderObject.title($scope.need.title)
             .needURI(needURI)
-            .ownerFacet()//mandatory
+            .ownerFacet()               // mandatory
             .description($scope.need.textDescription)
             .hasTag($scope.need.tags)
-            .hasContentDescription() //mandayoty
+            .hasContentDescription()    // mandatory
             //.hasPriceSpecification("EUR",5.0,10.0)
             // for now location is static
             .hasLocationSpecification(48.218748, 16.360783)
-            .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
-            //.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime),false,2,3)
-            .active()//mandatory: active or inactive
+            // start date and end date must be filled in GUI !!!    .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
+            .hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime),false,2,3)
+            .active()                   // mandatory: active or inactive
             .build();
 
+        //console.log(needJson);
         var newNeedUriPromise = wonService.createNeed(needJson);
-        // TODO answer is not received - needs to be fixed
-        console.log('promised uri: ' + newNeedUriPromise);
+        //console.log('promised uri: ' + newNeedUriPromise);
 	};
 
 

@@ -1,6 +1,5 @@
 package won.matcher.protocol.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
-import won.protocol.rest.LinkedDataRestClient;
+import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
 import won.protocol.ws.MatcherProtocolNeedWebServiceEndpoint;
 import won.protocol.ws.fault.IllegalMessageForNeedStateFault;
@@ -30,7 +29,7 @@ public class MatcherProtocolNeedServiceClientWSBased implements MatcherProtocolN
   private MatcherProtocolNeedClientFactory clientFactory;
 
   @Override
-  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content, Dataset messageEvent)
+  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content, WonMessage wonMessage)
             throws NoSuchNeedException, IllegalMessageForNeedStateException
   {
         logger.info("need-facing: HINT called for needURI {} and otherNeed {} " +

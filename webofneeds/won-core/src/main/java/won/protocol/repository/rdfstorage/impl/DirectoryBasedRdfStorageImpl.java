@@ -29,6 +29,7 @@ import java.text.MessageFormat;
 /**
  * Rdf storage service using jena tdb.
  */
+@Deprecated
 public class DirectoryBasedRdfStorageImpl extends AbstractOneDatasetPerThreadRdfStorageService
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());

@@ -1,12 +1,12 @@
 package won.node.facet.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
@@ -34,7 +34,7 @@ public class GroupFacetImpl extends AbstractFacet
   }
 
   @Override
-  public void sendMessageFromNeed(final Connection con, final Model message, final Dataset messageEvent)
+  public void sendMessageFromNeed(final Connection con, final Model message, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     final List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
       ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
@@ -45,7 +45,7 @@ public class GroupFacetImpl extends AbstractFacet
           for (final Connection c : cons) {
             try {
               if(! c.equals(con)) {
-                needFacingConnectionClient.sendMessage(c, message, messageEvent);
+                needFacingConnectionClient.sendMessage(c, message, wonMessage);
               }
           } catch (Exception e) {
             logger.warn("caught Exception:", e);

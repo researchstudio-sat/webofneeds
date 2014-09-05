@@ -16,18 +16,11 @@
 
 package won.protocol.owner;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessage;
 import won.protocol.service.ConnectionCommunicationService;
-import javax.jms.Message;
-
-import java.net.URI;
-import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -47,7 +40,7 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    */
   public void hint(String ownNeedURI, String otherNeedURI,
                    String score, String originatorURI,
-                   String content, Dataset messageEvent)
+                   String content, WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
   /**
@@ -73,7 +66,7 @@ public interface OwnerProtocolOwnerService extends ConnectionCommunicationServic
    */
   public void connect(String ownNeedURI, String otherNeedURI,
                       String ownConnectionURI, String content,
-                      Dataset messageEvent)
+                      WonMessage wonMessage)
           throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
   //TODO move to another interface maybe?

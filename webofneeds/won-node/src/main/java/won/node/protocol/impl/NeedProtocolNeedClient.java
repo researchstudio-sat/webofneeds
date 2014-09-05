@@ -17,11 +17,11 @@
 package won.node.protocol.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
 
@@ -44,32 +44,32 @@ public class NeedProtocolNeedClient implements NeedProtocolNeedClientSide
   @Override
   public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri,
                                        final URI otherConnectionUri,
-                                       final Model content, final Dataset messageEvent) throws Exception {
+                                       final Model content, final WonMessage wonMessage) throws Exception {
 
     logger.debug("need to need: CONNECT called for other need {}, own need {}, own connection {}, and content {}",
         new Object[]{needUri, otherNeedUri, otherConnectionUri, content});
-     return delegate.connect(needUri, otherNeedUri, otherConnectionUri, content, messageEvent);
+     return delegate.connect(needUri, otherNeedUri, otherConnectionUri, content, wonMessage);
 
   }
 
     @Override
-  public void open(final Connection connection, final Model content, final Dataset messageEvent) throws Exception {
+  public void open(final Connection connection, final Model content, final WonMessage wonMessage) throws Exception {
       logger.debug("need to need: OPEN called for connection {}", connection);
-      delegate.open(connection, content, messageEvent);
+      delegate.open(connection, content, wonMessage);
   }
 
   @Override
-  public void close(final Connection connection, final Model content, final Dataset messageEvent) throws Exception {
+  public void close(final Connection connection, final Model content, final WonMessage wonMessage) throws Exception {
     logger.debug("need to need: CLOSE called for connection {}", connection);
-    delegate.close(connection, content, messageEvent);
+    delegate.close(connection, content, wonMessage);
 
   }
 
   @Override
-  public void sendMessage(final Connection connection, final Model message, final Dataset messageEvent)
+  public void sendMessage(final Connection connection, final Model message, final WonMessage wonMessage)
           throws Exception {
     logger.debug("need to need: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
-    delegate.sendMessage(connection, message, messageEvent);
+    delegate.sendMessage(connection, message, wonMessage);
 
   }
 

@@ -16,11 +16,8 @@
 
 package won.protocol.service;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessage;
 
 import java.net.URI;
 
@@ -48,6 +45,6 @@ public interface MatcherFacingNeedCommunicationService
    *          if the need is not active
    */
   public void hint(URI needURI, URI otherNeed, double score,
-                   URI originator, Model content, Dataset messageEvent) throws Exception;
+                   URI originator, Model content, WonMessage wonMessage) throws Exception;
 
 }

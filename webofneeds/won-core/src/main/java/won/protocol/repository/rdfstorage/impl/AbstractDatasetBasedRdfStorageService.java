@@ -30,6 +30,7 @@ import java.net.URI;
 /**
  * Simple in-memory RDF storage for testing/benchmarking purposes.
  */
+@Deprecated
 public abstract class AbstractDatasetBasedRdfStorageService implements RDFStorageService
 {
   protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -43,19 +44,19 @@ public abstract class AbstractDatasetBasedRdfStorageService implements RDFStorag
 
 
   @Override
-  public void storeContent(final ConnectionEvent event, final Model graph)
+  public void storeModel(final ConnectionEvent event, final Model graph)
   {
-    storeContent(createEventURI(event), graph);
+    storeModel(createEventURI(event), graph);
   }
 
   @Override
-  public Model loadContent(final ConnectionEvent event)
+  public Model loadModel(final ConnectionEvent event)
   {
-    return loadContent(createEventURI(event));
+    return loadModel(createEventURI(event));
   }
 
   @Override
-  public void storeContent(final URI resourceURI, final Model model) {
+  public void storeModel(final URI resourceURI, final Model model) {
     if (model.isEmpty()) return;
     Model copy = RdfUtils.cloneModel(model);
     Dataset dataset = getDataset();
@@ -69,7 +70,12 @@ public abstract class AbstractDatasetBasedRdfStorageService implements RDFStorag
   }
 
   @Override
-  public Model loadContent(final URI resourceURI) {
+  public void storeDataset(final URI resourceURI, final Dataset dataset){
+    // class is deprecated
+  }
+
+  @Override
+  public Model loadModel(final URI resourceURI) {
     Dataset dataset = getDataset();
     try {
       dataset.begin(ReadWrite.READ);
@@ -78,6 +84,12 @@ public abstract class AbstractDatasetBasedRdfStorageService implements RDFStorag
     } finally {
       dataset.end();
     }
+  }
+
+  @Override
+  public Dataset loadDataset(final URI resourceURI) {
+    // class is deprecated
+    return null;
   }
 
   @Override

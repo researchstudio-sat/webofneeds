@@ -127,7 +127,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   {
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    return rdfStorage.loadContent(need.getNeedURI());
+    return rdfStorage.loadModel(need.getNeedURI());
   }
 
   @Override

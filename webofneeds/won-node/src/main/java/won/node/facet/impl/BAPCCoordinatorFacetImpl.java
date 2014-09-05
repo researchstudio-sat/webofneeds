@@ -1,18 +1,17 @@
 package won.node.facet.impl;
 
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
-import org.postgresql.translation.messages_es;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.facet.businessactivity.statemanager.BAStateManager;
 import won.node.facet.businessactivity.participantcompletion.BAPCEventType;
 import won.node.facet.businessactivity.participantcompletion.BAPCState;
+import won.node.facet.businessactivity.statemanager.BAStateManager;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.util.WonRdfUtils;
@@ -39,7 +38,7 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
         return FacetType.BAPCCoordinatorFacet;
     }
 
-    public void openFromNeed(final Connection con, final Model content, final Dataset messageEvent)
+    public void openFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //inform the need side
         //CONNECTED state
@@ -59,7 +58,7 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                     logger.debug("opened from Participant");
                     logger.debug("coordinator {}, participant {}", con.getNeedURI().toString(), con.getRemoteNeedURI().toString());
                     logger.debug("con {}, con BAstate {}",con.getConnectionURI().toString(), stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString());
-                    ownerFacingConnectionClient.open(con.getConnectionURI(), content, messageEvent);
+                    ownerFacingConnectionClient.open(con.getConnectionURI(), content, wonMessage);
                 } catch (WonProtocolException e) {
                     logger.warn("caught Exception:", e);
                 }
@@ -68,7 +67,7 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
     }
 
     //Coordinator sends message to Participant
-    public void sendMessageFromOwner(final Connection con, final Model message, final Dataset messageEvent)
+    public void sendMessageFromOwner(final Connection con, final Model message, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         final URI remoteConnectionURI = con.getRemoteConnectionURI();
         //inform the other side
@@ -134,7 +133,7 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
                             baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                            needFacingConnectionClient.sendMessage(con, myContent, messageEvent);
+                            needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
                         }
                         else
                         {
@@ -155,7 +154,7 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
     }
 
     //Coordinator receives message from Participant
-    public void sendMessageFromNeed(final Connection con, final Model message, final Dataset messageEvent)
+    public void sendMessageFromNeed(final Connection con, final Model message, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         //send to the need side
         executorService.execute(new Runnable() {
@@ -190,7 +189,7 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                     storeBAStateForConnection(con, newState.getURI());
                     logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
 
-                    ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, messageEvent);
+                    ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, wonMessage);
 
                     BAPCEventType resendEventType = state.getResendEvent();
                     if(resendEventType!=null)
@@ -215,7 +214,7 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                             Resource r = myContent.createResource(resendEventType.getURI().toString());
                             baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
                             //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
-                            needFacingConnectionClient.sendMessage(con, myContent, messageEvent);
+                            needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
                         }
                         else
                         {

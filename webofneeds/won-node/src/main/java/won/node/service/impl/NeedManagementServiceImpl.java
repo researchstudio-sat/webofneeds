@@ -21,7 +21,6 @@ package won.node.service.impl;
  * Date: 28.10.13
  */
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.javasimon.SimonManager;
@@ -32,18 +31,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
-import won.protocol.message.WonMessage;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.IllegalNeedContentException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.OwnerApplicationRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.util.DataAccessUtils;
@@ -93,8 +93,17 @@ public class NeedManagementServiceImpl implements NeedManagementService
   {
     String stopwatchName = getClass().getName()+".createNeed";
 
-    Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase1");
+    Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase0");
     Split split = stopwatch.start();
+    if (wonMessage != null) {
+      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+      rdfStorage.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                              WonMessageEncoder.encodeAsDataset(wonMessage));
+    }
+    split.stop();
+
+    stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase1");
+    split = stopwatch.start();
     logger.debug("CREATING need. OwnerApplicationId:{}", ownerApplicationID);
     Need need = new Need();
     need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
@@ -116,7 +125,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     split = stopwatch.start();
     String baseURI = need.getNeedURI().toString();
     RdfUtils.replaceBaseURI(content, baseURI);
-    rdfStorage.storeContent(need.getNeedURI(), content);
+    rdfStorage.storeModel(need.getNeedURI(), content);
     split.stop();
 
     stopwatch = SimonManager.getStopwatch(stopwatchName+"_phase4");
@@ -192,8 +201,14 @@ public class NeedManagementServiceImpl implements NeedManagementService
   }
 
   @Override
-    public void activate(final URI needURI, Dataset messageEvent) throws NoSuchNeedException
+    public void activate(final URI needURI, WonMessage wonMessage) throws NoSuchNeedException
     {
+
+      if (wonMessage != null) {
+        logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+        rdfStorage.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                WonMessageEncoder.encodeAsDataset(wonMessage));
+      }
 
       logger.debug("ACTIVATING need. needURI:{}",needURI);
       if (needURI == null) throw new IllegalArgumentException("needURI is not set");
@@ -202,13 +217,20 @@ public class NeedManagementServiceImpl implements NeedManagementService
       logger.debug("Setting Need State: "+ need.getState());
       needRepository.save(need);
 
-      matcherProtocolMatcherClient.needActivated(need.getNeedURI(), messageEvent);
+      matcherProtocolMatcherClient.needActivated(need.getNeedURI(), wonMessage);
 
     }
 
     @Override
-    public void deactivate(final URI needURI, Dataset messageEvent)
+    public void deactivate(final URI needURI, WonMessage wonMessage)
             throws NoSuchNeedException, NoSuchConnectionException {
+
+      if (wonMessage != null) {
+        logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
+        rdfStorage.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                WonMessageEncoder.encodeAsDataset(wonMessage));
+      }
+
         logger.debug("DEACTIVATING need. needURI:{}",needURI);
         if (needURI == null) throw new IllegalArgumentException("needURI is not set");
         Need need = DataAccessUtils.loadNeed(needRepository, needURI);
@@ -219,14 +241,14 @@ public class NeedManagementServiceImpl implements NeedManagementService
           (), ConnectionState.CLOSED);
         for (URI connURI : connectionURIs) {
             try {
-                // ToDo (FS): create appropriate messageEvent
-                  ownerFacingConnectionCommunicationService.close(connURI, null, messageEvent);
+                // ToDo (FS): create appropriate wonMessage
+                  ownerFacingConnectionCommunicationService.close(connURI, null, wonMessage);
             } catch (IllegalMessageForConnectionStateException e) {
                 logger.warn("wrong connection state",e);
             }
 
         }
-      matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), messageEvent);
+      matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), wonMessage);
     }
 
     private boolean isNeedActive(final Need need)

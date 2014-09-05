@@ -15,9 +15,11 @@
  */
 
 package won.protocol.service;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.exception.*;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
+import won.protocol.exception.IllegalNeedContentException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Need;
 
@@ -55,7 +57,7 @@ public interface NeedManagementService
      * @param needURI
      * @throws won.protocol.exception.NoSuchNeedException if needURI does not refer to an existing need
      */
-  public void activate(URI needURI, Dataset messageEvent) throws NoSuchNeedException;
+  public void activate(URI needURI, WonMessage wonMessage) throws NoSuchNeedException;
 
   /**
    * Deactivates the need object, closing all its established connections.
@@ -63,5 +65,5 @@ public interface NeedManagementService
    * @param needURI
    * @throws NoSuchNeedException if needURI does not refer to an existing need
    */
-  public void deactivate(URI needURI, Dataset messageEvent) throws NoSuchNeedException, IllegalMessageForConnectionStateException, NoSuchConnectionException;
+  public void deactivate(URI needURI, WonMessage wonMessage) throws NoSuchNeedException, IllegalMessageForConnectionStateException, NoSuchConnectionException;
 }

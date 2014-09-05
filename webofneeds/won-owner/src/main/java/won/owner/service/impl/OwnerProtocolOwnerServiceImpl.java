@@ -1,6 +1,5 @@
 package won.owner.service.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.node.facet.impl.WON_TX;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ChatMessageRepository;
@@ -60,7 +60,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     @Override
     public void hint(final String ownNeedURI, final String otherNeedURI,
                      final String score, final String originatorURI,
-                     final String content, final Dataset messageEvent)
+                     final String content, final WonMessage wonMessage)
             throws NoSuchNeedException, IllegalMessageForNeedStateException {
         logger.debug("owner from need: HINT called for own need {}, other need {}, with score {} from originator {} and content {}",
                 new Object[]{ownNeedURI, otherNeedURI, score, originatorURI, content});
@@ -91,7 +91,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         }
         match.setScore(scoreConvert);
         matchRepository.save(match);
-        ownerServiceCallback.onHint(match, contentConvert);
+        ownerServiceCallback.onHint(match, contentConvert, wonMessage);
       //ownerService.handleHintMessageEventFromWonNode(match, contentConvert);
     }
 
@@ -101,7 +101,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
     @Override
     public void connect(final String ownNeedURI, final String otherNeedURI, final String ownConnectionURI,
-                        final String content, final Dataset messageEvent)
+                        final String content, final WonMessage wonMessage)
             throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
         //TODO: String or URI that is the question..
@@ -164,12 +164,12 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
           //TODO: do we save the connection content? where? as a chat content?
         }
-        ownerServiceCallback.onConnect(con, contentConvert);
+        ownerServiceCallback.onConnect(con, contentConvert, wonMessage);
       //ownerService.handleConnectMessageEventFromWonNode(con, contentConvert);
     }
 
     @Override
-    public void open(URI connectionURI, Model content, final Dataset messageEvent)
+    public void open(URI connectionURI, Model content, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         logger.debug("owner from need: OPEN called for connection {} with content {}.", connectionURI, content);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
@@ -180,12 +180,12 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
         //save in the db
         connectionRepository.save(con);
-        ownerServiceCallback.onOpen(con, content);
+        ownerServiceCallback.onOpen(con, content, wonMessage);
       //ownerService.handleOpenMessageEventFromWonNode(con, content);
     }
 
     @Override
-    public void close(final URI connectionURI, Model content, final Dataset messageEvent)
+    public void close(final URI connectionURI, Model content, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         logger.debug("owner from need: CLOSE called for connection {}", connectionURI);
@@ -197,12 +197,12 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         con.setState(con.getState().transit(ConnectionEventType.PARTNER_CLOSE));
         //save in the db
         connectionRepository.save(con);
-        ownerServiceCallback.onClose(con, content);
+        ownerServiceCallback.onClose(con, content, wonMessage);
       //ownerService.handleCloseMessageEventFromWonNode(con, content);
     }
 
     @Override
-    public void sendMessage(final URI connectionURI, final Model message, final Dataset messageEvent)
+    public void sendMessage(final URI connectionURI, final Model message, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
         logger.debug("owner from need: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
@@ -254,7 +254,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         chatMessage.setOriginatorURI(con.getRemoteNeedURI());
         //save in the db
         chatMessageRepository.save(chatMessage);
-        ownerServiceCallback.onTextMessage(con, chatMessage, message);
+        ownerServiceCallback.onTextMessage(con, chatMessage, message, wonMessage);
       //ownerService.handleTextMessageEventFromWonNode(con, chatMessage, message);
     }
 

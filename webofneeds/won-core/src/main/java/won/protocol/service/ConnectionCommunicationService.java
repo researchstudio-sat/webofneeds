@@ -16,9 +16,11 @@
 
 package won.protocol.service;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.exception.*;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
+import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.message.WonMessage;
 
 import java.net.URI;
 
@@ -38,7 +40,7 @@ public interface ConnectionCommunicationService
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void open(URI connectionURI, Model content, Dataset messageEvent)
+  public void open(URI connectionURI, Model content, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException;
 
   /**
@@ -50,7 +52,8 @@ public interface ConnectionCommunicationService
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void close(URI connectionURI, Model content, Dataset messageEvent) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void close(URI connectionURI, Model content, WonMessage wonMessage)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * Sends a chat message via the local connection identified by the specified connectionURI
@@ -66,6 +69,7 @@ public interface ConnectionCommunicationService
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void sendMessage(URI connectionURI, Model message, Dataset messageEvent) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void sendMessage(URI connectionURI, Model message, WonMessage wonMessage)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 }
