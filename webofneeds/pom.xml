@@ -34,6 +34,7 @@
         <module>won-bot</module>
         <module>won-facets</module>
         <module>won-cryptography</module>
+        <module>won-utils</module>
     </modules>
 
     <dependencyManagement>
