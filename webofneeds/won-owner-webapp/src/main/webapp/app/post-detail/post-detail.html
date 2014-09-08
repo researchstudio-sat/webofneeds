@@ -27,8 +27,8 @@
             <div class="row">
                 <div class="col-md-4">
                     <div id="bigImageArea" class="text-center">
-                        <a id="bigImage" href="{{bigImage.url}}" data-lightbox="roadtrip">
-                            <img src="{{bigImage.url}}" alt="Big picture">
+                        <a id="bigImage" data-lightbox="roadtrip">
+                            <img id="obr" alt="Big picture" />
                         </a>
                     </div>
                 </div>
@@ -58,19 +58,18 @@
                 </p>
             </div>
 
+
             <div class="row">
                 <div id="locationInfoCollapsed" class="well div-table col-lg-12">
                     <div class="div-table-row">
-                        <div class="col-lg-8 div-table centered-text additional-info-title">{{location}}</div>
+                        <div class="col-lg-8 div-table centered-text additional-info-title">Location TODO</div>
                         <div class="col-lg-1 div-table-cell centered-text pull-right">
-                                <span>
-                                    <a href="" class="glyphicon glyphicon-chevron-right"
-                                         ng-click="outputLocationCollapseClick()" ng-show="locationOutputFieldCollapsed"></a>
-                                </span>
-                                <span>
-                                    <a href="" class="glyphicon glyphicon-chevron-down"
-                                         ng-click="outputLocationCollapseClick()" ng-show="!locationOutputFieldCollapsed"></a>
-                                </span>
+                            <span ng-show="locationOutputFieldCollapsed">
+                                <a href="" class="glyphicon glyphicon-chevron-right" ng-click="outputLocationCollapseClick()"></a>
+                            </span>
+                            <span ng-show="!locationOutputFieldCollapsed">
+                                <a href="" class="glyphicon glyphicon-chevron-down" ng-click="outputLocationCollapseClick()"></a>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -80,8 +79,10 @@
 
                     <div class="div-table-row">
                         <section id="map" class="col-lg-8 col-lg-offset-2">
+                            <!--
                             <div ui-map="myMap" ui-options="mapOptions" class="map-canvas"
                                  ui-event="{'map-click' : 'onClickMap($event, $params, $myMap)'}"></div>
+                            -->
                         </section>
                     </div>
                 </div>
@@ -90,13 +91,13 @@
             <div class="row">
                 <div id="timeInfoCollapsed" class="well div-table col-lg-12">
                     <div class="div-table-row">
-                        <div class="col-lg-8 div-table centered-text additional-info-title">{{toDateString(need.startDate)}} - {{toDateString(need.endDate)}}</div>
+                        <div class="col-lg-8 div-table centered-text additional-info-title">DateTime TODO</div>
                         <div class="col-lg-1 div-table-cell centered-text pull-right">
-                            <span>
-                                <a href="" class="glyphicon glyphicon-chevron-right" ng-click="timeInputFieldCollapsedClick()" ng-show="timeInputFieldCollapsed"></a>
+                            <span ng-show="timeInputFieldCollapsed">
+                                <a href="" class="glyphicon glyphicon-chevron-right" ng-click="timeInputFieldCollapsedClick()"></a>
                             </span>
-                            <span>
-                                <a href="" class="glyphicon glyphicon-chevron-down" ng-click="timeInputFieldCollapsedClick()" ng-show="!timeInputFieldCollapsed"></a>
+                            <span ng-show="!timeInputFieldCollapsed">
+                                <a href="" class="glyphicon glyphicon-chevron-down" ng-click="timeInputFieldCollapsedClick()"></a>
                             </span>
                         </div>
                     </div>
@@ -104,12 +105,14 @@
 
                 <div id="timeInputFields" ng-show="!timeInputFieldCollapsed" class="div-table col-lg-12">
                     <div class="div-table-row">
+                        TODO
                         <div id="time_from"
                              class="col-lg-4 col-lg-offset-2"></div>
                         <div id="time_to" class="col-lg-4"></div>
                     </div>
                 </div>
             </div>
+
 
             <!--<div class="row">
                               <div class="text-center">

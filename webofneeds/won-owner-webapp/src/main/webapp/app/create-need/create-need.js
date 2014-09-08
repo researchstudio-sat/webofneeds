@@ -310,6 +310,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     }
 
     // TODO does not update models
+    /*
     $('#start_date').datepicker({
         format:'dd.mm.yyyy',
         autoclose: true
@@ -318,7 +319,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     $('#end_date').datepicker({
         format:'dd.mm.yyyy',
         autoclose: true
-    });
+    }); */
 
     // TODO fix when date and time are empty
     function createISODateTimeString(date, time) {
