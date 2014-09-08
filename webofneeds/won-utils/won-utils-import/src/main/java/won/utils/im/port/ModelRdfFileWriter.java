@@ -23,7 +23,7 @@ public class ModelRdfFileWriter implements NeedDataWriter<Model>
 
   @Override
   public void write(final Model model) {
-    RDFDataMgr.write(out, model, Lang.TRIG);
+    RDFDataMgr.write(out, model, Lang.TURTLE);
   }
 
   @Override

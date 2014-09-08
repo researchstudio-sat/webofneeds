@@ -36,6 +36,7 @@
         <qualifier value="default"/>
         <property name="needFactories">
             <set>
+
                 <bean id="supplyNeedProducer"
                       class="won.bot.framework.component.needproducer.impl.TemplateBasedNeedProducer">
                     <property name="template" value="classpath:/default-templates/default-template-supply.ttl"/>
@@ -93,6 +94,8 @@
                     </property>
                 </bean>
 
+                <!-- ideally, needProducerFromTrig should return Dataset, thus, cannot be used here -->
+                <!--
                 <bean id="needProducerFromTrig"
                       class="won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer">
                     <qualifier value="default"/>
@@ -100,6 +103,25 @@
                         <set>
                             <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
                                 <property name="directory" value="${needs.trig.directory.supply}"/>
+
+                                <property name="filenameFilterRegex" value=".*trig"/>
+                                <property name="repeat" value="false"/>
+                                <property name="fileBasedNeedProducer">
+                                    <bean class="won.bot.framework.component.needproducer.impl.TrigFileNeedProducer"/>
+                                </property>
+                            </bean>
+                        </set>
+                    </property>
+                </bean>
+                -->
+
+                <bean id="needProducerFromTurtle"
+                      class="won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer">
+                    <qualifier value="default"/>
+                    <property name="needFactories">
+                        <set>
+                            <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
+                                <property name="directory" value="${needs.turtle.directory.supply}"/>
 
                                 <property name="filenameFilterRegex" value=".*ttl"/>
                                 <property name="repeat" value="false"/>
