@@ -61,7 +61,7 @@ public class WONMSG
     m.createResource(BASE_URI + "DuplicateMessageIdResponse");
 
   public static final Property HAS_RESPONSE_STATE_PROPERTY =
-    m.createProperty(BASE_URI + "hasResponseStateProperty");
+    m.createProperty(BASE_URI + "hasResponseStateProperty"); //TODO rename!
 
 
   //public static final String MESSAGE_TYPE_CREATE_RESOURCE = BASE_URI + "CreateMessage";
@@ -77,6 +77,7 @@ public class WONMSG
   public static final Property SENDER_NEED_PROPERTY = m.createProperty(BASE_URI, "hasSenderNeed");
   public static final Property SENDER_NODE_PROPERTY = m.createProperty(BASE_URI, "hasSenderNode");
 
+  public static final Property HAS_MESSAGE_TYPE_PROPERTY = m.createProperty(BASE_URI, "hasMessageType");
   public static final Property HAS_CONTENT_PROPERTY = m.createProperty(BASE_URI, "hasContent");
   public static final Property REFERS_TO_PROPERTY = m.createProperty(BASE_URI, "refersTo");
   public static final Property NEW_NEED_STATE_PROPERTY = m.createProperty(BASE_URI, "newNeedState");

@@ -69,7 +69,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
             .build();
         //TODO: obtain message URI so we can wait for a dedicated response
         var callback = new messageService.MessageCallback(
-            function (msg) {
+            function (event, msg) {
                 //check if the message we got (the create need response message) indicates that all went well
                 console.log("got create need message response!");
                 //TODO: if negative, use alternative need URI and send again
@@ -106,10 +106,10 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
                 this.done = true;
             });
         callback.done = false;
-        callback.shouldHandleTest = function (msg) {
+        callback.shouldHandleTest = function (event, msg) {
             return true;
         };
-        callback.shouldUnregisterTest = function(msg) {
+        callback.shouldUnregisterTest = function(event, msg) {
             return this.done;
         };
 
@@ -135,7 +135,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
             .receiver()
             .build();
         var callback = new messageService.MessageCallback(
-            function (msg) {
+            function (event, msg) {
                 //check if the message we got (the create need response message) indicates that all went well
                 console.log("got connect needs message response!");
                 //TODO: if negative, use alternative need URI and send again

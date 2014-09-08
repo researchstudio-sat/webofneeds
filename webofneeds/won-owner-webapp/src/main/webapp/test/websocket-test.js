@@ -48,32 +48,32 @@ function testRdf() {
 
     store.load("application/ld+json", jsontest, "ex:test", function(success, results) {
         console.log("success:" + success + ", results: " + results);
-        var graph = store.rdf.createGraph();
-        store.graph("ex:test", function(success, mygraph) {
-            // process graph here
-            //var triples = [];
-            //var triples = mygraph.match("ex:test", null, "http://purl.org/webofneeds/message#hasReceiverNeed", null, null);
-
-            for (var i = 0; i < mygraph.triples.length; i++) {
-                console.log("triple:" + mygraph.triples[i]);
-            }
-
-            var triples = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve('wonmsg:hasReceiverNeed')),null);
-            for (var i = 0; i < triples.length; i++) {
-                console.log("triple:" + triples[i]);
-            }
-        });
-        store.node("http://example.com/responseMessage/837ddj#data","ex:test", function(success, mygraph) {
-            // process graph here
-            //var triples = [];
-            //var triples = mygraph.match("ex:test", null, "http://purl.org/webofneeds/message#hasReceiverNeed", null, null);
-
-            for (var i = 0; i < mygraph.triples.length; i++) {
-                console.log("triple:" + mygraph.triples[i]);
-            }
-        });
-
     });
+    var graph = store.rdf.createGraph();
+    store.graph("ex:test", function(success, mygraph) {
+        // process graph here
+        //var triples = [];
+        //var triples = mygraph.match("ex:test", null, "http://purl.org/webofneeds/message#hasReceiverNeed", null, null);
+
+        for (var i = 0; i < mygraph.triples.length; i++) {
+            console.log("triple:" + mygraph.triples[i]);
+        }
+
+        var triples = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve('wonmsg:hasReceiverNeed')),null);
+        for (var i = 0; i < triples.length; i++) {
+            console.log("triple:" + triples[i]);
+        }
+    });
+    store.node("http://example.com/responseMessage/837ddj#data","ex:test", function(success, mygraph) {
+        // process graph here
+        //var triples = [];
+        //var triples = mygraph.match("ex:test", null, "http://purl.org/webofneeds/message#hasReceiverNeed", null, null);
+
+        for (var i = 0; i < mygraph.triples.length; i++) {
+            console.log("triple:" + mygraph.triples[i]);
+        }
+    });
+
 
     var  parseResult = JSONLDParser.parser.parse(jsontest, "ex:test");
 }

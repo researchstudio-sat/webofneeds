@@ -32,6 +32,72 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
     //and send the message later.
     privateData.pendingOutMessages = [];
 
+    getSafeValue = function(dataItem) {
+        if (dataItem == null) return null;
+        if (dataItem.value != null) return dataItem.value;
+        return null;
+    }
+
+    getEventData = function(json){
+        var deferred = $q.defer();
+        var store = rdfstore.create(function(store) {
+            store.setPrefix("wonmsg", "http://purl.org/webofneeds/message#");
+            store.load("application/ld+json", json, function (success, results) {
+                console.log("success:" + success + ", results: " + results);
+            });
+        });
+
+        var query =
+            "prefix " + won.WONMSG.prefix +": <" + won.WONMSG.baseUri +"> \n" +
+            "SELECT ?receiver ?receiverNeed ?receiverNode ?sender ?senderNeed ?senderNode ?messageType ?refersTo ?responseState where {" +
+            "?msg " + won.WONMSG.hasMessageTypePropertyCompacted+" ?messageType." +
+            " OPTIONAL { " +
+             "?msg " + won.WONMSG.hasReceiverCompacted +" ?receiver ." +
+             "} OPTIONAL { " +
+             "?msg " + won.WONMSG.hasReceiverNeedCompacted +" ?receiverNeed ." +
+             "} OPTIONAL { " +
+             "?msg " + won.WONMSG.hasReceiverNodeCompacted +" ?receiverNode ." +
+             "} OPTIONAL { " +
+             "?msg " + won.WONMSG.hasSenderCompacted+" ?sender ." +
+             "} OPTIONAL { " +
+             "?msg " + won.WONMSG.hasSenderNeedCompacted +" ?senderNeed ." +
+             "} OPTIONAL { " +
+             "?msg " + won.WONMSG.hasSenderNodeCompacted +" ?senderNode ." +
+             "} OPTIONAL { " +
+             "?msg " + won.WONMSG.refersToCompacted +" ?refersTo ." +
+             "} OPTIONAL { " +
+             "?msg " + won.WONMSG.hasResponseStatePropertyCompacted +" ?responseState ." +
+             "}" +
+             "}";
+         store.execute(query, function (success, results) {
+            var eventData = {};
+            if (!success) {
+                deferred.reject("query failed");
+                return;
+            }
+            //use only first result!
+            if (results.length == 0) {
+                deferred.reject("did not find expected message data!");
+                return;
+            }
+            if (results.length > 1) {
+                console.log("more than 1 solution found for message property query!");
+            }
+            var result = results[0];
+             eventData.messageType = getSafeValue(result.messageType);
+             eventData.receiver = getSafeValue(result.receiver);
+             eventData.receiverNeed = getSafeValue(result.receiverNeed);
+             eventData.receiverNode = getSafeValue(result.receiverNode);
+             eventData.sender = getSafeValue(result.sender);
+             eventData.senderNeed = getSafeValue(result.senderNeed);
+             eventData.senderNode = getSafeValue(result.senderNode);
+             eventData.refersTo = getSafeValue(result.refersTo);
+             eventData.responseState = getSafeValue(result.responseState);
+            deferred.resolve(eventData);
+        });
+        return deferred.promise;
+    }
+
     enqueueMessage = function(msg) {
         if (isConnected()) {
             //just to be sure, test if the connection is established now and send instead of enqueue
@@ -41,6 +107,8 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         }
     }
     attachListenersToSocket = function(newsocket){
+        //TODO: register listeners for incoming messages
+
         newsocket.onopen = function () {
             console.log("SockJS connection has been established!")
             var i = 0;
@@ -53,14 +121,21 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
 
         newsocket.onmessage = function (msg) {
             //first, run callbacks registered inside the service:
+            var jsonld = JSON.parse(msg.data);
             console.log("SockJS message received!")
-            for(var i = 0; i < privateData.callbacks.length; i++) {
-                privateData.callbacks[i].handleMessage(msg);
-            }
-            console.log("Received data: "+msg);
-            $rootScope.$apply(function () {
-                $rootScope.$broadcast("WonMessageReceived", msg);
-            });
+            var eventPromise = getEventData(jsonld);
+            //call all registered callbacks
+            eventPromise.then(function(event) {
+                for (var i = 0; i < privateData.callbacks.length; i++) {
+                    var myJsonld = JSON.parse(JSON.stringify(jsonld));
+                    privateData.callbacks[i].handleMessage(event, myJsonld);
+                }
+                console.log("Received data: " + msg);
+            },
+            function (cause) {
+                console.log("could not read event data: " + cause);
+            },
+            null);
         };
 
         newsocket.onclose = function () {
@@ -138,31 +213,31 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
      */
     messageService.MessageCallback = function MessageCallback(action){
         this.action = action;
-        this.shouldUnregisterTest = function(msg){ return false; };
-        this.shouldHandleTest = function(msg){ return true; };
+        this.shouldUnregisterTest = function(event, msg){ return false; };
+        this.shouldHandleTest = function(event, msg){ return true; };
     }
 
     messageService.MessageCallback.prototype = {
         constructor: messageService.MessageCallback,
-        shouldHandle: function(msg) {
-            var ret = this.shouldHandleTest(msg);
+        shouldHandle: function(event, msg) {
+            var ret = this.shouldHandleTest(event, msg);
             console.log("interested in message: " + ret)
             return ret;
         },
-        performAction: function(msg) {
+        performAction: function(event, msg) {
             console.log("performing action for message " + JSON.stringify(msg));
-            this.action(msg);
+            this.action(event, msg);
         },
-        shouldUnregister: function(msg) {
-            var ret = this.shouldUnregisterTest(msg);
+        shouldUnregister: function(event, msg) {
+            var ret = this.shouldUnregisterTest(event, msg);
             console.log("should unregister: " + ret);
             return ret;
         },
-        handleMessage: function(msg) {
-            if (this.shouldHandle(msg)) {
-                this.performAction(msg);
+        handleMessage: function(event, msg) {
+            if (this.shouldHandle(event, msg)) {
+                this.performAction(event, msg);
             }
-            if (this.shouldUnregister(msg)){
+            if (this.shouldUnregister(event, msg)){
                this.unregister();
             }
         },

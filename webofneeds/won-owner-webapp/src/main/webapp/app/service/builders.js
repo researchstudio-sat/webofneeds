@@ -46,6 +46,25 @@
         won.WONMSG.baseUri = "http://purl.org/webofneeds/message#";
         won.WONMSG.prefix = "wonmsg";
         won.WONMSG.hasReceiverNeed = won.WONMSG.baseUri + "hasReceiverNeed";
+        won.WONMSG.hasReceiverNeedCompacted = won.WONMSG.prefix + ":hasReceiverNeed";
+        won.WONMSG.hasReceiver = won.WONMSG.baseUri + "hasReceiver";
+        won.WONMSG.hasReceiverCompacted = won.WONMSG.prefix + ":hasReceiver";
+        won.WONMSG.hasReceiverNode = won.WONMSG.baseUri + "hasReceiverNode";
+        won.WONMSG.hasReceiverNodeCompacted = won.WONMSG.prefix + ":hasReceiverNode";
+        won.WONMSG.hasResponseStateProperty = won.WONMSG.baseUri + "hasResponseStateProperty";
+        won.WONMSG.hasResponseStatePropertyCompacted = won.WONMSG.prefix + ":hasResponseStateProperty";
+        won.WONMSG.createResponseMessage = won.WONMSG.baseUri + "CreateResponseMessage";
+        won.WONMSG.createResponseMessageCompacted = won.WONMSG.prefix + ":CreateResponseMessage";
+        won.WONMSG.hasSenderNeed = won.WONMSG.baseUri + "hasSenderNeed";
+        won.WONMSG.hasSenderNeedCompacted = won.WONMSG.prefix + ":hasSenderNeed";
+        won.WONMSG.hasSender = won.WONMSG.baseUri + "hasSender";
+        won.WONMSG.hasSenderCompacted = won.WONMSG.prefix + ":hasSender";
+        won.WONMSG.hasSenderNode = won.WONMSG.baseUri + "hasSenderNode";
+        won.WONMSG.hasSenderNodeCompacted = won.WONMSG.prefix + ":hasSenderNode";
+        won.WONMSG.hasMessageTypeProperty = won.WONMSG.baseUri + ":hasMessageType";
+        won.WONMSG.hasMessageTypePropertyCompacted = won.WONMSG.prefix + ":hasMessageType";
+        won.WONMSG.refersTo = won.WONMSG.baseUri + "refersTo";
+        won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
 
         won.EVENT = {};
         won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
@@ -69,7 +88,12 @@
                 "won:hasContent":{
                     "@id":"http://purl.org/webofneeds/model#hasContent",
                     "@type":"@id"
+                },
+                "msg:hasMessageType":{
+                    "@id":"http://purl.org/webofneeds/message#hasMessageType",
+                    "@type":"@id"
                 }
+
 
         }
 
@@ -325,7 +349,7 @@
                 this.data['@graph'][2] = {
                     "@graph": [
                         {
-                            "@type": "msg:CreateMessage",
+                            "msg:hasMessageType": "msg:CreateMessage",
                             "msg:hasContent": [
                                 {
                                     "@id": "core#data"
@@ -442,7 +466,7 @@
                 this.data['@graph'][2] = {
                     "@graph": [
                         {
-                            "@type": "msg:ConnectMessage"
+                            "msg:hasMessageType": "msg:ConnectMessage"
                         }
                     ]
                 }
