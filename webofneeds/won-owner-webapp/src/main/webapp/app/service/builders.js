@@ -47,6 +47,10 @@
         won.WONMSG.prefix = "wonmsg";
         won.WONMSG.hasReceiverNeed = won.WONMSG.baseUri + "hasReceiverNeed";
 
+        won.EVENT = {};
+        won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
+        won.EVENT.NEED_CREATED = "NeedCreatedEvent";
+
         won.clone = function(obj){
             return JSON.parse(JSON.stringify(obj));
         }

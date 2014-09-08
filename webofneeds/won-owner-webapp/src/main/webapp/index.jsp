@@ -49,12 +49,13 @@
 		<script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
-	<script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
-	<script type="text/javascript" src="scripts/lightbox.min.js"></script>
-	<script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
-	<script type="text/javascript" src="scripts/smart-table.min.js"></script>
-	<script type="text/javascript" src="scripts/bootstrap-tagsinput.min.js"></script>
-    <script type="text/javascript" src="scripts/star-rating.min.js"></script>
+        <script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
+        <script type="text/javascript" src="scripts/lightbox.min.js"></script>
+        <script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
+        <script type="text/javascript" src="scripts/smart-table.min.js"></script>
+        <script type="text/javascript" src="scripts/bootstrap-tagsinput.min.js"></script>
+        <script type="text/javascript" src="scripts/rdfstore-js/rdf_store.js"></script>
+        <script type="text/javascript" src="scripts/star-rating.min.js"></script>
 
 		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
@@ -63,6 +64,7 @@
         <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/won-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/linkeddata-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-factory-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/builders.js"/>"></script>

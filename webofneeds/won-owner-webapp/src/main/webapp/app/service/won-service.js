@@ -17,9 +17,41 @@
 /**
  * Created by syim on 08.08.2014.
  */
-angular.module('won.owner').factory('wonService', function (messageService, $q) {
+angular.module('won.owner').factory('wonService', function (messageService, $q, linkedDataService, $rootScope) {
 
     wonService = {};
+
+    /**
+     * helper function for accessin JSON-LD data
+     */
+    matchFirstObject = function(jsonld, subject, predicate){
+        var deferred = $q.defer();
+        console.log("obtaining data from " + jsonld);
+        var ret = {};
+        ret.result = null;
+        var store = rdfstore.create();
+        store.setPrefix("ex", "http://example.org/people/");
+        store.setPrefix("wonmsg","http://purl.org/webofneeds/message#");
+        store.load("application/ld+json", jsonld, "ex:test", function(success, results) {
+            if (!success) {
+                deferred.reject("could not parse jsonld " + jsonld);
+            }
+            console.log("success:" + success + ", results: " + results);
+            var sub = subject == null ? null:store.rdf.createNamedNode(store.rdf.resolve(subject));
+            var pred = predicate == null ? null:store.rdf.createNamedNode(store.rdf.resolve(predicate));
+            store.graph("ex:test", function(success, mygraph) {
+                if (!success) {
+                    deferred.reject("could not match subject " + subject + " predicate " + predicate);
+                }
+                var resultGraph = mygraph.match(sub, pred, null);
+                if (resultGraph != null && resultGraph.triples.length > 0) {
+                    deferred.resolve(resultGraph.triples[0].object.nominalValue);
+                }
+            });
+        });
+        return deferred.promise;
+    };
+
 
     /**
      * Creates a need and returns a Promise to the URI of the newly created need (which may differ from the one
@@ -36,21 +68,42 @@ angular.module('won.owner').factory('wonService', function (messageService, $q) 
             .hasReceiverNode("http://localhost:8080/won")//TODO: pass node to function
             .build();
         //TODO: obtain message URI so we can wait for a dedicated response
-        //var messageURI = messageService.utils.getMessageURI(message);
         var callback = new messageService.MessageCallback(
             function (msg) {
                 //check if the message we got (the create need response message) indicates that all went well
                 console.log("got create need message response!");
                 //TODO: if negative, use alternative need URI and send again
                 //TODO: if positive, propagate positive response back to caller
-                //TODO: fetch need data and store in local RDF store
+                //fetch need data and store in local RDF store
+                //get URI of newly created need from message
+                needURIPromise = matchFirstObject(msg.data, null, "wonmsg:hasReceiverNeed", null);
+                //load the data into the local rdf store and publish NeedCreatedEvent when done
+                needURIPromise.then(
+                    function(value) {
+                        var needURI = value;
+                        console.log("need uri:" + needURI);
+                        linkedDataService.fetch(needURI)
+                            .then(
+                            function (value) {
+                                eventData = {};
+                                eventData.needURI = needURI;
+                                eventData.type = won.EVENT.NEED_CREATED;
+                                //publish a needCreatedEvent
+                                $rootScope.$broadcast(won.EVENT.NEED_CREATED, eventData);
+                                //inform the caller of the new need URI
+                                deferred.resolve(needURI);
+                            },
+                            function (reason) {
+                                deferred.reject(reason);
+                            }, null
+                        );
+                    },
+                    function(reason){
+                        console.log("could not get receiver need uri. Reason:" + reason);
+                    }
+                    ,null
+                );
                 this.done = true;
-                //WON.CreateResponse.equals(messageService.utils.getMessageType(msg)) &&
-                //messageService.utils.getRefersToURIs(msg).contains(messageURI)
-
-                //assume we can obtain a need URI and return it
-                var needURI = "sadf"; //TODO: get needURI from result
-                deferred.resolve(needURI);
             });
         callback.done = false;
         callback.shouldHandleTest = function (msg) {
@@ -68,6 +121,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q) 
         }
         return deferred.promise;
     }
+
     wonService.connect = function(connectionAsJsonLd, need1, need2){
         var deferred = $q.defer();
         var message = new won.ConnectMessageBuilder(connectionAsJsonLd)
@@ -111,6 +165,8 @@ angular.module('won.owner').factory('wonService', function (messageService, $q) 
         }
         return deferred.promise;
     }
+
+
 
     return wonService;
 });
