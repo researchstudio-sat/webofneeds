@@ -66,6 +66,9 @@
         won.WONMSG.refersTo = won.WONMSG.baseUri + "refersTo";
         won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
 
+        won.WONMSG.MessageEnvelope = won.WONMSG.baseUri + "EnvelopeGraph";
+        won.WONMSG.MessageEnvelopeCompacted = won.WONMSG.prefix+ ":EnvelopeGraph";
+
         won.EVENT = {};
         won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
         won.EVENT.NEED_CREATED = "NeedCreatedEvent";
@@ -326,7 +329,7 @@
                 return this;
             },
             build: function () {
-                console.log("built this data:" + JSON.stringify(this.data));
+
                 return this.data;
             }
         }
@@ -396,7 +399,6 @@
                 return this.data["@graph"][2]["@graph"][0]
             },
             build: function () {
-                console.log("built this message:" + JSON.stringify(this.data));
                 return this.data;
             }
         }

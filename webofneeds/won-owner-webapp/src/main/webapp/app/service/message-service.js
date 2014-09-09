@@ -39,70 +39,69 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
     }
 
     getEventData = function(json){
-        var deferred = $q.defer();
-        var store = rdfstore.create(function(store) {
+        console.log("getting data from jsonld message");
+        var eventData = {};
+        rdfstore.create(function (store) {
             store.setPrefix("wonmsg", "http://purl.org/webofneeds/message#");
-            store.load("application/ld+json", json, function (success, results) {
-                console.log("success:" + success + ", results: " + results);
+            store.load("application/ld+json", json, function (success, results) {});
+
+            var query =
+                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                "SELECT ?msg ?receiver ?receiverNeed ?receiverNode ?sender ?senderNeed ?senderNode ?messageType ?refersTo ?responseState where {" +
+                "?msg " + won.WONMSG.hasMessageTypePropertyCompacted + " ?messageType." +
+                " OPTIONAL { " +
+                "?msg " + won.WONMSG.hasReceiverCompacted + " ?receiver ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasReceiverNeedCompacted + " ?receiverNeed ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasReceiverNodeCompacted + " ?receiverNode ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasSenderCompacted + " ?sender ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasSenderNeedCompacted + " ?senderNeed ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasSenderNodeCompacted + " ?senderNode ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.refersToCompacted + " ?refersTo ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasResponseStatePropertyCompacted + " ?responseState ." +
+                "}" +
+                "}";
+            store.execute(query, function (success, results) {
+                if (!success) {
+                    return;
+                }
+                //use only first result!
+                if (results.length == 0) {
+                    return;
+                }
+                if (results.length > 1) {
+                    console.log("more than 1 solution found for message property query!");
+                }
+                var result = results[0];
+                eventData.messageType = getSafeValue(result.messageType);
+                eventData.receiverURI = getSafeValue(result.receiver);
+                eventData.receiverNeedURI = getSafeValue(result.receiverNeed);
+                eventData.receiverNodeURI = getSafeValue(result.receiverNode);
+                eventData.senderURI = getSafeValue(result.sender);
+                eventData.senderNeedURI = getSafeValue(result.senderNeed);
+                eventData.senderNodeURI = getSafeValue(result.senderNode);
+                eventData.refersToURI = getSafeValue(result.refersTo);
+                eventData.responseState = getSafeValue(result.responseState);
+                eventData.eventURI = getSafeValue(result.msg);
+                console.log("done copying the data to the event object, returning the result");
             });
         });
-
-        var query =
-            "prefix " + won.WONMSG.prefix +": <" + won.WONMSG.baseUri +"> \n" +
-            "SELECT ?receiver ?receiverNeed ?receiverNode ?sender ?senderNeed ?senderNode ?messageType ?refersTo ?responseState where {" +
-            "?msg " + won.WONMSG.hasMessageTypePropertyCompacted+" ?messageType." +
-            " OPTIONAL { " +
-             "?msg " + won.WONMSG.hasReceiverCompacted +" ?receiver ." +
-             "} OPTIONAL { " +
-             "?msg " + won.WONMSG.hasReceiverNeedCompacted +" ?receiverNeed ." +
-             "} OPTIONAL { " +
-             "?msg " + won.WONMSG.hasReceiverNodeCompacted +" ?receiverNode ." +
-             "} OPTIONAL { " +
-             "?msg " + won.WONMSG.hasSenderCompacted+" ?sender ." +
-             "} OPTIONAL { " +
-             "?msg " + won.WONMSG.hasSenderNeedCompacted +" ?senderNeed ." +
-             "} OPTIONAL { " +
-             "?msg " + won.WONMSG.hasSenderNodeCompacted +" ?senderNode ." +
-             "} OPTIONAL { " +
-             "?msg " + won.WONMSG.refersToCompacted +" ?refersTo ." +
-             "} OPTIONAL { " +
-             "?msg " + won.WONMSG.hasResponseStatePropertyCompacted +" ?responseState ." +
-             "}" +
-             "}";
-         store.execute(query, function (success, results) {
-            var eventData = {};
-            if (!success) {
-                deferred.reject("query failed");
-                return;
-            }
-            //use only first result!
-            if (results.length == 0) {
-                deferred.reject("did not find expected message data!");
-                return;
-            }
-            if (results.length > 1) {
-                console.log("more than 1 solution found for message property query!");
-            }
-            var result = results[0];
-             eventData.messageType = getSafeValue(result.messageType);
-             eventData.receiver = getSafeValue(result.receiver);
-             eventData.receiverNeed = getSafeValue(result.receiverNeed);
-             eventData.receiverNode = getSafeValue(result.receiverNode);
-             eventData.sender = getSafeValue(result.sender);
-             eventData.senderNeed = getSafeValue(result.senderNeed);
-             eventData.senderNode = getSafeValue(result.senderNode);
-             eventData.refersTo = getSafeValue(result.refersTo);
-             eventData.responseState = getSafeValue(result.responseState);
-            deferred.resolve(eventData);
-        });
-        return deferred.promise;
+        return eventData;
     }
 
     enqueueMessage = function(msg) {
         if (isConnected()) {
+            console.log("sending message instead of enqueueing");
             //just to be sure, test if the connection is established now and send instead of enqueue
             privateData.socket.send(msg);
         } else {
+            console.log("socket not connected yet, enqueueing");
             privateData.pendingOutMessages.push(msg);
         }
     }
@@ -110,7 +109,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         //TODO: register listeners for incoming messages
 
         newsocket.onopen = function () {
-            console.log("SockJS connection has been established!")
+            console.log("SockJS connection has been established!");
             var i = 0;
             while (privateData.pendingOutMessages.length > 0){
                 var msg = privateData.pendingOutMessages.shift();
@@ -123,19 +122,26 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             //first, run callbacks registered inside the service:
             var jsonld = JSON.parse(msg.data);
             console.log("SockJS message received!")
-            var eventPromise = getEventData(jsonld);
+            var event = getEventData(jsonld);
             //call all registered callbacks
-            eventPromise.then(function(event) {
-                for (var i = 0; i < privateData.callbacks.length; i++) {
+            console.log("starting to process callbacks");
+            var callbacksToKeep = [];
+            for (var i = 0; i < privateData.callbacks.length; i++) {
+                console.log("processing messaging callback " + (i+1) + " of " + privateData.callbacks.length);
+                try {
                     var myJsonld = JSON.parse(JSON.stringify(jsonld));
-                    privateData.callbacks[i].handleMessage(event, myJsonld);
+                    var myEvent = JSON.parse(JSON.stringify(event));
+                    var callback = privateData.callbacks[i];
+                    callback.handleMessage(myEvent, myJsonld);
+                    if (!callback.shouldUnregister(myEvent, myJsonld)){
+                        callbacksToKeep.push(callback);
+                    }
+                } catch (e){
+                    console.log("error processing messaging callback " + i + ", ignoring");
                 }
-                console.log("Received data: " + msg);
-            },
-            function (cause) {
-                console.log("could not read event data: " + cause);
-            },
-            null);
+                console.log("done processing callback ")
+            }
+            privateData.callbacks = callbacksToKeep;
         };
 
         newsocket.onclose = function () {
@@ -173,6 +179,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
 
 
     messageService.closeConnection = function () {
+        console.log("closing Websocket via messageService.closeConnection()");
         if (privateData.socket != null && ! isClosingOrClosed()) {
             privateData.socket.close();
         }
@@ -225,7 +232,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             return ret;
         },
         performAction: function(event, msg) {
-            console.log("performing action for message " + JSON.stringify(msg));
+            console.log("performing action for message " + event.eventURI);
             this.action(event, msg);
         },
         shouldUnregister: function(event, msg) {
@@ -236,17 +243,6 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         handleMessage: function(event, msg) {
             if (this.shouldHandle(event, msg)) {
                 this.performAction(event, msg);
-            }
-            if (this.shouldUnregister(event, msg)){
-               this.unregister();
-            }
-        },
-        unregister: function() {
-            console.log("removing message callback: " + this);
-            //remove the callback
-            var index = privateData.callbacks.indexOf(this);
-            if (index > -1) {
-                privateData.callbacks = privateData.callbacks.splice(index, 1);
             }
         }
     };
