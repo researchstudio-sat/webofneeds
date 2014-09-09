@@ -26,7 +26,9 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     //alert($routeParams.postId);
 
     $scope.need = $scope.$parent.need;
-
+    $scope.$on("CreateNeedResponseMessageReceived", onNeedCreated = function(event, msg){
+        $scope.need.needURI = msg.receiverNeed+"new";
+    })
     var imagesPerPage = 6;
 
     <!-- TODO call here backend to load images of the post -->

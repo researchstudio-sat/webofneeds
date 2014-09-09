@@ -7,6 +7,9 @@
  */
 angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope) {
 
+    $scope.$on("CreateNeedResponseMessageReceived", onNeedCreated = function(event, msg){
+        $scope.need.needURI = msg.receiverNeed+"new";
+    })
     $scope.title = 'New Flat, Need Furniture';
     $scope.img_path = '/owner/images/thumbnail_demo.jpg';
     $rootScope.postClosed = false;
