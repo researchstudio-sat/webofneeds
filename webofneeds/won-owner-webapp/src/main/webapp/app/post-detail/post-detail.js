@@ -25,9 +25,10 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
 
-    $scope.need = $scope.$parent.need;
-    $scope.$on("CreateNeedResponseMessageReceived", onNeedCreated = function(event, msg){
-        $scope.need.needURI = msg.receiverNeed+"new";
+    //$scope.need = $scope.$parent.need;
+    $scope.$on(won.EVENT.NEED_CREATED, onNeedCreated = function(event, eventData){
+        $scope.images = eventData.images;
+
     })
     var imagesPerPage = 6;
 

@@ -17,7 +17,7 @@
 /**
  * Created by syim on 08.08.2014.
  */
-angular.module('won.owner').factory('wonService', function (messageService, $q, linkedDataService, $rootScope) {
+angular.module('won.owner').factory('wonService', function (messageService, $q, linkedDataService, $rootScope,applicationStateService) {
 
     wonService = {};
 
@@ -116,8 +116,10 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
                         console.log("publishing angular event");
                         eventData = won.clone(event);
                         eventData.eventType = won.EVENT.NEED_CREATED;
-                        //publish a needCreatedEvent
+                        eventData.needURI = needURI;
+
                         $rootScope.$broadcast(won.EVENT.NEED_CREATED, eventData);
+
                         //inform the caller of the new need URI
                         deferred.resolve(needURI);
                     },

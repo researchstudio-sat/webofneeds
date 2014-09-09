@@ -14,15 +14,17 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService, mapService, userService, utilService, wonService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService,applicationStateService, mapService, userService, utilService, wonService) {
     $scope.menuposition = $routeParams.menuposition;
     $scope.title = $routeParams.title;
 
+    $scope.$on(won.EVENT.NEED_CREATED, onNeedCreated = function(event, eventData){
 
-    $scope.$on("CreateNeedResponseMessageReceived", onNeedCreated = function(event, msg){
-        $scope.need.needURI = msg.receiverNeed+"new";
-    })
+        $scope.needURI = eventData.needURI;
+        applicationStateService.setCurrentNeedURI($scope.needURI);
+        $location.path("/private-link");
 
+    });
     /*Text constants for new Need form*/
     /*$rootScope.createNewPost = {
 
@@ -115,27 +117,28 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             $scope.previewButton = false;
         }else*/ if(step == 1){//2  ){
             $scope.previousButton = false;
-            $scope.saveDraftButton = true;
+
+            $scope.saveDraftButton = userService.isAuth();
             $scope.nextButton = true;
             $scope.previewButton = true;
             $scope.publishButton = false;
         } else if(step == 2){//3){
             if($scope.collapsed == true){
                 $scope.previousButton = true;
-                $scope.saveDraftButton = true;
+                $scope.saveDraftButton = userService.isAuth();
                 $scope.nextButton = false;
                 $scope.previewButton = false;
                 $scope.publishButton = true;
             } else {
                 $scope.previousButton = true;
-                $scope.saveDraftButton = true;
+                $scope.saveDraftButton = userService.isAuth();
                 $scope.nextButton = false;
                 $scope.previewButton = true;
                 $scope.publishButton = false;
             }
         }else if(step == 3){
             $scope.previousButton = true;
-            $scope.saveDraftButton = true;
+            $scope.saveDraftButton = userService.isAuth();
             $scope.nextButton = false;
             $scope.previewButton = false;
             $scope.publishButton = true;

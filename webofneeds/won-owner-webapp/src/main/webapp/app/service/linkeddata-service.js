@@ -115,8 +115,15 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         var query =
             "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
             "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-            "SELECT ?basicNeedType where {" +"
-            "<" + uri +">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType .";
+            "SELECT ?basicNeedType ?title ?tag ?textDescription where {" +"\n"+
+            "<" + uri +">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ."+
+            "<" + uri +">" + won.WON.hasContentCompacted + " ?content ."+
+            "?content " + "dc:title" + " ?title ."+
+            " OPTIONAL { " +
+                "<" + uri +">" + won.WON.hasTagCompacted + " ?tag ."+
+            "} OPTIONAL { " +
+                "<" + uri +">" + won.WON.hasTextDescriptionCompacted + " ?tag ."+
+            "}"+
             "}";
         privateData.store.execute(query, function (success, results) {
             if (!success) {
@@ -132,7 +139,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             var result = results[0];
             resultObject = {};
             resultObject.basicNeedType = getSafeValue(result.basicNeedType);
-            resultObject.log("done copying the data to the event object, returning the result");
+            resultObject.title = getSafeValue(result.title);
+            resultObject.tag = getSafeValue(result.tag);
+            resultObject.textDescription = getSafeValue(result.textDescription);
+
+            //resultObject.log("done copying the data to the event object, returning the result");
         });
         return resultObject;
     }

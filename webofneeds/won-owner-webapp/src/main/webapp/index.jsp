@@ -59,7 +59,10 @@
 
         <script type="text/javascript" src="scripts/star-rating.min.js"></script>
 
+
 		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/application-state-service.js"/>"></script>
+
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
