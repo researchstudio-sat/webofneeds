@@ -109,13 +109,13 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
                 //get URI of newly created need from message
 
                 //load the data into the local rdf store and publish NeedCreatedEvent when done
-                var needURI = event.receiverNeed;
+                var needURI = event.receiverNeedURI;
                 linkedDataService.fetch(needURI)
                     .then(
                     function (value) {
                         console.log("publishing angular event");
                         eventData = won.clone(event);
-                        eventData.type = won.EVENT.NEED_CREATED;
+                        eventData.eventType = won.EVENT.NEED_CREATED;
                         //publish a needCreatedEvent
                         $rootScope.$broadcast(won.EVENT.NEED_CREATED, eventData);
                         //inform the caller of the new need URI

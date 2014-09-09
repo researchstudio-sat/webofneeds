@@ -109,39 +109,43 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         //TODO: register listeners for incoming messages
 
         newsocket.onopen = function () {
-            console.log("SockJS connection has been established!");
-            var i = 0;
-            while (privateData.pendingOutMessages.length > 0){
-                var msg = privateData.pendingOutMessages.shift();
-                console.log("sending pending message no " + (++i));
-                privateData.socket.send(msg);
-            }
+            $rootScope.$apply(function() {
+                console.log("SockJS connection has been established!");
+                var i = 0;
+                while (privateData.pendingOutMessages.length > 0) {
+                    var msg = privateData.pendingOutMessages.shift();
+                    console.log("sending pending message no " + (++i));
+                    privateData.socket.send(msg);
+                }
+            });
         }
 
         newsocket.onmessage = function (msg) {
-            //first, run callbacks registered inside the service:
-            var jsonld = JSON.parse(msg.data);
-            console.log("SockJS message received!")
-            var event = getEventData(jsonld);
-            //call all registered callbacks
-            console.log("starting to process callbacks");
-            var callbacksToKeep = [];
-            for (var i = 0; i < privateData.callbacks.length; i++) {
-                console.log("processing messaging callback " + (i+1) + " of " + privateData.callbacks.length);
-                try {
-                    var myJsonld = JSON.parse(JSON.stringify(jsonld));
-                    var myEvent = JSON.parse(JSON.stringify(event));
-                    var callback = privateData.callbacks[i];
-                    callback.handleMessage(myEvent, myJsonld);
-                    if (!callback.shouldUnregister(myEvent, myJsonld)){
-                        callbacksToKeep.push(callback);
+            $rootScope.$apply(function() {
+                //first, run callbacks registered inside the service:
+                var jsonld = JSON.parse(msg.data);
+                console.log("SockJS message received!")
+                var event = getEventData(jsonld);
+                //call all registered callbacks
+                console.log("starting to process callbacks");
+                var callbacksToKeep = [];
+                for (var i = 0; i < privateData.callbacks.length; i++) {
+                    console.log("processing messaging callback " + (i + 1) + " of " + privateData.callbacks.length);
+                    try {
+                        var myJsonld = JSON.parse(JSON.stringify(jsonld));
+                        var myEvent = JSON.parse(JSON.stringify(event));
+                        var callback = privateData.callbacks[i];
+                        callback.handleMessage(myEvent, myJsonld);
+                        if (!callback.shouldUnregister(myEvent, myJsonld)) {
+                            callbacksToKeep.push(callback);
+                        }
+                    } catch (e) {
+                        console.log("error processing messaging callback " + i + ", ignoring");
                     }
-                } catch (e){
-                    console.log("error processing messaging callback " + i + ", ignoring");
+                    console.log("done processing callback ")
                 }
-                console.log("done processing callback ")
-            }
-            privateData.callbacks = callbacksToKeep;
+                privateData.callbacks = callbacksToKeep;
+            });
         };
 
         newsocket.onclose = function () {

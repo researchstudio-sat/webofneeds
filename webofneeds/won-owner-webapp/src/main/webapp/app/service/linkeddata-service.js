@@ -18,7 +18,7 @@
  * Created by fkleedorfer on 05.09.2014.
  */
 
-angular.module('won.owner').factory('linkedDataService', function ($q) {
+angular.module('won.owner').factory('linkedDataService', function ($q, $rootScope) {
     linkedDataService = {};
 
     privateData = {};
@@ -35,7 +35,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q) {
         var deferred = $q.defer();
         try {
             privateData.store.load('remote', uri, function (success, results) {
-                deferred.resolve(success);
+                $rootScope.$apply(function(){
+                    deferred.resolve(success);
+                });
             });
         } catch (e) {
             deferred.reject(e);
@@ -59,10 +61,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q) {
             //load the data from the local rdf store if forceFetch is false
             if (! forceFetch) {
                 privateData.store.graph(uri, function (success, mygraph) {
-                    if (success) {
-                        deferred.resolve(mygraph);
-                        done = true;
-                    }
+                    $rootScope.$apply(function() {
+                        if (success) {
+                            deferred.resolve(mygraph);
+                            done = true;
+                        }
+                    });
                 })
             }
             if (done) {
@@ -76,7 +80,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q) {
                     deferred.notify("fetched data for " + uri);
                     //now get the data from the store and return
                     privateData.store.graph(uri, function(success, graph) {
-                        deferred.resolve(graph);
+                        $rootScope.$apply(function() {
+                            deferred.resolve(graph);
+                        });
                     })
                 },
                 function(reason) {
