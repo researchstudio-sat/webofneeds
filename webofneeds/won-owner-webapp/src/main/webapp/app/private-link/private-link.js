@@ -315,6 +315,14 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
+
+    $scope.openFacebook = function() {
+        window.open(
+            'https://www.facebook.com/sharer/sharer.php?u={{publicLink}}', //+encodeURIComponent(location.href),
+            'facebook-share-dialog',
+            'width=626,height=436');
+        return false;
+    }
 });
 
 angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService, $rootScope) {
