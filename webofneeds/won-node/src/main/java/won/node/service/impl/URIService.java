@@ -16,6 +16,8 @@
 
 package won.node.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import won.cryptography.service.RandomNumberService;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
@@ -29,12 +31,17 @@ import java.net.URI;
 public class URIService
 {
 
+  @Autowired
+  private RandomNumberService randomNumberService;
+
   //prefix of any URI
   private String generalURIPrefix;
   //prefix of a need resource
   private String needResourceURIPrefix;
   //prefix of a connection resource
   private String connectionResourceURIPrefix;
+  //prefix of a messageEvent resource
+  private String messageEventResourceURIInfix;
   //prefix for URISs of RDF data
   private String dataURIPrefix;
   //prefix for URIs referring to real-world things
@@ -130,6 +137,10 @@ public class URIService
     this.connectionResourceURIPrefix = connectionResourceURIPrefix;
   }
 
+  public void setMessageEventResourceURIInfix(final String messageEventResourceURIInfix) {
+    this.messageEventResourceURIInfix = messageEventResourceURIInfix;
+  }
+
   public void setDataURIPrefix(final String dataURIPrefix)
   {
     this.dataURIPrefix = dataURIPrefix;
@@ -158,6 +169,12 @@ public class URIService
   public URI createEventURI(final URI connectionURI, final String eventId)
   {
     return URI.create(connectionURI.toString()+"/event/"+eventId);
+  }
+
+  public URI createMessageEventURI(final URI parentURI) {
+    // ToDo (FS): take length from configuration and choose good length value (maybe change value to bytes)
+    return URI.create(parentURI.toString() + messageEventResourceURIInfix + "/" + randomNumberService
+      .generateRandomString(9));
   }
 
   /**
