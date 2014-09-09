@@ -177,6 +177,23 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         var url = 'http://localhost:8080/owner/msg'; //TODO: get socket URI from server through JSP
         privateData.socket = new SockJS(url, null, options);
         attachListenersToSocket(privateData.socket);
+        //TODO attach additional listener that creates the correct angular events (create is msg-response, i need to code events for simply incoming)
+        messageService.addMessageCallback(newMatchesCallback())
+    }
+
+    newMatchesCallback = function() {
+        return new messageService.MessageCallback(function(event, msg){
+            console.log("in newMatchesCallback-Action");
+            switch(event.messageType) {
+                case won.WONMSG.hintMessage:
+                    console.log("Got a hint ", JSON.stringify(msg));
+                    break;
+                default:
+                    console.log("Got a yet unhandled message. ", JSON.stringify(msg));
+
+            }
+        });
+
     }
 
 
@@ -219,7 +236,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
      * shouldHandleTest: . Function that gets the message as only parameter and returns a boolean.
      *  action will only be executed if shouldHandleTest returns true or is omitted.
      * shouldUnregisterTest: . Function that gets the message as only parameter and returns a boolean.
-     *  callback will be unregistered if shouldUnregisterTest returns true or is omitted.
+     *  callback will be unregistered if shouldUnregisterTest returns true.
      * @constructor
      */
     messageService.MessageCallback = function MessageCallback(action){
