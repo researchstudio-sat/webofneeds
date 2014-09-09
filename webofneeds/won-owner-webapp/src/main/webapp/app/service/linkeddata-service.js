@@ -26,6 +26,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     //create an rdfstore-js based store as a cache for rdf data.
     privateData.store =  rdfstore.create();
 
+
+    getSafeValue = function(dataItem) {
+        if (dataItem == null) return null;
+        if (dataItem.value != null) return dataItem.value;
+        return null;
+    }
+
     /**
      * Fetches the linked data for the specified URI and saves it in the local triplestore.
      * @param uri
@@ -97,6 +104,71 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         }
         return deferred.promise;
     }
+
+    /**
+     * Loads the default data of the need with the specified URI into a js object.
+     * @return the object or null if no data is found for that URI in the local datastore
+     */
+    linkedDataService.getNeed = function(uri) {
+        //TODO: SPARQL query that returns the common need properties
+        var resultObject = null;
+        var query =
+            "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+            "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+            "SELECT ?basicNeedType where {" +"
+            "<" + uri +">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType .";
+            "}";
+        privateData.store.execute(query, function (success, results) {
+            if (!success) {
+                return;
+            }
+            //use only first result!
+            if (results.length == 0) {
+                return;
+            }
+            if (results.length > 1) {
+                console.log("more than 1 solution found for message property query!");
+            }
+            var result = results[0];
+            resultObject = {};
+            resultObject.basicNeedType = getSafeValue(result.basicNeedType);
+            resultObject.log("done copying the data to the event object, returning the result");
+        });
+        return resultObject;
+    }
+
+    /**
+     * Loads the default data of the need with the specified URI into a js object.
+     * @return the object or null if no data is found for that URI in the local datastore
+     */
+    linkedDataService.getConnection = function(uri) {
+        //TODO: SPARQL query that returns the common connection properties
+    }
+
+    /**
+     * Loads the default data of the need with the specified URI into a js object.
+     * @return the object or null if no data is found for that URI in the local datastore
+     */
+    linkedDataService.getMessage = function(uri) {
+        //TODO: SPARQL query that returns the common message properties
+    }
+
+    /**
+     * Loads the hints for the need with the specified URI into an array of js objects.
+     * @return the array or null if no data is found for that URI in the local datastore
+     */
+    linkedDataService.getHintsForNeed = function(uri) {
+        //TODO: SPARQL query that returns an array of hints
+    }
+
+    /**
+     * Loads the connections for the need with the specified URI into an array of js objects.
+     * @return the array or null if no data is found for that URI in the local datastore
+     */
+    linkedDataService.getConnections = function(uri) {
+        //TODO: SPARQL query that returns an array of connections
+    }
+
 
     return linkedDataService;
 

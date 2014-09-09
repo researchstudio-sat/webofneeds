@@ -42,6 +42,24 @@
          *
          */
 
+        won.WON = {};
+        won.WON.baseUri = "http://purl.org/webofneeds/model#";
+        won.WON.prefix = "won";
+        won.WON.Need = won.WON.baseUri + "Need";
+        won.WON.NeedCompacted = won.WON.prefix + ":Need";
+        won.WON.BasicNeedTypeDemand = won.WON.baseUri + "Demand";
+        won.WON.BasicNeedTypeDemandCompacted = won.WON.prefix + ":Demand";
+        won.WON.BasicNeedTypeSupply = won.WON.baseUri + "Supply";
+        won.WON.BasicNeedTypeSupplyCompacted = won.WON.prefix + ":Supply";
+        won.WON.BasicNeedTypeDotogether = won.WON.baseUri + "DoTogether";
+        won.WON.BasicNeedTypeDotogetherCompacted = won.WON.prefix + ":DoTogether";
+        won.WON.BasicNeedTypeDemand = won.WON.baseUri + "Critique";
+        won.WON.BasicNeedTypeCritiqueCompacted = won.WON.prefix + ":Critique";
+        won.WON.hasBasicNeedType = won.WON.baseUri + "hasBasicNeedType";
+        won.WON.hasBasicNeedTypeCompacted = won.WON.prefix + ":hasBasicNeedType";
+
+
+
         won.WONMSG = {};
         won.WONMSG.baseUri = "http://purl.org/webofneeds/message#";
         won.WONMSG.prefix = "wonmsg";
