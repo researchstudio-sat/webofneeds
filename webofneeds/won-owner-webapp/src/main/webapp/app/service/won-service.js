@@ -51,6 +51,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q) 
                 //assume we can obtain a need URI and return it
                 var needURI = "sadf"; //TODO: get needURI from result
                 deferred.resolve(needURI);
+
             });
         callback.done = false;
         callback.shouldHandleTest = function (event, msg) {

@@ -7,9 +7,12 @@
  */
 angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope) {
 
-    $scope.$on("CreateNeedResponseMessageReceived", onNeedCreated = function(event, msg){
-        $scope.need.needURI = msg.receiverNeed+"new";
+    $scope.$on("CreateNeedResponseMessageReceived", onNeedCreated = function(event, data){
+        $scope.need.needURI = data.receiverNeed+"new";
+        $scope.need.title = event.need.title;
+        $scope.need.images = event.need.images[0];
     })
+
     $scope.title = 'New Flat, Need Furniture';
     $scope.img_path = '/owner/images/thumbnail_demo.jpg';
     $rootScope.postClosed = false;
