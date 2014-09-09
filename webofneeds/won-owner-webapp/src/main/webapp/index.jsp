@@ -36,6 +36,7 @@
 		<script src="scripts/jquery.10.2.js"></script>
 	<script src="scripts/jquery.fs.scroller.min.js"></script>
 		<script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-mocks/angular-mocks.js"></script>
 		<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 

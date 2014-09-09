@@ -531,13 +531,7 @@
 
                             <a href="">
                                 <img src="/owner/images/social_icons_32x32/32-facebook.png"
-                                   onclick="
-                                        window.open(
-                                          'https://www.facebook.com/sharer/sharer.php?u={{publicLink}}', //+encodeURIComponent(location.href),
-                                          'facebook-share-dialog',
-                                          'width=626,height=436');
-                                        return false;">
-                                <img>
+                                   ng-click="openFacebook()">
                             </a>
                         </div>
                         <!--<div class="col-lg-1">
