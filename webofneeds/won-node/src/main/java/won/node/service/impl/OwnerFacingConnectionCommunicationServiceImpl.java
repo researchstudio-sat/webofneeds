@@ -32,7 +32,9 @@ import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
+import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
@@ -59,51 +61,85 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   private URIService URIService;
   @Autowired
   private RDFStorageService rdfStorageService;
+  @Autowired
+  private MessageEventRepository messageEventRepository;
 
   @Override
   public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
     if (wonMessage != null) {
+
       logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
+
+      URI connectionURIFromWonNode = wonMessage.getMessageEvent().getSenderURI();
+
+      logger.debug("OPEN received from the owner side for connection {0}", connectionURIFromWonNode);
+
+      Connection con = dataService.nextConnectionState(connectionURIFromWonNode, ConnectionEventType.OWNER_OPEN);
+
+      messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonNode,
+                                                              wonMessage.getMessageEvent()));
+
+      //invoke facet implementation
+      reg.get(con).openFromOwner(con, content, wonMessage);
+
+    } else {
+
+      logger.debug("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
+
+      Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
+
+      ConnectionEvent event = dataService
+        .createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_OPEN);
+
+      dataService.saveAdditionalContentForEvent(content, con, event);
+
+      //invoke facet implementation
+      reg.get(con).openFromOwner(con, content, wonMessage);
     }
-
-    logger.debug("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
-
-    Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
-
-    ConnectionEvent event = dataService
-      .createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_OPEN);
-
-    dataService.saveAdditionalContentForEvent(content, con, event);
-
-    //invoke facet implementation
-    reg.get(con).openFromOwner(con, content, wonMessage);
   }
 
   @Override
   public void close(final URI connectionURI, final Model content, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
+    // distinguish between the new message format (WonMessage) and the old parameters
+    // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
       logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
+
+      logger.debug("CLOSE received from the owner side for connection {}", connectionURI);
+
+      Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
+
+      // store wonMessage and messageEventPlaceholder
+      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+      messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(),
+                                                              wonMessage.getMessageEvent()));
+
+      //invoke facet implementation
+      reg.get(con).closeFromOwner(con, content, wonMessage);
+
+    } else {
+
+      logger.debug("CLOSE received from the owner side for connection {} with content {}", connectionURI, content);
+
+      Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
+
+      ConnectionEvent event = dataService
+        .createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_CLOSE);
+
+      dataService.saveAdditionalContentForEvent(content, con, event);
+
+      //invoke facet implementation
+      reg.get(con).closeFromOwner(con, content, wonMessage);
     }
-
-    logger.debug("CLOSE received from the owner side for connection {} with content {}", connectionURI, content);
-
-    Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
-
-    ConnectionEvent event = dataService
-      .createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_CLOSE);
-
-    dataService.saveAdditionalContentForEvent(content, con, event);
-
-    //invoke facet implementation
-    reg.get(con).closeFromOwner(con, content, wonMessage);
   }
 
   @Override

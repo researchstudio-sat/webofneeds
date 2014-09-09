@@ -54,18 +54,30 @@ public class NeedProtocolNeedServiceImplJMSBased
     throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
     logger.debug("NODE2: connect received for need {], otherNeed{},connectionURI {}, content {}");
-    URI needURIConvert = URI.create(needURI);
-    URI otherNeedURIConvert = URI.create(otherNeedURI);
-    URI otherConnectionURIConvert = URI.create(otherConnectionURI);
-    Model contentConvert = RdfUtils.toModel(content);
-    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
 
-    return this.delegate.connect(
-            needURIConvert,
-            otherNeedURIConvert,
-            otherConnectionURIConvert,
-            contentConvert,
-            wonMessage);
+    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
+    // distinguish between the new message format (WonMessage) and the old parameters
+    // ToDo (FS): remove this distinction if the old parameters are not used anymore
+    if (wonMessage != null) {
+      return this.delegate.connect(
+        null,
+        null,
+        null,
+        null,
+        wonMessage);
+    } else {
+      URI needURIConvert = URI.create(needURI);
+      URI otherNeedURIConvert = URI.create(otherNeedURI);
+      URI otherConnectionURIConvert = URI.create(otherConnectionURI);
+      Model contentConvert = RdfUtils.toModel(content);
+      return this.delegate.connect(
+        needURIConvert,
+        otherNeedURIConvert,
+        otherConnectionURIConvert,
+        contentConvert,
+        null);
+    }
+
   }
 
   public void open(
@@ -74,12 +86,19 @@ public class NeedProtocolNeedServiceImplJMSBased
           @Header("wonMessage") String wonMessageString)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
 
-    logger.debug("NODE2: open received for need {], otherNeed{},connectionURI {}, content {}");
-    URI connectionURIConvert = URI.create(connectionURI);
-    Model contentConvert = RdfUtils.toModel(content);
-    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
+    logger.debug("NODE2: open received for need {}, otherNeed{},connectionURI {}, content {}");
 
-    delegate.open(connectionURIConvert, contentConvert, wonMessage);
+    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
+    // distinguish between the new message format (WonMessage) and the old parameters
+    // ToDo (FS): remove this distinction if the old parameters are not used anymore
+    if (wonMessage != null) {
+      delegate.open(null, null, wonMessage);
+    } else {
+      URI connectionURIConvert = URI.create(connectionURI);
+      Model contentConvert = RdfUtils.toModel(content);
+      delegate.open(connectionURIConvert, contentConvert, null);
+    }
+
   }
 
   public void close(
@@ -89,11 +108,17 @@ public class NeedProtocolNeedServiceImplJMSBased
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
     logger.debug("NODE2: close received for need {], otherNeed{},connectionURI {}, content {}");
-    URI connectionURIConvert = URI.create(connectionURI);
-    Model contentConvert = RdfUtils.toModel(content);
-    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
 
-    delegate.close(connectionURIConvert, contentConvert, wonMessage);
+    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
+    // distinguish between the new message format (WonMessage) and the old parameters
+    // ToDo (FS): remove this distinction if the old parameters are not used anymore
+    if (wonMessage != null) {
+      delegate.close(null, null, wonMessage);
+    } else {
+      URI connectionURIConvert = URI.create(connectionURI);
+      Model contentConvert = RdfUtils.toModel(content);
+      delegate.close(connectionURIConvert, contentConvert, null);
+    }
   }
 
   public void sendMessage(
@@ -103,11 +128,18 @@ public class NeedProtocolNeedServiceImplJMSBased
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
     logger.debug("NODE2: text message received for connection {], message {}", connectionURI, message);
-    URI connectionURIConvert = URI.create(connectionURI);
-    Model messageConvert = RdfUtils.toModel(message);
-    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
 
-    delegate.sendMessage(connectionURIConvert, messageConvert, wonMessage);
+    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
+    // distinguish between the new message format (WonMessage) and the old parameters
+    // ToDo (FS): remove this distinction if the old parameters are not used anymore
+    if (wonMessage != null) {
+      delegate.sendMessage(null, null, wonMessage);
+    } else {
+      URI connectionURIConvert = URI.create(connectionURI);
+      Model messageConvert = RdfUtils.toModel(message);
+
+      delegate.sendMessage(connectionURIConvert, messageConvert, wonMessage);
+    }
   }
 
   public void setNeedFacingNeedCommunicationService(final NeedFacingNeedCommunicationService needFacingNeedCommunicationService) {

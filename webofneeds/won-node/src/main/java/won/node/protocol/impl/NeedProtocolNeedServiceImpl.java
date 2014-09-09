@@ -17,14 +17,18 @@
 package won.node.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
+import won.node.service.impl.URIService;
 import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
@@ -53,6 +57,9 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   private ConnectionRepository connectionRepository;
   @Autowired
   private NeedRepository needRepository;
+  @Autowired
+  private URIService uriService;
+
   protected NeedProtocolNeedClientSide needFacingConnectionClient;
 
   @Override
@@ -70,20 +77,45 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   @Transactional(propagation = Propagation.SUPPORTS)
   public void open(final URI connectionURI, final Model content, final WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
-    logger.debug("need from need: OPEN received for connection {} with content {}", connectionURI, content);
 
-    List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
-    Connection con = cons.get(0);
-    List<Need> needs = needRepository.findByNeedURI(con.getNeedURI());
-    if (needs.size()>0 && needs.get(0).getState()!= NeedState.ACTIVE){
-      try {
-        needFacingConnectionClient.close(con, content, wonMessage);
-      } catch (Exception e) {
-        logger.warn("caught Exception in closeFromOwner: ",e);
+    // distinguish between the new message format (WonMessage) and the old parameters
+    // ToDo (FS): remove this distinction if the old parameters are not used anymore
+    if (wonMessage != null) {
+
+      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+
+      logger.debug("need from need: OPEN received for connection {}", connectionURIFromWonMessage);
+
+      List<Connection> cons = connectionRepository.findByConnectionURI(connectionURIFromWonMessage);
+      Connection con = cons.get(0);
+      List<Need> needs = needRepository.findByNeedURI(con.getNeedURI());
+      if (needs.size() > 0 && needs.get(0).getState() != NeedState.ACTIVE) {
+        try {
+          WonMessage closeWonMessage = createCloseWonMessage(connectionURIFromWonMessage);
+          needFacingConnectionClient.close(con, ModelFactory.createDefaultModel(), closeWonMessage);
+        } catch (Exception e) {
+          logger.warn("caught Exception in closeFromOwner: ", e);
+        }
+        throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(), "open", needs.get(0).getState());
       }
-      throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(),"open",needs.get(0).getState());
+      connectionCommunicationService.open(connectionURIFromWonMessage, null, wonMessage);
+    } else {
+
+      logger.debug("need from need: OPEN received for connection {} with content {}", connectionURI, content);
+
+      List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
+      Connection con = cons.get(0);
+      List<Need> needs = needRepository.findByNeedURI(con.getNeedURI());
+      if (needs.size() > 0 && needs.get(0).getState() != NeedState.ACTIVE) {
+        try {
+          needFacingConnectionClient.close(con, content, wonMessage);
+        } catch (Exception e) {
+          logger.warn("caught Exception in closeFromOwner: ", e);
+        }
+        throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(), "open", needs.get(0).getState());
+      }
+      connectionCommunicationService.open(connectionURI, content, wonMessage);
     }
-    connectionCommunicationService.open(connectionURI, content, wonMessage);
   }
 
   @Override
@@ -118,5 +150,31 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
 
   public void setNeedFacingConnectionClient(final NeedProtocolNeedClientSide needFacingConnectionClient) {
     this.needFacingConnectionClient = needFacingConnectionClient;
+  }
+
+  // ToDo (FS): move to more general place where everybody can use the method (this method exists twice!!)
+  private WonMessage createCloseWonMessage(URI connectionURI)
+    throws WonMessageBuilderException {
+
+    List<Connection> connections = connectionRepository.findByConnectionURI(connectionURI);
+    if (connections.size() != 1)
+      throw new IllegalArgumentException("no or too many connections found for ID " + connectionURI.toString());
+
+    Connection connection = connections.get(0);
+    Need need = needRepository.findByNeedURI(connection.getNeedURI()).get(0);
+    Need remoteNeed = needRepository.findByNeedURI(connection.getRemoteNeedURI()).get(0);
+
+    WonMessageBuilder builder = new WonMessageBuilder();
+    return builder
+      .setMessageURI(uriService.createMessageEventURI(connection.getConnectionURI()))
+      .setWonMessageType(WonMessageType.CLOSE)
+      .setSenderURI(connection.getConnectionURI())
+      .setSenderNeedURI(connection.getNeedURI())
+      .setSenderNodeURI(need.getWonNodeURI())
+      .setReceiverURI(connection.getRemoteConnectionURI())
+      .setReceiverNeedURI(connection.getRemoteNeedURI())
+      .setReceiverNodeURI(remoteNeed.getWonNodeURI())
+      .build();
+
   }
 }

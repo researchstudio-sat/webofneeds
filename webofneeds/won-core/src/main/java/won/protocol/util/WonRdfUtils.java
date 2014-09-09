@@ -377,7 +377,64 @@ public class WonRdfUtils
         return u;
       }
       else
-        return null;    }
+        return null;
+    }
+
+    public static URI queryConnectionContainer(Dataset dataset, URI needURI)
+      throws MultipleQueryResultsFoundException {
+
+      URI result = null;
+      result = queryConnectionContainer(dataset.getDefaultModel(), needURI);
+
+      Iterator<String> nameIt = dataset.listNames();
+      while (nameIt.hasNext()) {
+        URI tempResult = queryConnectionContainer(dataset.getNamedModel(nameIt.next()), needURI);
+        if (tempResult != null && result != null && !result.equals(tempResult))
+          throw new MultipleQueryResultsFoundException();
+        result = tempResult;
+      }
+      return result;
+    }
+
+    public static URI queryConnectionContainer(Model model, URI needURI)
+      throws MultipleQueryResultsFoundException {
+
+      StmtIterator iterator = model.listStatements(model.createResource(needURI.toString()),
+                                                   WON.HAS_CONNECTIONS,
+                                                   (RDFNode) null);
+      if (!iterator.hasNext())
+        return null;
+
+      URI result = null;
+      while (iterator.hasNext()) {
+        Statement s = iterator.nextStatement();
+        URI nextURI = URI.create(s.getResource().getURI());
+        if (result != null && !result.equals(nextURI))
+          throw new MultipleQueryResultsFoundException();
+        result = nextURI;
+      }
+      return result;
+    }
+
+    public static void removeConnectionContainer(Dataset dataset, URI needURI) {
+      removeConnectionContainer(dataset.getDefaultModel(), needURI);
+      Iterator<String> nameIt = dataset.listNames();
+      while (nameIt.hasNext()) {
+        removeConnectionContainer(dataset.getNamedModel(nameIt.next()), needURI);
+      }
+    }
+
+    public static void removeConnectionContainer(Model model, URI needURI) {
+
+      StmtIterator iterator = model.listStatements(model.createResource(needURI.toString()),
+                                                   WON.HAS_CONNECTIONS,
+                                                   (RDFNode) null);
+
+      URI result = null;
+      while (iterator.hasNext()) {
+        model.remove(iterator.nextStatement());
+      }
+    }
 
   }
 

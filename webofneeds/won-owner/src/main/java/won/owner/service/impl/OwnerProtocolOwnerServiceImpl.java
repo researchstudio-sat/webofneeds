@@ -171,6 +171,27 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     @Override
     public void open(URI connectionURI, Model content, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
+      // distinguish between the new message format (WonMessage) and the old parameters
+      // ToDo (FS): remove this distinction if the old parameters not used anymore
+      if (wonMessage != null) {
+
+        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
+
+        logger.debug("owner from need: OPEN called for connection {}.", connectionURIFromWonMessage);
+        if (connectionURIFromWonMessage == null) throw new IllegalArgumentException("connectionURI not defined");
+
+        //load connection, checking if it exists
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURIFromWonMessage);
+        //set new state and save in the db
+        con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
+        //save in the db
+        connectionRepository.save(con);
+        ownerServiceCallback.onOpen(con, content, wonMessage);
+        //ownerService.handleOpenMessageEventFromWonNode(con, content);
+
+      } else {
+
         logger.debug("owner from need: OPEN called for connection {} with content {}.", connectionURI, content);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
@@ -181,7 +202,8 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //save in the db
         connectionRepository.save(con);
         ownerServiceCallback.onOpen(con, content, wonMessage);
-      //ownerService.handleOpenMessageEventFromWonNode(con, content);
+        //ownerService.handleOpenMessageEventFromWonNode(con, content);
+      }
     }
 
     @Override

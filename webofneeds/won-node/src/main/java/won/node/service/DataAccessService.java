@@ -60,6 +60,10 @@ public interface DataAccessService
     final Model content, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
     throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
+  public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
+    final URI facet, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
+    throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+
   ConnectionEvent createConnectionEvent(URI connectionURI, URI originator,
     ConnectionEventType connectionEventType);
 
