@@ -112,11 +112,11 @@
         won.WONMSG.connectionMessage = won.WONMSG.baseUri + "ConnectionMessage";
         won.WONMSG.connectionMessageCompacted = won.WONMSG.prefix + ":ConnectionMessage";
 
+        //response types
         won.WONMSG.hasResponseStateProperty = won.WONMSG.baseUri + "hasResponseStateProperty";
         won.WONMSG.hasResponseStatePropertyCompacted = won.WONMSG.prefix + ":hasResponseStateProperty";
         won.WONMSG.createResponseMessage = won.WONMSG.baseUri + "CreateResponseMessage";
         won.WONMSG.createResponseMessageCompacted = won.WONMSG.prefix + ":CreateResponseMessage";
-
         won.WONMSG.connectResponseMessage = won.WONMSG.baseUri + "ConnectResponseMessage";
         won.WONMSG.connectResponseMessageCompacted = won.WONMSG.prefix + ":ConnectResponseMessage";
         won.WONMSG.needStateResponseMessage = won.WONMSG.baseUri + "NeedStateResponseMessage";
@@ -127,6 +127,10 @@
         won.WONMSG.openResponseMessageCompacted = won.WONMSG.prefix + ":OpenResponseMessage";
         won.WONMSG.connectionMessageResponseMessage = won.WONMSG.baseUri + "ConnectionMessageResponseMessage";
         won.WONMSG.connectionMessageResponseMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageResponseMessage";
+
+        //notification types
+        won.WONMSG.hintNotificationMessage = won.WONMSG.baseUri + "HintNotificationMessage";
+        won.WONMSG.hintNotificationMessageCompacted = won.WONMSG.prefix + ":HintNotificationMessage";
 
 
         won.EVENT = {};

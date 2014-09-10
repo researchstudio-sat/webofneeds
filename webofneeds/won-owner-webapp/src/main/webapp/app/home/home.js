@@ -362,7 +362,7 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
 
     }
     onLoginError = function(response) {
-        $scope.error = result.message;
+        $scope.error = response.message;
         console.log("LOGIN ERROR q509qriafjlkj");
         console.log(response);
     }

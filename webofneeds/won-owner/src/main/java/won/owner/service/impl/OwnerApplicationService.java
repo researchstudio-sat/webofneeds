@@ -48,7 +48,8 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   @Qualifier("default")
   private OwnerProtocolNeedServiceClientSide ownerProtocolService;
 
-  @Autowired
+  //when the callback is a bean in a child context, it sets itself as a dependency here
+  @Autowired(required = false)
   private OwnerApplicationServiceCallback ownerApplicationServiceCallbackToClient =
     new NopOwnerApplicationServiceCallback();
 
@@ -499,5 +500,11 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       logger.warn("caught WonMessageBuilderException:", e);
     }
   }
+
+  public void setOwnerApplicationServiceCallbackToClient(final OwnerApplicationServiceCallback ownerApplicationServiceCallbackToClient) {
+    this.ownerApplicationServiceCallbackToClient = ownerApplicationServiceCallbackToClient;
+  }
+
+
 
 }

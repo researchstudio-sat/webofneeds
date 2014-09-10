@@ -47,7 +47,7 @@ http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd">
         <websocket:sockjs/>
     </websocket:handlers>
 
-    <bean id="ownerApplicationService" class="won.owner.service.impl.OwnerApplicationService"/>
+
 
     <bean id="wonWebSocketHandler" class="won.owner.web.websocket.WonWebSocketHandler">
         <property name="ownerApplicationService" ref="ownerApplicationService"/>

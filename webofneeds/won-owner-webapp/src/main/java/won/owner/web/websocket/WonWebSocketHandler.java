@@ -18,6 +18,7 @@ package won.owner.web.websocket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -38,14 +39,20 @@ import java.util.Set;
  */
 public class WonWebSocketHandler
     extends TextWebSocketHandler
-    implements OwnerApplicationServiceCallback
+    implements OwnerApplicationServiceCallback, InitializingBean
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
+  @Autowired
   private OwnerApplicationService ownerApplicationService;
 
   @Autowired
   private WebSocketSessionService webSocketSessionService;
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    this.ownerApplicationService.setOwnerApplicationServiceCallbackToClient(this);
+  }
 
   @Override
   public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException

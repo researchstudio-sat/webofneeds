@@ -73,6 +73,9 @@ public enum WonMessageType
     if (WONMSG.TYPE_CONNECTION_MESSAGE_RESPONSE.equals(resource))
       return CONNECT_RESPONSE;
 
+    //notification classes
+    if (WONMSG.TYPE_HINT_NOTIFICATION.equals(resource))
+      return HINT_NOTIFICATION;
     return null;
   }
 
