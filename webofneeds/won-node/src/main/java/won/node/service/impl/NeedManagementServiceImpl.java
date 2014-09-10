@@ -115,7 +115,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
       URI needURI = getNeedURIFromWonMessage(needContent);
 
-      if (!needURI.equals(wonMessage.getMessageEvent().getReceiverNeedURI()))
+      if (!needURI.equals(wonMessage.getMessageEvent().getSenderNeedURI()))
         throw new IllegalArgumentException("receiverNeedURI and NeedURI of the content are not equal");
 
       Need need = new Need();

@@ -248,11 +248,11 @@ public class WonRdfUtils
       NeedState result = null;
       while (iterator.hasNext()) {
         Statement s = iterator.nextStatement();
-        if (s.equals(WON.NEED_STATE_ACTIVE)) {
+        if (s.getObject().equals(WON.NEED_STATE_ACTIVE)) {
           if (result != null && result.equals(NeedState.INACTIVE))
             throw new MultipleQueryResultsFoundException();
           result = NeedState.ACTIVE;
-        } else if (s.equals(WON.NEED_STATE_INACTIVE)) {
+        } else if (s.getObject().equals(WON.NEED_STATE_INACTIVE)) {
           if (result != null && result.equals(NeedState.ACTIVE))
             throw new MultipleQueryResultsFoundException();
           result = NeedState.INACTIVE;
@@ -329,9 +329,13 @@ public class WonRdfUtils
 
       Iterator<String> i = dataset.listNames();
       while (i.hasNext()) {
-        needURIs.add(getNeedURI(dataset.getNamedModel(i.next())));
+        URI newURI = getNeedURI(dataset.getNamedModel(i.next()));
+        if (newURI != null)
+          needURIs.add(newURI);
       }
-      needURIs.add(getNeedURI(dataset.getDefaultModel()));
+      URI newURI = getNeedURI(dataset.getDefaultModel());
+      if (newURI != null)
+        needURIs.add(newURI);
 
       if (needURIs.size() == 0)
         return null;

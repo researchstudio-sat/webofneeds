@@ -90,7 +90,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         boolean active = false;
         try {
           switch (WonRdfUtils.NeedUtils.queryActiveStatus(
-            messageContent, wonMessage.getMessageEvent().getReceiverNeedURI())) {
+            messageContent, wonMessage.getMessageEvent().getSenderNeedURI())) {
             case ACTIVE:
               active = true;
               break;
