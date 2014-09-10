@@ -136,16 +136,14 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     }); */
 
     // TODO fix when date is empty
-    /*
     $scope.toDateString = function(date) {
-        var d = date.split('.');
+        var d = date.split('-');
         var datetime = new Date();
-        datetime.setFullYear(d[2]);
+        datetime.setFullYear(d[0]);
         datetime.setMonth(d[1] - 1);
-        datetime.setDate(d[0]);
+        datetime.setDate(d[2]);
         return datetime.toDateString();
     }
-    */
 
     $scope.location = 'Thurngasse 8, 1080 Vienna, Austria';
 
