@@ -6,18 +6,9 @@
  * To change this template use File | Settings | File Templates.
  */
 angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService) {
-    $scope.$on(won.EVENT.NEED_CREATED, onNeedCreated = function(eventData){
-
-        //$scope.need.needURI = eventDta
-         $scope.need.title = eventData.need.title;
-        //$scope.need.images = event.need.images[0];
-    })
 
     $scope.need = {};
-    $scope.need.title = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI())['basicNeedType'];
-    $scope.$on("CreateNeedResponseMessageReceived", onNeedCreated = function(event, msg){
-        $scope.need.needURI = msg.receiverNeed+"new";
-    })
+    $scope.need.title = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI())['title'];
 
     //$scope.title = 'New Flat, Need Furniture';
     $scope.img_path = '/owner/images/thumbnail_demo.jpg';

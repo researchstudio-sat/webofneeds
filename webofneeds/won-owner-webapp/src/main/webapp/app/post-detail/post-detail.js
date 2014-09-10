@@ -21,15 +21,19 @@
  * Time: 10:01 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams) {
+angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams, applicationStateService) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
 
     //$scope.need = $scope.$parent.need;
-    $scope.$on(won.EVENT.NEED_CREATED, onNeedCreated = function(event, eventData){
-        $scope.images = eventData.images;
+    $scope.need = {};
+    var tmpNeed = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
+    $scope.need.title = tmpNeed['title'];
+    $scope.need.tag = tmpNeed['tag'];
+    $scope.need.textDescription = tmpNeed['textDescription'];
+    //TODO: location, date, needCreated date
 
-    })
+
     var imagesPerPage = 6;
 
     <!-- TODO call here backend to load images of the post -->

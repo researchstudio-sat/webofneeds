@@ -354,6 +354,7 @@
                 this.getContentNode()["won:hasTag"] = tags;
                 return this;
             },
+            //TODO: add images
             build: function () {
 
                 return this.data;
