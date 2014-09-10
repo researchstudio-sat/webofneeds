@@ -39,6 +39,12 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-cryptography</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- spring stuff -->
         <dependency>
             <groupId>org.springframework</groupId>

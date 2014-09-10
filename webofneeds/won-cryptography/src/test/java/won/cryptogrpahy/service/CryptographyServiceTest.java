@@ -27,7 +27,7 @@ public class CryptographyServiceTest {
     @Before
     public void init() {
         context = new ClassPathXmlApplicationContext(
-                new String[]{"spring/services.xml", "spring/key.xml"});
+                new String[]{"spring/component/cryptographyServices.xml"});
     }
 
     // ToDo: no tests yet, just used for debugging (FS)

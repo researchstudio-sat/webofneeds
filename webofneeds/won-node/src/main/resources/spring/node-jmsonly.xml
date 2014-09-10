@@ -33,4 +33,6 @@
     <import resource="classpath:/spring/component/monitoring/monitoring-recorder.xml" />
     <import resource="classpath:/spring/component/ehcache/node-ehcache.xml" />
 
+    <import resource="classpath:/spring/component/cryptographyServices.xml" />
+
 </beans>

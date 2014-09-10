@@ -30,7 +30,7 @@ public class CommentUnrestrictedFacet extends AbstractFacet
     super.connectFromNeed(con, content, wonMessage);
     /* send a connect back */
     try {
-        // ToDo: replace null with fitting wonMessage
+      // ToDo (FS): create open WonMessage
       needFacingConnectionClient.open(con, content, null);
       Model needContent = rdfStorageService.loadModel(con.getNeedURI());
       PrefixMapping prefixMapping = PrefixMapping.Factory.create();

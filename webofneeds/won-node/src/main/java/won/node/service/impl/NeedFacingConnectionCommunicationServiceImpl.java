@@ -33,10 +33,8 @@ import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.EventRepository;
-import won.protocol.repository.NeedRepository;
-import won.protocol.repository.OwnerApplicationRepository;
+import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.repository.*;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.ConnectionCommunicationService;
 import won.protocol.util.DataAccessUtils;
@@ -71,63 +69,101 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   private NeedRepository needRepository;
   @Autowired
   private URIService uriService;
+  @Autowired
+  private MessageEventRepository messageEventRepository;
 
   @Override
   public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
+    // distinguish between the new message format (WonMessage) and the old parameters
+    // ToDo (FS): remove this distinction if the old parameters are not used anymore
     if (wonMessage != null) {
       logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
-    }
 
-    Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_OPEN);
-    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_OPEN);
-    dataService.saveAdditionalContentForEvent(content, con, event);
-    //invoke facet implementation
-    reg.get(con).openFromNeed(con, content, wonMessage);
+      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+
+      Connection con = dataService.nextConnectionState(connectionURIFromWonMessage,
+                                                       ConnectionEventType.PARTNER_OPEN);
+      messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
+      //invoke facet implementation
+      reg.get(con).openFromNeed(con, content, wonMessage);
+
+    } else {
+
+      Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_OPEN);
+      ConnectionEvent event = dataService
+        .createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_OPEN);
+      dataService.saveAdditionalContentForEvent(content, con, event);
+      //invoke facet implementation
+      reg.get(con).openFromNeed(con, content, wonMessage);
+    }
   }
 
   @Override
   public void close(final URI connectionURI, final Model content, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
+    // distinguish between the new message format (WonMessage) and the old parameters
+    // ToDo (FS): remove this distinction if the old parameters are not used anymore
     if (wonMessage != null) {
       logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
-    }
 
-    Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
-    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_CLOSE);
-    dataService.saveAdditionalContentForEvent(content, con, event);
-    //invoke facet implementation
-    reg.get(con).closeFromNeed(con, content, wonMessage);
+      Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
+
+      messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
+
+      //invoke facet implementation
+      reg.get(con).closeFromNeed(con, content, wonMessage);
+
+    } else {
+
+      Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
+      ConnectionEvent event = dataService
+        .createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_CLOSE);
+      dataService.saveAdditionalContentForEvent(content, con, event);
+      //invoke facet implementation
+      reg.get(con).closeFromNeed(con, content, wonMessage);
+    }
   }
     @Override
     public void sendMessage(final URI connectionURI, final Model message, WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
+      // distinguish between the new message format (WonMessage) and the old parameters
+      // ToDo (FS): remove this distinction if the old parameters are not used anymore
       if (wonMessage != null) {
         logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
         rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                        WonMessageEncoder.encodeAsDataset(wonMessage));
-      }
 
-      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-      //create ConnectionEvent in Database
-        ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_MESSAGE);
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+
+        messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
+
+        //invoke facet implementation
+        reg.get(con).sendMessageFromNeed(con, message, wonMessage);
+      } else {
+
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        //create ConnectionEvent in Database
+        ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(),
+                                                                  ConnectionEventType.PARTNER_MESSAGE);
         replaceBaseURIWithEventURI(message, con, event);
         //create rdf content for the ConnectionEvent and save it to disk
         dataService.saveAdditionalContentForEvent(message, con, event, null);
-        if (logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
           StringWriter writer = new StringWriter();
           RDFDataMgr.write(writer, message, Lang.TTL);
-          logger.debug("message after saving:\n{}",writer.toString());
+          logger.debug("message after saving:\n{}", writer.toString());
         }
         //invoke facet implementation
         reg.get(con).sendMessageFromNeed(con, message, wonMessage);
+      }
     }
 
   private void replaceBaseURIWithEventURI(final Model message, final Connection con, final ConnectionEvent event) {

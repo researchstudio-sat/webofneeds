@@ -55,20 +55,45 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
    * @throws ConnectionAlreadyExistsException
    */
   public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
-                                      final Model content, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
+                                      final Model content, final ConnectionState connectionState,
+                                      final ConnectionEventType connectionEventType)
+      throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+
+    URI facetURI =  getFacet(content);
+    if (facetURI == null) throw new IllegalArgumentException("at least one RDF node must be of type won:" + WON.HAS_FACET.getLocalName());
+
+    return createConnection(needURI, otherNeedURI, otherConnectionURI, facetURI,
+                            connectionState, connectionEventType);
+  }
+
+  /**
+   * Creates a new Connection object. Excepts facet URI.
+   * @param needURI
+   * @param otherNeedURI
+   * @param otherConnectionURI
+   * @param facetURI
+   * @param connectionState
+   * @param connectionEventType
+   * @return
+   * @throws NoSuchNeedException
+   * @throws IllegalMessageForNeedStateException
+   * @throws ConnectionAlreadyExistsException
+   */
+  public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
+                                      final URI facetURI, final ConnectionState connectionState,
+                                      final ConnectionEventType connectionEventType)
       throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
     if (needURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
+    if (facetURI == null) throw new IllegalArgumentException("facetURI is not set");
 
     //Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (!isNeedActive(need))
       throw new IllegalMessageForNeedStateException(needURI, connectionEventType.name(), need.getState());
 
-    URI facetURI =  getFacet(content);
-    if (facetURI == null) throw new IllegalArgumentException("at least one RDF node must be of type won:" + WON.HAS_FACET.getLocalName());
     //TODO: create a proper exception if a facet is not supported by a need
     if(facetRepository.findByNeedURIAndTypeURI(needURI, facetURI).isEmpty()) throw new RuntimeException("Facet is not supported by Need: " + facetURI);
 
