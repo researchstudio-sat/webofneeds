@@ -73,6 +73,7 @@
 <div ng-show="showPublic(1)" class="col-lg-8 col-lg-offset-2">
 
 	<div class="well">
+        <form id="post-form" name="postForm" novalidate>
 		<fieldset>
 			<div class="form-group">
 				<label class="col-lg-2 col-lg-offset-2" tooltip="{{tooltipText}}">Type *</label>
@@ -117,7 +118,7 @@
 
 				<div class="row">
 					<div class="col-lg-8 col-lg-offset-2">
-						<input type="text" class="form-control" id="inputName" ng-model="need.title"
+						<input type="text" class="form-control" id="inputName" name="title" ng-model="need.title"
 						       placeholder="Roughly, what's it about?" required/>
 					</div>
 				</div>
@@ -127,7 +128,7 @@
 
 				<div class="row">
 					<div class="col-lg-8 col-lg-offset-2">
-						<textarea style="resize: none;" class="form-control" rows="8" id="textarea-description"
+						<textarea style="resize: none;" class="form-control" name="description" rows="8" id="textarea-description"
 						          ng-model="need.textDescription"
 
 
@@ -139,7 +140,7 @@
 				<!--span class="help-block">A longer block of help text that breaks onto a new line and may extend beyond one line.</span-->
 			</div>
 			<div class="form-group">
-				<label for="inputName" class="col-lg-2 col-lg-offset-2" tooltip="{{tooltipText}}">Tags *</label>
+				<label for="inputTagName" class="col-lg-2 col-lg-offset-2" tooltip="{{tooltipText}}">Tags *</label>
                 <div class="row">
                     <div class="col-lg-8 col-lg-offset-2">
                         Using tags improves results by a great deal.
@@ -157,12 +158,13 @@
 				-->
 				<div class="row">
 					<div class="col-lg-8 col-lg-offset-2">
-						<input type="text" class="form-control" id="inputTagName" ng-model="need.tags"
-						       placeholder="e.g. furniture, electronics, for children,...">
+						<input type="text" class="form-control" id="inputTagName" name="tags" ng-model="need.tags"
+						       placeholder="e.g. furniture, electronics, for children,..." required>
 					</div>
 				</div>
 			</div>
 		</fieldset>
+        </form>
 	</div>
 </div>
 <div ng-show="showPublic(2)" class="col-lg-10 col-lg-offset-1" ng-controller="AdditionalInfoCtrl">
@@ -357,29 +359,28 @@
 
             <div class="col-lg-offset-1">
                 <div>
-                    <label for="start_date" style="width: 19em; margin-left: 1em;">From:</label>
+                    <label for="start_date" style="width: 23em; margin-left: 1em;">From:</label>
                     <label for="end_date">To:</label>
                 </div>
 
                 <div>
-                    <input type="text" class="form-control inline field-width field-right-margin" id="start_date" ng-model="need.startDate"
-                           placeholder="today" required/>
+                    <input type="date" class="form-control inline field-date-width field-right-margin" id="start_date" ng-model="need.startDate"
+                           placeholder="today"/>
 
-                    <input type="text" class="form-control inline field-width" id="start_time" ng-model="need.startTime"
-                           placeholder="now" required/>
+                    <input type="time" class="form-control inline field-time-width" id="start_time" ng-model="need.startTime" ng-disabled="allDay"
+                           placeholder="now"/>
                     <span class="side-margins">-</span>
 
-                    <input type="text" class="form-control inline field-width field-right-margin" id="end_date" ng-model="need.endDate"
-                           placeholder="27.8.2013" required/>
+                    <input type="date" class="form-control inline field-date-width field-right-margin" id="end_date" ng-model="need.endDate"
+                           placeholder="27.8.2013"/>
 
-                    <input type="text" class="form-control inline field-width" id="end_time" ng-model="need.endTime"
-                           placeholder="23:59" required/>
+                    <input type="time" class="form-control inline field-time-width" id="end_time" ng-model="need.endTime" ng-disabled="allDay"
+                           placeholder="23:59"/>
                 </div>
 
                 <div>
-                    <input type="checkbox">&nbsp;All day
+                    <input type="checkbox" ng-model="allDay" ng-click="clickOnAllDay()">&nbsp;All day
                 </div>
-
                 <div>
                     Repeat&nbsp;
                     <div class="btn-group">
@@ -445,9 +446,9 @@
 			<!--<span class="glyphicon glyphicon-floppy-disk">)-->
             <i class="fa fa-pencil fa-lg"></i>&nbsp;Save Draft {{counter}}</span>
 		</button>
-		<button ng-show="nextButton" type="button" class="btn btn-success" ng-click="nextStep()">
+		<button ng-show="nextButton" type="button" class="btn btn-success" ng-disabled="!validatePostForm()" ng-click="nextStep()">
             <i class="fa fa-chevron-right fa-lg"></i>&nbsp;Next</button>
-		<button ng-show="previewButton" type="button" class="btn btn-primary" ng-click="jumpToStep(3)">
+		<button ng-show="previewButton" type="button" class="btn btn-primary" ng-disabled="skipToPreviewButtonDisabled()" ng-click="jumpToStep(3)">
             <i class="fa fa-chevron-right fa-lg"></i><i class="fa fa-chevron-right fa-lg"></i>&nbsp;Skip to Preview
 		</button>
 		<button ng-show="publishButton" type="button" class="btn btn-success" ng-click="publish()">

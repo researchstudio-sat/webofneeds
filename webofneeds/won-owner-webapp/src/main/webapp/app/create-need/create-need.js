@@ -199,6 +199,8 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             state               : 'ACTIVE',
             basicNeedType       : $scope.needType(),
             tags                :'',
+            latitude            :'',
+            longitude           :'',
             startDate           :'',
             startTime           :'',
             endDate             :'',
@@ -324,19 +326,26 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         autoclose: true
     }); */
 
-    // TODO fix when date and time are empty
     function createISODateTimeString(date, time) {
-        var d = date.split('.');
+        var d = date.split('-');
         var t = time.split(':');
         var datetime = new Date();
-        datetime.setFullYear(d[2]);
+        datetime.setFullYear(d[0]);
         datetime.setMonth(d[1] - 1);
-        datetime.setDate(d[0]);
+        datetime.setDate(d[2]);
         datetime.setHours(t[0]);
         datetime.setMinutes(t[1]);
         //datetime.setSeconds(0);
         //datetime.setMilliseconds(0);
         return datetime.toISOString();
+    }
+
+    function hasTimeSpecification(need) {
+        return need.startDate != '' && need.startTime != '' && need.endDate != '' && need.endTime != '';
+    }
+
+    function hasLocationSpecification(need) {
+        return need.latitude != '' && need.longitude != null;
     }
 
 	$scope.publish = function () {
@@ -350,7 +359,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         var needURI = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId;
         console.log(needURI);
 
-        // building need starts
+        // creating need object
         var needBuilderObject = new window.won.NeedBuilder().setContext();
         if ($scope.need.basicNeedType == 'DEMAND') {
             needBuilderObject.demand();
@@ -362,24 +371,34 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             needBuilderObject.critique();
         }
 
-        var needJson = needBuilderObject.title($scope.need.title)
+        needBuilderObject.title($scope.need.title)
             .needURI(needURI)
             .ownerFacet()               // mandatory
             .description($scope.need.textDescription)
             .hasTag($scope.need.tags)
             .hasContentDescription()    // mandatory
             //.hasPriceSpecification("EUR",5.0,10.0)
-            // for now location is static
-            .hasLocationSpecification(48.218748, 16.360783)
-            // start date and end date must be filled in GUI !!!
-            .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
-            //.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime),false,2,3)
             .active()                   // mandatory: active or inactive
-            .build();
 
-        //console.log(needJson);
+        if (hasLocationSpecification($scope.need)) {
+            // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
+            needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
+        }
+
+        // TODO specify false, 2 and 3
+        if (hasTimeSpecification($scope.need)) {
+            needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime),false,2,3)
+        }
+
+        // building need as JSON object
+        var needJson = needBuilderObject.build();
+
+        console.log(needJson);
         var newNeedUriPromise = wonService.createNeed(needJson);
         //console.log('promised uri: ' + newNeedUriPromise);
+
+        //$scope.need = $scope.getCleanNeed();      TODO decide what to do
+        $scope.successShow = true;
 	};
 
 
@@ -387,8 +406,68 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 		$location.path("/");
 	};
 
+    $scope.validatePostForm = function() {
+        return ($scope.need.basicNeedType != 'undefined' && $scope.need.basicNeedType != null && $scope.need.basicNeedType != '') &&
+            ($scope.need.title != 'undefined' && $scope.need.title != null && $scope.need.title != '') &&
+            ($scope.need.textDescription != 'undefined' && $scope.need.textDescription != null && $scope.need.textDescription != '') &&
+            ($scope.need.tags != 'undefined' &&  $scope.need.tags != null &&  $scope.need.tags != '');
+    }
 
+    $scope.validateDateTimeRange = function() {
+        // check date values
+        if (($scope.need.startDate == '' && $scope.need.endDate != '') ||
+            ($scope.need.startDate != '' && $scope.need.endDate == '')) {
+            // date value is missing
+            return false
+        }
 
+        // check time values
+        if (($scope.need.startTime == '' && $scope.need.endTime != '') ||
+            ($scope.need.startTime != '' && $scope.need.endTime == '')) {
+            // time value is missing
+            return false;
+        }
+
+        // check datetime values
+        if ($scope.need.startDate == '' && $scope.need.endDate == '' && $scope.need.startTime == '' && $scope.need.endTime == '') {
+            return true;
+        } else if ($scope.need.startDate != '' && $scope.need.endDate != '' && $scope.need.startTime != '' && $scope.need.endTime != '') {
+            return true;
+        } else {
+            // date specified but not time or vice versa
+            return false;
+        }
+    }
+
+    $scope.skipToPreviewButtonDisabled = function() {
+        if ($scope.currentStep == 1) {
+            return !$scope.validatePostForm();
+        } else if ($scope.currentStep == 2) {
+            return !$scope.validateDateTimeRange();
+        }
+    }
+
+    $scope.allDay = false;
+
+    $scope.clickOnAllDay = function() {
+        $scope.allDay = !$scope.allDay;
+        if ($scope.allDay) {
+            $("#start_time").prop('type', 'text');
+            $('#end_time').prop('type', 'text');
+
+            $scope.need.startTime = '00:00';
+            $scope.need.endTime = '23:59';
+
+            //$("#start_time").val('12:00 AM');     // does not help, model has higher priority
+            //$("#end_time").val('11:59 PM');
+        } else {
+            $("#start_time").prop('type', 'time');
+            $('#end_time').prop('type', 'time');
+
+            $scope.need.startTime = '';
+            $scope.need.endTime = '';
+        }
+    }
 
 });
 angular.module('won.owner').directive('wonProgressTracker',function factory(){
