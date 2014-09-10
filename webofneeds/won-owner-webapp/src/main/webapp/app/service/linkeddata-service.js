@@ -53,6 +53,36 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     }
 
     /**
+     * Fetches the linked data for the specified URI and saves it in the local triplestore.
+     * @param uri
+     * @return a promise to a boolean which indicates success
+     */
+    linkedDataService.ensureLoaded = function(uri) {
+        var isAlreadyLoaded = false;
+        //load the data from the local rdf store if forceFetch is false
+        privateData.store.graph(uri, function (success, mygraph) {
+            $rootScope.$apply(function() {
+                if (success) {
+                    isAlreadyLoaded = true;
+                }
+            });
+        });
+        if (!isAlreadyLoaded) {
+            linkedDataService.fetch(uri);
+            return;
+        }
+    }
+
+    /**
+     * Saves the specified jsonld structure in the triple store with the specified default graph URI.
+     * @param graphURI used if no graph URI is specified in the jsonld
+     * @param jsonld the data
+     */
+    linkedDataService.storeJsonLdGraph = function(graphURI, jsonld) {
+        privateData.store.load("application/ld+json", jsonld, graphURI, function (success, results) {});
+    }
+
+    /**
      * Retrieves the RDF data by dereferencing the specified URI.
      * @param uri
      * @param forceFetch if true, data will be fetched via http and updated in the cache before being returned.
