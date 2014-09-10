@@ -21,7 +21,8 @@
  * Time: 8:08 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $location, userService) {
+angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $location, userService, applicationStateService) {
+    $scope.allPosts = applicationStateService.getAllNeeds();
 	$scope.line = {
 		type:'',
 		title:'',
@@ -30,6 +31,8 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
 		puzzle:0,
 		date:''
 	};
+
+
 
     $scope.recordsToDisplay = 4;
     $scope.displayConfirmationDialog = false;
@@ -72,6 +75,10 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
     }
 
     // TODO call backend method here
+    //need to fetch: need type, need title, if unread messages exist -> icon of message + number, need create date
+   // $scope = {};
+    //how to fetch all needs of one user?
+
     // for filtering: when number of unread notifications is 0 set appropriate value (convText, reqText or matchText) to empty string
 	$scope.posts = [
 		{type:'Want', title:'Want PS 4', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: '', matches: 0}, datetime: new Date('2014-08-25')},
@@ -92,6 +99,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
     };
 
     // TODO call backend method here
+    //need to fetch: need type, need title, need create date
     $scope.drafts = [
         {type:'Together', title:'Car sharing to Prague', datetime: new Date('2014-08-20')},
         {type:'Want', title:'Moved recently ...', datetime: new Date('2014-08-25')},
@@ -101,6 +109,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
     ];
 
     // TODO call backend method here
+    //need to fetch: need type, need title, need close date
     $scope.closedList = [
         {type:'Want', title:'Playing soccer together', datetime: new Date('2014-08-23')},
         {type:'Change', title:'Looking for a flatscreen TV', datetime: new Date('2014-08-20')},

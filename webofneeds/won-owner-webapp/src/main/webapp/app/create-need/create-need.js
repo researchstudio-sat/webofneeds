@@ -22,6 +22,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
         $scope.needURI = eventData.needURI;
         applicationStateService.setCurrentNeedURI($scope.needURI);
+        applicationStateService.addNeed(linkedDataService.getNeed($scope.needURI));
         $location.path("/private-link");
 
     });

@@ -55,10 +55,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="post in posts | filter: search">
+                        <tr ng-repeat="post in allPosts | filter: search">
                             <td class="col-lg-1">
-                                <span style="display: none;">{{post.type}}</span>
-                                <img src="{{getTypePicURI(post.type)}}" tooltip="{{post.type}} (click to filter)"/>
+                                <span style="display: none;">{{post.basicNeedType}}</span>
+                                <img src="{{getTypePicURI(post.basicNeedType)}}"
+                                     tooltip="{{post.basicNeedType}} (click to filter)"/>
                             </td>
                             <td><a style="font-weight:bold;" href="#/private-link">{{post.title}}</a></td>
                             <td>
@@ -75,7 +76,7 @@
                                     <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{post.msg.matches}}
                                 </span>
                             </td>
-                            <td>{{post.datetime | date}}</td>
+                            <td>{{post.creationDate | date}}</td>
                         </tr>
                     </tbody>
                 </table>

@@ -20,7 +20,7 @@
 
 angular.module('won.owner').factory('applicationStateService', function (linkedDataService) {
     var currentNeedURI = null;
-
+    var allNeeds = [];
     var applicationStateService = {}
 
     applicationStateService.setCurrentNeedURI = function(needURI){
@@ -32,5 +32,12 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return currentNeedURI;
     }
 
+    applicationStateService.getAllNeeds = function(){
+        return allNeeds;
+    }
+
+    applicationStateService.addNeed = function(need){
+        allNeeds.push(need);
+    }
     return applicationStateService;
 });
