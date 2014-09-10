@@ -95,6 +95,9 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         return eventData;
     }
 
+
+
+
     enqueueMessage = function(msg) {
         if (isConnected()) {
             console.log("sending message instead of enqueueing");
@@ -124,10 +127,10 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             $rootScope.$apply(function() {
                 //first, run callbacks registered inside the service:
                 var jsonld = JSON.parse(msg.data);
-                console.log("SockJS message received!")
+                console.log("SockJS message received")
                 var event = getEventData(jsonld);
                 //call all registered callbacks
-                console.log("starting to process callbacks");
+                console.log("SockJS message is of type " + event.messageType + ", starting to process callbacks");
                 var callbacksToKeep = [];
                 for (var i = 0; i < privateData.callbacks.length; i++) {
                     console.log("processing messaging callback " + (i + 1) + " of " + privateData.callbacks.length);
@@ -150,6 +153,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
 
         newsocket.onclose = function () {
             console.log("SockJS connection closed");
+            //TODO: reconnect when connection is lost
         };
     }
 
@@ -174,27 +178,12 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
     }
     createSocket = function() {
         var options = {debug: true};
-        var url = 'http://localhost:8080/owner/msg'; //TODO: get socket URI from server through JSP
+        var url = 'http://localhost:8080/owner/msg'; //TODO: get socket URI from server
         privateData.socket = new SockJS(url, null, options);
         attachListenersToSocket(privateData.socket);
-        //TODO attach additional listener that creates the correct angular events (create is msg-response, i need to code events for simply incoming)
-        messageService.addMessageCallback(newMatchesCallback())
     }
 
-    newMatchesCallback = function() {
-        return new messageService.MessageCallback(function(event, msg){
-            console.log("in newMatchesCallback-Action");
-            switch(event.messageType) {
-                case won.WONMSG.hintMessage:
-                    console.log("Got a hint ", JSON.stringify(msg));
-                    break;
-                default:
-                    console.log("Got a yet unhandled message. ", JSON.stringify(msg));
 
-            }
-        });
-
-    }
 
 
 

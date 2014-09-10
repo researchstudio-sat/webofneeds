@@ -369,7 +369,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             // for now location is static
             .hasLocationSpecification(48.218748, 16.360783)
             // start date and end date must be filled in GUI !!!
-            .hasTimeSpecification("2001-07-04T12:08:56.235-0700","2001-07-05T12:08:56.235-0700",false,2,3)
+            .hasTimeSpecification("2001-07-04T12:08:56.235-07:00","2001-07-05T12:08:56.235-07:00",false,2,3)
             //.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime),false,2,3)
             .active()                   // mandatory: active or inactive
             .build();

@@ -63,18 +63,14 @@
         won.WONMSG = {};
         won.WONMSG.baseUri = "http://purl.org/webofneeds/message#";
         won.WONMSG.prefix = "wonmsg";
+
+        //sender/receiver etc.
         won.WONMSG.hasReceiverNeed = won.WONMSG.baseUri + "hasReceiverNeed";
         won.WONMSG.hasReceiverNeedCompacted = won.WONMSG.prefix + ":hasReceiverNeed";
         won.WONMSG.hasReceiver = won.WONMSG.baseUri + "hasReceiver";
         won.WONMSG.hasReceiverCompacted = won.WONMSG.prefix + ":hasReceiver";
         won.WONMSG.hasReceiverNode = won.WONMSG.baseUri + "hasReceiverNode";
         won.WONMSG.hasReceiverNodeCompacted = won.WONMSG.prefix + ":hasReceiverNode";
-        won.WONMSG.hasResponseStateProperty = won.WONMSG.baseUri + "hasResponseStateProperty";
-        won.WONMSG.hasResponseStatePropertyCompacted = won.WONMSG.prefix + ":hasResponseStateProperty";
-        won.WONMSG.createResponseMessage = won.WONMSG.baseUri + "CreateResponseMessage";
-        won.WONMSG.createResponseMessageCompacted = won.WONMSG.prefix + ":CreateResponseMessage";
-        won.WONMSG.hintMessage = won.WONMSG.baseUri + "HintMessage";
-        won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
         won.WONMSG.hasSenderNeed = won.WONMSG.baseUri + "hasSenderNeed";
         won.WONMSG.hasSenderNeedCompacted = won.WONMSG.prefix + ":hasSenderNeed";
         won.WONMSG.hasSender = won.WONMSG.baseUri + "hasSender";
@@ -85,13 +81,51 @@
         won.WONMSG.hasMessageTypePropertyCompacted = won.WONMSG.prefix + ":hasMessageType";
         won.WONMSG.refersTo = won.WONMSG.baseUri + "refersTo";
         won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
+        won.WONMSG.EnvelopeGraph = won.WONMSG.baseUri + "EnvelopeGraph";
+        won.WONMSG.EnvelopeGraphCompacted = won.WONMSG.prefix+ ":EnvelopeGraph";
 
-        won.WONMSG.MessageEnvelope = won.WONMSG.baseUri + "EnvelopeGraph";
-        won.WONMSG.MessageEnvelopeCompacted = won.WONMSG.prefix+ ":EnvelopeGraph";
+        //message types
+        won.WONMSG.hintMessage = won.WONMSG.baseUri + "HintMessage";
+        won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
+        won.WONMSG.connectMessage = won.WONMSG.baseUri + "ConnectMessage";
+        won.WONMSG.connectMessageCompacted = won.WONMSG.prefix + ":ConnectMessage";
+        won.WONMSG.needStateMessage = won.WONMSG.baseUri + "NeedStateMessage";
+        won.WONMSG.needStateMessageCompacted = won.WONMSG.prefix + ":NeedStateMessage";
+        won.WONMSG.closeMessage = won.WONMSG.baseUri + "CloseMessage";
+        won.WONMSG.closeMessageCompacted = won.WONMSG.prefix + ":CloseMessage";
+        won.WONMSG.openMessage = won.WONMSG.baseUri + "OpenMessage";
+        won.WONMSG.openMessageCompacted = won.WONMSG.prefix + ":OpenMessage";
+        won.WONMSG.connectionMessage = won.WONMSG.baseUri + "ConnectionMessage";
+        won.WONMSG.connectionMessageCompacted = won.WONMSG.prefix + ":ConnectionMessage";
+
+        won.WONMSG.hasResponseStateProperty = won.WONMSG.baseUri + "hasResponseStateProperty";
+        won.WONMSG.hasResponseStatePropertyCompacted = won.WONMSG.prefix + ":hasResponseStateProperty";
+        won.WONMSG.createResponseMessage = won.WONMSG.baseUri + "CreateResponseMessage";
+        won.WONMSG.createResponseMessageCompacted = won.WONMSG.prefix + ":CreateResponseMessage";
+
+        won.WONMSG.connectResponseMessage = won.WONMSG.baseUri + "ConnectResponseMessage";
+        won.WONMSG.connectResponseMessageCompacted = won.WONMSG.prefix + ":ConnectResponseMessage";
+        won.WONMSG.needStateResponseMessage = won.WONMSG.baseUri + "NeedStateResponseMessage";
+        won.WONMSG.needStateResponseMessageCompacted = won.WONMSG.prefix + ":NeedStateResponseMessage";
+        won.WONMSG.closeResponseMessage = won.WONMSG.baseUri + "CloseResponseMessage";
+        won.WONMSG.closeResponseMessageCompacted = won.WONMSG.prefix + ":CloseResponseMessage";
+        won.WONMSG.openResponseMessage = won.WONMSG.baseUri + "OpenResponseMessage";
+        won.WONMSG.openResponseMessageCompacted = won.WONMSG.prefix + ":OpenResponseMessage";
+        won.WONMSG.connectionMessageResponseMessage = won.WONMSG.baseUri + "ConnectionMessageResponseMessage";
+        won.WONMSG.connectionMessageResponseMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageResponseMessage";
+
 
         won.EVENT = {};
         won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
         won.EVENT.NEED_CREATED = "NeedCreatedEvent";
+        won.EVENT.HINT_RECEIVED = "HintReceivedEvent";
+        won.EVENT.CONNECT_RECEIVED = "ConnectReceivedEvent";
+        won.EVENT.OPEN_RECEIVED = "OpenReceivedEvent";
+        won.EVENT.CLOSE_RECEIVED = "CloseReceivedEvent";
+        won.EVENT.CONNECTION_MESSAGE_RECEIVED = "ConnectionMessageReceivedEvent";
+        won.EVENT.NEED_STATE_MESSAGE_RECEIVED = "NeedStateMessageReceivedEvent";
+
+
 
         won.clone = function(obj){
             return JSON.parse(JSON.stringify(obj));
@@ -323,8 +357,8 @@
                 this.getContentDescriptionNode()["won:hasLocationSpecification"]={
                     "@id":"_:locationSpecification",
                     "@type":"geo:Point",
-                    "geo:latitude":latitude,
-                    "geo:longitude":longitude
+                    "geo:latitude":latitude.toFixed(6),
+                    "geo:longitude":longitude.toFixed(6)
                 }
                 return this;
             },

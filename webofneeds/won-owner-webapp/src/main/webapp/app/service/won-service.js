@@ -21,6 +21,75 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
 
     wonService = {};
 
+
+    //private functions that handle incoming messages
+
+    /**
+     * Updates the local triple store with the data contained in the hint message.
+     * @param eventData event object that is passed as additional argument to $rootScope.$broadcast.
+     * @param message the complete message data as received from the WoN node.
+     */
+    processHintMessage = function(eventData, message) {
+        //load the data of the connection that the hint is about, if required
+        var connectionURI = eventData.receiverURI;
+        linkedDataService.ensureLoaded(connectionURI);
+        //load the data of the need the hint is about, if required
+
+        //add some properties to the eventData so as to make them easily accessible to consumers
+        //of the hint event
+    }
+
+
+    //mapping between message type and eventType/handler combination
+    messageTypeToEventType = {};
+    messageTypeToEventType[won.WONMSG.hintMessage] = {eventType: won.EVENT.HINT_RECEIVED, handler:wonService.processHintMessage};
+    messageTypeToEventType[won.WONMSG.connectMessage] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:null};
+    messageTypeToEventType[won.WONMSG.openMessage] = {eventType: won.EVENT.OPEN_RECEIVED, handler:null};
+    messageTypeToEventType[won.WONMSG.closeMessage] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:null};
+    messageTypeToEventType[won.WONMSG.connectionMessage] = {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED, handler:null};
+    messageTypeToEventType[won.WONMSG.needStateMessage] = {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED, handler:null};
+
+    //callback to be used in message-service to handle incoming messages
+    createIncomingMessageCallback = function() {
+        var incomingMessageHandler = new messageService.MessageCallback(
+            function (event, msg) {
+                console.log("in newMatchesCallback-Action");
+                var eventType = messageTypeToEventType[event.messageType].eventType;
+                var handler = messageTypeToEventType[event.messageType].handler;
+                //only do something if a type/handler combination is registered
+                if (eventType != null) {
+                    event.eventType = eventType;
+                    //store event in local triple store
+                    linkedDataService.saveJsonGraph(event.eventURI, msg);
+                    //call handler if there is one - it may modify the event object
+                    if (handler != null) {
+                        handler(event, msg);
+                    }
+                    //publish angular event
+                    console.log("incoming message: \n  ", JSON.stringify(msg) + "\npublishing angular event");
+                    $rootScope.$broadcast(event.eventType, event);
+                } else {
+                    console.log("Not handling message of type " + event.messageType + " in incomingMessageHandler");
+                }
+            });
+        //handle all incoming messages that are mapped to events in the messageTypeToEventType map
+        incomingMessageHandler.shouldHandleTest = function (event, msg){
+            var messageType = event.messageType;
+            if (typeof messageType === 'undefined') return false;
+            var eventTypeConfig = messageTypeToEventType[messageType];
+            if (typeof eventTypeConfig === 'undefined') return false;
+            return true;
+        };
+        //never unregister
+        incomingMessageHandler.shouldUnregisterTest = function(event, msg) {
+            return false;
+        };
+        return incomingMessageHandler;
+    }
+
+    //add callback to messageService
+    messageService.addMessageCallback(createIncomingMessageCallback());
+
     /**
      * helper function for accessin JSON-LD data
      */
@@ -201,6 +270,18 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
         return deferred.promise;
     }
 
+
+    /*********************
+     * Angular event handling
+     */
+
+    /**
+     * Handles a hint event.
+     * @param event
+     */
+    $rootScope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
+        //check if we
+    });
 
 
     return wonService;
