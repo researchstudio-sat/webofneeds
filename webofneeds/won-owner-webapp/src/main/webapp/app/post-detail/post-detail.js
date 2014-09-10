@@ -21,11 +21,18 @@
  * Time: 10:01 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $rootScope, $routeParams) {
+angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams, applicationStateService) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
 
-    $scope.need = $scope.$parent.need;
+    //$scope.need = $scope.$parent.need;
+    $scope.need = {};
+    var tmpNeed = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
+    $scope.need.title = tmpNeed['title'];
+    $scope.need.tag = tmpNeed['tag'];
+    $scope.need.textDescription = tmpNeed['textDescription'];
+    //TODO: location, date, needCreated date
+
 
     var imagesPerPage = 6;
 
@@ -44,9 +51,16 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     // just simple for now
     $scope.bigImage = $scope.images[0];
 
+    $('#bigImage').attr('href', $scope.images[0].url);
+    $('#obr').attr('src', $scope.images[0].url);
+
     $scope.clickOnThumbnail = function(index) {
+        console.log('img' + index);
         if (index >= 0 && index <= $scope.images.length) {
-            $scope.bigImage = $scope.images[index];
+            //$scope.bigImage = $scope.images[index];
+
+            $('#bigImage').attr('href', $scope.images[index].url);
+            $('#obr').attr('src', $scope.images[index].url);
             addImagesOnPageForLightbox(index);
         }
     }
@@ -70,7 +84,7 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     function displayFirstPageOfGallery(imagesPerPage) {
         var imageElements = '';
         for(var i = 0; i < imagesPerPage; i++) {
-            imageElements += '<a href="" ng-click="clickOnThumbnail(' + i + ');" ><img class="galleryImage" src="' + $scope.images[i].url + '" ng-click="clickOnThumbnail(' + i + ');"></a>';
+            imageElements += '<a href="" ng-click="clickOnThumbnail(' + i + ');" ><img class="galleryImage" src="' + $scope.images[i].url + '" ng-click="clickOnThumbnail(' + i + ')"></a>';
         }
         $(".gallery").html($compile(imageElements)($scope));
     }
@@ -98,6 +112,7 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     $scope.createPaginatedGallery(imagesPerPage);
 
     // TODO fix start and end date
+    /*
     $('#time_from').datepicker({
         format:'dd.mm.yyyy',
         todayHighlight:true,
@@ -110,30 +125,33 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
         changeMonth:true,
         changeYear:true,
         endDate:$scope.need.endDate
-    });
+    }); */
 
-    // TODO fixe when date is empty
+    // TODO fix when date is empty
     $scope.toDateString = function(date) {
-        var d = date.split('.');
+        var d = date.split('-');
         var datetime = new Date();
-        datetime.setFullYear(d[2]);
+        datetime.setFullYear(d[0]);
         datetime.setMonth(d[1] - 1);
-        datetime.setDate(d[0]);
+        datetime.setDate(d[2]);
         return datetime.toDateString();
     }
 
     $scope.location = 'Thurngasse 8, 1080 Vienna, Austria';
-    $scope.locationOutputFieldCollapsed = true;
 
-    $scope.timeInputFieldCollapsed = true;
+    $scope.locationOutputFieldCollapsed = true;
     $scope.outputLocationCollapseClick = function () {
         $scope.locationOutputFieldCollapsed = !$scope.locationOutputFieldCollapsed;
+        // console.log('location toggle');
     };
 
+    $scope.timeInputFieldCollapsed = true;
     $scope.timeInputFieldCollapsedClick = function () {
         $scope.timeInputFieldCollapsed = !$scope.timeInputFieldCollapsed;
+        // console.log('time toggle ' + $scope.timeInputFieldCollapsed);
     };
 
+    /*
     $scope.getMapOptions = function(){
 
         return {
@@ -156,12 +174,13 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
         $scope.need.latitude = $params[0].latLng.lat();
         $scope.need.longitude = $params[0].latLng.lng();
     };
+    */
 
     $scope.contactFormActiv = false;
     $scope.clickOnContact = function(){
+        console.log('contact clicked');
         $scope.contactFormActiv = !$scope.contactFormActiv;
     }
-
 
 
     /*$scope.mapOptions = $scope.getMapOptions()

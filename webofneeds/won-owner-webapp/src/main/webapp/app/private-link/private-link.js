@@ -5,9 +5,12 @@
  * Time: 8:08 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope) {
+angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService) {
 
-    $scope.title = 'New Flat, Need Furniture';
+    $scope.need = {};
+    $scope.need.title = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI())['title'];
+
+    //$scope.title = 'New Flat, Need Furniture';
     $scope.img_path = '/owner/images/thumbnail_demo.jpg';
     $rootScope.postClosed = false;
     $rootScope.postShouldBeClosed = false;
@@ -314,6 +317,14 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');
         $location.path('/private-link');
+    }
+
+    $scope.openFacebook = function() {
+        window.open(
+            'https://www.facebook.com/sharer/sharer.php?u={{publicLink}}', //+encodeURIComponent(location.href),
+            'facebook-share-dialog',
+            'width=626,height=436');
+        return false;
     }
 });
 

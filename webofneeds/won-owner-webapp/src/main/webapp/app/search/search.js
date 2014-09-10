@@ -37,7 +37,7 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
 angular.module('won.owner').directive('wonPostDetail', function factory(userService) {
     return {
         restrict:'AE',
-        templateUrl:"app/post-detail/post-detail.html",
-        scope:{}
+        templateUrl:"app/post-detail/post-detail.html"//,
+        //scope:{},
     }
 });

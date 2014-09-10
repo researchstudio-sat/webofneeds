@@ -14,27 +14,23 @@
  *    limitations under the License.
  */
 
-package won.bot.app;
+/**
+ * Created by LEIH-NB on 09.09.2014.
+ */
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.stereotype.Component;
+angular.module('won.owner').factory('applicationStateService', function (linkedDataService) {
+    var currentNeedURI = null;
 
-@Component
-public class NeedCreatorBotApp implements CommandLineRunner
-{
+    var applicationStateService = {}
 
-  public static void main(String[] args) {
-    SpringApplication app = new SpringApplication(
-        new Object[]{"classpath:/spring/app/needCreatorBotApp.xml"}
-    );
-    app.setWebEnvironment(false);
-    app.run(args);
-  }
+    applicationStateService.setCurrentNeedURI = function(needURI){
+        currentNeedURI = needURI;
+    }
 
-  @Override
-  public void run(final String... strings) throws Exception
-  {
+    applicationStateService.getCurrentNeedURI = function(){
 
-  }
-}
+        return currentNeedURI;
+    }
+
+    return applicationStateService;
+});

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller("HeaderCtrl", function($scope, $window,$location, userService) {
+angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService) {
 
 	$scope.isActive = function(where) {
 		if ($location.path().indexOf(where) > -1) {

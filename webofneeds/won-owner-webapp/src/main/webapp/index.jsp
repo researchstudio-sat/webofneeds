@@ -36,6 +36,7 @@
 		<script src="scripts/jquery.10.2.js"></script>
 	<script src="scripts/jquery.fs.scroller.min.js"></script>
 		<script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-mocks/angular-mocks.js"></script>
 		<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
@@ -54,17 +55,21 @@
 	<script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
 	<script type="text/javascript" src="scripts/smart-table.min.js"></script>
 	<script type="text/javascript" src="scripts/bootstrap-tagsinput.min.js"></script>
-        <script type="text/javascript" src="scripts/rdfstore-js/rdf_store_min.js"></script>
+        <script type="text/javascript" src="scripts/rdfstore-js/rdf_store.js"></script>
 
         <script type="text/javascript" src="scripts/star-rating.min.js"></script>
 
+
 		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/application-state-service.js"/>"></script>
+
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/won-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/linkeddata-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-factory-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/builders.js"/>"></script>

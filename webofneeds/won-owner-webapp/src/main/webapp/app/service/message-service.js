@@ -32,66 +32,119 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
     //and send the message later.
     privateData.pendingOutMessages = [];
 
+    getSafeValue = function(dataItem) {
+        if (dataItem == null) return null;
+        if (dataItem.value != null) return dataItem.value;
+        return null;
+    }
+
+    getEventData = function(json){
+        console.log("getting data from jsonld message");
+        var eventData = {};
+        rdfstore.create(function (store) {
+            store.setPrefix("wonmsg", "http://purl.org/webofneeds/message#");
+            store.load("application/ld+json", json, function (success, results) {});
+
+            var query =
+                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                "SELECT ?msg ?receiver ?receiverNeed ?receiverNode ?sender ?senderNeed ?senderNode ?messageType ?refersTo ?responseState where {" +
+                "?msg " + won.WONMSG.hasMessageTypePropertyCompacted + " ?messageType." +
+                " OPTIONAL { " +
+                "?msg " + won.WONMSG.hasReceiverCompacted + " ?receiver ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasReceiverNeedCompacted + " ?receiverNeed ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasReceiverNodeCompacted + " ?receiverNode ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasSenderCompacted + " ?sender ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasSenderNeedCompacted + " ?senderNeed ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasSenderNodeCompacted + " ?senderNode ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.refersToCompacted + " ?refersTo ." +
+                "} OPTIONAL { " +
+                "?msg " + won.WONMSG.hasResponseStatePropertyCompacted + " ?responseState ." +
+                "}" +
+                "}";
+            store.execute(query, function (success, results) {
+                if (!success) {
+                    return;
+                }
+                //use only first result!
+                if (results.length == 0) {
+                    return;
+                }
+                if (results.length > 1) {
+                    console.log("more than 1 solution found for message property query!");
+                }
+                var result = results[0];
+                eventData.messageType = getSafeValue(result.messageType);
+                eventData.receiverURI = getSafeValue(result.receiver);
+                eventData.receiverNeedURI = getSafeValue(result.receiverNeed);
+                eventData.receiverNodeURI = getSafeValue(result.receiverNode);
+                eventData.senderURI = getSafeValue(result.sender);
+                eventData.senderNeedURI = getSafeValue(result.senderNeed);
+                eventData.senderNodeURI = getSafeValue(result.senderNode);
+                eventData.refersToURI = getSafeValue(result.refersTo);
+                eventData.responseState = getSafeValue(result.responseState);
+                eventData.eventURI = getSafeValue(result.msg);
+                console.log("done copying the data to the event object, returning the result");
+            });
+        });
+        return eventData;
+    }
+
     enqueueMessage = function(msg) {
         if (isConnected()) {
+            console.log("sending message instead of enqueueing");
             //just to be sure, test if the connection is established now and send instead of enqueue
             privateData.socket.send(msg);
         } else {
+            console.log("socket not connected yet, enqueueing");
             privateData.pendingOutMessages.push(msg);
         }
     }
     attachListenersToSocket = function(newsocket){
+        //TODO: register listeners for incoming messages
+
         newsocket.onopen = function () {
-            console.log("SockJS connection has been established!")
-            var i = 0;
-            while (privateData.pendingOutMessages.length > 0){
-                var msg = privateData.pendingOutMessages.shift();
-                console.log("sending pending message no " + (++i));
-                privateData.socket.send(msg);
-            }
+            $rootScope.$apply(function() {
+                console.log("SockJS connection has been established!");
+                var i = 0;
+                while (privateData.pendingOutMessages.length > 0) {
+                    var msg = privateData.pendingOutMessages.shift();
+                    console.log("sending pending message no " + (++i));
+                    privateData.socket.send(msg);
+                }
+            });
         }
 
         newsocket.onmessage = function (msg) {
-            //first, run callbacks registered inside the service:
-            console.log("SockJS message received!")
-            for(var i = 0; i < privateData.callbacks.length; i++) {
-                privateData.callbacks[i].handleMessage(msg);
-            }
-            console.log("Received data: "+msg);
-            $rootScope.$apply(function () {
-                var store = new rdfstore.Store();
-                var event = window.won.clone(msg);
-
-                store.setPrefix("wonmsg","http://purl.org/webofneeds/message#");
-                store.load("application/ld+json", JSON.parse(msg.data), "ex:test", function(success, results) {
-                    console.log("success:" + success + ", results: " + results);
-                });
-                store.graph("ex:test", function(success, mygraph) {
-
-                    var receiverNeedTriples = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve('wonmsg:hasReceiverNeed')),null);
-                    var messageTypeTriple = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve(won.WONMSG.hasMessageTypePropertyCompacted)),null);
-                    var responseStateTriple = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve(won.WONMSG.hasResponseStatePropertyCompacted)),null);
-                    var hasSenderNodeTriple = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve(won.WONMSG.hasSenderNodeCompacted)));
-
-                    for (var i = 0; i < receiverNeedTriples.triples.length; i++) {
-                        event.receiverNeed = receiverNeedTriples.triples[i]["object"]["nominalValue"];
-                        console.log("receiverNeed:" +event.receiverNeed );
+            $rootScope.$apply(function() {
+                //first, run callbacks registered inside the service:
+                var jsonld = JSON.parse(msg.data);
+                console.log("SockJS message received!")
+                var event = getEventData(jsonld);
+                //call all registered callbacks
+                console.log("starting to process callbacks");
+                var callbacksToKeep = [];
+                for (var i = 0; i < privateData.callbacks.length; i++) {
+                    console.log("processing messaging callback " + (i + 1) + " of " + privateData.callbacks.length);
+                    try {
+                        var myJsonld = JSON.parse(JSON.stringify(jsonld));
+                        var myEvent = JSON.parse(JSON.stringify(event));
+                        var callback = privateData.callbacks[i];
+                        callback.handleMessage(myEvent, myJsonld);
+                        if (!callback.shouldUnregister(myEvent, myJsonld)) {
+                            callbacksToKeep.push(callback);
+                        }
+                    } catch (e) {
+                        console.log("error processing messaging callback " + i + ", ignoring");
                     }
-                    for(var i = 0; i< messageTypeTriple.triples.length; i++){
-                        event.messageType = messageTypeTriple.triples[i]["object"]["nominalValue"];
-                        console.log("messageType:"+ event.messageType);
-                    }
-                    for(var i = 0; i< responseStateTriple.triples.length; i++){
-                        event.responseState =responseStateTriple.triples[i]["object"]["nominalValue"];
-                        console.log("triple:"+event.responseState);
-                    }
-                    for(var i = 0; i< hasSenderNodeTriple.triples.length; i++){
-                        event.senderNode = hasSenderNodeTriple.triples[i]["object"]["nominalValue"];
-                        console.log("triple:"+event.senderNode);
-                    }
-                });
-                $rootScope.$broadcast("CreateNeedResponseMessageReceived",event);
-                $rootScope.$broadcast("WonMessageReceived", JSON.parse(msg.data));
+                    console.log("done processing callback ")
+                }
+                privateData.callbacks = callbacksToKeep;
             });
         };
 
@@ -124,12 +177,30 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         var url = 'http://localhost:8080/owner/msg'; //TODO: get socket URI from server through JSP
         privateData.socket = new SockJS(url, null, options);
         attachListenersToSocket(privateData.socket);
+        //TODO attach additional listener that creates the correct angular events (create is msg-response, i need to code events for simply incoming)
+        messageService.addMessageCallback(newMatchesCallback())
+    }
+
+    newMatchesCallback = function() {
+        return new messageService.MessageCallback(function(event, msg){
+            console.log("in newMatchesCallback-Action");
+            switch(event.messageType) {
+                case won.WONMSG.hintMessage:
+                    console.log("Got a hint ", JSON.stringify(msg));
+                    break;
+                default:
+                    console.log("Got a yet unhandled message. ", JSON.stringify(msg));
+
+            }
+        });
+
     }
 
 
 
 
     messageService.closeConnection = function () {
+        console.log("closing Websocket via messageService.closeConnection()");
         if (privateData.socket != null && ! isClosingOrClosed()) {
             privateData.socket.close();
         }
@@ -165,45 +236,34 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
      * shouldHandleTest: . Function that gets the message as only parameter and returns a boolean.
      *  action will only be executed if shouldHandleTest returns true or is omitted.
      * shouldUnregisterTest: . Function that gets the message as only parameter and returns a boolean.
-     *  callback will be unregistered if shouldUnregisterTest returns true or is omitted.
+     *  callback will be unregistered if shouldUnregisterTest returns true.
      * @constructor
      */
     messageService.MessageCallback = function MessageCallback(action){
         this.action = action;
-        this.shouldUnregisterTest = function(msg){ return false; };
-        this.shouldHandleTest = function(msg){ return true; };
+        this.shouldUnregisterTest = function(event, msg){ return false; };
+        this.shouldHandleTest = function(event, msg){ return true; };
     }
 
     messageService.MessageCallback.prototype = {
         constructor: messageService.MessageCallback,
-        shouldHandle: function(msg) {
-            var ret = this.shouldHandleTest(msg);
+        shouldHandle: function(event, msg) {
+            var ret = this.shouldHandleTest(event, msg);
             console.log("interested in message: " + ret)
             return ret;
         },
-        performAction: function(msg) {
-            console.log("performing action for message " + JSON.stringify(msg));
-            this.action(msg);
+        performAction: function(event, msg) {
+            console.log("performing action for message " + event.eventURI);
+            this.action(event, msg);
         },
-        shouldUnregister: function(msg) {
-            var ret = this.shouldUnregisterTest(msg);
+        shouldUnregister: function(event, msg) {
+            var ret = this.shouldUnregisterTest(event, msg);
             console.log("should unregister: " + ret);
             return ret;
         },
-        handleMessage: function(msg) {
-            if (this.shouldHandle(msg)) {
-                this.performAction(msg);
-            }
-            if (this.shouldUnregister(msg)){
-               this.unregister();
-            }
-        },
-        unregister: function() {
-            console.log("removing message callback: " + this);
-            //remove the callback
-            var index = privateData.callbacks.indexOf(this);
-            if (index > -1) {
-                privateData.callbacks = privateData.callbacks.splice(index, 1);
+        handleMessage: function(event, msg) {
+            if (this.shouldHandle(event, msg)) {
+                this.performAction(event, msg);
             }
         }
     };

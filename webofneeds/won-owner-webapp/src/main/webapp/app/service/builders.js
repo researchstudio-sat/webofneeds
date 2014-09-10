@@ -42,20 +42,62 @@
          *
          */
 
+        won.WON = {};
+        won.WON.baseUri = "http://purl.org/webofneeds/model#";
+        won.WON.prefix = "won";
+        won.WON.Need = won.WON.baseUri + "Need";
+        won.WON.NeedCompacted = won.WON.prefix + ":Need";
+        won.WON.BasicNeedTypeDemand = won.WON.baseUri + "Demand";
+        won.WON.BasicNeedTypeDemandCompacted = won.WON.prefix + ":Demand";
+        won.WON.BasicNeedTypeSupply = won.WON.baseUri + "Supply";
+        won.WON.BasicNeedTypeSupplyCompacted = won.WON.prefix + ":Supply";
+        won.WON.BasicNeedTypeDotogether = won.WON.baseUri + "DoTogether";
+        won.WON.BasicNeedTypeDotogetherCompacted = won.WON.prefix + ":DoTogether";
+        won.WON.BasicNeedTypeDemand = won.WON.baseUri + "Critique";
+        won.WON.BasicNeedTypeCritiqueCompacted = won.WON.prefix + ":Critique";
+        won.WON.hasBasicNeedType = won.WON.baseUri + "hasBasicNeedType";
+        won.WON.hasBasicNeedTypeCompacted = won.WON.prefix + ":hasBasicNeedType";
+        won.WON.hasContent = won.WON.baseUri + "hasContent";
+        won.WON.hasContentCompacted = won.WON.prefix + ":hasContent";
+        won.WON.hasTag = won.WON.baseUri + "hasTag";
+        won.WON.hasTagCompacted = won.WON.prefix + ":hasTag";
+        won.WON.hasTextDescription = won.WON.baseUri + "hasTextDescription";
+        won.WON.hasTextDescriptionCompacted = won.WON.prefix + ":hasTextDescription";
+
+
+
         won.WONMSG = {};
         won.WONMSG.baseUri = "http://purl.org/webofneeds/message#";
         won.WONMSG.prefix = "wonmsg";
         won.WONMSG.hasReceiverNeed = won.WONMSG.baseUri + "hasReceiverNeed";
         won.WONMSG.hasReceiverNeedCompacted = won.WONMSG.prefix + ":hasReceiverNeed";
+        won.WONMSG.hasReceiver = won.WONMSG.baseUri + "hasReceiver";
+        won.WONMSG.hasReceiverCompacted = won.WONMSG.prefix + ":hasReceiver";
+        won.WONMSG.hasReceiverNode = won.WONMSG.baseUri + "hasReceiverNode";
+        won.WONMSG.hasReceiverNodeCompacted = won.WONMSG.prefix + ":hasReceiverNode";
         won.WONMSG.hasResponseStateProperty = won.WONMSG.baseUri + "hasResponseStateProperty";
         won.WONMSG.hasResponseStatePropertyCompacted = won.WONMSG.prefix + ":hasResponseStateProperty";
         won.WONMSG.createResponseMessage = won.WONMSG.baseUri + "CreateResponseMessage";
         won.WONMSG.createResponseMessageCompacted = won.WONMSG.prefix + ":CreateResponseMessage";
+        won.WONMSG.hintMessage = won.WONMSG.baseUri + "HintMessage";
+        won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
+        won.WONMSG.hasSenderNeed = won.WONMSG.baseUri + "hasSenderNeed";
+        won.WONMSG.hasSenderNeedCompacted = won.WONMSG.prefix + ":hasSenderNeed";
+        won.WONMSG.hasSender = won.WONMSG.baseUri + "hasSender";
+        won.WONMSG.hasSenderCompacted = won.WONMSG.prefix + ":hasSender";
         won.WONMSG.hasSenderNode = won.WONMSG.baseUri + "hasSenderNode";
         won.WONMSG.hasSenderNodeCompacted = won.WONMSG.prefix + ":hasSenderNode";
         won.WONMSG.hasMessageTypeProperty = won.WONMSG.baseUri + ":hasMessageType";
         won.WONMSG.hasMessageTypePropertyCompacted = won.WONMSG.prefix + ":hasMessageType";
+        won.WONMSG.refersTo = won.WONMSG.baseUri + "refersTo";
+        won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
 
+        won.WONMSG.MessageEnvelope = won.WONMSG.baseUri + "EnvelopeGraph";
+        won.WONMSG.MessageEnvelopeCompacted = won.WONMSG.prefix+ ":EnvelopeGraph";
+
+        won.EVENT = {};
+        won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
+        won.EVENT.NEED_CREATED = "NeedCreatedEvent";
 
         won.clone = function(obj){
             return JSON.parse(JSON.stringify(obj));
@@ -312,8 +354,9 @@
                 this.getContentNode()["won:hasTag"] = tags;
                 return this;
             },
+            //TODO: add images
             build: function () {
-                console.log("built this data:" + JSON.stringify(this.data));
+
                 return this.data;
             }
         }
@@ -383,7 +426,6 @@
                 return this.data["@graph"][2]["@graph"][0]
             },
             build: function () {
-                console.log("built this message:" + JSON.stringify(this.data));
                 return this.data;
             }
         }
