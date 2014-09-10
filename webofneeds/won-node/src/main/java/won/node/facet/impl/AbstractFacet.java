@@ -14,6 +14,8 @@ import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
@@ -262,23 +264,40 @@ public abstract class AbstractFacet implements Facet
 
     final Model remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
 
-    executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        //here, we don't really need to handle exceptions, as we don't want to flood matching services with error messages
-        try {
-          ownerProtocolOwnerService.hint(
-                  con.getNeedURI(), con.getRemoteNeedURI(),
-                  score, originator, remoteFacetModel, wonMessage);
-        } catch (NoSuchNeedException e) {
-          logger.warn("error sending hint message to owner - no such need:", e);
-        } catch (IllegalMessageForNeedStateException e) {
-          logger.warn("error sending hint content to owner - illegal need state:", e);
-        } catch (Exception e) {
-          logger.warn("error sending hint content to owner:", e);
+    try {
+      WonMessageBuilder builder = new WonMessageBuilder();
+      // ToDo (FS): when merged with new URIService replace message URI and content URI with proper one
+      final WonMessage hintNotification = builder
+        .setMessageURI(URI.create("http://will.be.replaced.soon"))
+        .setWonMessageType(WonMessageType.CLOSE)
+        .setSenderNodeURI(originator) // ToDo (FS): get matcher ID from wonMessage when we can rely on a wonMessage being there
+        .setReceiverURI(con.getConnectionURI())
+        .setReceiverNeedURI(con.getNeedURI())
+        .setReceiverNodeURI(URI.create("http://not.yet.available")) // ToDo (FS): should be the WON node; add when available through wonMessage
+        .addContent(URI.create("http://will.be.replaced.soon"), remoteFacetModel, null)
+        .build();
+
+      executorService.execute(new Runnable()
+      {
+        @Override
+        public void run() {
+          //here, we don't really need to handle exceptions, as we don't want to flood matching services with error messages
+          try {
+            ownerProtocolOwnerService.hint(
+              con.getNeedURI(), con.getRemoteNeedURI(),
+              score, originator, remoteFacetModel, hintNotification);
+          } catch (NoSuchNeedException e) {
+            logger.warn("error sending hint message to owner - no such need:", e);
+          } catch (IllegalMessageForNeedStateException e) {
+            logger.warn("error sending hint content to owner - illegal need state:", e);
+          } catch (Exception e) {
+            logger.warn("error sending hint content to owner:", e);
+          }
         }
-      }
-    });
+      });
+    } catch (WonMessageBuilderException e) {
+      logger.warn("error creating HintNotificationMessage", e);
+    }
   }
 
   /**
