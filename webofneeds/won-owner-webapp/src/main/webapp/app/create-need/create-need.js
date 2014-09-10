@@ -205,6 +205,8 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             startTime           :'',
             endDate             :'',
             endTime             :'',
+            recursIn            :'P0D',
+            recurTimes          :0,         // not used for now, 0 is default value
             wonNode             :'',
             binaryFolder        :md5((new Date().getTime() + Math.random(1)).toString())
         };
@@ -385,15 +387,14 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
         }
 
-        // TODO specify false, 2 and 3
         if (hasTimeSpecification($scope.need)) {
-            needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime),false,2,3)
+            needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
         }
 
         // building need as JSON object
         var needJson = needBuilderObject.build();
 
-        console.log(needJson);
+        //console.log(needJson);
         var newNeedUriPromise = wonService.createNeed(needJson);
         //console.log('promised uri: ' + newNeedUriPromise);
 
