@@ -29,8 +29,16 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     $scope.need = {};
     var tmpNeed = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
     $scope.need.title = tmpNeed['title'];
-    $scope.need.tag = tmpNeed['tag'];
+    $scope.need.tags = tmpNeed['tags'];
     $scope.need.textDescription = tmpNeed['textDescription'];
+    $scope.need.creationDate = tmpNeed['creationDate'];
+    $scope.need.longitude = tmpNeed['longitude'];
+    $scope.need.latitude = tmpNeed['latitude'];
+    $scope.need.endTime = tmpNeed['endTime'];
+    $scope.need.recurInfinite = tmpNeed['recurInfinite'];
+    $scope.need.recursIn = tmpNeed['recursIn'];
+    $scope.need.startTime = tmpNeed['startTime'];
+
     //TODO: location, date, needCreated date
 
 

@@ -23,7 +23,12 @@
                 <div class="inline" style="font-size: 1.8em;">{{need.title}}</div>
                 <div class="inline pull-right"><i class="fa fa-copy fa-lg"></i></div>
             </div>
-
+            <div class="row">
+                <div class="inline"><i class="fa fa-star fa-lg"></i></div>
+                <div class="inline"><i class="fa fa-circle fa-lg"></i></div>
+                <div class="inline" style="font-size: 1.8em;">{{need.creationDate}}</div>
+                <div class="inline pull-right"><i class="fa fa-copy fa-lg"></i></div>
+            </div>
             <div class="row">
                 <div class="col-md-4">
                     <div id="bigImageArea" class="text-center">
@@ -48,7 +53,7 @@
                 <h4>Tagged with:</h4>
                 <span style="margin-right:5px;cursor:pointer;"
                       class="label label-primary btnTag"
-                      ng-repeat="tag in need.tags.split(', ')">{{need.tag}}
+                      ng-repeat="tag in need.tags.split(', ')">{{need.tags}}
                 </span>
             </div>
 

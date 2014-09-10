@@ -159,12 +159,21 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
             "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
             "prefix " + "dc"+":<"+"http://purl.org/dc/elements/1.1/>\n" +
-            "select ?basicNeedType ?title ?tag ?textDescription where { " +
+            "prefix " + "geo"+":<"+"http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
+                "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime where { " +
                 "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ."+
+                "<" + uri + ">" + " <"+"http://purl.org/dc/terms/created"+"> " + "?creationDate ."+
                 "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ."+
                 "?content dc:title ?title ."+
-                "OPTIONAL {<"+ uri + ">"+ won.WON.hasTagCompacted + " ?tag .}"+
-                "OPTIONAL {<"+ uri + ">"+ won.WON.hasTextDescriptionCompacted + " ?textDescription ."+
+                "OPTIONAL {?content "+ won.WON.hasTagCompacted + " ?tags .}"+
+                "OPTIONAL {?content "+ "geo:latitude" + " ?latitude .}"+
+                "OPTIONAL {?content "+ "geo:longitude" + " ?longitude .}"+
+                "OPTIONAL {?content "+ won.WON.hasEndTimeCompacted + " ?endTime .}"+
+                "OPTIONAL {?content "+ won.WON.hasRecurInfiniteTimesCompacted + " ?recurInfinite .}"+
+                "OPTIONAL {?content "+ won.WON.hasRecursInCompacted + " ?recursIn .}"+
+                "OPTIONAL {?content "+ won.WON.hasStartTimeCompacted + " ?startTime .}"+
+                "OPTIONAL {?content "+ won.WON.hasTagCompacted + " ?tags .}"+
+                "OPTIONAL {?content "+ won.WON.hasTextDescriptionCompacted + " ?textDescription ."+
                 "}}";
         privateData.store.execute(query, function (success, results) {
             if (!success) {
@@ -181,8 +190,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             resultObject = {};
             resultObject.basicNeedType = getSafeValue(result.basicNeedType);
             resultObject.title = getSafeValue(result.title);
-            resultObject.tag = getSafeValue(result.tag);
+            resultObject.tags = getSafeValue(result.tags);
             resultObject.textDescription = getSafeValue(result.textDescription);
+            resultObject.creationDate = getSafeValue(result.creationDate);
 
             //resultObject.log("done copying the data to the event object, returning the result");
         });

@@ -382,16 +382,13 @@
                     <input type="checkbox" ng-model="allDay" ng-click="clickOnAllDay()">&nbsp;All day
                 </div>
                 <div>
-                    Repeat&nbsp;
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-default dropdown-toggle"
-                                data-toggle="dropdown">
-                            Don't <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Weekly</a></li>
-                            <li><a href="#">Monthly</a></li>
-                        </ul>
+                    Repeat:&nbsp;
+                    <div>
+                        <select ng-model="need.recursIn" style="width: 7em;">
+                            <option value='P0D' selected>Don't</option>
+                            <option value='P7D'>Weekly</option>
+                            <option value='P30D'>Monthly</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -426,7 +423,7 @@
     </div>
 
     <div class="col-md-12">
-        <won-Post-Detail ng-controller="PostDetailCtrl" ng-init="previewRegimeOn()"></won-Post-Detail>
+        <won-Post-Detail></won-Post-Detail>
         <!--deactivate conatct, map and calendar-->
     </div>
 </div>
