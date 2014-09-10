@@ -98,7 +98,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
         }
         throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(), "open", needs.get(0).getState());
       }
-      connectionCommunicationService.open(connectionURIFromWonMessage, null, wonMessage);
+      connectionCommunicationService.open(connectionURIFromWonMessage, content, wonMessage);
     } else {
 
       logger.debug("need from need: OPEN received for connection {} with content {}", connectionURI, content);
@@ -152,7 +152,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
     this.needFacingConnectionClient = needFacingConnectionClient;
   }
 
-  // ToDo (FS): move to more general place where everybody can use the method (this method exists twice!!)
+  // ToDo (FS): move to more general place where everybody can use the method
   private WonMessage createCloseWonMessage(URI connectionURI)
     throws WonMessageBuilderException {
 

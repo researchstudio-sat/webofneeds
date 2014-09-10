@@ -3,14 +3,12 @@ package won.protocol.model;
 import won.protocol.message.MessageEvent;
 import won.protocol.message.WonMessageType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
 
 @Entity
-@Table(name = "need")
+@Table(name = "message_event")
 public class MessageEventPlaceholder
 {
 
@@ -27,7 +25,11 @@ public class MessageEventPlaceholder
   }
 
   @Id
-  @Column(name = "messageURI")
+  @GeneratedValue
+  @Column( name = "id" )
+  private Long id;
+
+  @Column(name = "messageURI", unique = true)
   private URI messageURI;
 
   // this URI refers to the need (in case of create, de-/activate) or connection (in case of hint, open,
@@ -50,6 +52,15 @@ public class MessageEventPlaceholder
   @Column(name = "receiverNodeURI")
   private URI receiverNodeURI;
 
+
+  @XmlTransient
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public URI getMessageURI() {
     return messageURI;

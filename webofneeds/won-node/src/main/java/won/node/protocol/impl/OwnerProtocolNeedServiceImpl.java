@@ -150,7 +150,7 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
             throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(), "open", needs.get(0).getState());
         }
 
-        this.connectionCommunicationService.open(null, null, wonMessage);
+        this.connectionCommunicationService.open(connectionURIFromWonMessage, content, wonMessage);
 
       } else {
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);

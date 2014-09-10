@@ -98,42 +98,78 @@ public class NeedCommunicationServiceImpl implements
                    final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException {
 
+    // distinguish between the new message format (WonMessage) and the old parameters
+    // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
       logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
-    }
 
-    if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
-    if (originator == null) throw new IllegalArgumentException("originator is not set");
+      if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
+      if (originator == null) throw new IllegalArgumentException("originator is not set");
 
-    //create Connection in Database
-    Connection con = null;
-    try {
-      //see if there is a facet specified in the content
-      URI facet = dataService.getFacet(content);
-      if (facet == null){
-        //get the first one of the need's supported facets. TODO: implement some sort of strategy for choosing a facet here (and in the matcher)
-        Collection<URI> facets = dataService.getSupportedFacets(needURI);
-        if (facets.isEmpty()) throw new IllegalArgumentException("hint does not specify facets, falling back to using one of the need's supported facets failed as the need does not support any facets");
-        //add the facet to the model.
-        dataService.addFacet(content, facets.iterator().next());
+      //create Connection in Database
+      Connection con = null;
+      try {
+
+        URI facet = wonMessage.getMessageEvent().getReceiverURI();
+        // ToDo (FS): adapt this part to the new message format (dont use content)
+        if (facet == null) {
+          //get the first one of the need's supported facets. TODO: implement some sort of strategy for choosing a facet here (and in the matcher)
+          Collection<URI> facets = dataService.getSupportedFacets(needURI);
+          if (facets.isEmpty()) throw new IllegalArgumentException(
+            "hint does not specify facets, falling back to using one of the need's supported facets failed as the need does not support any facets");
+          //add the facet to the model.
+          dataService.addFacet(content, facets.iterator().next());
+        }
+        con = dataService.createConnection(needURI, otherNeedURI, null, content, ConnectionState.SUGGESTED,
+                                           ConnectionEventType.MATCHER_HINT);
+      } catch (ConnectionAlreadyExistsException e) {
+        logger.warn("could not create connection", e);
       }
-      con = dataService.createConnection(needURI, otherNeedURI, null, content, ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT);
-    } catch (ConnectionAlreadyExistsException e) {
-      logger.warn("could not create connection", e);
+
+
+      messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(), wonMessage.getMessageEvent()));
+
+      //invoke facet implementation
+      reg.get(con).hint(con, score, originator, content, wonMessage);
+
+    } else {
+
+      if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
+      if (originator == null) throw new IllegalArgumentException("originator is not set");
+
+      //create Connection in Database
+      Connection con = null;
+      try {
+        //see if there is a facet specified in the content
+        URI facet = dataService.getFacet(content);
+        if (facet == null) {
+          //get the first one of the need's supported facets. TODO: implement some sort of strategy for choosing a facet here (and in the matcher)
+          Collection<URI> facets = dataService.getSupportedFacets(needURI);
+          if (facets.isEmpty()) throw new IllegalArgumentException(
+            "hint does not specify facets, falling back to using one of the need's supported facets failed as the need does not support any facets");
+          //add the facet to the model.
+          dataService.addFacet(content, facets.iterator().next());
+        }
+        con = dataService.createConnection(needURI, otherNeedURI, null, content, ConnectionState.SUGGESTED,
+                                           ConnectionEventType.MATCHER_HINT);
+      } catch (ConnectionAlreadyExistsException e) {
+        logger.warn("could not create connection", e);
+      }
+
+      //create ConnectionEvent in Database
+      ConnectionEvent event = dataService
+        .createConnectionEvent(con.getConnectionURI(), originator, ConnectionEventType.MATCHER_HINT);
+
+      String baseURI = con.getConnectionURI().toString();
+      RdfUtils.replaceBaseURI(content, baseURI);
+      //create rdf content for the ConnectionEvent and save it to disk
+      dataService.saveAdditionalContentForEvent(content, con, event, score);
+
+      //invoke facet implementation
+      reg.get(con).hint(con, score, originator, content, wonMessage);
     }
-
-    //create ConnectionEvent in Database
-    ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), originator, ConnectionEventType.MATCHER_HINT);
-
-    String baseURI = con.getConnectionURI().toString();
-    RdfUtils.replaceBaseURI(content, baseURI);
-    //create rdf content for the ConnectionEvent and save it to disk
-    dataService.saveAdditionalContentForEvent(content, con, event, score);
-
-    //invoke facet implementation
-    reg.get(con).hint(con, score, originator, content, wonMessage);
   }
 
   @Override
@@ -230,7 +266,7 @@ public class NeedCommunicationServiceImpl implements
       //invoke facet implementation
       Facet facet = reg.get(con);
       // send an empty model until we remove this parameter
-      facet.connectFromNeed(con, ModelFactory.createDefaultModel(), wonMessage);
+      facet.connectFromNeed(con, content, wonMessage);
 
       return con.getConnectionURI();
 

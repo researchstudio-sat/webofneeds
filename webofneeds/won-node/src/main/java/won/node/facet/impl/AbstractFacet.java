@@ -94,7 +94,7 @@ public abstract class AbstractFacet implements Facet
           @Override
           public void run() {
             try {
-              needFacingConnectionClient.open(null, null, wonMessage);
+              needFacingConnectionClient.open(con, content, wonMessage);
             } catch (Exception e) {
               logger.warn("caught Exception in openFromOwner", e);
             }
@@ -203,7 +203,7 @@ public abstract class AbstractFacet implements Facet
         public void run() {
           try {
             ownerFacingConnectionClient.open(wonMessage.getMessageEvent().getReceiverURI(),
-                                             ModelFactory.createDefaultModel(),
+                                             content,
                                              wonMessage);
           } catch (Exception e) {
             logger.warn("caught Exception in openFromNeed:", e);
@@ -303,7 +303,11 @@ public abstract class AbstractFacet implements Facet
                    final URI originator, final Model content, final WonMessage wonMessage)
       throws NoSuchNeedException, IllegalMessageForNeedStateException {
 
-    final Model remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
+    Model remoteFacetModelCandidate = content;
+    if (wonMessage == null)
+      remoteFacetModelCandidate = changeHasRemoteFacetToHasFacet(content);
+
+    final Model remoteFacetModel = remoteFacetModelCandidate;
 
     executorService.execute(new Runnable() {
       @Override
@@ -354,7 +358,7 @@ public abstract class AbstractFacet implements Facet
           // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
           logger.warn("could not connectFromNeed, sending close back. Exception was: ",e);
           try {
-            // ToDo (FS): in this case a new wonMessage of type close should be generated and send
+            // ToDo (FS): wonMessage should be a response type
             ownerFacingConnectionCommunicationService.close(
                     connectionForRunnable.getConnectionURI(), content, wonMessage);
           } catch (Exception e1) {
