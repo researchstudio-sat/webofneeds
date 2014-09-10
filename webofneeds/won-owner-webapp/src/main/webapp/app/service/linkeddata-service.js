@@ -53,36 +53,6 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     }
 
     /**
-     * Fetches the linked data for the specified URI and saves it in the local triplestore.
-     * @param uri
-     * @return a promise to a boolean which indicates success
-     */
-    linkedDataService.ensureLoaded = function(uri) {
-        var isAlreadyLoaded = false;
-        //load the data from the local rdf store if forceFetch is false
-        privateData.store.graph(uri, function (success, mygraph) {
-            $rootScope.$apply(function() {
-                if (success) {
-                    isAlreadyLoaded = true;
-                }
-            });
-        });
-        if (!isAlreadyLoaded) {
-            linkedDataService.fetch(uri);
-            return;
-        }
-    }
-
-    /**
-     * Saves the specified jsonld structure in the triple store with the specified default graph URI.
-     * @param graphURI used if no graph URI is specified in the jsonld
-     * @param jsonld the data
-     */
-    linkedDataService.storeJsonLdGraph = function(graphURI, jsonld) {
-        privateData.store.load("application/ld+json", jsonld, graphURI, function (success, results) {});
-    }
-
-    /**
      * Retrieves the RDF data by dereferencing the specified URI.
      * @param uri
      * @param forceFetch if true, data will be fetched via http and updated in the cache before being returned.
@@ -142,12 +112,30 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.getNeed = function(uri) {
         //TODO: SPARQL query that returns the common need properties
         var resultObject = null;
+        /*var query =
+            "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+            "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+            "SELECT ?basicNeedType ?title ?tag ?textDescription where {" +"\n"+
+            "<" + uri +">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ."+
+            "<" + uri +">" + won.WON.hasContentCompacted + " ?content ."+
+            "?content " + "dc:title" + " ?title ."+
+            " OPTIONAL { " +
+                "<" + uri +">" + won.WON.hasTagCompacted + " ?tag ."+
+            "} OPTIONAL { " +
+                "<" + uri +">" + won.WON.hasTextDescriptionCompacted + " ?tag ."+
+            "}"+
+            "}"; */
         var query =
             "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
             "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-            "SELECT ?basicNeedType where {" +
-            "<" + uri +">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ." +
-            "}";
+            "prefix " + "dc"+":<"+"http://purl.org/dc/elements/1.1/>\n" +
+            "select ?basicNeedType ?title ?tag ?textDescription where { " +
+                "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ."+
+                "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ."+
+                "?content dc:title ?title ."+
+                "OPTIONAL {<"+ uri + ">"+ won.WON.hasTagCompacted + " ?tag .}"+
+                "OPTIONAL {<"+ uri + ">"+ won.WON.hasTextDescriptionCompacted + " ?textDescription ."+
+                "}}";
         privateData.store.execute(query, function (success, results) {
             if (!success) {
                 return;
@@ -162,7 +150,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             var result = results[0];
             resultObject = {};
             resultObject.basicNeedType = getSafeValue(result.basicNeedType);
-            resultObject.log("done copying the data to the event object, returning the result");
+            resultObject.title = getSafeValue(result.title);
+            resultObject.tag = getSafeValue(result.tag);
+            resultObject.textDescription = getSafeValue(result.textDescription);
+
+            //resultObject.log("done copying the data to the event object, returning the result");
         });
         return resultObject;
     }

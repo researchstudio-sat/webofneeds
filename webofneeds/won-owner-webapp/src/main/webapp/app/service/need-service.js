@@ -200,9 +200,9 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
         var needToSave = angular.copy(need);
         needToSave.currentStep = currentStep+'';
         needToSave.userName = userName;
-        needToSave.tags = need.tags.join(",");
+        needToSave.tags = need.tags;
         delete needToSave.binaryFolder;
-        /*return $http({
+        return $http({
             method:'POST',
             url:'/owner/rest/needs/drafts',
             data:needToSave,
@@ -217,7 +217,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
             function (response) {
                 console.log("FATAL ERROR");
             }
-        );   */
+        );
     }
 
 	needService.save = function(need) {

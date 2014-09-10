@@ -362,9 +362,14 @@ h1#main-heading {
 }
 
 /** General form stuff */
-.field-width {
-    width: 8em;
+.field-date-width {
+    width: 11em;
 }
+
+.field-time-width {
+    width: 9em;
+}
+
 
 .field-right-margin {
     margin-right: 0.5em;

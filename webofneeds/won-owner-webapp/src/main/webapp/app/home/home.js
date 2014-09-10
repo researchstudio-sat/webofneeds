@@ -358,7 +358,7 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
     onLoginSuccessful = function(result) {
         //if (result.status == 'OK') {
         userService.setAuth($scope.username);
-        $window.location.href = '/';
+        $window.location.href = '/owner';
 
     }
     onLoginError = function(response) {

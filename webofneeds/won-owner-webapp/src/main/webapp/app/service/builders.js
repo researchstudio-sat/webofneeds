@@ -57,6 +57,12 @@
         won.WON.BasicNeedTypeCritiqueCompacted = won.WON.prefix + ":Critique";
         won.WON.hasBasicNeedType = won.WON.baseUri + "hasBasicNeedType";
         won.WON.hasBasicNeedTypeCompacted = won.WON.prefix + ":hasBasicNeedType";
+        won.WON.hasContent = won.WON.baseUri + "hasContent";
+        won.WON.hasContentCompacted = won.WON.prefix + ":hasContent";
+        won.WON.hasTag = won.WON.baseUri + "hasTag";
+        won.WON.hasTagCompacted = won.WON.prefix + ":hasTag";
+        won.WON.hasTextDescription = won.WON.baseUri + "hasTextDescription";
+        won.WON.hasTextDescriptionCompacted = won.WON.prefix + ":hasTextDescription";
 
 
 
@@ -382,6 +388,7 @@
                 this.getContentNode()["won:hasTag"] = tags;
                 return this;
             },
+            //TODO: add images
             build: function () {
 
                 return this.data;

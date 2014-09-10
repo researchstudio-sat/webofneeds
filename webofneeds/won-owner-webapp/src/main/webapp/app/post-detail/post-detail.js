@@ -21,11 +21,18 @@
  * Time: 10:01 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams) {
+angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams, applicationStateService) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
 
-    // $scope.need = $scope.$parent.need;   // works without this
+    //$scope.need = $scope.$parent.need;
+    $scope.need = {};
+    var tmpNeed = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
+    $scope.need.title = tmpNeed['title'];
+    $scope.need.tag = tmpNeed['tag'];
+    $scope.need.textDescription = tmpNeed['textDescription'];
+    //TODO: location, date, needCreated date
+
 
     var imagesPerPage = 6;
 
@@ -121,16 +128,14 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     }); */
 
     // TODO fix when date is empty
-    /*
     $scope.toDateString = function(date) {
-        var d = date.split('.');
+        var d = date.split('-');
         var datetime = new Date();
-        datetime.setFullYear(d[2]);
+        datetime.setFullYear(d[0]);
         datetime.setMonth(d[1] - 1);
-        datetime.setDate(d[0]);
+        datetime.setDate(d[2]);
         return datetime.toDateString();
     }
-    */
 
     $scope.location = 'Thurngasse 8, 1080 Vienna, Austria';
 

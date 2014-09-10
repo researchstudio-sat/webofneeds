@@ -5,9 +5,12 @@
  * Time: 8:08 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope) {
+angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService) {
 
-    $scope.title = 'New Flat, Need Furniture';
+    $scope.need = {};
+    $scope.need.title = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI())['title'];
+
+    //$scope.title = 'New Flat, Need Furniture';
     $scope.img_path = '/owner/images/thumbnail_demo.jpg';
     $rootScope.postClosed = false;
     $rootScope.postShouldBeClosed = false;
