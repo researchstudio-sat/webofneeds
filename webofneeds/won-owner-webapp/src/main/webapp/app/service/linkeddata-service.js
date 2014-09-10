@@ -112,7 +112,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.getNeed = function(uri) {
         //TODO: SPARQL query that returns the common need properties
         var resultObject = null;
-        var query =
+        /*var query =
             "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
             "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
             "SELECT ?basicNeedType ?title ?tag ?textDescription where {" +"\n"+
@@ -124,7 +124,18 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             "} OPTIONAL { " +
                 "<" + uri +">" + won.WON.hasTextDescriptionCompacted + " ?tag ."+
             "}"+
-            "}";
+            "}"; */
+        var query =
+            "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+            "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+            "prefix " + "dc"+":<"+"http://purl.org/dc/elements/1.1/>\n" +
+            "select ?basicNeedType ?title ?tag ?textDescription where { " +
+                "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ."+
+                "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ."+
+                "?content dc:title ?title ."+
+                "OPTIONAL {<"+ uri + ">"+ won.WON.hasTagCompacted + " ?tag .}"+
+                "OPTIONAL {<"+ uri + ">"+ won.WON.hasTextDescriptionCompacted + " ?textDescription ."+
+                "}}";
         privateData.store.execute(query, function (success, results) {
             if (!success) {
                 return;
