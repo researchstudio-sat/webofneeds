@@ -269,7 +269,7 @@ public abstract class AbstractFacet implements Facet
       // ToDo (FS): when merged with new URIService replace message URI and content URI with proper one
       final WonMessage hintNotification = builder
         .setMessageURI(URI.create("http://will.be.replaced.soon"))
-        .setWonMessageType(WonMessageType.CLOSE)
+        .setWonMessageType(WonMessageType.HINT_NOTIFICATION)
         .setSenderNodeURI(originator) // ToDo (FS): get matcher ID from wonMessage when we can rely on a wonMessage being there
         .setReceiverURI(con.getConnectionURI())
         .setReceiverNeedURI(con.getNeedURI())
