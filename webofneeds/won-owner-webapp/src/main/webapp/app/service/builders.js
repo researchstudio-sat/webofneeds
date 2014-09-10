@@ -63,6 +63,14 @@
         won.WON.hasTagCompacted = won.WON.prefix + ":hasTag";
         won.WON.hasTextDescription = won.WON.baseUri + "hasTextDescription";
         won.WON.hasTextDescriptionCompacted = won.WON.prefix + ":hasTextDescription";
+        won.WON.hasEndTime = won.WON.baseUri + "hasEndTime";
+        won.WON.hasEndTimeCompacted = won.WON.prefix + ":hasEndTime";
+        won.WON.hasRecurInfiniteTimes = won.WON.baseUri + "hasRecurInfiniteTimes";
+        won.WON.hasRecurInfiniteTimesCompacted = won.WON.prefix + ":hasRecurInfiniteTimes";
+        won.WON.hasRecursIn = won.WON.baseUri + "hasRecursIn";
+        won.WON.hasRecursInCompacted = won.WON.prefix + ":hasRecurInfiniteTimes";
+        won.WON.hasStartTime = won.WON.baseUri + "hasStartTime";
+        won.WON.hasStartTimeCompacted = won.WON.prefix + ":hasStartTime";
 
 
 

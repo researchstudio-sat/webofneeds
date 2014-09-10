@@ -142,7 +142,7 @@ angular.module('won.owner').controller('HomeCtrl', function ($scope, $location, 
     $scope.iMenuValidationMessage = 'Please choose type of post';
     $scope.iPostValidationMessage = 'Please enter a title for your post';
     $scope.chooseText = 'Choose if you want to find what you need or what others need';
-    $scope.iChooseTypeText = 'Choose type of need';
+    $scope.iChooseTypeText = 'Choose type of post';
     $scope.iGivePostTitlText = 'Give your post a title';
     $scope.iPostBtnText = 'New post';
     $scope.iPost = new function(){
@@ -198,7 +198,7 @@ angular.module('won.owner').controller('HomeCtrl', function ($scope, $location, 
     $scope.othersMenu = {item0 : 'want to have something', item1 : 'offer something', item2 : 'want to do something together', item3 : 'want to change something'};
     $scope.othersMenuValidationMessage = 'Please choose type of post';
     $scope.othersPostValidationMessage = 'Please enter a title for your post';
-    $scope.othersChooseTypeText = 'Choose type of need';
+    $scope.othersChooseTypeText = 'Choose type of post';
     $scope.othersSearchText = 'Type what you want to find';
     $scope.othersSearchBtnText = 'Search';
     $scope.othersPost = new function(){
