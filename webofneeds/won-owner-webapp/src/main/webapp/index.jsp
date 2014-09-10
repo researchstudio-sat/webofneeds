@@ -76,6 +76,8 @@
 
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/faq/faq.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/impressum/impressum.js"/>"></script>
 
         <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
