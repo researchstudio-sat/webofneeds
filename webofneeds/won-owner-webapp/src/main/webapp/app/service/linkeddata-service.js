@@ -104,7 +104,88 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         }
         return deferred.promise;
     }
+    linkedDataService.getAllEvents = function(uri){
+        var resultObject = null;
 
+        var query = "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+            "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+            "prefix " + "dc"+":<"+"http://purl.org/dc/elements/1.1/>\n" +
+            "prefix " + "geo"+":<"+"http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
+            "prefix " + "rdfs"+":<"+"http://www.w3.org/2000/01/rdf-schema#>\n" +
+            "prefix " + "rdf"+":<"+"http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+            "select ?connection ?event ?eventType ?otherNeedURI ?originator ?score ?timeStamp where { " +
+            "<" + uri + ">" + won.WON.hasConnectionsCompacted + " ?connections ."+
+            "OPTIONAL {?connections rdfs:member ?connection .}"+
+            "OPTIONAL {?connection "+won.WON.hasEventContainerCompacted+" ?eventContainer .}"+
+            "OPTIONAL {?connection "+won.WON.belongsToNeedCompacted + " ?otherNeedURI .}"+
+            "OPTIONAL {?eventContainer rdfs:member "+"?event .}"+
+            "OPTIONAL {?event rdf:type "+"?eventType .}"+
+            // "OPTIONAL {?hintEvent rdf:type "+won.WON.HintCompacted+ " .}"+
+            // "OPTIONAL {?hintEvent "+won.WON.hasOriginatorCompacted+" ?originator .}"+
+            // "OPTIONAL {?hintEvent "+won.WON.hasScoreCompacted+ " ?score .}"+
+            // "OPTIONAL {?hintEvent "+won.WON.hasTimeStamp+ " ?timeStamp .}"+
+            "}";
+        privateData.store.execute(query, function (success, results) {
+            if (!success) {
+                return;
+            }
+            //use only first result!
+            if (results.length == 0) {
+                return;
+            }
+            if (results.length > 1) {
+                console.log("more than 1 solution found for match query!");
+            }
+            var result = results[0];
+            resultObject = {};
+            resultObject.connection = getSafeValue(result.connection);
+            resultObject.event = getSafeValue(result.event);
+            resultObject.eventType = getSafeValue(result.eventType);
+            resultObject.otherNeedURI = getSafeValue(result.otherNeedURI);
+            resultObject.timeStamp = getSafeValue(result.timeStamp);
+            resultObject.originator = getSafeValue(result.originator);
+            resultObject.score = getSafeValue(result.score);
+        });
+        return resultObject;
+    }
+    linkedDataService.getMatches = function(uri){
+        var resultObject = null;
+
+        var query = "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+            "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+            "prefix " + "dc"+":<"+"http://purl.org/dc/elements/1.1/>\n" +
+            "prefix " + "geo"+":<"+"http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
+            "prefix " + "rdfs"+":<"+"http://www.w3.org/2000/01/rdf-schema#>\n" +
+            "prefix " + "rdf"+":<"+"http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+            "select ?connection ?otherNeedURI ?originator ?score ?timeStamp where { " +
+            "<" + uri + ">" + won.WON.hasConnectionsCompacted + " ?connections ."+
+            "OPTIONAL {?connections rdfs:member ?connection .}"+
+            "OPTIONAL {?connection "+won.WON.hasEventContainerCompacted+" ?eventContainer .}"+
+            "OPTIONAL {?connection "+won.WON.belongsToNeedCompacted + " ?otherNeedURI .}"+
+            "OPTIONAL {?eventContainer rdfs:member "+"?events .}"+
+           // "OPTIONAL {?hintEvent rdf:type "+won.WON.HintCompacted+ " .}"+
+           // "OPTIONAL {?hintEvent "+won.WON.hasOriginatorCompacted+" ?originator .}"+
+           // "OPTIONAL {?hintEvent "+won.WON.hasScoreCompacted+ " ?score .}"+
+           // "OPTIONAL {?hintEvent "+won.WON.hasTimeStamp+ " ?timeStamp .}"+
+            "}";
+        privateData.store.execute(query, function (success, results) {
+            if (!success) {
+                return;
+            }
+            //use only first result!
+            if (results.length == 0) {
+                return;
+            }
+            if (results.length > 1) {
+                console.log("more than 1 solution found for match query!");
+            }
+            var result = results[0];
+            resultObject = {};
+            resultObject.originator = getSafeValue(result.originator);
+            resultObject.score = getSafeValue(result.score);
+        });
+        return resultObject;
+    }
     /**
      * Loads the default data of the need with the specified URI into a js object.
      * @return the object or null if no data is found for that URI in the local datastore
@@ -112,19 +193,6 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.getNeed = function(uri) {
         //TODO: SPARQL query that returns the common need properties
         var resultObject = null;
-        /*var query =
-            "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-            "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-            "SELECT ?basicNeedType ?title ?tag ?textDescription where {" +"\n"+
-            "<" + uri +">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ."+
-            "<" + uri +">" + won.WON.hasContentCompacted + " ?content ."+
-            "?content " + "dc:title" + " ?title ."+
-            " OPTIONAL { " +
-                "<" + uri +">" + won.WON.hasTagCompacted + " ?tag ."+
-            "} OPTIONAL { " +
-                "<" + uri +">" + won.WON.hasTextDescriptionCompacted + " ?tag ."+
-            "}"+
-            "}"; */
         var query =
             "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
             "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +

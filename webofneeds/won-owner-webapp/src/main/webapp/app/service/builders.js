@@ -42,9 +42,36 @@
          *
          */
 
+
         won.WON = {};
         won.WON.baseUri = "http://purl.org/webofneeds/model#";
         won.WON.prefix = "won";
+
+        //EVENT TYPES
+        won.WON.OwnerClose = won.WON.baseUri + "OwnerClose";
+        won.WON.OwnerCloseCompacted = won.WON.prefix + ":OwnerClose";
+
+        won.WON.OwnerOpen = won.WON.baseUri + "OwnerOpen";
+        won.WON.OwnerOpenCompacted = won.WON.prefix + ":OwnerOpen";
+        won.WON.PartnerClose = won.WON.baseUri + "PartnerClose";
+        won.WON.PartnerCloseCompacted = won.WON.prefix + ":PartnerClose";
+        won.WON.PartnerOpen = won.WON.baseUri + "PartnerOpen";
+        won.WON.PartnerOpenCompacted = won.WON.prefix + ":PartnerOpen";
+        won.WON.PartnerMessage = won.WON.baseUri + "PartnerMessage";
+        won.WON.PartnerMessageCompacted = won.WON.prefix + ":PartnerMessage";
+        won.WON.OwnerMessage = won.WON.baseUri + "OwnerMessage";
+        won.WON.OwnerMessageCompacted = won.WON.prefix + ":OwnerMessage";
+        won.WON.Hint = won.WON.baseUri + "Hint";
+        won.WON.HintCompacted = won.WON.prefix + ":Hint";
+
+
+
+
+        won.WON.Connection = won.WON.baseUri + "Connection";
+        won.WON.ConnectionCompacted = won.WON.prefix + ":Connection";
+        won.WON.Event = won.WON.baseUri + "Event";
+        won.WON.EventCompacted = won.WON.prefix + ":Event";
+
         won.WON.Need = won.WON.baseUri + "Need";
         won.WON.NeedCompacted = won.WON.prefix + ":Need";
         won.WON.BasicNeedTypeDemand = won.WON.baseUri + "Demand";
@@ -55,22 +82,34 @@
         won.WON.BasicNeedTypeDotogetherCompacted = won.WON.prefix + ":DoTogether";
         won.WON.BasicNeedTypeDemand = won.WON.baseUri + "Critique";
         won.WON.BasicNeedTypeCritiqueCompacted = won.WON.prefix + ":Critique";
+        won.WON.belongsToNeed = won.WON.baseUri + ":belongsToNeed";
+        won.WON.belongsToNeedCompacted = won.WON.prefix + ":belongsToNeed";
         won.WON.hasBasicNeedType = won.WON.baseUri + "hasBasicNeedType";
         won.WON.hasBasicNeedTypeCompacted = won.WON.prefix + ":hasBasicNeedType";
+        won.WON.hasConnections = won.WON.baseUri + "hasConnections";
+        won.WON.hasConnectionsCompacted = won.WON.prefix + ":hasConnections";
         won.WON.hasContent = won.WON.baseUri + "hasContent";
         won.WON.hasContentCompacted = won.WON.prefix + ":hasContent";
-        won.WON.hasTag = won.WON.baseUri + "hasTag";
-        won.WON.hasTagCompacted = won.WON.prefix + ":hasTag";
-        won.WON.hasTextDescription = won.WON.baseUri + "hasTextDescription";
-        won.WON.hasTextDescriptionCompacted = won.WON.prefix + ":hasTextDescription";
         won.WON.hasEndTime = won.WON.baseUri + "hasEndTime";
         won.WON.hasEndTimeCompacted = won.WON.prefix + ":hasEndTime";
+        won.WON.hasEventContainer = won.WON.baseUri + "hasEventContainer";
+        won.WON.hasEventContainerCompacted = won.WON.prefix + ":hasEventContainer";
+        won.WON.hasOriginator = won.WON.baseUri + "hasOriginator";
+        won.WON.hasOriginatorCompacted = won.WON.prefix + ":hasOriginator";
         won.WON.hasRecurInfiniteTimes = won.WON.baseUri + "hasRecurInfiniteTimes";
         won.WON.hasRecurInfiniteTimesCompacted = won.WON.prefix + ":hasRecurInfiniteTimes";
         won.WON.hasRecursIn = won.WON.baseUri + "hasRecursIn";
         won.WON.hasRecursInCompacted = won.WON.prefix + ":hasRecurInfiniteTimes";
+        won.WON.hasScore = won.WON.baseUri + "hasScore";
+        won.WON.hasScoreCompacted = won.WON.prefix + ":hasScore";
         won.WON.hasStartTime = won.WON.baseUri + "hasStartTime";
         won.WON.hasStartTimeCompacted = won.WON.prefix + ":hasStartTime";
+        won.WON.hasTag = won.WON.baseUri + "hasTag";
+        won.WON.hasTagCompacted = won.WON.prefix + ":hasTag";
+        won.WON.hasTextDescription = won.WON.baseUri + "hasTextDescription";
+        won.WON.hasTextDescriptionCompacted = won.WON.prefix + ":hasTextDescription";
+        won.WON.hasTimeStamp = won.WON.baseUri + "hasTimeStamp"
+        won.WON.hasTimeStampCompacted = won.WON.prefix + ":hasTimeStamp";
 
 
 

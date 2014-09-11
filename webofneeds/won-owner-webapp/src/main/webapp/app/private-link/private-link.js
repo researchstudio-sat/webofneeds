@@ -8,7 +8,18 @@
 angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService) {
 
     $scope.need = {};
-    $scope.need.title = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI())['title'];
+    $scope.need = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
+    $scope.need.needURI = applicationStateService.getCurrentNeedURI();
+    $scope.need.matches = linkedDataService.getMatches($scope.need.needURI);
+
+    //
+    // $scope.need.events = linkedDataService.getAllEvents($scope.need.needURI);
+    $scope.need.events = [
+        { eventType: won.WON.HintCompacted , title:'Car sharing to Prague', datetime: new Date('2014-08-25 14:30'), msg:'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'},
+        { eventType: won.WON.PartnerOpenCompacted, title:'Moved recently ...', datetime:new Date('2014-08-20')}]
+    $scope.currentEventType = [won.WON.OwnerMessageCompacted, won.WON.PartnerMessageCompacted, won.WON.OwnerOpenCompacted, won.WON.PartnerOpenCompacted, won.WON.HintCompacted]
+
+
 
     //$scope.title = 'New Flat, Need Furniture';
     $scope.img_path = '/owner/images/thumbnail_demo.jpg';
@@ -71,6 +82,7 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
     };
 
     //Messages Options
+    /*
     $scope.messages = [
         {id:1, type: 1, typeText:'Conversation', title:'Car sharing to Prague', datetime: new Date('2014-08-25 14:30'), msg:'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'},
         {id:2, type: 2, typeText:'Incoming Request', title:'Moved recently ...', datetime:new Date('2014-08-20')},
@@ -81,7 +93,7 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         {id:7, type: 2, typeText:'Outgoing Request', title:'Let\'s grill ...', datetime:new Date('2014-06-19')},
         {id:8, type: 3, typeText:'Matches', title:'Old men\'s clothes ..', datetime:new Date('2014-02-10')}
     ];
-
+    */
     $scope.messageTypeColapsed = -1;
     $scope.conversationType0CollapseClick = function() {
         if($scope.messageTypeColapsed != 0) $scope.messageTypeColapsed = 0;
@@ -113,25 +125,45 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         else return 'fa fa-puzzle-piece fa-lg';
     };
 
-    $scope.messageFilter = function(msg) {
+    /*$scope.messageFilter = function(msg) {
         return msgFilterCriteria.indexOf(msg.type) >= 0 ? true : false;
-    }
-
-    $scope.clickOnMessageButton = function(buttonId) {
-        // configuring message filter
-        var critIndex = msgFilterCriteria.indexOf(buttonId);
-        if (critIndex == -1) {
-            msgFilterCriteria.push(buttonId);
-        } else {
-            msgFilterCriteria.splice(critIndex, 1);
-        }
-
+    } */
+    $scope.changeEventTypeButtonsDisplay = function(buttonId){
         var button = $('#' + buttonId);
         if (button.hasClass('btn-success')) {
             button.removeClass('btn-success').addClass('btn-default');
         } else {
             button.removeClass('btn-default').addClass('btn-success');
         }
+    }
+    $scope.clickOnMessageButton = function(buttonId) {
+        switch (buttonId) {
+            case 1:
+                if($scope.currentEventType.indexOf(won.WON.OwnerMessageCompacted)<1 && $scope.currentEventType.indexOf(won.WON.PartnerMessageCompacted)<1){
+                    $scope.currentEventType.push(won.WON.OwnerMessageCompacted)  ;
+                    $scope.currentEventType.push(won.WON.PartnerMessageCompacted)  ;
+                }else{
+                    $scope.currentEventType.splice($scope.currentEventType.indexOf(won.WON.OwnerMessageCompacted),1)  ;
+                    $scope.currentEventType.splice($scope.currentEventType.indexOf(won.WON.PartnerMessageCompacted),1)  ;
+                }
+                break;
+            case 2:
+                if($scope.currentEventType.indexOf(won.WON.OwnerOpenCompacted) < 1 && $scope.currentEventTypeindexOf(won.WON.PartnerOpenCompacted)<1){
+                    $scope.currentEventType.push(won.WON.OwnerOpenCompacted)  ;
+                    $scope.currentEventType.push(won.WON.PartnerOpenCompacted)  ;
+                }else{
+                    $scope.currentEventType.splice($scope.currentEventType.indexOf(won.WON.OwnerOpenCompacted),1)  ;
+                    $scope.currentEventType.splice($scope.currentEventType.indexOf(won.WON.PartnerOpenCompacted),1)  ;
+                }break;
+            case 3:
+                if($scope.currentEventType.indexOf(won.WON.HintCompacted) < 1){
+                    $scope.currentEventType.push(won.WON.HintCompacted)  ;
+                }else{
+                    $scope.currentEventType.splice($scope.currentEventType.indexOf(won.WON.HintCompacted),1)  ;
+                }
+                break;
+        }
+        $scope.changeEventTypeButtonsDisplay(buttonId);
     }
 
     $scope.conversationCollapseClick = function() {
@@ -328,6 +360,38 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
     }
 });
 
+angular.module('won.owner').filter('messageTypeFilter', function(){
+    getTypeText = function(eventType) {
+        switch (eventType) {
+            case won.WON.OwnerMessageCompacted:
+            case won.WON.PartnerMessageCompacted:
+                return 'Conversation';
+            case won.WON.OwnerOpenCompacted:
+                return 'Outgoing Request';
+            case won.WON.PartnerOpenCompacted:
+                return 'Incoming Request';
+            case won.WON.HintCompacted:
+                return 'Matches';
+        }
+    }
+
+    return function(inputArray, eventTypes){
+        var outputArray = [];
+        var filter= [won.Won.OwnerOpenCompacted, won.WON.PartnerOpenCompacted, won.WON.PartnerMessageCompacted, won.WON.OwnerMessageCompacted, won.WON.HintCompacted];
+
+        for(var i = 0; i < inputArray.length; i++) {
+            var item = inputArray[i];
+            if(filter.indexOf(item.eventType)>0){
+                item.id = i;
+                item.typeText = getTypeText(item.eventType);
+                outputArray.push(item);
+            }
+
+        }
+
+        return outputArray;
+    }
+})
 angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService, $rootScope) {
 
     $scope.close = false;
