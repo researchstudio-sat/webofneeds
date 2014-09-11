@@ -2,10 +2,14 @@ package won.protocol.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ResIterator;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -22,15 +26,17 @@ import java.util.List;
 public class WonMessageDecoder
 {
 
-  //private static final RDFNode NULL_NODE = null;
+  private static final Logger logger = LoggerFactory.getLogger(WonMessageDecoder.class);
 
   public static WonMessage decodeFromJsonLd(String message) {
     return decode(Lang.JSONLD, message);
   }
 
   public static WonMessage decode(Lang lang, String message) {
-    if (message == null || message.equals(""))
+    if (message == null || message.equals("")) {
+      logger.warn("cannot decode empty or null string to message");
       return null;
+    }
     Dataset dataset = DatasetFactory.createMem();
     StringReader sr = new StringReader(message);
     RDFDataMgr.read(dataset, sr, null, lang);

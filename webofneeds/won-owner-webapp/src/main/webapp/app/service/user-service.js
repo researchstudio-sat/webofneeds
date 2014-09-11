@@ -39,14 +39,14 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 				},
 				function(response) {
 					switch (response.status) {
-					case 409:
-						// normal error
-						return {status:"ERROR", message: "Username is already used"};
-					break;
-					default:
-						// system error
-						console.log("FATAL ERROR");
-					break;
+                        case 409:
+                            // normal error
+                            return {status:"ERROR", message: "Email address already in use."};
+                        break;
+                        default:
+                            // system error
+                            return {status:"FATAL_ERROR", message: "Unknown error occured."};
+                        break;
 					}
 				}
 			);
@@ -55,7 +55,23 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 			return $http.post(
 					'/owner/rest/users/signin',
 					user
-			)
+			).then(
+                function () {
+                    // success
+                    return {status:"OK"};
+                },
+                function (response) {
+                    switch(response.status) {
+                        case 403:
+                            // normal error
+                            return {status: "ERROR", message: "Email address not found."};
+                        default:
+                            // system error
+                            return {status:"FATAL_ERROR", message: "Unknown error occured."};
+                        break;
+                    }
+                }
+            );
 		},
 		logOut : function() { //TODO directly pass promise
 			return $http.post(

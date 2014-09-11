@@ -21,6 +21,7 @@ public class WONMSG
   private static Model m = ModelFactory.createDefaultModel();
 
 
+  // main types
   public static final Resource TYPE_CREATE = m.createResource(BASE_URI + "CreateMessage");
   public static final Resource TYPE_CONNECT = m.createResource(BASE_URI + "ConnectMessage");
   public static final Resource TYPE_NEED_STATE = m.createResource(BASE_URI + "NeedStateMessage");
@@ -28,6 +29,9 @@ public class WONMSG
   public static final Resource TYPE_CLOSE = m.createResource(BASE_URI + "CloseMessage");
   public static final Resource TYPE_CONNECTION_MESSAGE = m.createResource(BASE_URI + "ConnectionMessage");
   public static final Resource TYPE_HINT = m.createResource(BASE_URI + "HintMessage");
+
+  // notification types
+  public static final Resource TYPE_HINT_NOTIFICATION = m.createResource(BASE_URI + "HintNotificationMessage");
 
   // response types
   public static final Resource TYPE_CREATE_RESPONSE = m.createResource(BASE_URI + "CreateResponseMessage");

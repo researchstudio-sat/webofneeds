@@ -9,6 +9,7 @@ import won.protocol.vocabulary.WONMSG;
  */
 public enum WonMessageType
 {
+  // main messages
   CREATE_NEED(WONMSG.TYPE_CREATE),
   CONNECT(WONMSG.TYPE_CONNECT),
   NEED_STATE(WONMSG.TYPE_NEED_STATE),
@@ -17,9 +18,10 @@ public enum WonMessageType
   CONNECTION_MESSAGE(WONMSG.TYPE_CONNECTION_MESSAGE),
   HINT_MESSAGE(WONMSG.TYPE_HINT),
 
+  // notification messages
+  HINT_NOTIFICATION(WONMSG.TYPE_HINT_NOTIFICATION),
 
   // response messages
-
   CREATE_RESPONSE(WONMSG.TYPE_CREATE_RESPONSE),
   CONNECT_RESPONSE(WONMSG.TYPE_CONNECT_RESPONSE),
   NEED_STATE_RESPONSE(WONMSG.TYPE_NEED_STATE_RESPONSE),
@@ -71,6 +73,9 @@ public enum WonMessageType
     if (WONMSG.TYPE_CONNECTION_MESSAGE_RESPONSE.equals(resource))
       return CONNECT_RESPONSE;
 
+    //notification classes
+    if (WONMSG.TYPE_HINT_NOTIFICATION.equals(resource))
+      return HINT_NOTIFICATION;
     return null;
   }
 
