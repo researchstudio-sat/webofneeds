@@ -16,6 +16,7 @@
 
 package won.protocol.service;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
@@ -59,10 +60,9 @@ public interface LinkedDataService
    * @return
    * @throws NoSuchConnectionException
    */
-
-  public Model getNodeModel();
   public Model getConnectionModel(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException;
 
+  public Model getNodeModel();
 
   /**
    * Returns a model containing all connection uris belonging to the specified need.
@@ -75,4 +75,12 @@ public interface LinkedDataService
   public Model listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException;
 
   Model getEventModel(URI eventURI);
+
+
+  /**
+   * returns a dataset of the (message) event with the specified URI
+   * @param eventURI
+   */
+  public Dataset getEventDataset(final URI eventURI);
+
 }

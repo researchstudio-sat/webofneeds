@@ -17,6 +17,7 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -25,20 +26,26 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
+import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
+import won.protocol.repository.MessageEventRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
-import won.protocol.util.*;
+import won.protocol.util.ConnectionModelMapper;
+import won.protocol.util.DateTimeUtils;
+import won.protocol.util.DefaultPrefixUtils;
+import won.protocol.util.NeedModelMapper;
 import won.protocol.vocabulary.LDP;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -64,6 +71,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   @Autowired
   private RDFStorageService rdfStorage;
+  @Autowired
+  private MessageEventRepository messageEventRepository;
 
   //TODO: used to access/create event URIs for connection model rendering. Could be removed if events knew their URIs.
   private URIService uriService;
@@ -137,8 +146,17 @@ public class LinkedDataServiceImpl implements LinkedDataService
   {
     Need need = needInformationService.readNeed(needUri);
 
-    // load the model from storage
-    Model model = rdfStorage.loadModel(need.getNeedURI());
+    // load the dataset from storage
+    Dataset dataset = rdfStorage.loadDataset(need.getNeedURI());
+
+    // with the old messaging system the model is stored as default model in the dataset
+    // with the new messaging system the triples are stored as named graphs
+    // therefore we merge all together to one model
+    Model model = dataset.getDefaultModel();
+    Iterator<String> i = dataset.listNames();
+    while (i.hasNext()) {
+      model.add(dataset.getNamedModel(i.next()));
+    }
     setNsPrefixes(model);
 
     Model needModel = needModelMapper.toModel(need);
@@ -151,6 +169,19 @@ public class LinkedDataServiceImpl implements LinkedDataService
     // add connections
     Resource connectionsContainer = model.createResource(need.getNeedURI().toString() + "/connections/");
     model.add(model.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
+
+    // add need event container
+    Resource needEventContainer = model.createResource(WON.EVENT_CONTAINER);
+    model.add(model.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
+
+    // add need event URIs
+    List<MessageEventPlaceholder> messageEvents = messageEventRepository.findByParentURI(needUri);
+    for (MessageEventPlaceholder messageEvent : messageEvents) {
+      model.add(model.createStatement(needEventContainer,
+                                      RDFS.member,
+                                      model.getResource(messageEvent.getMessageURI().toString())));
+    }
+
     // add WON node link
     needResource.addProperty(WON.HAS_WON_NODE, model.createResource(this.resourceURIPrefix));
 
@@ -218,7 +249,15 @@ public class LinkedDataServiceImpl implements LinkedDataService
       connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
       connectionResource.addProperty(WON.HAS_REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
       addAdditionalData(model, connection.getConnectionURI(), connectionResource);
-  
+
+      // add the events with the new format (only the URI, no content)
+      List<MessageEventPlaceholder> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
+      for (MessageEventPlaceholder event : connectionEvents) {
+        model.add(model.createStatement(eventContainer,
+                                        RDFS.member,
+                                        model.getResource(event.getMessageURI().toString())));
+      }
+
       //add event members and attach them
       for (ConnectionEvent e : events) {
         Resource eventMember = model.createResource(this.uriService.createEventURI(connection,e).toString(),WON.toResource(e.getType()));
@@ -262,6 +301,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     addAdditionalData(model, eventURI, eventMember);
     return model;
+  }
+
+  public Dataset getEventDataset(URI eventURI) {
+    return rdfStorage.loadDataset(eventURI);
   }
 
   private void addAdditionalData(final Model model, URI resourceToLoad, final Resource targetResource) {
