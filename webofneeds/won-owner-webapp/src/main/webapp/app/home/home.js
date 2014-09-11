@@ -258,15 +258,15 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
 
 	$scope.error = '';
 
-
-	onLoginResponse = function(result) {
-		if (result.status == 'OK') {
+	onLoginResponse = function(response) {
+		if (response.status == "OK") {
 			userService.setAuth($scope.username);
 			$location.path('/');
-
+		} else if (response.status == "ERROR") {
+			$scope.error = response.message;
 		} else {
-			$scope.error = result.message;
-		}
+            console.log(response.messsage);
+        }
 	}
 
 	$scope.onClickSignIn = function () {
@@ -275,8 +275,6 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
 			userService.logIn($scope.user).then(onLoginResponse);
 		}
 	}
-
-
 });
 
 angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route, $window, $location, userService) {
@@ -300,92 +298,29 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
     $scope.registered = false;
     $scope.mail_s = false;
 
-    onRegisterSuccessful = function(response) {
-        /*        console.log("FOOOOOO");
-         console.log(result);*/
-        //if (response.status == "OK") {
-        console.log("TEST OK got asdfdfajif;");
-
-        $scope.error = '';
-        $scope.success = '';
-
-        angular.resetForm($scope, "registerForm");
-        //	$scope.success = 'You\'ve
-        // been successfully registered. Please try to Sign in';
-        $scope.registered = true;
-
-        //TODO causes digest already in progress error:
-        userService.logIn($scope.registerUser).then(onLoginSuccessful, onLoginError);
-        /*$scope.$apply(function () {
-         userService.logIn($scope.registerUser).then(onLoginResponse);
-         });*/
-
-
-        //$scope.registerUser.reset();
-        //$location.path("/");
-        console.log("End of onRegister 4099uqgjfakl");
-    };
-
-    onRegisterError = function (response) {
-        $scope.error = response.message;
-
-        switch (response.status) {
-            case 403:
-                // normal error
-                alert(response.message);
-                break;
-            default:
-                // system error
-                console.log("FATAL ERROR while registering " , response.status, " - q3afujjsdafl");
-                console.log(response);
-                alert("Couldn't sign up at the moment. Please try again later.");
-                //TODO alert's a dirty hack to notify the user
-                break;
-        }
-    }
-
-//					registering:
-//                  case 409:
-//						// normal error
-//						return {status:"ERROR", message: "Username is already used"};
-                    /* logging in:
-					switch (response.status) {
-						case 403:
-							// normal error
-							return {status:"ERROR", message:"Bad username or password"};
-			);*/
-
-    onLoginSuccessful = function(result) {
-        //if (result.status == 'OK') {
+    onLoginSuccessful = function() {
         userService.setAuth($scope.username);
         $window.location.href = '/owner';
 
     }
+
     onLoginError = function(response) {
-        $scope.error = result.message;
-        console.log("LOGIN ERROR q509qriafjlkj");
-        console.log(response);
+        $scope.error = response.message;
     }
 
-    /*.then(
-     function () {
-     return {status:"OK", message: "Successful"};
-     },
-     function (response) {
-     switch (response.status) {
-     case 403:
-     // normal error
-     return {status:"ERROR", message:"Bad username or password"};
-     break;
-     default:
-     // system error
-     var msg = "FATAL ERROR during login";
-     console.log(msg);
-     return {status:"ERROR", message: msg};
-     break;
-     }
-     }
-     );*/
+    onRegisterResponse = function(response) {
+        if (response.status == "OK") {
+            $scope.error = '';
+            $scope.success = '';
+            angular.resetForm($scope, "registerForm");
+            $scope.registered = true;
+            userService.logIn($scope.registerUser).then(onLoginSuccessful, onLoginError);
+        } else if (response.status == "ERROR") {
+            $scope.error = response.message;
+        } else {
+            console.log(response.messsage);
+        }
+    }
 
 	$scope.onClickRegister = function () {
 		var validPass = true;
@@ -404,7 +339,7 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
 //			userService.registerUser($scope.registerUser)
 //                .success(onRegisterSuccessful)
 //                .error(onRegisterError);
-            userService.registerUser($scope.registerUser).then(onRegisterSuccessful, onRegisterError);
+            userService.registerUser($scope.registerUser).then(onRegisterResponse);
 		}
 	}
 
