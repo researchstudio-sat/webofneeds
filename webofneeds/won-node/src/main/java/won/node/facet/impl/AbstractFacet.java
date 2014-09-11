@@ -311,15 +311,15 @@ public abstract class AbstractFacet implements Facet
 
     try {
       WonMessageBuilder builder = new WonMessageBuilder();
-      // ToDo (FS): when merged with new URIService replace message URI and content URI with proper one
+      URI messageURI = URIService.createMessageEventURI(con.getConnectionURI());
       final WonMessage hintNotification = builder
-        .setMessageURI(URI.create("http://will.be.replaced.soon"))
+        .setMessageURI(messageURI)
         .setWonMessageType(WonMessageType.HINT_NOTIFICATION)
         .setSenderNodeURI(originator) // ToDo (FS): get matcher ID from wonMessage when we can rely on a wonMessage being there
         .setReceiverURI(con.getConnectionURI())
         .setReceiverNeedURI(con.getNeedURI())
-        .setReceiverNodeURI(URI.create("http://not.yet.available")) // ToDo (FS): should be the WON node; add when available through wonMessage
-        .addContent(URI.create("http://will.be.replaced.soon"), remoteFacetModel, null)
+        .setReceiverNodeURI(URI.create(URIService.getGeneralURIPrefix()))
+        .addContent(URI.create(messageURI.toString() + "/content"), remoteFacetModel, null)
         .build();
 
       executorService.execute(new Runnable()

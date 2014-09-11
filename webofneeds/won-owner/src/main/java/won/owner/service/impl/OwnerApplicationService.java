@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import won.cryptography.service.RandomNumberService;
 import won.owner.service.OwnerApplicationServiceCallback;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.exception.MultipleQueryResultsFoundException;
@@ -16,7 +17,10 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.*;
+import won.protocol.model.ChatMessage;
+import won.protocol.model.Connection;
+import won.protocol.model.FacetType;
+import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -58,6 +62,9 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
   @Autowired
   private Executor executor;
+
+  @Autowired
+  private RandomNumberService randomNumberService;
 
   final private Map<URI, WonMessage> wonMessageMap = new HashMap<>();
 
@@ -282,11 +289,10 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   private void sendBackResponseMessageToClient(WonMessage wonMessage, Resource responseType) {
 
     try {
-      URI responseMessageURI = null;
-
-      responseMessageURI = URI
-        .create(
-          "http://example.com/responseMessage/837ddj");//new URI(WONMSG.getGraphURI(msgURI.toString()).toString());
+      URI responseMessageURI = URI.create(wonMessage.getMessageEvent().getSenderNeedURI().toString() +
+                                            "/event/" +
+                                            randomNumberService
+                                              .generateRandomString(9));
 
       WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
       WonMessage responseWonMessage = wonMessageBuilder
