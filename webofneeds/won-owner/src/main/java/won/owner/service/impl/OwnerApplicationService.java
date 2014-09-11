@@ -16,10 +16,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.ChatMessage;
-import won.protocol.model.Connection;
-import won.protocol.model.FacetType;
-import won.protocol.model.Match;
+import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
@@ -93,7 +90,15 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         // get the active status
         boolean active = false;
         try {
-          active = WonRdfUtils.NeedUtils.queryActiveStatus(messageContent);
+          switch (WonRdfUtils.NeedUtils.queryActiveStatus(
+            messageContent, wonMessage.getMessageEvent().getSenderNeedURI())) {
+            case ACTIVE:
+              active = true;
+              break;
+            case INACTIVE:
+              active = false;
+              break;
+          }
         } catch (MultipleQueryResultsFoundException e) {
           logger.warn("caught MultipleOwnersFoundException:", e);
         }

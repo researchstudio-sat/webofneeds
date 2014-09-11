@@ -89,12 +89,12 @@ public class MessageEventMapper implements ModelMapper<MessageEvent>
           model.createResource(externalRef.toString()));
       }
 
-      // create signatures
-      for (URI uriOfSignedGraph : messageEvent.getSignatures().keySet()) {
-        // add signature model triples to event triples
-        RdfUtils.addAllStatements(model, messageEvent.getSignatures().get(uriOfSignedGraph));
-        RdfUtils.addPrefixMapping(model, messageEvent.getSignatures().get(uriOfSignedGraph));
-      }
+//      // create signatures
+//      for (URI uriOfSignedGraph : messageEvent.getSignatures().keySet()) {
+//        // add signature model triples to event triples
+//        RdfUtils.addAllStatements(model, messageEvent.getSignatures().get(uriOfSignedGraph));
+//        RdfUtils.addPrefixMapping(model, messageEvent.getSignatures().get(uriOfSignedGraph));
+//      }
 
       return model;
     }

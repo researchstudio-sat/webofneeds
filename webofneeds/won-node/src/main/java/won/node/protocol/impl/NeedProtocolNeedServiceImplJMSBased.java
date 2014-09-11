@@ -54,18 +54,19 @@ public class NeedProtocolNeedServiceImplJMSBased
     throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
     logger.debug("NODE2: connect received for need {], otherNeed{},connectionURI {}, content {}");
+
     URI needURIConvert = URI.create(needURI);
     URI otherNeedURIConvert = URI.create(otherNeedURI);
     URI otherConnectionURIConvert = URI.create(otherConnectionURI);
     Model contentConvert = RdfUtils.toModel(content);
     WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
-
     return this.delegate.connect(
-            needURIConvert,
-            otherNeedURIConvert,
-            otherConnectionURIConvert,
-            contentConvert,
-            wonMessage);
+      needURIConvert,
+      otherNeedURIConvert,
+      otherConnectionURIConvert,
+      contentConvert,
+      wonMessage);
+
   }
 
   public void open(
@@ -74,12 +75,13 @@ public class NeedProtocolNeedServiceImplJMSBased
           @Header("wonMessage") String wonMessageString)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
 
-    logger.debug("NODE2: open received for need {], otherNeed{},connectionURI {}, content {}");
+    logger.debug("NODE2: open received for need {}, otherNeed{},connectionURI {}, content {}");
+
     URI connectionURIConvert = URI.create(connectionURI);
     Model contentConvert = RdfUtils.toModel(content);
     WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
-
     delegate.open(connectionURIConvert, contentConvert, wonMessage);
+
   }
 
   public void close(
@@ -89,10 +91,10 @@ public class NeedProtocolNeedServiceImplJMSBased
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
     logger.debug("NODE2: close received for need {], otherNeed{},connectionURI {}, content {}");
+
     URI connectionURIConvert = URI.create(connectionURI);
     Model contentConvert = RdfUtils.toModel(content);
     WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
-
     delegate.close(connectionURIConvert, contentConvert, wonMessage);
   }
 
@@ -103,10 +105,10 @@ public class NeedProtocolNeedServiceImplJMSBased
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
     logger.debug("NODE2: text message received for connection {], message {}", connectionURI, message);
+
     URI connectionURIConvert = URI.create(connectionURI);
     Model messageConvert = RdfUtils.toModel(message);
     WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
-
     delegate.sendMessage(connectionURIConvert, messageConvert, wonMessage);
   }
 

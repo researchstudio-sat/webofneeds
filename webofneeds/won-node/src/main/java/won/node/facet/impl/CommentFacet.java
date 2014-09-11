@@ -38,6 +38,7 @@ public class CommentFacet extends AbstractFacet
 
 
     super.connectFromNeed(con, content, wonMessage);
+    // ToDo (FS): not sure how to adapt this step to the new wonMessage format
     addLinkedDataStatements(con, content);
     // Model content = rdfStorageService.loadModel(con.getNeedURI());
 

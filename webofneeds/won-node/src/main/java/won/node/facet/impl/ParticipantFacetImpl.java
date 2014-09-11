@@ -55,8 +55,9 @@ public class ParticipantFacetImpl extends AbstractFacet
           // For now, we call the close method as if it had been called from the owner side
           // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
           try {
+            // ToDo (FS): create close wonMessage
             ownerFacingConnectionCommunicationService.close(
-                    connectionForRunnable.getConnectionURI(), content, wonMessage);
+                    connectionForRunnable.getConnectionURI(), content, null);
           } catch (NoSuchConnectionException e1) {
             logger.warn("caught NoSuchConnectionException:", e1);
           } catch (IllegalMessageForConnectionStateException e1) {

@@ -258,16 +258,18 @@
 		<div class="col-md-5 col-md-offset-4">
 			<div class="well">
 				<fieldset>
+                    <!--
 					<div class="alert alert-danger" ng-show="error.length > 0">
 						{{ error }}
 					</div>
+					-->
 					<div class="form-group">
 						<div class="col-md-12">
                             <label for="signUsername">Username</label>
                             <input type="email" class="form-control" name="signUsername" id="signUsername" ng-model="user.username"
                                        placeholder="Username" required>
                             <!--TODO put in reg form in login form crosses in input fields from http://getbootstrap.com/css/-->
-                            <span class="label label-warning" ng-show="signInForm.signUsername.$invalid">Please write valid email address</span>
+                            <span class="label label-warning" ng-show="signInForm.signUsername.$invalid && !signInForm.signUsername.$pristine">Please write valid email address</span>
                             <span class="label label-warning" ng-show="error.length > 0">{{error}}</span>
 						</div>
 					</div>
@@ -376,7 +378,7 @@
                                     <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-remove-circle"/></button>
                                 </span>         -->
 
-                            <span class="label label-warning" ng-show="registerForm.registerUsername.$invalid">Please write valid email address</span>
+                            <span class="label label-warning" ng-show="registerForm.registerUsername.$invalid && !registerForm.registerUsername.$pristine">Please write valid email address</span>
                             <span class="label label-warning" ng-show="error.length > 0">{{error}}</span>
                         </div>
                     </div>

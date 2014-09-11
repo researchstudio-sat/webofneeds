@@ -16,7 +16,6 @@
 
 package won.node.protocol.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -135,16 +134,36 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     @Transactional(propagation = Propagation.SUPPORTS)
     public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
-        List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
-        if(cons.size()!=0){
+
+      // distinguish between the new message format (WonMessage) and the old parameters
+      // ToDo (FS): remove this distinction if the old parameters are not used anymore
+      if (wonMessage != null) {
+
+        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
+
+        List<Connection> cons = connectionRepository.findByConnectionURI(connectionURIFromWonMessage);
+        if (cons.size() != 0) {
           Connection con = cons.get(0);
           List<Need> needs = needRepository.findByNeedURI(con.getNeedURI());
 
           if (needs.get(0).getState() != NeedState.ACTIVE)
-            throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(),"open",needs.get(0).getState());
+            throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(), "open", needs.get(0).getState());
+        }
+
+        this.connectionCommunicationService.open(connectionURIFromWonMessage, content, wonMessage);
+
+      } else {
+        List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
+        if (cons.size() != 0) {
+          Connection con = cons.get(0);
+          List<Need> needs = needRepository.findByNeedURI(con.getNeedURI());
+
+          if (needs.get(0).getState() != NeedState.ACTIVE)
+            throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(), "open", needs.get(0).getState());
         }
 
         this.connectionCommunicationService.open(connectionURI, content, wonMessage);
+      }
     }
 
     @Override
