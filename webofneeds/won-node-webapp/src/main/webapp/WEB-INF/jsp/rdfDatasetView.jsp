@@ -1,6 +1,9 @@
 <%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
 <%@ page import="java.io.StringWriter" %>
 <%@ page import="org.springframework.web.util.HtmlUtils" %>
+<%@ page import="com.hp.hpl.jena.query.Dataset" %>
+<%@ page import="org.apache.jena.riot.RDFDataMgr" %>
+<%@ page import="org.apache.jena.riot.RDFFormat" %>
 <%--
 ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
 ~
@@ -38,9 +41,9 @@
     <div style="background-color:#C9C9E0">
     <pre>
 <%
-        Model model = (Model) request.getAttribute("rdfModel");
+        Dataset dataset = (Dataset) request.getAttribute("rdfDataset");
         StringWriter stringWriter = new StringWriter();
-        model.write(stringWriter,"TURTLE");
+        RDFDataMgr.write(stringWriter, dataset, RDFFormat.TRIG.getLang());
         //String escapedTurtle = HtmlUtils.htmlEscape(stringWriter.toString());
         String htmlTurtle = stringWriter.toString().replaceAll("<([^>]+)>","<a href=\"$1\">&lt;$1&gt;</a>");
         out.print(htmlTurtle);
