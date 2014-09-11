@@ -16,6 +16,8 @@
 
 angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService) {
 
+    $scope.allNeeds = applicationStateService.getAllNeeds();
+
 	$scope.isActive = function(where) {
 		if ($location.path().indexOf(where) > -1) {
 			return 'active';

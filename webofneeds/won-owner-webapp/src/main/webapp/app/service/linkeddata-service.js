@@ -171,6 +171,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             resultObject.connection = getSafeValue(result.connection);
             resultObject.event = getSafeValue(result.event);
             resultObject.eventType = getSafeValue(result.eventType);
+            resultObject.needURI = uri;
             resultObject.otherNeedURI = getSafeValue(result.otherNeedURI);
             resultObject.timeStamp = getSafeValue(result.timeStamp);
             resultObject.originator = getSafeValue(result.originator);
