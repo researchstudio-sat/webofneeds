@@ -29,7 +29,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
      * @param eventData event object that is passed as additional argument to $rootScope.$broadcast.
      * @param message the complete message data as received from the WoN node.
      */
-    processHintMessage = function(eventData, message) {
+    processHintNotificationMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
         var connectionURI = eventData.receiverURI;
         linkedDataService.ensureLoaded(connectionURI);
@@ -42,7 +42,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
 
     //mapping between message type and eventType/handler combination
     messageTypeToEventType = {};
-    messageTypeToEventType[won.WONMSG.hintMessage] = {eventType: won.EVENT.HINT_RECEIVED, handler:wonService.processHintMessage};
+    messageTypeToEventType[won.WONMSG.hintNotificationMessage] = {eventType: won.EVENT.HINT_RECEIVED, handler:wonService.processHintNotificationMessage};
     messageTypeToEventType[won.WONMSG.connectMessage] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:null};
     messageTypeToEventType[won.WONMSG.openMessage] = {eventType: won.EVENT.OPEN_RECEIVED, handler:null};
     messageTypeToEventType[won.WONMSG.closeMessage] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:null};
@@ -53,14 +53,14 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
     createIncomingMessageCallback = function() {
         var incomingMessageHandler = new messageService.MessageCallback(
             function (event, msg) {
-                console.log("in newMatchesCallback-Action");
+                console.log("processing incoming message");
                 var eventType = messageTypeToEventType[event.messageType].eventType;
                 var handler = messageTypeToEventType[event.messageType].handler;
                 //only do something if a type/handler combination is registered
                 if (eventType != null) {
                     event.eventType = eventType;
                     //store event in local triple store
-                    linkedDataService.saveJsonGraph(event.eventURI, msg);
+                    linkedDataService.storeJsonLdGraph(event.eventURI, msg);
                     //call handler if there is one - it may modify the event object
                     if (handler != null) {
                         handler(event, msg);

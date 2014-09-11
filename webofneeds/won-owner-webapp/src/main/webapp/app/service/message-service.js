@@ -131,7 +131,6 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
                 var event = getEventData(jsonld);
                 //call all registered callbacks
                 console.log("SockJS message is of type " + event.messageType + ", starting to process callbacks");
-                var callbacksToKeep = [];
                 for (var i = 0; i < privateData.callbacks.length; i++) {
                     console.log("processing messaging callback " + (i + 1) + " of " + privateData.callbacks.length);
                     try {
@@ -139,15 +138,21 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
                         var myEvent = JSON.parse(JSON.stringify(event));
                         var callback = privateData.callbacks[i];
                         callback.handleMessage(myEvent, myJsonld);
-                        if (!callback.shouldUnregister(myEvent, myJsonld)) {
-                            callbacksToKeep.push(callback);
+                    } catch(e) {
+                        console.log("error processing messaging callback " + i + ": " + e);
+                    }
+                    try {
+                        if (callback.shouldUnregister(myEvent, myJsonld)) {
+                            //delete current callback from array
+                            privateData.callbacks.splice(i,1);
+                            i--;
                         }
                     } catch (e) {
-                        console.log("error processing messaging callback " + i + ", ignoring");
+                        console.log("error while deciding whether to unregister callback " + i + ": "+ e);
                     }
-                    console.log("done processing callback ")
+                    console.log("done processing callback ");
                 }
-                privateData.callbacks = callbacksToKeep;
+                console.log("done processing all callbacks ");
             });
         };
 
