@@ -28,6 +28,11 @@
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-cryptography</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- messaging stuff -->
         <dependency>
             <groupId>com.google.guava</groupId>

@@ -111,8 +111,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
       // the dataset which contains the need model graphs from the owner application
       Dataset needContent = wonMessage.getMessageContent();
 
-      wonMessage.getMessageEvent().getReceiverNeedURI();
-
       URI needURI = getNeedURIFromWonMessage(needContent);
 
       if (!needURI.equals(wonMessage.getMessageEvent().getSenderNeedURI()))

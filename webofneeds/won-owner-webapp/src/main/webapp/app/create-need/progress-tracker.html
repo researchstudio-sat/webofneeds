@@ -30,17 +30,17 @@
                             <li class="centered-text" ng-show="!showPublic(1)">
                                 <a href="" ng-click="jumpToStep({num:1})">Step 1<br>Basic Description</a>
                             </li>
-                            <li class="active centered-text" ng-show="showPublic(2)">
-                                <a href="" ng-click="jumpToStep({num:2})">Step 2<br>Additional Data</a>
+                            <li class="active centered-text" ng-show="showPublic(2)" ng-class="navStep2Disabled">
+                                <a href="" ng-click="navStep2Disabled || jumpToStep({num:2})">Step 2<br>Additional Data</a>
                             </li>
-                            <li class="centered-text" ng-show="!showPublic(2)">
-                                <a href="" ng-click="jumpToStep({num:2})">Step 2<br>Additional Data</a>
+                            <li class="centered-text" ng-show="!showPublic(2)" ng-class="navStep2Disabled">
+                                <a href="" ng-click="navStep2Disabled || jumpToStep({num:2})">Step 2<br>Additional Data</a>
                             </li>
-                            <li class="active centered-text" ng-show="showPublic(3)">
-                                <a href="" ng-click="jumpToStep({num:3})">Step 3<br>Preview</a>
+                            <li class="active centered-text" ng-show="showPublic(3)" ng-class="navStep2Disabled || navStep3Disabled">
+                                <a href="" ng-click="navStep2Disabled || navStep3Disabled || jumpToStep({num:3})">Step 3<br>Preview</a>
                             </li>
-                            <li class="centered-text" ng-show="!showPublic(3)">
-                                <a href="" ng-click="jumpToStep({num:3})">Step 3<br>Preview</a>
+                            <li class="centered-text" ng-show="!showPublic(3)" ng-class="navStep2Disabled || navStep3Disabled">
+                                <a href="" ng-click="navStep2Disabled || navStep3Disabled || jumpToStep({num:3})">Step 3<br>Preview</a>
                             </li>
                         </ul>
                     </div><!-- /.navbar-collapse -->
