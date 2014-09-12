@@ -48,9 +48,12 @@
                     <div class="row col-lg-12 text-center">
                         <!--<div class="panel panel-default"> -->
                             <div class="btn-group">
-                                <button id="1" ng-click="clickOnMessageButton(1)" type="button" class="btn btn-success"><img src="/owner/images/conversations.svg">Conversations</button>
-                                <button id="2" ng-click="clickOnMessageButton(2)" type="button" class="btn btn-success"><img src="/owner/images/requests.svg">Requests</button>
-                                <button id="3" ng-click="clickOnMessageButton(3)" type="button" class="btn btn-success"><img src="/owner/images/matches.svg">Matches</button>
+                                <button id="1" ng-click="clickOnMessageButton(1)" type="button"
+                                        class="btn btn-success"><img src="/owner/images/conversations.svg">Conversations</button>
+                                <button id="2" ng-click="clickOnMessageButton(2)" type="button"
+                                        class="btn btn-success"><img src="/owner/images/requests.svg">Requests</button>
+                                <button id="3" ng-click="clickOnMessageButton(3)" type="button"
+                                        class="btn btn-success"><img src="/owner/images/matches.svg">Matches</button>
                             </div>
                             <table st-table="messages" class="table table-bordered table-striped">
                                 <thead>
@@ -67,13 +70,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="message in messages | filter: messageFilter">
+                                    <tr
+                                            ng-repeat="event in need.events | messageTypeFilter:currentEventType ">
                                         <td>
-                                            <span style="display: none;">{{message.typeText}}</span>
-                                            <i ng-class="getIconClass(message.typeText)" tooltip="{{message.typeText}}"/>
+                                            <span style="display: none;">{{event.typeText}}</span>
+                                            <i ng-class="getIconClass(event.typeText)" tooltip="{{event.typeText}}"/>
                                         </td>
-                                        <td><a style="font-weight:bold;" href="" ng-click="clickOnTitle(message.id)">{{message.title}}</a></td>
-                                        <td>{{message.datetime | date}}</td>
+                                        <td><a style="font-weight:bold;" href="" ng-click="clickOnTitle(event.id)">{{event
+                                            .title}}</a></td>
+                                        <td>{{event.timeStamp | date}}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -99,7 +104,8 @@
                                     <td>
                                         <div class="row col-lg-3">
                                             <img src="/owner/images/house.gif" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.datetime | date}}</br>{{chosenMessage.datetime | date:'HH:mm'}} <!--TODO put here time-->
+                                            </br>{{chosenMessage.timeStamp}}</br>{{chosenMessage.timeStamp |
+                                            date:'HH:mm'}} <!--TODO put here time-->
                                         </div>
                                         <p class="row col-lg-9 text-justify">
                                             {{chosenMessage.msg}}
@@ -113,7 +119,7 @@
                                         </p>
                                         <div class="row col-lg-1">
                                             <img src="/owner/images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.datetime | date}}</br>{{chosenMessage.datetime | date:'HH:mm'}} <!--TODO put here time-->
+                                            </br>{{chosenMessage.timeStamp}}</br>{{chosenMessage.timeStamp}} <!--TODO put here time-->
                                         </div>
                                     </td>
                                 </tr>
@@ -325,7 +331,7 @@
                                 <div class="row">
                                     <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
                                     <h3 class="panel-title col-md-9">New match found!</h3>
-                                    <div class="col-md-2">{{chosenMessage.datetime | date}}</div>
+                                    <div class="col-md-2">{{chosenMessage.timeStamp | date}}</div>
                                 </div>
                             </div>
 
@@ -335,12 +341,8 @@
                                     <div class="media-body">
                                         <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.title}}</a>
                                         <p class="text-justify">
-                                            Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
-                                            Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
-                                            pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
-                                            Pellentesque sollicitudin nec sem ut porttitor eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
-                                            pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
-                                            Pellentesque sollicitudin nec sem ut porttitor (<a href="#/post-detail/">go to full description</a>).
+                                            {{chosenMessage.otherNeed.textDescription}} (<a href="#/post-detail/">go to
+                                            full description</a>).
                                             <!-- TODO link needs to be extended by parameters -->
                                         </p>
                                     </div>
@@ -351,7 +353,7 @@
                                 </div>
 
                                 <div class="row col-lg-12">
-                                    <p class="pull-left">Please reate how good this match is so we can provide you the best possible matches:<p>
+                                    <p class="pull-left">Please rate how good this match is so we can provide you the best possible matches:<p>
                                 </div>
 
                                 <div class="row col-lg-12">

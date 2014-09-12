@@ -125,11 +125,11 @@ public class
   public String showNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
     try {
       URI needURI = uriService.createNeedURIForId(identifier);
-      com.hp.hpl.jena.rdf.model.Model rdfModel = linkedDataService.getNeedModel(needURI);
-      model.addAttribute("rdfModel", rdfModel);
+      Dataset rdfDataset = linkedDataService.getNeedDataset(needURI);
+      model.addAttribute("rdfDataset", rdfDataset);
       model.addAttribute("resourceURI", needURI.toString());
       model.addAttribute("dataURI", uriService.toDataURIIfPossible(needURI).toString());
-      return "rdfModelView";
+      return "rdfDatasetView";
     } catch (NoSuchNeedException e) {
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
@@ -386,19 +386,22 @@ public class
   @RequestMapping(
       value="${uri.path.data.need}/{identifier}",
       method = RequestMethod.GET,
-      produces={"application/rdf+xml","application/x-turtle","text/turtle","text/rdf+n3","application/json","application/ld+json"})
-  public ResponseEntity<com.hp.hpl.jena.rdf.model.Model> readNeed(
+      produces={"application/rdf+xml","application/x-turtle",
+                "text/turtle","text/rdf+n3",
+                "application/json","application/ld+json",
+                "application/trig"})
+  public ResponseEntity<Dataset> readNeed(
       HttpServletRequest request,
       @PathVariable(value="identifier") String identifier) {
     logger.debug("readNeed() called");
     URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
     try {
-      com.hp.hpl.jena.rdf.model.Model model = linkedDataService.getNeedModel(needUri);
+      Dataset dataset = linkedDataService.getNeedDataset(needUri);
       //TODO: need information does change over time. The immutable need information should never expire, the mutable should
       HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), needUri));
-      return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(model, headers, HttpStatus.OK);
+      return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
     } catch (NoSuchNeedException e) {
-      return new ResponseEntity<com.hp.hpl.jena.rdf.model.Model>(HttpStatus.NOT_FOUND);
+      return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
     }
 
   }

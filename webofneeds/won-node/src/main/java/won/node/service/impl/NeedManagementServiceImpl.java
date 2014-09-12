@@ -140,8 +140,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
       // remove connection container if the create message contains already one (or some)
       WonRdfUtils.NeedUtils.removeConnectionContainer(needContent, needURI);
 
-      rdfStorage.storeDataset(needURI, needContent);
-
+      //rdfStorage.storeDataset(needURI, needContent);
+      rdfStorage.storeModel(needURI, content);
       authorizeOwnerApplicationForNeed(ownerApplicationID, need);
 
       // ToDo (FS): send the same wonMessage or create a new one (with new type)?

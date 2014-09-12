@@ -14,7 +14,31 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService) {
+angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService, linkedDataService, applicationStateService, $filter, $interval) {
+    $scope.eventNotifications =  [];
+    $scope.fetchNotifications = function(){
+        $scope.eventNotifications = applicationStateService.fetchUnreadEventsForAllNeeds();
+        return $scope.eventNotifications;
+    }
+    $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
+        $scope.eventNotifications = $scope.fetchNotifications();
+    });
+    $scope.$on(won.EVENT.NEED_CREATED, function(ngEvent, eventData) {
+        $scope.eventNotifications = $scope.fetchNotifications();
+    });
+
+    $scope.allNeeds = applicationStateService.getAllNeeds();
+
+
+    $scope.notificationRefreshInterval = 1000;
+
+
+
+    var p = $interval($scope.fetchNotifications(),$scope.notificationRefreshInterval);
+    p.then(function(value){
+        console.log('interval: ', value);
+        $scope.$digest();
+    });
 
 	$scope.isActive = function(where) {
 		if ($location.path().indexOf(where) > -1) {

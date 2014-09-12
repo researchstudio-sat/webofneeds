@@ -55,6 +55,14 @@ public interface LinkedDataService
   public Model getNeedModel(final URI needUri) throws NoSuchNeedException;
 
   /**
+   * Returns a dataset describing the need with the specified URI.
+   * @param needUri
+   * @return
+   * @throws NoSuchNeedException
+   */
+  public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException;
+
+  /**
    * Returns a model describing the connection with the specified URI.
    * @param connectionUri
    * @return
