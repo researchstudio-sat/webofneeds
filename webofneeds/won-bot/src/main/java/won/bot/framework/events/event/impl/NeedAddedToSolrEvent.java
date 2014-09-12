@@ -16,7 +16,6 @@
 
 package won.bot.framework.events.event.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.event.BaseNeedSpecificEvent;
 
 import java.net.URI;
@@ -26,19 +25,8 @@ import java.net.URI;
  */
 public class NeedAddedToSolrEvent extends BaseNeedSpecificEvent
 {
-
-  private final Model needModel;
-
-  public NeedAddedToSolrEvent(final URI needURI, final Model needModel) {
+   public NeedAddedToSolrEvent(final URI needURI) {
     super(needURI);
-    this.needModel = needModel;
-
   }
-
-  public Model getNeedModel()
-  {
-    return needModel;
-  }
-
 
 }

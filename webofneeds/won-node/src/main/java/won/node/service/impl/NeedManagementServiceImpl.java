@@ -145,7 +145,20 @@ public class NeedManagementServiceImpl implements NeedManagementService
       authorizeOwnerApplicationForNeed(ownerApplicationID, need);
 
       // ToDo (FS): send the same wonMessage or create a new one (with new type)?
-      matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(), wonMessage);
+
+      WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+      WonMessage newNeedNotificationMessage = null;
+      try {
+        newNeedNotificationMessage = wonMessageBuilder
+          .setWonMessageType(WonMessageType.NEED_CREATED_NOTIFICATION)
+          .setMessageURI(uriService.createMessageEventURI(need.getNeedURI()))
+          .setSenderNeedURI(need.getNeedURI())
+          .setSenderNodeURI(need.getWonNodeURI()) // ToDo (FS): replace by local WON node
+          .build();
+      } catch (WonMessageBuilderException e) {
+        throw new IllegalArgumentException("could not create NeedCreatedNotification", e);
+      }
+      matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(), newNeedNotificationMessage);
 
       return needURI;
 

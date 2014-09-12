@@ -16,7 +16,7 @@
 
 package won.bot.framework.events.action.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.query.Dataset;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
@@ -28,6 +28,7 @@ import won.bot.framework.events.event.impl.NeedCreatedEventForMatcher;
 import won.matcher.solr.NeedSolrInputDocumentBuilder;
 import won.protocol.util.NeedModelBuilder;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.MalformedURLException;
 
@@ -67,13 +68,13 @@ public class IndexNeedAction extends BaseEventBotAction
   {
     logger.debug("adding need {} to solr server", ((NeedCreatedEventForMatcher) event).getNeedURI());
     NeedCreatedEventForMatcher needEvent = (NeedCreatedEventForMatcher) event;
-    Model needModel = needEvent.getNeedModel();
+    Dataset needDataset = needEvent.getNeedData();
     NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
     NeedModelBuilder needModelBuilder = new NeedModelBuilder();
-    needModelBuilder.copyValuesFromProduct(needModel);
+    needModelBuilder.copyValuesFromProduct(WonRdfUtils.NeedUtils.getNeedModelFromNeedDataset(needDataset));
     needModelBuilder.copyValuesToBuilder(builder);
     if (logger.isDebugEnabled()){
-      logger.debug("got this model from won node: {}", RdfUtils.toString(needModel));
+      logger.debug("got this model from won node: {}", RdfUtils.toString(needDataset));
       logger.debug("writing this solrInputDocument to siren: {}", builder.build());
     }
 
@@ -84,7 +85,7 @@ public class IndexNeedAction extends BaseEventBotAction
     server.add(doc);
     server.commit();
     getEventListenerContext().getEventBus().publish(new NeedAddedToSolrEvent(((NeedCreatedEventForMatcher) event)
-                                                                               .getNeedURI(),((NeedCreatedEventForMatcher) event).getNeedModel()));
+      .getNeedURI()));
     logger.debug("need {} added to solr", ((NeedCreatedEventForMatcher) event).getNeedURI());
   }
 

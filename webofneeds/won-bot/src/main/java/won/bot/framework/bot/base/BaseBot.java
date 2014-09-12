@@ -16,6 +16,7 @@
 
 package won.bot.framework.bot.base;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,7 +127,7 @@ public class BaseBot implements Bot
   public void onMatcherRegistered(final URI wonNodeUri) {}
 
   @Override
-  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Model needModel){}
+  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Dataset needModel){}
 
   @Override
   public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {}

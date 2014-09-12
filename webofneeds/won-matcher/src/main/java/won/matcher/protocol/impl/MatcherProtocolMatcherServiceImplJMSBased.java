@@ -57,10 +57,10 @@ public class MatcherProtocolMatcherServiceImplJMSBased
 
     public void needCreated(@Header("wonNodeURI") final String wonNodeURI,
                             @Header("needURI") final String needURI,
-                            @Header("content") final String content) {
+                            @Header("wonMessage") final String content) {
         logger.debug("new need received: {} with content {}", needURI, content);
 
-        delegate.onNewNeed(URI.create(wonNodeURI), URI.create(needURI), RdfUtils.toModel(content));
+        delegate.onNewNeed(URI.create(wonNodeURI), URI.create(needURI), RdfUtils.toDataset(content));
     }
     public void needActivated(@Header("wonNodeURI") final String wonNodeURI,
                               @Header("needURI") final String needURI) {
