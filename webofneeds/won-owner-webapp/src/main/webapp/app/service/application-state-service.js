@@ -23,6 +23,11 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     var allNeeds = [];
     var applicationStateService = {}
     var readEvents = [];
+    var allNeedsWithUnreadEvents = [];
+
+    applicationStateService.getAllNeedsWithUnreadEvents= function(){
+        return allNeedsWithUnreadEvents;
+    }
     applicationStateService.getReadEvents= function(){
         return readEvents;
     }
@@ -47,15 +52,16 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     }
     applicationStateService.fetchUnreadEventsForAllNeeds= function(){
             var needsWithUnreadEvents=[];
-            var unread = [];
+
             var allNeeds = this.getAllNeeds();
             for(var i = 0; allNeeds.length >i; i++){
+                var unread = [];
                 var matchFilterType = [won.WON.HintCompacted];
                 var conversationFilterType = [won.WON.OwnerMessageCompacted, won.WON.PartnerMessageCompacted];
                 var requestFilterType =  [won.WON.OwnerOpenCompacted, won.WON.PartnerOpenCompacted];
                 //  var events = linkedDataService.getAllEvents($scope.allNeeds[i].needURI);
                 var need = allNeeds[i];
-
+                //TODO: events shall be retrieved with linked data service
                 var events =  [
                     { eventType: won.WON.HintCompacted , eventURI : "http://event1.com", title:'Car sharing to Prague', timeStamp: new Date('2014-08-25 14:30'), msg:'This is a Hint '},
                     { eventType: won.WON.PartnerOpenCompacted,eventURI : "http://event2.com" ,title:'Moved recently ...', timeStamp:new Date('2014-08-20'), msg:'This is a Connection Request'}];
@@ -65,19 +71,17 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
                         unread.push(events[j]);
                     }
                 }
-
                     var matches = $filter('messageTypeFilter')(unread,matchFilterType);
                     var conversations = $filter('messageTypeFilter')(unread, conversationFilterType);
                     var requests = $filter('messageTypeFilter')(unread, requestFilterType)
-
-
                 need.matches = matches;
                 need.conversations = conversations;
                 need.requests = requests;
                 needsWithUnreadEvents.push(need);
             }
             //return unread;
-           return needsWithUnreadEvents;
+           allNeedsWithUnreadEvents = needsWithUnreadEvents;
+        return allNeedsWithUnreadEvents;
     }
 
 
