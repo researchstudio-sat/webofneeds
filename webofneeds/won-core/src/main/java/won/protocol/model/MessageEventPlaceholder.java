@@ -12,6 +12,8 @@ import java.net.URI;
 public class MessageEventPlaceholder
 {
 
+  public MessageEventPlaceholder() {}
+
   public MessageEventPlaceholder(URI parentURI, MessageEvent messageEvent){
     this.parentURI = parentURI;
     this.messageURI = messageEvent.getMessageURI();
