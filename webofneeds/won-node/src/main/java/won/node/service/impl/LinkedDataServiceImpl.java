@@ -193,8 +193,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     // load the dataset from storage
     Dataset dataset = rdfStorage.loadDataset(need.getNeedURI());
-
     Model metaModel = needModelMapper.toModel(need);
+    Model defaultModel = ModelFactory.createDefaultModel();
 
     Resource needResource = metaModel.getResource(needUri.toString());
 
@@ -218,8 +218,16 @@ public class LinkedDataServiceImpl implements LinkedDataService
     needResource.addProperty(WON.HAS_WON_NODE, metaModel.createResource(this.resourceURIPrefix));
 
     // add meta model to dataset
-    dataset.addNamedModel(uriService.createNeedMetaInformationURI(needUri).toString(),
-                          metaModel);
+    String needMetaInformationURI = uriService.createNeedMetaInformationURI(needUri).toString();
+    dataset.addNamedModel(needMetaInformationURI, metaModel);
+
+    // add the won:hasGraph properties
+    Iterator<String> it = dataset.listNames();
+    while (it.hasNext()) {
+      defaultModel.add(needResource, WON.HAS_GRAPH, defaultModel.createResource(it.next()));
+    }
+
+    dataset.setDefaultModel(defaultModel);
 
     return dataset;
   }
