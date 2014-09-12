@@ -93,6 +93,37 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
     $scope.tooltipText = 'Required so other people can find the post.';
 
+    var titlePlaceholder = [
+        'Roughly, what are you looking for?',
+        'Roughly, what are you offering?',
+        'Roughly, what are you planning for which you need people?',
+        'Roughly, what are you pointing out and want to change?'];
+
+    $scope.getTitlePlaceholder = function() {
+        return titlePlaceholder[$scope.menuposition];
+    }
+
+    var descriptionPlaceholder = [
+        'And now with details! (By the way, there\'s specialised textboxes for specifying a pickup adress and time of availability)',
+        'As demand, but "delivery adress" instead of "pickup adress"',
+        'As demand but ending in "...for specifying an event location and time"',
+        '...for specifying when and where the thing you want to change occurred.'];
+
+    $scope.getDescriptionPlaceholder = function() {
+        return descriptionPlaceholder[$scope.menuposition];
+    }
+
+    var tagsPlaceholder = [
+    'Shoes, Entertainment, Suited For Small Children, ... ',
+    'As demand',
+    'Soccer, Party, Discussion Group, Food Coop ...',
+    'FML, Clean Park Initiative, Recycling, Occupy Wallstreet, Privacy, ... '];
+
+    $scope.getTagsPlaceholder = function() {
+        return tagsPlaceholder[$scope.menuposition];
+    }
+
+
 	$scope.uploadOptions = {
 		maxFileSize:5000000,
 		acceptFileTypes:/(\.|\/)(gif|jpe?g|png)$/i
@@ -602,10 +633,7 @@ angular.module('won.owner').directive('wonGallery', function factory() {
 		}
 	};
 });
-angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  $location, $http, $routeParams, needService, mapService, userService){
-    $scope.menuposition = $routeParams.menuposition;
-
-
+angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  $location, $http, needService, mapService, userService){
     $scope.imageInputFieldCollapsed = true;
     $scope.locationInputFieldCollapsed = true;
     $scope.timeInputFieldCollapsed = true;
@@ -628,6 +656,22 @@ angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  
         if($scope.menuposition == 2) return "If you want you can add an image or photo here to illustrate the activity.";
         if($scope.menuposition == 3) return "Add a photo, sketch (or screenshot) of the problem you want to point out.";
     }
+
+    $scope.getLocationComment = function() {
+        if($scope.menuposition == 0) return "Where should the thing be available? i.e. where would you pick it up or where should it be delivered to?"
+        if($scope.menuposition == 1) return "Where\'s your offer available? i.e. where can people pick it up or where would you deliver it too?";
+        if($scope.menuposition == 2) return "Where's the action happening?";
+        if($scope.menuposition == 3) return "Where did the problem occur / where have things to be changed?";
+    }
+
+    /* static text used for all offer types
+    $scope.getTimeComment = function() {
+        if($scope.menuposition == 0) return "Do you need it during a limited time intervall / at certain times or up till a deadline?...";
+        if($scope.menuposition == 1) return "Is it only available during a limited time intervall or up till a deadline?...";
+        if($scope.menuposition == 2) return "When's the action happing / the event?...";
+        if($scope.menuposition == 3) return "When did the thing happen you want to change or when does it happen?...";
+    }
+    */
 });
 
 
