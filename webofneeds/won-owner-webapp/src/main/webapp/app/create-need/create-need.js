@@ -409,10 +409,13 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 	};
 
     $scope.validatePostForm = function() {
-        return ($scope.need.basicNeedType != 'undefined' && $scope.need.basicNeedType != null && $scope.need.basicNeedType != '') &&
+        var result =  ($scope.need.basicNeedType != 'undefined' && $scope.need.basicNeedType != null && $scope.need.basicNeedType != '') &&
             ($scope.need.title != 'undefined' && $scope.need.title != null && $scope.need.title != '') &&
             ($scope.need.textDescription != 'undefined' && $scope.need.textDescription != null && $scope.need.textDescription != '') &&
             ($scope.need.tags != 'undefined' &&  $scope.need.tags != null &&  $scope.need.tags != '');
+
+        $scope.$broadcast('validatePostFormEvent', result);
+        return result;
     }
 
     $scope.validateDateTimeRange = function() {
@@ -420,6 +423,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         if (($scope.need.startDate == '' && $scope.need.endDate != '') ||
             ($scope.need.startDate != '' && $scope.need.endDate == '')) {
             // date value is missing
+            $scope.$broadcast('validateDateTimeRangeEvent', false);
             return false
         }
 
@@ -427,23 +431,27 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         if (($scope.need.startTime == '' && $scope.need.endTime != '') ||
             ($scope.need.startTime != '' && $scope.need.endTime == '')) {
             // time value is missing
+            $scope.$broadcast('validateDateTimeRangeEvent', false);
             return false;
         }
 
         // check datetime values
         if ($scope.need.startDate == '' && $scope.need.endDate == '' && $scope.need.startTime == '' && $scope.need.endTime == '') {
+            $scope.$broadcast('validateDateTimeRangeEvent', true);
             return true;
         } else if ($scope.need.startDate != '' && $scope.need.endDate != '' && $scope.need.startTime != '' && $scope.need.endTime != '') {
+            $scope.$broadcast('validateDateTimeRangeEvent', true);
             return true;
         } else {
             // date specified but not time or vice versa
+            $scope.$broadcast('validateDateTimeRangeEvent', false);
             return false;
         }
     }
 
     $scope.skipToPreviewButtonDisabled = function() {
         if ($scope.currentStep == 1) {
-            return !$scope.validatePostForm();
+            return !$scope.validatePostForm() || !$scope.validateDateTimeRange();
         } else if ($scope.currentStep == 2) {
             return !$scope.validateDateTimeRange();
         }
@@ -510,6 +518,26 @@ angular.module('won.owner').directive('wonProgressTracker',function factory(){
             }
 
 
+            // states for menu items and event handling for form validation
+            $scope.navStep1Disabled = '';
+            $scope.navStep2Disabled = 'disabled';
+            $scope.navStep3Disabled = 'disabled';
+
+            $scope.$on('validatePostFormEvent', function(event, eventData) {
+                if (eventData == true) {
+                    $scope.navStep2Disabled = '';
+                } else {
+                    $scope.navStep2Disabled = 'disabled';
+                }
+            })
+
+            $scope.$on('validateDateTimeRangeEvent', function(event, eventData) {
+                if (eventData == true) {
+                    $scope.navStep3Disabled = '';
+                } else {
+                    $scope.navStep3Disabled = 'disabled';
+                }
+            })
         } ,
         link: function(scope, element, attrs){
             console.log("Progress Tracker");
