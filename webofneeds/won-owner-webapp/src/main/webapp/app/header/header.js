@@ -14,42 +14,31 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService, linkedDataService, applicationStateService, $filter) {
+angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService, linkedDataService, applicationStateService, $filter, $interval) {
+    $scope.eventNotifications =  [];
+    $scope.fetchNotifications = function(){
+        $scope.eventNotifications = applicationStateService.fetchUnreadEventsForAllNeeds();
+        return $scope.eventNotifications;
+    }
+    $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
+        $scope.eventNotifications = $scope.fetchNotifications();
+    });
+    $scope.$on(won.EVENT.NEED_CREATED, function(ngEvent, eventData) {
+        $scope.eventNotifications = $scope.fetchNotifications();
+    });
 
     $scope.allNeeds = applicationStateService.getAllNeeds();
-    $scope.eventNotifications = [];
-    $scope.getUnreadEvents = function(){
-        var unread = [];
-        for(var i = 0; $scope.allNeeds.length >i; i++){
-            var matchFilterType = [won.WON.HintCompacted];
-            var conversationFilterType = [won.WON.OwnerMessageCompacted, won.WON.PartnerMessageCompacted];
-            var requestFilterType =  [won.WON.OwnerOpenCompacted, won.WON.PartnerOpenCompacted];
-          //  var events = linkedDataService.getAllEvents($scope.allNeeds[i].needURI);
-            var need = $scope.allNeeds[i];
-
-            var events =  [
-                { eventType: won.WON.HintCompacted , title:'Car sharing to Prague', timeStamp: new Date('2014-08-25 14:30'), msg:'This is a Hint '},
-                { eventType: won.WON.PartnerOpenCompacted, title:'Moved recently ...', timeStamp:new Date('2014-08-20'), msg:'This is a Connection Request'}];
-            for(var j = 0; events.length;j++){
-                if(applicationStateService.getReadEvents().indexOf(events[j])==-1)
-                {
-                    unread.push(matches[j].eventURI);
-                }
-            }
-
-            var matches = $filter('messageTypeFilter')(unread,matchFilterType);
-            var conversations = $filter('messageTypeFilter')(unread, conversationFilterType);
-            var requests = $filter('messageTypeFilter')(unread, requestFilterType)
-            need.matches = matches;
-            need.conversations = conversations;
-            need.requests = requests;
-            $scope.eventNotifications.push(need);
-        }
-        //return unread;
-    }
-    $scope.getUnreadEvents();
 
 
+    $scope.notificationRefreshInterval = 1000;
+
+
+
+    var p = $interval($scope.fetchNotifications(),$scope.notificationRefreshInterval);
+    p.then(function(value){
+        console.log('interval: ', value);
+        $scope.$digest();
+    });
 
 	$scope.isActive = function(where) {
 		if ($location.path().indexOf(where) > -1) {

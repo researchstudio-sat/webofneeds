@@ -22,7 +22,11 @@
  * To change this template use File | Settings | File Templates.
  */
 angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $location, userService, applicationStateService) {
-    $scope.allPosts = applicationStateService.getAllNeeds();
+    $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
+        $scope.fetchUnreadEventsForAllNeeds();
+    });
+    $scope.AllNeedsWithUnreadNotifications = applicationStateService.fetchUnreadEventsForAllNeeds();
+  //  $scope.allPosts = applicationStateService.getAllNeeds();
 	$scope.line = {
 		type:'',
 		title:'',
@@ -80,7 +84,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
     //how to fetch all needs of one user?
 
     // for filtering: when number of unread notifications is 0 set appropriate value (convText, reqText or matchText) to empty string
-	$scope.posts = [
+/*	$scope.posts = [
 		{type:'Want', title:'Want PS 4', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: '', matches: 0}, datetime: new Date('2014-08-25')},
 		{type:'Change', title:'Looking for a flatscreen TV', msg:{convText: 'unread conversations', conversations : 3, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, datetime: new Date('2014-08-20')},
 		{type:'Offer', title:'Offering IKEA couch', msg:{convText: 'unread conversations', conversations : 1, reqText: '', requests: 0, matchText: 'unread matches', matches: 5}, datetime: new Date('2014-08-15')},
@@ -89,7 +93,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
         {type:'Together', title:'Clean the forest', msg:{convText: 'unread conversations', conversations : 10, reqText: '', requests: 0, matchText: '', matches: 0}, datetime: new Date('2014-08-26')},
         {type:'Offer', title:'Selling old laptop', msg:{convText: '', conversations : 0, reqText: 'unread requests', requests: 7, matchText: '', matches: 0}, datetime: new Date('2014-03-01')},
         {type:'Want', title:'Want a plane', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, datetime: new Date('2014-02-22')}
-	];
+	];          */
 
     $scope.getTypePicURI = function (type) {
         if(type=='Want') return "/owner/images/type_posts/want.png";
