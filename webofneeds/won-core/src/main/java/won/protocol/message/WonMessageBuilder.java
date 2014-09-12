@@ -41,11 +41,42 @@ public class WonMessageBuilder
   private Map<URI, Model> contentMap = new HashMap<>();
   private Map<URI, Model> signatureMap = new HashMap<>();
 
-  public WonMessage build()
+  public WonMessage build() throws WonMessageBuilderException {
+    return build(null);
+  }
+
+  /**
+   * Builds a WonMessage by adding data to the specified dataset.
+   * The dataset may be null or empty.
+   * @param dataset
+   * @return
+   * @throws WonMessageBuilderException
+   */
+  public WonMessage build(Dataset dataset)
     throws WonMessageBuilderException {
+
+    Model defaultModel = null;
+
+    if (dataset == null) {
+      // create the default model, containing a triple that denotes the message graph as
+      // envelope graph
+      defaultModel = ModelFactory.createDefaultModel();
+      dataset = DatasetFactory.create(defaultModel);
+    } else {
+      defaultModel = dataset.getDefaultModel();
+      if (defaultModel == null) {
+        defaultModel = ModelFactory.createDefaultModel();
+        dataset.setDefaultModel(defaultModel);
+      }
+    }
+
+    defaultModel.createResource(WONMSG.getGraphURI(messageURI.toString()), WONMSG.ENVELOPE_GRAPH);
 
     Model messageEvent = ModelFactory.createDefaultModel();
     DefaultPrefixUtils.setDefaultPrefixes(messageEvent);
+
+
+    dataset.addNamedModel(WONMSG.getGraphURI(messageURI.toString()), messageEvent);
 
     // message URI
     Resource messageEventResource = messageEvent.createResource(messageURI.toString());
@@ -108,26 +139,17 @@ public class WonMessageBuilder
     }
 
 
-    // create the default model, containing a triple that denotes the message graph as
-    // envelope graph
-    Model defaultModel = ModelFactory.createDefaultModel();
-    defaultModel.createResource(WONMSG.getGraphURI(messageURI.toString()), WONMSG.ENVELOPE_GRAPH);
-
-    // create the graphs
-    Dataset wonMessageDataSet = DatasetFactory.create(defaultModel);
-    wonMessageDataSet.addNamedModel(WONMSG.getGraphURI(messageURI.toString()), messageEvent);
-
     for (URI contentURI : contentMap.keySet()) {
-      wonMessageDataSet.addNamedModel(
+      dataset.addNamedModel(
         contentURI.toString(),
         contentMap.get(contentURI));
     }
-    wonMessageDataSet.setDefaultModel(defaultModel);
+    dataset.setDefaultModel(defaultModel);
 
     // ToDo (FS): add signature of the whole message
 
     // ToDo (FS): since all the properties are already available this can be done more efficiently
-    WonMessage wonMessage = WonMessageDecoder.decodeFromDataset(wonMessageDataSet);
+    WonMessage wonMessage = WonMessageDecoder.decodeFromDataset(dataset);
     return wonMessage;
 
   }

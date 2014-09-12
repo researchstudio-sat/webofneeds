@@ -69,6 +69,7 @@ public class IndexNeedAction extends BaseEventBotAction
     logger.debug("adding need {} to solr server", ((NeedCreatedEventForMatcher) event).getNeedURI());
     NeedCreatedEventForMatcher needEvent = (NeedCreatedEventForMatcher) event;
     Dataset needDataset = needEvent.getNeedData();
+    //this dataset contains the complete need data
     NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
     NeedModelBuilder needModelBuilder = new NeedModelBuilder();
     needModelBuilder.copyValuesFromProduct(WonRdfUtils.NeedUtils.getNeedModelFromNeedDataset(needDataset));

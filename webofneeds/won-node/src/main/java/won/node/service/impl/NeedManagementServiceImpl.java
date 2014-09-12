@@ -41,6 +41,7 @@ import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.*;
 import won.protocol.repository.rdfstorage.RDFStorageService;
+import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.util.DataAccessUtils;
@@ -82,6 +83,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
   private OwnerApplicationRepository ownerApplicationRepository;
   @Autowired
   private MessageEventRepository messageEventRepository;
+  @Autowired
+  private LinkedDataService linkedDataService;
 
 
   //TODO: remove 'active' parameter, make need active by default, and look into RDF for an optional 'isInState' triple.
@@ -146,20 +149,20 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
       // ToDo (FS): send the same wonMessage or create a new one (with new type)?
 
-      WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-      WonMessage newNeedNotificationMessage = null;
-      try {
-        newNeedNotificationMessage = wonMessageBuilder
-          .setWonMessageType(WonMessageType.NEED_CREATED_NOTIFICATION)
-          .setMessageURI(uriService.createMessageEventURI(need.getNeedURI()))
-          .setSenderNeedURI(need.getNeedURI())
-          .setSenderNodeURI(need.getWonNodeURI()) // ToDo (FS): replace by local WON node
-          .build();
-      } catch (WonMessageBuilderException e) {
-        throw new IllegalArgumentException("could not create NeedCreatedNotification", e);
-      }
-      matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(), newNeedNotificationMessage);
 
+      try {
+        Dataset needDataset = linkedDataService.getNeedDataset(need.getNeedURI());
+        WonMessage newNeedNotificationMessage =
+          new WonMessageBuilder()
+            .setWonMessageType(WonMessageType.NEED_CREATED_NOTIFICATION)
+            .setMessageURI(uriService.createMessageEventURI(need.getNeedURI()))
+            .setSenderNeedURI(need.getNeedURI())
+            .setSenderNodeURI(need.getWonNodeURI())
+            .build(needDataset);
+        matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(), newNeedNotificationMessage);
+      } catch (Exception e) {
+        logger.warn("could not create NeedCreatedNotification", e);
+      }
       return needURI;
 
     } else {
