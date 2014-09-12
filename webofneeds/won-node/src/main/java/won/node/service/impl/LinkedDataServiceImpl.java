@@ -187,6 +187,43 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     return model;
   }
+
+  public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException {
+    Need need = needInformationService.readNeed(needUri);
+
+    // load the dataset from storage
+    Dataset dataset = rdfStorage.loadDataset(need.getNeedURI());
+
+    Model metaModel = needModelMapper.toModel(need);
+
+    Resource needResource = metaModel.getResource(needUri.toString());
+
+    // add connections
+    Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections/");
+    metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
+
+    // add need event container
+    Resource needEventContainer = metaModel.createResource(WON.EVENT_CONTAINER);
+    metaModel.add(metaModel.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
+
+    // add need event URIs
+    List<MessageEventPlaceholder> messageEvents = messageEventRepository.findByParentURI(needUri);
+    for (MessageEventPlaceholder messageEvent : messageEvents) {
+      metaModel.add(metaModel.createStatement(needEventContainer,
+                                      RDFS.member,
+                                      metaModel.getResource(messageEvent.getMessageURI().toString())));
+    }
+
+    // add WON node link
+    needResource.addProperty(WON.HAS_WON_NODE, metaModel.createResource(this.resourceURIPrefix));
+
+    // add meta model to dataset
+    dataset.addNamedModel(uriService.createNeedMetaInformationURI(needUri).toString(),
+                          metaModel);
+
+    return dataset;
+  }
+
     public Model getNodeModel()
     {
       Model model = ModelFactory.createDefaultModel();

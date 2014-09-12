@@ -6,6 +6,7 @@ import won.protocol.message.WonMessageType;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
+import java.util.Date;
 
 @Entity
 @Table(name = "message_event")
@@ -24,6 +25,8 @@ public class MessageEventPlaceholder
     this.receiverURI = messageEvent.getReceiverURI();
     this.receiverNeedURI = messageEvent.getReceiverNeedURI();
     this.receiverNodeURI = messageEvent.getReceiverNodeURI();
+
+    this.creationDate = new Date();
   }
 
   @Id
@@ -53,6 +56,9 @@ public class MessageEventPlaceholder
   private URI receiverNeedURI;
   @Column(name = "receiverNodeURI")
   private URI receiverNodeURI;
+
+  @Column(name = "creationDate")
+  private Date creationDate;
 
 
   @XmlTransient
@@ -134,6 +140,14 @@ public class MessageEventPlaceholder
 
   public void setReceiverNodeURI(final URI receiverNodeURI) {
     this.receiverNodeURI = receiverNodeURI;
+  }
+
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(final Date creationDate) {
+    this.creationDate = creationDate;
   }
 
   @Override
