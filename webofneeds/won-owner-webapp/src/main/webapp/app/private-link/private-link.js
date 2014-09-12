@@ -5,7 +5,8 @@
  * Time: 8:08 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService) {
+angular.module('won.owner')
+    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService) {
 
     $scope.need = {};
     $scope.need = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
@@ -359,55 +360,7 @@ angular.module('won.owner').controller('PrivateLinkCtrl', function ($scope, $loc
         return false;
     }
 })
-    .filter('messageTypeFilter', function(){
-        var getTypeText = function(eventType) {
-            switch (eventType) {
-                case won.WON.OwnerMessageCompacted:
-                case won.WON.PartnerMessageCompacted:
-                    return 'Conversation';
-                case won.WON.OwnerOpenCompacted:
-                    return 'Outgoing Request';
-                case won.WON.PartnerOpenCompacted:
-                    return 'Incoming Request';
-                case won.WON.HintCompacted:
-                    return 'Matches';
-            }
-        }
-        var getAdditionalInformation = function(item){
-            switch (item.eventType) {
-                case won.WON.OwnerMessageCompacted:
-                    break;
-                case won.WON.PartnerMessageCompacted:
-                    break;
-                case won.WON.OwnerOpenCompacted:
-                    break;
-                case won.WON.PartnerOpenCompacted:
-                    break;
-                case won.WON.HintCompacted:
-                    item.otherNeed = linkedDataService.getNeed(item.otherNeedURI);
-                    break;
-            }
-            return item;
-        }
 
-        return function(inputArray, eventTypes){
-            var outputArray = [];
-            //var filter= [won.Won.OwnerOpenCompacted, won.WON.PartnerOpenCompacted, won.WON.PartnerMessageCompacted, won.WON.OwnerMessageCompacted, won.WON.HintCompacted];
-
-            for(var i = 0; i < inputArray.length; i++) {
-                var item = inputArray[i];
-                if(eventTypes.indexOf(item.eventType)!=-1){
-                    item.id = i;
-                    item.typeText = getTypeText(item.eventType);
-                    getAdditionalInformation(item);
-                    outputArray.push(item);
-                }
-            }
-
-            return outputArray;
-        }
-    }
-);
 
 
 angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService, $rootScope) {

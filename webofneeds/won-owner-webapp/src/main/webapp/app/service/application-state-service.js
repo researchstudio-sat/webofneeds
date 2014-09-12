@@ -18,11 +18,17 @@
  * Created by LEIH-NB on 09.09.2014.
  */
 
-angular.module('won.owner').factory('applicationStateService', function (linkedDataService) {
+angular.module('won.owner').factory('applicationStateService', function (linkedDataService, $filter) {
     var currentNeedURI = null;
     var allNeeds = [];
     var applicationStateService = {}
-
+    var readEvents = [];
+    applicationStateService.getReadEvents= function(){
+        return readEvents;
+    }
+    applicationStateService.addReadEvent=function (eventURI){
+        readEvents.push(eventURI);
+    }
     applicationStateService.setCurrentNeedURI = function(needURI){
         currentNeedURI = needURI;
     }
@@ -39,5 +45,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.addNeed = function(need){
         allNeeds.push(need);
     }
+
+
     return applicationStateService;
 });

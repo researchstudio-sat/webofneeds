@@ -233,13 +233,14 @@
 				<li ng-show="!showPublic()" ng-cloak>
 					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
 						<!-- TODO provide here the total number of messages -->
-						<i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{5}}
+						<i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{unreadMatches}}
 					</a>
-					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
-						<li class="text-center grey-item">{{5}}&nbsp;new messages</li>
+					<ul class="dropdown-menu" style="width: 280px;">
+						<li class="text-center grey-item">{{unreadMatches}}&nbsp;new messages</li>
 						<!-- TODO put real parameters into url -->
-						<li ng-repeat="match in matches"><a href="#/private-link"><img
-								src="{{getTypePicURI(req.type)}}"/>&nbsp;{{match.title}}&nbsp;<span class="badge pull-right">{{match.msgs}}</span></a>
+						<li ng-repeat="need in eventNotifications"><a href="#/private-link"><img
+								src="{{getTypePicURI(req.type)}}"/>&nbsp;{{need.title}}&nbsp;<span
+                                class="badge pull-right">{{need.matches.length}}</span></a>
 						</li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
 						</li>

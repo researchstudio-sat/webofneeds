@@ -169,7 +169,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             var result = results[0];
             resultObject = {};
             resultObject.connection = getSafeValue(result.connection);
-            resultObject.event = getSafeValue(result.event);
+            resultObject.eventURI = getSafeValue(result.event);
             resultObject.eventType = getSafeValue(result.eventType);
             resultObject.needURI = uri;
             resultObject.otherNeedURI = getSafeValue(result.otherNeedURI);
@@ -257,6 +257,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             }
             var result = results[0];
             resultObject = {};
+            resultObject.needURI = uri;
             resultObject.basicNeedType = getSafeValue(result.basicNeedType);
             resultObject.title = getSafeValue(result.title);
             resultObject.tags = getSafeValue(result.tags);
