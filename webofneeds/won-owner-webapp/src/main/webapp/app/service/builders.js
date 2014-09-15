@@ -50,7 +50,6 @@
         //EVENT TYPES
         won.WON.OwnerClose = won.WON.baseUri + "OwnerClose";
         won.WON.OwnerCloseCompacted = won.WON.prefix + ":OwnerClose";
-
         won.WON.OwnerOpen = won.WON.baseUri + "OwnerOpen";
         won.WON.OwnerOpenCompacted = won.WON.prefix + ":OwnerOpen";
         won.WON.PartnerClose = won.WON.baseUri + "PartnerClose";
@@ -65,7 +64,8 @@
         won.WON.HintCompacted = won.WON.prefix + ":Hint";
 
 
-
+        won.WON.hasGraph = won.WON.baseUri + "hasGraph";
+        won.WON.hasGraphCompacted = won.WON.prefix + "hasGraph";
 
         won.WON.Connection = won.WON.baseUri + "Connection";
         won.WON.ConnectionCompacted = won.WON.prefix + ":Connection";
@@ -206,8 +206,33 @@
                 "msg:hasMessageType":{
                     "@id":"http://purl.org/webofneeds/message#hasMessageType",
                     "@type":"@id"
+                },
+                "dc:created":{
+                    "@id":"http://purl.org/dc/terms/created",
+                    "@type":"xsd:date"
+                },
+                "won:hasConnections":{
+                    "@id": "http://purl.org/webofneeds/model#hasConnections",
+                    "@type":"@id"
+                },
+                "won:hasEventContainer":{
+                    "@id":"http://purl.org/webofneeds/model#hasEventContainer",
+                    "@type":"@id"
+                },
+                "won:hasWonNode":{
+                    "@id": "http://purl.org/webofneeds/model#hasWonNode",
+                    "@type":"@id"
+                },
+                "won:isInState":{
+                    "@id":  "http://purl.org/webofneeds/model#isInState",
+                    "@type":"@id"
                 }
 
+        },
+        {
+            "@id":"_:ec",
+            "@type": "http://purl.org/webofneeds/model#EventContainer",
+            "rdfs:member":  "http://localhost:8080/won/resource/need/7996573010242830000/event/34543242134"
 
         }
 
@@ -557,7 +582,7 @@
                     messageGraph[won.WONMSG.hasContentCompacted] = contentGraphURIs;
                 }
                 //add the message graph to the graphs of the builder
-                graphs.push(messageGraph);
+               graphs.push(messageGraph);
                 //point to the messagegraph so we can later access it easily for modifications
                 builder.messageGraph = messageGraph;
             };
@@ -596,7 +621,85 @@
                 return this.data;
             }
         }
+        //TODO: used only for creating fake response messages for testing. remove it afterwards
+        won.CreateMessageResponseBuilder = function CreateMessageResponseBuilder(dataset, needURI){
+            this.data = won.clone(dataset);
+            this.needURI = needURI;
 
+            addMessageGraph = function (builder, graphURIs) {
+                won.JsonLdHelper.getContext(builder.data)["won:hasGraph"] = {
+                    "@id": "http://purl.org/webofneeds/model#hasGraph",
+                    "@type":"@id"
+                }
+                graphs = builder.data['@graph'];
+                //add the default graph to the graphs of the builder
+                graphs.push({
+                    "@id":needURI,
+                    "won:hasGraph":needURI+"meta#data,"+needURI+"core#data"
+                })
+
+                graphs.push(
+                    {
+                        "@graph": [
+                            {
+                                "@id":needURI,
+                                "@type":won.WON.Need,
+                                "dc:created":"2014-09-15T10:08:33.687Z",
+                                "won:hasConnections":"http://localhost:8080/won/resource/need/7996573010242830000/connections",
+                                "won:hasEventContainer":["_:ec"],
+                                "won:hasWonNode": "http://localhost:8080/won/resource",
+                                "won:isInState":"http://purl.org/webofneeds/model#Active"
+
+                            },
+                            {
+                                "@id":"_:ec",
+                                "@type": "http://purl.org/webofneeds/model#EventContainer",
+                                "rdfs:member":  "http://localhost:8080/won/resource/need/7996573010242830000/event/34543242134"
+                            }
+                        ],
+                        "@id":needURI+"/meta#data"
+                    }
+                );
+
+                //create the message graph, containing the message type
+                var messageGraph = {
+                    "@graph": [ {"@id":needURI,"won:hasGraph": needURI+"/meta#data","won:hasGraph":needURI+"/core#data"}]
+
+                };
+                //add a won:hasContent triple for each specified graphURI into the message graph
+                if (typeof graphURIs == 'object' && graphURIs.length > 0){
+                    var contentGraphURIs = [];
+                    for (var i = 0; i < graphURIs.length; i++) {
+                        contentGraphURIs.push({'@id':graphURIs[i]});
+                    }
+                    messageGraph[won.WONMSG.hasContentCompacted] = contentGraphURIs;
+                }
+                //add the message graph to the graphs of the builder
+               // graphs.push(messageGraph);
+                //point to the messagegraph so we can later access it easily for modifications
+                //builder.messageGraph = messageGraph;
+            };
+
+            this.data = won.clone(dataset);
+            this.messageGraph = null;
+            addMessageGraph(this, won.JsonLdHelper.getGraphNames(dataset));
+            //add the sender need
+           // this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":this.data["@context"]["@base"]};
+        }
+        won.CreateMessageResponseBuilder.prototype = {
+            constructor : won.CreateMessageBuilder,
+
+            hasGraph: function(needURI){
+                won.JsonLdHelper.getDefaultGraph(this.data).push({"@id":needURI});
+
+                won.JsonLdHelper.getDefaultGraph(this.data)[0]={"@id":needURI,"won:hasGraph":needURI+"meta#data,"+needURI+"core#data"};
+                return this;
+            },
+            build: function () {
+                return this.data;
+            }
+
+        }
         won.ConnectionBuilder = function ConnectionBuilder(data){
             if (data != null && data != undefined) {
                 this.data = won.clone(data);

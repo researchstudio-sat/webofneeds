@@ -174,6 +174,9 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
                 //TODO: if negative, use alternative need URI and send again
                 //fetch need data and store in local RDF store
                 //get URI of newly created need from message
+                var responseMessage = new won.CreateMessageResponseBuilder(needAsJsonLd, event.receiverNeedURI)
+               //     .hasGraph(event.receiverNeedURI)
+                    .build();
 
                 //load the data into the local rdf store and publish NeedCreatedEvent when done
                 var needURI = event.receiverNeedURI;

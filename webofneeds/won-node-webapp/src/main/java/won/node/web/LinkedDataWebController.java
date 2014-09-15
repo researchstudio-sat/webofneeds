@@ -38,6 +38,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.service.LinkedDataService;
 import won.protocol.util.HTTP;
+import won.protocol.util.RdfUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -262,7 +263,7 @@ public class
 
     private void addDeepConnectionData(String needUri, com.hp.hpl.jena.rdf.model.Model model) throws NoSuchConnectionException {
         //add the connection model to each connection
-        Resource connectionsResource = model.getResource(needUri+"/connections/");
+        Resource connectionsResource = model.getResource(needUri + "/connections/");
         NodeIterator it = model.listObjectsOfProperty(connectionsResource, RDFS.member);
         while (it.hasNext()){
             RDFNode node = it.next();
@@ -389,8 +390,8 @@ public class
       produces={"application/rdf+xml","application/x-turtle",
                 "text/turtle","text/rdf+n3",
                 "application/json","application/ld+json",
-                "application/trig"})
-  public ResponseEntity<Dataset> readNeed(
+                "application/trig", "text/plain"})
+  public ResponseEntity<String> readNeed(
       HttpServletRequest request,
       @PathVariable(value="identifier") String identifier) {
     logger.debug("readNeed() called");
@@ -399,9 +400,9 @@ public class
       Dataset dataset = linkedDataService.getNeedDataset(needUri);
       //TODO: need information does change over time. The immutable need information should never expire, the mutable should
       HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), needUri));
-      return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
+      return new ResponseEntity<String>(RdfUtils.toString(dataset), headers, HttpStatus.OK);
     } catch (NoSuchNeedException e) {
-      return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+      return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
     }
 
   }
