@@ -50,7 +50,6 @@
         //EVENT TYPES
         won.WON.OwnerClose = won.WON.baseUri + "OwnerClose";
         won.WON.OwnerCloseCompacted = won.WON.prefix + ":OwnerClose";
-
         won.WON.OwnerOpen = won.WON.baseUri + "OwnerOpen";
         won.WON.OwnerOpenCompacted = won.WON.prefix + ":OwnerOpen";
         won.WON.PartnerClose = won.WON.baseUri + "PartnerClose";
@@ -65,7 +64,8 @@
         won.WON.HintCompacted = won.WON.prefix + ":Hint";
 
 
-
+        won.WON.hasGraph = won.WON.baseUri + "hasGraph";
+        won.WON.hasGraphCompacted = won.WON.prefix + ":hasGraph";
 
         won.WON.Connection = won.WON.baseUri + "Connection";
         won.WON.ConnectionCompacted = won.WON.prefix + ":Connection";

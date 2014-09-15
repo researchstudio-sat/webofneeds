@@ -15,8 +15,9 @@
  */
 
 angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService, linkedDataService, applicationStateService, $filter, $interval) {
-    $scope.eventNotifications =  [];
-    $scope.fetchNotifications = function(){
+    $scope.fetchNotifications();
+    //$scope.eventNotifications =  [];
+   /* $scope.fetchNotifications = function(){
         $scope.eventNotifications = applicationStateService.fetchUnreadEventsForAllNeeds();
         return $scope.eventNotifications;
     }
@@ -26,12 +27,12 @@ angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, 
     $scope.$on(won.EVENT.NEED_CREATED, function(ngEvent, eventData) {
         $scope.eventNotifications = $scope.fetchNotifications();
     });
+          */
 
     $scope.allNeeds = applicationStateService.getAllNeeds();
 
 
     $scope.notificationRefreshInterval = 1000;
-
 
 
     var p = $interval($scope.fetchNotifications(),$scope.notificationRefreshInterval);

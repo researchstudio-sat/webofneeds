@@ -55,7 +55,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="post in AllNeedsWithUnreadNotifications | filter: search">
+                        <tr ng-repeat="post in allNeedsWithUnreadNotifications | filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{post.basicNeedType}}</span>
                                 <img src="{{getTypePicURI(post.basicNeedType)}}"
@@ -65,7 +65,8 @@
                             <td>
                                 <span ng-show="post.conversations.length > 0">
                                     <span style="display: none;">{{post.msg.convText}}</span>
-                                    <i class="fa fa-comment-o fa-lg"></i>&nbsp;{{post.conversations.length}}
+                                    <i
+                                            class="fa fa-comment-o fa-lg"></i>&nbsp;{{post.conversations.length}}
                                 </span>
                                 <span ng-show="post.requests.length > 0">
                                     <span style="display: none;">{{post.msg.reqText}}</span>

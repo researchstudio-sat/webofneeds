@@ -386,10 +386,9 @@ public class
   @RequestMapping(
       value="${uri.path.data.need}/{identifier}",
       method = RequestMethod.GET,
-      produces={"application/rdf+xml","application/x-turtle",
-                "text/turtle","text/rdf+n3",
-                "application/json","application/ld+json",
-                "application/trig"})
+      produces={"text/trig",
+                "application/ld+json",
+                "application/json"})
   public ResponseEntity<Dataset> readNeed(
       HttpServletRequest request,
       @PathVariable(value="identifier") String identifier) {
@@ -443,8 +442,9 @@ public class
   @RequestMapping(
     value="${uri.path.data.connection}/{identifier}${uri.infix.messageEvent}/{eventId}",
     method = RequestMethod.GET,
-    produces={"application/rdf+xml","application/x-turtle","text/turtle",
-              "text/rdf+n3","application/json","application/ld+json"})
+    produces={"text/trig",
+              "application/ld+json",
+              "application/json"})
   public ResponseEntity<Dataset> readConnectionEvent(
     HttpServletRequest request,
     @PathVariable(value = "identifier") String identifier,
@@ -466,8 +466,9 @@ public class
   @RequestMapping(
     value="${uri.path.data.need}/{identifier}${uri.infix.messageEvent}/{eventId}",
     method = RequestMethod.GET,
-    produces={"application/rdf+xml","application/x-turtle","text/turtle",
-              "text/rdf+n3","application/json","application/ld+json"})
+    produces={"text/trig",
+              "application/ld+json",
+              "application/json"})
   public ResponseEntity<Dataset> readNeedEvent(
     HttpServletRequest request,
     @PathVariable(value = "identifier") String identifier,

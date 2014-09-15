@@ -78,6 +78,7 @@
 		<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/faq/faq.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/impressum/impressum.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/main/main.js"/>"></script>
 
         <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
@@ -93,7 +94,7 @@
 	<script type="text/javascript" src="<c:url value="/app/post-detail/post-detail.js"/>"></script>
 
 	</head>
-	<body>
+	<body ng-controller="MainCtrl">
 		<span ng-init=""></span>
 		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>
 		<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
@@ -233,12 +234,12 @@
 				<li ng-show="!showPublic()" ng-cloak>
 					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
 						<!-- TODO provide here the total number of messages -->
-						<i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{need.matches.length}}
+						<i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{countOfAllUnreadMatchEvents}}
 					</a>
 					<ul class="dropdown-menu" style="width: 280px;">
-						<li class="text-center grey-item">{{need.matches.length}}&nbsp;new messages</li>
+						<li class="text-center grey-item">{{countOfAllUnreadMatchEvents}}&nbsp;new messages</li>
 						<!-- TODO put real parameters into url -->
-						<li ng-repeat="need in eventNotifications"><a href="#/private-link"><img
+						<li ng-repeat="need in allNeedsWithUnreadNotifications"><a href="#/private-link"><img
 								src="{{getTypePicURI(req.type)}}"/>&nbsp;{{need.title}}&nbsp;<span
                                 class="badge pull-right">{{need.matches.length}}</span></a>
 						</li>

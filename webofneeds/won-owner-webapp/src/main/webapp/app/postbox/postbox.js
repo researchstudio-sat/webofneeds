@@ -21,13 +21,31 @@
  * Time: 8:08 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $location, userService, applicationStateService) {
-    $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
-        $scope.fetchUnreadEventsForAllNeeds();
-    });
+angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval, $location, userService, applicationStateService) {
+    $scope.countOfAllUnreadMatchEvents = 0;
+    $scope.updateCountOfAllUnreadMatchEvents= function(){
+        var allMatchEvents = [];
+
+        for(var i = 0; i<$scope.allNeedsWithUnreadNotifications.length;i++){
+            var need = $scope.allNeedsWithUnreadNotifications[i];
+            allMatchEvents.push(need.matches);
+        }
+        $scope.countOfAllUnreadMatchEvents = allMatchEvents.length;
+
+    }
+
+    $scope.$watchCollection('allNeedsWithUnreadNotifications',function(updated, old){
+        console.log("Watching allNeedsWithUnreadNotifications collection: ", updated, old);
+        $scope.updateCountOfAllUnreadMatchEvents();
+    })
+    /*
     $scope.AllNeedsWithUnreadNotifications = applicationStateService.fetchUnreadEventsForAllNeeds();
+
+    $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
+        $scope.AllNeedsWithUnreadNotifications= applicationStateService.fetchUnreadEventsForAllNeeds();
+    });        */
   //  $scope.allPosts = applicationStateService.getAllNeeds();
-	$scope.line = {
+	/*$scope.line = {
 		type:'',
 		title:'',
 		newMessages:0,
@@ -35,14 +53,24 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
 		puzzle:0,
 		date:''
 	};
-
-
-
+                */
+    $scope.fetchNotifications();
     $scope.recordsToDisplay = 4;
     $scope.displayConfirmationDialog = false;
     var indexOfChosenDraft;
 	$scope.search = '';
+    $scope.notificationRefreshInterval = 5000;
 
+    var p = $interval(function(){
+            console.log("Interval");
+            $scope.fetchNotifications();
+        },$scope.notificationRefreshInterval);
+
+
+    p.then(function(value){
+        console.log('interval: ', value);
+        $scope.$digest();
+    });
     // TODO call here backend method
     function deleteDraft(index) {
         if (index >= 0) {
@@ -121,7 +149,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
     ];
 
     // data for notifications in menu, TODO call backend methods here and maybe more convenient controller
-    $scope.conversations = [
+   /* $scope.conversations = [
         {type: 'Together', title:'Car sharing to Prague', msgs: 5},
         {type: 'Offer', title:'Friendly Bicycle ...', msgs: 4},
         {type: 'Want', title:'I want smartphone ...', msgs: 6},
@@ -141,7 +169,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope, $locatio
         {type: 'Change', title:'Old children\'s clothes ..', msgs: 3},
         {type: 'Offer', title:'Old men\'s clothes ..', msgs: 2}
     ];
-
+             */
 	$scope.clickOnMessage = function () {
 		//TODO Put here logic
 	};

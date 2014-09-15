@@ -230,6 +230,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             "prefix " + "dc"+":<"+"http://purl.org/dc/elements/1.1/>\n" +
             "prefix " + "geo"+":<"+"http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
                 "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime where { " +
+                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
+                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
                 "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ."+
                 "<" + uri + ">" + " <"+"http://purl.org/dc/terms/created"+"> " + "?creationDate ."+
                 "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ."+
