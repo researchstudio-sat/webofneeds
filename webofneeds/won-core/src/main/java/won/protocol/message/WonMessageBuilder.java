@@ -144,7 +144,6 @@ public class WonMessageBuilder
         contentURI.toString(),
         contentMap.get(contentURI));
     }
-    dataset.setDefaultModel(defaultModel);
 
     // ToDo (FS): add signature of the whole message
 
