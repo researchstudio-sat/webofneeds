@@ -32,6 +32,8 @@ public class WONMSG
 
   // notification types
   public static final Resource TYPE_HINT_NOTIFICATION = m.createResource(BASE_URI + "HintNotificationMessage");
+  public static final Resource TYPE_NEED_CREATED_NOTIFICATION = m.createResource(BASE_URI +
+    "NeedCreatedNotificationMessage");
 
   // response types
   public static final Resource TYPE_CREATE_RESPONSE = m.createResource(BASE_URI + "CreateResponseMessage");

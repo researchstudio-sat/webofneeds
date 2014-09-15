@@ -16,7 +16,7 @@
 
 package won.bot.framework.events.event.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.query.Dataset;
 import won.bot.framework.events.event.BaseNeedSpecificEvent;
 
 import java.net.URI;
@@ -27,17 +27,17 @@ import java.net.URI;
 public class NeedCreatedEventForMatcher extends BaseNeedSpecificEvent
 {
 
-  private final Model needModel;
+  private final Dataset needData;
 
-  public NeedCreatedEventForMatcher(final URI needURI, final Model needModel) {
+  public NeedCreatedEventForMatcher(final URI needURI, final Dataset needData) {
     super(needURI);
-    this.needModel = needModel;
+    this.needData = needData;
 
   }
 
-  public Model getNeedModel()
+  public Dataset getNeedData()
   {
-    return needModel;
+    return needData;
   }
 
 

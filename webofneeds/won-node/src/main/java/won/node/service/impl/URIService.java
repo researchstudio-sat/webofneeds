@@ -21,6 +21,7 @@ import won.cryptography.service.RandomNumberService;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 
@@ -42,6 +43,8 @@ public class URIService
   private String connectionResourceURIPrefix;
   //prefix of a messageEvent resource
   private String messageEventResourceURIInfix;
+  //need meta information suffix
+  private String needMetaInformationURISuffix;
   //prefix for URISs of RDF data
   private String dataURIPrefix;
   //prefix for URIs referring to real-world things
@@ -110,7 +113,7 @@ public class URIService
   }
 
   public URI createNeedURIForId(String id) {
-    return URI.create(needResourceURIPrefix.toString() + "/"   + id);
+    return URI.create(needResourceURIPrefix.toString() + "/" + id);
   }
 
   public URI createConnectionURIForId(String id) {
@@ -139,6 +142,10 @@ public class URIService
 
   public void setMessageEventResourceURIInfix(final String messageEventResourceURIInfix) {
     this.messageEventResourceURIInfix = messageEventResourceURIInfix;
+  }
+
+  public void setNeedMetaInformationURISuffix(final String needMetaInformationURISuffix) {
+    this.needMetaInformationURISuffix = needMetaInformationURISuffix;
   }
 
   public void setDataURIPrefix(final String dataURIPrefix)
@@ -175,6 +182,10 @@ public class URIService
     // ToDo (FS): take length from configuration and choose good length value (maybe change value to bytes)
     return URI.create(parentURI.toString() + messageEventResourceURIInfix + "/" + randomNumberService
       .generateRandomString(9));
+  }
+
+  public URI createNeedMetaInformationURI(final URI needURI) {
+    return URI.create(needURI.toString() + needMetaInformationURISuffix + WonRdfUtils.NAMED_GRAPH_SUFFIX);
   }
 
   /**

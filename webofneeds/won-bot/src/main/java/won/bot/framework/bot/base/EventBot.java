@@ -16,6 +16,7 @@
 
 package won.bot.framework.bot.base;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.BotContext;
@@ -151,7 +152,7 @@ public class EventBot extends TriggeredBot
     }
   }
   @Override
-  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri, final Model needModel)
+  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri, final Dataset needModel)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new NeedCreatedEventForMatcher(needUri, needModel));

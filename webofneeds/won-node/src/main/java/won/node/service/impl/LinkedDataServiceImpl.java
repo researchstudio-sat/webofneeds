@@ -187,6 +187,51 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     return model;
   }
+
+  public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException {
+    Need need = needInformationService.readNeed(needUri);
+
+    // load the dataset from storage
+    Dataset dataset = rdfStorage.loadDataset(need.getNeedURI());
+    Model metaModel = needModelMapper.toModel(need);
+    Model defaultModel = ModelFactory.createDefaultModel();
+
+    Resource needResource = metaModel.getResource(needUri.toString());
+
+    // add connections
+    Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections/");
+    metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
+
+    // add need event container
+    Resource needEventContainer = metaModel.createResource(WON.EVENT_CONTAINER);
+    metaModel.add(metaModel.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
+
+    // add need event URIs
+    List<MessageEventPlaceholder> messageEvents = messageEventRepository.findByParentURI(needUri);
+    for (MessageEventPlaceholder messageEvent : messageEvents) {
+      metaModel.add(metaModel.createStatement(needEventContainer,
+                                      RDFS.member,
+                                      metaModel.getResource(messageEvent.getMessageURI().toString())));
+    }
+
+    // add WON node link
+    needResource.addProperty(WON.HAS_WON_NODE, metaModel.createResource(this.resourceURIPrefix));
+
+    // add meta model to dataset
+    String needMetaInformationURI = uriService.createNeedMetaInformationURI(needUri).toString();
+    dataset.addNamedModel(needMetaInformationURI, metaModel);
+
+    // add the won:hasGraph properties
+    Iterator<String> it = dataset.listNames();
+    while (it.hasNext()) {
+      defaultModel.add(needResource, WON.HAS_GRAPH, defaultModel.createResource(it.next()));
+    }
+
+    dataset.setDefaultModel(defaultModel);
+
+    return dataset;
+  }
+
     public Model getNodeModel()
     {
       Model model = ModelFactory.createDefaultModel();

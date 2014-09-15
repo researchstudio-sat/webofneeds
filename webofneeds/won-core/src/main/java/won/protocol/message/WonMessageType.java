@@ -20,6 +20,7 @@ public enum WonMessageType
 
   // notification messages
   HINT_NOTIFICATION(WONMSG.TYPE_HINT_NOTIFICATION),
+  NEED_CREATED_NOTIFICATION(WONMSG.TYPE_NEED_CREATED_NOTIFICATION),
 
   // response messages
   CREATE_RESPONSE(WONMSG.TYPE_CREATE_RESPONSE),
@@ -76,6 +77,8 @@ public enum WonMessageType
     //notification classes
     if (WONMSG.TYPE_HINT_NOTIFICATION.equals(resource))
       return HINT_NOTIFICATION;
+    if (WONMSG.TYPE_NEED_CREATED_NOTIFICATION.equals(resource))
+      return NEED_CREATED_NOTIFICATION;
     return null;
   }
 

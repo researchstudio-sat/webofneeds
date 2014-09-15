@@ -211,6 +211,81 @@
 
         }
 
+
+        won.JsonLdHelper = {
+            /**
+             * Returns all graph URIs. If none are found, an empty array is returned.
+             * @returns {Array}
+             */
+            getGraphNames: function(data){
+                //collect graph URIs in the specified dataset
+                var graphs = data["@graph"]
+                var graphURIs = [];
+                if (graphs != null && typeof graphs.length === 'Array' && graphs.length > 0)
+                    for (var i = 0; i < graphs.length; i++){
+                        var graphURI = graphs[i]['@id'];
+                        if (graphURI != null){
+                            graphURIs.push(graphURI);
+                        }
+                    }
+                return graphURIs;
+            },
+
+            getDefaultGraph: function(data){
+                if (data['@graph'] != null) {
+                  //graph keyword is present. It could represent the default graph
+                  // (in which case it contains only nodes) or a collection of
+                  //, which are nodes that contain th @graph keyword.
+                  //our naive test is: if the first node contains an '@graph' keyword
+                  //we assume the outermost @graph array to contain only named graphs.
+                  // we search for the one with '@id'='@default' or without
+                  // an '@id' keyword and return it (if we find it)
+                  //if the first node doesn't contain an @graph keyword, we assume that there
+                  //are no named graphs and all data is in the default graph.
+                  outermostGraphContent = data['@graph'];
+                  for (var i = 0; i < outermostGraphContent.length; i++) {
+                    var curNode = outermostGraphContent[i];
+                    if (curNode['@graph'] == null){
+                        //we assume there are no named graphs, the outermost graph is the default graph
+                        return outermostGraphContent;
+                    }
+                    if (curNode['@id'] == null || curNode['@id'] === '@default'){
+                        //we've found the named graph without an @id attribute - that's the default graph
+                        return curNode['@graph'];
+                    }
+                  }
+                  return null; //no default graph found
+                } else {
+                    //there is no @graph keyword at top level:
+                    return data;
+                }
+            },
+            getNamedGraph: function(data, graphName) {
+                if (data['@graph'] != null) {
+                    if (data['@id'] != null) {
+                        if (data['@id'] === graphName) {
+                            return data['@graph'];
+                        }
+                    } else {
+                        //outermost node has '@graph' but no '@id'
+                        //--> @graph array contains named graphs. search for name.
+                        outermostGraphContent = data['@graph'];
+                        for (var i = 0; i < outermostGraphContent.length; i++) {
+                            var curNode = outermostGraphContent[i];
+                            if (curNode['@id'] == null || curNode['@id'] === graphName) {
+                                //we've found the named graph without an @id attribute - that's the default graph
+                                return curNode['@graph'];
+                            }
+                        }
+                    }
+                }
+                return null;
+            } ,
+            getContext :  function (data) {
+                return data["@context"];
+            }
+        }
+
         /*
          * Creates a JSON-LD representation of the need data provided through builder functions.
          * e.g.:
@@ -224,6 +299,7 @@
                 {
                     "@graph": [
                         {
+                            "@id": "no-id-yet",
                             "@graph": [
                                 {
                                     "@type": "won:Need",
@@ -243,7 +319,7 @@
         won.NeedBuilder.prototype = {
             constructor: won.NeedBuilder,
             setContext: function(){
-                this.data["@context"] = won.defaultContext;
+                this.data["@context"] = won.clone(won.defaultContext);
 
                 return this;
             },
@@ -448,67 +524,73 @@
        // window.NeedBuilder = NeedBuilder;
 
         won.CreateMessageBuilder = function CreateMessageBuilder(dataset) {
+
+
+
+            /**
+             * Adds the message graph to the json-ld structure 'this.data',
+             * and adds all specified graph URIs (which must be URIs of the
+             * graphs to be added as content of the message) with triples
+             * [message] wonmsg:hasContent [graphURI]
+             * @param graphURIs
+             * @returns {won.CreateMessageBuilder}
+             */
+            addMessageGraph = function (builder, graphURIs) {
+                graphs = builder.data['@graph'];
+                //add the default graph to the graphs of the builder
+                graphs.push(
+                    {
+                        "@graph": [],
+                        "@id":"@default"
+                    });
+
+                //create the message graph, containing the message type
+                var messageGraph = {
+                    "@graph": [ {"msg:hasMessageType": "msg:CreateMessage"}]
+                };
+                //add a won:hasContent triple for each specified graphURI into the message graph
+                if (typeof graphURIs == 'object' && graphURIs.length > 0){
+                    var contentGraphURIs = [];
+                    for (var i = 0; i < graphURIs.length; i++) {
+                        contentGraphURIs.push({'@id':graphURIs[i]});
+                    }
+                    messageGraph[won.WONMSG.hasContentCompacted] = contentGraphURIs;
+                }
+                //add the message graph to the graphs of the builder
+                graphs.push(messageGraph);
+                //point to the messagegraph so we can later access it easily for modifications
+                builder.messageGraph = messageGraph;
+            };
+
             this.data = won.clone(dataset);
-            this.socket;
+            this.messageGraph = null;
+            addMessageGraph(this, won.JsonLdHelper.getGraphNames(dataset));
+            //add the sender need
+            this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":this.data["@context"]["@base"]};
         };
 
         won.CreateMessageBuilder.prototype = {
             constructor: won.CreateMessageBuilder,
 
-            addMessageGraph: function () {
-                this.data['@graph'][1] =
-                {
-                    "@id": "urn:x-arq:DefaultGraphNode",
-                    "@graph": []
-                };
-                this.data['@graph'][2] = {
-                    "@graph": [
-                        {
-                            "msg:hasMessageType": "msg:CreateMessage",
-                            "msg:hasContent": [
-                                {
-                                    "@id": "core#data"
-                                },
-                                {
-                                    "@id": "transient#data"
-                                }
-                            ]
-
-                        }
-                    ]
-                }
-                return this;
-            },
             eventURI: function (eventId) {
-                this.getContext()["msg:EnvelopeGraph"]= {
+                won.JsonLdHelper.getContext(this.data)["msg:EnvelopeGraph"]= {
                     "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
                     "@type": "@id"
-                },
-                this.getDefaultGraphNode().push({"@id":this.data["@context"]["@base"] + "/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
+                };
+                won.JsonLdHelper.getDefaultGraph(this.data).push({"@id":this.data["@context"]["@base"] + "/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
                 this.getMessageEventNode()['@id'] =this.data["@context"]["@base"] +"/event/"+eventId;
                 this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] +"/event/"+eventId+"#data";
                 return this;
             },
-            getContext :  function () {               //TODO inherit from base buiilder
-                return this.data["@context"];
-            },
-            hasSenderNeed: function(needURI){
-                this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":this.data["@context"]["@base"]};
-                return this;
-            },
-
             hasReceiverNode: function(receiverNodeURI){
                 this.getMessageEventNode()["msg:hasReceiverNode"]={"@id":receiverNodeURI};
                 return this;
             },
-            getDefaultGraphNode: function () {
-                return this.data["@graph"][1]["@graph"];
-            },
             getMessageEventGraph: function (){
-                return this.data["@graph"][2];
+                return this.messageGraph;
             },
             getMessageEventNode: function () {
-                return this.data["@graph"][2]["@graph"][0]
+                return this.getMessageEventGraph()["@graph"][0]
             },
             build: function () {
                 return this.data;
@@ -564,8 +646,6 @@
 
         won.ConnectMessageBuilder = function ConnectMessageBuilder(dataset){
             this.data = won.clone(dataset);
-            this.socket;
-
         };
 
         won.ConnectMessageBuilder.prototype = {
@@ -622,9 +702,6 @@
             hasReceiverNode: function(receiverURI){
                 this.getMessageEventNode()["msg:hasReceiverNode"]={"@id":receiverURI};
                 return this;
-            },
-            getDefaultGraphNode: function () {
-                return this.data["@graph"][1]["@graph"];
             },
             getMessageEventGraph: function (){
                 return this.data["@graph"][2];

@@ -384,6 +384,28 @@ public class WonRdfUtils
         return null;
     }
 
+    /**
+     * Extracts all triples from the dataset (which is expected to be a dataset describing
+     * one need, expressed in multiple named graphs) and copies them to a new model.
+     * @param dataset
+     * @return
+     */
+    public static Model getNeedModelFromNeedDataset(Dataset dataset){
+      assert dataset != null : "dataset must not be null";
+      Model result = ModelFactory.createDefaultModel();
+      Model defaultModel = dataset.getDefaultModel();
+      //find the hasGraph triples that should reference graphs in the dataset.
+      // Get their data and copy it to the result graph.
+      NodeIterator it = defaultModel.listObjectsOfProperty(WON.HAS_GRAPH);
+      while(it.hasNext()){
+        Model namedModel = dataset.getNamedModel(it.next().toString());
+        if (namedModel != null){
+          result.add(namedModel);
+        }
+      }
+      return result;
+    }
+
     public static URI queryConnectionContainer(Dataset dataset, URI needURI)
       throws MultipleQueryResultsFoundException {
 

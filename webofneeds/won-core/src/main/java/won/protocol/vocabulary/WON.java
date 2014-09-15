@@ -68,6 +68,8 @@ public class WON
 
   public static final Property HAS_CONTENT = m.createProperty(BASE_URI, "hasContent");
 
+
+
   public static final Resource TEXT_MESSAGE = m.createResource(BASE_URI + "TextMessage");
   public static final Property HAS_TEXT_MESSAGE = m.createProperty(BASE_URI + "hasTextMessage");
   public static final Resource MESSAGE = m.createResource(BASE_URI + "Message");
@@ -161,9 +163,12 @@ public class WON
   public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
   public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
 
+  public static final Property HAS_GRAPH = m.createProperty(BASE_URI,"hasGraph");
+
   //search result model
   public static final Property SEARCH_RESULT_URI = m.createProperty(BASE_URI,"uri");
   public static final Property SEARCH_RESULT_PREVIEW = m.createProperty(BASE_URI, "preview");
+
 
   /**
    * Returns the base URI for this schema.

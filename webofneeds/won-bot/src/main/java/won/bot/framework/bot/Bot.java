@@ -16,6 +16,7 @@
 
 package won.bot.framework.bot;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
@@ -40,7 +41,7 @@ public interface Bot
   public void onHintFromMatcher(Match match, final Model content) throws Exception;
   public void onMessageFromOtherNeed(Connection con, ChatMessage message, final Model content) throws Exception;
   public void onMatcherRegistered(URI wonNodeUri);
-  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Model needModel);
+  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Dataset needModel);
   public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
   public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
 

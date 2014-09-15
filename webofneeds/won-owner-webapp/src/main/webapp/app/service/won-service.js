@@ -162,9 +162,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
     wonService.createNeed = function(needAsJsonLd) {
         var deferred = $q.defer();
         var message = new won.CreateMessageBuilder(needAsJsonLd)
-            .addMessageGraph()
             .eventURI("34543242134")//TODO: generate event URI here
-            .hasSenderNeed()
             .hasReceiverNode("http://localhost:8080/won")//TODO: pass node to function
             .build();
 
