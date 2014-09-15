@@ -39,6 +39,7 @@
     <mvc:annotation-driven conversion-service="conversionService">
         <mvc:message-converters>
             <bean class="won.protocol.rest.RdfModelConverter"/>
+            <bean class="won.protocol.rest.RdfDatasetConverter"/>
         </mvc:message-converters>
     </mvc:annotation-driven>
     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />

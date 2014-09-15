@@ -79,22 +79,30 @@ public class RdfUtils
      * @return Jena Dataset containing the RDF from content
      */
     public static Dataset toDataset(String content) {
-
-        Dataset dataset = DatasetFactory.createMem();
-
-        if (content != null) {
-            InputStream is = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
-            RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
-            try {
-                is.close();
-            } catch (IOException ex) {
-                logger.warn ("An exception occurred.", ex);
-            }
-        }
-        return dataset;
+      return toDataset(content, RDFFormat.TRIG);
     }
 
+  public static Dataset toDataset(String content, RDFFormat rdfFormat) {
+    if (content != null) {
+      return toDataset(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), rdfFormat);
+    } else
+      return DatasetFactory.createMem();
 
+
+  }
+
+  public static Dataset toDataset(InputStream stream, RDFFormat rdfFormat) {
+
+    Dataset dataset = DatasetFactory.createMem();
+
+    RDFDataMgr.read(dataset, stream, rdfFormat.getLang());
+    try {
+      stream.close();
+    } catch (IOException ex) {
+      logger.warn("An exception occurred.", ex);
+    }
+    return dataset;
+  }
 
     /**
    * Clones the specified model (its statements and ns prefixes) and returns the clone.
