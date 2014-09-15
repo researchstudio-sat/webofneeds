@@ -29,5 +29,6 @@ public class RDFMediaType
   public static final MediaType APPLICATION_X_TURTLE = new MediaType("application","x-turtle");
   public static final MediaType TEXT_RDF_N3 = new MediaType("text","rdf+n3");
   public static final MediaType APPLICATION_JSON = new MediaType("application","json");
+  public static final MediaType APPLICATION_TRIG = new MediaType("application", "trig");
 
 }

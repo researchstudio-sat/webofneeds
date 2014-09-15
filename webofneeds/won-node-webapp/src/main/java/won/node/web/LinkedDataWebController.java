@@ -389,7 +389,7 @@ public class
       produces={"application/rdf+xml","application/x-turtle",
                 "text/turtle","text/rdf+n3",
                 "application/json","application/ld+json",
-                "application/trig"})
+                "text/trig"})
   public ResponseEntity<Dataset> readNeed(
       HttpServletRequest request,
       @PathVariable(value="identifier") String identifier) {
