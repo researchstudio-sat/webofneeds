@@ -63,7 +63,7 @@ public class LinkedDataRestClient
     //it was probably the wrong resourceURI
     Model result;
     try {
-       result = r.accept(RDFMediaType.APPLICATION_RDF_XML).get(Model.class);
+       result = r.accept(RDFMediaType.APPLICATION_TRIG).get(Model.class);
     } catch (ClientHandlerException e) {
       throw new IllegalArgumentException(MessageFormat.format("caught a clientHandler exception, " +
         "which may indicate that the URI that was accessed isn't a" +

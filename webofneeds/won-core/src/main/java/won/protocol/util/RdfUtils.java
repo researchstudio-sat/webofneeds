@@ -645,4 +645,23 @@ public class RdfUtils
     RDFDataMgr.read(dataset, sr, "no:uri", lang);
     return dataset;
   }
+
+  /**
+   * Adds the second dataset to the first one, merging default models and models with identical name.
+   * @param baseDataset
+   * @param toBeAddedtoBase
+   */
+  public static void addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase) {
+    assert baseDataset != null : "baseDataset must not be null";
+    assert toBeAddedtoBase != null : "toBeAddedToBase must not be null";
+    baseDataset.getDefaultModel().add(toBeAddedtoBase.getDefaultModel());
+    for ( Iterator<String> nameIt = toBeAddedtoBase.listNames(); nameIt.hasNext();){
+      String modelName = nameIt.next();
+      if (baseDataset.containsNamedModel(modelName)) {
+        baseDataset.getNamedModel(modelName).add(toBeAddedtoBase.getNamedModel(modelName));
+      } else {
+        baseDataset.addNamedModel(modelName, toBeAddedtoBase.getNamedModel(modelName));
+      }
+    }
+  }
 }
