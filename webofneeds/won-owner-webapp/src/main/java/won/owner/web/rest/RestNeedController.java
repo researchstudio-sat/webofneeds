@@ -2,6 +2,7 @@ package won.owner.web.rest;
 
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -146,7 +147,7 @@ public class RestNeedController {
 
     //create an URI iterator from the matches and fetch the linked data descriptions for the needs.
     final Iterator<Match> matchIterator = matches.iterator();
-    Iterator<com.hp.hpl.jena.rdf.model.Model> modelIterator = WonLinkedDataUtils.getModelForURIs(
+    Iterator<Dataset> modelIterator = WonLinkedDataUtils.getModelForURIs(
       new ProjectingIterator<Match, URI>(matchIterator)
       {
         @Override
@@ -185,7 +186,7 @@ public class RestNeedController {
 
     Iterable<Need> needs = user.getNeeds();
     for (Need need : needs) {
-      NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+      NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()).getDefaultModel());
       needPojo.setNeedId(need.getId());
       returnList.add(needPojo);
     }
@@ -401,7 +402,7 @@ public class RestNeedController {
 		Iterable<Need> needs = needRepository.findById(needId);
 		Need need = needs.iterator().next();
 
-		NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+		NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()).getDefaultModel());
 		needPojo.setNeedId(need.getId());
 
 		return needPojo;
@@ -534,8 +535,8 @@ public class RestNeedController {
       URI connectionURI = futureResult.get();
       Connection connection = DataAccessUtils.loadConnection(connectionRepository,connectionURI);
       if (connection != null){
-        fullConnection = new ConnectionPojo(connectionURI, linkedDataSource.getModelForResource
-          (connection.getConnectionURI()));
+        fullConnection = new ConnectionPojo(connectionURI, linkedDataSource.getDataForResource
+          (connection.getConnectionURI()).getDefaultModel());
         fullConnection.setConnectionId(connection.getId());
         logger.debug("Added connection id:" + fullConnection.getConnectionId() + "uri: " + connectionURI);
       }
@@ -622,7 +623,7 @@ public class RestNeedController {
 
       Need need = DataAccessUtils.loadNeed(needRepository, needURI);
       if (need != null) {
-        NeedPojo fullNeed = new NeedPojo(needURI, linkedDataSource.getModelForResource(need.getNeedURI()));
+        NeedPojo fullNeed = new NeedPojo(needURI, linkedDataSource.getDataForResource(need.getNeedURI()).getDefaultModel());
         fullNeed.setNeedId(need.getId());
         logger.info("Added need id:" + fullNeed.getNeedId() + "uri: " + needURI);
         return fullNeed;

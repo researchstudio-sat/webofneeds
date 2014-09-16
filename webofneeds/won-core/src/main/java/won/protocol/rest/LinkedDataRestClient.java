@@ -17,6 +17,7 @@
 package won.protocol.rest;
 
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.eval.PathEval;
@@ -49,28 +50,30 @@ public class LinkedDataRestClient
    * @param resourceURI
    * @return
    */
-  public Model readResourceData(URI resourceURI){
+  public Dataset readResourceData(URI resourceURI){
     assert resourceURI != null : "resource URI must not be null";
     logger.debug("fetching linked data resource: {}", resourceURI);
     ClientConfig cc = new DefaultClientConfig();
     cc.getProperties().put(
         ClientConfig.PROPERTY_FOLLOW_REDIRECTS, true);
-    cc.getClasses().add(ModelReaderWriter.class);
+    cc.getClasses().add(DatasetReaderWriter.class);
     Client c = Client.create(cc);
     WebResource r = c.resource(resourceURI);
     //TODO: improve error handling
     //If a ClientHandlerException is thrown here complaining that it can't read a Model with MIME media type text/html,
     //it was probably the wrong resourceURI
-    Model result;
+    Dataset result;
     try {
-       result = r.accept(RDFMediaType.APPLICATION_TRIG).get(Model.class);
+       result = r.accept(RDFMediaType.APPLICATION_TRIG).get(Dataset.class);
     } catch (ClientHandlerException e) {
-      throw new IllegalArgumentException(MessageFormat.format("caught a clientHandler exception, " +
-        "which may indicate that the URI that was accessed isn't a" +
+      throw new IllegalArgumentException(
+        MessageFormat.format(
+        "caught a clientHandler exception, " +
+        "which may indicate that the URI that was accessed isn''t a" +
         " linked data URI, please check {0}", resourceURI), e);
     }
     if (logger.isDebugEnabled()) {
-      logger.debug("fetched model with {} statements for resource {}",result.size(), resourceURI);
+      logger.debug("fetched model with {} statements for resource {}",result.getDefaultModel().size(), resourceURI);
     }
     return result;
   }
@@ -86,9 +89,9 @@ public class LinkedDataRestClient
      */
   public URI getURIPropertyForResource(final URI resourceURI, Property property)
   {
-    Model rdfModel = readResourceData(resourceURI);
-    StmtIterator stmts = rdfModel.listStatements(
-        new SimpleSelector(rdfModel.createResource(resourceURI.toString()), property, (RDFNode) null));
+    Dataset dataset = readResourceData(resourceURI);
+    StmtIterator stmts = dataset.getDefaultModel().listStatements(
+      new SimpleSelector(dataset.getDefaultModel().createResource(resourceURI.toString()), property, (RDFNode) null));
     //assume only one endpoint
     if (!stmts.hasNext()) return null;
     Statement stmt = stmts.next();
@@ -105,9 +108,9 @@ public class LinkedDataRestClient
      */
     public String getStringPropertyForResource(final URI resourceURI, Property property)
     {
-        Model rdfModel =  readResourceData(resourceURI);
-        StmtIterator stmts = rdfModel.listStatements(
-                new SimpleSelector(rdfModel.createResource(resourceURI.toString()), property, (RDFNode) null));
+        Dataset dataset =  readResourceData(resourceURI);
+        StmtIterator stmts = dataset.getDefaultModel().listStatements(
+                new SimpleSelector(dataset.getDefaultModel().createResource(resourceURI.toString()), property, (RDFNode) null));
         //assume only one endpoint
         if (!stmts.hasNext()) return null;
         Statement stmt = stmts.next();
@@ -159,11 +162,11 @@ public class LinkedDataRestClient
 
 
     private Node getNodeForPropertyPath(URI resourceURI, Path propertyPath) {
-        Model rdfModel = readResourceData(resourceURI);
+        Dataset dataset = readResourceData(resourceURI);
 //        Iterator<Node> result =  PathEval.eval(rdfModel.getGraph(), rdfModel.getResource(resourceURI.toString())
 //                                                                             .asNode(), propertyPath);
 //
-      Iterator<Node> result =  PathEval.eval(rdfModel.getGraph(), rdfModel.getResource(resourceURI.toString())
+      Iterator<Node> result =  PathEval.eval(dataset.getDefaultModel().getGraph(), dataset.getDefaultModel().getResource(resourceURI.toString())
                                                                           .asNode(), propertyPath, Context.emptyContext);
       if (!result.hasNext()) return null;
         return result.next();

@@ -74,7 +74,7 @@ public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements M
             try{
                 Path path = PathParser.parse(matcherProtocolTopicList.get(i),PrefixMapping.Standard);
                 activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
-                        linkedDataSource.getModelForResource(resourceURI),
+                        linkedDataSource.getDataForResource(resourceURI).getDefaultModel(),
                         resourceURI,
                         path
                 ));

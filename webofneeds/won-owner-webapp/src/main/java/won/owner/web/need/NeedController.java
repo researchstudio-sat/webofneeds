@@ -1,6 +1,7 @@
 package won.owner.web.need;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hp.hpl.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -202,7 +203,7 @@ public class NeedController
     NeedPojo needCommandPojo = new NeedPojo(facets);
           model.addAttribute("command", needCommandPojo);
 
-    NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataSource.getModelForResource(need.getNeedURI()));
+    NeedPojo pojo = new NeedPojo(need.getNeedURI(), linkedDataSource.getDataForResource(need.getNeedURI()).getDefaultModel());
     pojo.setState(need.getState());
     model.addAttribute("pojo", pojo);
 
@@ -227,7 +228,7 @@ public class NeedController
 
     //create an URI iterator from the matches and fetch the linked data descriptions for the needs.
     final Iterator<Match> matchIterator = matches.iterator();
-    Iterator<com.hp.hpl.jena.rdf.model.Model> modelIterator = WonLinkedDataUtils.getModelForURIs(
+    Iterator<Dataset> modelIterator = WonLinkedDataUtils.getModelForURIs(
       new ProjectingIterator<Match, URI>(matchIterator)
       {
         @Override
@@ -259,14 +260,15 @@ public class NeedController
 
     //create an URI iterator from the matches and fetch the linked data descriptions for the needs.
     final Iterator<Connection> connectionIterator = connections.iterator();
-    Iterator<com.hp.hpl.jena.rdf.model.Model> modelIterator = WonLinkedDataUtils.getModelForURIs(new ProjectingIterator<Connection,URI>(connectionIterator)
+    Iterator<Dataset> datasetIterator = WonLinkedDataUtils.getModelForURIs(new ProjectingIterator<Connection,
+      URI>(connectionIterator)
     {
       @Override
       public URI next() {
         return connectionIterator.next().getRemoteNeedURI();
       }
     }, this.linkedDataSource);
-    Iterator<NeedPojo> needPojoIterator = WonOwnerWebappUtils.toNeedPojos(modelIterator);
+    Iterator<NeedPojo> needPojoIterator = WonOwnerWebappUtils.toNeedPojos(datasetIterator);
 
     //create a list of models and add all the descriptions:
     List<NeedPojo> remoteNeeds = new ArrayList<NeedPojo>(connections.size());

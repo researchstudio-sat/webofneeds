@@ -17,7 +17,6 @@
 package won.bot.framework.events.listener.baStateBots;
 
 import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import won.bot.framework.events.EventListenerContext;
@@ -192,7 +191,7 @@ public class BATestScriptListener extends AbstractFinishingListener
       ((CachingLinkedDataSource)linkedDataSource).removeElement(fromCon);
     }
     logger.debug("fromCon {}, stateOfSenderBeforeSending{}", fromCon, action.getStateOfSenderBeforeSending());
-    Model dataModel = linkedDataSource.getModelForResource(fromCon);
+    Dataset dataModel = linkedDataSource.getDataForResource(fromCon);
 
     logger.debug("crawled dataset for fromCon {}: {}", fromCon, RdfUtils.toString(dataModel));
 

@@ -17,6 +17,7 @@
 package won.protocol.util.linkeddata;
 
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;
@@ -38,31 +39,32 @@ public class WonLinkedDataUtils
 
   public static URI getRemoteConnectionURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
-    Model model = getModelForResource(connectionURI, linkedDataSource);
+    Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
     Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_CONNECTION + ">", PrefixMapping.Standard);
-    return RdfUtils.getURIPropertyForPropertyPath(model, connectionURI, propertyPath);
+    return RdfUtils.getURIPropertyForPropertyPath(dataset.getDefaultModel(), connectionURI, propertyPath);
   }
 
   public static URI getRemoteNeedURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
-    Model model = getModelForResource(connectionURI, linkedDataSource);
+    Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
     Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_NEED + ">", PrefixMapping.Standard);
-    return RdfUtils.getURIPropertyForPropertyPath(model, connectionURI, propertyPath);
+    return RdfUtils.getURIPropertyForPropertyPath(dataset.getDefaultModel(), connectionURI, propertyPath);
   }
 
-  public static Model getModelForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
+  public static Dataset getDatalForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     assert connectionURI != null : "connection URI must not be null";
-    Model model = null;
+    Dataset dataset = null;
     logger.debug("loading model for connection {}", connectionURI);
-    model = linkedDataSource.getModelForResource(connectionURI);
-    if (model == null) {
+    dataset = linkedDataSource.getDataForResource(connectionURI);
+    if (dataset == null) {
       throw new IllegalStateException("failed to load model for Connection " + connectionURI);
     }
-    return model;
+    return dataset;
   }
 
-  public static Iterator<Model> getModelForURIs(final Iterator<URI> uriIterator, final LinkedDataSource linkedDataSource) {
+  public static Iterator<Dataset> getModelForURIs(final Iterator<URI> uriIterator,
+    final LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     return new ModelFetchingIterator(uriIterator, linkedDataSource);
   }
@@ -70,7 +72,7 @@ public class WonLinkedDataUtils
   public static URI getWonNodeURIForNeedOrConnectionURI(final URI resourceURI, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     logger.debug("fetching WON node URI for resource {} with linked data source {}", resourceURI, linkedDataSource);
-    return getWonNodeURIForNeedOrConnection(linkedDataSource.getModelForResource(resourceURI));
+    return getWonNodeURIForNeedOrConnection(linkedDataSource.getDataForResource(resourceURI).getDefaultModel());
   }
 
   public static URI getWonNodeURIForNeedOrConnection(final Model resourceModel) {
@@ -112,9 +114,9 @@ public class WonLinkedDataUtils
   public static Node getWonNodePropertyForNeedOrConnectionURI(URI resourceURI, Path propertyPath, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(resourceURI, linkedDataSource);
-    Model nodeModel = linkedDataSource.getModelForResource(wonNodeUri);
+    Dataset nodeDataset = linkedDataSource.getDataForResource(wonNodeUri);
     return RdfUtils.getNodeForPropertyPath(
-      nodeModel,
+      nodeDataset.getDefaultModel(),
       wonNodeUri,
       propertyPath
     );
@@ -131,9 +133,9 @@ public class WonLinkedDataUtils
    */
   public static Node getPropertyForURI(URI resourceURI, Path propertyPath, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
-    Model model = linkedDataSource.getModelForResource(resourceURI);
+    Dataset dataset = linkedDataSource.getDataForResource(resourceURI);
     return RdfUtils.getNodeForPropertyPath(
-      model,
+      dataset.getDefaultModel(),
       resourceURI,
       propertyPath
     );
@@ -145,7 +147,7 @@ public class WonLinkedDataUtils
   /**
    * Iterator implementation that fetches linked data lazily for the specified iterator of URIs.
    */
-  private static class ModelFetchingIterator implements Iterator<Model> {
+  private static class ModelFetchingIterator implements Iterator<Dataset> {
     private Iterator<URI> uriIterator = null;
     private LinkedDataSource linkedDataSource = null;
 
@@ -155,9 +157,9 @@ public class WonLinkedDataUtils
     }
 
     @Override
-    public Model next() {
+    public Dataset next() {
       URI uri = uriIterator.next();
-      return linkedDataSource.getModelForResource(uri);
+      return linkedDataSource.getDataForResource(uri);
     }
 
     @Override

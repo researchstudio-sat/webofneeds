@@ -1,7 +1,6 @@
 package won.bot.integrationtest;
 
 import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -219,9 +218,9 @@ public class BAAtomicCCActiveFailingBotTest
         ((CachingLinkedDataSource)linkedDataSource).clear();
       }
 
-      Model dataModel = linkedDataSource.getModelForResourceWithPropertyPath(needs.get(0),
-                                                                             PropertyPathConfigurator.configurePropertyPaths
-                                                                               (), 300,4);
+      Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0),
+        PropertyPathConfigurator.configurePropertyPaths
+          (), 300, 4);
       logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
 
       String queryString = sparqlPrefix +
@@ -261,9 +260,9 @@ public class BAAtomicCCActiveFailingBotTest
       }
 
 
-      Model dataModel = linkedDataSource.getModelForResourceWithPropertyPath(needs.get(0),
-                                                                             PropertyPathConfigurator.configurePropertyPaths
-                                                                               (), 300,4);
+      Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0),
+        PropertyPathConfigurator.configurePropertyPaths
+          (), 300, 4);
 
       logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
 

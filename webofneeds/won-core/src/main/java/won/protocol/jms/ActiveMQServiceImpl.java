@@ -75,7 +75,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             logger.debug("trying to get queue name prototol type {} on resource {}", protocolType, resourceUri);
             Path path = PathParser.parse(queueNamePath, PrefixMapping.Standard);
 
-            Model resourceModel = linkedDataSource.getModelForResource(resourceUri);
+            Model resourceModel = linkedDataSource.getDataForResource(resourceUri).getDefaultModel();
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(
                 resourceModel,
                 resourceUri,
@@ -87,7 +87,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             logger.debug("could not to get queue name from resource {}, trying to obtain won node URI",
               resourceUri);
             URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceModel);
-            resourceModel = linkedDataSource.getModelForResource(wonNodeUri);
+            resourceModel = linkedDataSource.getDataForResource(wonNodeUri).getDefaultModel();
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(
               resourceModel,
               wonNodeUri,
@@ -116,7 +116,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
         try{
           logger.debug("trying to get broker endpoint for {} on resource {}", protocolType, resourceUri);
           Path path = PathParser.parse(PATH_BROKER_URI, PrefixMapping.Standard);
-          Model resourceModel = linkedDataSource.getModelForResource(resourceUri);
+          Model resourceModel = linkedDataSource.getDataForResource(resourceUri).getDefaultModel();
           logger.debug("ResourceModel for {}: {}", resourceUri, resourceModel);
           activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(
                 resourceModel,
@@ -133,7 +133,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
 
           URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceModel);
           logger.debug("wonNodeUri: {}", wonNodeUri);
-          resourceModel = linkedDataSource.getModelForResource(wonNodeUri);
+          resourceModel = linkedDataSource.getDataForResource(wonNodeUri).getDefaultModel();
           activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(
             resourceModel,
             wonNodeUri,
@@ -156,7 +156,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
       try{
         Path path = PathParser.parse(matcherProtocolTopicList.get(i),PrefixMapping.Standard);
         activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
-          linkedDataSource.getModelForResource(resourceURI),
+          linkedDataSource.getDataForResource(resourceURI).getDefaultModel(),
           resourceURI,
           path
         ));
