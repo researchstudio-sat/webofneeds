@@ -387,8 +387,7 @@ public class
       value="${uri.path.data.need}/{identifier}",
       method = RequestMethod.GET,
       produces={"text/trig",
-                "application/ld+json",
-                "application/json"})
+                "application/ld+json"})
   public ResponseEntity<Dataset> readNeed(
       HttpServletRequest request,
       @PathVariable(value="identifier") String identifier) {

@@ -22,10 +22,7 @@ import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
-import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.GR;
-import won.protocol.vocabulary.LDP;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.*;
 
 /**
  * User: fkleedorfer
@@ -47,6 +44,7 @@ public class DefaultPrefixUtils
    */
   public static void setDefaultPrefixes(PrefixMapping prefixMapping) {
     prefixMapping.setNsPrefix("won", WON.getURI());
+    prefixMapping.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.getURI());
     prefixMapping.setNsPrefix("rdf", RDF.getURI());
     prefixMapping.setNsPrefix("ldp", LDP.getURI());
     prefixMapping.setNsPrefix("rdfs", RDFS.getURI());
