@@ -46,6 +46,11 @@
         won.WON = {};
         won.WON.baseUri = "http://purl.org/webofneeds/model#";
         won.WON.prefix = "won";
+        won.WON.hasWonNode = won.WON.baseUri+"hasWonNode";
+        won.WON.hasWonNodeCompacted = won.WON.prefix+":hasWonNode";
+
+        won.WON.isInState = won.WON.baseUri+"isInState";
+        won.WON.isInStateCompacted = won.WON.prefix+":isInState";
 
         //EVENT TYPES
         won.WON.OwnerClose = won.WON.baseUri + "OwnerClose";

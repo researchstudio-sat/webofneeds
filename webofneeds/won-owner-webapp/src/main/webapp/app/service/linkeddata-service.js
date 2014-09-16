@@ -232,8 +232,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime where { " +
                 "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
                 "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
+                "GRAPH ?coreURI {"+
                 "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ."+
-                "<" + uri + ">" + " <"+"http://purl.org/dc/terms/created"+"> " + "?creationDate ."+
                 "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ."+
                 "?content dc:title ?title ."+
                 "OPTIONAL {?content "+ won.WON.hasTagCompacted + " ?tags .}"+
@@ -245,7 +245,15 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 "OPTIONAL {?content "+ won.WON.hasStartTimeCompacted + " ?startTime .}"+
                 "OPTIONAL {?content "+ won.WON.hasTagCompacted + " ?tags .}"+
                 "OPTIONAL {?content "+ won.WON.hasTextDescriptionCompacted + " ?textDescription ."+
-                "}}";
+                "}" +
+                "GRAPH ?metaURI {" +
+                "<" + uri + ">" + " <"+"http://purl.org/dc/terms/created"+"> " + "?creationDate ."+
+                "<" + uri + ">" + won.WON.hasConnectionsCompacted + " ?connections ."+
+                "<" + uri + ">" + won.WON.hasWonNodeCompacted + " ?wonNode ."+
+                "<" + uri + ">" + won.WON.isInStateCompacted + " ?state ."+
+                "OPTIONAL {<"+ uri +"> "+ won.WON.hasEventContainerCompacted+" ?eventContainer .}"+
+                "OPTIONAL {?eventContainer "+ "rdfs:member" + " ?event .}"+
+                "}}}";
         privateData.store.execute(query, function (success, results) {
             if (!success) {
                 return;
