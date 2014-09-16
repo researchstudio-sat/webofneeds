@@ -66,6 +66,7 @@ public class WonMessageDecoder
         dataset.addNamedModel(name, message.getNamedModel(name));
       }
     }
+    dataset.setDefaultModel(defaultModel);
     RdfUtils.addPrefixMapping(dataset.getDefaultModel(), message.getDefaultModel());
 
     return new WonMessage(msgEvent, dataset);
