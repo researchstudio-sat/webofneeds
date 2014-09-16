@@ -227,6 +227,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
       defaultModel.add(needResource, WON.HAS_GRAPH, defaultModel.createResource(it.next()));
     }
 
+    setNsPrefixes(defaultModel);
+
     dataset.setDefaultModel(defaultModel);
 
     return dataset;

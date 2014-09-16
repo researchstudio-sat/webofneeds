@@ -16,7 +16,7 @@ public class WONMSG
   // access the vocabulary from there? If yes, change to that all the enum classes
 
   public static final String BASE_URI = "http://purl.org/webofneeds/message#";
-  public static final String DEFAULT_PREFIX = "wonmsg";
+  public static final String DEFAULT_PREFIX = "msg";
 
   private static Model m = ModelFactory.createDefaultModel();
 
@@ -95,6 +95,16 @@ public class WONMSG
   public static String getGraphURI(String uri)
   {
     return uri + "#" + GRAPH_URI_FRAGMENT;
+  }
+
+  /**
+   * Returns the base URI for this schema.
+   *
+   * @return the URI for this schema
+   */
+  public static String getURI()
+  {
+    return BASE_URI;
   }
 
 }
