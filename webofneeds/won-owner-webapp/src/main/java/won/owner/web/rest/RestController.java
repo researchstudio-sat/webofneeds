@@ -139,7 +139,7 @@ public class RestController
     logger.info("Found need in DB: ");
     Need need = needs.get(0);
 
-    NeedPojo fullNeed = new NeedPojo(need.getNeedURI(), linkedDataSource.getModelForResource(need.getNeedURI()));
+    NeedPojo fullNeed = new NeedPojo(need.getNeedURI(), linkedDataSource.getDataForResource(need.getNeedURI()).getDefaultModel());
 
     //NeedPojo fullNeed = NeedFetcher.getNeedInfo(need);
 
@@ -162,7 +162,8 @@ public class RestController
         logger.debug("found {} needs for uri {} in repo", matchNeeds.size(), matchUri);
         logger.debug("matchUri:{}, needURi:{}", matchUri, matchNeeds.get(0));
         logger.debug("fetching need {} from WON node", matchUri);
-        matchedNeed = new NeedPojo(matchNeeds.get(0).getNeedURI(), linkedDataSource.getModelForResource(matchNeeds.get(0).getNeedURI()));
+        matchedNeed = new NeedPojo(matchNeeds.get(0).getNeedURI(), linkedDataSource.getDataForResource(
+          matchNeeds.get(0).getNeedURI()).getDefaultModel());
         //matchedNeed = new NeedPojo(matchUri, linkedDataRestClient.readResourceData(matchUri));
         //NeedPojo matchedNeed = NeedFetcher.getNeedInfo(matchNeeds.get(0));
         this.cachedNeeds.put(matchUri, matchedNeed);
@@ -213,7 +214,7 @@ public class RestController
 
     Iterable<Need> needs = needRepository.findAll();
     for (Need need : needs) {
-      NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataSource.getModelForResource(need.getNeedURI()));
+      NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataSource.getDataForResource(need.getNeedURI()).getDefaultModel());
       needPojo.setNeedId(need.getId());
       returnList.add(needPojo);
     }
@@ -235,7 +236,7 @@ public class RestController
 		Iterable<Need> needs = needRepository.findById(needId);
 		Need need = needs.iterator().next();
 
-		NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+		NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()).getDefaultModel());
 		needPojo.setNeedId(need.getId());
 
 		return needPojo;
@@ -340,7 +341,7 @@ public class RestController
 
 
 			LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
-			NeedPojo fullNeed = new NeedPojo(needURI, linkedDataRestClient.readResourceData(needs.get(0).getNeedURI()));
+			NeedPojo fullNeed = new NeedPojo(needURI, linkedDataRestClient.readResourceData(needs.get(0).getNeedURI()).getDefaultModel());
 			fullNeed.setNeedId(needs.get(0).getId());
 
 			//NeedPojo fullNeed = NeedFetcher.getNeedInfo(needs.get(0));

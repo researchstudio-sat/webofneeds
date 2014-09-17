@@ -234,9 +234,9 @@ public class CommentBotTest
 
 
 
-      Model dataModel = linkedDataSource.getModelForResourceWithPropertyPath(needs.get(0),PropertyPathConfigurator
-        .configurePropertyPaths(), 30,
-                                                                             8 );
+      Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0), PropertyPathConfigurator
+          .configurePropertyPaths(), 30,
+        8);
 
       logger.debug("crawled dataset with property path: {}",RdfUtils.toString(dataModel));
 
@@ -265,10 +265,10 @@ public class CommentBotTest
 
     }
 
-    public Model executeNeedRDFValidationAsserts(){
+    public Dataset executeNeedRDFValidationAsserts(){
 
       List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(NAME_NEEDS);
-      Model needModel = getEventListenerContext().getLinkedDataSource().getModelForResource(needs.get(0));
+      Dataset needModel = getEventListenerContext().getLinkedDataSource().getDataForResource(needs.get(0));
       System.out.println("executing queries...");
       String queryString = sparqlPrefix +
         "SELECT ?need WHERE {" +
@@ -289,9 +289,9 @@ public class CommentBotTest
       //assertThat(actualList, hasItems(expected1));
       return needModel;
     }
-    public Model executeCommentRDFValidationAsserts(){
+    public Dataset executeCommentRDFValidationAsserts(){
       List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(NAME_COMMENTS);
-      Model commentModel = getEventListenerContext().getLinkedDataSource().getModelForResource(needs.get(0));
+      Dataset commentModel = getEventListenerContext().getLinkedDataSource().getDataForResource(needs.get(0));
       System.out.println("executing queries...");
       String queryString = sparqlPrefix +
         "SELECT ?need WHERE {" +
@@ -348,7 +348,8 @@ public class CommentBotTest
       qExec.close();
       assertTrue("wrong number of results", actualList.size() >= 1);
 
-      Model needConnections = getEventListenerContext().getLinkedDataSource().getModelForResource(needConnectionCollectionURI);
+      Dataset needConnections = getEventListenerContext().getLinkedDataSource().getDataForResource(
+        needConnectionCollectionURI);
       String queryString2 = sparqlPrefix+
         "SELECT ?connection WHERE {" +
         "?connections rdfs:member ?connection"+
@@ -371,7 +372,7 @@ public class CommentBotTest
       qExec2.close();
       assertTrue("wrong number of results", actualList2.size() >= 1);
 
-      Model needConnection = getEventListenerContext().getLinkedDataSource().getModelForResource(needConnectionURI);
+      Dataset needConnection = getEventListenerContext().getLinkedDataSource().getDataForResource(needConnectionURI);
       String queryString3 = sparqlPrefix +
         "SELECT ?remoteConnection WHERE {" +
         "?connection won:hasRemoteConnection ?remoteConnection"+
@@ -391,7 +392,8 @@ public class CommentBotTest
       }
       assertTrue("wrong number of results", actualList3.size() >= 1);
 
-      Model remoteConnections = getEventListenerContext().getLinkedDataSource().getModelForResource(commentConnectionsURI);
+      Dataset remoteConnections = getEventListenerContext().getLinkedDataSource().getDataForResource(
+        commentConnectionsURI);
       String queryString4 = sparqlPrefix +
         "SELECT ?remoteConnection WHERE {" +
         "?connection won:hasRemoteConnection ?remoteConnection"+

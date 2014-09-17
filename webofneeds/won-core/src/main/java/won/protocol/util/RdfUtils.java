@@ -1,5 +1,6 @@
 package won.protocol.util;
 
+import com.google.common.collect.Iterators;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Dataset;
@@ -17,6 +18,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.vocabulary.WON;
@@ -423,42 +425,6 @@ public class RdfUtils
     return readRdfSnippet(new StringReader(rdfAsString), rdfLanguage);
   }
 
-  /**
-   * Looks for the triple [resourceURI, property, X] in the model obtained by
-   * dereferencing the specified resourceURI and returns X as a URI.
-   * If multiple triples are found, only the object of the first one is returned.
-   * @param resourceURI
-   * @param property
-   * @return null if the model is empty or the property does not exist
-   * @throws  IllegalArgumentException if the node found by the path is not a URI
-   */
-  public static URI getURIPropertyForResource(final Model model, final URI resourceURI, Property property)
-  {
-    StmtIterator stmts = model.listStatements(
-        new SimpleSelector(model.createResource(resourceURI.toString()), property, (RDFNode) null));
-    //assume only one endpoint
-    if (!stmts.hasNext()) return null;
-    Statement stmt = stmts.next();
-    return URI.create(stmt.getObject().toString());
-  }
-
-  /**
-   * Looks for the triple [resourceURI, property, X] in the model obtained by
-   * dereferencing the specified resourceURI and returns X as a string.
-   * If multiple triples are found, only the object of the first one is returned.
-   * @param resourceURI
-   * @param property
-   * @return null if the model is empty or the property does not exist
-   */
-  public static String getStringPropertyForResource(final Model model, final URI resourceURI, Property property)
-  {
-    StmtIterator stmts = model.listStatements(
-        new SimpleSelector(model.createResource(resourceURI.toString()), property, (RDFNode) null));
-    //assume only one endpoint
-    if (!stmts.hasNext()) return null;
-    Statement stmt = stmts.next();
-    return stmt.getString();
-  }
 
   /**
    * Evaluates the path on the model obtained by dereferencing the specified resourceURI.
@@ -481,18 +447,49 @@ public class RdfUtils
     return toURI(getNodeForPropertyPath(model, resourceURI, propertyPath));
   }
 
-  public static List<URI> getURIListForPropertyPath(final Model model, final URI resourceURI, Path propertyPath)
+  /**
+   * Evaluates the path on all models in the dataset obtained by dereferencing the specified resourceURI.
+   * If the path resolves to multiple resources, only the first one is returned.
+   * <br />
+   * <br />
+   * Note: For more information on property paths, see http://jena.sourceforge.net/ARQ/property_paths.html
+   * <br />
+   * To create a Path object for the path "rdf:type/rdfs:subClassOf*":
+   * <pre>
+   * Path path = PathParser.parse("rdf:type/rdfs:subClassOf*", PrefixMapping.Standard) ;
+   * </pre>
+   * @param resourceURI
+   * @param propertyPath
+   * @return null if the model is empty or the path does not resolve to a node
+   * @throws  IllegalArgumentException if the node found by the path is not a URI
+   */
+  public static URI getURIPropertyForPropertyPath(final Dataset dataset, final URI resourceURI, Path propertyPath)
+  {
+    return toURI(getNodeForPropertyPath(dataset, resourceURI, propertyPath));
+  }
+
+  public static Iterator<URI> getURIsForPropertyPath(final Model model, final URI resourceURI, Path propertyPath)
   {
     Iterator<Node> nodeIterator = getNodesForPropertyPath(model,resourceURI,propertyPath);
-    List<URI> nodeURIList = new ArrayList<>();
-    if (nodeIterator==null) return nodeURIList;
-    if (!nodeIterator.hasNext()) return null;
-
-    while(nodeIterator.hasNext()){
-      nodeURIList.add(toURI(nodeIterator.next()));
-    }
-    return nodeURIList;
+    return new ProjectingIterator<Node, URI>(nodeIterator) {
+        @Override
+        public URI next() {
+          return toURI(this.baseIterator.next());
+        }
+      };
   }
+
+  public static Iterator<URI> getURIsForPropertyPath(final Dataset dataset, final URI resourceURI, Path propertyPath)
+  {
+    Iterator<Node> nodeIterator = getNodesForPropertyPath(dataset,resourceURI,propertyPath);
+    return new ProjectingIterator<Node, URI>(nodeIterator) {
+      @Override
+      public URI next() {
+        return toURI(this.baseIterator.next());
+      }
+    };
+  }
+
 
 
   /**
@@ -513,6 +510,26 @@ public class RdfUtils
   public static String getStringPropertyForPropertyPath(final Model model, final URI resourceURI, Path propertyPath)
   {
     return toString(getNodeForPropertyPath(model, resourceURI, propertyPath));
+  }
+
+  /**
+   * Evaluates the path on each model in the dataset obtained by dereferencing the specified resourceURI.
+   * If the path resolves to multiple resources, only the first one is returned.
+   * <br />
+   * <br />
+   * Note: For more information on property paths, see http://jena.sourceforge.net/ARQ/property_paths.html
+   * <br />
+   * To create a Path object for the path "rdf:type/rdfs:subClassOf*":
+   * <pre>
+   * Path path = PathParser.parse("rdf:type/rdfs:subClassOf*", PrefixMapping.Standard) ;
+   * </pre>
+   * @param resourceURI
+   * @param propertyPath
+   * @return null if the model is empty or the path does not resolve to a node
+   */
+  public static String getStringPropertyForPropertyPath(final Dataset dataset, final URI resourceURI, Path propertyPath)
+  {
+    return toString(getNodeForPropertyPath(dataset, resourceURI, propertyPath));
   }
 
   /**
@@ -554,15 +571,227 @@ public class RdfUtils
     return result.next();
   }
 
+  /**
+   * Returns the first RDF node found in the specified dataset for the specified property path.
+   * @param dataset
+   * @param resourceURI
+   * @param propertyPath
+   * @return
+   */
+  public static Node getNodeForPropertyPath(final Dataset dataset, final URI resourceURI, final Path propertyPath) {
+    return findFirst(dataset, new ModelVisitor<Node>()
+    {
+      @Override
+      public Node visit(final Model model) {
+        return getNodeForPropertyPath(model, resourceURI, propertyPath);
+      }
+    });
+  }
+
+  /**
+   * Evaluates the specified path in the specified model, starting with the specified resourceURI.
+   * @param model
+   * @param resourceURI
+   * @param propertyPath
+   * @return
+   */
   public static Iterator<Node> getNodesForPropertyPath(final Model model, URI resourceURI, Path propertyPath) {
     Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
                                            propertyPath, Context.emptyContext);
     logger.debug("running path eval: "+ RdfUtils.toString(model));
-    if (!result.hasNext()) return null;
     return result;
   }
 
 
+  /**
+   * Evaluates the specified path in each model of the specified dataset, starting with the specified resourceURI.
+   * @param dataset
+   * @param resourceURI
+   * @param propertyPath
+   * @return
+   */
+  public static Iterator<Node> getNodesForPropertyPath(final Dataset dataset, final URI resourceURI, final Path propertyPath) {
+    return Iterators.concat(
+      visit(dataset, new ModelVisitor<Iterator<Node>>()
+      {
+        @Override
+        public Iterator<Node> visit(final Model model) {
+          return getNodesForPropertyPath(model, resourceURI, propertyPath);
+        }
+      })
+    );
+  }
+
+
+
+  /**
+   * Dataset visitor used for repeated application of model operations in a dataset.
+   */
+  public static interface ModelVisitor<T> {
+    public T visit(Model model);
+  }
+
+  /**
+   * ModelSelector used to select which models in a dataset to visit.
+   */
+  public static interface ModelSelector {
+    public Iterator<Model> select(Dataset dataset);
+  }
+
+  /**
+   * Selector that selects all models, including the default model.
+   * The first model is the default model, the named models are returned in the order
+   * specified by Dataset.listNames().
+   */
+  public static class DefaultModelSelector implements ModelSelector{
+    @Override
+    public Iterator<Model> select(final Dataset dataset) {
+      List ret = new LinkedList<Model>();
+      Model model = dataset.getDefaultModel();
+      if (model != null) {
+        ret.add(model);
+      }
+      for (Iterator<String> modelNames = dataset.listNames(); modelNames.hasNext(); ){
+        ret.add(dataset.getNamedModel(modelNames.next()));
+      }
+      return ret.iterator();
+    }
+  }
+
+  private static ModelSelector DEFAULT_MODEL_SELECTOR = new DefaultModelSelector();
+
+  /**
+   * Returns a thread-safe, shared default model selector.
+   * @return
+   */
+  public static ModelSelector getDefaultModelSelector(){
+    return DEFAULT_MODEL_SELECTOR;
+  };
+
+  /**
+   * Calls the specified ModelVisitor's visit method on each model of the dataset that is selected by the ModelSelector.
+   * The rsults are collected in the returned iterator.
+   * @param dataset
+   * @param visitor
+   * @param modelSelector
+   * @param <T>
+   * @return
+   */
+  public static <T> Iterator<T> visit(Dataset dataset, ModelVisitor<T> visitor, ModelSelector modelSelector){
+    List<T> results = new LinkedList<T>();
+    for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();){
+      results.add(visitor.visit(modelIterator.next()));
+    }
+    return results.iterator();
+  }
+
+  public static <T> Iterator<T> visit(Dataset dataset, ModelVisitor<T> visitor){
+    return visit(dataset, visitor, getDefaultModelSelector());
+  }
+
+  /**
+   * Visits all models and flattens the collections returned by the visitor into one list.
+   * @param dataset
+   * @param visitor
+   * @param modelSelector
+   * @param <T>
+   * @return
+   */
+  public static <E, T extends Collection<E>> List<E> visitFlattenedToList(Dataset dataset, ModelVisitor<T> visitor,
+    ModelSelector modelSelector){
+    List<E> results = new ArrayList<E>();
+    for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();){
+      results.addAll(visitor.visit(modelIterator.next()));
+    }
+    return results;
+  }
+
+  public static <E, T extends Collection<E>> List<E> visitFlattenedToList(Dataset dataset, ModelVisitor<T> visitor) {
+    return visitFlattenedToList(dataset, visitor, getDefaultModelSelector());
+  }
+
+  /**
+   * Visits all models and flattens the NodeIterator returned by the visitor into one.
+   * Returns null if all visitors return null.
+   * @param dataset
+   * @param visitor
+   * @param modelSelector
+   * @return
+   */
+  public static NodeIterator visitFlattenedToNodeIterator(Dataset dataset,
+    ModelVisitor<NodeIterator> visitor,
+    ModelSelector modelSelector){
+    NodeIterator it = null;
+    for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();){
+      NodeIterator currentIt = visitor.visit(modelIterator.next());
+      if (it == null) {
+        it = currentIt;
+      } else {
+        it.andThen(currentIt);
+      }
+    }
+    return it;
+  }
+
+
+  public static NodeIterator visitFlattenedToNodeIterator(Dataset dataset,
+    ModelVisitor<NodeIterator> visitor){
+    return visitFlattenedToNodeIterator(dataset, visitor, getDefaultModelSelector());
+  }
+
+  /**
+   * Returns the first non-null result obtained by calling the specified ModelVisitor's visit method in the order
+   * defined by the specified ModelSelector.
+   * @param dataset
+   * @param visitor
+   * @param modelSelector
+   * @param <T>
+   * @return
+   */
+  public static <T> T findFirst(Dataset dataset, ModelVisitor<T> visitor, ModelSelector modelSelector){
+    List<T> results = new LinkedList<T>();
+    for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();){
+      T result = visitor.visit(modelIterator.next());
+      if (result != null) return result;
+    }
+    return null;
+  }
+
+  public static <T> T findFirst(Dataset dataset, ModelVisitor<T> visitor){
+    return findFirst(dataset, visitor, getDefaultModelSelector());
+  }
+
+  /**
+   * Returns the result obtained by calling the specified ModelVisitor's visit method in the order
+   * defined by the specified ModelSelector. Throws an IncorrectPropertyCountException if no result or
+   * more than one result is found. ModelVisitors should implement the same exception strategy.
+   * @param dataset
+   * @param visitor
+   * @param modelSelector
+   * @param allowSame if true, multiple results will be checked with equals() and if they are are equal, no
+   *                  exception is thrown
+   * @param <T>
+   * @return
+   */
+  public static <T> T findOne(Dataset dataset, ModelVisitor<T> visitor, ModelSelector modelSelector, boolean allowSame){
+    T result = null;
+    for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();){
+      T newResult = visitor.visit(modelIterator.next());
+      if (result != null && newResult != null) {
+        if (!allowSame || ! result.equals(newResult)) {
+          throw new IncorrectPropertyCountException("Results were found in more than " +
+            "one model", 1, 2);
+        }
+      }
+      result = newResult;
+    }
+    if (result == null) throw new IncorrectPropertyCountException("No result found", 1, 0);
+    return result;
+  }
+
+  public static <T> T findOne(Dataset dataset, ModelVisitor<T> visitor, boolean allowSame){
+    return findOne(dataset, visitor, getDefaultModelSelector(), allowSame);
+  }
 
 
   /**
@@ -644,5 +873,24 @@ public class RdfUtils
     Dataset dataset = DatasetFactory.createMem();
     RDFDataMgr.read(dataset, sr, "no:uri", lang);
     return dataset;
+  }
+
+  /**
+   * Adds the second dataset to the first one, merging default models and models with identical name.
+   * @param baseDataset
+   * @param toBeAddedtoBase
+   */
+  public static void addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase) {
+    assert baseDataset != null : "baseDataset must not be null";
+    assert toBeAddedtoBase != null : "toBeAddedToBase must not be null";
+    baseDataset.getDefaultModel().add(toBeAddedtoBase.getDefaultModel());
+    for ( Iterator<String> nameIt = toBeAddedtoBase.listNames(); nameIt.hasNext();){
+      String modelName = nameIt.next();
+      if (baseDataset.containsNamedModel(modelName)) {
+        baseDataset.getNamedModel(modelName).add(toBeAddedtoBase.getNamedModel(modelName));
+      } else {
+        baseDataset.addNamedModel(modelName, toBeAddedtoBase.getNamedModel(modelName));
+      }
+    }
   }
 }

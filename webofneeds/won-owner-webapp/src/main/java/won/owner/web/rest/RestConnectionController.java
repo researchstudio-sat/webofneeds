@@ -62,7 +62,7 @@ public class RestConnectionController
     Connection connection = connectionRepository.findOne(connectionId);
     ConnectionPojo connectionPojo = new ConnectionPojo(connection.getConnectionURI(),
                                                        linkedDataRestClient.readResourceData(connection
-                                                                                               .getConnectionURI()));
+                                                                                               .getConnectionURI()).getDefaultModel());
     return connectionPojo;
 
   }

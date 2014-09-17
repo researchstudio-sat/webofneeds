@@ -69,12 +69,11 @@ public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements M
 
     public final Set<String> getMatcherProtocolTopicNamesWithResource(URI resourceURI){
         Set<String> activeMQMatcherProtocolTopicNames = new HashSet<>();
-        resourceURI = URI.create(resourceURI.toString());
         for (int i = 0; i< matcherProtocolTopicList.size();i++){
             try{
                 Path path = PathParser.parse(matcherProtocolTopicList.get(i),PrefixMapping.Standard);
                 activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
-                        linkedDataSource.getModelForResource(resourceURI),
+                        linkedDataSource.getDataForResource(resourceURI),
                         resourceURI,
                         path
                 ));

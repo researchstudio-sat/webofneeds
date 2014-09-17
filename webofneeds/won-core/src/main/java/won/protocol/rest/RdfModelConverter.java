@@ -19,9 +19,7 @@ package won.protocol.rest;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.jena.atlas.web.ContentType;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFLanguages;
+import org.apache.jena.riot.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpInputMessage;
@@ -85,16 +83,22 @@ public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
       // now register the media types this converter can handle
       Collection<Lang> languages = RDFLanguages.getRegisteredLanguages();
       Set<MediaType> mediaTypeSet = new HashSet<MediaType>();
-      //make sure we support JSONLD
-      mediaTypeSet.add(new MediaType(Lang.JSONLD.getContentType().getType(),Lang.JSONLD.getContentType().getSubType()));
       for(Lang lang: languages){
-        ContentType ct = lang.getContentType();
-        logger.debug("registering converter for rdf content type {}", lang.getContentType());
-        MediaType mt = new MediaType(ct.getType(), ct.getSubType());
-        mediaTypeSet.add(mt);
+        if (datasetWriterExistsForLang(lang)) {
+          ContentType ct = lang.getContentType();
+          logger.debug("registering converter for rdf content type {}", lang.getContentType());
+          MediaType mt = new MediaType(ct.getType(), ct.getSubType());
+          mediaTypeSet.add(mt);
+        }
       }
       return mediaTypeSet.toArray(new MediaType[mediaTypeSet.size()]);
     }
+
+  private static boolean datasetWriterExistsForLang(Lang lang) {
+    RDFFormat serialization = RDFWriterRegistry.defaultSerialization(lang) ;
+    WriterDatasetRIOTFactory wf = RDFWriterRegistry.getWriterDatasetFactory(serialization) ;
+    return wf != null;
+  }
 
 
 

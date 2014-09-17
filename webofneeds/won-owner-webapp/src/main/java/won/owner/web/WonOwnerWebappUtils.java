@@ -16,7 +16,7 @@
 
 package won.owner.web;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.query.Dataset;
 import won.owner.pojo.MatchPojo;
 import won.owner.pojo.NeedPojo;
 import won.protocol.model.Match;
@@ -33,30 +33,31 @@ import java.util.Iterator;
  */
 public class WonOwnerWebappUtils
 {
-  public static Iterator<NeedPojo> toNeedPojos(Iterator<Model> modelIterator){
-    return new ProjectingIterator<Model, NeedPojo>(modelIterator) {
+  public static Iterator<NeedPojo> toNeedPojos(Iterator<Dataset> modelIterator){
+    return new ProjectingIterator<Dataset, NeedPojo>(modelIterator) {
       @Override
       public NeedPojo next() {
-        Model model = baseIterator.next();
-        URI baseURI = URI.create(RdfUtils.getBaseResource(model).toString());
-        return new NeedPojo(baseURI, model);
+        Dataset dataset = baseIterator.next();
+        URI baseURI = URI.create(RdfUtils.getBaseResource(dataset.getDefaultModel()).toString());
+        return new NeedPojo(baseURI, dataset.getDefaultModel());
       }
     };
   }
 
-  public static Iterator<MatchPojo> toMatchPojos(final Iterator<Model> modelIterator, final Iterator<Match> matchIterator){
+  public static Iterator<MatchPojo> toMatchPojos(final Iterator<Dataset> datasetIterator,
+    final Iterator<Match> matchIterator){
     return new Iterator<MatchPojo>()
     {
       @Override
       public boolean hasNext() {
-        return modelIterator. hasNext() && matchIterator.hasNext();
+        return datasetIterator. hasNext() && matchIterator.hasNext();
       }
 
       @Override
       public MatchPojo next() {
         MatchPojoNeedBuilder matchPojoNeedBuilder = new MatchPojoNeedBuilder();
         NeedModelBuilder needModelBuilder = new NeedModelBuilder();
-        needModelBuilder.copyValuesFromProduct(modelIterator.next());
+        needModelBuilder.copyValuesFromProduct(datasetIterator.next().getDefaultModel());
         needModelBuilder.copyValuesToBuilder(matchPojoNeedBuilder);
         Match match = matchIterator.next();
         MatchPojo matchPojo = matchPojoNeedBuilder.build();

@@ -18,6 +18,7 @@ package won.node.service.impl;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -96,7 +97,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String activeMqMatcherProtocolTopicNameNeedActivated;
   private String activeMqMatcherProtocolTopicNameNeedDeactivated;
 
-    public Model listNeedURIs(final int page)
+    public Dataset listNeedURIs(final int page)
   {
     Collection<URI> uris = null;
     if (page >= 0) {
@@ -115,10 +116,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
     for (URI needURI : uris) {
       model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
     }
-    return model;
+    return DatasetFactory.create(model);
   }
 
-  public Model listConnectionURIs(final int page)
+  public Dataset listConnectionURIs(final int page)
   {
     Collection<URI> uris = null;
     if (page >= 0) {
@@ -139,7 +140,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
                                                                                      WON.CONNECTION) ));
 
     }
-    return model;
+    return DatasetFactory.create(model);
   }
 
   public Model getNeedModel(final URI needUri) throws NoSuchNeedException
@@ -234,14 +235,14 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return dataset;
   }
 
-    public Model getNodeModel()
+    public Dataset getNodeDataset()
     {
       Model model = ModelFactory.createDefaultModel();
       setNsPrefixes(model);
       Resource showNodePageResource = null;
       showNodePageResource = model.createResource(this.resourceURIPrefix);
       addProtocolEndpoints(model, showNodePageResource);
-      return model;
+      return DatasetFactory.create(model);
     }
 
   //TODO: protocol endpoint specification in RDF model needs refactoring!
@@ -270,7 +271,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   }
 
-  public Model getConnectionModel(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException
+  public Dataset getConnectionDataset(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException
   {
     Connection connection = needInformationService.readConnection(connectionUri);
 
@@ -319,7 +320,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
       }
     }
 
-    return model;
+    return DatasetFactory.create(model);
   }
 
   /**
@@ -365,7 +366,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
   }
 
-  public Model listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException
+  public Dataset listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException
   {
     Collection<URI> uris = null;
     if (page >= 0)
@@ -385,8 +386,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     for (URI connURI : uris)
       model.add(model.createStatement(connections, RDFS.member, model.createResource(connURI.toString())));
-
-    return model;
+    return DatasetFactory.create(model);
   }
 
   private String addPageQueryString(String uri, int page)

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import won.cryptography.service.RandomNumberService;
 import won.owner.service.OwnerApplicationServiceCallback;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
-import won.protocol.exception.MultipleQueryResultsFoundException;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -96,27 +95,20 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         // ToDo (FS): this should be encapsulated in an own subclass of WonMessage
         // get the active status
         boolean active = false;
-        try {
-          switch (WonRdfUtils.NeedUtils.queryActiveStatus(
-            messageContent, wonMessage.getMessageEvent().getSenderNeedURI())) {
-            case ACTIVE:
-              active = true;
-              break;
-            case INACTIVE:
-              active = false;
-              break;
-          }
-        } catch (MultipleQueryResultsFoundException e) {
-          logger.warn("caught MultipleOwnersFoundException:", e);
+        switch (WonRdfUtils.NeedUtils.queryActiveStatus(
+          messageContent, wonMessage.getMessageEvent().getSenderNeedURI())) {
+          case ACTIVE:
+            active = true;
+            break;
+          case INACTIVE:
+            active = false;
+            break;
         }
+
 
         // get the wonNodeURI
         URI wonNodeURI = null;
-        try {
-          wonNodeURI = WonRdfUtils.NeedUtils.queryWonNode(messageContent);
-        } catch (MultipleQueryResultsFoundException e) {
-          logger.warn("caught MultipleOwnersFoundException:", e);
-        }
+        wonNodeURI = WonRdfUtils.NeedUtils.queryWonNode(messageContent);
 
         final ListenableFuture<URI> newNeedURI;
         try {

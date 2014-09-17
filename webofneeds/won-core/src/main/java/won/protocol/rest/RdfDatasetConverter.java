@@ -1,11 +1,7 @@
 package won.protocol.rest;
 
 import com.hp.hpl.jena.query.Dataset;
-import org.apache.jena.atlas.web.ContentType;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.riot.RDFLanguages;
+import org.apache.jena.riot.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpInputMessage;
@@ -17,9 +13,6 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import won.protocol.util.RdfUtils;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * User: fsalcher
@@ -30,8 +23,15 @@ public class RdfDatasetConverter extends AbstractHttpMessageConverter<Dataset>
 
   private static final Logger logger = LoggerFactory.getLogger(RdfDatasetConverter.class);
 
+
+  private static final MediaType[] supportedMediaTypes =  {
+    new MediaType("application", "trig"),
+    new MediaType("application", "ld+json"),
+    new MediaType("application", "n-quads")
+  };
+
   public RdfDatasetConverter() {
-    this(buildMediaTypeArray());
+    this(supportedMediaTypes);
   }
 
   public RdfDatasetConverter(MediaType supportedMediaType) {
@@ -67,21 +67,6 @@ public class RdfDatasetConverter extends AbstractHttpMessageConverter<Dataset>
     Lang lang = RDFLanguages.contentTypeToLang(mediaType.toString());
     if (lang == null) return defaultLanguage;
     return lang;
-  }
-
-  private static MediaType[] buildMediaTypeArray(){
-    // now register the media types this converter can handle
-    Collection<Lang> languages = RDFLanguages.getRegisteredLanguages();
-    Set<MediaType> mediaTypeSet = new HashSet<MediaType>();
-    //make sure we support JSONLD
-    mediaTypeSet.add(new MediaType(Lang.JSONLD.getContentType().getType(),Lang.JSONLD.getContentType().getSubType()));
-    for(Lang lang: languages){
-      ContentType ct = lang.getContentType();
-      logger.debug("registering converter for rdf content type {}", lang.getContentType());
-      MediaType mt = new MediaType(ct.getType(), ct.getSubType());
-      mediaTypeSet.add(mt);
-    }
-    return mediaTypeSet.toArray(new MediaType[mediaTypeSet.size()]);
   }
 
 }

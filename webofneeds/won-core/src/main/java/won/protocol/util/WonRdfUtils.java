@@ -8,14 +8,18 @@ import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.exception.MultipleQueryResultsFoundException;
+import won.protocol.exception.DataIntegrityException;
+import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.Facet;
 import won.protocol.model.NeedState;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON application.
@@ -178,8 +182,7 @@ public class WonRdfUtils
   public static class NeedUtils
   {
 
-    public static URI queryOwner(Dataset content)
-      throws MultipleQueryResultsFoundException {
+    public static URI queryOwner(Dataset content) {
 
       URI ownerURI = null;
       // ToDo (FS): add as much as possible to vocabulary stuff
@@ -192,7 +195,7 @@ public class WonRdfUtils
         boolean foundOneResult = false;
         for (; results.hasNext(); ) {
           if (foundOneResult)
-            throw new MultipleQueryResultsFoundException();
+            throw new IncorrectPropertyCountException(1,2);
           foundOneResult = true;
           QuerySolution solution = results.nextSolution();
           Resource r = solution.getResource("owner");
@@ -200,28 +203,27 @@ public class WonRdfUtils
             ownerURI = new URI(r.getURI());
           } catch (URISyntaxException e) {
             logger.warn("caught URISyntaxException:", e);
-            return null;
+            throw new DataIntegrityException("could not parse ownerUri: " + r.getURI(), e);
           }
         }
       }
       return ownerURI;
     }
 
-    public static URI queryWonNode(Dataset content)
-      throws MultipleQueryResultsFoundException {
+    public static URI queryWonNode(Dataset content) {
 
       URI wonNodeURI = null;
       // ToDo (FS): add as much as possible to vocabulary stuff
       final String queryString =
         "PREFIX won: <http://purl.org/webofneeds/model#> " +
-          "SELECT * { { ?s won:hasWonNode ?wonNode } UNION { GRAPH ?g { ?s won:hasWonNode ?wonNod } } }";
+          "SELECT * { { ?s won:hasWonNode ?wonNode } UNION { GRAPH ?g { ?s won:hasWonNode ?wonNode } } }";
       Query query = QueryFactory.create(queryString);
       try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
         ResultSet results = qexec.execSelect();
         boolean foundOneResult = false;
         for (; results.hasNext(); ) {
           if (foundOneResult)
-            throw new MultipleQueryResultsFoundException();
+            throw new IncorrectPropertyCountException(1,2);
           foundOneResult = true;
           QuerySolution solution = results.nextSolution();
           Resource r = solution.getResource("wonNode");
@@ -229,15 +231,14 @@ public class WonRdfUtils
             wonNodeURI = new URI(r.getURI());
           } catch (URISyntaxException e) {
             logger.warn("caught URISyntaxException:", e);
-            return null;
+            throw new DataIntegrityException("could not parse wonNodeUri: " + r.getURI(), e);
           }
         }
       }
       return wonNodeURI;
     }
 
-    public static NeedState queryActiveStatus(Model model, URI needURI)
-      throws MultipleQueryResultsFoundException {
+    public static NeedState queryActiveStatus(Model model, URI needURI) {
 
       StmtIterator iterator = model.listStatements(model.createResource(needURI.toString()),
                                                    WON.IS_IN_STATE,
@@ -250,31 +251,25 @@ public class WonRdfUtils
         Statement s = iterator.nextStatement();
         if (s.getObject().equals(WON.NEED_STATE_ACTIVE)) {
           if (result != null && result.equals(NeedState.INACTIVE))
-            throw new MultipleQueryResultsFoundException();
+            throw new IncorrectPropertyCountException("More than one result found, but only one expected", 1,2);
           result = NeedState.ACTIVE;
         } else if (s.getObject().equals(WON.NEED_STATE_INACTIVE)) {
           if (result != null && result.equals(NeedState.ACTIVE))
-            throw new MultipleQueryResultsFoundException();
+            throw new IncorrectPropertyCountException("More than one result found, but only one expected", 1,2);
           result = NeedState.INACTIVE;
         }
       }
       return result;
     }
 
-    public static NeedState queryActiveStatus(Dataset content, URI needURI)
-      throws MultipleQueryResultsFoundException {
-      NeedState result = null;
-      result = queryActiveStatus(content.getDefaultModel(), needURI);
-
-      Iterator<String> nameIt = content.listNames();
-      while (nameIt.hasNext()) {
-        NeedState tempResult = queryActiveStatus(content.getNamedModel(nameIt.next()), needURI);
-        if (tempResult != null && result != null && !result.equals(tempResult))
-          throw new MultipleQueryResultsFoundException();
-        result = tempResult;
-      }
-
-      return result;
+    public static NeedState queryActiveStatus(Dataset content, final URI needURI) {
+      return RdfUtils.findOne(content, new RdfUtils.ModelVisitor<NeedState>()
+      {
+        @Override
+        public NeedState visit(final Model model) {
+          return queryActiveStatus(model, needURI);
+        }
+      }, true);
     }
 
     /**
@@ -284,14 +279,14 @@ public class WonRdfUtils
      * @param dataset <code>Dataset</code> object which will be searched for the facets
      * @return list of facets
      */
-    public static List<Facet> getFacets(URI needURI, Dataset dataset) {
-      List<Facet> result = new ArrayList<Facet>();
-      Iterator<String> i = dataset.listNames();
-      while (i.hasNext()) {
-        result.addAll(getFacets(needURI, dataset.getNamedModel(i.next())));
-      }
-      result.addAll(getFacets(needURI, dataset.getDefaultModel()));
-      return result;
+    public static List<Facet> getFacets(final URI needURI, Dataset dataset) {
+      return RdfUtils.visitFlattenedToList(dataset, new RdfUtils.ModelVisitor<List<Facet>>()
+      {
+        @Override
+        public List<Facet> visit(final Model model) {
+          return getFacets(needURI, model);
+        }
+      });
     }
 
     /**
@@ -322,35 +317,14 @@ public class WonRdfUtils
      * @param dataset <code>Dataset</code> object which will be searched for the NeedURI
      * @return <code>URI</code> which is of type won:Need
      */
-    public static URI getNeedURI(Dataset dataset)
-      throws MultipleQueryResultsFoundException {
-
-      List<URI> needURIs = new ArrayList<URI>();
-
-      Iterator<String> i = dataset.listNames();
-      while (i.hasNext()) {
-        URI newURI = getNeedURI(dataset.getNamedModel(i.next()));
-        if (newURI != null)
-          needURIs.add(newURI);
-      }
-      URI newURI = getNeedURI(dataset.getDefaultModel());
-      if (newURI != null)
-        needURIs.add(newURI);
-
-      if (needURIs.size() == 0)
-        return null;
-      else if (needURIs.size() == 1)
-        return needURIs.get(0);
-      else if (needURIs.size() > 1) {
-        URI u = needURIs.get(0);
-        for (URI uri : needURIs) {
-          if (!uri.equals(u))
-            throw new MultipleQueryResultsFoundException();
+    public static URI getNeedURI(Dataset dataset) {
+      return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<URI>()
+      {
+        @Override
+        public URI visit(final Model model) {
+          return getNeedURI(model);
         }
-        return u;
-      }
-      else
-        return null;
+      }, true);
     }
     /**
      * searches for a subject of type won:Need and returns the NeedURI
@@ -358,8 +332,7 @@ public class WonRdfUtils
      * @param model <code>Model</code> object which will be searched for the NeedURI
      * @return <code>URI</code> which is of type won:Need
      */
-    public static URI getNeedURI(Model model)
-      throws MultipleQueryResultsFoundException {
+    public static URI getNeedURI(Model model) {
 
       List<URI> needURIs = new ArrayList<URI>();
 
@@ -367,7 +340,6 @@ public class WonRdfUtils
       while (iterator.hasNext()) {
         needURIs.add(URI.create(iterator.next().getURI()));
       }
-
       if (needURIs.size() == 0)
         return null;
       else if (needURIs.size() == 1)
@@ -376,7 +348,7 @@ public class WonRdfUtils
         URI u = needURIs.get(0);
         for (URI uri : needURIs) {
           if (!uri.equals(u))
-            throw new MultipleQueryResultsFoundException();
+            throw new IncorrectPropertyCountException(1,2);
         }
         return u;
       }
@@ -406,48 +378,44 @@ public class WonRdfUtils
       return result;
     }
 
-    public static URI queryConnectionContainer(Dataset dataset, URI needURI)
-      throws MultipleQueryResultsFoundException {
-
-      URI result = null;
-      result = queryConnectionContainer(dataset.getDefaultModel(), needURI);
-
-      Iterator<String> nameIt = dataset.listNames();
-      while (nameIt.hasNext()) {
-        URI tempResult = queryConnectionContainer(dataset.getNamedModel(nameIt.next()), needURI);
-        if (tempResult != null && result != null && !result.equals(tempResult))
-          throw new MultipleQueryResultsFoundException();
-        result = tempResult;
-      }
-      return result;
+    public static URI queryConnectionContainer(Dataset dataset, final URI needURI) {
+      return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<URI>()
+      {
+        @Override
+        public URI visit(final Model model) {
+          return queryConnectionContainer(model, needURI);
+        }
+      }, true);
     }
 
-    public static URI queryConnectionContainer(Model model, URI needURI)
-      throws MultipleQueryResultsFoundException {
+    public static URI queryConnectionContainer(Model model, URI needURI) {
 
       StmtIterator iterator = model.listStatements(model.createResource(needURI.toString()),
                                                    WON.HAS_CONNECTIONS,
                                                    (RDFNode) null);
-      if (!iterator.hasNext())
+      if (!iterator.hasNext()) {
         return null;
-
+      }
       URI result = null;
       while (iterator.hasNext()) {
         Statement s = iterator.nextStatement();
         URI nextURI = URI.create(s.getResource().getURI());
         if (result != null && !result.equals(nextURI))
-          throw new MultipleQueryResultsFoundException();
+          throw new IncorrectPropertyCountException(1,2);
         result = nextURI;
       }
       return result;
     }
 
-    public static void removeConnectionContainer(Dataset dataset, URI needURI) {
-      removeConnectionContainer(dataset.getDefaultModel(), needURI);
-      Iterator<String> nameIt = dataset.listNames();
-      while (nameIt.hasNext()) {
-        removeConnectionContainer(dataset.getNamedModel(nameIt.next()), needURI);
-      }
+    public static void removeConnectionContainer(Dataset dataset, final URI needURI) {
+      RdfUtils.visit(dataset, new RdfUtils.ModelVisitor<Object>()
+      {
+        @Override
+        public Object visit(final Model model) {
+          removeConnectionContainer(model, needURI);
+          return null;
+        }
+      });
     }
 
     public static void removeConnectionContainer(Model model, URI needURI) {

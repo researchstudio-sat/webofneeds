@@ -35,7 +35,7 @@ public interface LinkedDataService
    * @param page
    * @return
    */
-  public Model listNeedURIs(final int page);
+  public Dataset listNeedURIs(final int page);
 
   /**
    * Returns a model containing all connection URIs.
@@ -43,7 +43,7 @@ public interface LinkedDataService
    * @param page
    * @return
    */
-  public Model listConnectionURIs(final int page);
+  public Dataset listConnectionURIs(final int page);
 
 
   /**
@@ -52,6 +52,7 @@ public interface LinkedDataService
    * @return
    * @throws NoSuchNeedException
    */
+  @Deprecated
   public Model getNeedModel(final URI needUri) throws NoSuchNeedException;
 
   /**
@@ -68,9 +69,9 @@ public interface LinkedDataService
    * @return
    * @throws NoSuchConnectionException
    */
-  public Model getConnectionModel(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException;
+  public Dataset getConnectionDataset(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException;
 
-  public Model getNodeModel();
+  public Dataset getNodeDataset();
 
   /**
    * Returns a model containing all connection uris belonging to the specified need.
@@ -80,8 +81,9 @@ public interface LinkedDataService
    * @return
    * @throws NoSuchNeedException
    */
-  public Model listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException;
+  public Dataset listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException;
 
+  @Deprecated
   Model getEventModel(URI eventURI);
 
 
