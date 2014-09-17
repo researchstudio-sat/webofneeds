@@ -711,6 +711,35 @@ public class RdfUtils
   }
 
   /**
+   * Visits all models and flattens the NodeIterator returned by the visitor into one.
+   * Returns null if all visitors return null.
+   * @param dataset
+   * @param visitor
+   * @param modelSelector
+   * @return
+   */
+  public static NodeIterator visitFlattenedToNodeIterator(Dataset dataset,
+    ModelVisitor<NodeIterator> visitor,
+    ModelSelector modelSelector){
+    NodeIterator it = null;
+    for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();){
+      NodeIterator currentIt = visitor.visit(modelIterator.next());
+      if (it == null) {
+        it = currentIt;
+      } else {
+        it.andThen(currentIt);
+      }
+    }
+    return it;
+  }
+
+
+  public static NodeIterator visitFlattenedToNodeIterator(Dataset dataset,
+    ModelVisitor<NodeIterator> visitor){
+    return visitFlattenedToNodeIterator(dataset, visitor, getDefaultModelSelector());
+  }
+
+  /**
    * Returns the first non-null result obtained by calling the specified ModelVisitor's visit method in the order
    * defined by the specified ModelSelector.
    * @param dataset
