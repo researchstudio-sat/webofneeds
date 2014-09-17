@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
     <groupId>webofneeds</groupId>
     <artifactId>won-matcher-solr</artifactId>
-    <name>Matcher</name>
+    <name>Matcher Solr</name>
     <dependencies>
         <!--
 
