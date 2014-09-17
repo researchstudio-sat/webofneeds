@@ -142,11 +142,11 @@ public class
   public String showConnectionPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
     try {
       URI connectionURI = uriService.createConnectionURIForId(identifier);
-      Dataset rdfModel = linkedDataService.getConnectionDataset(connectionURI, true);
-      model.addAttribute("rdfModel", rdfModel);
+      Dataset rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true);
+      model.addAttribute("rdfDataset", rdfDataset);
       model.addAttribute("resourceURI", connectionURI.toString());
       model.addAttribute("dataURI", uriService.toDataURIIfPossible(connectionURI).toString());
-      return "rdfModelView";
+      return "rdfDatasetView";
     } catch (NoSuchConnectionException e) {
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
@@ -198,11 +198,11 @@ public class
       HttpServletRequest request,
       Model model,
       HttpServletResponse response) {
-      Dataset rdfModel = linkedDataService.listNeedURIs(page);
-      model.addAttribute("rdfModel", rdfModel);
+      Dataset rdfDataset = linkedDataService.listNeedURIs(page);
+      model.addAttribute("rdfDataset", rdfDataset);
       model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
       model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
-      return "rdfModelView";
+      return "rdfDatasetView";
   }
 
     @RequestMapping("${uri.path.page}")
@@ -210,11 +210,11 @@ public class
             HttpServletRequest request,
             Model model,
             HttpServletResponse response) {
-        Dataset rdfModel = linkedDataService.getNodeDataset();
-        model.addAttribute("rdfModel", rdfModel);
+        Dataset rdfDataset = linkedDataService.getNodeDataset();
+        model.addAttribute("rdfDataset", rdfDataset);
         model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
         model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
-        return "rdfModelView";
+        return "rdfDatasetView";
     }
 
 
@@ -226,11 +226,11 @@ public class
       HttpServletRequest request,
       Model model,
       HttpServletResponse response) {
-    Dataset rdfModel = linkedDataService.listConnectionURIs(page);
-    model.addAttribute("rdfModel", rdfModel);
+    Dataset rdfDataset = linkedDataService.listConnectionURIs(page);
+    model.addAttribute("rdfDataset", rdfDataset);
     model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
     model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
-    return "rdfModelView";
+    return "rdfDatasetView";
   }
 
   //webmvc controller method
@@ -244,14 +244,14 @@ public class
       HttpServletResponse response) {
     URI needURI = uriService.createNeedURIForId(identifier);
     try{
-      Dataset model = linkedDataService.listConnectionURIs(page,needURI);
+      Dataset dataset = linkedDataService.listConnectionURIs(page,needURI);
         if (deep){
-            addDeepConnectionData(needURI.toString(), model);
+            addDeepConnectionData(needURI.toString(), dataset);
         }
-      webmvcModel.addAttribute("rdfModel", model);
+      webmvcModel.addAttribute("rdfDataset", dataset);
       webmvcModel.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
       webmvcModel.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
-      return "rdfModelView";
+      return "rdfDatasetView";
     } catch (NoSuchNeedException e) {
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
