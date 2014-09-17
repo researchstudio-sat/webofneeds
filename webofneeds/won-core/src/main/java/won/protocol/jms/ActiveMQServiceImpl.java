@@ -16,7 +16,7 @@
 
 package won.protocol.jms;
 
-import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
@@ -75,9 +75,9 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             logger.debug("trying to get queue name prototol type {} on resource {}", protocolType, resourceUri);
             Path path = PathParser.parse(queueNamePath, PrefixMapping.Standard);
 
-            Model resourceModel = linkedDataSource.getDataForResource(resourceUri).getDefaultModel();
+            Dataset resourceDataset = linkedDataSource.getDataForResource(resourceUri);
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(
-                resourceModel,
+                resourceDataset,
                 resourceUri,
                 path);
             //check if we've found the information we were looking for
@@ -86,10 +86,9 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             }
             logger.debug("could not to get queue name from resource {}, trying to obtain won node URI",
               resourceUri);
-            URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceModel);
-            resourceModel = linkedDataSource.getDataForResource(wonNodeUri).getDefaultModel();
+            URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceDataset);
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(
-              resourceModel,
+              linkedDataSource.getDataForResource(wonNodeUri),
               wonNodeUri,
               path);
             //now, even if it's null, we return the result.
@@ -116,10 +115,10 @@ public class ActiveMQServiceImpl implements ActiveMQService {
         try{
           logger.debug("trying to get broker endpoint for {} on resource {}", protocolType, resourceUri);
           Path path = PathParser.parse(PATH_BROKER_URI, PrefixMapping.Standard);
-          Model resourceModel = linkedDataSource.getDataForResource(resourceUri).getDefaultModel();
-          logger.debug("ResourceModel for {}: {}", resourceUri, resourceModel);
+          Dataset resourceDataset = linkedDataSource.getDataForResource(resourceUri);
+          logger.debug("ResourceModel for {}: {}", resourceUri, resourceDataset);
           activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(
-                resourceModel,
+            resourceDataset,
                 resourceUri,
                 path);
           //check if we've found the information we were looking for
@@ -131,11 +130,11 @@ public class ActiveMQServiceImpl implements ActiveMQService {
           //we didnt't get the queue name. Check if the model contains a triple <baseuri> won:hasWonNode
           // <wonNode> and get the information from there.
 
-          URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceModel);
+          URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceDataset);
           logger.debug("wonNodeUri: {}", wonNodeUri);
-          resourceModel = linkedDataSource.getDataForResource(wonNodeUri).getDefaultModel();
+          resourceDataset = linkedDataSource.getDataForResource(wonNodeUri);
           activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(
-            resourceModel,
+            resourceDataset,
             wonNodeUri,
             path);
         } catch (UniformInterfaceException e){
@@ -156,7 +155,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
       try{
         Path path = PathParser.parse(matcherProtocolTopicList.get(i),PrefixMapping.Standard);
         activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
-          linkedDataSource.getDataForResource(resourceURI).getDefaultModel(),
+          linkedDataSource.getDataForResource(resourceURI),
           resourceURI,
           path
         ));

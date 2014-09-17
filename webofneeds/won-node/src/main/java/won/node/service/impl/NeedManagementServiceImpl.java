@@ -400,13 +400,9 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
   private URI getNeedURIFromWonMessage(final Dataset wonMessage) {
     URI needURI;
-    try {
-      needURI = WonRdfUtils.NeedUtils.getNeedURI(wonMessage);
-      if (needURI == null) {
-        throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
-      }
-    } catch (MultipleQueryResultsFoundException e) {
-      throw new IllegalArgumentException("there are multiple RDF nodes of type won:Need");
+    needURI = WonRdfUtils.NeedUtils.getNeedURI(wonMessage);
+    if (needURI == null) {
+      throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
     }
     return needURI;
   }

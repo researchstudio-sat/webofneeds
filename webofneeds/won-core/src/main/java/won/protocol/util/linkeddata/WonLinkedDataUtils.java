@@ -72,7 +72,7 @@ public class WonLinkedDataUtils
   public static URI getWonNodeURIForNeedOrConnectionURI(final URI resourceURI, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     logger.debug("fetching WON node URI for resource {} with linked data source {}", resourceURI, linkedDataSource);
-    return getWonNodeURIForNeedOrConnection(linkedDataSource.getDataForResource(resourceURI).getDefaultModel());
+    return getWonNodeURIForNeedOrConnection(linkedDataSource.getDataForResource(resourceURI));
   }
 
   public static URI getWonNodeURIForNeedOrConnection(final Model resourceModel) {
@@ -100,6 +100,15 @@ public class WonLinkedDataUtils
       logger.warn("multiple WON node URIs found for resource {}, using first one: {} ", baseResource, wonNodeUri );
     }
     return wonNodeUri;
+  }
+
+  public static URI getWonNodeURIForNeedOrConnection(final Dataset resourceDataset) {
+    return RdfUtils.findFirst(resourceDataset, new RdfUtils.ModelVisitor<URI>(){
+      @Override
+      public URI visit(final Model model) {
+        return getWonNodeURIForNeedOrConnection(model);
+      }
+    });
   }
 
   /**

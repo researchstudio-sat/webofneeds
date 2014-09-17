@@ -18,7 +18,6 @@ package won.protocol.rest;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
@@ -88,7 +87,7 @@ public class DatasetReaderWriter implements MessageBodyWriter<Dataset>, MessageB
   @Override
   public Dataset readFrom(Class<Dataset> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException
   {
-    Dataset dataset = DatasetFactory.create(ModelFactory.createDefaultModel());
+    Dataset dataset = DatasetFactory.createMem();
     logger.debug("readFrom called on GraphWriter, mediaType={}", mediaType);
     Lang jenaLanguage = mimeTypeToJenaLanguage(mediaType.toString(), Lang.TRIG);
     logger.debug("converted mediaType {} to jena language {}", mediaType, jenaLanguage);

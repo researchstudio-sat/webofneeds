@@ -60,8 +60,8 @@ public class WonMessageBuilder
     if (dataset == null) {
       // create the default model, containing a triple that denotes the message graph as
       // envelope graph
-      defaultModel = ModelFactory.createDefaultModel();
-      dataset = DatasetFactory.create(defaultModel);
+      dataset = DatasetFactory.createMem();
+      defaultModel = dataset.getDefaultModel();
     } else {
       defaultModel = dataset.getDefaultModel();
       if (defaultModel == null) {

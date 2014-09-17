@@ -18,7 +18,9 @@ package won.protocol.util.linkeddata;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.sparql.path.Path;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
@@ -36,6 +38,7 @@ import won.protocol.util.RdfUtils;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -152,9 +155,10 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
                                                   List<Path> properties){
     Set<URI> toCrawl = new HashSet<URI>();
     for (int i = 0; i<properties.size();i++){
-      List<URI> newURI = RdfUtils.getURIListForPropertyPath(dataset.getDefaultModel(), resourceURI, properties.get(i));
-      if (!crawled.contains(newURI)) {
-        toCrawl.addAll(newURI);
+      Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPath(dataset.getDefaultModel(), resourceURI,
+        properties.get(i));
+      while (newURIs.hasNext()){
+        toCrawl.add(newURIs.next());
       }
     }
     return toCrawl;
