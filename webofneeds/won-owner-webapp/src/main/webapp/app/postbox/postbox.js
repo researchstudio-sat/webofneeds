@@ -34,10 +34,13 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 
     }
 
+    /*
     $scope.$watchCollection('allNeedsWithUnreadNotifications',function(updated, old){
         console.log("Watching allNeedsWithUnreadNotifications collection: ", updated, old);
         $scope.updateCountOfAllUnreadMatchEvents();
-    })
+    })*/
+
+
     /*
     $scope.AllNeedsWithUnreadNotifications = applicationStateService.fetchUnreadEventsForAllNeeds();
 
@@ -59,18 +62,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
     $scope.displayConfirmationDialog = false;
     var indexOfChosenDraft;
 	$scope.search = '';
-    $scope.notificationRefreshInterval = 5000;
 
-    var p = $interval(function(){
-            console.log("Interval");
-            $scope.fetchNotifications();
-        },$scope.notificationRefreshInterval);
-
-
-    p.then(function(value){
-        console.log('interval: ', value);
-        $scope.$digest();
-    });
     // TODO call here backend method
     function deleteDraft(index) {
         if (index >= 0) {

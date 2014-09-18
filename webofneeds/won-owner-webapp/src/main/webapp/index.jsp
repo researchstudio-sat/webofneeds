@@ -44,17 +44,18 @@
 		<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
 		<script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
-        <script type="text/javascript" src="bower_components/jsonld.js/js/jsonld.js"></script>
+
 		<script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
-	<script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
-	<script type="text/javascript" src="scripts/lightbox.min.js"></script>
-	<script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
-	<script type="text/javascript" src="scripts/smart-table.min.js"></script>
-	<script type="text/javascript" src="scripts/bootstrap-tagsinput.min.js"></script>
+        <script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
+        <script type="text/javascript" src="scripts/lightbox.min.js"></script>
+        <script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
+        <script type="text/javascript" src="scripts/smart-table.min.js"></script>
+        <script type="text/javascript" src="scripts/bootstrap-tagsinput.min.js"></script>
+        <script type="text/javascript" src="bower_components/jsonld.js/js/jsonld.js"></script>
         <script type="text/javascript" src="scripts/rdfstore-js/rdf_store.js"></script>
 
         <script type="text/javascript" src="scripts/star-rating.min.js"></script>

@@ -41,6 +41,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.fetch = function(uri) {
         var deferred = $q.defer();
         try {
+            //store into graph identified by uri.
             privateData.store.load('remote', uri, function (success, results) {
                 $rootScope.$apply(function(){
                     deferred.resolve(success);
@@ -155,7 +156,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             // "OPTIONAL {?hintEvent "+won.WON.hasScoreCompacted+ " ?score .}"+
             // "OPTIONAL {?hintEvent "+won.WON.hasTimeStamp+ " ?timeStamp .}"+
             "}";
-        privateData.store.execute(query, function (success, results) {
+        privateData.store.execute(query, [], [], function (success, results) {
             if (!success) {
                 return;
             }
@@ -199,7 +200,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
            // "OPTIONAL {?hintEvent "+won.WON.hasScoreCompacted+ " ?score .}"+
            // "OPTIONAL {?hintEvent "+won.WON.hasTimeStamp+ " ?timeStamp .}"+
             "}";
-        privateData.store.execute(query, function (success, results) {
+        privateData.store.execute(query, [], [], function (success, results) {
             if (!success) {
                 return;
             }
@@ -230,9 +231,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             "prefix " + "dc"+":<"+"http://purl.org/dc/elements/1.1/>\n" +
             "prefix " + "geo"+":<"+"http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
                 "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime where { " +
-                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
-                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
-                "GRAPH ?coreURI {"+
+//TODO: add as soon as named graphs are handled by the rdf store
+//
+//                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
+//                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
+//                "GRAPH ?coreURI {"+
                 "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ."+
                 "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ."+
                 "?content dc:title ?title ."+
@@ -245,16 +248,20 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 "OPTIONAL {?content "+ won.WON.hasStartTimeCompacted + " ?startTime .}"+
                 "OPTIONAL {?content "+ won.WON.hasTagCompacted + " ?tags .}"+
                 "OPTIONAL {?content "+ won.WON.hasTextDescriptionCompacted + " ?textDescription ."+
-                "}" +
-                "GRAPH ?metaURI {" +
+//TODO: add as soon as named graphs are handled by the rdf store
+//                "}" +
+//                "GRAPH ?metaURI {" +
                 "<" + uri + ">" + " <"+"http://purl.org/dc/terms/created"+"> " + "?creationDate ."+
                 "<" + uri + ">" + won.WON.hasConnectionsCompacted + " ?connections ."+
                 "<" + uri + ">" + won.WON.hasWonNodeCompacted + " ?wonNode ."+
                 "<" + uri + ">" + won.WON.isInStateCompacted + " ?state ."+
                 "OPTIONAL {<"+ uri +"> "+ won.WON.hasEventContainerCompacted+" ?eventContainer .}"+
                 "OPTIONAL {?eventContainer "+ "rdfs:member" + " ?event .}"+
-                "}}}";
-        privateData.store.execute(query, function (success, results) {
+//TODO: add as soon as named graphs are handled by the rdf store
+//                "}" +
+                "}}";
+        resultObject = {};
+        privateData.store.execute(query, [],[], function (success, results) {
             if (!success) {
                 return;
             }
@@ -266,7 +273,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 console.log("more than 1 solution found for message property query!");
             }
             var result = results[0];
-            resultObject = {};
+
             resultObject.needURI = uri;
             resultObject.basicNeedType = getSafeValue(result.basicNeedType);
             resultObject.title = getSafeValue(result.title);
