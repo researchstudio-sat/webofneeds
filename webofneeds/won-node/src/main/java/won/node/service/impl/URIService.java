@@ -17,7 +17,7 @@
 package won.node.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import won.cryptography.service.RandomNumberService;
+import won.cryptography.service.RandomNumberServiceImpl;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
@@ -33,7 +33,7 @@ public class URIService
 {
 
   @Autowired
-  private RandomNumberService randomNumberService;
+  private RandomNumberServiceImpl randomNumberService;
 
   //prefix of any URI
   private String generalURIPrefix;

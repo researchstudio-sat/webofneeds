@@ -40,5 +40,6 @@
     <import resource="classpath:/spring/component/monitoring/bot-monitoring.xml" />
     <import resource="classpath:/spring/component/monitoring/monitoring-recorder.xml" />
     <import resource="classpath:/spring/matcher-jmsonly.xml"/>
+    <import resource="classpath:/spring/component/wonNodeInformationService.xml"/>
 
 </beans>
