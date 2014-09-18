@@ -180,18 +180,10 @@ app.directive('header', function(){
         }
     }
 );
+
 app.run(function($httpBackend,$rootScope){
 
         //$httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
-
-       /* $httpBackend.whenPOST('/owner/rest/needs').respond(function(method, url, data){
-
-            return [200, 'text',{}];
-        });   */
-       /* $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').respond(function(method, url, data){
-
-            return [200, 'text',{}];
-        });*/
         $httpBackend.whenPOST('/owner/rest/needs/').passThrough();
         $httpBackend.whenGET('/owner/rest/needs/drafts').passThrough();
         $httpBackend.whenPOST('/owner/rest/needs/drafts').passThrough();
@@ -216,6 +208,7 @@ app.run(function($httpBackend,$rootScope){
        // $httpBackend.whenGET('/app.*/').passThrough();
     }
 );
+
 angular.resetForm = function (scope, formName, defaults) {
 	$('form[name=' + formName + '], form[name=' + formName + '] .ng-dirty').removeClass('ng-dirty').addClass('ng-pristine');
 	var form = scope[formName];

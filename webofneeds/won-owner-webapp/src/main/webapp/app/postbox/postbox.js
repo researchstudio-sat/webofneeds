@@ -57,7 +57,8 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 		date:''
 	};
                 */
-    $scope.fetchNotifications();
+    //$scope.fetchNotifications();
+    $scope.unreadObjects = $scope.$parent.unreadObjects;
     $scope.recordsToDisplay = 4;
     $scope.displayConfirmationDialog = false;
     var indexOfChosenDraft;

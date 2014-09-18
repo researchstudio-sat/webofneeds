@@ -275,13 +275,6 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
      * Angular event handling
      */
 
-    /**
-     * Handles a hint event.
-     * @param event
-     */
-    $rootScope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
-        //check if we
-    });
 
 
     return wonService;

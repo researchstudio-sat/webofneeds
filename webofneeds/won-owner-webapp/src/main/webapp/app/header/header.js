@@ -15,7 +15,7 @@
  */
 
 angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService, linkedDataService, applicationStateService, $filter, $interval) {
-    $scope.fetchNotifications();
+    //$scope.fetchNotifications();
     //$scope.eventNotifications =  [];
    /* $scope.fetchNotifications = function(){
         $scope.eventNotifications = applicationStateService.fetchUnreadEventsForAllNeeds();
@@ -29,17 +29,16 @@ angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, 
     });
           */
 
-    $scope.allNeeds = applicationStateService.getAllNeeds();
 
+    $scope.unreadObjects = $scope.$parent.unreadObjects;
 
-    $scope.notificationRefreshInterval = 1000;
-
-
+    /*
     var p = $interval($scope.fetchNotifications(),$scope.notificationRefreshInterval);
     p.then(function(value){
         console.log('interval: ', value);
         $scope.$digest();
     });
+    */
 
 	$scope.isActive = function(where) {
 		if ($location.path().indexOf(where) > -1) {
