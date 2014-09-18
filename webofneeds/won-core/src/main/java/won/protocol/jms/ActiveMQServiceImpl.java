@@ -86,7 +86,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             }
             logger.debug("could not to get queue name from resource {}, trying to obtain won node URI",
               resourceUri);
-            URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceDataset);
+            URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceUri, resourceDataset);
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(
               linkedDataSource.getDataForResource(wonNodeUri),
               wonNodeUri,
@@ -130,7 +130,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
           //we didnt't get the queue name. Check if the model contains a triple <baseuri> won:hasWonNode
           // <wonNode> and get the information from there.
 
-          URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceDataset);
+          URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceUri, resourceDataset);
           logger.debug("wonNodeUri: {}", wonNodeUri);
           resourceDataset = linkedDataSource.getDataForResource(wonNodeUri);
           activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(

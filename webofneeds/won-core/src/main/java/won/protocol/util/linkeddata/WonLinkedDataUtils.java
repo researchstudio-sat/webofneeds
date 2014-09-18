@@ -41,14 +41,14 @@ public class WonLinkedDataUtils
     assert linkedDataSource != null : "linkedDataSource must not be null";
     Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
     Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_CONNECTION + ">", PrefixMapping.Standard);
-    return RdfUtils.getURIPropertyForPropertyPath(dataset.getDefaultModel(), connectionURI, propertyPath);
+    return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
   }
 
   public static URI getRemoteNeedURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
     Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_NEED + ">", PrefixMapping.Standard);
-    return RdfUtils.getURIPropertyForPropertyPath(dataset.getDefaultModel(), connectionURI, propertyPath);
+    return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
   }
 
   public static Dataset getDatalForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
@@ -72,15 +72,15 @@ public class WonLinkedDataUtils
   public static URI getWonNodeURIForNeedOrConnectionURI(final URI resourceURI, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     logger.debug("fetching WON node URI for resource {} with linked data source {}", resourceURI, linkedDataSource);
-    return getWonNodeURIForNeedOrConnection(linkedDataSource.getDataForResource(resourceURI));
+    return getWonNodeURIForNeedOrConnection(resourceURI, linkedDataSource.getDataForResource(resourceURI));
   }
 
-  public static URI getWonNodeURIForNeedOrConnection(final Model resourceModel) {
+  public static URI getWonNodeURIForNeedOrConnection(final URI resURI, final Model resourceModel) {
     assert resourceModel != null : "model must not be null";
     //we didnt't get the queue name. Check if the model contains a triple <baseuri> won:hasWonNode
     // <wonNode> and get the information from there.
-    logger.debug("getting WON node URI from model", resourceModel);
-    Resource baseResource = RdfUtils.getBaseResource(resourceModel);
+    logger.debug("getting WON node URI from model");
+    Resource baseResource = resourceModel.getResource(resURI.toString());
     logger.debug("resourceModel: {}",RdfUtils.toString(resourceModel));
     StmtIterator wonNodeStatementIterator = baseResource.listProperties(WON.HAS_WON_NODE);
     if (! wonNodeStatementIterator.hasNext()){
@@ -102,11 +102,11 @@ public class WonLinkedDataUtils
     return wonNodeUri;
   }
 
-  public static URI getWonNodeURIForNeedOrConnection(final Dataset resourceDataset) {
+  public static URI getWonNodeURIForNeedOrConnection(final URI resourceURI, final Dataset resourceDataset) {
     return RdfUtils.findFirst(resourceDataset, new RdfUtils.ModelVisitor<URI>(){
       @Override
       public URI visit(final Model model) {
-        return getWonNodeURIForNeedOrConnection(model);
+        return getWonNodeURIForNeedOrConnection(resourceURI, model);
       }
     });
   }
@@ -125,7 +125,7 @@ public class WonLinkedDataUtils
     URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(resourceURI, linkedDataSource);
     Dataset nodeDataset = linkedDataSource.getDataForResource(wonNodeUri);
     return RdfUtils.getNodeForPropertyPath(
-      nodeDataset.getDefaultModel(),
+      nodeDataset,
       wonNodeUri,
       propertyPath
     );
@@ -144,7 +144,7 @@ public class WonLinkedDataUtils
     assert linkedDataSource != null : "linkedDataSource must not be null";
     Dataset dataset = linkedDataSource.getDataForResource(resourceURI);
     return RdfUtils.getNodeForPropertyPath(
-      dataset.getDefaultModel(),
+      dataset,
       resourceURI,
       propertyPath
     );
