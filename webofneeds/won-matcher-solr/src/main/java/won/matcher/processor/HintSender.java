@@ -19,7 +19,6 @@ package won.matcher.processor;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonMessageBuilderException;
@@ -39,14 +38,14 @@ public class HintSender implements MatchProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private MatcherProtocolNeedServiceClientSide client;
-
-  @Autowired
   private WonNodeInformationService wonNodeInformationService;
 
-  public HintSender(MatcherProtocolNeedServiceClientSide client)
+  public HintSender(MatcherProtocolNeedServiceClientSide client, WonNodeInformationService wonNodeInformationService)
   {
     assert client != null : "client must not be null";
+    assert wonNodeInformationService != null : "wonNodeInformationService must not be null";
     this.client = client;
+    this.wonNodeInformationService = wonNodeInformationService;
   }
 
   @Override
