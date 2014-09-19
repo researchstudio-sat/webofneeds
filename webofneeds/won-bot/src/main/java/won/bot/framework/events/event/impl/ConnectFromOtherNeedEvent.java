@@ -16,9 +16,9 @@
 
 package won.bot.framework.events.event.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.event.BaseNeedAndConnectionSpecificEvent;
 import won.bot.framework.events.event.MessageEvent;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 
 /**
@@ -26,16 +26,16 @@ import won.protocol.model.Connection;
 public class ConnectFromOtherNeedEvent extends BaseNeedAndConnectionSpecificEvent  implements MessageEvent
 {
 
-  private final Model content;
+  private final WonMessage wonMessage;
 
 
-  public ConnectFromOtherNeedEvent(final Connection con, final Model content) {
+  public ConnectFromOtherNeedEvent(final Connection con, final WonMessage wonMessage) {
     super(con);
-    this.content = content;
+    this.wonMessage = wonMessage;
   }
 
-  public Model getContent() {
-    return content;
+  public WonMessage getWonMessage() {
+    return wonMessage;
   }
 }
 

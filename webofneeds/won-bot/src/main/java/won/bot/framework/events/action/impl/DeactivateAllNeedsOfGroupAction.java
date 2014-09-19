@@ -20,6 +20,12 @@ import won.bot.framework.events.event.Event;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.event.impl.NeedDeactivatedEvent;
 import won.bot.framework.events.EventListenerContext;
+import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.model.NeedState;
+import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 import java.util.List;
@@ -40,8 +46,28 @@ public class DeactivateAllNeedsOfGroupAction extends BaseEventBotAction
   protected void doRun(Event event) throws Exception {
     List<URI> toDeactivate = getEventListenerContext().getBotContext().getNamedNeedUriList(groupName);
     for (URI uri: toDeactivate){
-      getEventListenerContext().getOwnerService().deactivate(uri, null);
+      getEventListenerContext().getOwnerService().deactivate(uri, createWonMessage(uri));
       getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
     }
   }
+
+  private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
+
+    WonNodeInformationService wonNodeInformationService =
+      getEventListenerContext().getWonNodeInformationService();
+
+    URI localWonNode = WonRdfUtils.NeedUtils.queryWonNode(
+      getEventListenerContext().getLinkedDataSource().getDataForResource(needURI));
+
+    WonMessageBuilder builder = new WonMessageBuilder();
+    return builder
+      .setMessagePropertiesForNeedState(
+        wonNodeInformationService.generateMessageEventURI(
+          needURI, localWonNode),
+        NeedState.INACTIVE,
+        needURI,
+        localWonNode)
+      .build();
+  }
+
 }

@@ -8,6 +8,13 @@ import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.impl.CloseFromOtherNeedEvent;
 import won.bot.framework.events.event.impl.NeedDeactivatedEvent;
 import won.node.facet.impl.WON_TX;
+import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.model.NeedState;
+import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 
@@ -28,14 +35,44 @@ public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction
     if(event instanceof CloseFromOtherNeedEvent)
     {
       URI needURI = ((CloseFromOtherNeedEvent) event).getNeedURI();
-      Model m = ((CloseFromOtherNeedEvent) event).getContent();
-      NodeIterator ni = m.listObjectsOfProperty(m.getProperty(WON_TX.COORDINATION_MESSAGE.getURI().toString()));
+      WonMessage wonMessage = ((CloseFromOtherNeedEvent) event).getWonMessage();
+      NodeIterator ni = RdfUtils.visitFlattenedToNodeIterator(
+        wonMessage.getMessageContent(),
+        new RdfUtils.ModelVisitor<NodeIterator>()
+        {
+          @Override
+          public NodeIterator visit(final Model model) {
+            return model.listObjectsOfProperty(
+              model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI()));
+          }
+        });
       assert ni.hasNext() : "no additional content found in close message, expected a commit";
       String coordinationMessageUri = ni.toList().get(0).asResource().getURI().toString();
       assert coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_COMMIT.getURI().toString()) : "expected a " +
         "Commmit message";
-      getEventListenerContext().getOwnerService().deactivate(needURI, null);
+      getEventListenerContext().getOwnerService().deactivate(
+        needURI, createWonMessage(needURI));
       getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(needURI));
     }
   }
+
+  private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
+
+    WonNodeInformationService wonNodeInformationService =
+      getEventListenerContext().getWonNodeInformationService();
+
+    URI localWonNode = WonRdfUtils.NeedUtils.queryWonNode(
+      getEventListenerContext().getLinkedDataSource().getDataForResource(needURI));
+
+    WonMessageBuilder builder = new WonMessageBuilder();
+    return builder
+      .setMessagePropertiesForNeedState(
+        wonNodeInformationService.generateMessageEventURI(
+          needURI, localWonNode),
+        NeedState.INACTIVE,
+        needURI,
+        localWonNode)
+      .build();
+  }
+
 }

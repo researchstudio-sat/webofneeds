@@ -24,6 +24,7 @@ import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.BotContext;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.InMemoryBotContext;
+import won.protocol.message.WonMessage;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -113,15 +114,15 @@ public class BaseBot implements Bot
 
   @Override public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception{}
 
-  @Override public void onConnectFromOtherNeed(Connection con, final Model content) throws Exception {}
+  @Override public void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage) throws Exception {}
 
-  @Override public void onOpenFromOtherNeed(Connection con, final Model content) throws Exception {}
+  @Override public void onOpenFromOtherNeed(Connection con, final WonMessage wonMessage) throws Exception {}
 
-  @Override public void onCloseFromOtherNeed(Connection con, final Model content) throws Exception {}
+  @Override public void onCloseFromOtherNeed(Connection con, final WonMessage wonMessage) throws Exception {}
 
-  @Override public void onHintFromMatcher(Match match, final Model content) throws Exception {}
+  @Override public void onHintFromMatcher(Match match, final WonMessage wonMessage) throws Exception {}
 
-  @Override public void onMessageFromOtherNeed(Connection con, ChatMessage message, final Model content) throws Exception {}
+  @Override public void onMessageFromOtherNeed(Connection con, ChatMessage message, final WonMessage wonMessage) throws Exception {}
 
   @Override
   public void onMatcherRegistered(final URI wonNodeUri) {}

@@ -16,9 +16,15 @@
 
 package won.bot.framework.events.action.impl;
 
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.action.BaseEventBotAction;
+import won.bot.framework.events.event.Event;
+import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.model.FacetType;
+import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 import java.util.List;
@@ -47,6 +53,31 @@ public class MatchNeedsAction extends BaseEventBotAction
             1.0,
             URI.create("http://localhost:8080/matcher"),
             null,
-            null);
+            createWonMessage(need1, need2, 1.0, URI.create("http://localhost:8080/matcher")));
   }
+
+  private WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
+    throws WonMessageBuilderException {
+
+    WonNodeInformationService wonNodeInformationService =
+      getEventListenerContext().getWonNodeInformationService();
+
+    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(
+      getEventListenerContext().getLinkedDataSource().getDataForResource(needURI), needURI);
+
+    WonMessageBuilder builder = new WonMessageBuilder();
+    return builder
+      .setMessagePropertiesForHint(
+        wonNodeInformationService.generateMessageEventURI(
+          needURI, localWonNode),
+        needURI,
+        FacetType.OwnerFacet.getURI(),
+        localWonNode,
+        otherNeedURI,
+        FacetType.OwnerFacet.getURI(),
+        originator,
+        score)
+      .build();
+  }
+
 }
