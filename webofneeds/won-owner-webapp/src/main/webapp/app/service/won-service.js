@@ -32,8 +32,26 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
     processHintNotificationMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
         var connectionURI = eventData.receiverURI;
-        linkedDataService.ensureLoaded(connectionURI);
+        if (connectionURI != null) {
+            linkedDataService.ensureLoaded(connectionURI);
+        }
+        //extract hint information from message
+        //TODO: switch to JSON-LD framing as soon as it can handle named graphs (and we can handle it :)
+        var frame = {"@context" : {
+            "msg":"http://purl.org/webofneeds/message#",
+            "won":"http://purl.org/webofneeds/model#"
+            },
+            "msg:hasMessageType":["msg:HintNotificationMessage"]
+        };
+        var framedMessage = {};
+        jsonld.frame(message, frame, function(err, framed) {
+            framedMessage = framed;
+        });
+        eventData.matchScore = framedMessage['@graph']["won:hasMatchScore"];
+        eventData.matchCounterpart = framedMessage['@graph']["won:hasMatchCounterpart"];
+
         //load the data of the need the hint is about, if required
+
 
         //add some properties to the eventData so as to make them easily accessible to consumers
         //of the hint event
@@ -42,7 +60,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
 
     //mapping between message type and eventType/handler combination
     messageTypeToEventType = {};
-    messageTypeToEventType[won.WONMSG.hintNotificationMessage] = {eventType: won.EVENT.HINT_RECEIVED, handler:wonService.processHintNotificationMessage};
+    messageTypeToEventType[won.WONMSG.hintNotificationMessage] = {eventType: won.EVENT.HINT_RECEIVED, handler: processHintNotificationMessage};
     messageTypeToEventType[won.WONMSG.connectMessage] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:null};
     messageTypeToEventType[won.WONMSG.openMessage] = {eventType: won.EVENT.OPEN_RECEIVED, handler:null};
     messageTypeToEventType[won.WONMSG.closeMessage] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:null};
@@ -54,16 +72,15 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
         var incomingMessageHandler = new messageService.MessageCallback(
             function (event, msg) {
                 console.log("processing incoming message");
-                var eventType = messageTypeToEventType[event.messageType].eventType;
-                var handler = messageTypeToEventType[event.messageType].handler;
+                var configForEvent = messageTypeToEventType[event.messageType];
                 //only do something if a type/handler combination is registered
-                if (eventType != null) {
-                    event.eventType = eventType;
+                if (configForEvent.eventType != null) {
+                    event.eventType = configForEvent.eventType;
                     //store event in local triple store
                     linkedDataService.storeJsonLdGraph(event.eventURI, msg);
                     //call handler if there is one - it may modify the event object
-                    if (handler != null) {
-                        handler(event, msg);
+                    if (configForEvent.handler != null) {
+                        configForEvent.handler(event, msg);
                     }
                     //publish angular event
                     console.log("incoming message: \n  ", JSON.stringify(msg) + "\npublishing angular event");
