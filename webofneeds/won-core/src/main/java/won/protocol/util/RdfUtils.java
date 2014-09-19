@@ -793,6 +793,60 @@ public class RdfUtils
     return findOne(dataset, visitor, getDefaultModelSelector(), allowSame);
   }
 
+  /**
+   * Finds resource which is a specified property of a specified resource.
+   * If multiple (non equal) resources are found an exception is thrown.
+   *
+   *
+   * @param dataset <code>Dataset</code> to look into
+   * @param resourceURI
+   * @param p
+   * @return <code>URI</code> of the resource
+   */
+  public static RDFNode findOnePropertyFromResource(Dataset dataset, final URI resourceURI, final Property p) {
+    return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<RDFNode>()
+    {
+      @Override
+      public RDFNode visit(final Model model) {
+        return findOnePropertyFromResource(model, resourceURI, p);
+      }
+    }, true);
+  }
+  /**
+   * Finds resource which is a specified property of a specified resource.
+   * If multiple (non equal) resources are found an exception is thrown.
+   *
+   *
+   * @param model <code>Model</code> to look into
+   * @param resourceURI
+   * @param p
+   * @return <code>URI</code> of the resource
+   */
+  public static RDFNode findOnePropertyFromResource(Model model, URI resourceURI, Property p) {
+
+    List<RDFNode> foundNodes = new ArrayList<RDFNode>();
+
+    NodeIterator iterator = model.listObjectsOfProperty(model.createResource(resourceURI.toString()),
+                                                        WON.BELONGS_TO_NEED);
+    while (iterator.hasNext()) {
+      foundNodes.add(iterator.next());
+    }
+    if (foundNodes.size() == 0)
+      return null;
+    else if (foundNodes.size() == 1)
+      return foundNodes.get(0);
+    else if (foundNodes.size() > 1) {
+      RDFNode n = foundNodes.get(0);
+      for (RDFNode node : foundNodes) {
+        if (!node.equals(n))
+          throw new IncorrectPropertyCountException(1,2);
+      }
+      return n;
+    }
+    else
+      return null;
+  }
+
 
   /**
    * Stores additional data if there is any in the specified model.

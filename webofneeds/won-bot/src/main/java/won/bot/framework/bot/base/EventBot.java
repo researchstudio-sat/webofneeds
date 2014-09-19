@@ -37,6 +37,7 @@ import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
 import java.net.URI;
@@ -315,6 +316,11 @@ public class EventBot extends TriggeredBot
     public LinkedDataSource getLinkedDataSource()
     {
       return EventBot.this.getLinkedDataSource();
+    }
+
+    @Override
+    public WonNodeInformationService getWonNodeInformationService() {
+      return EventBot.this.getWonNodeInformationService();
     }
   }
 

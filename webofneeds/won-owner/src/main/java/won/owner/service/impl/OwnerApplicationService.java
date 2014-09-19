@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import won.cryptography.service.RandomNumberService;
+import won.cryptography.service.RandomNumberServiceImpl;
 import won.owner.service.OwnerApplicationServiceCallback;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.exception.WonMessageBuilderException;
@@ -63,7 +63,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   private Executor executor;
 
   @Autowired
-  private RandomNumberService randomNumberService;
+  private RandomNumberServiceImpl randomNumberService;
 
   final private Map<URI, WonMessage> wonMessageMap = new HashMap<>();
 

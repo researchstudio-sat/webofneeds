@@ -6,16 +6,13 @@ import java.util.Random;
  * User: fsalcher
  * Date: 09.09.2014
  */
-public class RandomNumberService
+public class RandomNumberServiceImpl implements RandomNumberService
 {
 
   // ToDo (FS): check how good this generator is and replace it if necessary
   Random random = new Random();
 
-  /**
-   * generates a URI safe random string with the given length
-   * @param length
-   */
+  @Override
   public String generateRandomString(int length) {
 
     // ToDo (FS): use not only numbers

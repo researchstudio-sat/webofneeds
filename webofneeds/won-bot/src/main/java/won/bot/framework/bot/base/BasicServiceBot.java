@@ -24,6 +24,7 @@ import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
 import java.net.URI;
@@ -44,6 +45,7 @@ public abstract class BasicServiceBot extends BaseBot
 
 
   private LinkedDataSource linkedDataSource;
+  private WonNodeInformationService wonNodeInformationService;
 
   protected NodeURISource getNodeURISource()
   {
@@ -125,4 +127,14 @@ public abstract class BasicServiceBot extends BaseBot
   @Qualifier("default")
   @Autowired(required = true)
   public void setLinkedDataSource(final LinkedDataSource linkedDataSource) { this.linkedDataSource = linkedDataSource; }
+
+  public WonNodeInformationService getWonNodeInformationService() {
+    return wonNodeInformationService;
+  }
+
+  @Autowired(required = true)
+  public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
+    this.wonNodeInformationService = wonNodeInformationService;
+  }
+
 }

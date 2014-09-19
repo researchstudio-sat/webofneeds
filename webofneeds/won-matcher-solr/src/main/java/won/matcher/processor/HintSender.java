@@ -19,9 +19,15 @@ package won.matcher.processor;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.model.FacetType;
+import won.protocol.service.WonNodeInformationService;
 
 import java.net.URI;
 
@@ -33,6 +39,9 @@ public class HintSender implements MatchProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private MatcherProtocolNeedServiceClientSide client;
+
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
   public HintSender(MatcherProtocolNeedServiceClientSide client)
   {
@@ -46,7 +55,8 @@ public class HintSender implements MatchProcessor
     try {
       logger.debug("sending hint from {} to {}", from, to);
         // ToDo (FS): provide fitting messageEvent
-      client.hint(from, to, score, originator, explanation, null);
+      client.hint(from, to, score, originator, explanation,
+                  createWonMessage(from, to, score, originator));
     } catch (NoSuchNeedException e) {
       logger.debug("hint failed: no need found with URI {}", e.getUnknownNeedURI());
     } catch (IllegalMessageForNeedStateException e) {
@@ -54,5 +64,25 @@ public class HintSender implements MatchProcessor
     } catch (Exception e) {
         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
+  }
+
+  private WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
+    throws WonMessageBuilderException {
+
+    URI wonNode = wonNodeInformationService.getDefaultWonNode();
+
+    WonMessageBuilder builder = new WonMessageBuilder();
+    return builder
+      .setMessagePropertiesForHint(
+        wonNodeInformationService.generateMessageEventURI(
+          needURI, wonNode),
+        needURI,
+        FacetType.OwnerFacet.getURI(),
+        wonNode,
+        otherNeedURI,
+        FacetType.OwnerFacet.getURI(),
+        originator,
+        score)
+      .build();
   }
 }
