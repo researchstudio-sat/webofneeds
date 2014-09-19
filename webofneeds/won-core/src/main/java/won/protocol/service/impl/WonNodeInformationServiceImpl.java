@@ -22,19 +22,10 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService
   }
 
   @Override
-  public URI generateNeedMessageEventURI(URI needURI, URI wonNodeURI) {
+  public URI generateMessageEventURI(URI needURI, URI wonNodeURI) {
     WonNodeInformation wonNodeInformation = getWonNodeInformation(wonNodeURI);
     return URI.create(wonNodeInformation.getNeedMessageEventURIPattern()
                                         .replace(wonNodeInformation.getNeedURIPlaceholder(), needURI.toString())
-                                        .replace(wonNodeInformation.getIdPlaceholder(),
-                                                 generateRandomMessageEventID()));
-  }
-
-  @Override
-  public URI generateConnectionMessageEventURI(URI connectionURI, URI wonNodeURI) {
-    WonNodeInformation wonNodeInformation = getWonNodeInformation(wonNodeURI);
-    return URI.create(wonNodeInformation.getConnectionMessageEventURIPattern()
-                                        .replace(wonNodeInformation.getConnectionURIPlaceholder(), connectionURI.toString())
                                         .replace(wonNodeInformation.getIdPlaceholder(),
                                                  generateRandomMessageEventID()));
   }

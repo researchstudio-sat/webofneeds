@@ -71,9 +71,7 @@ public interface WonNodeInformationService
 
   public WonNodeInformation getWonNodeInformation(URI wonNodeURI);
 
-  public URI generateNeedMessageEventURI(URI needURI, URI wonNodeURI);
-
-  public URI generateConnectionMessageEventURI(URI connectionURI, URI wonNodeURI);
+  public URI generateMessageEventURI(URI needURI, URI wonNodeURI);
 
   public URI generateConnectionURI(URI needURI, URI wonNodeURI);
 

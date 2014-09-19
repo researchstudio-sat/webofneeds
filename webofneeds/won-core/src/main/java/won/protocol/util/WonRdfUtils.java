@@ -357,6 +357,33 @@ public class WonRdfUtils
     }
 
     /**
+     * return the needURI of a connection
+     *
+     * @param dataset <code>Dataset</code> object which contains connection information
+     * @param connectionURI
+     * @return <code>URI</code> of the need
+     */
+    public static URI getLocalNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
+      return RdfUtils.findOnePropertyFromResource(dataset, connectionURI, WON.BELONGS_TO_NEED);
+    }
+
+    public static URI getRemoteNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
+      return RdfUtils.findOnePropertyFromResource(dataset, connectionURI, WON.HAS_REMOTE_NEED);
+    }
+
+    public static URI getWonNodeURIFromConnection(Dataset dataset, final URI connectionURI) {
+      return RdfUtils.findOnePropertyFromResource(dataset, connectionURI, WON.HAS_WON_NODE);
+    }
+
+    public static URI getRemoteConnectionURIFromConnection(Dataset dataset, final URI connectionURI) {
+      return RdfUtils.findOnePropertyFromResource(dataset, connectionURI, WON.HAS_REMOTE_CONNECTION);
+    }
+
+    public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {
+      return RdfUtils.findOnePropertyFromResource(dataset, needURI, WON.HAS_WON_NODE);
+    }
+
+    /**
      * Extracts all triples from the dataset (which is expected to be a dataset describing
      * one need, expressed in multiple named graphs) and copies them to a new model.
      * @param dataset

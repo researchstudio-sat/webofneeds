@@ -116,6 +116,7 @@ public class WON
   public static final Resource ADDITIONAL_DATA_CONTAINER = m.createResource(BASE_URI + "AdditionalDataContainer");
 
   public static final Property HAS_MATCH_SCORE = m.createProperty(BASE_URI, "hasMatchScore");
+  public static final Property HAS_MATCH_COUNTERPART = m.createProperty(BASE_URI, "hasMatchCounterpart");
 
   public static final Property HAS_NEED_MODALITY = m.createProperty(BASE_URI, "hasNeedModality");
   public static final Resource NEED_MODALITY = m.createResource(BASE_URI + "NeedModality");

@@ -793,6 +793,60 @@ public class RdfUtils
     return findOne(dataset, visitor, getDefaultModelSelector(), allowSame);
   }
 
+  /**
+   * Finds resource which is a specified property of a specified resource.
+   * If multiple (non equal) resources are found an exception is thrown.
+   *
+   *
+   * @param dataset <code>Dataset</code> to look into
+   * @param resourceURI
+   * @param p
+   * @return <code>URI</code> of the resource
+   */
+  public static URI findOnePropertyFromResource(Dataset dataset, final URI resourceURI, final Property p) {
+    return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<URI>()
+    {
+      @Override
+      public URI visit(final Model model) {
+        return findOnePropertyFromResource(model, resourceURI, p);
+      }
+    }, true);
+  }
+  /**
+   * Finds resource which is a specified property of a specified resource.
+   * If multiple (non equal) resources are found an exception is thrown.
+   *
+   *
+   * @param model <code>Model</code> to look into
+   * @param resourceURI
+   * @param p
+   * @return <code>URI</code> of the resource
+   */
+  public static URI findOnePropertyFromResource(Model model, URI resourceURI, Property p) {
+
+    List<URI> foundURIs = new ArrayList<URI>();
+
+    NodeIterator iterator = model.listObjectsOfProperty(model.createResource(resourceURI.toString()),
+                                                        WON.BELONGS_TO_NEED);
+    while (iterator.hasNext()) {
+      foundURIs.add(URI.create(iterator.next().asResource().getURI()));
+    }
+    if (foundURIs.size() == 0)
+      return null;
+    else if (foundURIs.size() == 1)
+      return foundURIs.get(0);
+    else if (foundURIs.size() > 1) {
+      URI u = foundURIs.get(0);
+      for (URI uri : foundURIs) {
+        if (!uri.equals(u))
+          throw new IncorrectPropertyCountException(1,2);
+      }
+      return u;
+    }
+    else
+      return null;
+  }
+
 
   /**
    * Stores additional data if there is any in the specified model.
