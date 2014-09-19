@@ -31,6 +31,7 @@
     <import resource="classpath:/spring/component/camel/matcher-camel.xml" />
     <import resource="classpath:/spring/component/matcherProtocolNeedServiceClient/matcherProtocolNeedServiceClient-jms.xml" />
     <import resource="classpath:/spring/component/storage/storage.xml" />
+    <import resource="classpath:/spring/component/wonNodeInformationService.xml" />
 
 
 

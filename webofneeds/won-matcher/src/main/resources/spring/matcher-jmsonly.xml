@@ -36,6 +36,7 @@
     <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml" />
     <import resource="classpath:/spring/component/ehcache/matcher-ehcache.xml" />
     <import resource="classpath:/spring/component/nodeurisource/matcher-nodeurisource-all.xml" />
+    <import resource="classpath:/spring/component/wonNodeInformationService.xml" />
 
 
 
