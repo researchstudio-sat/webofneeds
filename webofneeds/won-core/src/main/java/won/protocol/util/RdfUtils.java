@@ -803,11 +803,11 @@ public class RdfUtils
    * @param p
    * @return <code>URI</code> of the resource
    */
-  public static URI findOnePropertyFromResource(Dataset dataset, final URI resourceURI, final Property p) {
-    return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<URI>()
+  public static RDFNode findOnePropertyFromResource(Dataset dataset, final URI resourceURI, final Property p) {
+    return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<RDFNode>()
     {
       @Override
-      public URI visit(final Model model) {
+      public RDFNode visit(final Model model) {
         return findOnePropertyFromResource(model, resourceURI, p);
       }
     }, true);
@@ -822,26 +822,26 @@ public class RdfUtils
    * @param p
    * @return <code>URI</code> of the resource
    */
-  public static URI findOnePropertyFromResource(Model model, URI resourceURI, Property p) {
+  public static RDFNode findOnePropertyFromResource(Model model, URI resourceURI, Property p) {
 
-    List<URI> foundURIs = new ArrayList<URI>();
+    List<RDFNode> foundNodes = new ArrayList<RDFNode>();
 
     NodeIterator iterator = model.listObjectsOfProperty(model.createResource(resourceURI.toString()),
                                                         WON.BELONGS_TO_NEED);
     while (iterator.hasNext()) {
-      foundURIs.add(URI.create(iterator.next().asResource().getURI()));
+      foundNodes.add(iterator.next());
     }
-    if (foundURIs.size() == 0)
+    if (foundNodes.size() == 0)
       return null;
-    else if (foundURIs.size() == 1)
-      return foundURIs.get(0);
-    else if (foundURIs.size() > 1) {
-      URI u = foundURIs.get(0);
-      for (URI uri : foundURIs) {
-        if (!uri.equals(u))
+    else if (foundNodes.size() == 1)
+      return foundNodes.get(0);
+    else if (foundNodes.size() > 1) {
+      RDFNode n = foundNodes.get(0);
+      for (RDFNode node : foundNodes) {
+        if (!node.equals(n))
           throw new IncorrectPropertyCountException(1,2);
       }
-      return u;
+      return n;
     }
     else
       return null;

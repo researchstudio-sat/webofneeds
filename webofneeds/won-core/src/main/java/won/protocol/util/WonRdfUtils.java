@@ -364,23 +364,28 @@ public class WonRdfUtils
      * @return <code>URI</code> of the need
      */
     public static URI getLocalNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return RdfUtils.findOnePropertyFromResource(dataset, connectionURI, WON.BELONGS_TO_NEED);
+      return URI.create(RdfUtils.findOnePropertyFromResource(
+        dataset, connectionURI, WON.BELONGS_TO_NEED).asResource().getURI());
     }
 
     public static URI getRemoteNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return RdfUtils.findOnePropertyFromResource(dataset, connectionURI, WON.HAS_REMOTE_NEED);
+      return URI.create(RdfUtils.findOnePropertyFromResource(
+        dataset, connectionURI, WON.HAS_REMOTE_NEED).asResource().getURI());
     }
 
     public static URI getWonNodeURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return RdfUtils.findOnePropertyFromResource(dataset, connectionURI, WON.HAS_WON_NODE);
+      return URI.create(RdfUtils.findOnePropertyFromResource(
+        dataset, connectionURI, WON.HAS_WON_NODE).asResource().getURI());
     }
 
     public static URI getRemoteConnectionURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return RdfUtils.findOnePropertyFromResource(dataset, connectionURI, WON.HAS_REMOTE_CONNECTION);
+      return URI.create(RdfUtils.findOnePropertyFromResource(
+        dataset, connectionURI, WON.HAS_REMOTE_CONNECTION).asResource().getURI());
     }
 
     public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {
-      return RdfUtils.findOnePropertyFromResource(dataset, needURI, WON.HAS_WON_NODE);
+      return URI.create(RdfUtils.findOnePropertyFromResource(
+        dataset, needURI, WON.HAS_WON_NODE).asResource().getURI());
     }
 
     /**

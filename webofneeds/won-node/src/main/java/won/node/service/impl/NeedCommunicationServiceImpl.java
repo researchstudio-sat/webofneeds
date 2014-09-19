@@ -42,6 +42,7 @@ import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;
@@ -105,11 +106,18 @@ public class NeedCommunicationServiceImpl implements
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
-      if (originator == null) throw new IllegalArgumentException("originator is not set");
+      double wmScore = RdfUtils.findOnePropertyFromResource(
+        wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+        WON.HAS_MATCH_SCORE).asLiteral().getDouble();
+      URI wmOriginator = wonMessage.getMessageEvent().getSenderNodeURI();
+      if (wmScore < 0 || wmScore > 1) throw new IllegalArgumentException("score is not in [0,1]");
+      if (wmOriginator == null)
+        throw new IllegalArgumentException("originator is not set");
 
       //create Connection in Database
       Connection con = null;
+      Model facetModel = ModelFactory.createDefaultModel();
+
       try {
 
         URI facet = wonMessage.getMessageEvent().getReceiverURI();
@@ -120,9 +128,9 @@ public class NeedCommunicationServiceImpl implements
           if (facets.isEmpty()) throw new IllegalArgumentException(
             "hint does not specify facets, falling back to using one of the need's supported facets failed as the need does not support any facets");
           //add the facet to the model.
-          dataService.addFacet(content, facets.iterator().next());
+          dataService.addFacet(facetModel, facets.iterator().next());
         }
-        con = dataService.createConnection(needURI, otherNeedURI, null, content, ConnectionState.SUGGESTED,
+        con = dataService.createConnection(needURI, otherNeedURI, null, facetModel, ConnectionState.SUGGESTED,
                                            ConnectionEventType.MATCHER_HINT);
       } catch (ConnectionAlreadyExistsException e) {
         logger.warn("could not create connection", e);
@@ -132,7 +140,7 @@ public class NeedCommunicationServiceImpl implements
       messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(), wonMessage.getMessageEvent()));
 
       //invoke facet implementation
-      reg.get(con).hint(con, score, originator, content, wonMessage);
+      reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wonMessage);
 
     } else {
 

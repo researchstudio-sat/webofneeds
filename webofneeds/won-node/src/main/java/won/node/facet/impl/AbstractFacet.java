@@ -22,6 +22,7 @@ import won.protocol.model.NeedState;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.rdfstorage.RDFStorageService;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.io.StringWriter;
@@ -301,25 +302,34 @@ public abstract class AbstractFacet implements Facet
   @Override
   public void hint(final Connection con, final double score,
                    final URI originator, final Model content, final WonMessage wonMessage)
-      throws NoSuchNeedException, IllegalMessageForNeedStateException {
+    throws NoSuchNeedException, IllegalMessageForNeedStateException {
 
     Model remoteFacetModelCandidate = content;
     if (wonMessage == null)
       remoteFacetModelCandidate = changeHasRemoteFacetToHasFacet(content);
-
     final Model remoteFacetModel = remoteFacetModelCandidate;
 
     try {
       WonMessageBuilder builder = new WonMessageBuilder();
-      URI messageURI = URIService.createMessageEventURI(con.getConnectionURI());
+      URI messageURI = URIService.createMessageEventURI(con.getNeedURI());
+      URI localFacet = URI.create(RdfUtils.findOnePropertyFromResource(
+        wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+        WON.HAS_FACET).asResource().getURI());
+      URI remoteFacet = URI.create(RdfUtils.findOnePropertyFromResource(
+        wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+        WON.HAS_REMOTE_FACET).asResource().getURI());
       final WonMessage hintNotification = builder
-        .setMessageURI(messageURI)
-        .setWonMessageType(WonMessageType.HINT_NOTIFICATION)
-        .setSenderNodeURI(originator) // ToDo (FS): get matcher ID from wonMessage when we can rely on a wonMessage being there
-        .setReceiverURI(con.getConnectionURI())
-        .setReceiverNeedURI(con.getNeedURI())
-        .setReceiverNodeURI(URI.create(URIService.getGeneralURIPrefix()))
-        .addContent(URI.create(messageURI.toString() + "/content"), remoteFacetModel, null)
+        .setMessagePropertiesForHintNotification(
+          messageURI,
+          con.getNeedURI(),
+          localFacet,
+          con.getConnectionURI(),
+          URI.create(URIService.getGeneralURIPrefix()),
+          con.getRemoteNeedURI(),
+          remoteFacet,
+          originator,
+          score
+        )
         .build();
 
       executorService.execute(new Runnable()

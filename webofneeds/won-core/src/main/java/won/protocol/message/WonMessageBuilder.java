@@ -296,6 +296,36 @@ public class WonMessageBuilder
     return this;
   }
 
+  public WonMessageBuilder setMessagePropertiesForHintNotification(
+    URI messageURI,
+    URI needURI,
+    URI needFacetURI,
+    URI needConnectionURI,
+    URI wonNodeURI,
+    URI otherNeedURI,
+    URI otherNeedFacet,
+    URI matcherURI,
+    double score) {
+
+    Model contentModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(needFacetURI, otherNeedFacet);
+    contentModel.add(contentModel.createResource(messageURI.toString()), WON.HAS_MATCH_SCORE,
+                     contentModel.createTypedLiteral(score));
+    contentModel.add(contentModel.createResource(messageURI.toString()), WON.HAS_MATCH_COUNTERPART,
+                     contentModel.createResource(otherNeedURI.toString()));
+
+    this
+      .setMessageURI(messageURI)
+      .setWonMessageType(WonMessageType.HINT_NOTIFICATION)
+      .setSenderNodeURI(matcherURI)
+      .setReceiverURI(needConnectionURI)
+      .setReceiverNeedURI(needURI)
+      .setReceiverNodeURI(wonNodeURI)
+        // ToDo (FS): remove the hardcoded part of the URI
+      .addContent(URI.create(messageURI.toString() + "/content"), contentModel, null);
+
+    return this;
+  }
+
   public WonMessageBuilder setMessagePropertiesForConnectionMessage(
     URI messageURI,
     URI localConnection,
