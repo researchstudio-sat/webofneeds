@@ -206,27 +206,31 @@
 				<li ng-show="!showPublic()">
 					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
 						<!-- TODO provide here the total number of messages -->
-						<i class="fa fa-comment-o fa-lg"></i>&nbsp;{{21}}
+						<i class="fa fa-comment-o fa-lg"></i>&nbsp;{{unreadObjects.all.message.count}}
 					</a>
 					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
-						<li class="text-center grey-item">{{21}}&nbsp;new messages</li>
+						<li class="text-center grey-item">{{unreadObjects.all.message.count}}&nbsp;new messages</li>
 						<!-- TODO put real parameters into url -->
-						<li ng-repeat="conv in conversations"><a href="#/private-link"><img src="{{getTypePicURI(conv.type)}}"/>&nbsp;{{conv.title}}&nbsp;<span
-								class="badge pull-right">{{conv.msgs}}</span></a></li>
+						<li ng-repeat="entry in unreadObjects.byNeed.message"><a href="#/private-link"><img
+                                src="{{getTypePicURI
+						(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
+								class="badge pull-right">{{entry.count}}</span></a></li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
 						</li>
 					</ul>
 				</li>
 				<li ng-show="!showPublic()" ng-cloak>
 					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
-						<!-- TODO provide here the total number of messages -->
-						<i class="fa fa-male fa-lg"></i>&nbsp;{{11}}
+						<!-- TODO provide here the total number of connects -->
+						<i class="fa fa-male fa-lg"></i>&nbsp;{{unreadObjects.all.connect.count}}
 					</a>
 					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
-						<li class="text-center grey-item">{{11}}&nbsp;new messages</li>
+						<li class="text-center grey-item">{{unreadObjects.all.connect.count}}&nbsp;new
+                            connects</li>
 						<!-- TODO put real parameters into url -->
-						<li ng-repeat="req in requests"><a href="#/private-link"><img
-								src="{{getTypePicURI(req.type)}}"/>&nbsp;{{req.title}}&nbsp;<span class="badge pull-right">{{req.msgs}}</span></a>
+						<li ng-repeat="entry in unreadObjects.byNeed.connect"><a href="#/private-link"><img
+								src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
+                                class="badge pull-right">{{entry.count}}</span></a>
 						</li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
 						</li>
@@ -234,15 +238,15 @@
 				</li>
 				<li ng-show="!showPublic()" ng-cloak>
 					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
-						<!-- TODO provide here the total number of messages -->
-						<i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{countOfAllUnreadMatchEvents}}
+						<!-- TODO provide here the total number of matches -->
+						<i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{unreadObjects.all.hint.count}}
 					</a>
 					<ul class="dropdown-menu" style="width: 280px;">
-						<li class="text-center grey-item">{{countOfAllUnreadMatchEvents}}&nbsp;new messages</li>
+						<li class="text-center grey-item">{{unreadObjects.all.hint.count}}&nbsp;new matches</li>
 						<!-- TODO put real parameters into url -->
-						<li ng-repeat="need in allNeedsWithUnreadNotifications"><a href="#/private-link"><img
-								src="{{getTypePicURI(req.type)}}"/>&nbsp;{{need.title}}&nbsp;<span
-                                class="badge pull-right">{{need.matches.length}}</span></a>
+						<li ng-repeat="entry in unreadObjects.byNeed.hint"><a href="#/private-link"><img
+								src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
+                                class="badge pull-right">{{entry.count}}</span></a>
 						</li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
 						</li>

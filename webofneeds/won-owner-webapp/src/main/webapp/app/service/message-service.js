@@ -139,7 +139,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
                         var callback = privateData.callbacks[i];
                         callback.handleMessage(myEvent, myJsonld);
                     } catch(e) {
-                        console.log("error processing messaging callback " + i + ": " + e);
+                        console.log("error processing messaging callback " + i + ": " + JSON.stringify(e));
                     }
                     try {
                         if (callback.shouldUnregister(myEvent, myJsonld)) {
@@ -148,7 +148,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
                             i--;
                         }
                     } catch (e) {
-                        console.log("error while deciding whether to unregister callback " + i + ": "+ e);
+                        console.log("error while deciding whether to unregister callback " + i + ": "+ JSON.stringify(e));
                     }
                     console.log("done processing callback ");
                 }

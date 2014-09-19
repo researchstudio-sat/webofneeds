@@ -61,12 +61,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.ensureLoaded = function(uri) {
         var isAlreadyLoaded = false;
         //load the data from the local rdf store if forceFetch is false
-        privateData.store.graph(uri, function (success, mygraph) {
-            $rootScope.$apply(function() {
-                if (success) {
-                    isAlreadyLoaded = true;
-                }
-            });
+        privateData.store.node(uri, function (success, mygraph) {
+            if (success && mygraph.triples.length > 0) {
+                isAlreadyLoaded = true;
+            }
         });
         if (!isAlreadyLoaded) {
             linkedDataService.fetch(uri);

@@ -9,6 +9,6 @@
     <bean id="keyPairService" class="won.cryptography.service.KeyPairService" >
         <constructor-arg name="keyInformationExtractor" ref="keyInformationExtractorBouncyCastle"/>
     </bean>
-    <bean id="randomNumberService" class="won.cryptography.service.RandomNumberServiceImpl"/>
+
 
 </beans>

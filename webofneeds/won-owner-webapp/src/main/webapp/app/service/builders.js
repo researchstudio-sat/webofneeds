@@ -187,6 +187,16 @@
         won.EVENT.CONNECTION_MESSAGE_RECEIVED = "ConnectionMessageReceivedEvent";
         won.EVENT.NEED_STATE_MESSAGE_RECEIVED = "NeedStateMessageReceivedEvent";
 
+        //keys for things that can be shown in the GUI as 'unread'
+        won.UNREAD = {};
+        won.UNREAD.TYPE = {};
+        won.UNREAD.TYPE.HINT = "hint";
+        won.UNREAD.TYPE.MESSAGE = "message";
+        won.UNREAD.TYPE.CONNECT = "connect";
+        won.UNREAD.TYPE.CLOSE = "close";
+        won.UNREAD.GROUP = {};
+        won.UNREAD.GROUP.ALL="all";
+        won.UNREAD.GROUP.BYNEED="byNeed";
 
 
         won.clone = function(obj){

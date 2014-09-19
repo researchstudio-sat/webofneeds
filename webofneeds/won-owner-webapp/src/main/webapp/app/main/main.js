@@ -38,21 +38,40 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.needURIPath = "/resource/need";
     $scope.connectionURIPath = "/connection";
 
-    $scope.allNeedsWithUnreadNotifications = [];
+    $scope.unreadObjects = applicationStateService.getUnreadObjects();
 
-    $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
-        $scope.allNeedsWithUnreadNotifications= applicationStateService.fetchUnreadEventsForAllNeeds();
-    });
-    $scope.fetchNotifications = function(){
-        $scope.allNeedsWithUnreadNotifications = applicationStateService.fetchUnreadEventsForAllNeeds();
-        return $scope.allNeedsWithUnreadNotifications;
+
+    addEventAsUnreadAndUpdateUnreadObjects = function(eventData) {
+        applicationStateService.addEvent(eventData);
+        //update the unread objects key by key.
+        var newUnread = applicationStateService.getUnreadObjects();
+        for(key in won.UNREAD.GROUP) {
+            var realKey = won.UNREAD.GROUP[key];
+            var entries = newUnread[realKey];
+            if (typeof (entries) != 'undefined'){
+                $scope.unreadObjects[realKey] = entries;
+            }
+        }
     }
+
     $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
-        $scope.allNeedsWithUnreadNotifications= applicationStateService.fetchUnreadEventsForAllNeeds();
-
+        addEventAsUnreadAndUpdateUnreadObjects(eventData);
     });
-    $scope.$on(won.EVENT.NEED_CREATED, function(ngEvent, eventData) {
-        $scope.allNeedsWithUnreadNotifications= applicationStateService.fetchUnreadEventsForAllNeeds();
 
+    $scope.$on(won.EVENT.CONNECT_RECEIVED, function(ngEvent, eventData) {
+        addEventAsUnreadAndUpdateUnreadObjects(eventData);
     });
+
+    $scope.$on(won.EVENT.OPEN_RECEIVED, function(ngEvent, eventData) {
+        addEventAsUnreadAndUpdateUnreadObjects(eventData);
+    });
+
+    $scope.$on(won.EVENT.CLOSE_RECEIVED, function(ngEvent, eventData) {
+        addEventAsUnreadAndUpdateUnreadObjects(eventData);
+    });
+
+    $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {
+        addEventAsUnreadAndUpdateUnreadObjects(eventData);
+    });
+
 });
