@@ -775,17 +775,20 @@ public class RdfUtils
    */
   public static <T> T findOne(Dataset dataset, ModelVisitor<T> visitor, ModelSelector modelSelector, boolean allowSame){
     T result = null;
-    for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();){
+    for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();) {
       T newResult = visitor.visit(modelIterator.next());
-      if (result != null && newResult != null) {
-        if (!allowSame || ! result.equals(newResult)) {
-          throw new IncorrectPropertyCountException("Results were found in more than " +
-            "one model", 1, 2);
+      if (newResult != null) {
+        if (result != null) {
+          if (!allowSame || !result.equals(newResult)) {
+            throw new IncorrectPropertyCountException("Results were found in more than " +
+                                                        "one model", 1, 2);
+          }
         }
+        result = newResult;
       }
-      result = newResult;
     }
-    if (result == null) throw new IncorrectPropertyCountException("No result found", 1, 0);
+    if (result == null)
+      throw new IncorrectPropertyCountException("No result found", 1, 0);
     return result;
   }
 
