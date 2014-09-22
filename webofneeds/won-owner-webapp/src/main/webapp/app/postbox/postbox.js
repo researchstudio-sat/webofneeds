@@ -58,7 +58,6 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 	};
                 */
     //$scope.fetchNotifications();
-    $scope.unreadObjects = $scope.$parent.unreadObjects;
     $scope.recordsToDisplay = 4;
     $scope.displayConfirmationDialog = false;
     var indexOfChosenDraft;
@@ -117,9 +116,9 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 	];          */
 
     $scope.getTypePicURI = function (type) {
-        if(type=='Want') return "/owner/images/type_posts/want.png";
-        else if(type=='Change') return "/owner/images/type_posts/change.png";
-        else if(type=='Offer') return "/owner/images/type_posts/offer.png";
+        if(type==won.WON.DEMAND) return "/owner/images/type_posts/want.png";
+        else if(type==won.WON.CRITIQUE) return "/owner/images/type_posts/change.png";
+        else if(type==won.WON.SUPPLY) return "/owner/images/type_posts/offer.png";
         else return "/owner/images/type_posts/todo.png";
     };
 

@@ -307,40 +307,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         }
 
     }
-
-        /*connectMessage = new window.won.ConnectMessageBuilder(connectionJson)
-            .addMessageGraph()
-            .eventURI("2345432343")
-            .hasSenderNeed(needJson_2["@context"]["@base"])
-            .hasSenderNode("http://localhost:8080/won")
-            .hasReceiverNeed(needJson["@context"]["@base"])
-            .hasReceiverNode("http://localhost:8080/won")
-            .sender()
-            .receiver()
-            .build();
-
-        sender = messageService.sendMessage(connectMessage);  */
-        // messageFactory.generateCreateNeedMessage($scope.need);
-       // console.log("expandedJson: "+expandedJson);
-        /*needService.saveDraft($scope.need, $scope.currentStep,userService.getUserName()).then(function(){
-           $scope.successShow = true;
-
-        }
-        );       */
-   // }
-	/*$scope.save = function () {
-        connectionRandomId = utilService.getRandomInt(1,9223372036854775807);
-        connectionURI = needJson["@context"]["@base"]+$scope.connectionURIPath+"/"+connectionRandomId;
-        connectionJson = new window.won.ConnectionBuilder()
-            .setContext()
-            .connectionURI(connectionURI)
-            .build();
-        wonService.connect(connectionJson, $scope.needURI2, $scope.needURI);    */
-		/*needService.save($scope.need).then(function() {
-			$scope.need = $scope.getCleanNeed();
-			$scope.successShow = true;
-		});    */
-	//};
     $scope.saveDraft = function(){
         needService.saveDraft($scope.need, $scope.currentStep,userService.getUnescapeUserName()).then(function(){
            $scope.successShow = true;

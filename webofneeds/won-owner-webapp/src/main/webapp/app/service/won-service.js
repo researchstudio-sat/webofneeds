@@ -19,7 +19,7 @@
  */
 angular.module('won.owner').factory('wonService', function (messageService, $q, linkedDataService, $rootScope,applicationStateService) {
 
-    wonService = {};
+    var wonService = {};
 
 
 
@@ -30,7 +30,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
      * @param eventData event object that is passed as additional argument to $rootScope.$broadcast.
      * @param message the complete message data as received from the WoN node.
      */
-    processHintNotificationMessage = function(eventData, message) {
+    var processHintNotificationMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
         var connectionURI = eventData.receiverURI;
         if (connectionURI != null) {
@@ -40,7 +40,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
         //call handler if there is one - it may modify the event object
 
         eventData.matchScore = eventData.framedMessage[won.WON.hasMatchScoreCompacted];
-        eventData.matchCounterpartURI = won.getSafeURI(eventData.framedMessage[won.WON.hasMatchCounterpart]);
+        eventData.matchCounterpartURI = won.getSafeJsonLdValue(eventData.framedMessage[won.WON.hasMatchCounterpart]);
         //add some properties to the eventData so as to make them easily accessible to consumers
         //of the hint event
         if (eventData.matchCounterpartURI != null) {
@@ -51,7 +51,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
 
 
     //mapping between message type and eventType/handler combination
-    messageTypeToEventType = {};
+    var messageTypeToEventType = {};
     messageTypeToEventType[won.WONMSG.hintNotificationMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED, handler: processHintNotificationMessage};
     messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:null};
     messageTypeToEventType[won.WONMSG.openMessageCompacted] = {eventType: won.EVENT.OPEN_RECEIVED, handler:null};
@@ -60,16 +60,16 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
     messageTypeToEventType[won.WONMSG.needStateMessageCompacted] = {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED, handler:null};
 
     //callback to be used in message-service to handle incoming messages
-    createIncomingMessageCallback = function() {
+    var createIncomingMessageCallback = function() {
         var incomingMessageHandler = new messageService.MessageCallback(
             function (event, msg) {
                 console.log("processing incoming message");
-                var configForEvent = messageTypeToEventType[event.messageType];
+                var configForEvent = messageTypeToEventType[event.hasMessageType];
                 //only do something if a type/handler combination is registered
                 if (configForEvent.eventType != null) {
                     event.eventType = configForEvent.eventType;
                     //store event in local triple store
-                    linkedDataService.storeJsonLdGraph(event.eventURI, msg);
+                    linkedDataService.storeJsonLdGraph(event.uri, msg);
 
                     if (configForEvent.handler != null) {
                         configForEvent.handler(event, msg);
@@ -78,12 +78,12 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
                     console.log("incoming message: \n  ", JSON.stringify(msg) + "\npublishing angular event");
                     $rootScope.$broadcast(event.eventType, event);
                 } else {
-                    console.log("Not handling message of type " + event.messageType + " in incomingMessageHandler");
+                    console.log("Not handling message of type " + event.hasMessageType + " in incomingMessageHandler");
                 }
             });
         //handle all incoming messages that are mapped to events in the messageTypeToEventType map
         incomingMessageHandler.shouldHandleTest = function (event, msg){
-            var messageType = event.messageType;
+            var messageType = event.hasMessageType;
             if (typeof messageType === 'undefined') return false;
             var eventTypeConfig = messageTypeToEventType[messageType];
             if (typeof eventTypeConfig === 'undefined') return false;
@@ -102,7 +102,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
     /**
      * helper function for accessin JSON-LD data
      */
-    matchFirstObject = function(jsonld, subject, predicate){
+    var matchFirstObject = function(jsonld, subject, predicate){
         var deferred = $q.defer();
         var ret = {};
         ret.result = null;
@@ -132,7 +132,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
     /**
      * helper function for accessin JSON-LD data
      */
-    matchFirstSubject = function(jsonld, predicate, object){
+    var matchFirstSubject = function(jsonld, predicate, object){
         var deferred = $q.defer();
         var ret = {};
         ret.result = null;
@@ -179,13 +179,13 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
         var callback = new messageService.MessageCallback(
             function (event, msg) {
                 //check if the message we got (the create need response message) indicates that all went well
-                console.log("got create need message response for need " + event.receiverNeedURI);
+                console.log("got create need message response for need " + event.hasReceiverNeed);
                 //TODO: if negative, use alternative need URI and send again
                 //fetch need data and store in local RDF store
                 //get URI of newly created need from message
 
                 //load the data into the local rdf store and publish NeedCreatedEvent when done
-                var needURI = event.receiverNeedURI;
+                var needURI = event.hasReceiverNeed;
                 linkedDataService.fetch(needURI)
                     .then(
                     function (value) {
@@ -208,8 +208,8 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
         callback.done = false;
         callback.msgURI = null;
         callback.shouldHandleTest = function (event, msg) {
-            var ret = event.refersToURI == this.msgURI;
-            console.log("event " + event.eventURI + " refers to event " + this.msgURI + ": " + ret);
+            var ret = event.refersTo == this.msgURI;
+            console.log("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
             return ret;
         };
         callback.shouldUnregisterTest = function(event, msg) {

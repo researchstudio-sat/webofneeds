@@ -8,16 +8,27 @@
 angular.module('won.owner')
     .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService) {
 
+    $scope.$on(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED, function(event){
+        $scope.initialize();
+    });
+
         // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
      $scope.initialize = function() {
-        $scope.need = {};
-        $scope.need = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
-        $scope.need.needURI = applicationStateService.getCurrentNeedURI();
-        $scope.need.matches = linkedDataService.getMatches($scope.need.needURI);
+
+         $scope.need = {};
+         $scope.need = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
+         $scope.need.uri = applicationStateService.getCurrentNeedURI();
+         if ($scope.need.uri != null) {
+             linkedDataService.getAllEventsOfNeed($scope.need.uri).then(function(allEvents){
+                 $scope.needData = allEvents;
+             })
+         }
+
+        //$scope.need.matches = linkedDataService.getMatches($scope.need.uri);
 
         //
-        // $scope.need.events = linkedDataService.getAllEvents($scope.need.needURI);
+        // $scope.need.events = linkedDataService.getAllEvents($scope.need.uri);
         $scope.need.events = [
             { eventType: won.WON.HintCompacted, title: 'Car sharing to Prague', timeStamp: new Date('2014-08-25 14:30'), msg: 'This is a Hint '},
             { eventType: won.WON.PartnerOpenCompacted, title: 'Moved recently ...', timeStamp: new Date('2014-08-20'), msg: 'This is a Connection Request'}

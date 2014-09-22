@@ -51,6 +51,10 @@
 
         won.WON.isInState = won.WON.baseUri+"isInState";
         won.WON.isInStateCompacted = won.WON.prefix+":isInState";
+        won.WON.hasFacet= won.WON.baseUri+"hasFacet";
+        won.WON.hasFacetCompacted= won.WON.prefix+":hasFacet";
+        won.WON.hasRemoteNeed= won.WON.baseUri+"hasRemoteNeed";
+        won.WON.hasRemoteNeedCompacted = won.WON.prefix+":hasRemoteNeed";
 
         //EVENT TYPES
         won.WON.OwnerClose = won.WON.baseUri + "OwnerClose";
@@ -74,6 +78,7 @@
 
         won.WON.Connection = won.WON.baseUri + "Connection";
         won.WON.ConnectionCompacted = won.WON.prefix + ":Connection";
+
         won.WON.Event = won.WON.baseUri + "Event";
         won.WON.EventCompacted = won.WON.prefix + ":Event";
 
@@ -93,6 +98,8 @@
         won.WON.hasBasicNeedTypeCompacted = won.WON.prefix + ":hasBasicNeedType";
         won.WON.hasConnections = won.WON.baseUri + "hasConnections";
         won.WON.hasConnectionsCompacted = won.WON.prefix + ":hasConnections";
+        won.WON.hasConnectionState = won.WON.baseUri + "hasConnectionState";
+        won.WON.hasConnectionStateCompacted = won.WON.prefix + ":hasConnectionState";
         won.WON.hasContent = won.WON.baseUri + "hasContent";
         won.WON.hasContentCompacted = won.WON.prefix + ":hasContent";
         won.WON.hasEndTime = won.WON.baseUri + "hasEndTime";
@@ -190,6 +197,8 @@
         won.EVENT.CONNECTION_MESSAGE_RECEIVED = "ConnectionMessageReceivedEvent";
         won.EVENT.NEED_STATE_MESSAGE_RECEIVED = "NeedStateMessageReceivedEvent";
 
+        won.EVENT.APPSTATE_CURRENT_NEED_CHANGED = "AppState.CurrentNeedChangedEvent";
+
         //keys for things that can be shown in the GUI as 'unread'
         won.UNREAD = {};
         won.UNREAD.TYPE = {};
@@ -208,10 +217,40 @@
         }
 
         //get the URI from a jsonld resource (expects an object with an '@id' property)
-        won.getSafeURI = function(dataItem) {
+        //or a value from a literal
+        won.getSafeJsonLdValue = function(dataItem) {
             if (dataItem == null) return null;
-            if (dataItem['@id'] != null) return dataItem['@id'];
+            if (typeof dataItem === 'object') {
+                if (dataItem['@id'] != null) return dataItem['@id'];
+            } else {
+                return dataItem;
+            }
             return null;
+        }
+
+        won.getLocalName = function(uriOrQname) {
+            if (uriOrQname == null || typeof uriOrQname !== 'string') return null;
+            //first, try to get the URI hash fragment (without hash)
+            var pos = uriOrQname.lastIndexOf('#')
+            if ( pos > -1 && pos < uriOrQname.length) {
+                return uriOrQname.substring(pos + 1);
+            }
+            //try portion after last trailing slash
+            pos = uriOrQname.lastIndexOf('/')
+            if ( pos > -1 && pos < uriOrQname.length) {
+                return uriOrQname.substring(pos + 1);
+            }
+            //take portion after last ':'
+            pos = uriOrQname.lastIndexOf(':')
+            if ( pos > -1 && pos < uriOrQname.length) {
+                return uriOrQname.substring(pos + 1);
+            }
+            return uriOrQname;
+        }
+
+        won.isJsonLdKeyword = function(propertyName) {
+            if (propertyName == null || typeof propertyName !== 'string') return false;
+            return propertyName.indexOf('@') == 0;
         }
 
         won.defaultContext = {

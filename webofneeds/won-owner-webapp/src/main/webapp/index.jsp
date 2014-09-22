@@ -246,7 +246,7 @@
 						<li class="text-center grey-item">{{unreadObjects.all.hint.count}}&nbsp;new matches</li>
 						<!-- TODO put real parameters into url -->
 						<li ng-repeat="entry in unreadObjects.byNeed.hint"><a
-                                ng-click="openNeedDetailView(entry.need.needURI)"><img
+                                ng-click="openNeedDetailView(entry.need.uri)"><img
 								src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
                                 class="badge pull-right">{{entry.count}}</span></a>
 						</li>

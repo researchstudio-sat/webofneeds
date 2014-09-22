@@ -22,7 +22,7 @@
  * - removeEvent(event) : removes the event
  * addEvent(event) must only be called once for each event.
  */
-angular.module('won.owner').factory('applicationStateService', function (linkedDataService, $filter) {
+angular.module('won.owner').factory('applicationStateService', function (linkedDataService, $rootScope) {
 
     //the service
     var applicationStateService = {}
@@ -57,7 +57,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     //dirty flag for the unread objects.
     privateData.unreadObjectsDirty = false;
 
-    prepareEmptyUnreadObjects = function() {
+    var prepareEmptyUnreadObjects = function() {
         return {
             'all': {
                 'hint': {'count': 0, 'events': []},
@@ -76,7 +76,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     privateData.unreadObjects = prepareEmptyUnreadObjects();
 
     //helper function: is x an array?
-    isArray = function(x){
+    var isArray = function(x){
         return Object.prototype.toString.call( x ) === '[object Array]';
     }
 
@@ -87,7 +87,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * @param data  containing key/value pairs. if the value is an array, one of the elements must
      * match the value found in the array element for the key.
      */
-    myfilter = function(array, data) {
+    var myfilter = function(array, data) {
         var ret = [];
         outer:
         for (var i = 0; i < array.length; i++) {
@@ -115,7 +115,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     /**
      * Reconstructs the unreadObjects structure. May be expensive.
      */
-    updateUnreadObjects = function(){
+    var updateUnreadObjects = function(){
         var newObjects = prepareEmptyUnreadObjects(); //array used in the GUI to show message counts
         for (key in privateData.filters) {
             var filtered = myfilter(privateData.unreadEvents, privateData.filters[key]);
@@ -130,7 +130,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             for (var i = 0; i < privateData.allNeeds.length; i++) {
                 var currentNeed = privateData.allNeeds[i];
                 var needFilter = {}
-                needFilter['receiverNeedURI'] = currentNeed.needURI;
+                needFilter['hasReceiverNeed'] = currentNeed.uri;
                 var filteredAgain = myfilter(filtered, needFilter);
                 newObjects[won.UNREAD.GROUP.BYNEED][key].push(
                     {need: currentNeed,
@@ -160,7 +160,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      */
     applicationStateService.removeEvent=function (event){
         for(var i = 0; i < privateData.unreadEvents.length; i++){
-            if (privateData.unreadEvents[i].eventURI === event.eventURI){
+            if (privateData.unreadEvents[i].uri === event.uri){
                 privateData.unreadEvents.splice(i,1);
                 i--;
             }
@@ -173,7 +173,10 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * @param needURI
      */
     applicationStateService.setCurrentNeedURI = function(needURI){
-        privateData.currentNeedURI = needURI;
+        if (needURI != null && needURI != '' && needURI != privateData.currentNeedURI) {
+            privateData.currentNeedURI = needURI;
+            $rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
+        }
     }
 
     /**
