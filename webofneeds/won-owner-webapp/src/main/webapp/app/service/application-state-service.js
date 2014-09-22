@@ -181,7 +181,6 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * @returns {null|*}
      */
     applicationStateService.getCurrentNeedURI = function(){
-
         return privateData.currentNeedURI;
     }
 

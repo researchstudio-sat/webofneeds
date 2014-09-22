@@ -98,7 +98,7 @@ public class UpdateListener implements SolrEventListener
     logger.debug("newSearcher called");
 
     Matcher matcher = new Matcher(solrIndexSearcher, new ScoreTransformer(), this.originatorURI);
-    matcher.addMatchProcessor(new HintSender(this.client));
+    matcher.addMatchProcessor(new HintSender(this.client, this.wonNodeInformationService));
 
     while (documentStorage.hasNext())
       try {

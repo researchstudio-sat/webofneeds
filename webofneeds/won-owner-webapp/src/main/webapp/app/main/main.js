@@ -33,12 +33,16 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService) {
+angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService) {
     $scope.wonNodeURI = "http://localhost:8080/won";
     $scope.needURIPath = "/resource/need";
     $scope.connectionURIPath = "/connection";
 
     $scope.unreadObjects = applicationStateService.getUnreadObjects();
+
+    //allow acces to service methods from angular expressions:
+    $scope.openNeedDetailView = applicationControlService.openNeedDetailView;
+
 
 
     addEventAsUnreadAndUpdateUnreadObjects = function(eventData) {

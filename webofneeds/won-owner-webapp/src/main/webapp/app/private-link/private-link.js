@@ -8,48 +8,65 @@
 angular.module('won.owner')
     .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService) {
 
-    $scope.need = {};
-    $scope.need = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
-    $scope.need.needURI = applicationStateService.getCurrentNeedURI();
-    $scope.need.matches = linkedDataService.getMatches($scope.need.needURI);
+        // all types of messages will be shown when the page is loaded
+     var msgFilterCriteria = [1, 2, 3];
+     $scope.initialize = function() {
+        $scope.need = {};
+        $scope.need = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
+        $scope.need.needURI = applicationStateService.getCurrentNeedURI();
+        $scope.need.matches = linkedDataService.getMatches($scope.need.needURI);
 
-    //
-    // $scope.need.events = linkedDataService.getAllEvents($scope.need.needURI);
-    $scope.need.events = [
-        { eventType: won.WON.HintCompacted , title:'Car sharing to Prague', timeStamp: new Date('2014-08-25 14:30'), msg:'This is a Hint '},
-        { eventType: won.WON.PartnerOpenCompacted, title:'Moved recently ...', timeStamp:new Date('2014-08-20'), msg:'This is a Connection Request'}];
-    $scope.currentEventType = [won.WON.OwnerMessageCompacted, won.WON.PartnerMessageCompacted, won.WON.OwnerOpenCompacted, won.WON.PartnerOpenCompacted, won.WON.HintCompacted]
+        //
+        // $scope.need.events = linkedDataService.getAllEvents($scope.need.needURI);
+        $scope.need.events = [
+            { eventType: won.WON.HintCompacted, title: 'Car sharing to Prague', timeStamp: new Date('2014-08-25 14:30'), msg: 'This is a Hint '},
+            { eventType: won.WON.PartnerOpenCompacted, title: 'Moved recently ...', timeStamp: new Date('2014-08-20'), msg: 'This is a Connection Request'}
+        ];
+        $scope.currentEventType = [won.WON.OwnerMessageCompacted, won.WON.PartnerMessageCompacted, won.WON.OwnerOpenCompacted, won.WON.PartnerOpenCompacted, won.WON.HintCompacted]
 
 
+        //$scope.title = 'New Flat, Need Furniture';
+        $scope.img_path = '/owner/images/thumbnail_demo.jpg';
+        $rootScope.postClosed = false;
+        $rootScope.postShouldBeClosed = false;
+        $rootScope.postShouldBeReopened = false;
 
-    //$scope.title = 'New Flat, Need Furniture';
-    $scope.img_path = '/owner/images/thumbnail_demo.jpg';
-    $rootScope.postClosed = false;
-    $rootScope.postShouldBeClosed = false;
-    $rootScope.postShouldBeReopened = false;
+
+        //settings
+        $scope.privateLink = 'https://won.com/la3f#private'; //todo set value normaly
+        $scope.publicLink = 'http://www.webofneeds.org/'; //todo set value normaly;
+        $scope.notificationEmail = '';
+        $scope.notificationEmailValide = false;
+        $scope.notificationChecks = {
+            val1: false,
+            val2: false,
+            val3: false
+        };
+
+        $scope.prevMessageId = null;
+        $scope.chosenMessage = null;
+        $scope.rateValue = 0;
+        $scope.showConfirmationDialogForDeclineRequest = false;
+        $scope.showConfirmationDialogForCancelRequest = false;
+        $scope.showEditButtons = false;
+        $scope.showPencil = true;
+        $scope.textAreaContent = '';
+        $scope.showConfirmationDialogForRemoveMatch = false;
+
+        $scope.showWarningForRating = false;
+        $scope.showMatchControl = false;
+    }
+
+
     $scope.showPublic = function() {
         return userService.isAuth();
     };
-
-    //settings
-    $scope.privateLink = 'https://won.com/la3f#private'; //todo set value normaly
-    $scope.publicLink = 'http://www.webofneeds.org/'; //todo set value normaly;
-    $scope.notificationEmail = '';
-    $scope.notificationEmailValide = false;
-    $scope.notificationChecks = {
-        val1 : false,
-        val2 : false,
-        val3 : false
-    };
-
-    // all types of messages will be shown when the page is loaded
-    var msgFilterCriteria = [1, 2, 3];
 
     $scope.copyLinkToClipboard = function() {
         //todo maybe we can use http://zeroclipboard.org/
     };
 
-    $scope.settingsCollapsed = false;
+
     $scope.settingsCollapseClick= function() {
         $scope.settingsCollapsed = !$scope.settingsCollapsed;
     };
@@ -63,6 +80,10 @@ angular.module('won.owner')
     };
 
     //Post Options
+    $scope.newMessage = '';
+    $scope.mesagesCollapsed = false;
+    $scope.messageTypeColapsed = -1;
+    $scope.settingsCollapsed = false;
     $scope.postOptionsCollapsed = false;
     $scope.postOptionsCollapseClick= function() {
         $scope.postOptionsCollapsed = !$scope.postOptionsCollapsed;
@@ -95,7 +116,7 @@ angular.module('won.owner')
         {id:8, type: 3, typeText:'Matches', title:'Old men\'s clothes ..', datetime:new Date('2014-02-10')}
     ];
     */
-    $scope.messageTypeColapsed = -1;
+
     $scope.conversationType0CollapseClick = function() {
         if($scope.messageTypeColapsed != 0) $scope.messageTypeColapsed = 0;
         else $scope.messageTypeColapsed = -1;
@@ -171,20 +192,19 @@ angular.module('won.owner')
         $scope.conversationCollapsed = !$scope.conversationCollapsed;
     };
 
-    $scope.mesagesCollapsed = false;
+
     $scope.messagesCollapseClick = function() {
         $scope.mesagesCollapsed = !$scope.mesagesCollapsed;
     };
 
     //send new message
-    $scope.newMessage = '';
+
     $scope.sendMessage = function() {
         //TODO logic
         $scope.newMessage = '';
     };
 
-    $scope.prevMessageId = null;
-    $scope.chosenMessage = null;
+
     // helper function to get message according to its id from messages
     function getEventById(msgId) {
         for(var i = 0; i < $scope.need.events.length; i++) {
@@ -192,8 +212,6 @@ angular.module('won.owner')
         }
         // should not get here
     }
-
-    $scope.rateValue = 0;
     $scope.initRater = function() {
         $("#rater").rating({
             starCaptions: function(val) {
@@ -238,8 +256,6 @@ angular.module('won.owner')
     }
 
     // Incoming Requests
-    $scope.showConfirmationDialogForDeclineRequest = false;
-
     $scope.clickOnDeclineForInRequest = function() {
         console.log('decline clicked');
         $scope.showConfirmationDialogForDeclineRequest = true;
@@ -266,8 +282,6 @@ angular.module('won.owner')
     }
 
     // Outgoing Requests
-    $scope.showConfirmationDialogForCancelRequest = false;
-
     $scope.clickOnCancelRequest = function() {
         console.log('cancel clicked');
         $scope.showConfirmationDialogForCancelRequest = true;
@@ -287,9 +301,6 @@ angular.module('won.owner')
     }
 
     // for editable text box
-    $scope.showEditButtons = false;
-    $scope.showPencil = true;
-    $scope.textAreaContent = '';
     $scope.changeToEditable = function() {
         $('#textboxInRequest').removeAttr('disabled');
         $scope.textAreaContent = $('#textboxInRequest').val();
@@ -312,7 +323,6 @@ angular.module('won.owner')
     }
 
     // Matches
-    $scope.showConfirmationDialogForRemoveMatch = false;
 
     $scope.clickOnRemoveMatch = function() {
         console.log('remove clicked');
@@ -332,8 +342,7 @@ angular.module('won.owner')
         $location.path('/private-link');
     }
 
-    $scope.showWarningForRating = false;
-    $scope.showMatchControl = false;
+
     $scope.clickOnRequestConversation = function() {
         console.log('request conversation');
         if ($scope.rateValue > 0) {
@@ -359,6 +368,8 @@ angular.module('won.owner')
             'width=626,height=436');
         return false;
     }
+
+    $scope.initialize();
 })
 
 

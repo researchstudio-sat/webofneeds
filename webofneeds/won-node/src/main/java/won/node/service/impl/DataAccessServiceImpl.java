@@ -41,30 +41,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   @Autowired
   private FacetRepository facetRepository;
 
-  /**
-   * Creates a new Connection object. Expects <> won:hasFacet [FACET] in the RDF content, will throw exception if it's not there.
-   * @param needURI
-   * @param otherNeedURI
-   * @param otherConnectionURI
-   * @param content
-   * @param connectionState
-   * @param connectionEventType
-   * @return
-   * @throws NoSuchNeedException
-   * @throws IllegalMessageForNeedStateException
-   * @throws ConnectionAlreadyExistsException
-   */
-  public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
-                                      final Model content, final ConnectionState connectionState,
-                                      final ConnectionEventType connectionEventType)
-      throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
-    URI facetURI =  getFacet(content);
-    if (facetURI == null) throw new IllegalArgumentException("at least one RDF node must be of type won:" + WON.HAS_FACET.getLocalName());
-
-    return createConnection(needURI, otherNeedURI, otherConnectionURI, facetURI,
-                            connectionState, connectionEventType);
-  }
 
   /**
    * Creates a new Connection object. Excepts facet URI.
