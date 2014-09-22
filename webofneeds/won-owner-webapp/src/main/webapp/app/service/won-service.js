@@ -22,8 +22,9 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
     wonService = {};
 
 
-    //private functions that handle incoming messages
 
+
+    //private functions that handle incoming messages
     /**
      * Updates the local triple store with the data contained in the hint message.
      * @param eventData event object that is passed as additional argument to $rootScope.$broadcast.
@@ -36,36 +37,27 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
             linkedDataService.ensureLoaded(connectionURI);
         }
         //extract hint information from message
-        //TODO: switch to JSON-LD framing as soon as it can handle named graphs (and we can handle it :)
-        var frame = {"@context" : {
-            "msg":"http://purl.org/webofneeds/message#",
-            "won":"http://purl.org/webofneeds/model#"
-            },
-            "msg:hasMessageType":["msg:HintNotificationMessage"]
-        };
-        var framedMessage = {};
-        jsonld.frame(message, frame, function(err, framed) {
-            framedMessage = framed;
-        });
-        eventData.matchScore = framedMessage['@graph']["won:hasMatchScore"];
-        eventData.matchCounterpart = framedMessage['@graph']["won:hasMatchCounterpart"];
+        //call handler if there is one - it may modify the event object
 
-        //load the data of the need the hint is about, if required
-
-
+        eventData.matchScore = eventData.framedMessage[won.WON.hasMatchScoreCompacted];
+        eventData.matchCounterpartURI = won.getSafeURI(eventData.framedMessage[won.WON.hasMatchCounterpart]);
         //add some properties to the eventData so as to make them easily accessible to consumers
         //of the hint event
+        if (eventData.matchCounterpartURI != null) {
+            //load the data of the need the hint is about, if required
+            linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
+        }
     }
 
 
     //mapping between message type and eventType/handler combination
     messageTypeToEventType = {};
-    messageTypeToEventType[won.WONMSG.hintNotificationMessage] = {eventType: won.EVENT.HINT_RECEIVED, handler: processHintNotificationMessage};
-    messageTypeToEventType[won.WONMSG.connectMessage] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:null};
-    messageTypeToEventType[won.WONMSG.openMessage] = {eventType: won.EVENT.OPEN_RECEIVED, handler:null};
-    messageTypeToEventType[won.WONMSG.closeMessage] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:null};
-    messageTypeToEventType[won.WONMSG.connectionMessage] = {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED, handler:null};
-    messageTypeToEventType[won.WONMSG.needStateMessage] = {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED, handler:null};
+    messageTypeToEventType[won.WONMSG.hintNotificationMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED, handler: processHintNotificationMessage};
+    messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:null};
+    messageTypeToEventType[won.WONMSG.openMessageCompacted] = {eventType: won.EVENT.OPEN_RECEIVED, handler:null};
+    messageTypeToEventType[won.WONMSG.closeMessageCompacted] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:null};
+    messageTypeToEventType[won.WONMSG.connectionMessageCompacted] = {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED, handler:null};
+    messageTypeToEventType[won.WONMSG.needStateMessageCompacted] = {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED, handler:null};
 
     //callback to be used in message-service to handle incoming messages
     createIncomingMessageCallback = function() {
@@ -78,7 +70,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
                     event.eventType = configForEvent.eventType;
                     //store event in local triple store
                     linkedDataService.storeJsonLdGraph(event.eventURI, msg);
-                    //call handler if there is one - it may modify the event object
+
                     if (configForEvent.handler != null) {
                         configForEvent.handler(event, msg);
                     }
@@ -116,7 +108,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
         ret.result = null;
         var store = rdfstore.create();
         store.setPrefix("ex", "http://example.org/people/");
-        store.setPrefix("wonmsg","http://purl.org/webofneeds/message#");
+        store.setPrefix("msg","http://purl.org/webofneeds/message#");
         store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         store.load("application/ld+json", jsonld, "ex:test", function(success, results) {
             if (!success) {
@@ -146,7 +138,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
         ret.result = null;
         var store = rdfstore.create();
         store.setPrefix("ex", "http://example.org/people/");
-        store.setPrefix("wonmsg","http://purl.org/webofneeds/message#");
+        store.setPrefix("msg","http://purl.org/webofneeds/message#");
         store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         store.load("application/ld+json", jsonld, function(success, results) {
             if (!success) {
@@ -227,7 +219,7 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
         //find out which message uri was created and use it for the callback's shouldHandleTest
         //so we can wait for a dedicated response
         //TODO: get the event URI from where we generate it in the first place! this is unsafe!
-        matchFirstSubject(message, won.WONMSG.hasMessageTypePropertyCompacted, null)
+        matchFirstSubject(message, won.WONMSG.hasMessageTypeCompacted, null)
             .then(function(uri) {
                 callback.msgURI = uri;
             })

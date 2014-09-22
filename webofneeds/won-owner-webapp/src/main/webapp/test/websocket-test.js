@@ -3,17 +3,17 @@ var jsontest ={
     "@graph" : [ {
         "@graph" : [ {
             "@id" : "http://example.com/responseMessage/837ddj",
-            "@type" : "wonmsg:CreateResponseMessage",
-            "wonmsg:hasReceiverNeed" : {
+            "@type" : "msg:CreateResponseMessage",
+            "msg:hasReceiverNeed" : {
                 "@id" : "http://localhost:8080/won/resource/need/920094381212434400"
             },
-            "wonmsg:hasResponseStateProperty" : {
-                "@id" : "wonmsg:SuccessResponse"
+            "msg:hasResponseStateProperty" : {
+                "@id" : "msg:SuccessResponse"
             },
-            "wonmsg:hasSenderNode" : {
+            "msg:hasSenderNode" : {
                 "@id" : "http://localhost:8080/won"
             },
-            "wonmsg:refersTo" : {
+            "msg:refersTo" : {
                 "@id" : "http://localhost:8080/won/resource/need/920094381212434400/event/34543242134"
             }
         } ],
@@ -21,12 +21,12 @@ var jsontest ={
     }, {
         "@graph" : [ {
             "@id" : "http://example.com/responseMessage/837ddj#data",
-            "@type" : "wonmsg:EnvelopeGraph"
+            "@type" : "msg:EnvelopeGraph"
         } ],
         "@id" : "urn:x-arq:DefaultGraphNode"
     } ],
     "@context" : {
-        "wonmsg" : "http://purl.org/webofneeds/message#"
+        "msg" : "http://purl.org/webofneeds/message#"
     }
 }
 
@@ -44,7 +44,7 @@ function testRdf() {
     });*/
     var store = new rdfstore.Store();
     store.setPrefix("ex", "http://example.org/people/");
-    store.setPrefix("wonmsg","http://purl.org/webofneeds/message#");
+    store.setPrefix("msg","http://purl.org/webofneeds/message#");
 
     store.load("application/ld+json", jsontest, "ex:test", function(success, results) {
         console.log("success:" + success + ", results: " + results);
@@ -59,7 +59,7 @@ function testRdf() {
             console.log("triple:" + mygraph.triples[i]);
         }
 
-        var triples = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve('wonmsg:hasReceiverNeed')),null);
+        var triples = mygraph.match(null, store.rdf.createNamedNode(store.rdf.resolve('msg:hasReceiverNeed')),null);
         for (var i = 0; i < triples.length; i++) {
             console.log("triple:" + triples[i]);
         }

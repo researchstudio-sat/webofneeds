@@ -42,6 +42,7 @@ import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -128,9 +129,9 @@ public class NeedCommunicationServiceImpl implements
           if (facets.isEmpty()) throw new IllegalArgumentException(
             "hint does not specify facets, falling back to using one of the need's supported facets failed as the need does not support any facets");
           //add the facet to the model.
-          dataService.addFacet(facetModel, facets.iterator().next());
+          facet = facets.iterator().next();
         }
-        con = dataService.createConnection(needURI, otherNeedURI, null, facetModel, ConnectionState.SUGGESTED,
+        con = dataService.createConnection(needURI, otherNeedURI, null, facet, ConnectionState.SUGGESTED,
                                            ConnectionEventType.MATCHER_HINT);
       } catch (ConnectionAlreadyExistsException e) {
         logger.warn("could not create connection", e);
@@ -158,9 +159,9 @@ public class NeedCommunicationServiceImpl implements
           if (facets.isEmpty()) throw new IllegalArgumentException(
             "hint does not specify facets, falling back to using one of the need's supported facets failed as the need does not support any facets");
           //add the facet to the model.
-          dataService.addFacet(content, facets.iterator().next());
+          facet = facets.iterator().next();
         }
-        con = dataService.createConnection(needURI, otherNeedURI, null, content, ConnectionState.SUGGESTED,
+        con = dataService.createConnection(needURI, otherNeedURI, null, facet, ConnectionState.SUGGESTED,
                                            ConnectionEventType.MATCHER_HINT);
       } catch (ConnectionAlreadyExistsException e) {
         logger.warn("could not create connection", e);
@@ -216,8 +217,10 @@ public class NeedCommunicationServiceImpl implements
 
     } else {
 
+      URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
+
       //create Connection in Database
-      Connection con = dataService.createConnection(needURI, otherNeedURI, null, content, ConnectionState.REQUEST_SENT,
+      Connection con = dataService.createConnection(needURI, otherNeedURI, null, facetURI, ConnectionState.REQUEST_SENT,
                                                     ConnectionEventType.OWNER_OPEN);
 
       //create ConnectionEvent in Database
@@ -284,8 +287,10 @@ public class NeedCommunicationServiceImpl implements
                    new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
       if (otherConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
 
+      URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
+
       //create Connection in Database
-      Connection con = dataService.createConnection(needURI, otherNeedURI, otherConnectionURI, content,
+    Connection con = dataService.createConnection(needURI, otherNeedURI, otherConnectionURI, facetURI,
                                                     ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
       String baseURI = con.getConnectionURI().toString();
       RdfUtils.replaceBaseURI(content, baseURI);

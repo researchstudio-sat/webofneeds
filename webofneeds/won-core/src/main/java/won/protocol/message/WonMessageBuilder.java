@@ -8,6 +8,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.model.NeedState;
 import won.protocol.util.DefaultPrefixUtils;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
@@ -237,7 +238,7 @@ public class WonMessageBuilder
 
     // create facet model
     Model facetModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(localFacet, remoteFacet);
-
+    RdfUtils.replaceBaseResource(facetModel, facetModel.createResource(messageURI.toString()));
     this
       .setMessageURI(messageURI)
       .setWonMessageType(WonMessageType.CONNECT)
@@ -278,9 +279,11 @@ public class WonMessageBuilder
     double score) {
 
     Model contentModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(needFacetURI, otherNeedFacet);
-    contentModel.add(contentModel.createResource(messageURI.toString()), WON.HAS_MATCH_SCORE,
+    Resource msgResource = contentModel.createResource(messageURI.toString());
+    RdfUtils.replaceBaseResource(contentModel, msgResource);
+    contentModel.add(msgResource, WON.HAS_MATCH_SCORE,
                      contentModel.createTypedLiteral(score));
-    contentModel.add(contentModel.createResource(messageURI.toString()), WON.HAS_MATCH_COUNTERPART,
+    contentModel.add(msgResource, WON.HAS_MATCH_COUNTERPART,
                      contentModel.createResource(otherNeedURI.toString()));
 
     this
@@ -308,9 +311,11 @@ public class WonMessageBuilder
     double score) {
 
     Model contentModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(needFacetURI, otherNeedFacet);
-    contentModel.add(contentModel.createResource(messageURI.toString()), WON.HAS_MATCH_SCORE,
+    Resource msgResource = contentModel.createResource(messageURI.toString());
+    RdfUtils.replaceBaseResource(contentModel, msgResource);
+    contentModel.add(msgResource, WON.HAS_MATCH_SCORE,
                      contentModel.createTypedLiteral(score));
-    contentModel.add(contentModel.createResource(messageURI.toString()), WON.HAS_MATCH_COUNTERPART,
+    contentModel.add(msgResource, WON.HAS_MATCH_COUNTERPART,
                      contentModel.createResource(otherNeedURI.toString()));
 
     this

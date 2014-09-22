@@ -32,66 +32,34 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
     //and send the message later.
     privateData.pendingOutMessages = [];
 
-    getSafeValue = function(dataItem) {
-        if (dataItem == null) return null;
-        if (dataItem.value != null) return dataItem.value;
-        return null;
-    }
 
     getEventData = function(json){
         console.log("getting data from jsonld message");
         var eventData = {};
-        rdfstore.create(function (store) {
-            store.setPrefix("wonmsg", "http://purl.org/webofneeds/message#");
-            store.load("application/ld+json", json, function (success, results) {});
+        //call handler if there is one - it may modify the event object
+        //frame the incoming jsonld to get the data that interest us
+        var frame = {"@context" : {
+            "won":"http://purl.org/webofneeds/model#",
+            "msg":"http://purl.org/webofneeds/message#" //message is the default vocabulary
+        },
+            "msg:hasMessageType": { }
+        };
+        //copy data from the framed message to the event object
+        var framedMessage = jsonld.frame(json, frame);
 
-            var query =
-                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-                "SELECT ?msg ?receiver ?receiverNeed ?receiverNode ?sender ?senderNeed ?senderNode ?messageType ?refersTo ?responseState where {" +
-                "?msg " + won.WONMSG.hasMessageTypePropertyCompacted + " ?messageType." +
-                " OPTIONAL { " +
-                "?msg " + won.WONMSG.hasReceiverCompacted + " ?receiver ." +
-                "} OPTIONAL { " +
-                "?msg " + won.WONMSG.hasReceiverNeedCompacted + " ?receiverNeed ." +
-                "} OPTIONAL { " +
-                "?msg " + won.WONMSG.hasReceiverNodeCompacted + " ?receiverNode ." +
-                "} OPTIONAL { " +
-                "?msg " + won.WONMSG.hasSenderCompacted + " ?sender ." +
-                "} OPTIONAL { " +
-                "?msg " + won.WONMSG.hasSenderNeedCompacted + " ?senderNeed ." +
-                "} OPTIONAL { " +
-                "?msg " + won.WONMSG.hasSenderNodeCompacted + " ?senderNode ." +
-                "} OPTIONAL { " +
-                "?msg " + won.WONMSG.refersToCompacted + " ?refersTo ." +
-                "} OPTIONAL { " +
-                "?msg " + won.WONMSG.hasResponseStatePropertyCompacted + " ?responseState ." +
-                "}" +
-                "}";
-            store.execute(query, function (success, results) {
-                if (!success) {
-                    return;
-                }
-                //use only first result!
-                if (results.length == 0) {
-                    return;
-                }
-                if (results.length > 1) {
-                    console.log("more than 1 solution found for message property query!");
-                }
-                var result = results[0];
-                eventData.messageType = getSafeValue(result.messageType);
-                eventData.receiverURI = getSafeValue(result.receiver);
-                eventData.receiverNeedURI = getSafeValue(result.receiverNeed);
-                eventData.receiverNodeURI = getSafeValue(result.receiverNode);
-                eventData.senderURI = getSafeValue(result.sender);
-                eventData.senderNeedURI = getSafeValue(result.senderNeed);
-                eventData.senderNodeURI = getSafeValue(result.senderNode);
-                eventData.refersToURI = getSafeValue(result.refersTo);
-                eventData.responseState = getSafeValue(result.responseState);
-                eventData.eventURI = getSafeValue(result.msg);
-                console.log("done copying the data to the event object, returning the result");
-            });
-        });
+        eventData.messageType = won.getSafeURI(framedMessage[won.WONMSG.hasMessageTypeCompacted]);
+        eventData.receiverURI = won.getSafeURI(framedMessage[won.WONMSG.hasReceiverCompacted]);
+        eventData.receiverNeedURI = won.getSafeURI(framedMessage[won.WONMSG.hasReceiverNeedCompacted]);
+        eventData.receiverNodeURI = won.getSafeURI(framedMessage[won.WONMSG.hasReceiverNodeCompacted]);
+        eventData.senderURI = won.getSafeURI(framedMessage[won.WONMSG.hasSenderCompacted]);
+        eventData.senderNeedURI = won.getSafeURI(framedMessage[won.WONMSG.hasSenderNeedCompacted]);
+        eventData.senderNodeURI = won.getSafeURI(framedMessage[won.WONMSG.hasSenderNodeCompacted]);
+        eventData.refersToURI = won.getSafeURI(framedMessage[won.WONMSG.refersToCompacted]);
+        eventData.responseState = won.getSafeURI(framedMessage[won.WONMSG.hasResponseStateCompacted]);
+        eventData.eventURI = won.getSafeURI(framedMessage);
+        eventData.framedMessage = framedMessage;
+        console.log("done copying the data to the event object, returning the result");
+
         return eventData;
     }
 

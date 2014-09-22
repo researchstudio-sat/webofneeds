@@ -116,11 +116,14 @@
         won.WON.hasTimeStamp = won.WON.baseUri + "hasTimeStamp"
         won.WON.hasTimeStampCompacted = won.WON.prefix + ":hasTimeStamp";
 
-
+        won.WON.hasMatchScore = won.WON.baseURI + "hasMatchScore";
+        won.WON.hasMatchScoreCompacted = won.WON.prefix + ":hasMatchScore";
+        won.WON.hasMatchCounterpart = won.WON.baseURI + "hasMatchCounterpart";
+        won.WON.hasMatchCounterpart = won.WON.prefix + ":hasMatchCounterpart";
 
         won.WONMSG = {};
         won.WONMSG.baseUri = "http://purl.org/webofneeds/message#";
-        won.WONMSG.prefix = "wonmsg";
+        won.WONMSG.prefix = "msg";
 
         //sender/receiver etc.
         won.WONMSG.hasReceiverNeed = won.WONMSG.baseUri + "hasReceiverNeed";
@@ -135,8 +138,8 @@
         won.WONMSG.hasSenderCompacted = won.WONMSG.prefix + ":hasSender";
         won.WONMSG.hasSenderNode = won.WONMSG.baseUri + "hasSenderNode";
         won.WONMSG.hasSenderNodeCompacted = won.WONMSG.prefix + ":hasSenderNode";
-        won.WONMSG.hasMessageTypeProperty = won.WONMSG.baseUri + ":hasMessageType";
-        won.WONMSG.hasMessageTypePropertyCompacted = won.WONMSG.prefix + ":hasMessageType";
+        won.WONMSG.hasMessageType = won.WONMSG.baseUri + ":hasMessageType";
+        won.WONMSG.hasMessageTypeCompacted = won.WONMSG.prefix + ":hasMessageType";
         won.WONMSG.refersTo = won.WONMSG.baseUri + "refersTo";
         won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
         won.WONMSG.EnvelopeGraph = won.WONMSG.baseUri + "EnvelopeGraph";
@@ -158,7 +161,7 @@
 
         //response types
         won.WONMSG.hasResponseStateProperty = won.WONMSG.baseUri + "hasResponseStateProperty";
-        won.WONMSG.hasResponseStatePropertyCompacted = won.WONMSG.prefix + ":hasResponseStateProperty";
+        won.WONMSG.hasResponseStateCompacted = won.WONMSG.prefix + ":hasResponseStateProperty";
         won.WONMSG.createResponseMessage = won.WONMSG.baseUri + "CreateResponseMessage";
         won.WONMSG.createResponseMessageCompacted = won.WONMSG.prefix + ":CreateResponseMessage";
         won.WONMSG.connectResponseMessage = won.WONMSG.baseUri + "ConnectResponseMessage";
@@ -198,10 +201,19 @@
         won.UNREAD.GROUP.ALL="all";
         won.UNREAD.GROUP.BYNEED="byNeed";
 
+        //UTILS
 
         won.clone = function(obj){
             return JSON.parse(JSON.stringify(obj));
         }
+
+        //get the URI from a jsonld resource (expects an object with an '@id' property)
+        won.getSafeURI = function(dataItem) {
+            if (dataItem == null) return null;
+            if (dataItem['@id'] != null) return dataItem['@id'];
+            return null;
+        }
+
         won.defaultContext = {
                 "@base": "http://www.example.com/resource/need/randomNeedID_1",
                 "webID": "http://www.example.com/webids/",

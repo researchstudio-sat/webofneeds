@@ -819,15 +819,14 @@ public class RdfUtils
    *
    * @param model <code>Model</code> to look into
    * @param resourceURI
-   * @param p
+   * @param property
    * @return <code>URI</code> of the resource
    */
-  public static RDFNode findOnePropertyFromResource(Model model, URI resourceURI, Property p) {
+  public static RDFNode findOnePropertyFromResource(Model model, URI resourceURI, Property property) {
 
     List<RDFNode> foundNodes = new ArrayList<RDFNode>();
 
-    NodeIterator iterator = model.listObjectsOfProperty(model.createResource(resourceURI.toString()),
-                                                        WON.BELONGS_TO_NEED);
+    NodeIterator iterator = model.listObjectsOfProperty(model.createResource(resourceURI.toString()), property);
     while (iterator.hasNext()) {
       foundNodes.add(iterator.next());
     }

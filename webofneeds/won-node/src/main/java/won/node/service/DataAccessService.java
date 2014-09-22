@@ -57,10 +57,6 @@ public interface DataAccessService
       throws ConnectionAlreadyExistsException;
 
   public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
-    final Model content, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
-    throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
-
-  public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
     final URI facet, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
     throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 

@@ -15,30 +15,6 @@
  */
 
 angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService, linkedDataService, applicationStateService, $filter, $interval) {
-    //$scope.fetchNotifications();
-    //$scope.eventNotifications =  [];
-   /* $scope.fetchNotifications = function(){
-        $scope.eventNotifications = applicationStateService.fetchUnreadEventsForAllNeeds();
-        return $scope.eventNotifications;
-    }
-    $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
-        $scope.eventNotifications = $scope.fetchNotifications();
-    });
-    $scope.$on(won.EVENT.NEED_CREATED, function(ngEvent, eventData) {
-        $scope.eventNotifications = $scope.fetchNotifications();
-    });
-          */
-
-
-    $scope.unreadObjects = $scope.$parent.unreadObjects;
-
-    /*
-    var p = $interval($scope.fetchNotifications(),$scope.notificationRefreshInterval);
-    p.then(function(value){
-        console.log('interval: ', value);
-        $scope.$digest();
-    });
-    */
 
 	$scope.isActive = function(where) {
 		if ($location.path().indexOf(where) > -1) {

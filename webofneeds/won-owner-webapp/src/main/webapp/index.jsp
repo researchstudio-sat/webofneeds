@@ -55,7 +55,7 @@
         <script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
         <script type="text/javascript" src="scripts/smart-table.min.js"></script>
         <script type="text/javascript" src="scripts/bootstrap-tagsinput.min.js"></script>
-        <script type="text/javascript" src="bower_components/jsonld.js/js/jsonld.js"></script>
+        <script type="text/javascript" src="scripts/jsonld.js"></script>
         <script type="text/javascript" src="scripts/rdfstore-js/rdf_store.js"></script>
 
         <script type="text/javascript" src="scripts/star-rating.min.js"></script>
@@ -63,6 +63,7 @@
 
 		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/application-state-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/application-control-service.js"/>"></script>
 
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
@@ -244,7 +245,8 @@
 					<ul class="dropdown-menu" style="width: 280px;">
 						<li class="text-center grey-item">{{unreadObjects.all.hint.count}}&nbsp;new matches</li>
 						<!-- TODO put real parameters into url -->
-						<li ng-repeat="entry in unreadObjects.byNeed.hint"><a href="#/private-link"><img
+						<li ng-repeat="entry in unreadObjects.byNeed.hint"><a
+                                ng-click="openNeedDetailView(entry.need.needURI)"><img
 								src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
                                 class="badge pull-right">{{entry.count}}</span></a>
 						</li>
