@@ -229,7 +229,6 @@ public class WonMessageBuilder
   public WonMessageBuilder setMessagePropertiesForConnect(
     URI messageURI,
     URI localFacet,
-    URI localConnection,
     URI localNeed,
     URI localWonNode,
     URI remoteFacet,
@@ -242,7 +241,6 @@ public class WonMessageBuilder
     this
       .setMessageURI(messageURI)
       .setWonMessageType(WonMessageType.CONNECT)
-      .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
       .setSenderNodeURI(localWonNode)
       .setReceiverURI(remoteFacet)

@@ -112,6 +112,8 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
 
     URI needURI = wonNodeInformationService.generateNeedURI(wonNodeURI);
 
+    RdfUtils.replaceBaseURI(needModel,needURI.toString());
+
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
       .setMessagePropertiesForCreate(

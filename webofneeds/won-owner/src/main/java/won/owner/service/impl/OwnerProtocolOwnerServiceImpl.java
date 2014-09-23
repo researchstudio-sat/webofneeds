@@ -104,22 +104,35 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
                         final String content, final WonMessage wonMessage)
             throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
     {
+
+      URI ownNeedURIConvert;
+      URI otherNeedURIConvert;
+      URI ownConnectionURIConvert;
+      URI facetURI;
+      Model contentConvert = RdfUtils.toModel(content);
+
+      if (wonMessage != null) {
+        ownNeedURIConvert = wonMessage.getMessageEvent().getReceiverNeedURI();
+        otherNeedURIConvert = wonMessage.getMessageEvent().getSenderNeedURI();
+
+        ownConnectionURIConvert = URI.create(RdfUtils.findOnePropertyFromResource(
+          wonMessage.getMessageContent(),
+          wonMessage.getMessageEvent().getMessageURI(),
+          WON.HAS_REMOTE_CONNECTION).asResource().getURI());
+
+
+        facetURI = URI.create(RdfUtils.findOnePropertyFromResource(
+          wonMessage.getMessageContent(),
+          wonMessage.getMessageEvent().getMessageURI(),
+          WON.HAS_FACET)
+        .asResource().getURI());
+
+      } else {
         //TODO: String or URI that is the question..
         //TODO: why do we pass a String content here?
-        URI ownNeedURIConvert = URI.create(ownNeedURI);
-        URI otherNeedURIConvert = URI.create(otherNeedURI);
-        URI ownConnectionURIConvert = URI.create(ownConnectionURI);
-        Model contentConvert = RdfUtils.toModel(content);
-        logger.debug("owner from need: CONNECT called for own need {}, other need {}, own connection {} and content {}", new Object[]{ownNeedURI,otherNeedURI,ownConnectionURI, content});
-        if (ownNeedURI == null) throw new IllegalArgumentException("needURI is not set");
-        if (otherNeedURI == null) throw new IllegalArgumentException("otherNeedURI is not set");
-        if (ownConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
-        if (ownNeedURI.equals(otherNeedURI)) throw new IllegalArgumentException("needURI and otherNeedURI are the same");
-
-        //Load need (throws exception if not found)
-        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURIConvert);
-        if (!isNeedActive(need))
-          throw new IllegalMessageForNeedStateException(ownNeedURIConvert, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
+        ownNeedURIConvert = URI.create(ownNeedURI);
+        otherNeedURIConvert = URI.create(otherNeedURI);
+        ownConnectionURIConvert = URI.create(ownConnectionURI);
 
         Resource baseRes = contentConvert.getResource(contentConvert.getNsPrefixURI(""));
         StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
@@ -127,8 +140,22 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         if (!stmtIterator.hasNext()) {
           throw new IllegalArgumentException("at least one RDF node must be of type won:" + WON.HAS_FACET.getLocalName());
         }
+        facetURI =  URI.create(stmtIterator.next().getObject().asResource().getURI());
+      }
 
-        URI facetURI =  URI.create(stmtIterator.next().getObject().asResource().getURI());
+        if (ownNeedURIConvert == null) throw new IllegalArgumentException("needURI is not set");
+        if (otherNeedURIConvert == null) throw new IllegalArgumentException("otherNeedURI is not set");
+        if (ownConnectionURIConvert == null) throw new IllegalArgumentException("otherConnectionURI is not set");
+        if (ownNeedURIConvert.equals(otherNeedURIConvert)) throw new IllegalArgumentException("needURI and otherNeedURI are" +
+                                                                                          " the " +
+                                                                                   "same");
+      logger.debug("owner from need: CONNECT called for own need {}, other need {}, own connection {} and content {}",
+                   new Object[]{ownNeedURIConvert, otherNeedURIConvert, ownConnectionURIConvert, content});
+
+        //Load need (throws exception if not found)
+        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURIConvert);
+        if (!isNeedActive(need))
+          throw new IllegalMessageForNeedStateException(ownNeedURIConvert, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
 
         List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURIConvert, otherNeedURIConvert);
         Connection con = null;

@@ -42,6 +42,7 @@ import won.protocol.util.RdfUtils;
 
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -87,7 +88,11 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
 
       Connection con = dataService.nextConnectionState(connectionURIFromWonMessage,
                                                        ConnectionEventType.PARTNER_OPEN);
-      messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
+
+      List<MessageEventPlaceholder> l = messageEventRepository.findByMessageURI(
+        wonMessage.getMessageEvent().getMessageURI());
+      if (l.size() == 0)
+        messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
       //invoke facet implementation
       reg.get(con).openFromNeed(con, content, wonMessage);
 

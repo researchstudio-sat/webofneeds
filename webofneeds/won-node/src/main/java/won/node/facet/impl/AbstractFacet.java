@@ -310,6 +310,7 @@ public abstract class AbstractFacet implements Facet
     final Model remoteFacetModel = remoteFacetModelCandidate;
 
     try {
+      // ToDo (FS): copy all the content models from the hint message
       WonMessageBuilder builder = new WonMessageBuilder();
       URI messageURI = URIService.createMessageEventURI(con.getNeedURI());
       URI localFacet = URI.create(RdfUtils.findOnePropertyFromResource(

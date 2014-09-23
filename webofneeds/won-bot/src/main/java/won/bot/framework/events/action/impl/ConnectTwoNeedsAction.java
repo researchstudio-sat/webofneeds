@@ -73,7 +73,6 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(localNeedRDF, fromUri);
     URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toUri);
 
-    URI newConnectionURI = wonNodeInformationService.generateConnectionURI(fromUri, localWonNode);
 
     WonMessageBuilder builder = new WonMessageBuilder();
     return  builder
@@ -81,7 +80,6 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction
         wonNodeInformationService.generateMessageEventURI(
           fromUri, localWonNode),
         localFacet,
-        newConnectionURI,
         fromUri,
         localWonNode,
         remoteFacet,
