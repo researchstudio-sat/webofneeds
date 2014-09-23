@@ -192,6 +192,12 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         if (typeof callback.handleMessage !== 'function') {
             throw new TypeError("callback must provide function 'handleMessage(object)'");
         }
+        for (key in privateData.callbacks){
+            if (callback.equals(privateData.callbacks[key])){
+                console.log("prevented duplicate callback registration");
+                return;
+            }
+        }
         privateData.callbacks.push(callback);
     }
 
@@ -234,7 +240,20 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             if (this.shouldHandle(event, msg)) {
                 this.performAction(event, msg);
             }
+        },
+        /**
+         * Equals method for testing if callbacks are identical. Before a callback
+         * is registered, the callback is compared with all registerd callbacks using this
+         * method. If it returns true, the callback is not added.
+         * Should be overwritten by callbacks that want to avoid duplicate reactions.
+         * in cases where multiple callbacks
+         * @param other
+         * @returns {boolean}
+         */
+        equals: function(other){
+            return this === other;
         }
+
     };
 
     return messageService;

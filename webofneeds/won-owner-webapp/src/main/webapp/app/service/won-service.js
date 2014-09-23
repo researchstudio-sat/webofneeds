@@ -93,6 +93,10 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
         incomingMessageHandler.shouldUnregisterTest = function(event, msg) {
             return false;
         };
+        incomingMessageHandler.id = "incomingMessageHandler";
+        incomingMessageHandler.equals = function(other){
+            return other != null && other.id != null && other.id === this.id;
+        }
         return incomingMessageHandler;
     }
 
@@ -215,6 +219,9 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
         callback.shouldUnregisterTest = function(event, msg) {
             return this.done;
         };
+        callback.equals = function(other){
+            return other != null && other.msgURI != null && other.msgURI === this.msgURI;
+        }
 
         //find out which message uri was created and use it for the callback's shouldHandleTest
         //so we can wait for a dedicated response
