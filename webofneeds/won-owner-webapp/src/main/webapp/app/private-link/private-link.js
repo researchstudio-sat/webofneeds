@@ -28,7 +28,11 @@ angular.module('won.owner')
              .then(function(){
                  if ($scope.need.uri != null) {
                      linkedDataService.getLastEventOfEachConnectionOfNeed($scope.need.uri).then(function(allEvents){
-                         $scope.events = allEvents;
+                         $scope.events.splice(0,$scope.events.length);
+                         for (key in allEvents){
+                             $scope.events.push(allEvents[key]);
+                         }
+                         //$scope.events = allEvents;
                      })
                  }
              });
@@ -37,7 +41,11 @@ angular.module('won.owner')
         //
         // $scope.need.events = linkedDataService.getAllEvents($scope.need.uri);
 
-        $scope.currentEventType = [won.WON.OwnerMessageCompacted, won.WON.PartnerMessageCompacted, won.WON.OwnerOpenCompacted, won.WON.PartnerOpenCompacted, won.WON.HintCompacted]
+        $scope.currentEventType = [
+         won.WONMSG.connectionMessage,
+         won.WONMSG.connectMessage,
+         won.WONMSG.openMessage,
+         won.WONMSG.hintMessage];
 
 
         //$scope.title = 'New Flat, Need Furniture';
@@ -173,32 +181,38 @@ angular.module('won.owner')
             button.removeClass('btn-default').addClass('btn-success');
         }
     }
+
+        /**
+         * Appends each element of the array to $scope.currentEventType if it is not
+         * yet in it, otherwise it removes the element.
+         * @param types
+         */
+    var toggleEventTypes = function(types){
+        var list = $scope.currentEventType;
+        for (key in types){
+            var elem = types[key];
+            var pos = list.indexOf(elem);
+            if (pos == -1){
+                list.push(elem);
+            } else {
+                list.splice(pos,1);
+            }
+        }
+    }
+
     $scope.clickOnMessageButton = function(buttonId) {
         switch (buttonId) {
             case 1:
-                if($scope.currentEventType.indexOf(won.WON.OwnerMessageCompacted)==-1 && $scope.currentEventType.indexOf(won.WON.PartnerMessageCompacted)==-1){
-                    $scope.currentEventType.push(won.WON.OwnerMessageCompacted)  ;
-                    $scope.currentEventType.push(won.WON.PartnerMessageCompacted)  ;
-                }else{
-                    $scope.currentEventType.splice($scope.currentEventType.indexOf(won.WON.OwnerMessageCompacted),1)  ;
-                    $scope.currentEventType.splice($scope.currentEventType.indexOf(won.WON.PartnerMessageCompacted),1)  ;
-                }
+                toggleEventTypes([won.WONMSG.connectionMessage]);
                 break;
             case 2:
-                if($scope.currentEventType.indexOf(won.WON.OwnerOpenCompacted) ==-1 && $scope.currentEventType.indexOf(won.WON.PartnerOpenCompacted)==-1){
-                    $scope.currentEventType.push(won.WON.OwnerOpenCompacted)  ;
-                    $scope.currentEventType.push(won.WON.PartnerOpenCompacted)  ;
-                }else{
-                    $scope.currentEventType.splice($scope.currentEventType.indexOf(won.WON.OwnerOpenCompacted),1)  ;
-                    $scope.currentEventType.splice($scope.currentEventType.indexOf(won.WON.PartnerOpenCompacted),1)  ;
-                }break;
-            case 3:
-                if($scope.currentEventType.indexOf(won.WON.HintCompacted) ==-1){
-                    $scope.currentEventType.push(won.WON.HintCompacted)  ;
-                }else{
-                    $scope.currentEventType.splice($scope.currentEventType.indexOf(won.WON.HintCompacted),1)  ;
-                }
+                toggleEventTypes([won.WONMSG.connectMessage, won.WONMSG.openMessage]);
                 break;
+            case 3:
+                toggleEventTypes([won.WONMSG.hintMessage]);
+                break;
+            default:
+                console.log("not handling message button id " + buttonId)  ;
         }
         $scope.changeEventTypeButtonsDisplay(buttonId);
     }

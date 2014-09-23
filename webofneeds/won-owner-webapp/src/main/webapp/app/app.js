@@ -152,22 +152,7 @@ app.directive('header', function(){
                     return 'Unknown';
             }
         }
-        var getAdditionalInformation = function(item){
-            switch (item.eventType) {
-                case won.WON.OwnerMessageCompacted:
-                    break;
-                case won.WON.PartnerMessageCompacted:
-                    break;
-                case won.WON.OwnerOpenCompacted:
-                    break;
-                case won.WON.PartnerOpenCompacted:
-                    break;
-                case won.WON.HintCompacted:
-                    linkedDataService.getNeed(item.otherNeedURI).then(function(need){item.otherNeed = need});
-                    break;
-            }
-            return item;
-        }
+
 
         return function(inputArray, eventTypes){
             if (inputArray == null) return null;
@@ -180,8 +165,7 @@ app.directive('header', function(){
                 var item = inputArray[i];
                 if(eventTypes.indexOf(item.event.hasMessageType)!=-1){
                     item.id = i;
-                    item.typeText = getTypeText(item.remoteNeed.title);
-                    getAdditionalInformation(item);
+                    item.typeText = getTypeText(item);
                     outputArray.push(item);
                 }
             }
