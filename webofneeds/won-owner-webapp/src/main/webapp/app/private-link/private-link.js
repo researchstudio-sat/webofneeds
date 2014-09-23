@@ -8,31 +8,35 @@
 angular.module('won.owner')
     .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService) {
 
+    $scope.need = {};
+    $scope.events = [];
+
     $scope.$on(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED, function(event){
-        $scope.initialize();
+        if (applicationStateService.getCurrentNeedURI() != $scope.need.uri && ! $scope.initializing){
+            $scope.initialize();
+        }
     });
 
         // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
      $scope.initialize = function() {
-
          $scope.need = {};
-         $scope.need = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
-         $scope.need.uri = applicationStateService.getCurrentNeedURI();
-         if ($scope.need.uri != null) {
-             linkedDataService.getAllEventsOfNeed($scope.need.uri).then(function(allEvents){
-                 $scope.needData = allEvents;
+         linkedDataService.getNeed(applicationStateService.getCurrentNeedURI())
+             .then(function(need){
+               $scope.need = need;
              })
-         }
-
+             .then(function(){
+                 if ($scope.need.uri != null) {
+                     linkedDataService.getLastEventOfEachConnectionOfNeed($scope.need.uri).then(function(allEvents){
+                         $scope.events = allEvents;
+                     })
+                 }
+             });
         //$scope.need.matches = linkedDataService.getMatches($scope.need.uri);
 
         //
         // $scope.need.events = linkedDataService.getAllEvents($scope.need.uri);
-        $scope.need.events = [
-            { eventType: won.WON.HintCompacted, title: 'Car sharing to Prague', timeStamp: new Date('2014-08-25 14:30'), msg: 'This is a Hint '},
-            { eventType: won.WON.PartnerOpenCompacted, title: 'Moved recently ...', timeStamp: new Date('2014-08-20'), msg: 'This is a Connection Request'}
-        ];
+
         $scope.currentEventType = [won.WON.OwnerMessageCompacted, won.WON.PartnerMessageCompacted, won.WON.OwnerOpenCompacted, won.WON.PartnerOpenCompacted, won.WON.HintCompacted]
 
 

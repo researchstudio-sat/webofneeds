@@ -132,17 +132,24 @@ app.directive('header', function(){
 	}]);
 })
     .filter('messageTypeFilter', function(){
-        var getTypeText = function(eventType) {
-            switch (eventType) {
-                case won.WON.OwnerMessageCompacted:
-                case won.WON.PartnerMessageCompacted:
+        var getTypeText = function(lastConEvent) {
+            switch (lastConEvent.event.hasMessageType) {
+                case won.WONMSG.connectionMessage:
                     return 'Conversation';
-                case won.WON.OwnerOpenCompacted:
-                    return 'Outgoing Request';
-                case won.WON.PartnerOpenCompacted:
+                case won.WONMSG.openMessage:
+                    if (lastConEvent.event.hasReceiverNeed == lastConEvent.remoteNeed.uri){
+                        return 'Outgoing Request';
+                    }
                     return 'Incoming Request';
-                case won.WON.HintCompacted:
+                case won.WONMSG.connectMessage:
+                    if (lastConEvent.event.hasReceiverNeed == lastConEvent.remoteNeed.uri){
+                        return 'Outgoing Request';
+                    }
+                    return 'Incoming Request';
+                case won.WONMSG.hintMessage:
                     return 'Matches';
+                default:
+                    return 'Unknown';
             }
         }
         var getAdditionalInformation = function(item){
@@ -156,21 +163,24 @@ app.directive('header', function(){
                 case won.WON.PartnerOpenCompacted:
                     break;
                 case won.WON.HintCompacted:
-                    item.otherNeed = linkedDataService.getNeed(item.otherNeedURI);
+                    linkedDataService.getNeed(item.otherNeedURI).then(function(need){item.otherNeed = need});
                     break;
             }
             return item;
         }
 
         return function(inputArray, eventTypes){
+            if (inputArray == null) return null;
+            if (! angular.isArray(inputArray)) return null;
+            if (inputArray.length == 0) return [];
             var outputArray = [];
             //var filter= [won.Won.OwnerOpenCompacted, won.WON.PartnerOpenCompacted, won.WON.PartnerMessageCompacted, won.WON.OwnerMessageCompacted, won.WON.HintCompacted];
 
             for(var i = 0; i < inputArray.length; i++) {
                 var item = inputArray[i];
-                if(eventTypes.indexOf(item.eventType)!=-1){
+                if(eventTypes.indexOf(item.event.hasMessageType)!=-1){
                     item.id = i;
-                    item.typeText = getTypeText(item.eventType);
+                    item.typeText = getTypeText(item.remoteNeed.title);
                     getAdditionalInformation(item);
                     outputArray.push(item);
                 }

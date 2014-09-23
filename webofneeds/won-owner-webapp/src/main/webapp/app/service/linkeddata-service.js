@@ -192,6 +192,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @return the object or null if no data is found for that URI in the local datastore
      */
     linkedDataService.getNeed = function(uri) {
+        var deferred = $q.defer();
         //TODO: SPARQL query that returns the common need properties
         var resultObject = null;
         var query =
@@ -229,8 +230,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 //TODO: add as soon as named graphs are handled by the rdf store
 //                "}" +
                 "}}";
-        resultObject = {};
+
         privateData.store.execute(query, [],[], function (success, results) {
+            resultObject = {};
             if (!success) {
                 return;
             }
@@ -249,32 +251,54 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             resultObject.tags = getSafeValue(result.tags);
             resultObject.textDescription = getSafeValue(result.textDescription);
             resultObject.creationDate = getSafeValue(result.creationDate);
-
+            deferred.resolve(resultObject);
             //resultObject.log("done copying the data to the event object, returning the result");
         });
-        return resultObject;
+        return deferred.promise;
     }
 
 
-    linkedDataService.getAllEventsOfNeed = function(uri) {
-        return linkedDataService.getConnectionURIsOfNeed(uri).then(function(conUris) {
-            var result = [];
-            var promises = [];
-            for (var conKey in conUris) {
-                promises.push(linkedDataService.getConnection(conUris[conKey]).then(function(connection) {
-                    return linkedDataService.getConnectionEventURIs(conUris[conKey]).then(function(eventUris){
-                        var eventPromises = [];
-                        for (var evtKey in eventUris) {
-                            eventPromises.push(linkedDataService.getConnectionEvent(eventUris[evtKey]));
-                        }
-                        return $q.all(eventPromises).then(function(events){
-                            return {connection: connection, events: events};
-                        })
-                    });
-                }));
+    linkedDataService.getLastEventOfEachConnectionOfNeed = function(uri) {
+        return linkedDataService.getConnectionURIsOfNeed(uri)
+            .then(function(conUris) {
+                var promises = [];
+                for (var conKey in conUris) {
+                    promises.push(linkedDataService.getLastEventOfConnection(conUris[conKey]));
+                }
+                return $q.all(promises);
             }
-            return $q.all(promises);
-        });
+        );
+    }
+
+    linkedDataService.getLastEventOfConnection = function(connectionUri) {
+        return linkedDataService.getConnection(connectionUri)
+            .then(function (connection) {
+                return linkedDataService.getNeed(connection.hasRemoteNeed)
+                    .then(function (need) {
+                        return linkedDataService.getLastConnectionEvent(connectionUri)
+                            .then(function (event) {
+                                return {connection: connection, remoteNeed: need, event: event}
+                            });
+                    });
+            });
+    }
+
+    linkedDataService.getAllConnectionEvents = function(connectionUri) {
+        return linkedDataService.getConnectionEventUris(connectionUri)
+            .then(function (eventUris) {
+                var eventPromises = [];
+                for (var evtKey in eventUris) {
+                    eventPromises.push(linkedDataService.getConnectionEvent(eventUris[evtKey]));
+                }
+                return $q.all(eventPromises)
+            });
+    }
+
+    linkedDataService.getLastConnectionEvent = function(connectionUri) {
+        return linkedDataService.getLastConnectionEventUri(connectionUri)
+            .then(function (eventUri) {
+                    return linkedDataService.getConnectionEvent(eventUri);
+            })
     }
 
 
@@ -328,7 +352,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getNodeWithAttributes(eventUri);
     }
 
-    linkedDataService.getConnectionEventURIs = function(connectionURI) {
+    linkedDataService.getAllConnectionEventUris = function(connectionURI) {
         return linkedDataService.ensureLoaded(connectionURI).then(function(success) {
             var eventURIs = [];
             var query =
@@ -354,6 +378,34 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         });
     }
 
+    linkedDataService.getLastConnectionEventUri = function(connectionURI) {
+        return linkedDataService.ensureLoaded(connectionURI).then(function(success) {
+            var resultObject = {};
+            //TODO: use event with highest timestamp
+            var query =
+                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                "select ?eventURI where { " +
+                "<" + connectionURI + "> a " + won.WON.ConnectionCompacted + ";\n" +
+                won.WON.hasEventContainerCompacted + " ?container.\n" +
+                "?container rdfs:member ?eventURI. \n" +
+                "} limit 1";
+            privateData.store.execute(query, [], [], function (success, results) {
+                if (success) {
+                    for (var key in results) {
+                        var eventURI = getSafeValue(results[key].eventURI);
+                        if (eventURI != null) {
+                            resultObject.eventURI = eventURI;
+                            return;
+                        }
+                    }
+                }
+            });
+            return resultObject.eventURI;
+        });
+    }
+
     /**
      * Fetches the triples where URI is subject and add objects of those triples to the
      * resulting structure by the localname of the predicate.
@@ -363,7 +415,6 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.getNodeWithAttributes = function(uri){
         return linkedDataService.ensureLoaded(uri).then(function(success) {
             var node = {};
-            var subject = uri;
             privateData.store.node(uri, function (success, graph) {
                 if (graph != null && graph.length > 0) {
                     for (key in graph.triples) {
