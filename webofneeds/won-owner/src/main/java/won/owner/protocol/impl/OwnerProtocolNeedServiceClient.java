@@ -152,32 +152,68 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
   @Transactional(propagation = Propagation.SUPPORTS)
   public void sendConnectionMessage(final URI connectionURI, final Model message, WonMessage wonMessage)
     throws Exception {
-    logger.debug("owner to need: MESSAGE called for connection {} with message {}", connectionURI, message);
 
-    List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
-    if (cons.isEmpty())
-      throw new NoSuchConnectionException(connectionURI);
-    Connection con = cons.get(0);
-    //todo: text message shall be returned
-    delegate.sendConnectionMessage(connectionURI, message, wonMessage);
-    //todo: the parameter for setMessage method shall be set by retrieving the result of delegate.textMessage method
-    ChatMessage chatMessage = new ChatMessage();
-    chatMessage.setCreationDate(new Date());
-    chatMessage.setLocalConnectionURI(connectionURI);
+    // distinguish between the new message format (WonMessage) and the old parameters
+    // ToDo (FS): remove this distinction if the old parameters not used anymore
+    if (wonMessage != null) {
 
-    String textMessage = WonRdfUtils.MessageUtils.getTextMessage(message);
-    if (textMessage == null) {
-      logger.debug("could not extract text message from RDF content of message");
-      textMessage = "[could not extract text message]";
+      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
+      URI messageURI = wonMessage.getMessageEvent().getMessageURI();
+      logger.debug("owner to need: MESSAGE called for connection {} with message {}",
+                   connectionURIFromWonMessage, RdfUtils.toString(wonMessage.getMessageContent()));
+
+      List<Connection> cons = connectionRepository.findByConnectionURI(connectionURIFromWonMessage);
+      if (cons.isEmpty())
+        throw new NoSuchConnectionException(connectionURIFromWonMessage);
+      Connection con = cons.get(0);
+      //todo: text message shall be returned
+      delegate.sendConnectionMessage(connectionURI, message, wonMessage);
+      //todo: the parameter for setMessage method shall be set by retrieving the result of delegate.textMessage method
+      ChatMessage chatMessage = new ChatMessage();
+      chatMessage.setCreationDate(new Date());
+      chatMessage.setLocalConnectionURI(connectionURIFromWonMessage);
+
+      String textMessage =
+        RdfUtils.findOnePropertyFromResource(wonMessage.getMessageContent(), messageURI, WON.HAS_TEXT_MESSAGE)
+          .asLiteral().getLexicalForm();
+
+      if (textMessage == null) {
+        logger.debug("could not extract text message from RDF content of message");
+        textMessage = "[could not extract text message]";
+      }
+
+      chatMessage.setMessage(textMessage);
+      chatMessage.setOriginatorURI(con.getNeedURI());
+
+      //save in the db
+      chatMessageRepository.save(chatMessage);
+    } else {
+      logger.debug("owner to need: MESSAGE called for connection {} with message {}", connectionURI, message);
+
+      List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
+      if (cons.isEmpty())
+        throw new NoSuchConnectionException(connectionURI);
+      Connection con = cons.get(0);
+      //todo: text message shall be returned
+      delegate.sendConnectionMessage(connectionURI, message, wonMessage);
+      //todo: the parameter for setMessage method shall be set by retrieving the result of delegate.textMessage method
+      ChatMessage chatMessage = new ChatMessage();
+      chatMessage.setCreationDate(new Date());
+      chatMessage.setLocalConnectionURI(connectionURI);
+
+      String textMessage = WonRdfUtils.MessageUtils.getTextMessage(message);
+      if (textMessage == null) {
+        logger.debug("could not extract text message from RDF content of message");
+        textMessage = "[could not extract text message]";
+      }
+
+
+      chatMessage.setMessage(textMessage);
+      chatMessage.setOriginatorURI(con.getNeedURI());
+
+      //save in the db
+      chatMessageRepository.save(chatMessage);
     }
-
-
-    chatMessage.setMessage(textMessage);
-    chatMessage.setOriginatorURI(con.getNeedURI());
-
-    //save in the db
-    chatMessageRepository.save(chatMessage);
-
 
   }
 

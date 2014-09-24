@@ -301,6 +301,9 @@ public class NeedCommunicationServiceImpl implements
       logger.debug("STORING message with id {}", messageURI);
       rdfStorageService.storeDataset(messageURI, tempWonMessage);
 
+      messageEventRepository.save(new MessageEventPlaceholder(
+        con.getConnectionURI(), newWonMessage.getMessageEvent()));
+
       //invoke facet implementation
       Facet facet = reg.get(con);
       // send an empty model until we remove this parameter

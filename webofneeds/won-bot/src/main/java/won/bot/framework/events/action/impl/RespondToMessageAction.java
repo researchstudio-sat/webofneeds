@@ -26,6 +26,7 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -93,11 +94,13 @@ public class RespondToMessageAction extends BaseEventBotAction
     Dataset remoteNeedRDF =
       getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
+    URI messageURI = wonNodeInformationService.generateMessageEventURI(wonNode);
+    RdfUtils.replaceBaseURI(content, messageURI.toString());
+
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
       .setMessagePropertiesForConnectionMessage(
-        wonNodeInformationService.generateMessageEventURI(
-          localNeed, wonNode),
+        messageURI,
         connectionURI,
         localNeed,
         wonNode,

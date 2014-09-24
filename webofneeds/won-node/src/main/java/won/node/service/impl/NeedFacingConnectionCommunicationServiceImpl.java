@@ -89,6 +89,8 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       Connection con = dataService.nextConnectionState(connectionURIFromWonMessage,
                                                        ConnectionEventType.PARTNER_OPEN);
 
+      // if both needs are on the same WON node the message has already been saved in the repo
+      // therefore we need this check to not violate the unique messageID constraint
       List<MessageEventPlaceholder> l = messageEventRepository.findByMessageURI(
         wonMessage.getMessageEvent().getMessageURI());
       if (l.size() == 0)
@@ -120,7 +122,12 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
 
       Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
 
-      messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
+      // if both needs are on the same WON node the message has already been saved in the repo
+      // therefore we need this check to not violate the unique messageID constraint
+      List<MessageEventPlaceholder> l = messageEventRepository.findByMessageURI(
+        wonMessage.getMessageEvent().getMessageURI());
+      if (l.size() == 0)
+        messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
 
       //invoke facet implementation
       reg.get(con).closeFromNeed(con, content, wonMessage);
@@ -148,6 +155,11 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
 
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
 
+        // if both needs are on the same WON node the message has already been saved in the repo
+        // therefore we need this check to not violate the unique messageID constraint
+        List<MessageEventPlaceholder> l = messageEventRepository.findByMessageURI(
+          wonMessage.getMessageEvent().getMessageURI());
+        if (l.size() == 0)
         messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
 
         //invoke facet implementation
