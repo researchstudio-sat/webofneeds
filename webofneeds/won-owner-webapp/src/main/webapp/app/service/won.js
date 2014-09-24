@@ -643,9 +643,13 @@
                     "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
                     "@type": "@id"
                 };
-                won.JsonLdHelper.getDefaultGraph(this.data).push({"@id":this.data["@context"]["@base"] + "/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
-                this.getMessageEventNode()['@id'] =this.data["@context"]["@base"] +"/event/"+eventId;
-                this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] +"/event/"+eventId+"#data";
+                // ToDo (FS): remove hard coded base
+//                won.JsonLdHelper.getDefaultGraph(this.data).push({"@id":this.data["@context"]["@base"] + "/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
+//                this.getMessageEventNode()['@id'] =this.data["@context"]["@base"] +"/event/"+eventId;
+//                this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] +"/event/"+eventId+"#data";
+                won.JsonLdHelper.getDefaultGraph(this.data).push({"@id":"http://localhost:8080/won/resource/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
+                this.getMessageEventNode()['@id'] = "http://localhost:8080/won/resource/event/" + eventId;
+                this.getMessageEventGraph()['@id'] = "http://localhost:8080/won/resource/event/" + eventId + "#data";
                 return this;
             },
             hasReceiverNode: function(receiverNodeURI){
@@ -737,9 +741,14 @@
                     "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
                     "@type": "@id"
                 },
-                    this.getDefaultGraphNode().push({"@id":this.data["@context"]["@base"] + "/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
-                this.getMessageEventNode()['@id'] =this.data["@context"]["@base"] +"/event/"+eventId;
-                this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] +"/event/"+eventId+"#data";
+
+                    // ToDo (FS): remove hard coded base
+//                this.getDefaultGraphNode().push({"@id": this.data["@context"]["@base"] + "/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
+//                this.getMessageEventNode()['@id'] = this.data["@context"]["@base"] + "/event/" + eventId;
+//                this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] + "/event/" + eventId + "#data";
+                this.getDefaultGraphNode().push({"@id": "http://localhost:8080/won/resource/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
+                this.getMessageEventNode()['@id'] = "http://localhost:8080/won/resource/event/" + eventId;
+                this.getMessageEventGraph()['@id'] = "http://localhost:8080/won/resource/event/" + eventId + "#data";
                 return this;
             },
             getContext :  function () {               //TODO inherit from base buiilder
