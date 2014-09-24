@@ -25,16 +25,24 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService
   public URI generateMessageEventURI(URI needURI, URI wonNodeURI) {
     WonNodeInformation wonNodeInformation = getWonNodeInformation(wonNodeURI);
     return URI.create(wonNodeInformation.getNeedMessageEventURIPattern()
-                                        .replace(wonNodeInformation.getNeedURIPlaceholder(), needURI.toString())
                                         .replace(wonNodeInformation.getIdPlaceholder(),
                                                  generateRandomMessageEventID()));
+  }
+
+  @Override
+  public URI generateMessageEventURI(URI wonNodeURI) {
+    return generateMessageEventURI(null, wonNodeURI);
+  }
+
+  @Override
+  public URI generateMessageEventURI() {
+    return generateMessageEventURI(null, getDefaultWonNode());
   }
 
   @Override
   public URI generateConnectionURI(URI needURI, URI wonNodeURI) {
     WonNodeInformation wonNodeInformation = getWonNodeInformation(wonNodeURI);
     return URI.create(wonNodeInformation.getConnectionURIPattern()
-                                        .replace(wonNodeInformation.getNeedURIPlaceholder(), needURI.toString())
                                         .replace(wonNodeInformation.getIdPlaceholder(),
                                                  generateRandomConnectionID()));
   }
@@ -70,12 +78,9 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService
 
   private WonNodeInformation getDefaultWonNodeInformation() {
     return new WonNodeInformation(
-      "<needURI>/event/<ID>",
-      "<connectionURI>/event/<ID>",
-      "<needURI>/connection/<ID>",
+      "http://localhost:8080/won/resource/event/<ID>",
+      "http://localhost:8080/won/resource/connection/<ID>",
       "http://localhost:8080/won/resource/need/<ID>",
-      "<needURI>",
-      "<connectionURI>",
       "<ID>");
   }
 

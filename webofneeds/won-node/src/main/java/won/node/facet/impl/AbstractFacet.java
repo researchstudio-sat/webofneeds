@@ -9,6 +9,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import won.node.service.DataAccessService;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
@@ -22,6 +23,7 @@ import won.protocol.model.NeedState;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.rdfstorage.RDFStorageService;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
@@ -39,6 +41,9 @@ import java.util.concurrent.ExecutorService;
 public abstract class AbstractFacet implements Facet
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
+
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
   /**
    * Client talking another need via the need protocol
@@ -312,7 +317,7 @@ public abstract class AbstractFacet implements Facet
     try {
       // ToDo (FS): copy all the content models from the hint message
       WonMessageBuilder builder = new WonMessageBuilder();
-      URI messageURI = URIService.createMessageEventURI(con.getNeedURI());
+      URI messageURI = wonNodeInformationService.generateMessageEventURI();
       URI localFacet = URI.create(RdfUtils.findOnePropertyFromResource(
         wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
         WON.HAS_FACET).asResource().getURI());
@@ -450,7 +455,8 @@ public abstract class AbstractFacet implements Facet
         // but it should be replaced with a response message anyway
         WonMessageBuilder builder = new WonMessageBuilder();
         WonMessage closeWonMessage = builder
-          .setMessageURI(URIService.createMessageEventURI(con.getConnectionURI()))
+          .setMessageURI(wonNodeInformationService.generateMessageEventURI(
+            wonNodeInformationService.getDefaultWonNode()))
           .setWonMessageType(WonMessageType.CLOSE)
           .setSenderURI(wonMessage.getMessageEvent().getSenderURI())
           .setSenderNeedURI(wonMessage.getMessageEvent().getSenderNeedURI())
