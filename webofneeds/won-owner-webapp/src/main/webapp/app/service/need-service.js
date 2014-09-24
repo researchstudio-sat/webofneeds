@@ -134,7 +134,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 				angular.forEach(responses, function (response) {
 					if(response.status == 200) {
 						var need = new NeeLD(response.config.url, response.data);
-						needs[need.needURI] = need;
+						needs[need.uri] = need;
 					}
 				});
 				return needs;

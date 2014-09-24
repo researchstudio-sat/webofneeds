@@ -88,7 +88,7 @@ angular.module('won.owner').controller('NeedListCtrl', function ($scope, $locati
 		$scope.model.myNeeds = needs;
 		var allConnsRequests = [];
 		angular.forEach(needs, function (need) {
-			allConnsRequests.push(needService.getNeedConnections(need.needURI));
+			allConnsRequests.push(needService.getNeedConnections(need.uri));
 		});
 		$q.allSettled(allConnsRequests).then(function(responses) {
 			categorizeNeeds(responses);

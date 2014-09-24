@@ -33,7 +33,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
     privateData.pendingOutMessages = [];
 
 
-    getEventData = function(json){
+    var getEventData = function(json){
         console.log("getting data from jsonld message");
         var eventData = {};
         //call handler if there is one - it may modify the event object
@@ -46,17 +46,24 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         };
         //copy data from the framed message to the event object
         var framedMessage = jsonld.frame(json, frame);
-
-        eventData.messageType = won.getSafeURI(framedMessage[won.WONMSG.hasMessageTypeCompacted]);
-        eventData.receiverURI = won.getSafeURI(framedMessage[won.WONMSG.hasReceiverCompacted]);
-        eventData.receiverNeedURI = won.getSafeURI(framedMessage[won.WONMSG.hasReceiverNeedCompacted]);
-        eventData.receiverNodeURI = won.getSafeURI(framedMessage[won.WONMSG.hasReceiverNodeCompacted]);
-        eventData.senderURI = won.getSafeURI(framedMessage[won.WONMSG.hasSenderCompacted]);
-        eventData.senderNeedURI = won.getSafeURI(framedMessage[won.WONMSG.hasSenderNeedCompacted]);
-        eventData.senderNodeURI = won.getSafeURI(framedMessage[won.WONMSG.hasSenderNodeCompacted]);
-        eventData.refersToURI = won.getSafeURI(framedMessage[won.WONMSG.refersToCompacted]);
-        eventData.responseState = won.getSafeURI(framedMessage[won.WONMSG.hasResponseStateCompacted]);
-        eventData.eventURI = won.getSafeURI(framedMessage);
+        for (key in framedMessage){
+            var propName = won.getLocalName(key);
+            if (propName != null && ! won.isJsonLdKeyword(propName)) {
+                eventData[propName] = won.getSafeJsonLdValue(framedMessage[key]);
+            }
+        }
+/*
+        eventData.messageType = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasMessageTypeCompacted]);
+        eventData.receiverURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasReceiverCompacted]);
+        eventData.receiverNeedURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasReceiverNeedCompacted]);
+        eventData.receiverNodeURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasReceiverNodeCompacted]);
+        eventData.senderURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasSenderCompacted]);
+        eventData.senderNeedURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasSenderNeedCompacted]);
+        eventData.senderNodeURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasSenderNodeCompacted]);
+        eventData.refersToURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.refersToCompacted]);
+        eventData.responseState = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasResponseStateCompacted]);
+        */
+        eventData.uri = won.getSafeJsonLdValue(framedMessage);
         eventData.framedMessage = framedMessage;
         console.log("done copying the data to the event object, returning the result");
 
@@ -66,7 +73,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
 
 
 
-    enqueueMessage = function(msg) {
+    var enqueueMessage = function(msg) {
         if (isConnected()) {
             console.log("sending message instead of enqueueing");
             //just to be sure, test if the connection is established now and send instead of enqueue
@@ -76,7 +83,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             privateData.pendingOutMessages.push(msg);
         }
     }
-    attachListenersToSocket = function(newsocket){
+    var attachListenersToSocket = function(newsocket){
         //TODO: register listeners for incoming messages
 
         newsocket.onopen = function () {
@@ -98,7 +105,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
                 console.log("SockJS message received")
                 var event = getEventData(jsonld);
                 //call all registered callbacks
-                console.log("SockJS message is of type " + event.messageType + ", starting to process callbacks");
+                console.log("SockJS message is of type " + event.hasMessageType + ", starting to process callbacks");
                 for (var i = 0; i < privateData.callbacks.length; i++) {
                     console.log("processing messaging callback " + (i + 1) + " of " + privateData.callbacks.length);
                     try {
@@ -130,26 +137,26 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         };
     }
 
-    isConnected = function(){
+    var isConnected = function(){
         return privateData.socket != null && privateData.socket.readyState == SockJS.OPEN ;
     }
 
-    isConnecting = function(){
+    var isConnecting = function(){
         return privateData.socket != null && privateData.socket.readyState == SockJS.CONNECTING;
     }
 
-    isConnectedOrConnecting = function(){
+    var isConnectedOrConnecting = function(){
         return privateData.socket != null && (privateData.socket.readyState == SockJS.OPEN || privateData.socket.readyState == SockJS.CONNECTING) ;
     }
 
-    isClosingOrClosed= function(){
+    var isClosingOrClosed= function(){
         return privateData.socket != null && (privateData.socket.readyState == SockJS.CLOSED || privateData.socket.readyState == SockJS.CLOSING) ;
     }
 
-    isConnecting = function(){
+    var isConnecting = function(){
         return privateData.socket != null && privateData.socket.readyState == SockJS.CONNECTING;
     }
-    createSocket = function() {
+    var createSocket = function() {
         var options = {debug: true};
         var url = 'http://localhost:8080/owner/msg'; //TODO: get socket URI from server
         privateData.socket = new SockJS(url, null, options);
@@ -185,6 +192,12 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         if (typeof callback.handleMessage !== 'function') {
             throw new TypeError("callback must provide function 'handleMessage(object)'");
         }
+        for (key in privateData.callbacks){
+            if (callback.equals(privateData.callbacks[key])){
+                console.log("prevented duplicate callback registration");
+                return;
+            }
+        }
         privateData.callbacks.push(callback);
     }
 
@@ -215,7 +228,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             return ret;
         },
         performAction: function(event, msg) {
-            console.log("performing action for message " + event.eventURI);
+            console.log("performing action for message " + event.uri);
             this.action(event, msg);
         },
         shouldUnregister: function(event, msg) {
@@ -227,7 +240,20 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             if (this.shouldHandle(event, msg)) {
                 this.performAction(event, msg);
             }
+        },
+        /**
+         * Equals method for testing if callbacks are identical. Before a callback
+         * is registered, the callback is compared with all registerd callbacks using this
+         * method. If it returns true, the callback is not added.
+         * Should be overwritten by callbacks that want to avoid duplicate reactions.
+         * in cases where multiple callbacks
+         * @param other
+         * @returns {boolean}
+         */
+        equals: function(other){
+            return this === other;
         }
+
     };
 
     return messageService;

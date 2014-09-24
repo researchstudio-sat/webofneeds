@@ -27,17 +27,19 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
 
     //$scope.need = $scope.$parent.need;
     $scope.need = {};
-    var tmpNeed = linkedDataService.getNeed(applicationStateService.getCurrentNeedURI());
-    $scope.need.title = tmpNeed['title'];
-    $scope.need.tags = tmpNeed['tags'];
-    $scope.need.textDescription = tmpNeed['textDescription'];
-    $scope.need.creationDate = tmpNeed['creationDate'];
-    $scope.need.longitude = tmpNeed['longitude'];
-    $scope.need.latitude = tmpNeed['latitude'];
-    $scope.need.endTime = tmpNeed['endTime'];
-    $scope.need.recurInfinite = tmpNeed['recurInfinite'];
-    $scope.need.recursIn = tmpNeed['recursIn'];
-    $scope.need.startTime = tmpNeed['startTime'];
+    linkedDataService.getNeed(applicationStateService.getCurrentNeedURI()).then(function(need){
+        $scope.need.title = need['title'];
+        $scope.need.tags = need['tags'];
+        $scope.need.textDescription = need['textDescription'];
+        $scope.need.creationDate = need['creationDate'];
+        $scope.need.longitude = need['longitude'];
+        $scope.need.latitude = need['latitude'];
+        $scope.need.endTime = need['endTime'];
+        $scope.need.recurInfinite = need['recurInfinite'];
+        $scope.need.recursIn = need['recursIn'];
+        $scope.need.startTime = need['startTime'];
+    });
+
 
     //TODO: location, date, needCreated date
 

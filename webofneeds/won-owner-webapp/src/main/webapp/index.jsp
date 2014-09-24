@@ -62,9 +62,10 @@
 
 
 		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/won.js"/>"></script>
+
         <script type="text/javascript" src="<c:url value="/app/service/application-state-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/application-control-service.js"/>"></script>
-
 		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
@@ -74,7 +75,7 @@
         <script type="text/javascript" src="<c:url value="/app/service/linkeddata-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-factory-service.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/builders.js"/>"></script>
+
 
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
@@ -246,7 +247,7 @@
 						<li class="text-center grey-item">{{unreadObjects.all.hint.count}}&nbsp;new matches</li>
 						<!-- TODO put real parameters into url -->
 						<li ng-repeat="entry in unreadObjects.byNeed.hint"><a
-                                ng-click="openNeedDetailView(entry.need.needURI)"><img
+                                ng-click="openNeedDetailView(entry.need.uri)"><img
 								src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
                                 class="badge pull-right">{{entry.count}}</span></a>
 						</li>

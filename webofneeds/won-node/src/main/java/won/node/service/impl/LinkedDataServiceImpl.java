@@ -163,7 +163,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Model needModel = needModelMapper.toModel(need);
     //merge needModel and model
     model.add(needModel.listStatements());
-    model.setNsPrefix("",need.getNeedURI().toString());
+    //model.setNsPrefix("",need.getNeedURI().toString());
 
     Resource needResource = model.getResource(needUri.toString());
 
@@ -282,7 +282,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     if (additionalData != null) {
       model.add(additionalData);
     }
-    model.setNsPrefix("", connection.getConnectionURI().toString());
+    //model.setNsPrefix("", connection.getConnectionURI().toString());
 
     //create connection member
     Resource connectionResource = model.getResource(connection.getConnectionURI().toString());
@@ -336,7 +336,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     if (event == null) return null;
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
-    model.setNsPrefix("",eventURI.toString());
+    //model.setNsPrefix("",eventURI.toString());
 
     Resource eventMember = model.createResource(eventURI.toString(),WON.toResource(event.getType()));
     if (event.getOriginatorUri() != null) {
@@ -376,7 +376,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
-    model.setNsPrefix("", needURI.toString());
+    //model.setNsPrefix("", needURI.toString());
 
     Resource connections = null;
     if (page >= 0)
