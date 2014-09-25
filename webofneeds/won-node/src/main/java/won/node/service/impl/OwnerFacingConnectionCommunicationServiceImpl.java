@@ -74,13 +74,13 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      URI connectionURIFromWonNode = wonMessage.getMessageEvent().getSenderURI();
+      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
 
-      logger.debug("OPEN received from the owner side for connection {0}", connectionURIFromWonNode);
+      logger.debug("OPEN received from the owner side for connection {0}", connectionURIFromWonMessage);
 
-      Connection con = dataService.nextConnectionState(connectionURIFromWonNode, ConnectionEventType.OWNER_OPEN);
+      Connection con = dataService.nextConnectionState(connectionURIFromWonMessage, ConnectionEventType.OWNER_OPEN);
 
-      messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonNode,
+      messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
                                                               wonMessage.getMessageEvent()));
 
       //invoke facet implementation

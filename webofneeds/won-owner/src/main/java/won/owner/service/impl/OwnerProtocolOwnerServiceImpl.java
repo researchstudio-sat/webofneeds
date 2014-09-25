@@ -1,9 +1,6 @@
 package won.owner.service.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +20,7 @@ import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -62,25 +60,42 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
                      final String score, final String originatorURI,
                      final String content, final WonMessage wonMessage)
             throws NoSuchNeedException, IllegalMessageForNeedStateException {
-        logger.debug("owner from need: HINT called for own need {}, other need {}, with score {} from originator {} and content {}",
+        logger.debug("owner from need: HINT called for own need {}, other need {}, " +
+                       "with score {} from originator {} and content {}",
                 new Object[]{ownNeedURI, otherNeedURI, score, originatorURI, content});
 
-        URI ownNeedUriConvert = URI.create(ownNeedURI);
-        URI otherNeedUriConvert = URI.create(otherNeedURI);
-        double scoreConvert = Double.valueOf(score);
-        URI originatorUriConvert = URI.create(originatorURI);
-        Model contentConvert = RdfUtils.toModel(content);
+      // distinguish between the new message format (WonMessage) and the old parameters
+      // ToDo (FS): remove this distinction if the old parameters not used anymore
+      if (wonMessage != null) {
+
+        URI ownNeedUriConvert = wonMessage.getMessageEvent().getReceiverNeedURI();
+        URI otherNeedUriConvert = URI.create(RdfUtils.findOnePropertyFromResource(
+          wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+          WON.HAS_MATCH_COUNTERPART).asResource().getURI());
+        double scoreConvert = RdfUtils.findOnePropertyFromResource(
+          wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+          WON.HAS_MATCH_SCORE).asLiteral().getDouble();
+        URI originatorUriConvert = wonMessage.getMessageEvent().getSenderNodeURI();
+
+        Model contentConvert = ModelFactory.createDefaultModel();
+        Iterator<String> i = wonMessage.getMessageContent().listNames();
+        while (i.hasNext()) {
+          contentConvert.add(wonMessage.getMessageContent().getNamedModel(i.next()));
+        }
 
         if (scoreConvert < 0 || scoreConvert > 1) throw new IllegalArgumentException("score is not in [0,1]");
 
 
         //Load need (throws exception if not found)
         Need need = DataAccessUtils.loadNeed(needRepository, ownNeedUriConvert);
-        if (! isNeedActive(need)) throw new IllegalMessageForNeedStateException(ownNeedUriConvert, ConnectionEventType.MATCHER_HINT.name(), need.getState());
+        if (!isNeedActive(need))
+          throw new IllegalMessageForNeedStateException(ownNeedUriConvert, ConnectionEventType.MATCHER_HINT.name(),
+                                                        need.getState());
 
-        List<Match> matches = matchRepository.findByFromNeedAndToNeedAndOriginator(ownNeedUriConvert, otherNeedUriConvert, originatorUriConvert);
+        List<Match> matches = matchRepository
+          .findByFromNeedAndToNeedAndOriginator(ownNeedUriConvert, otherNeedUriConvert, originatorUriConvert);
         Match match = null;
-        if (matches.size() > 0){
+        if (matches.size() > 0) {
           match = matches.get(0);
         } else {
           //save match
@@ -92,7 +107,40 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         match.setScore(scoreConvert);
         matchRepository.save(match);
         ownerServiceCallback.onHint(match, contentConvert, wonMessage);
-      //ownerService.handleHintMessageEventFromWonNode(match, contentConvert);
+        //ownerService.handleHintMessageEventFromWonNode(match, contentConvert);
+      } else {
+        URI ownNeedUriConvert = URI.create(ownNeedURI);
+        URI otherNeedUriConvert = URI.create(otherNeedURI);
+        double scoreConvert = Double.valueOf(score);
+        URI originatorUriConvert = URI.create(originatorURI);
+        Model contentConvert = RdfUtils.toModel(content);
+
+        if (scoreConvert < 0 || scoreConvert > 1) throw new IllegalArgumentException("score is not in [0,1]");
+
+
+        //Load need (throws exception if not found)
+        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedUriConvert);
+        if (!isNeedActive(need))
+          throw new IllegalMessageForNeedStateException(ownNeedUriConvert, ConnectionEventType.MATCHER_HINT.name(),
+                                                        need.getState());
+
+        List<Match> matches = matchRepository
+          .findByFromNeedAndToNeedAndOriginator(ownNeedUriConvert, otherNeedUriConvert, originatorUriConvert);
+        Match match = null;
+        if (matches.size() > 0) {
+          match = matches.get(0);
+        } else {
+          //save match
+          match = new Match();
+          match.setFromNeed(ownNeedUriConvert);
+          match.setToNeed(otherNeedUriConvert);
+          match.setOriginator(originatorUriConvert);
+        }
+        match.setScore(scoreConvert);
+        matchRepository.save(match);
+        ownerServiceCallback.onHint(match, contentConvert, wonMessage);
+        //ownerService.handleHintMessageEventFromWonNode(match, contentConvert);
+      }
     }
 
     private boolean isNeedActive(final Need need) {
@@ -203,7 +251,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
       // ToDo (FS): remove this distinction if the old parameters not used anymore
       if (wonMessage != null) {
 
-        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
+        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
 
         logger.debug("owner from need: OPEN called for connection {}.", connectionURIFromWonMessage);
         if (connectionURIFromWonMessage == null) throw new IllegalArgumentException("connectionURI not defined");
@@ -237,6 +285,26 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     public void close(final URI connectionURI, Model content, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
+
+      // distinguish between the new message format (WonMessage) and the old parameters
+      // ToDo (FS): remove this distinction if the old parameters not used anymore
+      if (wonMessage != null) {
+
+        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+
+        logger.debug("owner from need: CLOSE called for connection {}", connectionURIFromWonMessage);
+        if (connectionURIFromWonMessage == null)
+          throw new IllegalArgumentException("connectionURI is not set");
+
+        //load connection, checking if it exists
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURIFromWonMessage);
+        //set new state and save in the db
+        con.setState(con.getState().transit(ConnectionEventType.PARTNER_CLOSE));
+        //save in the db
+        connectionRepository.save(con);
+        ownerServiceCallback.onClose(con, content, wonMessage);
+        //ownerService.handleCloseMessageEventFromWonNode(con, content);
+      } else {
         logger.debug("owner from need: CLOSE called for connection {}", connectionURI);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
 
@@ -247,13 +315,74 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //save in the db
         connectionRepository.save(con);
         ownerServiceCallback.onClose(con, content, wonMessage);
-      //ownerService.handleCloseMessageEventFromWonNode(con, content);
+        //ownerService.handleCloseMessageEventFromWonNode(con, content);
+      }
     }
 
     @Override
     public void sendMessage(final URI connectionURI, final Model message, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
+      // distinguish between the new message format (WonMessage) and the old parameters
+      // ToDo (FS): remove this distinction if the old parameters not used anymore
+      if (wonMessage != null) {
+
+        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+        Model messageFromWonMessage = ModelFactory.createDefaultModel();
+        Iterator<String> i = wonMessage.getMessageContent().listNames();
+        while (i.hasNext()) {
+          messageFromWonMessage.add(wonMessage.getMessageContent().getNamedModel(i.next()));
+        }
+
+        logger
+          .debug("owner from need: SEND_TEXT_MESSAGE called for connection {} with message {}",
+                 connectionURIFromWonMessage, messageFromWonMessage);
+        if (connectionURIFromWonMessage == null) throw new IllegalArgumentException("connectionURI is not set");
+        if (messageFromWonMessage == null) throw new IllegalArgumentException("message is not set");
+        //load connection, checking if it exists
+        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURIFromWonMessage);
+        Resource baseRes = messageFromWonMessage.getResource(message.getNsPrefixURI(""));
+        StmtIterator stmtIterator = null;
+        boolean baFacetType = false;
+        if (con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
+          con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()) ||
+          con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI()) ||
+          con.getTypeURI().equals(FacetType.BACCParticipantFacet.getURI()) ||
+          con.getTypeURI().equals(FacetType.BAAtomicPCCoordinatorFacet.getURI()) ||
+          con.getTypeURI().equals(FacetType.BAAtomicCCCoordinatorFacet.getURI())) {
+          baFacetType = true;
+          stmtIterator = baseRes.listProperties(WON_TX.COORDINATION_MESSAGE);
+        } else {
+          stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
+        }
+        String textMessage = null;
+        while (stmtIterator.hasNext()) {
+          RDFNode obj = stmtIterator.nextStatement().getObject();
+          if (obj.isLiteral()) {
+            textMessage = obj.asLiteral().getLexicalForm();
+            break;
+          } else if (baFacetType)
+            textMessage = this.getCoordinationMessage(obj.toString());
+          else
+            textMessage = null;
+        }
+        if (textMessage == null) {
+          logger.debug("could not extract text message from RDF content of message");
+          textMessage = "[could not extract text message]";
+        }
+        //perform state transit (should not result in state change)
+        //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
+        //construct chatMessage object to store in the db
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setCreationDate(new Date());
+        chatMessage.setLocalConnectionURI(con.getConnectionURI());
+        chatMessage.setMessage(textMessage);
+        chatMessage.setOriginatorURI(con.getRemoteNeedURI());
+        //save in the db
+        chatMessageRepository.save(chatMessage);
+        ownerServiceCallback.onTextMessage(con, chatMessage, messageFromWonMessage, wonMessage);
+        //ownerService.handleTextMessageEventFromWonNode(con, chatMessage, message);
+      } else {
         logger.debug("owner from need: SEND_TEXT_MESSAGE called for connection {} with message {}", connectionURI, message);
         if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
         if (message == null) throw new IllegalArgumentException("message is not set");
@@ -263,35 +392,35 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         StmtIterator stmtIterator = null;
         boolean baFacetType = false;
         if(con.getTypeURI().equals(FacetType.BAPCCoordinatorFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BACCParticipantFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BAAtomicPCCoordinatorFacet.getURI()) ||
-                con.getTypeURI().equals(FacetType.BAAtomicCCCoordinatorFacet.getURI()))
+          con.getTypeURI().equals(FacetType.BAPCParticipantFacet.getURI()) ||
+          con.getTypeURI().equals(FacetType.BACCCoordinatorFacet.getURI()) ||
+          con.getTypeURI().equals(FacetType.BACCParticipantFacet.getURI()) ||
+          con.getTypeURI().equals(FacetType.BAAtomicPCCoordinatorFacet.getURI()) ||
+          con.getTypeURI().equals(FacetType.BAAtomicCCCoordinatorFacet.getURI()))
         {
-            baFacetType = true;
-            stmtIterator = baseRes.listProperties(WON_TX.COORDINATION_MESSAGE);
+          baFacetType = true;
+          stmtIterator = baseRes.listProperties(WON_TX.COORDINATION_MESSAGE);
         }
         else
         {
-            stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
+          stmtIterator = baseRes.listProperties(WON.HAS_TEXT_MESSAGE);
         }
         String textMessage = null;
         while (stmtIterator.hasNext()){
-            RDFNode obj = stmtIterator.nextStatement().getObject();
-            if (obj.isLiteral()) {
-                textMessage = obj.asLiteral().getLexicalForm();
-                break;
-            }
-            else
-                if(baFacetType)
-                    textMessage = this.getCoordinationMessage(obj.toString());
-                else
-                    textMessage = null;
+          RDFNode obj = stmtIterator.nextStatement().getObject();
+          if (obj.isLiteral()) {
+            textMessage = obj.asLiteral().getLexicalForm();
+            break;
+          }
+          else
+          if(baFacetType)
+            textMessage = this.getCoordinationMessage(obj.toString());
+          else
+            textMessage = null;
         }
         if (textMessage == null){
-            logger.debug("could not extract text message from RDF content of message");
-            textMessage = "[could not extract text message]";
+          logger.debug("could not extract text message from RDF content of message");
+          textMessage = "[could not extract text message]";
         }
         //perform state transit (should not result in state change)
         //ConnectionState nextState = performStateTransit(con, ConnectionEventType.OWNER_MESSAGE);
@@ -304,7 +433,9 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         //save in the db
         chatMessageRepository.save(chatMessage);
         ownerServiceCallback.onTextMessage(con, chatMessage, message, wonMessage);
-      //ownerService.handleTextMessageEventFromWonNode(con, chatMessage, message);
+        //ownerService.handleTextMessageEventFromWonNode(con, chatMessage, message);
+
+      }
     }
 
     //url -> Message

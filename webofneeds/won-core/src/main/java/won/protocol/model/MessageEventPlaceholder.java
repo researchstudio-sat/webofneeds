@@ -34,7 +34,7 @@ public class MessageEventPlaceholder
   @Column( name = "id" )
   private Long id;
 
-  @Column(name = "messageURI", unique = true)
+  @Column(name = "messageURI")
   private URI messageURI;
 
   // this URI refers to the need (in case of create, de-/activate) or connection (in case of hint, open,

@@ -110,6 +110,10 @@ public class NeedCommunicationServiceImpl implements
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
+      URI needURIFromWonMessage = wonMessage.getMessageEvent().getReceiverNeedURI();
+      URI otherNeedURIFromWonMessage = URI.create(RdfUtils.findOnePropertyFromResource(
+        wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+        WON.HAS_MATCH_COUNTERPART).asResource().getURI());
       double wmScore = RdfUtils.findOnePropertyFromResource(
         wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
         WON.HAS_MATCH_SCORE).asLiteral().getDouble();
@@ -128,14 +132,15 @@ public class NeedCommunicationServiceImpl implements
         // ToDo (FS): adapt this part to the new message format (dont use content)
         if (facet == null) {
           //get the first one of the need's supported facets. TODO: implement some sort of strategy for choosing a facet here (and in the matcher)
-          Collection<URI> facets = dataService.getSupportedFacets(needURI);
+          Collection<URI> facets = dataService.getSupportedFacets(needURIFromWonMessage);
           if (facets.isEmpty()) throw new IllegalArgumentException(
             "hint does not specify facets, falling back to using one of the need's supported facets failed as the need does not support any facets");
           //add the facet to the model.
           facet = facets.iterator().next();
         }
-        con = dataService.createConnection(needURI, otherNeedURI, null, facet, ConnectionState.SUGGESTED,
-                                           ConnectionEventType.MATCHER_HINT);
+        con = dataService.createConnection(
+          needURIFromWonMessage, otherNeedURIFromWonMessage,
+          null, facet, ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT);
       } catch (ConnectionAlreadyExistsException e) {
         logger.warn("could not create connection", e);
       }

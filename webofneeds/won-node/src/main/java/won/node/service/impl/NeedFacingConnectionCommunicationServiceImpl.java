@@ -89,12 +89,8 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       Connection con = dataService.nextConnectionState(connectionURIFromWonMessage,
                                                        ConnectionEventType.PARTNER_OPEN);
 
-      // if both needs are on the same WON node the message has already been saved in the repo
-      // therefore we need this check to not violate the unique messageID constraint
-      List<MessageEventPlaceholder> l = messageEventRepository.findByMessageURI(
-        wonMessage.getMessageEvent().getMessageURI());
-      if (l.size() == 0)
-        messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
+      messageEventRepository.save(new MessageEventPlaceholder(
+        connectionURIFromWonMessage, wonMessage.getMessageEvent()));
       //invoke facet implementation
       reg.get(con).openFromNeed(con, content, wonMessage);
 
@@ -120,14 +116,12 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
+      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+      Connection con = dataService.nextConnectionState(
+        connectionURIFromWonMessage, ConnectionEventType.PARTNER_CLOSE);
 
-      // if both needs are on the same WON node the message has already been saved in the repo
-      // therefore we need this check to not violate the unique messageID constraint
-      List<MessageEventPlaceholder> l = messageEventRepository.findByMessageURI(
-        wonMessage.getMessageEvent().getMessageURI());
-      if (l.size() == 0)
-        messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
+      messageEventRepository.save(new MessageEventPlaceholder(
+        connectionURIFromWonMessage, wonMessage.getMessageEvent()));
 
       //invoke facet implementation
       reg.get(con).closeFromNeed(con, content, wonMessage);
@@ -153,14 +147,13 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
         rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                        WonMessageEncoder.encodeAsDataset(wonMessage));
 
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
 
-        // if both needs are on the same WON node the message has already been saved in the repo
-        // therefore we need this check to not violate the unique messageID constraint
-        List<MessageEventPlaceholder> l = messageEventRepository.findByMessageURI(
-          wonMessage.getMessageEvent().getMessageURI());
-        if (l.size() == 0)
-        messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
+        Connection con = DataAccessUtils.loadConnection(
+          connectionRepository, connectionURIFromWonMessage);
+
+        messageEventRepository.save(new MessageEventPlaceholder(
+          connectionURIFromWonMessage, wonMessage.getMessageEvent()));
 
         //invoke facet implementation
         reg.get(con).sendMessageFromNeed(con, message, wonMessage);
