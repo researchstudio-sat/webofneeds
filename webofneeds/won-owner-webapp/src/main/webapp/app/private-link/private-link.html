@@ -76,7 +76,7 @@
                                             <span style="display: none;">{{event.typeText}}</span>
                                             <i ng-class="getIconClass(event.typeText)" tooltip="{{event.typeText}}"/>
                                         </td>
-                                        <td><a style="font-weight:bold;" href="" ng-click="clickOnTitle(event.id)">{{event
+                                        <td><a style="font-weight:bold;" href="" ng-click="clickOnTitle(event.otherNeed.uri)">{{event
                                             .remoteNeed.title}}</a></td>
                                         <td>{{event.connection.hasCreationDate | date}}</td>
                                     </tr>

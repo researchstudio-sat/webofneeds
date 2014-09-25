@@ -11,16 +11,24 @@ angular.module('won.owner')
     $scope.need = {};
     $scope.events = [];
 
+    $scope.$on("$routeChangeSuccess", function() {
+        console.log("route change success: now initializing");
+        $scope.initialize();
+    });
+
     $scope.$on(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED, function(event){
-        if (applicationStateService.getCurrentNeedURI() != $scope.need.uri && ! $scope.initializing){
+        console.log("current need chagned: now initializing");
+        if (applicationStateService.getCurrentNeedURI() != $scope.need.uri){
             $scope.initialize();
         }
     });
 
         // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
-     $scope.initialize = function() {
+
+    $scope.initialize = function() {
          $scope.need = {};
+         $scope.events = [];
          linkedDataService.getNeed(applicationStateService.getCurrentNeedURI())
              .then(function(need){
                $scope.need = need;
@@ -28,11 +36,7 @@ angular.module('won.owner')
              .then(function(){
                  if ($scope.need.uri != null) {
                      linkedDataService.getLastEventOfEachConnectionOfNeed($scope.need.uri).then(function(allEvents){
-                         $scope.events.splice(0,$scope.events.length);
-                         for (key in allEvents){
-                             $scope.events.push(allEvents[key]);
-                         }
-                         //$scope.events = allEvents;
+                         $scope.events = allEvents;
                      })
                  }
              });
@@ -236,10 +240,10 @@ angular.module('won.owner')
 
     // helper function to get message according to its id from messages
     function getEventById(msgId) {
-        for(var i = 0; i < $scope.need.events.length; i++) {
-            if ($scope.need.events[i].id == msgId) return $scope.need.events[i];
+        for(var i = 0; i < $scope.events.length; i++) {
+            if ($scope.events[i].uri == msgId) return $scope.events[i];
         }
-        // should not get here
+        return null; //should not get here
     }
     $scope.initRater = function() {
         $("#rater").rating({
@@ -398,7 +402,6 @@ angular.module('won.owner')
         return false;
     }
 
-    $scope.initialize();
 })
 
 

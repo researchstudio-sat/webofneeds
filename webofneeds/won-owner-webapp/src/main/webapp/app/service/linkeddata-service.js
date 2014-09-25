@@ -93,7 +93,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             //actually do load data
             try {
                 privateData.store.load('remote', uri, function (success, results) {
-                    resolveDeferredsForUrisBeingFetched(uri, success);
+                    if (success){
+                        resolveDeferredsForUrisBeingFetched(uri, success);
+                    } else {
+                        rejectDeferredsForUrisBeingFetched(uri, "failed to load " +uri);
+                    }
                 });
             } catch (e) {
                 rejectDeferredsForUrisBeingFetched(uri, e);
@@ -266,6 +270,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     promises.push(linkedDataService.getLastEventOfConnection(conUris[conKey]));
                 }
                 return $q.all(promises);
+            }, function(reason){
+                console.log("could not getLastEventOfEachConnectionOfNeed: " + reason);
             }
         );
     }
@@ -278,8 +284,14 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         return linkedDataService.getLastConnectionEvent(connectionUri)
                             .then(function (event) {
                                 return {connection: connection, remoteNeed: need, event: event}
+                            }, function(reason){
+                                console.log("could not getLastConnectionEvent in getLastEventConnection: " + reason);
                             });
+                    }, function(reason){
+                        console.log("could not getNeed in getLastEventConnection: " + reason);
                     });
+            }, function(reason){
+                console.log("could not getConnection in getLastEventConnection: " + reason);
             });
     }
 
@@ -298,6 +310,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getLastConnectionEventUri(connectionUri)
             .then(function (eventUri) {
                     return linkedDataService.getConnectionEvent(eventUri);
+            }, function(reason){
+                console.log("could not getLastConnectionEventUri in getLastConnectionEvent: " + reason);
             })
     }
 

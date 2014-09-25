@@ -57,6 +57,9 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     //dirty flag for the unread objects.
     privateData.unreadObjectsDirty = false;
 
+    privateData.latestEventsForConnections = [];
+    privateData.latestEventsDirty = false;
+
     var prepareEmptyUnreadObjects = function() {
         return {
             'all': {
@@ -152,6 +155,9 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.addEvent=function (event){
         privateData.unreadEvents.push(event);
         privateData.unreadObjectsDirty = true;
+        if (event.hasReceiverNeed == privateData.currentNeedURI){
+            privateData.latestEventsDirty = true;
+        }
     }
 
     /**
@@ -212,6 +218,21 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             updateUnreadObjects();
         }
         return privateData.unreadObjects;
+    }
+
+    /**
+     * For the current need, fetch the latest event for each connection.
+     * @returns {Array}
+     */
+    applicationStateService.getLatestEventsForConnectionsOfCurrentNeed = function(){
+        if (privateData.latestEventsDirty) {
+                linkedDataService.getLastEventOfEachConnectionOfNeed(applicationStateService.getCurrentNeedURI())
+                    .then(function(events){
+                        privateData.latestEventsForConnections = events;
+                    });
+            privateData.latestEventsDirty = false;
+        }
+        return privateData.latestEventsForConnections;
     }
 
 

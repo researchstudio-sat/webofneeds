@@ -19,12 +19,10 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     $scope.title = $routeParams.title;
 
     $scope.$on(won.EVENT.NEED_CREATED, onNeedCreated = function(event, eventData){
-
         $scope.needURI = eventData.needURI;
-        applicationStateService.setCurrentNeedURI($scope.needURI);
         linkedDataService.getNeed($scope.needURI).then(function(need){applicationStateService.addNeed(need)});
+        applicationStateService.setCurrentNeedURI($scope.needURI);
         $location.path("/private-link");
-
     });
     /*Text constants for new Need form*/
     /*$rootScope.createNewPost = {
