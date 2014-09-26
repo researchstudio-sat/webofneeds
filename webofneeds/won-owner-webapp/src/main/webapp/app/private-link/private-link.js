@@ -17,8 +17,8 @@ angular.module('won.owner')
     });
 
     $scope.$on(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED, function(event){
-        console.log("current need chagned: now initializing");
         if (applicationStateService.getCurrentNeedURI() != $scope.need.uri){
+            console.log("current need changed: now initializing");
             $scope.initialize();
         }
     });
@@ -29,17 +29,19 @@ angular.module('won.owner')
     $scope.initialize = function() {
          $scope.need = {};
          $scope.events = [];
-         linkedDataService.getNeed(applicationStateService.getCurrentNeedURI())
+         var needUri = applicationStateService.getCurrentNeedURI();
+         if (needUri != null) {
+            linkedDataService.getNeed(needUri)
              .then(function(need){
                $scope.need = need;
-             })
+             }, won.reportError())
              .then(function(){
-                 if ($scope.need.uri != null) {
-                     linkedDataService.getLastEventOfEachConnectionOfNeed($scope.need.uri).then(function(allEvents){
-                         $scope.events = allEvents;
-                     })
-                 }
-             });
+                linkedDataService.getLastEventOfEachConnectionOfNeed(needUri)
+                    .then(function(events){
+                        $scope.events = events;
+                    },won.reportError())
+             }, won.reportError("could not fetch need " + needUri));
+        }
         //$scope.need.matches = linkedDataService.getMatches($scope.need.uri);
 
         //

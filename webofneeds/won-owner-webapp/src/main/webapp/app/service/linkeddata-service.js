@@ -43,6 +43,42 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return null;
     }
 
+    /**
+     * Similar to $q.all, takes an array of promises and returns a promise.
+     * That promise will resolve if at least one of the promises succeeds.
+     * The value with which it resolves it is an array of equal length as the input
+     * containing either the resolve value of the promise or null if rejected.
+     * If an errorHandler is specified, it is called with ([array key], [reject value]) of
+     * each rejected promise.
+     * @param promises
+     */
+    var somePromises = function(promises, errorHandler){
+        var deferred = $q.defer(),
+            counter = 0,
+            results = angular.isArray(promises) ? [] : {},
+            handler = typeof errorHandler === 'function' ? errorHandler : function(x,y){};
+
+        angular.forEach(promises, function(promise, key) {
+            counter++;
+            promise.then(function(value) {
+                if (results.hasOwnProperty(key)) return;
+                results[key] = value;
+                if (!(--counter)) deferred.resolve(results);
+            }, function(reason) {
+                if (results.hasOwnProperty(key)) return;
+                results[key] = null;
+                handler(key, reason);
+                if (!(--counter)) deferred.reject("all promises failed");
+            });
+        });
+
+        if (counter === 0) {
+            deferred.resolve(results);
+        }
+
+        return deferred.promise;
+    }
+
     privateData.deferredsForUrisBeingFetched = {}; //uri -> list of promise
 
     var isBeingFetched = function(uri){
@@ -78,6 +114,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         delete privateData.deferredsForUrisBeingFetched[uri];
     }
 
+
+
     /**
      * Fetches the linked data for the specified URI and saves it in the local triplestore.
      * @param uri
@@ -93,14 +131,18 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             //actually do load data
             try {
                 privateData.store.load('remote', uri, function (success, results) {
-                    if (success){
-                        resolveDeferredsForUrisBeingFetched(uri, success);
-                    } else {
-                        rejectDeferredsForUrisBeingFetched(uri, "failed to load " +uri);
-                    }
+                    $rootScope.$apply(function() {
+                        if (success) {
+                            resolveDeferredsForUrisBeingFetched(uri, success);
+                        } else {
+                            rejectDeferredsForUrisBeingFetched(uri, "failed to load " + uri);
+                        }
+                    });
                 });
             } catch (e) {
-                rejectDeferredsForUrisBeingFetched(uri, e);
+                $rootScope.$apply(function() {
+                    rejectDeferredsForUrisBeingFetched(uri, e);
+                });
             }
         }
         return deferred.promise;
@@ -141,137 +183,92 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     }
 
     /**
-     * Retrieves the RDF data by dereferencing the specified URI.
-     * @param uri
-     * @param forceFetch if true, data will be fetched via http and updated in the cache before being returned.
-     * @return a promise to the data, which is represented as JSON-LD.
-     */
-    linkedDataService.get = function(uri, forceFetch) {
-        if (typeof forceFetch === 'undefined'){
-            forceFetch = false;
-        }
-        var deferred = $q.defer();
-        try {
-            var done = false;
-            //load the data from the local rdf store if forceFetch is false
-            if (! forceFetch) {
-                privateData.store.graph(uri, function (success, mygraph) {
-                    if (success) {
-                        deferred.resolve(mygraph);
-                        done = true;
-                    }
-                })
-            }
-            if (done) {
-                //if we found the data, we're done!
-                return deferred.promise;
-            }
-            //we're not done yet - we have to fetch the data remotely
-            linkedDataService.fetch(uri).then(
-                function(successValue) {
-                    //ignore successValue 'true'
-                    deferred.notify("fetched data for " + uri);
-                    //now get the data from the store and return
-                    privateData.store.graph(uri, function(success, graph) {
-                        deferred.resolve(graph);
-                    })
-                },
-                function(reason) {
-                    //handle error when fetching the data
-                    deferred.reject("cannot get " + uri + ", reason:" + reason);
-                },
-                //don't handle updates
-                null
-            );
-        } catch (e){
-            deferred.reject(e);
-        }
-        return deferred.promise;
-    }
-
-   
-   
-    /**
      * Loads the default data of the need with the specified URI into a js object.
      * @return the object or null if no data is found for that URI in the local datastore
      */
     linkedDataService.getNeed = function(uri) {
-        var deferred = $q.defer();
-        //TODO: SPARQL query that returns the common need properties
-        var resultObject = null;
-        var query =
-            "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-            "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-            "prefix " + "dc"+":<"+"http://purl.org/dc/elements/1.1/>\n" +
-            "prefix " + "geo"+":<"+"http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
-                "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime where { " +
-//TODO: add as soon as named graphs are handled by the rdf store
-//
-//                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
-//                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
-//                "GRAPH ?coreURI {"+
-                "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ."+
-                "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ."+
-                "?content dc:title ?title ."+
-                "OPTIONAL {?content "+ won.WON.hasTagCompacted + " ?tags .}"+
-                "OPTIONAL {?content "+ "geo:latitude" + " ?latitude .}"+
-                "OPTIONAL {?content "+ "geo:longitude" + " ?longitude .}"+
-                "OPTIONAL {?content "+ won.WON.hasEndTimeCompacted + " ?endTime .}"+
-                "OPTIONAL {?content "+ won.WON.hasRecurInfiniteTimesCompacted + " ?recurInfinite .}"+
-                "OPTIONAL {?content "+ won.WON.hasRecursInCompacted + " ?recursIn .}"+
-                "OPTIONAL {?content "+ won.WON.hasStartTimeCompacted + " ?startTime .}"+
-                "OPTIONAL {?content "+ won.WON.hasTagCompacted + " ?tags .}"+
-                "OPTIONAL {?content "+ won.WON.hasTextDescriptionCompacted + " ?textDescription ."+
-//TODO: add as soon as named graphs are handled by the rdf store
-//                "}" +
-//                "GRAPH ?metaURI {" +
-                "<" + uri + ">" + " <"+"http://purl.org/dc/terms/created"+"> " + "?creationDate ."+
-                "<" + uri + ">" + won.WON.hasConnectionsCompacted + " ?connections ."+
-                "<" + uri + ">" + won.WON.hasWonNodeCompacted + " ?wonNode ."+
-                "<" + uri + ">" + won.WON.isInStateCompacted + " ?state ."+
-                "OPTIONAL {<"+ uri +"> "+ won.WON.hasEventContainerCompacted+" ?eventContainer .}"+
-                "OPTIONAL {?eventContainer "+ "rdfs:member" + " ?event .}"+
-//TODO: add as soon as named graphs are handled by the rdf store
-//                "}" +
-                "}}";
+       return linkedDataService.ensureLoaded(uri).then(function(){
+            try {
+                var resultObject = null;
+                var query =
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+                    "prefix " + "dc" + ":<" + "http://purl.org/dc/elements/1.1/>\n" +
+                    "prefix " + "geo" + ":<" + "http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
+                    "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime where { " +
+                    //TODO: add as soon as named graphs are handled by the rdf store
+                    //
+                    //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
+                    //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
+                    //                "GRAPH ?coreURI {"+
+                    "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ." +
+                    "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ." +
+                    "?content dc:title ?title ." +
+                    "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}" +
+                    "OPTIONAL {?content " + "geo:latitude" + " ?latitude .}" +
+                    "OPTIONAL {?content " + "geo:longitude" + " ?longitude .}" +
+                    "OPTIONAL {?content " + won.WON.hasEndTimeCompacted + " ?endTime .}" +
+                    "OPTIONAL {?content " + won.WON.hasRecurInfiniteTimesCompacted + " ?recurInfinite .}" +
+                    "OPTIONAL {?content " + won.WON.hasRecursInCompacted + " ?recursIn .}" +
+                    "OPTIONAL {?content " + won.WON.hasStartTimeCompacted + " ?startTime .}" +
+                    "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}" +
+                    "OPTIONAL {?content " + won.WON.hasTextDescriptionCompacted + " ?textDescription ." +
+                    //TODO: add as soon as named graphs are handled by the rdf store
+                    //                "}" +
+                    //                "GRAPH ?metaURI {" +
+                    "<" + uri + ">" + " <" + "http://purl.org/dc/terms/created" + "> " + "?creationDate ." +
+                    "<" + uri + ">" + won.WON.hasConnectionsCompacted + " ?connections ." +
+                    "<" + uri + ">" + won.WON.hasWonNodeCompacted + " ?wonNode ." +
+                    "<" + uri + ">" + won.WON.isInStateCompacted + " ?state ." +
+                    "OPTIONAL {<" + uri + "> " + won.WON.hasEventContainerCompacted + " ?eventContainer .}" +
+                    "OPTIONAL {?eventContainer " + "rdfs:member" + " ?event .}" +
+                    //TODO: add as soon as named graphs are handled by the rdf store
+                    //                "}" +
+                    "}}";
+                resultObject = {};
+                privateData.store.execute(query, [], [], function (success, results) {
 
-        privateData.store.execute(query, [],[], function (success, results) {
-            resultObject = {};
-            if (!success) {
-                return;
-            }
-            //use only first result!
-            if (results.length == 0) {
-                return;
-            }
-            if (results.length > 1) {
-                console.log("more than 1 solution found for message property query!");
-            }
-            var result = results[0];
+                    if (!success) {
+                        $q.reject("query for need " + uri + " failed.");
+                    }
+                    //use only first result!
+                    if (results.length == 0) {
+                        $q.reject("query for need " + uri + " returned no results");
+                    }
+                    if (results.length > 1) {
+                        $q.reject("query for need " + uri + " returned more than one result");
+                    }
+                    var result = results[0];
 
-            resultObject.uri = uri;
-            resultObject.basicNeedType = getSafeValue(result.basicNeedType);
-            resultObject.title = getSafeValue(result.title);
-            resultObject.tags = getSafeValue(result.tags);
-            resultObject.textDescription = getSafeValue(result.textDescription);
-            resultObject.creationDate = getSafeValue(result.creationDate);
-            deferred.resolve(resultObject);
-            //resultObject.log("done copying the data to the event object, returning the result");
+                    resultObject.uri = uri;
+                    resultObject.basicNeedType = getSafeValue(result.basicNeedType);
+                    resultObject.title = getSafeValue(result.title);
+                    resultObject.tags = getSafeValue(result.tags);
+                    resultObject.textDescription = getSafeValue(result.textDescription);
+                    resultObject.creationDate = getSafeValue(result.creationDate);
+                });
+                return resultObject;
+            } catch (e){
+                return $q.reject("could not load need " + uri + ". Reason: " + e);
+            }
         });
-        return deferred.promise;
     }
 
 
     linkedDataService.getLastEventOfEachConnectionOfNeed = function(uri) {
         return linkedDataService.getConnectionURIsOfNeed(uri)
             .then(function(conUris) {
-                var promises = [];
-                for (var conKey in conUris) {
-                    promises.push(linkedDataService.getLastEventOfConnection(conUris[conKey]));
+                try {
+                    var promises = [];
+                    for (var conKey in conUris) {
+                        promises.push(linkedDataService.getLastEventOfConnection(conUris[conKey]));
+                    }
+                    return somePromises(promises, function(key, reason){
+                        won.reportError("could not fetch last event of connection " + conUris[key], reason);
+                    }).then(won.deleteWhereNull);
+                } catch (e) {
+                    $q.reject("could not get last event of connection " + uri + ". Reason: " + e);
                 }
-                return $q.all(promises);
-            }, function(reason){
-                console.log("could not getLastEventOfEachConnectionOfNeed: " + reason);
             }
         );
     }
@@ -284,25 +281,23 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         return linkedDataService.getLastConnectionEvent(connectionUri)
                             .then(function (event) {
                                 return {connection: connection, remoteNeed: need, event: event}
-                            }, function(reason){
-                                console.log("could not getLastConnectionEvent in getLastEventConnection: " + reason);
                             });
-                    }, function(reason){
-                        console.log("could not getNeed in getLastEventConnection: " + reason);
                     });
-            }, function(reason){
-                console.log("could not getConnection in getLastEventConnection: " + reason);
             });
     }
 
     linkedDataService.getAllConnectionEvents = function(connectionUri) {
         return linkedDataService.getConnectionEventUris(connectionUri)
             .then(function (eventUris) {
-                var eventPromises = [];
-                for (var evtKey in eventUris) {
-                    eventPromises.push(linkedDataService.getConnectionEvent(eventUris[evtKey]));
+                try {
+                    var eventPromises = [];
+                    for (var evtKey in eventUris) {
+                        eventPromises.push(linkedDataService.getConnectionEvent(eventUris[evtKey]));
+                    }
+                    return $q.all(eventPromises)
+                } catch (e) {
+                    $q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
                 }
-                return $q.all(eventPromises)
             });
     }
 
@@ -310,8 +305,6 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getLastConnectionEventUri(connectionUri)
             .then(function (eventUri) {
                     return linkedDataService.getConnectionEvent(eventUri);
-            }, function(reason){
-                console.log("could not getLastConnectionEventUri in getLastConnectionEvent: " + reason);
             })
     }
 
@@ -321,38 +314,42 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      */
     linkedDataService.getConnectionURIsOfNeed = function(uri) {
         return linkedDataService.ensureLoaded(uri).then(function(success) {
-            var subject = uri;
-            var predicate = won.WON.hasConnections;
-            var connectionsPromises = [];
-            privateData.store.node(uri, function (success, graph) {
-                var resultGraph = graph.match(subject, predicate, null);
-                if (resultGraph != null && resultGraph.length > 0) {
-                   for (key in resultGraph.triples) {
-                        var connectionsURI = resultGraph.triples[key].object.nominalValue;
-                        connectionsPromises.push(linkedDataService.ensureLoaded(connectionsURI).then(function(success) {
-                            var connectionURIs = [];
-                            privateData.store.node(connectionsURI, function (success, graph) {
-                                if (graph != null && graph.length > 0) {
-                                    var memberTriples = graph.match(connectionsURI, createNameNodeInStore("rdfs:member"), null);
-                                    for (var memberKey in memberTriples.triples) {
-                                        var member = memberTriples.triples[memberKey].object.nominalValue;
-                                        connectionURIs.push(member);
+            try {
+                var subject = uri;
+                var predicate = won.WON.hasConnections;
+                var connectionsPromises = [];
+                privateData.store.node(uri, function (success, graph) {
+                    var resultGraph = graph.match(subject, predicate, null);
+                    if (resultGraph != null && resultGraph.length > 0) {
+                        for (key in resultGraph.triples) {
+                            var connectionsURI = resultGraph.triples[key].object.nominalValue;
+                            connectionsPromises.push(linkedDataService.ensureLoaded(connectionsURI).then(function (success) {
+                                var connectionURIs = [];
+                                privateData.store.node(connectionsURI, function (success, graph) {
+                                    if (graph != null && graph.length > 0) {
+                                        var memberTriples = graph.match(connectionsURI, createNameNodeInStore("rdfs:member"), null);
+                                        for (var memberKey in memberTriples.triples) {
+                                            var member = memberTriples.triples[memberKey].object.nominalValue;
+                                            connectionURIs.push(member);
+                                        }
                                     }
-                                }
-                            });
-                            return connectionURIs;
-                        }));
+                                });
+                                return connectionURIs;
+                            }));
+                        }
                     }
-                }
-            });
-            return $q.all(connectionsPromises)
-                .then(function(listOfLists){
-                //for each hasConnections triple (should only be one, but hey) we get a list of connections.
-                //now flatten the list.
-                var merged = [];
-                merged = merged.concat.apply(merged, listOfLists);
-                return merged;
-            });
+                });
+                return $q.all(connectionsPromises)
+                    .then(function (listOfLists) {
+                        //for each hasConnections triple (should only be one, but hey) we get a list of connections.
+                        //now flatten the list.
+                        var merged = [];
+                        merged = merged.concat.apply(merged, listOfLists);
+                        return merged;
+                    });
+            } catch (e) {
+                $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
+            }
          });
     }
     
@@ -368,55 +365,63 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     linkedDataService.getAllConnectionEventUris = function(connectionURI) {
         return linkedDataService.ensureLoaded(connectionURI).then(function(success) {
-            var eventURIs = [];
-            var query =
-                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                "select ?eventURI where { " +
-                "<" + connectionURI + "> a " + won.WON.ConnectionCompacted + ";\n" +
-                won.WON.hasEventContainerCompacted + " ?container.\n" +
-                "?container rdfs:member ?eventURI. \n" +
-                "}";
-            privateData.store.execute(query, [], [], function (success, results) {
-                if (success) {
-                    for (var key in results) {
-                        var eventURI = getSafeValue(results[key].eventURI);
-                        if (eventURI != null) {
-                            eventURIs.push(eventURI);
+            try {
+                var eventURIs = [];
+                var query =
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                    "select ?eventURI where { " +
+                    "<" + connectionURI + "> a " + won.WON.ConnectionCompacted + ";\n" +
+                    won.WON.hasEventContainerCompacted + " ?container.\n" +
+                    "?container rdfs:member ?eventURI. \n" +
+                    "}";
+                privateData.store.execute(query, [], [], function (success, results) {
+                    if (success) {
+                        for (var key in results) {
+                            var eventURI = getSafeValue(results[key].eventURI);
+                            if (eventURI != null) {
+                                eventURIs.push(eventURI);
+                            }
                         }
                     }
-                }
-            });
-            return eventURIs;
+                });
+                return eventURIs;
+            } catch (e) {
+                $q.reject("Could not get all connection event URIs for connection " + connectionURI +". Reason: " + e);
+            }
         });
     }
 
     linkedDataService.getLastConnectionEventUri = function(connectionURI) {
         return linkedDataService.ensureLoaded(connectionURI).then(function(success) {
-            var resultObject = {};
-            //TODO: use event with highest timestamp
-            var query =
-                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                "select ?eventURI where { " +
-                "<" + connectionURI + "> a " + won.WON.ConnectionCompacted + ";\n" +
-                won.WON.hasEventContainerCompacted + " ?container.\n" +
-                "?container rdfs:member ?eventURI. \n" +
-                "} limit 1";
-            privateData.store.execute(query, [], [], function (success, results) {
-                if (success) {
-                    for (var key in results) {
-                        var eventURI = getSafeValue(results[key].eventURI);
-                        if (eventURI != null) {
-                            resultObject.eventURI = eventURI;
-                            return;
+            try {
+                var resultObject = {};
+                //TODO: use event with highest timestamp
+                var query =
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                    "select ?eventURI where { " +
+                    "<" + connectionURI + "> a " + won.WON.ConnectionCompacted + ";\n" +
+                    won.WON.hasEventContainerCompacted + " ?container.\n" +
+                    "?container rdfs:member ?eventURI. \n" +
+                    "} limit 1";
+                privateData.store.execute(query, [], [], function (success, results) {
+                    if (success) {
+                        for (var key in results) {
+                            var eventURI = getSafeValue(results[key].eventURI);
+                            if (eventURI != null) {
+                                resultObject.eventURI = eventURI;
+                                return;
+                            }
                         }
                     }
-                }
-            });
-            return resultObject.eventURI;
+                });
+                return resultObject.eventURI;
+            } catch (e) {
+                $q.reject("could not get last connection event URI for connection " + connectionURI +". Reason: " + e);
+            }
         });
     }
 
@@ -428,17 +433,21 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      */
     linkedDataService.getNodeWithAttributes = function(uri){
         return linkedDataService.ensureLoaded(uri).then(function(success) {
-            var node = {};
-            privateData.store.node(uri, function (success, graph) {
-                if (graph != null && graph.length > 0) {
-                    for (key in graph.triples) {
-                        var propName = won.getLocalName(graph.triples[key].predicate.nominalValue);
-                        node[propName] = graph.triples[key].object.nominalValue;
+            try {
+                var node = {};
+                privateData.store.node(uri, function (success, graph) {
+                    if (graph != null && graph.length > 0) {
+                        for (key in graph.triples) {
+                            var propName = won.getLocalName(graph.triples[key].predicate.nominalValue);
+                            node[propName] = graph.triples[key].object.nominalValue;
+                        }
                     }
-                }
-            });
-            node.uri = uri;
-            return node;
+                });
+                node.uri = uri;
+                return node;
+            } catch (e) {
+                $q.reject("could not get node " + uri + "with attributes: " + e);
+            }
         });
     }
     

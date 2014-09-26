@@ -253,6 +253,42 @@
             return propertyName.indexOf('@') == 0;
         }
 
+        won.reportError = function(message) {
+            if (arguments.length == 1) {
+                return function(reason) {
+                    console.log(message + " reason: " + reason);
+                }
+            }
+            return function(reason) {
+                console.log("Error! reason: " + reason);
+            }
+        }
+
+        /**
+         * Deletes every element of the array for which the
+         * test function returns true.
+         * @param array
+         * @param test
+         */
+        won.deleteWhere = function(array, test) {
+            for (var i = 0; i< array.length; i++){
+                if (test(array[i])){
+                    array.splice(i,1);
+                    i--;
+                }
+            }
+        }
+
+        /**
+         * Deletes all null entries in the specified array.
+         * @param array
+         */
+        won.deleteWhereNull = function(array){
+            won.deleteWhere(array, function(x){ return x == null});
+        }
+
+
+
         won.defaultContext = {
                 "@base": "http://www.example.com/resource/need/randomNeedID_1",
                 "webID": "http://www.example.com/webids/",
