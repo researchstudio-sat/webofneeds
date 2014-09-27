@@ -44,6 +44,7 @@ import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -85,6 +86,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
   private MessageEventRepository messageEventRepository;
   @Autowired
   private LinkedDataService linkedDataService;
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
 
   //TODO: remove 'active' parameter, make need active by default, and look into RDF for an optional 'isInState' triple.
@@ -154,7 +157,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
         WonMessage newNeedNotificationMessage =
           new WonMessageBuilder()
             .setWonMessageType(WonMessageType.NEED_CREATED_NOTIFICATION)
-            .setMessageURI(uriService.createMessageEventURI(need.getNeedURI()))
+            .setMessageURI(wonNodeInformationService.generateMessageEventURI())
             .setSenderNeedURI(need.getNeedURI())
             .setSenderNodeURI(need.getWonNodeURI())
             .build(needDataset);
@@ -421,7 +424,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
-      .setMessageURI(uriService.createMessageEventURI(connection.getConnectionURI()))
+      .setMessageURI(wonNodeInformationService.generateMessageEventURI())
       .setWonMessageType(WonMessageType.CLOSE)
       .setSenderURI(connection.getConnectionURI())
       .setSenderNeedURI(connection.getNeedURI())

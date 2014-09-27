@@ -16,8 +16,6 @@
 
 package won.node.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import won.cryptography.service.RandomNumberServiceImpl;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
@@ -32,15 +30,14 @@ import java.net.URI;
 public class URIService
 {
 
-  @Autowired
-  private RandomNumberServiceImpl randomNumberService;
-
   //prefix of any URI
   private String generalURIPrefix;
   //prefix of a need resource
   private String needResourceURIPrefix;
   //prefix of a connection resource
   private String connectionResourceURIPrefix;
+  //prefix of an event resource
+  private String eventResourceURIPrefix;
   //prefix of a messageEvent resource
   private String messageEventResourceURIInfix;
   //need meta information suffix
@@ -120,6 +117,10 @@ public class URIService
     return URI.create(connectionResourceURIPrefix.toString() + "/"   + id);
   }
 
+  public URI createEventURIForId(String id) {
+    return URI.create(eventResourceURIPrefix.toString() + "/"   + id);
+  }
+
   public URI createNeedURI(Need need)
   {
     return URI.create(needResourceURIPrefix.toString() + "/" + need.getId());
@@ -138,6 +139,11 @@ public class URIService
   public void setConnectionResourceURIPrefix(final String connectionResourceURIPrefix)
   {
     this.connectionResourceURIPrefix = connectionResourceURIPrefix;
+  }
+
+  public void setEventResourceURIPrefix(final String eventResourceURIPrefix)
+  {
+    this.eventResourceURIPrefix = eventResourceURIPrefix;
   }
 
   public void setMessageEventResourceURIInfix(final String messageEventResourceURIInfix) {
@@ -170,18 +176,7 @@ public class URIService
 
   public URI createEventURI(final Connection con, final ConnectionEvent event)
   {
-    return URI.create(con.getConnectionURI()+"/event/"+event.getId());
-  }
-
-  public URI createEventURI(final URI connectionURI, final String eventId)
-  {
-    return URI.create(connectionURI.toString()+"/event/"+eventId);
-  }
-
-  public URI createMessageEventURI(final URI parentURI) {
-    // ToDo (FS): take length from configuration and choose good length value (maybe change value to bytes)
-    return URI.create(parentURI.toString() + messageEventResourceURIInfix + "/" + randomNumberService
-      .generateRandomString(9));
+    return createEventURIForId(event.getId().toString());
   }
 
   public URI createNeedMetaInformationURI(final URI needURI) {

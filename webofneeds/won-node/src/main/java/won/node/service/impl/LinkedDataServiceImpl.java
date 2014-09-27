@@ -37,10 +37,7 @@ import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
-import won.protocol.util.ConnectionModelMapper;
-import won.protocol.util.DateTimeUtils;
-import won.protocol.util.DefaultPrefixUtils;
-import won.protocol.util.NeedModelMapper;
+import won.protocol.util.*;
 import won.protocol.vocabulary.LDP;
 import won.protocol.vocabulary.WON;
 
@@ -352,7 +349,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   public Dataset getEventDataset(URI eventURI) {
-    return rdfStorage.loadDataset(eventURI);
+    Dataset result = rdfStorage.loadDataset(eventURI);
+    DefaultPrefixUtils.setDefaultPrefixes(result.getDefaultModel());
+    return result;
   }
 
   private void addAdditionalData(final Model model, URI resourceToLoad, final Resource targetResource) {

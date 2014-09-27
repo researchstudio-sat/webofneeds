@@ -37,6 +37,7 @@ import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.NeedFacingNeedCommunicationService;
+import won.protocol.service.WonNodeInformationService;
 
 import java.net.URI;
 import java.util.List;
@@ -59,6 +60,8 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   private NeedRepository needRepository;
   @Autowired
   private URIService uriService;
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
   protected NeedProtocolNeedClientSide needFacingConnectionClient;
 
@@ -166,7 +169,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
 
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
-      .setMessageURI(uriService.createMessageEventURI(connection.getConnectionURI()))
+      .setMessageURI(wonNodeInformationService.generateMessageEventURI())
       .setWonMessageType(WonMessageType.CLOSE)
       .setSenderURI(connection.getConnectionURI())
       .setSenderNeedURI(connection.getNeedURI())

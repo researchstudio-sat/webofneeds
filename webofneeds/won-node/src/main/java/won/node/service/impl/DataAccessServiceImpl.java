@@ -5,13 +5,14 @@ import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -40,6 +41,8 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   private EventRepository eventRepository;
   @Autowired
   private FacetRepository facetRepository;
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
 
 
@@ -88,7 +91,8 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
       //save connection (this creates a new id)
       con = connectionRepository.save(con);
       //create and set new uri
-      con.setConnectionURI(URIService.createConnectionURI(con));
+      con.setConnectionURI(wonNodeInformationService.generateConnectionURI(
+        needURI, wonNodeInformationService.getDefaultWonNode()));
       con = connectionRepository.save(con);
 
       //TODO: do we save the connection content? where? as a chat content?

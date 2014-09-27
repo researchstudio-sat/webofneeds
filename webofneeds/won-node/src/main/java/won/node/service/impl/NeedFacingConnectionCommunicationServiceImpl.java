@@ -42,6 +42,7 @@ import won.protocol.util.RdfUtils;
 
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -87,7 +88,9 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
 
       Connection con = dataService.nextConnectionState(connectionURIFromWonMessage,
                                                        ConnectionEventType.PARTNER_OPEN);
-      messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
+
+      messageEventRepository.save(new MessageEventPlaceholder(
+        connectionURIFromWonMessage, wonMessage.getMessageEvent()));
       //invoke facet implementation
       reg.get(con).openFromNeed(con, content, wonMessage);
 
@@ -113,9 +116,12 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
+      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+      Connection con = dataService.nextConnectionState(
+        connectionURIFromWonMessage, ConnectionEventType.PARTNER_CLOSE);
 
-      messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
+      messageEventRepository.save(new MessageEventPlaceholder(
+        connectionURIFromWonMessage, wonMessage.getMessageEvent()));
 
       //invoke facet implementation
       reg.get(con).closeFromNeed(con, content, wonMessage);
@@ -141,9 +147,13 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
         rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                        WonMessageEncoder.encodeAsDataset(wonMessage));
 
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
+        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
 
-        messageEventRepository.save(new MessageEventPlaceholder(connectionURI, wonMessage.getMessageEvent()));
+        Connection con = DataAccessUtils.loadConnection(
+          connectionRepository, connectionURIFromWonMessage);
+
+        messageEventRepository.save(new MessageEventPlaceholder(
+          connectionURIFromWonMessage, wonMessage.getMessageEvent()));
 
         //invoke facet implementation
         reg.get(con).sendMessageFromNeed(con, message, wonMessage);

@@ -74,13 +74,13 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      URI connectionURIFromWonNode = wonMessage.getMessageEvent().getSenderURI();
+      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
 
-      logger.debug("OPEN received from the owner side for connection {0}", connectionURIFromWonNode);
+      logger.debug("OPEN received from the owner side for connection {0}", connectionURIFromWonMessage);
 
-      Connection con = dataService.nextConnectionState(connectionURIFromWonNode, ConnectionEventType.OWNER_OPEN);
+      Connection con = dataService.nextConnectionState(connectionURIFromWonMessage, ConnectionEventType.OWNER_OPEN);
 
-      messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonNode,
+      messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
                                                               wonMessage.getMessageEvent()));
 
       //invoke facet implementation
@@ -155,22 +155,28 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
       URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
 
-      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURIFromWonMessage);
+      final Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURIFromWonMessage);
 
 
       messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
                                                               wonMessage.getMessageEvent()));
 
-      ConnectionEvent event = dataService
-        .createConnectionEvent(con.getConnectionURI(), connectionURI, ConnectionEventType.OWNER_MESSAGE);
-
-
-
-      Resource eventNode = message.createResource(this.URIService.createEventURI(con, event).toString());
-      RdfUtils.replaceBaseResource(message, eventNode);
-      //create rdf content for the ConnectionEvent and save it to disk
-
-      boolean feedbackWasPresent = processFeedbackMessage(con, message);
+      final Connection connection = con;
+      boolean feedbackWasPresent = RdfUtils.applyMethod(wonMessage.getMessageContent(),
+                           new RdfUtils.ModelVisitor<Boolean>()
+                           {
+                             @Override
+                             public Boolean visit(final Model model) {
+                               return processFeedbackMessage(connection, model);
+                             }
+                           },
+                           new RdfUtils.ResultCombiner<Boolean>()
+                           {
+                             @Override
+                             public Boolean combine(final Boolean first, final Boolean second) {
+                               return first || second;
+                             }
+                           });
 
       if (!feedbackWasPresent) {
         //a feedback message is not forwarded to the remote connection, and facets cannot react to it.

@@ -154,31 +154,11 @@ public class
   }
 
   //webmvc controller method
-  @RequestMapping("${uri.path.page.connection}/{identifier}${uri.infix.messageEvent}/{eventId}")
-  public String showConnectionEventPage(@PathVariable(value = "identifier") String identifier,
-                                        @PathVariable(value = "eventId") String eventId,
-                                        Model model,
-                                        HttpServletResponse response) {
-    URI eventURI = uriService.createEventURI(uriService.createConnectionURIForId(identifier), eventId);
-    Dataset rdfDataset = linkedDataService.getEventDataset(eventURI);
-    if (model != null) {
-      model.addAttribute("rdfDataset", rdfDataset);
-      model.addAttribute("resourceURI", eventURI.toString());
-      model.addAttribute("dataURI", uriService.toDataURIIfPossible(eventURI).toString());
-      return "rdfDatasetView";
-    } else {
-      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-      return "notFoundView";
-    }
-  }
-
-  //webmvc controller method
-  @RequestMapping("${uri.path.page.need}/{identifier}${uri.infix.messageEvent}/{eventId}")
-  public String showNeedEventPage(@PathVariable(value = "identifier") String identifier,
-                                  @PathVariable(value = "eventId") String eventId,
-                                  Model model,
-                                  HttpServletResponse response) {
-    URI eventURI = uriService.createEventURI(uriService.createNeedURIForId(identifier), eventId);
+  @RequestMapping("${uri.path.page.event}/{identifier}")
+  public String showEventPage(@PathVariable(value = "identifier") String identifier,
+                              Model model,
+                              HttpServletResponse response) {
+    URI eventURI = uriService.createEventURIForId(identifier);
     Dataset rdfDataset = linkedDataService.getEventDataset(eventURI);
     if (model != null) {
       model.addAttribute("rdfDataset", rdfDataset);
@@ -453,42 +433,17 @@ public class
   }
 
   @RequestMapping(
-    value="${uri.path.data.connection}/{identifier}${uri.infix.messageEvent}/{eventId}",
+    value="${uri.path.data.event}/{identifier}",
     method = RequestMethod.GET,
     produces={"application/trig",
               "application/ld+json",
               "application/n-quads"})
-  public ResponseEntity<Dataset> readConnectionEvent(
+  public ResponseEntity<Dataset> readEvent(
     HttpServletRequest request,
-    @PathVariable(value = "identifier") String identifier,
-    @PathVariable(value = "eventId") String eventId) {
+    @PathVariable(value = "identifier") String identifier) {
     logger.debug("readConnectionEvent() called");
 
-    URI eventURI = uriService.createEventURI(uriService.createConnectionURIForId(identifier), eventId);
-    Dataset rdfDataset = linkedDataService.getEventDataset(eventURI);
-    if (rdfDataset != null) {
-      HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(),
-                                                                                URI.create(request.getRequestURI()),
-                                                                                eventURI));
-      return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
-    } else {
-      return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
-    }
-  }
-
-  @RequestMapping(
-    value="${uri.path.data.need}/{identifier}${uri.infix.messageEvent}/{eventId}",
-    method = RequestMethod.GET,
-    produces={"application/trig",
-              "application/ld+json",
-              "application/n-quads"})
-  public ResponseEntity<Dataset> readNeedEvent(
-    HttpServletRequest request,
-    @PathVariable(value = "identifier") String identifier,
-    @PathVariable(value = "eventId") String eventId) {
-    logger.debug("readNeedEvent() called");
-
-    URI eventURI = uriService.createEventURI(uriService.createNeedURIForId(identifier), eventId);
+    URI eventURI = uriService.createEventURIForId(identifier);
     Dataset rdfDataset = linkedDataService.getEventDataset(eventURI);
     if (rdfDataset != null) {
       HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(),

@@ -639,6 +639,13 @@ public class RdfUtils
   }
 
   /**
+   * ResultCombiner which combines to results of type T and returns it.
+   */
+  public static interface ResultCombiner<T> {
+    public T combine(T first, T second);
+  }
+
+  /**
    * Selector that selects all models, including the default model.
    * The first model is the default model, the named models are returned in the order
    * specified by Dataset.listNames().
@@ -775,22 +782,55 @@ public class RdfUtils
    */
   public static <T> T findOne(Dataset dataset, ModelVisitor<T> visitor, ModelSelector modelSelector, boolean allowSame){
     T result = null;
-    for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();){
+    for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();) {
       T newResult = visitor.visit(modelIterator.next());
-      if (result != null && newResult != null) {
-        if (!allowSame || ! result.equals(newResult)) {
-          throw new IncorrectPropertyCountException("Results were found in more than " +
-            "one model", 1, 2);
+      if (newResult != null) {
+        if (result != null) {
+          if (!allowSame || !result.equals(newResult)) {
+            throw new IncorrectPropertyCountException("Results were found in more than " +
+                                                        "one model", 1, 2);
+          }
         }
+        result = newResult;
       }
-      result = newResult;
     }
-    if (result == null) throw new IncorrectPropertyCountException("No result found", 1, 0);
+    if (result == null)
+      throw new IncorrectPropertyCountException("No result found", 1, 0);
     return result;
   }
 
   public static <T> T findOne(Dataset dataset, ModelVisitor<T> visitor, boolean allowSame){
     return findOne(dataset, visitor, getDefaultModelSelector(), allowSame);
+  }
+
+  /**
+   * Returns the result obtained by calling the specified ModelVisitor's visit method where the
+   * result is combined with the ResultCombiner's combine method.
+   * @param dataset
+   * @param visitor
+   * @param modelSelector
+   * @param resultCombiner
+   * @param <T>
+   * @return
+   */
+  public static <T> T applyMethod(Dataset dataset, ModelVisitor<T> visitor,
+                                  ModelSelector modelSelector,
+                                  ResultCombiner<T> resultCombiner) {
+    T result = null;
+    for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();) {
+      T newResult = visitor.visit(modelIterator.next());
+      if (result != null)
+        result = resultCombiner.combine(result, newResult);
+      else
+        result = newResult;
+    }
+    return result;
+  }
+
+  public static <T> T applyMethod(Dataset dataset,
+                                  ModelVisitor<T> visitor,
+                                  ResultCombiner<T> resultCombiner) {
+    return applyMethod(dataset, visitor, getDefaultModelSelector(), resultCombiner);
   }
 
   /**

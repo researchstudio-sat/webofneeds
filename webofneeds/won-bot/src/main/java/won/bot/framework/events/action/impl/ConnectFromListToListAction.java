@@ -16,9 +16,14 @@
 
 package won.bot.framework.events.action.impl;
 
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.action.BaseEventBotAction;
+import com.hp.hpl.jena.query.Dataset;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.action.BaseEventBotAction;
+import won.bot.framework.events.event.Event;
+import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -108,13 +113,47 @@ public class ConnectFromListToListAction extends BaseEventBotAction
           if (connectHook != null){
             connectHook.onConnect(fromUri, toUri);
           }
-          getEventListenerContext().getOwnerService().connect(fromUri,toUri, WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet), null);
+
+          getEventListenerContext()
+            .getOwnerService()
+            .connect(fromUri,
+                     toUri,
+                     WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet),
+                     createWonMessage(fromUri, toUri));
         } catch (Exception e) {
           logger.warn("could not connect {} and {}", fromUri, toUri);  //throws
           logger.warn("caught exception", e);
         }
       }
     }, when);
+  }
+
+  private WonMessage createWonMessage(URI fromUri, URI toUri)
+    throws WonMessageBuilderException {
+
+    WonNodeInformationService wonNodeInformationService =
+      getEventListenerContext().getWonNodeInformationService();
+
+    Dataset localNeedRDF =
+      getEventListenerContext().getLinkedDataSource().getDataForResource(fromUri);
+    Dataset remoteNeedRDF =
+      getEventListenerContext().getLinkedDataSource().getDataForResource(toUri);
+
+    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(localNeedRDF, fromUri);
+    URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toUri);
+
+    WonMessageBuilder builder = new WonMessageBuilder();
+    return  builder
+      .setMessagePropertiesForConnect(
+        wonNodeInformationService.generateMessageEventURI(
+          fromUri, localWonNode),
+        fromFacet,
+        fromUri,
+        localWonNode,
+        toFacet,
+        toUri,
+        remoteWonNode)
+      .build();
   }
 
   public static abstract class ConnectHook{

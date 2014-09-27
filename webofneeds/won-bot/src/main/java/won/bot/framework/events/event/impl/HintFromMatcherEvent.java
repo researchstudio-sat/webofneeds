@@ -16,9 +16,9 @@
 
 package won.bot.framework.events.event.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.event.BaseEvent;
 import won.bot.framework.events.event.MessageEvent;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Match;
 
 /**
@@ -27,12 +27,12 @@ import won.protocol.model.Match;
 public class HintFromMatcherEvent extends BaseEvent  implements MessageEvent
 {
   private final Match match;
-  final Model content;
+  final WonMessage wonMessage;
 
-  public HintFromMatcherEvent(final Match match, final Model content)
+  public HintFromMatcherEvent(final Match match, final WonMessage wonMessage)
   {
     this.match = match;
-    this.content = content;
+    this.wonMessage = wonMessage;
   }
 
   public Match getMatch()
@@ -40,8 +40,8 @@ public class HintFromMatcherEvent extends BaseEvent  implements MessageEvent
     return match;
   }
 
-  public Model getContent()
+  public WonMessage getWonMessage()
   {
-    return content;
+    return wonMessage;
   }
 }

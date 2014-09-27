@@ -32,6 +32,7 @@ import won.bot.framework.events.listener.BaseEventListener;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.protocol.message.WonMessage;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
@@ -94,50 +95,50 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final Model content) throws Exception
+  public void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final WonMessage wonMessage) throws Exception
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));
+      eventBus.publish(new MessageFromOtherNeedEvent(con, message, wonMessage));
     } else {
       logger.info("not publishing event for call to onMessageFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public void onHintFromMatcher(final Match match, final Model content) throws Exception
+  public void onHintFromMatcher(final Match match, final WonMessage wonMessage) throws Exception
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new HintFromMatcherEvent(match, content));
+      eventBus.publish(new HintFromMatcherEvent(match, wonMessage));
     } else {
       logger.info("not publishing event for call to onHintFromMatcher() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage) throws Exception
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new CloseFromOtherNeedEvent(con, content));
+      eventBus.publish(new CloseFromOtherNeedEvent(con, wonMessage));
     } else {
       logger.info("not publishing event for call to onClose() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public void onOpenFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage) throws Exception
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new OpenFromOtherNeedEvent(con, content));
+      eventBus.publish(new OpenFromOtherNeedEvent(con, wonMessage));
     } else {
       logger.info("not publishing event for call to onOpenFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public void onConnectFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage) throws Exception
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new ConnectFromOtherNeedEvent(con, content));
+      eventBus.publish(new ConnectFromOtherNeedEvent(con, wonMessage));
     } else {
       logger.info("not publishing event for call to onConnectFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
