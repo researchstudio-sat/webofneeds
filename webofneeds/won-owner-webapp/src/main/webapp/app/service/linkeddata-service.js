@@ -265,7 +265,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     }
                     return somePromises(promises, function(key, reason){
                         won.reportError("could not fetch last event of connection " + conUris[key], reason);
-                    }).then(won.deleteWhereNull);
+                    }).then(function(val) { return won.deleteWhereNull(val)});
                 } catch (e) {
                     $q.reject("could not get last event of connection " + uri + ". Reason: " + e);
                 }

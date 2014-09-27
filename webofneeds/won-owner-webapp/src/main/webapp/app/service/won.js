@@ -277,6 +277,7 @@
                     i--;
                 }
             }
+            return array;
         }
 
         /**
@@ -284,7 +285,7 @@
          * @param array
          */
         won.deleteWhereNull = function(array){
-            won.deleteWhere(array, function(x){ return x == null});
+            return won.deleteWhere(array, function(x){ return x == null});
         }
 
 
