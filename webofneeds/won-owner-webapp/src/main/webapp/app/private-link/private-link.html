@@ -95,7 +95,7 @@
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
-                                    <h3 class="panel-title col-md-9">Conversation with <a href="#/post-detail" class="underline">{{chosenMessage.title}}</a></h3>  <!--TODO put parameter into url -->
+                                    <h3 class="panel-title col-md-9">Conversation with <a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a></h3>  <!--TODO put parameter into url -->
                                 </div>
                             </div>
                             <table class="table table-hover">
@@ -104,22 +104,22 @@
                                     <td>
                                         <div class="row col-lg-3">
                                             <img src="/owner/images/house.gif" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.timeStamp}}</br>{{chosenMessage.timeStamp |
-                                            date:'HH:mm'}} <!--TODO put here time-->
+                                            </br>{{chosenMessage.event.timeStamp}}</br>{{chosenMessage.event.timeStamp |date:'HH:mm'}} <!--TODO put here time-->
                                         </div>
                                         <p class="row col-lg-9 text-justify">
-                                            {{chosenMessage.msg}}
+                                            {{chosenMessage.event.hasTextMessage}}
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <p class="row col-lg-11 text-justify">
-                                            {{chosenMessage.msg}}
+                                            {{chosenMessage.event.hasTextMessage}}
                                         </p>
                                         <div class="row col-lg-1">
                                             <img src="/owner/images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.timeStamp}}</br>{{chosenMessage.timeStamp}} <!--TODO put here time-->
+                                            </br>{{chosenMessage.event
+                                            .timeStamp}}</br>{{chosenMessage.event.timeStamp}} <!--TODO put here time-->
                                         </div>
                                     </td>
                                 </tr>
@@ -155,7 +155,7 @@
                                 <div class="row">
                                     <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
                                     <h3 class="panel-title col-md-9">Request for conversation</h3>
-                                    <div class="col-md-2">{{chosenMessage.datetime | date}}</div>
+                                    <div class="col-md-2">{{chosenMessage.event.timestamp | date}}</div>
                                 </div>
                             </div>
 
@@ -180,7 +180,7 @@
                             <!-- Post exists IMPLICITLY DISPLAYED -->
                             <div ng-show="true" class="col-lg-12">
                                 <div class="row col-lg-12">
-                                    <h4 class="pull-left"><a href="#/post-detail" class="underline">{{chosenMessage.title}}</a>&nbsp;has sent you a request:</h4>
+                                    <h4 class="pull-left"><a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a>&nbsp;has sent you a request:</h4>
                                 </div>
 
                                 <div class="row col-lg-12">
@@ -193,14 +193,14 @@
                                 </div>
 
                                 <div class="row col-lg-12">
-                                    <h4 class="pull-left"><a href="#/post-detail" class="underline">{{chosenMessage.title}}</a>&nbsp;wants to connect to this post:</h4>
+                                    <h4 class="pull-left"><a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a>&nbsp;wants to connect to this post:</h4>
                                 </div>
 
                                 <div class="row col-lg-12">
                                     <div class="media">
                                         <img class="thumbnail thumbnail-size media-object pull-left" src="/owner/images/need.jpg"/>
                                         <div class="media-body">
-                                            <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.title}}</a>
+                                            <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.remoteNeed.title}}</a>
                                             <p class="text-justify">
                                                 Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
                                                 Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
@@ -230,7 +230,7 @@
                             <!-- Post does not exist NOT DISPLAYED NOW -->
                             <div ng-show="false" class="col-lg-12">
                                 <div class="row col-lg-12">
-                                    <h4 class="pull-left">Re:&nbsp;{{chosenMessage.title}}&nbsp;has sent you a request:</h4>
+                                    <h4 class="pull-left">Re:&nbsp;{{chosenMessage.remoteNeed.title}}&nbsp;has sent you a request:</h4>
                                 </div>
 
                                 <div class="row col-lg-12">
@@ -260,13 +260,13 @@
                                 <div class="row">
                                     <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
                                     <h3 class="panel-title col-md-9">Request for conversation</h3>
-                                    <div clss="col-md-2">{{chosenMessage.datetime | date}}</div>
+                                    <div clss="col-md-2">{{chosenMessage.event.timestamp | date}}</div>
                                 </div>
                             </div>
 
                             <div class="col-lg-12">
                                 <div class="row col-lg-12">
-                                    <h4 class="pull-left">Waiting for reply from&nbsp;<a href="#/post-detail" class="underline">{{chosenMessage.title}}</a></h4>
+                                    <h4 class="pull-left">Waiting for reply from&nbsp;<a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a></h4>
                                 </div>
 
                                 <div class="row col-lg-12">
@@ -288,7 +288,7 @@
                                     <div class="media">
                                         <img class="thumbnail thumbnail-size media-object pull-left" src="/owner/images/need.jpg"/>
                                         <div class="media-body">
-                                            <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.title}}</a>
+                                            <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.remoteNeed.title}}</a>
                                             <p class="text-justify">
                                                 Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
                                                 Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
@@ -331,7 +331,7 @@
                                 <div class="row">
                                     <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
                                     <h3 class="panel-title col-md-9">New match found!</h3>
-                                    <div class="col-md-2">{{chosenMessage.timeStamp | date}}</div>
+                                    <div class="col-md-2">{{chosenMessage.event.timeStamp | date}}</div>
                                 </div>
                             </div>
 
@@ -339,9 +339,10 @@
                                 <div class="media">
                                     <img class="thumbnail thumbnail-size media-object pull-left" src="/owner/images/need.jpg"/>
                                     <div class="media-body">
-                                        <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.title}}</a>
+                                        <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.remoteNeed.title}}</a>
                                         <p class="text-justify">
-                                            {{chosenMessage.otherNeed.textDescription}} (<a href="#/post-detail/">go to
+                                            {{chosenMessage.remoteNeed.textDescription}} (<a href="#/post-detail/">go
+                                            to
                                             full description</a>).
                                             <!-- TODO link needs to be extended by parameters -->
                                         </p>
