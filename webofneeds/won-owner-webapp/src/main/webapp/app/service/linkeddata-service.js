@@ -108,7 +108,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         var deferreds = privateData.deferredsForUrisBeingFetched[uri]
         if (deferreds != null) {
             for (key in deferreds){
-                deferreds[key].reject(value);
+                deferreds[key].reject("failed to load uri: " + uri +". Reason: "+ value);
             }
         }
         delete privateData.deferredsForUrisBeingFetched[uri];
@@ -130,6 +130,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (first) {
             //actually do load data
             try {
+                console.log("fetching linked data: " + uri);
                 privateData.store.load('remote', uri, function (success, results) {
                     $rootScope.$apply(function() {
                         if (success) {
@@ -230,13 +231,16 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
                     if (!success) {
                         $q.reject("query for need " + uri + " failed.");
+                        return;
                     }
                     //use only first result!
                     if (results.length == 0) {
                         $q.reject("query for need " + uri + " returned no results");
+                        return;
                     }
                     if (results.length > 1) {
                         $q.reject("query for need " + uri + " returned more than one result");
+                        return;
                     }
                     var result = results[0];
 
@@ -249,7 +253,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 });
                 return resultObject;
             } catch (e){
-                return $q.reject("could not load need " + uri + ". Reason: " + e);
+                $q.reject("could not load need " + uri + ". Reason: " + e);
             }
         });
     }
