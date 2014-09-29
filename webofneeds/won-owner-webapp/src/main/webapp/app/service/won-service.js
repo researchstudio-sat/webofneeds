@@ -254,20 +254,23 @@ angular.module('won.owner').factory('wonService', function (
         return deferred.promise;
     }
 
+    /**
+     * Creates a connection on behalf of need1 to need2. If a connection between the same facets
+     * as defined here already exists, the WoN node will return an error message.
+     * @param need1
+     * @param need2
+     */
     wonService.connect = function(need1, need2){
 
         var sendConnect = function(need1, need2, wonNodeUri1, wonNodeUri2) {
-
+            //TODO: use event URI pattern specified by WoN node
             var eventUri = wonNodeUri1+ "/event/" +  utilService.getRandomInt(1,9223372036854775807);
             var message = new won.ConnectMessageBuilder()
-                .addMessageGraph()
-                .eventURI(eventUri)  //TODO: generate event URI here
+                .eventURI(eventUri)
                 .hasSenderNeed(need1)
                 .hasSenderNode(wonNodeUri1)
                 .hasReceiverNeed(need2)
                 .hasReceiverNode(wonNodeUri2)
-                .sender()
-                .receiver()
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {
@@ -305,6 +308,58 @@ angular.module('won.owner').factory('wonService', function (
                         sendConnect(need1, need2, wonNodeUri1, wonNodeUri2);
                     }
                 );
+            });
+
+    }
+
+    /**
+     * Opens the existing connection specified by connectionUri.
+     * @param need1
+     * @param need2
+     */
+    wonService.open = function(needUri, connectionUri){
+
+        var sendOpen = function(needUri, connectionUri, wonNodeUri) {
+            //TODO: use event URI pattern specified by WoN node
+            var eventUri = wonNodeUri+ "/event/" +  utilService.getRandomInt(1,9223372036854775807);
+            var message = new won.MessageBuilder(won.WONMSG.openMessage)
+                .eventURI(eventUri)
+                .hasSender(connectionUri)
+                .hasSenderNode(wonNodeUri)
+                .hasSenderNeed(needUri)
+                .build();
+            var callback = new messageService.MessageCallback(
+                function (event, msg) {
+                    //check if the message we got (the create need response message) indicates that all went well
+                    console.log("got connect needs message response! TODO: check for connect response!");
+                    //TODO: if negative, use alternative need URI and send again
+                    //TODO: if positive, propagate positive response back to caller
+                    //TODO: fetch need data and store in local RDF store
+                    this.done = true;
+                    //WON.CreateResponse.equals(messageService.utils.getMessageType(msg)) &&
+                    //messageService.utils.getRefersToURIs(msg).contains(messageURI)
+
+                });
+            callback.done = false;
+            callback.shouldHandleTest = function (msg) {
+                return true;
+            };
+            callback.shouldUnregisterTest = function(msg) {
+                return this.done;
+            };
+
+            messageService.addMessageCallback(callback);
+            try {
+                messageService.sendMessage(message);
+            } catch (e) {
+                console.log("could not open " + connectionUri + ". Reason" + e);
+            }
+        }
+
+        //fetch the won nodes of both needs
+        linkedDataService.getWonNodeOfNeed(needUri).then(
+            function (wonNodeUri) {
+                    sendOpen(needUri, connectionUri, wonNodeUri);
             });
 
     }
