@@ -17,7 +17,13 @@
 /**
  * Created by syim on 08.08.2014.
  */
-angular.module('won.owner').factory('wonService', function (messageService, $q, linkedDataService, $rootScope,applicationStateService) {
+angular.module('won.owner').factory('wonService', function (
+    messageService,
+    $q,
+    linkedDataService,
+    $rootScope,
+    applicationStateService,
+    utilService) {
 
     var wonService = {};
 
@@ -174,9 +180,15 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
      */
     wonService.createNeed = function(needAsJsonLd) {
         var deferred = $q.defer();
-        var message = new won.CreateMessageBuilder(needAsJsonLd)
-            .eventURI("34543242134")//TODO: generate event URI here
-            .hasReceiverNode("http://localhost:8080/won")//TODO: pass node to function
+        var needData = won.clone(needAsJsonLd);
+        var eventUri = "http://localhost:8080/won/resource/event/" + utilService.getRandomInt(1,9223372036854775807);
+        var needUri = "http://localhost:8080/won/resource/need/" + utilService.getRandomInt(1,9223372036854775807);
+        var wonNode = "http://localhost:8080/won";
+        needData['@graph'][0]['@id'] = needUri + "/core/#data";
+        needData['@graph'][0]['@graph'][0]['@id'] = needUri;
+        var message = new won.CreateMessageBuilder(needData)
+            .eventURI(eventUri)//TODO: generate event URI here
+            .hasReceiverNode(wonNode)//TODO: pass node to function
             .build();
 
 
@@ -242,48 +254,59 @@ angular.module('won.owner').factory('wonService', function (messageService, $q, 
         return deferred.promise;
     }
 
-    wonService.connect = function(connectionAsJsonLd, need1, need2){
-        var deferred = $q.defer();
-        var message = new won.ConnectMessageBuilder(connectionAsJsonLd)
-            .addMessageGraph()
-            .eventURI("2345432343")  //TODO: generate event URI here
-            .hasSenderNeed(need1)
-            .hasSenderNode("http://localhost:8080/won")
-            .hasReceiverNeed(need2)
-            .hasReceiverNode("http://localhost:8080/won")
-            .sender()
-            .receiver()
-            .build();
-        var callback = new messageService.MessageCallback(
-            function (event, msg) {
-                //check if the message we got (the create need response message) indicates that all went well
-                console.log("got connect needs message response!");
-                //TODO: if negative, use alternative need URI and send again
-                //TODO: if positive, propagate positive response back to caller
-                //TODO: fetch need data and store in local RDF store
-                this.done = true;
-                //WON.CreateResponse.equals(messageService.utils.getMessageType(msg)) &&
-                //messageService.utils.getRefersToURIs(msg).contains(messageURI)
+    wonService.connect = function(need1, need2){
 
-                //assume we can obtain a need URI and return it
-                var connectionURI = "sadf"; //TODO: get needURI from result
-                deferred.resolve(connectionURI);
-            });
-        callback.done = false;
-        callback.shouldHandleTest = function (msg) {
-            return true;
-        };
-        callback.shouldUnregisterTest = function(msg) {
-            return this.done;
-        };
+        var sendConnect = function(need1, need2, wonNodeUri1, wonNodeUri2) {
 
-        messageService.addMessageCallback(callback);
-        try {
-            messageService.sendMessage(message);
-        } catch (e) {
-            deferred.reject(e);
+            var eventUri = wonNodeUri1+ "/event/" +  utilService.getRandomInt(1,9223372036854775807);
+            var message = new won.ConnectMessageBuilder()
+                .addMessageGraph()
+                .eventURI(eventUri)  //TODO: generate event URI here
+                .hasSenderNeed(need1)
+                .hasSenderNode(wonNodeUri1)
+                .hasReceiverNeed(need2)
+                .hasReceiverNode(wonNodeUri2)
+                .sender()
+                .receiver()
+                .build();
+            var callback = new messageService.MessageCallback(
+                function (event, msg) {
+                    //check if the message we got (the create need response message) indicates that all went well
+                    console.log("got connect needs message response! TODO: check for connect response!");
+                    //TODO: if negative, use alternative need URI and send again
+                    //TODO: if positive, propagate positive response back to caller
+                    //TODO: fetch need data and store in local RDF store
+                    this.done = true;
+                    //WON.CreateResponse.equals(messageService.utils.getMessageType(msg)) &&
+                    //messageService.utils.getRefersToURIs(msg).contains(messageURI)
+
+                });
+            callback.done = false;
+            callback.shouldHandleTest = function (msg) {
+                return true;
+            };
+            callback.shouldUnregisterTest = function(msg) {
+                return this.done;
+            };
+
+            messageService.addMessageCallback(callback);
+            try {
+                messageService.sendMessage(message);
+            } catch (e) {
+               console.log("could not connect " + need1 + " and " + need2 + ". Reason" + e);
+            }
         }
-        return deferred.promise;
+
+        //fetch the won nodes of both needs
+        linkedDataService.getWonNodeOfNeed(need1).then(
+            function (wonNodeUri1) {
+                return linkedDataService.getWonNodeOfNeed(need2).then(
+                    function(wonNodeUri2){
+                        sendConnect(need1, need2, wonNodeUri1, wonNodeUri2);
+                    }
+                );
+            });
+
     }
 
 

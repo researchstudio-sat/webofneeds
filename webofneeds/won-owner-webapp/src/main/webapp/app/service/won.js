@@ -151,8 +151,12 @@
         won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
         won.WONMSG.EnvelopeGraph = won.WONMSG.baseUri + "EnvelopeGraph";
         won.WONMSG.EnvelopeGraphCompacted = won.WONMSG.prefix+ ":EnvelopeGraph";
+        won.WONMSG.hasContent = won.WONMSG.baseUri + "hasContent";
+        won.WONMSG.hasContentCompacted = won.WONMSG.prefix+ ":hasContent";
 
         //message types
+        won.WONMSG.createMessage = won.WONMSG.baseUri + "CreateMessage";
+        won.WONMSG.createMessageCompacted = won.WONMSG.prefix + ":CreateMessage";
         won.WONMSG.hintMessage = won.WONMSG.baseUri + "HintMessage";
         won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
         won.WONMSG.connectMessage = won.WONMSG.baseUri + "ConnectMessage";
@@ -264,6 +268,11 @@
             }
         }
 
+        //helper function: is x an array?
+        won.isArray = function(x){
+            return Object.prototype.toString.call( x ) === '[object Array]';
+        }
+
         /**
          * Deletes every element of the array for which the
          * test function returns true.
@@ -288,10 +297,13 @@
             return won.deleteWhere(array, function(x){ return x == null});
         }
 
-
+        won.minimalContext = {
+            "msg": "http://purl.org/webofneeds/message#",
+            "won": "http://purl.org/webofneeds/model#",
+            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        }
 
         won.defaultContext = {
-                "@base": "http://www.example.com/resource/need/randomNeedID_1",
                 "webID": "http://www.example.com/webids/",
                 "msg": "http://purl.org/webofneeds/message#",
                 "dc": "http://purl.org/dc/elements/1.1/",
@@ -324,13 +336,19 @@
                 //collect graph URIs in the specified dataset
                 var graphs = data["@graph"]
                 var graphURIs = [];
-                if (graphs != null && typeof graphs.length === 'Array' && graphs.length > 0)
+                if (graphs == null) {
+                    return graphURIs;
+                }
+                if (won.isArray(graphs) && graphs.length > 0) {
                     for (var i = 0; i < graphs.length; i++){
                         var graphURI = graphs[i]['@id'];
                         if (graphURI != null){
                             graphURIs.push(graphURI);
                         }
                     }
+                } else if (typeof graphs === 'object' && graphs["@graph"] != null){
+                    return won.JsonLdHelper.getGraphNames(graphs['@graph']);
+                }
                 return graphURIs;
             },
 
@@ -388,6 +406,44 @@
                 return data["@context"];
             }
         }
+
+        /**
+         * Adds the message graph to the json-ld structure 'builder.data' with
+         * the specified messageType
+         * and adds all specified graph URIs (which must be URIs of the
+         * graphs to be added as content of the message) with triples
+         * [message] wonmsg:hasContent [graphURI]
+         * @param graphURIs
+         * @returns {won.CreateMessageBuilder}
+         */
+        won.addMessageGraph = function (builder, graphURIs, messageType) {
+            graphs = builder.data['@graph'];
+            //add the default graph to the graphs of the builder
+            graphs.push(
+                {
+                    "@graph": [],
+                    "@id":"@default"
+                });
+
+            //create the message graph, containing the message type
+            var messageGraph = {
+                "@graph": [ {"msg:hasMessageType": {'@id':messageType}}]
+            };
+            //add a won:hasContent triple for each specified graphURI into the message graph
+            if (typeof graphURIs == 'object' && graphURIs.length > 0){
+                var contentGraphURIs = [];
+                for (var i = 0; i < graphURIs.length; i++) {
+                    contentGraphURIs.push({'@id':graphURIs[i]});
+                    //workaround for a suspected bug in jena's jsonld reader: multiple properties specified as array not supported?
+                    messageGraph["@graph"][0][won.WONMSG.hasContentCompacted] = {'@id' : graphURIs[i]};
+                }
+                //messageGraph["@graph"][0][won.WONMSG.hasContentCompacted] = contentGraphURIs;
+            }
+            //add the message graph to the graphs of the builder
+            graphs.push(messageGraph);
+            //point to the messagegraph so we can later access it easily for modifications
+            builder.messageGraph = messageGraph;
+        };
 
         /*
          * Creates a JSON-LD representation of the need data provided through builder functions.
@@ -532,15 +588,7 @@
                 this.getContentNode()["won:hasTextDescription"] = description;
                 return this;
             },
-            needURI: function (needURI) {
-                this.getContext()["@base"] = needURI;
-                this.getMainNode()["@id"] = needURI;
-                this.data["@graph"][0]["@id"] = needURI + "/core#data";
-                this.getNeedURI = function (){
-                    return this.getContext()["@base"];
-                }
-                return this;
-            },
+
             title: function (title) {
                 this.getContentNode()["dc:title"] = title;
                 return this;
@@ -628,65 +676,25 @@
 
         won.CreateMessageBuilder = function CreateMessageBuilder(dataset) {
 
-
-
-            /**
-             * Adds the message graph to the json-ld structure 'this.data',
-             * and adds all specified graph URIs (which must be URIs of the
-             * graphs to be added as content of the message) with triples
-             * [message] wonmsg:hasContent [graphURI]
-             * @param graphURIs
-             * @returns {won.CreateMessageBuilder}
-             */
-            addMessageGraph = function (builder, graphURIs) {
-                graphs = builder.data['@graph'];
-                //add the default graph to the graphs of the builder
-                graphs.push(
-                    {
-                        "@graph": [],
-                        "@id":"@default"
-                    });
-
-                //create the message graph, containing the message type
-                var messageGraph = {
-                    "@graph": [ {"msg:hasMessageType": "msg:CreateMessage"}]
-                };
-                //add a won:hasContent triple for each specified graphURI into the message graph
-                if (typeof graphURIs == 'object' && graphURIs.length > 0){
-                    var contentGraphURIs = [];
-                    for (var i = 0; i < graphURIs.length; i++) {
-                        contentGraphURIs.push({'@id':graphURIs[i]});
-                    }
-                    messageGraph[won.WONMSG.hasContentCompacted] = contentGraphURIs;
-                }
-                //add the message graph to the graphs of the builder
-                graphs.push(messageGraph);
-                //point to the messagegraph so we can later access it easily for modifications
-                builder.messageGraph = messageGraph;
-            };
-
             this.data = won.clone(dataset);
             this.messageGraph = null;
-            addMessageGraph(this, won.JsonLdHelper.getGraphNames(dataset));
+            won.addMessageGraph(this, won.JsonLdHelper.getGraphNames(dataset), won.WONMSG.createMessage);
             //add the sender need
-            this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":this.data["@context"]["@base"]};
+            this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":dataset['@graph'][0]['@graph'][0]['@id']};
         };
 
         won.CreateMessageBuilder.prototype = {
             constructor: won.CreateMessageBuilder,
 
-            eventURI: function (eventId) {
+            eventURI: function (eventUri) {
                 won.JsonLdHelper.getContext(this.data)["msg:EnvelopeGraph"]= {
                     "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
                     "@type": "@id"
                 };
-                // ToDo (FS): remove hard coded base
-//                won.JsonLdHelper.getDefaultGraph(this.data).push({"@id":this.data["@context"]["@base"] + "/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
-//                this.getMessageEventNode()['@id'] =this.data["@context"]["@base"] +"/event/"+eventId;
-//                this.getMessageEventGraph()['@id'] = this.data["@context"]["@base"] +"/event/"+eventId+"#data";
-                won.JsonLdHelper.getDefaultGraph(this.data).push({"@id":"http://localhost:8080/won/resource/event/" + eventId + "#data", "@type": "msg:EnvelopeGraph" });
-                this.getMessageEventNode()['@id'] = "http://localhost:8080/won/resource/event/" + eventId;
-                this.getMessageEventGraph()['@id'] = "http://localhost:8080/won/resource/event/" + eventId + "#data";
+
+                won.JsonLdHelper.getDefaultGraph(this.data).push({"@id":eventUri+"#data", "@type": "msg:EnvelopeGraph" });
+                this.getMessageEventNode()['@id'] = eventUri;
+                this.getMessageEventGraph()['@id'] = eventUri+"#data";
                 return this;
             },
             hasReceiverNode: function(receiverNodeURI){
@@ -704,75 +712,20 @@
             }
         }
 
-        won.ConnectionBuilder = function ConnectionBuilder(data){
-            if (data != null && data != undefined) {
-                this.data = won.clone(data);
-            } else {
-                this.data =
+        won.ConnectMessageBuilder = function ConnectMessageBuilder(){
+            this.data =
                 {
                     "@graph": [
-                        {
-                            "@graph": [
-                                {
-                                    "@type": "won:Connection"
-                                }
-                            ]
-                        }
-                    ]
-                };
-            }
-        }
 
-        won.ConnectionBuilder.prototype = {
-            constructor: won.ConnectionBuilder,
-            setContext: function(){
-                this.data["@context"] = won.defaultContext;
-
-                return this;
-            },
-            getContext: function () {               //TODO inherit from base buiilder
-                return this.data["@context"];
-            },
-            getConnectionGraph: function(){
-                return this.data["@graph"][0]["@graph"];
-            },
-            getMainNode: function () {
-                return this.data["@graph"][0]["@graph"][0];
-            },
-            connectionURI: function (connectionURI) {
-                this.getContext()["@base"] = connectionURI;
-                this.getMainNode()["@id"] = connectionURI;
-                this.data["@graph"][0]["@id"] = connectionURI + "/core#data";
-                return this;
-            },
-            build: function () {
-                console.log("built this data:" + JSON.stringify(this.data));
-                return this.data;
-            }
-        }
-
-        won.ConnectMessageBuilder = function ConnectMessageBuilder(dataset){
-            this.data = won.clone(dataset);
+                    ],
+                    "@context" : won.clone(won.minimalContext)
+                }
+            won.addMessageGraph(this, null, won.WONMSG.connectMessageCompacted);
         };
 
         won.ConnectMessageBuilder.prototype = {
             constructor: won.ConnectMessageBuilder,
 
-                addMessageGraph: function () {
-                this.data['@graph'][1] =
-                {
-                    "@id": "urn:x-arq:DefaultGraphNode",
-                    "@graph": []
-                };
-                this.data['@graph'][2] = {
-                    "@graph": [
-                        {
-                            "msg:hasMessageType": "msg:ConnectMessage"
-                        }
-                    ]
-                }
-                return this;
-            },
             eventURI: function (eventId) {      //TODO: inherit from base class
                 this.getContext()["msg:EnvelopeGraph"]= {
                     "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
@@ -816,10 +769,10 @@
                 return this;
             },
             getMessageEventGraph: function (){
-                return this.data["@graph"][2];
+                return this.messageGraph;
             },
             getMessageEventNode: function () {
-                return this.data["@graph"][2]["@graph"][0]
+                return this.getMessageEventGraph()["@graph"][0];
             },
             build: function () {
                 console.log("built this message:" + JSON.stringify(this.data));

@@ -263,30 +263,14 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
             if (wonNodeUri == null) need.setWonNodeURI(URI.create(wonNodeDefault));
             else need.setWonNodeURI(wonNodeUri);
             needRepository.save(need);
-
-            ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
-            if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
-
-            Resource needRes = needIt.next();
-            logger.debug("processing need resource {}", needRes.getURI());
-
-            StmtIterator stmtIterator = content.listStatements(needRes, WON.HAS_FACET, (RDFNode) null);
-            if (!stmtIterator.hasNext())
-              throw new IllegalArgumentException("at least one RDF node must be of type won:HAS_FACET");
-            else
-              do {
-                Facet facet = new Facet();
-                facet.setNeedURI(need.getNeedURI());
-                facet.setTypeURI(URI.create(stmtIterator.next().getObject().asResource().getURI()));
-                facetRepository.save(facet);
-              } while (stmtIterator.hasNext());
             //now that we're done, let our callers know the URI
             result.set(need.getNeedURI());
           } catch (Exception e) {
-              logger.info("Error creating need {}. Stacktrace follows", need);
-              logger.warn("Error creating need", e);
-              result.cancel(true);
+            logger.warn("error while processing result of createNeed call", e);
+            result.setException(e);
+            result.cancel(true);
           }
+
         }
       }
     );

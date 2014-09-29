@@ -258,6 +258,36 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         });
     }
 
+    linkedDataService.getWonNodeOfNeed = function(needUri){
+        return linkedDataService.ensureLoaded(needUri).then(
+          function(){
+            try{
+                resultData = {};
+                privateData.store.node(needUri, function(success, graph){
+                    if (!success) {
+                        $q.reject("failed to load node " + needUri);
+                        return;
+                    }
+                    if (graph.triples.length == 0){
+                        $q.reject("loading node " + needUri + " returned an empty graph");
+                        return;
+                    }
+                    var results = graph.match(needUri, won.WON.hasWonNode, null);
+                    if (results.length == 0){
+                        $q.reject("loading won:hasWonNode triples " + needUri + " returned no triples");
+                        return;
+                    }
+                    resultData.wonNodeUri = results[0].object.nominalValue;
+                });
+                return resultData.wonNodeUri;
+            } catch (e){
+                $q.reject("could not get WoN node for need " + needUri + ". Reason: " + e);
+            }
+            $q.reject("unable to load WoN node for need " + needUri);
+          }
+        );
+    }
+
 
     linkedDataService.getLastEventOfEachConnectionOfNeed = function(uri) {
         return linkedDataService.getConnectionURIsOfNeed(uri)

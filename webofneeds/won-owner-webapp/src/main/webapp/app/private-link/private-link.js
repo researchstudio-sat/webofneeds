@@ -6,7 +6,7 @@
  * To change this template use File | Settings | File Templates.
  */
 angular.module('won.owner')
-    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService) {
+    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService, wonService) {
 
     $scope.need = {};
     $scope.events = [];
@@ -390,6 +390,7 @@ angular.module('won.owner')
 
     $scope.clickOnSendRequestMessage = function() {
         console.log('send request message');
+        wonService.connect($scope.need.uri, $scope.chosenMessage.remoteNeed.uri);
         $scope.showMatchControl = false;
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');

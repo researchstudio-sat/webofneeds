@@ -78,10 +78,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     }
     privateData.unreadObjects = prepareEmptyUnreadObjects();
 
-    //helper function: is x an array?
-    var isArray = function(x){
-        return Object.prototype.toString.call( x ) === '[object Array]';
-    }
+
 
     /**
      * filters the array of js objects by testing if all the dictionary values found in data are
@@ -98,7 +95,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
                 if (array[i][field] === 'undefined'){
                     continue;
                 }
-                if (isArray(data[field])){
+                if (won.isArray(data[field])){
                     for (var j = 0; j < data[field].length; j++){
                         if (array[i][field] === data[field][j] ){
                             ret.push(array[i]);

@@ -353,10 +353,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 			$scope.successShow = true;
 		}); */
 
-        var needRandomId = utilService.getRandomInt(1,9223372036854775807);
-        var needURI = $scope.wonNodeURI+$scope.needURIPath+"/"+needRandomId;
-        console.log(needURI);
-
         // creating need object
         var needBuilderObject = new window.won.NeedBuilder().setContext();
         if ($scope.need.basicNeedType == 'DEMAND') {
@@ -370,7 +366,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         }
 
         needBuilderObject.title($scope.need.title)
-            .needURI(needURI)
             .ownerFacet()               // mandatory
             .description($scope.need.textDescription)
             .hasTag($scope.need.tags)
