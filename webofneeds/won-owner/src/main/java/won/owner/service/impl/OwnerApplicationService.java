@@ -29,7 +29,6 @@ import won.protocol.vocabulary.WONMSG;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -204,17 +203,8 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
       case OPEN:
         try {
-
-          senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
-          URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
-
-          List<Connection> connections =
-            connectionRepository.findByNeedURIAndRemoteNeedURI(senderNeedURI, receiverNeedURI);
-
-          URI connectionURI = connections.get(0).getConnectionURI();
-
+          URI connectionURI = wonMessage.getMessageEvent().getSenderURI();
           content = wonMessage.getMessageEvent().getModel();
-
           ownerProtocolService.open(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
@@ -223,17 +213,8 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
       case CLOSE:
         try {
-
-          senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
-          URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
-
-          List<Connection> connections =
-            connectionRepository.findByNeedURIAndRemoteNeedURI(senderNeedURI, receiverNeedURI);
-
-          URI connectionURI = connections.get(0).getConnectionURI();
-
+          URI connectionURI = wonMessage.getMessageEvent().getSenderURI();
           content = wonMessage.getMessageEvent().getModel();
-
           ownerProtocolService.close(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
@@ -243,16 +224,8 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       case CONNECTION_MESSAGE:
         try {
 
-          senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
-          URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
-
-          List<Connection> connections =
-            connectionRepository.findByNeedURIAndRemoteNeedURI(senderNeedURI, receiverNeedURI);
-
-          URI connectionURI = connections.get(0).getConnectionURI();
-
+          URI connectionURI = wonMessage.getMessageEvent().getSenderURI();
           content = wonMessage.getMessageEvent().getModel();
-
           ownerProtocolService.sendConnectionMessage(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
