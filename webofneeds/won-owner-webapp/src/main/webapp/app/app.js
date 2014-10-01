@@ -14,7 +14,14 @@
  *    limitations under the License.
  */
 
-app = angular.module('won.owner', ['ui.bootstrap', 'ngRoute', 'ui.map', 'blueimp.fileupload', 'ngMockE2E', 'smart-table']).config(function ($routeProvider, $httpProvider, $provide) {
+app = angular.module('won.owner',
+        [ 'ui.bootstrap'
+        , 'ngRoute'
+        , 'ui.map'
+        , 'blueimp.fileupload'
+        , 'ngMockE2E'
+        , 'smart-table'
+        ]).config(function ($routeProvider, $httpProvider, $provide) {
 	$routeProvider.
 			when('/', {controller : 'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
 			when('/signin', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).

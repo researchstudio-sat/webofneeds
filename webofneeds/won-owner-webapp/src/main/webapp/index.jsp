@@ -87,6 +87,8 @@
 		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
 
+        <script type="text/javascript" src="<c:url value="/app/register/register.js"/>"></script>
+
 	<script type="text/javascript" src="<c:url value="/app/why-use/why-use.js"/>"></script>
 	<script type="text/javascript" src="<c:url value="/app/forgot-pwd/forgot-pwd.js"/>"></script>
 	<script type="text/javascript" src="<c:url value="/app/forgot-pwd/enter-new-pwd.js"/>"></script>
@@ -258,7 +260,46 @@
 			</ul>
 					<ul class="nav navbar-nav navbar-right" ng-cloak>
                         <li><span ng-show="checkRegistered()">{{message}}</span></li>
+				<!-- OLD version with redirect:
 				<li ng-show="showPublic()" ng-class="isActive('register')"><a href="#/register">Sign up&nbsp;<span class="caret"/></a></li>
+				-->
+                <li ng-show="showPublic()" ng-class="isActive('register')">
+                    <!--tooltip="fooooooo" tooltip-placement="bottom"-->
+                    <a href="javascript:void(0);" html="true" popover-placement="bottom" popover="harhar! <form><input type='text' value='foo'></form> asdf">
+                        Sign up&nbsp;<span class="caret"/>
+                    </a>
+                </li>
+                <li ng-show="showPublic()" ng-class="isActive('register')">
+                    <!--tooltip="fooooooo" tooltip-placement="bottom"-->
+                    <a href="javascript:void(0);" html="true" popover-placement="bottom"
+                       popover-html-unsafe="<h1>unsafe foooo</h1>"
+                       popover="<h1>normal foooo</h1>"
+                       popover-template="test/dummytemplate.html"
+                       templateUrl="app/home/home.partial.html">
+                        TestFoo&nbsp;<span class="caret"/>
+                    </a>
+                </li>
+                        <!--https://github.com/angular-ui/bootstrap/issues/220 proof-of-concept is in head-->
+                        <!-- use a modal (overlay, needs to be cancelled to do other stuff) -->
+                <li>
+                   <a tooltip-html-unsafe="<strong>Hello!</strong">Hover!</a>
+                </li>
+                <li ng-controller="ModalDemoCtrl">
+                    <button class="btn btn-default" ng-click="open()">Open me!</button>
+                    <!--<button class="btn btn-default" ng-click="open('lg')">Large modal</button>
+                    <button class="btn btn-default" ng-click="open('sm')">Small modal</button>
+                    <div ng-show="selected">Selection from a modal: {{ selected }}</div>-->
+                </li>
+
+                <!--<div class="popover bottom" ng-class="{ in: isOpen(), fade: animation() }">
+                  <div class="arrow"></div>
+                  <div class="popover-inner">
+                      <h3 class="popover-title" ng-bind="title" ng-show="title"></h3>
+                      <div class="popover-content" ng-bind="content"></div>
+                  </div>
+                </div>-->
+
+
 				<li ng-show="showPublic()" ng-class="isActive('signin')"><a href="#/signin">Sign in&nbsp;<span class="caret"/></a></li>
 				<!--<li ng-show="!showPublic()"><a href="#/need-list">{{userdata.username}}</a></li>
 										<li ng-show="!showPublic()"><a href="" ng-click="onClickSignOut()">Sign out</a></li>     -->
