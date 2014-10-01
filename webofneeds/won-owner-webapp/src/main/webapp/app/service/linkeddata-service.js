@@ -114,6 +114,37 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         delete privateData.deferredsForUrisBeingFetched[uri];
     }
 
+    /**
+     * Checks the query results (success, data) as returned by store.execute or store.node
+     * and assuming that we are inside a deferred execution, calls $q.reject if the
+     * query failed.
+     * returns: true if a reject happened, false otherwise
+     * options: object with the following keys:
+     * * allowNone: boolean - if false, empty data is an error
+     * * allowMultiple: boolean - if false, more than one result in data is an error
+     * * message: string - if set, the message is prepended to the generic error message (with 1 whitespace in between)
+     */
+    var rejectIfFailed = function(success, data, options){
+        var errorMessage = null;
+        if (options == null) {
+            options = {};
+        }
+        if (!options.message){
+            options.message = "Query failed.";
+        }
+        if (!success){
+            errorMessage = "Query failed.";
+        } else if (typeof options.allowNone !== undefined  && options.allowNone == false && data.length == 0){
+            errorMessage = "No results found.";
+        } else if (typeof options.allowMultiple !== undefined  && options.allowMultiple == false && data.length > 1){
+            errorMessage = "More than one result found.";
+        }
+        if (errorMessage != null){
+            $q.reject(options.message + " " + errorMessage);
+            return true;
+        }
+        return false;
+    }
 
 
     /**
@@ -228,22 +259,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     "}}";
                 resultObject = {};
                 privateData.store.execute(query, [], [], function (success, results) {
-
-                    if (!success) {
-                        $q.reject("query for need " + uri + " failed.");
-                        return;
-                    }
-                    //use only first result!
-                    if (results.length == 0) {
-                        $q.reject("query for need " + uri + " returned no results");
-                        return;
-                    }
-                    if (results.length > 1) {
-                        $q.reject("query for need " + uri + " returned more than one result");
+                    if (rejectIfFailed(success, results,{message : "Could not load need " + uri +".", allowNone : false, allowMultiple: false})){
                         return;
                     }
                     var result = results[0];
-
                     resultObject.uri = uri;
                     resultObject.basicNeedType = getSafeValue(result.basicNeedType);
                     resultObject.title = getSafeValue(result.title);
@@ -258,38 +277,111 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         });
     }
 
-    linkedDataService.getWonNodeOfNeed = function(needUri){
-        return linkedDataService.ensureLoaded(needUri).then(
-          function(){
-            try{
-                resultData = {};
-                privateData.store.node(needUri, function(success, graph){
-                    if (!success) {
-                        $q.reject("failed to load node " + needUri);
-                        return;
-                    }
-                    if (graph.triples.length == 0){
-                        $q.reject("loading node " + needUri + " returned an empty graph");
-                        return;
-                    }
-                    var results = graph.match(needUri, won.WON.hasWonNode, null);
-                    if (results.length == 0){
-                        $q.reject("loading won:hasWonNode triples " + needUri + " returned no triples");
-                        return;
-                    }
-                    if (results.length > 1){
-                        $q.reject("loading won:hasWonNode triples " + needUri + " returned more than 1 triple: " + JSON.stringify(results.triples));
-                        return;
-                    }
-                    resultData.wonNodeUri = results.triples[0].object.nominalValue;
-                });
-                return resultData.wonNodeUri;
-            } catch (e){
-                $q.reject("could not get WoN node for need " + needUri + ". Reason: " + e);
-            }
-            $q.reject("unable to load WoN node for need " + needUri);
-          }
-        );
+    /**
+     * Utility method that first ensures the resourceURI is locally loaded, then fetches the object of the
+     * specified property, which must be present only once.
+     * @param resourceURI
+     * @param propertyURI
+     * @returns {*}
+     */
+    linkedDataService.getUniqueObjectOfProperty = function(resourceURI, propertyURI){
+        return linkedDataService.ensureLoaded(resourceURI)
+            .then(function () {
+                try {
+                    var resultData = {};
+                    privateData.store.node(resourceURI, function (success, graph) {
+                        if (rejectIfFailed(success, graph,{message : "Error loading object of property " + propertyURI + " of resource " + resourceURI + ".", allowNone : false, allowMultiple: true})){
+                            return;
+                        }
+                        var results = graph.match(resourceURI, propertyURI, null);
+                        if (rejectIfFailed(success, results,{message : "Error loading object of property " + propertyURI + " of resource " + resourceURI + ".", allowNone : false, allowMultiple: false})){
+                            return;
+                        }
+                        resultData.result = results.triples[0].object.nominalValue;
+                    });
+                    return resultData.result;
+                } catch (e) {
+                    $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
+                }
+                $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
+            });
+    }
+
+    linkedDataService.getWonNodeUriOfNeed = function(needUri){
+        return linkedDataService.getUniqueObjectOfProperty(needUri, won.WON.hasWonNode)
+            .then(
+                function(result){return result;},
+                function(reason) { $q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
+    }
+
+    linkedDataService.getNeedUriOfConnection = function(connectionURI){
+        return linkedDataService.getUniqueObjectOfProperty(connectionURI, won.WON.belongsToNeed)
+            .then(
+                function(result){return result;},
+                function(reason) { $q.reject("could not get need uri of connection " + connectionURI + ". Reason: " + reason)});
+    }
+
+    linkedDataService.getRemoteConnectionUriOfConnection = function(connectionURI){
+        return linkedDataService.getUniqueObjectOfProperty(connectionURI, won.WON.hasRemoteConnection)
+            .then(
+                function(result){return result;},
+                function(reason) { $q.reject("could not get remote connection uri of connection " + connectionURI + ". Reason: " + reason)});
+    }
+
+    linkedDataService.getRemoteNeedUriOfConnection = function(connectionURI){
+        return linkedDataService.getUniqueObjectOfProperty(connectionURI, won.WON.hasRemoteNeed)
+            .then(
+                function(result){return result;},
+                function(reason) { $q.reject("could not get remote need uri of connection " + connectionURI + ". Reason: " + reason)});
+    }
+
+    /**
+     * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
+     * to send a message via the specified connectionURI (that is interpreted as a local connection.
+     * @param connectionUri
+     * @returns a promise to the data
+     */
+    linkedDataService.getEnvelopeDataforConnection = function(connectionUri){
+        return linkedDataService.getNeedUriOfConnection(connectionUri)
+            .then(function(needUri) {
+                return linkedDataService.getWonNodeUriOfNeed(needUri)
+                    .then(function (wonNodeUri) {
+                        return linkedDataService.getRemoteNeedUriOfConnection(connectionUri)
+                            .then(function(remoteNeedUri){
+                                return linkedDataService.getWonNodeUriOfNeed(remoteNeedUri)
+                                    .then(function(remoteWonNodeUri){
+                                        //if the local connection was created through a hint message (most likely)
+                                        //the remote connection is not known or doesn't exist yet. Hence, the next call
+                                        //may or may not succeed.
+                                        return linkedDataService.getRemoteConnectionUriOfConnection(connectionUri).then(
+                                            function(remoteConnectionUri) {
+                                                var ret = {};
+                                                ret[won.WONMSG.hasSender] = connectionUri;
+                                                ret[won.WONMSG.hasSenderNeed] = needUri;
+                                                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
+                                                if (remoteConnectionUri != null) {
+                                                    ret[won.WONMSG.hasReceiver] = remoteConnectionUri;
+                                                }
+                                                ret[won.WONMSG.hasReceiverNeed] = remoteNeedUri;
+                                                ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
+                                                return ret;
+                                            },function(reason) {
+                                                //no connection found
+                                                var deferred = $q.defer();
+                                                var ret = {};
+                                                ret[won.WONMSG.hasSender] = connectionUri;
+                                                ret[won.WONMSG.hasSenderNeed] = needUri;
+                                                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
+                                                ret[won.WONMSG.hasReceiverNeed] = remoteNeedUri;
+                                                ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
+                                                return ret;
+                                                deferred.resolve(ret);
+                                                return deferred.promise;
+                                            });
+                                    });
+                            });
+                    });
+            });
     }
 
 
@@ -401,6 +493,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getNodeWithAttributes(eventUri);
     }
 
+
+
     linkedDataService.getAllConnectionEventUris = function(connectionURI) {
         return linkedDataService.ensureLoaded(connectionURI).then(function(success) {
             try {
@@ -415,12 +509,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     "?container rdfs:member ?eventURI. \n" +
                     "}";
                 privateData.store.execute(query, [], [], function (success, results) {
-                    if (success) {
-                        for (var key in results) {
-                            var eventURI = getSafeValue(results[key].eventURI);
-                            if (eventURI != null) {
-                                eventURIs.push(eventURI);
-                            }
+                    if (rejectIfFailed(success, results,{message : "Error loading all connection event URIs for connection " + connectionURI +".", allowNone : false, allowMultiple: true})){
+                        return;
+                    }
+                    for (var key in results) {
+                        var eventURI = getSafeValue(results[key].eventURI);
+                        if (eventURI != null) {
+                            eventURIs.push(eventURI);
                         }
                     }
                 });
@@ -446,19 +541,20 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     "?container rdfs:member ?eventURI. \n" +
                     "} limit 1";
                 privateData.store.execute(query, [], [], function (success, results) {
-                    if (success) {
-                        for (var key in results) {
-                            var eventURI = getSafeValue(results[key].eventURI);
-                            if (eventURI != null) {
-                                resultObject.eventURI = eventURI;
-                                return;
-                            }
+                    if (rejectIfFailed(success, results,{message : "Error loading last connection event URI for connection " + connectionURI +".", allowNone : false, allowMultiple: false})){
+                        return;
+                    }
+                    for (var key in results) {
+                        var eventURI = getSafeValue(results[key].eventURI);
+                        if (eventURI != null) {
+                            resultObject.eventURI = eventURI;
+                            return;
                         }
                     }
                 });
                 return resultObject.eventURI;
             } catch (e) {
-                $q.reject("could not get last connection event URI for connection " + connectionURI +". Reason: " + e);
+                $q.reject("Could not get last connection event URI for connection " + connectionURI +". Reason: " + e);
             }
         });
     }
@@ -474,11 +570,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             try {
                 var node = {};
                 privateData.store.node(uri, function (success, graph) {
-                    if (graph != null && graph.length > 0) {
-                        for (key in graph.triples) {
-                            var propName = won.getLocalName(graph.triples[key].predicate.nominalValue);
-                            node[propName] = graph.triples[key].object.nominalValue;
-                        }
+                    if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
+                        return;
+                    }
+                    for (key in graph.triples) {
+                        var propName = won.getLocalName(graph.triples[key].predicate.nominalValue);
+                        node[propName] = graph.triples[key].object.nominalValue;
                     }
                 });
                 node.uri = uri;
