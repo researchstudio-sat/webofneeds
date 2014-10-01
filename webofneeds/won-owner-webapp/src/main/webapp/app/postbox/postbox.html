@@ -55,7 +55,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="post in allNeedsWithUnreadNotifications | filter: search">
+                        <tr ng-repeat="post in allNeeds | orderBy: 'title': false |filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{post.basicNeedType}}</span>
                                 <img src="{{getTypePicURI(post.basicNeedType)}}"
@@ -63,16 +63,16 @@
                             </td>
                             <td><a style="font-weight:bold;" href="#/private-link">{{post.title}}</a></td>
                             <td>
-                                <span ng-show="post.conversations.length > 0">
-                                    <span style="display: none;">{{post.msg.convText}}</span>
+                                <span>
+                                    <span style="display: none;">{{unreadObjects}}</span>
                                     <i
                                             class="fa fa-comment-o fa-lg"></i>&nbsp;{{post.conversations.length}}
                                 </span>
-                                <span ng-show="post.requests.length > 0">
+                                <span>
                                     <span style="display: none;">{{post.msg.reqText}}</span>
                                     <i class="fa fa-male fa-lg"></i>&nbsp;{{post.requests.length}}
                                 </span>
-                                <span ng-show="post.matches.length > 0">
+                                <span>
                                     <span style="display: none;">{{post.msg.matchText}}</span>
                                     <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{post.matches.length}}
                                 </span>

@@ -23,7 +23,8 @@
  */
 angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval, $location, userService, applicationStateService) {
     $scope.countOfAllUnreadMatchEvents = 0;
-    $scope.updateCountOfAllUnreadMatchEvents= function(){
+   // $scope.allUnreadEvents = applicationStateService.getUnreadObjects();
+   /* $scope.updateCountOfAllUnreadMatchEvents= function(){
         var allMatchEvents = [];
 
         for(var i = 0; i<$scope.allNeedsWithUnreadNotifications.length;i++){
@@ -32,7 +33,8 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
         }
         $scope.countOfAllUnreadMatchEvents = allMatchEvents.length;
 
-    }
+    }                         */
+    $scope.allNeeds = applicationStateService.getAllNeeds();
 
     /*
     $scope.$watchCollection('allNeedsWithUnreadNotifications',function(updated, old){
@@ -42,11 +44,11 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 
 
     /*
-    $scope.AllNeedsWithUnreadNotifications = applicationStateService.fetchUnreadEventsForAllNeeds();
-
+    $scope.AllNeedsWithUnreadNotifications = applicationStateService.fetchUnreadEventsForAllNeeds(); */
+    /*
     $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
         $scope.AllNeedsWithUnreadNotifications= applicationStateService.fetchUnreadEventsForAllNeeds();
-    });        */
+    });   */
   //  $scope.allPosts = applicationStateService.getAllNeeds();
 	/*$scope.line = {
 		type:'',
@@ -116,9 +118,9 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 	];          */
 
     $scope.getTypePicURI = function (type) {
-        if(type==won.WON.DEMAND) return "/owner/images/type_posts/want.png";
-        else if(type==won.WON.CRITIQUE) return "/owner/images/type_posts/change.png";
-        else if(type==won.WON.SUPPLY) return "/owner/images/type_posts/offer.png";
+        if(type==won.WON.BasicNeedTypeDemand) return "/owner/images/type_posts/want.png";
+        else if(type==won.WON.BasicNeedTypeCritique) return "/owner/images/type_posts/change.png";
+        else if(type==won.WON.BasicNeedTypeSupply) return "/owner/images/type_posts/offer.png";
         else return "/owner/images/type_posts/todo.png";
     };
 
