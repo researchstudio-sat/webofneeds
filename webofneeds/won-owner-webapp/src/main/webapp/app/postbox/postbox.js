@@ -23,6 +23,7 @@
  */
 angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval, $location, userService, applicationStateService) {
     $scope.countOfAllUnreadMatchEvents = 0;
+  //  $scope.emptyListText = 'You don\'t have posts yet. Fill it by creating new posts';
    // $scope.allUnreadEvents = applicationStateService.getUnreadObjects();
    /* $scope.updateCountOfAllUnreadMatchEvents= function(){
         var allMatchEvents = [];
@@ -35,7 +36,16 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 
     }                         */
     $scope.allNeeds = applicationStateService.getAllNeeds();
+    $scope.getMatchesForNeed = function(need){
+        var unreadCreatedEventsForNeed = [];
+        for(var unreadCreated in $scope.unreadObjects.byNeed.created){
+            if(need.needURI==unreadCreated.need.uri ){
+                unreadCreatedEventsForNeed.push(unreadCreated);
+            }
 
+        }
+        return unreadCreatedEventsForNeed;
+    }
     /*
     $scope.$watchCollection('allNeedsWithUnreadNotifications',function(updated, old){
         console.log("Watching allNeedsWithUnreadNotifications collection: ", updated, old);

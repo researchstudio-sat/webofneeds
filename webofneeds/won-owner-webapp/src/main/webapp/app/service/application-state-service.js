@@ -36,6 +36,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     //copied to the result array.
     //if the value for a key in the filter is an array, only one of the values must match (i.e., OR semantics)
     privateData.filters = {};
+    privateData.filters[won.UNREAD.TYPE.CREATED] =    { 'eventType' : won.EVENT.NEED_CREATED };
     privateData.filters[won.UNREAD.TYPE.HINT] =    { 'eventType' : won.EVENT.HINT_RECEIVED };
     privateData.filters[won.UNREAD.TYPE.MESSAGE] = { 'eventType' : won.EVENT.CONNECTION_MESSAGE_RECEIVED };
     privateData.filters[won.UNREAD.TYPE.CONNECT] = { 'eventType' : [won.EVENT.CONNECT_RECEIVED, won.EVENT.OPEN_RECEIVED] };
@@ -66,13 +67,16 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
                 'hint': {'count': 0, 'events': []},
                 'connect': {'count': 0, 'events': []},
                 'message': {'count': 0, 'events': []},
-                'close': {'count': 0, 'events': []}
+                'close': {'count': 0, 'events': []},
+                'created' : {'count':0, 'events': []}
             },
             byNeed: {
                 'hint': [],
                 'connect': [],
                 'message': [],
-                'close': []
+                'close': [],
+                'created': []
+
             }
         };
     }

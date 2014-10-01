@@ -206,6 +206,7 @@
         //keys for things that can be shown in the GUI as 'unread'
         won.UNREAD = {};
         won.UNREAD.TYPE = {};
+        won.UNREAD.TYPE.CREATED = "created";
         won.UNREAD.TYPE.HINT = "hint";
         won.UNREAD.TYPE.MESSAGE = "message";
         won.UNREAD.TYPE.CONNECT = "connect";

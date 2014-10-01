@@ -61,7 +61,9 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadAndUpdateUnreadObjects(eventData);
     });
-
+    $scope.$on(won.EVENT.NEED_CREATED, function(ngEvent, eventData) {
+        addEventAsUnreadAndUpdateUnreadObjects(eventData);
+    });
     $scope.$on(won.EVENT.CONNECT_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadAndUpdateUnreadObjects(eventData);
     });
