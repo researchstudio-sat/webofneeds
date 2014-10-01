@@ -16,10 +16,10 @@
 
 angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService, linkedDataService, applicationStateService, $filter, $interval) {
 
-	$scope.isActive = function(where) {
+    $scope.isActive = function(where) {
 		if ($location.path().indexOf(where) > -1) {
 			return 'active';
-		} else if(where == undefined && $location.path() == '/') {
+		} else if(where == undefined && $location.path() == '/home') {
 			return 'active';
 		}
 	};
@@ -49,7 +49,9 @@ angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, 
       //      $scope.$apply();
         }
     })
-
+    $scope.onDropDownClick=function(num){
+        $scope.$parent.selectedType = num;
+    }
 	onResponseSignOut = function (result) {
 		if (result.status == 'OK') {
 			userService.resetAuth();

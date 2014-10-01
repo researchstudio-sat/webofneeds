@@ -126,14 +126,15 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 		maxFileSize:5000000,
 		acceptFileTypes:/(\.|\/)(gif|jpe?g|png)$/i
 	};
-
-    $scope.currentStep = 1;
+    if($scope.currentStep==undefined){
+        $scope.currentStep = $routeParams.step;
+    }
     $scope.numberOfSteps = 3;
     $scope.toJump = 0;
 	$scope.successShow = false;
 
     $scope.previousButton = false;
-    $scope.saveDraftButton = true;
+    $scope.saveDraftButton = userService.isAuth();
     $scope.nextButton = true;
     $scope.previewButton = true;
     $scope.publishButton = false;
@@ -301,6 +302,8 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             $scope.currentStep = num;
             $scope.successShow = false;
             $scope.setShowButtons($scope.currentStep);
+         //   var newPath = '/create-need/'+$scope.currentStep+'/'+$scope.iPost.menuposition+'/'+$scope.need.title;
+         //   $location.path(newPath);
 
         }
 
@@ -599,14 +602,27 @@ angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  
 
     $scope.imageCollapseClick = function(){
         $scope.imageInputFieldCollapsed = !$scope.imageInputFieldCollapsed;
+        if($scope.imageInputFieldCollapsed==false){
+         /*   $location.hash('imagesInfoTitleWell');
+            $anchorScroll();*/
+        }
     };
 
     $scope.locationCollapseClick = function(){
         $scope.locationInputFieldCollapsed = !$scope.locationInputFieldCollapsed;
+        if($scope.locationInputFieldCollapsed==false){
+
+          /*  $location.hash('locationInfoTitleWell');
+            $anchorScroll();  */
+        }
     };
 
     $scope.timeCollapseClick = function(){
         $scope.timeInputFieldCollapsed = !$scope.timeInputFieldCollapsed;
+        if($scope.timeInputFieldCollapsed==false){
+         /*   $location.hash('timeInfoTitleWell');
+            $anchorScroll();    */
+        }
     };
 
     $scope.getImagesComment = function(){

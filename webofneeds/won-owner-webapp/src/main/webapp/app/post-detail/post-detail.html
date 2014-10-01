@@ -53,7 +53,7 @@
                 <h4>Tagged with:</h4>
                 <span style="margin-right:5px;cursor:pointer;"
                       class="label label-primary btnTag"
-                      ng-repeat="tag in need.tags.split(', ')">{{need.tags}}
+                      ng-repeat="tag in need.tags.split(', ')">{{need.tags.split(', ')[$index]}}
                 </span>
             </div>
 

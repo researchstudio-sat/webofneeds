@@ -64,7 +64,7 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
                     switch(response.status) {
                         case 403:
                             // normal error
-                            return {status: "ERROR", message: "Email address not found."};
+                            return {status: "ERROR", message: "Incorrect email adress or password"};
                         default:
                             // system error
                             return {status:"FATAL_ERROR", message: "Unknown error occured."};

@@ -102,72 +102,30 @@
 		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>
 		<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
 			<div class="container" style="padding:0">
-		<!--<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
-							<ul class="nav navbar-nav">
-								<li ng-class="isActive()"><a href="#">
-									<i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
-								</li>
-							</ul>
-							<ul class="nav navbar-nav navbar-right" ng-cloak>
-								<li><span ng-show="checkRegistered()">{{message}}</span></li>
-								<li ng-show="showPublic()" ng-class="isActive('register')"><a href="#/register">Sign up&nbsp;<span class="caret"/></a></li>
-								<li ng-show="showPublic()" ng-class="isActive('signin')"><a href="#/signin">Sign in&nbsp;<span class="caret"/></a></li>
-								<!--<li ng-show="!showPublic()"><a href="#/need-list">{{userdata.username}}</a></li>
-								<li ng-show="!showPublic()"><a href="" ng-click="onClickSignOut()">Sign out</a></li>     -->
-
-		<!--          <li class="dropdown" ng-show="!showPublic()" ng-cloak>
-						  <a class="dropdown-toggle" data-toggle="dropdown" href="">
-							  {{userdata.username}}&nbsp;<span class="caret"/>
-						  </a>
-						  <ul class="dropdown-menu">
-							  <li><a href="" ng-click="onClickSignOut()">Sign out</a></li>
-						  </ul>
-					  </li>
-				  </ul>
-			  </div>-->
-
-
-		<!--<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
-							<div class="container" style="padding:0">
-				<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
-					<ul class="nav navbar-nav">
-						<li ng-class="isActive()"><a href="#/">
-											<span class="glyphicon glyphicon-transfer"></span>&nbsp;WoN</a>
-						</li>
-									</ul>          -->
 
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
-			<!--<ul class="nav navbar-nav">
-						<li ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak><a
-                                href="#/create-need/1/">
-							<span class="glyphicon glyphicon-plus"></span>&nbsp;New	Post</a>
-						</li>
-						<li ng-show="!showPublic()" ng-class="isActive('need-list')" ng-cloak><a href="#/need-list/">
-										<span class="glyphicon glyphicon-globe"></span>&nbsp;My Posts</a>
-						</li>
-								</ul>       -->
+
 			<ul class="nav navbar-nav">
 				<li ng-class="isActive()"><a href="#">
 					<i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
 				</li>
 					</ul>
 			<ul class="nav navbar-nav">
-				<!--<li ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak><a
-												href="#/create-need/1/">
-											<span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Post</a>
-										</li>    -->
 				<li class="dropdown" ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak>
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
 					</a>
 					<ul class="dropdown-menu">
-						<li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img src="/owner/images/type_posts/want.png"/>&nbsp;I want
+						<li><a href="#/create-need/1/0"><!--<i class="fa fa-circle fa-lg"></i>--><img
+                                src="/owner/images/type_posts/want.png"/>&nbsp;I want
 							to <strong>have</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/owner/images/type_posts/offer.png"/>&nbsp;I
+						<li><a href="#/create-need/1/1"><!--<i class="fa fa-circle-o fa-lg"></i>--><img
+                                src="/owner/images/type_posts/offer.png"/>&nbsp;I
 							<strong>offer</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/owner/images/type_posts/todo.png"/>&nbsp;I
+						<li><a href="#/create-need/1/2"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img
+                                src="/owner/images/type_posts/todo.png"/>&nbsp;I
 							want to do something <strong>together</strong></a></li>
 						<li class="divider"></li>
 						<li><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/owner/images/type_posts/change.png"/>&nbsp;I
@@ -189,16 +147,25 @@
 						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
 					</a>
 					<ul class="dropdown-menu">
-						<li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img src="/owner/images/type_posts/want.png"/>&nbsp;I want
+						<li><a href="#/home"
+                               ng-click="onDropDownClick(0)"><!--<i class="fa fa-circle fa-lg"></i>--><im
+                                g src="/owne
+						r/images/type_posts/want.png"/>&nbsp;I want
 							to <strong>have</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/owner/images/type_posts/offer.png"/>&nbsp;I
+						<li><a href="#/home"
+                               ng-click="onDropDownClick(1)"><!--<i class="fa fa-circle-o fa-lg"></i>--><img
+                                src="/owner/images/type_posts/offer.png"/>&nbsp;I
 							<strong>offer</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/owner/images/type_posts/todo.png"/>&nbsp;I
+						<li><a href="#/home"
+                               ng-click="onDropDownClick(2)"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img
+                                src="/owner/images/type_posts/todo.png"/>&nbsp;I
 							want to do something <strong>together</strong></a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/owner/images/type_posts/change.png"/>&nbsp;I
+						<li><a href="#/home"
+                               ng-click="onDropDownClick(3)"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
+                                src="/owner/images/type_posts/change.png"/>&nbsp;I
 							want to <strong>change</strong> something</a></li>
 					</ul>
 				</li>
