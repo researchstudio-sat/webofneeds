@@ -68,7 +68,7 @@
                                 <span>
                                     <span style="display: none;">{{unreadObjects}}</span>
                                     <i
-                                            class="fa fa-comment-o fa-lg"></i>&nbsp;{{getMatchesForNeed(post).length}}
+                                            class="fa fa-comment-o fa-lg"></i>&nbsp;{{getMatchesForNeed(post).matchEvents.length}}
                                 </span>
                                 <span>
                                     <span style="display: none;">{{post.msg.reqText}}</span>
@@ -76,7 +76,7 @@
                                 </span>
                                 <span>
                                     <span style="display: none;">{{post.msg.matchText}}</span>
-                                    <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{post.matches.length}}
+                                    <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{getMatchesForNeed(post).matchEvents.length}}
                                 </span>
                             </td>
                             <td>{{post.creationDate | date}}</td>

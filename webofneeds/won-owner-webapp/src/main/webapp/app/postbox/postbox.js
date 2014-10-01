@@ -37,14 +37,15 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
     }                         */
     $scope.allNeeds = applicationStateService.getAllNeeds();
     $scope.getMatchesForNeed = function(need){
-        var unreadCreatedEventsForNeed = [];
-        for(var unreadCreated in $scope.unreadObjects.byNeed.created){
-            if(need.needURI==unreadCreated.need.uri ){
-                unreadCreatedEventsForNeed.push(unreadCreated);
+        var unreadHintEventsForNeed = {};
+        for(var i = 0; i< $scope.unreadObjects.byNeed.hint.length;i++){
+            var unreadHint = $scope.unreadObjects.byNeed.hint[i];
+            if(need.uri==unreadHint.need.uri ){
+                unreadHintEventsForNeed.matchEvents = unreadHint.events;
             }
 
         }
-        return unreadCreatedEventsForNeed;
+        return unreadHintEventsForNeed;
     }
     /*
     $scope.$watchCollection('allNeedsWithUnreadNotifications',function(updated, old){
