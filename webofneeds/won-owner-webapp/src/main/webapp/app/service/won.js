@@ -95,7 +95,7 @@
         won.WON.BasicNeedTypeSupplyCompacted = won.WON.prefix + ":Supply";
         won.WON.BasicNeedTypeDotogether = won.WON.baseUri + "DoTogether";
         won.WON.BasicNeedTypeDotogetherCompacted = won.WON.prefix + ":DoTogether";
-        won.WON.BasicNeedTypeDemand = won.WON.baseUri + "Critique";
+        won.WON.BasicNeedTypeCritique = won.WON.baseUri + "Critique";
         won.WON.BasicNeedTypeCritiqueCompacted = won.WON.prefix + ":Critique";
         won.WON.OwnerFacet = won.WON.baseUri +"OwnerFacet";
         won.WON.OwnerFacetCompacted = won.WON.prefix +":OwnerFacet";
@@ -223,6 +223,7 @@
         //keys for things that can be shown in the GUI as 'unread'
         won.UNREAD = {};
         won.UNREAD.TYPE = {};
+        won.UNREAD.TYPE.CREATED = "created";
         won.UNREAD.TYPE.HINT = "hint";
         won.UNREAD.TYPE.MESSAGE = "message";
         won.UNREAD.TYPE.CONNECT = "connect";
