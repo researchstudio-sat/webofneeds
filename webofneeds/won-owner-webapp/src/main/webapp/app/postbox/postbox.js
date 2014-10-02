@@ -36,17 +36,8 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 
     }                         */
     $scope.allNeeds = applicationStateService.getAllNeeds();
-    $scope.getMatchesForNeed = function(need){
-        var unreadHintEventsForNeed = {};
-        for(var i = 0; i< $scope.unreadObjects.byNeed.hint.length;i++){
-            var unreadHint = $scope.unreadObjects.byNeed.hint[i];
-            if(need.uri==unreadHint.need.uri ){
-                unreadHintEventsForNeed.matchEvents = unreadHint.events;
-            }
 
-        }
-        return unreadHintEventsForNeed;
-    }
+
     /*
     $scope.$watchCollection('allNeedsWithUnreadNotifications',function(updated, old){
         console.log("Watching allNeedsWithUnreadNotifications collection: ", updated, old);
@@ -219,4 +210,25 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
     $scope.clickOnNoButton = function() {
         $scope.displayConfirmationDialog = false;
     }
+});
+angular.module('won.owner').controller('MatchCountCtrl', function ($scope,$interval, $location, userService, applicationStateService) {
+    $scope.rowNeed = undefined;
+    $scope.matchCount = 0;
+    $scope.getMatchesForNeed = function(need){
+        var unreadHintEventsForNeed = {};
+        for(var i = 0; i< $scope.unreadObjects.byNeed.hint.length;i++){
+            var unreadHint = $scope.unreadObjects.byNeed.hint[i];
+            if(need.uri==unreadHint.need.uri ){
+                unreadHintEventsForNeed.matchEvents = unreadHint.events;
+            }
+
+        }
+        $scope.matchCount = unreadHintEventsForNeed.matchEvents.length;
+        //return unreadHintEventsForNeed;
+    }
+    $scope.$watch('unreadObjects', function(newValue, oldValue){
+        if($scope.rowNeed!=undefined){
+            $scope.getMatchesForNeed($scope.rowNeed);
+        }
+    });
 });
