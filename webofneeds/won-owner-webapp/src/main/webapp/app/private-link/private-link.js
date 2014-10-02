@@ -390,7 +390,7 @@ angular.module('won.owner')
 
     $scope.clickOnSendRequestMessage = function() {
         console.log('send request message');
-        wonService.connect($scope.need.uri, $scope.chosenMessage.remoteNeed.uri);
+        wonService.open($scope.need.uri, $scope.chosenMessage.connection.uri);
         $scope.showMatchControl = false;
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');

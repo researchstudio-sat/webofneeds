@@ -55,29 +55,44 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="post in allNeedsWithUnreadNotifications | filter: search">
+                        <tr
+                                ng-show="allNeeds.length>0"
+                                ng-repeat="post in allNeeds | orderBy: 'title': false |filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{post.basicNeedType}}</span>
                                 <img src="{{getTypePicURI(post.basicNeedType)}}"
                                      tooltip="{{post.basicNeedType}} (click to filter)"/>
                             </td>
-                            <td><a style="font-weight:bold;" href="#/private-link">{{post.title}}</a></td>
+                            <td><a style="font-weight:bold;" href="#/private-link" ng-click="clickOnNeedPrivateLink(post)">{{post
+                                .title}}</a></td>
                             <td>
-                                <span ng-show="post.conversations.length > 0">
-                                    <span style="display: none;">{{post.msg.convText}}</span>
+                                <span>
+                                    <span style="display: none;">{{unreadObjects}}</span>
                                     <i
-                                            class="fa fa-comment-o fa-lg"></i>&nbsp;{{post.conversations.length}}
+                                            class="fa fa-comment-o fa-lg"></i>&nbsp;{{rowNeed=need}}{{getMatchesForNeed(post)}}{{matchCount}}
                                 </span>
-                                <span ng-show="post.requests.length > 0">
+                                <span>
                                     <span style="display: none;">{{post.msg.reqText}}</span>
                                     <i class="fa fa-male fa-lg"></i>&nbsp;{{post.requests.length}}
                                 </span>
-                                <span ng-show="post.matches.length > 0">
+                                <span ng-controller="MatchCountCtrl">
                                     <span style="display: none;">{{post.msg.matchText}}</span>
-                                    <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{post.matches.length}}
+                                    <i
+                                            class="fa fa-puzzle-piece fa-lg"></i>&nbsp;
+                                    <span
+                                            ng-bind-template="{{rowNeed=need}} {{getMatchesForNeed(post)}} {{matchCount}}"/>
                                 </span>
                             </td>
                             <td>{{post.creationDate | date}}</td>
+                        </tr>
+                        <tr ng-show="allNeeds.length<1">
+                            <td class="col-lg-1">
+                            </td>
+                            <td>You don't have posts yet. Fill it by <a style="font-weight:bold;" href="#/home">creating new
+                                posts</a></td>
+                            <td>
+                            </td>
+                            <td></td>
                         </tr>
                     </tbody>
                 </table>
@@ -127,7 +142,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="draft in drafts | filter: search">
+                        <tr ng-show="drafts.length>0" ng-repeat="draft in drafts | filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{draft.type}}</span>
                                 <img src="{{getTypePicURI(draft.type)}}" tooltip="{{draft.type}} (click to filter)"/>
@@ -136,6 +151,14 @@
                             <td><a href="#/create-need/1" style="font-weight:bold;">{{draft.title}}</a></td>
                             <td>{{draft.datetime | date}}</td>
                             <td><a href="" ng-click="clickOnRemoveButton($index);"><i class="fa fa-times-circle-o fa-lg"></i></a></td>
+                        </tr>
+                        <tr ng-show="drafts.length<1">
+                            <td class="col-lg-1">
+                            </td>
+                            <td>You don't have drafts yet. </td>
+                            <td>
+                            </td>
+                            <td></td>
                         </tr>
                     </tbody>
                 </table>
@@ -167,13 +190,21 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="closed in closedList | filter: search">
+                        <tr ng-show="closedList.length>0" ng-repeat="closed in closedList | filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{closed.type}}</span>
                                 <img src="{{getTypePicURI(closed.type)}}" tooltip="{{closed.type}} (click to filter)"/>
                             </td>
                             <td>{{closed.title}}</a></td>
                             <td>{{closed.datetime | date}}</td>
+                        </tr>
+                        <tr ng-show="closedList.length<1">
+                            <td class="col-lg-1">
+                            </td>
+                            <td>You don't have closed posts yet. </td>
+                            <td>
+                            </td>
+                            <td></td>
                         </tr>
                     </tbody>
                 </table>

@@ -277,7 +277,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         $q.reject("loading won:hasWonNode triples " + needUri + " returned no triples");
                         return;
                     }
-                    resultData.wonNodeUri = results[0].object.nominalValue;
+                    if (results.length > 1){
+                        $q.reject("loading won:hasWonNode triples " + needUri + " returned more than 1 triple: " + JSON.stringify(results.triples));
+                        return;
+                    }
+                    resultData.wonNodeUri = results.triples[0].object.nominalValue;
                 });
                 return resultData.wonNodeUri;
             } catch (e){
