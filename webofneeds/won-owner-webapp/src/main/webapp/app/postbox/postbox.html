@@ -77,7 +77,9 @@
                                 <span ng-controller="MatchCountCtrl">
                                     <span style="display: none;">{{post.msg.matchText}}</span>
                                     <i
-                                            class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{rowNeed=need}}{{getMatchesForNeed(post)}}{{matchCount}}
+                                            class="fa fa-puzzle-piece fa-lg"></i>&nbsp;
+                                    <span
+                                            ng-bind-template="{{rowNeed=need}} {{getMatchesForNeed(post)}} {{matchCount}}"/>
                                 </span>
                             </td>
                             <td>{{post.creationDate | date}}</td>

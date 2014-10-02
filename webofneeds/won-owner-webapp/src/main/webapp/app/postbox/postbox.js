@@ -216,14 +216,20 @@ angular.module('won.owner').controller('MatchCountCtrl', function ($scope,$inter
     $scope.matchCount = 0;
     $scope.getMatchesForNeed = function(need){
         var unreadHintEventsForNeed = {};
-        for(var i = 0; i< $scope.unreadObjects.byNeed.hint.length;i++){
-            var unreadHint = $scope.unreadObjects.byNeed.hint[i];
-            if(need.uri==unreadHint.need.uri ){
-                unreadHintEventsForNeed.matchEvents = unreadHint.events;
-            }
+        if($scope.unreadObjects.byNeed.hint!=undefined) {
+            for(var i = 0; i< $scope.unreadObjects.byNeed.hint.length;i++){
+                var unreadHint = $scope.unreadObjects.byNeed.hint[i];
+                if(need.uri==unreadHint.need.uri ){
+                    unreadHintEventsForNeed.matchEvents = unreadHint.events;
+                }
 
+            }
+            if(unreadHintEventsForNeed.matchEvents!=undefined){
+                $scope.matchCount = unreadHintEventsForNeed.matchEvents.length;
+
+            }
         }
-        $scope.matchCount = unreadHintEventsForNeed.matchEvents.length;
+
         //return unreadHintEventsForNeed;
     }
     $scope.$watch('unreadObjects', function(newValue, oldValue){
