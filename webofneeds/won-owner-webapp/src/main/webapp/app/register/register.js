@@ -3,9 +3,15 @@ angular.module('won.owner').controller('ModalDemoCtrl', function ($scope, $modal
   $scope.items = ['item1', 'item2', 'item3'];
 
   $scope.open = function (size) {
+    $log.debug("opening modal");
 
     var modalInstance = $modal.open({
       templateUrl: 'app/register/register.partial.html',
+
+      /*template: "<div class='modal-body'>Hello Modal!</div>",
+      // doesn't work either (somewhere when parsing the template, the inline ng-style "display" doesn't get added)
+      <body> also gets the class modal-open (whatever it does)
+      */
       controller: 'ModalInstanceCtrl',
       size: size,
       resolve: {
