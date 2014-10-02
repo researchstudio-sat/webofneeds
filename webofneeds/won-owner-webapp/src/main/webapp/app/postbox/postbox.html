@@ -69,16 +69,16 @@
                                 <span>
                                     <span style="display: none;">{{unreadObjects}}</span>
                                     <i
-                                            class="fa fa-comment-o fa-lg"></i>&nbsp;{{getMatchesForNeed(post).length}}
+                                            class="fa fa-comment-o fa-lg"></i>&nbsp;{{rowNeed=need}}{{getMatchesForNeed(post)}}{{matchCount}}
                                 </span>
                                 <span>
                                     <span style="display: none;">{{post.msg.reqText}}</span>
                                     <i class="fa fa-male fa-lg"></i>&nbsp;{{post.requests.length}}
                                 </span>
-                                <span>
+                                <span ng-controller="MatchCountCtrl">
                                     <span style="display: none;">{{post.msg.matchText}}</span>
                                     <i
-                                            class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{(getMatchesForNeed(post)).matchEvents.length}}
+                                            class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{rowNeed=need}}{{getMatchesForNeed(post)}}{{matchCount}}
                                 </span>
                             </td>
                             <td>{{post.creationDate | date}}</td>
