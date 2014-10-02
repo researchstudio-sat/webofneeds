@@ -12,6 +12,7 @@ import won.protocol.vocabulary.WONMSG;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,62 +27,74 @@ public class WonMessage implements Serializable
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   private Dataset messageContent;
+  private Dataset completeDataset;
   //private Model messageMetadata;
   //private URI messageEventURI;
   private MessageEvent messageEvent;
+  private List<Model> envelopeGraphs;
+  private List<String> envelopeGraphNames;
+
 
 
   //private Resource msgBnode;
   // private Signature signature;
 
 
-  public WonMessage() {
-    initMessageMetadata();
-  }
 
-  public WonMessage(MessageEvent messageEvent, Dataset messageContent) {
+  public WonMessage(Dataset completeDataset) {
     //this.messageEventURI = messageEventURI;
-    this.messageEvent = messageEvent;
-    this.messageContent = messageContent;
-    //initMessageMetadata();
+    this.completeDataset = completeDataset;
+    MessageEventMapper mapper = new MessageEventMapper();
+    this.messageEvent = mapper.fromModel(
+        completeDataset.getNamedModel(
+            getEnvelopeGraphReference(completeDataset.getDefaultModel(), true).toString()));
   }
 
-  private void initMessageMetadata() {
-    Model defaultModel = ModelFactory.createDefaultModel();
-    defaultModel.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.BASE_URI);
-    Resource messageEventResource = defaultModel.createResource(messageEvent.getMessageURI().toString());
-    defaultModel.createStatement(messageEventResource, RDF.type, WONMSG.ENVELOPE_GRAPH);
-    //TODO own message event signature
+  public Dataset getCompleteDataset(){
+    return this.completeDataset;
   }
 
-
+  /**
+   * Creates a copy of the message dataset where all traces
+   * of the envelope graph are deleted.
+   * @return
+   */
   public Dataset getMessageContent() {
-    return messageContent;
-  }
-
-  public Model getMessageContent(String contentResourceUri) {
-    String ngName = getNamedGraphNameForUri(contentResourceUri);
-    return messageContent.getNamedModel(ngName);
-  }
-
-  public List<Model> getPayloadGraphs(){
-    List<Model> ret = new ArrayList<Model>();
-    List<Model> envelopeGraphs = getEnvelopeGraphs();
-    for (Model envelopeGraph : envelopeGraphs){
-      for (Resource payloadGraphUri :getPayloadReferences(envelopeGraph)){
-        Model payload = this.messageContent.getNamedModel(payloadGraphUri.toString());
-        if (payload == null){
-          throw new IllegalStateException("payload graph " + payloadGraphUri + " reference in envelope graph but not " +
-            "found in dataset");
+    if (this.messageContent != null){
+      return this.messageContent;
+    } else {
+      Dataset newMsgContent = DatasetFactory.createMem();
+      Iterator<String> modelNames = this.completeDataset.listNames();
+      List<String> envelopeGraphNames = getEnvelopeGraphNames();
+      //add all models that are not envelope graphs to the messageContent
+      while(modelNames.hasNext()){
+        String modelName = modelNames.next();
+        if (envelopeGraphNames.contains(modelName)) {
+          continue;
         }
-        ret.add(payload);
+        newMsgContent.addNamedModel(modelName, this.completeDataset.getNamedModel(modelName));
       }
+      //copy the default model, but delete the triples referencing the envelope graphs
+      Model newDefaultModel = ModelFactory.createDefaultModel();
+      newDefaultModel.add(this.completeDataset.getDefaultModel());
+      StmtIterator it = newDefaultModel.listStatements(null, RDF.type, WONMSG.ENVELOPE_GRAPH);
+      while (it.hasNext()){
+        Statement stmt = it.nextStatement();
+        String subjString = stmt.getSubject().toString();
+        if (envelopeGraphNames.contains(subjString)){
+          it.remove();
+        }
+      }
+      newMsgContent.setDefaultModel(newDefaultModel);
+      this.messageContent = newMsgContent;
     }
-    return ret;
+    return this.messageContent;
   }
 
   public List<Model> getEnvelopeGraphs(){
-    Model model = this.messageContent.getDefaultModel();
+    if (envelopeGraphs != null) return envelopeGraphs;
+    this.envelopeGraphNames = new ArrayList<String>();
+    Model model = this.completeDataset.getDefaultModel();
     if (model == null) throw new IllegalStateException("default model must not be null");
     boolean mustContainEnvelopeGraphRef = true;
     List<Model> ret = new ArrayList<Model>();
@@ -89,19 +102,35 @@ public class WonMessage implements Serializable
       Resource envelopeGraphResource = getEnvelopeGraphReference(model, mustContainEnvelopeGraphRef);
       model = null;
       if (envelopeGraphResource != null) {
+        this.envelopeGraphNames.add(envelopeGraphResource.toString());
         mustContainEnvelopeGraphRef = false; //only needed for default model
-        model = this.messageContent.getNamedModel(envelopeGraphResource.toString());
+        model = this.completeDataset.getNamedModel(envelopeGraphResource.toString());
         if (model == null) throw new IllegalStateException("envelope graph referenced in model" +
           envelopeGraphResource + " but not found as named graph in dataset!");
         ret.add(model);
       }
     } while (model != null);
-    return ret;
+    this.envelopeGraphs = ret;
+    return Collections.unmodifiableList(ret);
+  }
+
+  public List<String> getEnvelopeGraphNames(){
+    if (this.envelopeGraphNames != null) {
+      return Collections.unmodifiableList(this.envelopeGraphNames);
+    }
+    getEnvelopeGraphs(); //also sets envelopeGraphNames
+    return Collections.unmodifiableList(this.envelopeGraphNames);
   }
 
   private Resource getEnvelopeGraphReference(Model model, boolean mustContainEnvelopeGraphRef){
     StmtIterator it = model.listStatements(null, RDF.type, WONMSG.ENVELOPE_GRAPH);
-    if (mustContainEnvelopeGraphRef && !it.hasNext()) throw new IllegalStateException("no envelope graph found");
+    if (!it.hasNext()){
+      if (mustContainEnvelopeGraphRef) {
+        throw new IllegalStateException("no envelope graph found");
+      } else {
+        return null;
+      }
+    }
     Resource envelopeGraphResource = it.nextStatement().getSubject();
     if (it.hasNext()) throw new IllegalStateException("more than one envelope graphs " +
       "referenced in model!");
@@ -121,9 +150,9 @@ public class WonMessage implements Serializable
   public Dataset getMessageWithSignature(String contentResourceUri) {
     Dataset dataset = DatasetFactory.createMem();
     String ngName = getNamedGraphNameForUri(contentResourceUri);
-    dataset.addNamedModel(ngName, messageContent.getNamedModel(ngName));
-    RdfUtils.addPrefixMapping(dataset.getDefaultModel(), messageContent.getNamedModel(ngName));
-    RdfUtils.addPrefixMapping(dataset.getDefaultModel(), messageContent.getDefaultModel());
+    dataset.addNamedModel(ngName, completeDataset.getNamedModel(ngName));
+    RdfUtils.addPrefixMapping(dataset.getDefaultModel(), completeDataset.getNamedModel(ngName));
+    RdfUtils.addPrefixMapping(dataset.getDefaultModel(), completeDataset.getDefaultModel());
     //TODO signature into default graph
     return dataset;
   }
@@ -132,7 +161,7 @@ public class WonMessage implements Serializable
     String ngName = resourceUri;
     // we commonly use resource url + #data for the name of named graph
     // with this resource content
-    if (messageContent.getNamedModel(resourceUri) == null) {
+    if (completeDataset.getNamedModel(resourceUri) == null) {
       ngName = resourceUri + WonRdfUtils.NAMED_GRAPH_SUFFIX;
     }
     return ngName;
@@ -148,15 +177,11 @@ public class WonMessage implements Serializable
   {
     List<String> result = new ArrayList<String>();
 
-    Iterator<String> graphNames = messageContent.listNames();
+    Iterator<String> graphNames = getMessageContent().listNames();
     while (graphNames.hasNext()) {
         result.add(graphNames.next().replaceAll("#.*", ""));
     }
     return result;
-  }
-
-  public void setMessageContent(Dataset messageContent) {
-    this.messageContent = messageContent;
   }
 
   public MessageEvent getMessageEvent() {

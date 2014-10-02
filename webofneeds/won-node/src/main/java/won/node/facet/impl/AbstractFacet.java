@@ -420,9 +420,7 @@ public abstract class AbstractFacet implements Facet
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
     Model remoteFacetModel = null;
-    if (wonMessage == null) {
-       remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
-    }
+    remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
 
     final Connection connectionForRunnable = con;
     //send to need

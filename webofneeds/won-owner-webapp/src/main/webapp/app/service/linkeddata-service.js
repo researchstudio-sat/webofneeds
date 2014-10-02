@@ -409,12 +409,21 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 return linkedDataService.getNeed(connection.hasRemoteNeed)
                     .then(function (need) {
                         return linkedDataService.getLastConnectionEvent(connectionUri)
-                            .then(function (event) {
-                                return {connection: connection, remoteNeed: need, event: event}
-                            });
+                            .then(
+                                function (event) {
+                                    return {connection: connection, remoteNeed: need, event: event}
+                                },function(reason){
+                                    //remote need's won node may be offline - don't let that kill us
+                                    var deferred = $q.defer();
+                                    deferred.resolve(
+                                        {connection: connection, remoteNeed: {'title': '[could not load]'}, event: event}
+                                    );
+                                    return deferred.promise;
+                                });
                     });
             });
     }
+
 
     linkedDataService.getAllConnectionEvents = function(connectionUri) {
         return linkedDataService.getConnectionEventUris(connectionUri)

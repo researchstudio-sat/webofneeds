@@ -831,7 +831,7 @@
              * @returns {won.MessageBuilder}
              */
             hasFacet: function(facetURI){
-                this.getContentGraph()[0][won.WONMSG.hasFacetCompacted]={"@id":facetURI};
+                this.getContentGraphNode()[won.WON.hasFacetCompacted]={"@id":facetURI};
                 return this;
             },
             /**
@@ -841,7 +841,7 @@
              * @returns {won.MessageBuilder}
              */
             hasRemoteFacet: function(facetURI){
-                this.getContentGraph()[0][won.WONMSG.hasFacetCompacted]={"@id":facetURI};
+                this.getContentGraphNode()[won.WON.hasRemoteFacetCompacted]={"@id":facetURI};
                 return this;
             },
             getMessageEventGraph: function (){
@@ -854,8 +854,9 @@
              * Fetches the content graph, creating it if it doesn't exist.
              */
             getContentGraph: function(){
-                for (key in this.data){
-                    var graph = this.data[key];
+                var graphs = this.data["@graph"];
+                for (key in graphs){
+                    var graph = graphs[key];
                     if (graph['@id'] === this.eventUriValue + "#content"){
                         return graph;
                     }
@@ -867,8 +868,11 @@
                         {"@id": this.eventUriValue}
                     ]
                 }
-                this.data.push(contentGraph);
+                graphs.push(contentGraph);
                 return contentGraph;
+            },
+            getContentGraphNode: function(){
+                return this.getContentGraph()["@graph"][0];
             },
             build: function () {
                 console.log("built this message:" + JSON.stringify(this.data));

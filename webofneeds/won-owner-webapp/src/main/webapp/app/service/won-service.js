@@ -259,6 +259,8 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.connectMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
+                .hasFacet(won.WON.OwnerFacet)
+                .hasRemoteFacet(won.WON.OwnerFacet)
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {

@@ -315,12 +315,13 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
             //connection already known. check if the data is consistent
             if (
               !needURI.equals(con.getNeedURI()) ||
-              !facetURI.equals(con.getTypeURI()) ||
               !otherNeedURI.equals(con.getRemoteNeedURI())) {
               logger.warn("inconsistent data detected! Connect returned this new local connection URI: {}, " +
                 "which is already known with this data: {}", connectionURI, con );
               throw new IllegalArgumentException("Connect led to inconsistent data! See log for details");
             }
+            con.setTypeURI(facetURI);
+            con.setState(ConnectionState.REQUEST_SENT);
           } else {
             con = new Connection();
             con.setNeedURI(needURI);
@@ -331,9 +332,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
             if (logger.isDebugEnabled()) {
               logger.debug("saving connection: {}", con);
             }
-            connectionRepository.save(con);
           }
-
+          connectionRepository.save(con);
           result.set(con.getConnectionURI());
         } catch (Exception e) {
           logger.info("Error creating connection {}. Stacktrace follows", con);
