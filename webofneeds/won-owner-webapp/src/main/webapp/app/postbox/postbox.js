@@ -219,4 +219,8 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
     $scope.clickOnNoButton = function() {
         $scope.displayConfirmationDialog = false;
     }
+
+    $scope.clickOnNeedPrivateLink = function(clickedNeed) {
+        applicationStateService.setCurrentNeedURI(clickedNeed.uri);
+    }
 });
