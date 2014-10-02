@@ -237,4 +237,8 @@ angular.module('won.owner').controller('MatchCountCtrl', function ($scope,$inter
             $scope.getMatchesForNeed($scope.rowNeed);
         }
     });
+
+    $scope.clickOnNeedPrivateLink = function(clickedNeed) {
+        applicationStateService.setCurrentNeedURI(clickedNeed.uri);
+    }
 });

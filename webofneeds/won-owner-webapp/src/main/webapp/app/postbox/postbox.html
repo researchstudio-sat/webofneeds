@@ -63,7 +63,8 @@
                                 <img src="{{getTypePicURI(post.basicNeedType)}}"
                                      tooltip="{{post.basicNeedType}} (click to filter)"/>
                             </td>
-                            <td><a style="font-weight:bold;" href="#/private-link">{{post.title}}</a></td>
+                            <td><a style="font-weight:bold;" href="#/private-link" ng-click="clickOnNeedPrivateLink(post)">{{post
+                                .title}}</a></td>
                             <td>
                                 <span>
                                     <span style="display: none;">{{unreadObjects}}</span>
