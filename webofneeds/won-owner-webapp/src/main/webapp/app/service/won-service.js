@@ -110,69 +110,6 @@ angular.module('won.owner').factory('wonService', function (
     messageService.addMessageCallback(createIncomingMessageCallback());
 
     /**
-     * helper function for accessin JSON-LD data
-     */
-    var matchFirstObject = function(jsonld, subject, predicate){
-        var deferred = $q.defer();
-        var ret = {};
-        ret.result = null;
-        var store = rdfstore.create();
-        store.setPrefix("ex", "http://example.org/people/");
-        store.setPrefix("msg","http://purl.org/webofneeds/message#");
-        store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        store.load("application/ld+json", jsonld, "ex:test", function(success, results) {
-            if (!success) {
-                deferred.reject("could not parse jsonld " + jsonld);
-            }
-            var sub = subject == null ? null:store.rdf.createNamedNode(store.rdf.resolve(subject));
-            var pred = predicate == null ? null:store.rdf.createNamedNode(store.rdf.resolve(predicate));
-            store.graph("ex:test", function(success, mygraph) {
-                if (!success) {
-                    deferred.reject("could not match subject " + subject + " predicate " + predicate);
-                }
-                var resultGraph = mygraph.match(sub, pred, null);
-                if (resultGraph != null && resultGraph.triples.length > 0) {
-                    deferred.resolve(resultGraph.triples[0].object.nominalValue);
-                }
-            });
-        });
-        return deferred.promise;
-    };
-
-    /**
-     * helper function for accessin JSON-LD data
-     */
-    var matchFirstSubject = function(jsonld, predicate, object){
-        var deferred = $q.defer();
-        var ret = {};
-        ret.result = null;
-        var store = rdfstore.create();
-        store.setPrefix("ex", "http://example.org/people/");
-        store.setPrefix("msg","http://purl.org/webofneeds/message#");
-        store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        store.load("application/ld+json", jsonld, function(success, results) {
-            if (!success) {
-                deferred.reject("could not parse jsonld " + jsonld);
-            }
-            var obj = object == null ? null:store.rdf.createNamedNode(store.rdf.resolve(object));
-            var pred = predicate == null ? null:store.rdf.createNamedNode(store.rdf.resolve(predicate));
-            store.graph( function(success, mygraph) {
-                if (!success) {
-                    deferred.reject("could not match predicate " + predicate + " object " + object);
-                }
-                var resultGraph = mygraph.match(null, pred, obj);
-                if (resultGraph != null && resultGraph.triples.length > 0) {
-                    deferred.resolve(resultGraph.triples[0].subject.nominalValue);
-                } else {
-                    deferred.reject("could not match predicate " + predicate + " object " + object);
-                }
-            });
-        });
-        return deferred.promise;
-    };
-
-
-    /**
      * Creates a need and returns a Promise to the URI of the newly created need (which may differ from the one
      * specified in the need object here.
      * @param needAsJsonLd
@@ -181,14 +118,16 @@ angular.module('won.owner').factory('wonService', function (
     wonService.createNeed = function(needAsJsonLd) {
         var deferred = $q.defer();
         var needData = won.clone(needAsJsonLd);
+        //TODO: Fix hard-coded URIs here!
         var eventUri = "http://localhost:8080/won/resource/event/" + utilService.getRandomInt(1,9223372036854775807);
         var needUri = "http://localhost:8080/won/resource/need/" + utilService.getRandomInt(1,9223372036854775807);
         var wonNode = "http://localhost:8080/won";
         needData['@graph'][0]['@id'] = needUri + "/core/#data";
         needData['@graph'][0]['@graph'][0]['@id'] = needUri;
-        var message = new won.CreateMessageBuilder(needData)
-            .eventURI(eventUri)//TODO: generate event URI here
-            .hasReceiverNode(wonNode)//TODO: pass node to function
+        var message = new won.MessageBuilder(won.WONMSG.createMessage, needData)
+            .eventURI(eventUri)
+            .hasReceiverNode(wonNode)
+            .hasSenderNeed(needUri)
             .build();
 
 
@@ -222,7 +161,7 @@ angular.module('won.owner').factory('wonService', function (
                 this.done = true;
             });
         callback.done = false;
-        callback.msgURI = null;
+        callback.msgURI = eventUri;
         callback.shouldHandleTest = function (event, msg) {
             var ret = event.refersTo == this.msgURI;
             console.log("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
@@ -237,20 +176,13 @@ angular.module('won.owner').factory('wonService', function (
 
         //find out which message uri was created and use it for the callback's shouldHandleTest
         //so we can wait for a dedicated response
-        //TODO: get the event URI from where we generate it in the first place! this is unsafe!
-        matchFirstSubject(message, won.WONMSG.hasMessageTypeCompacted, null)
-            .then(function(uri) {
-                callback.msgURI = uri;
-            })
-            .then(function() {
-                console.log("adding message callback listening for refersToURI " + callback.msgURI);
-                messageService.addMessageCallback(callback);
-                try {
-                    messageService.sendMessage(message);
-                } catch (e) {
-                    deferred.reject(e);
-                }
-            });
+        console.log("adding message callback listening for refersToURI " + callback.msgURI);
+        messageService.addMessageCallback(callback);
+        try {
+            messageService.sendMessage(message);
+        } catch (e) {
+            deferred.reject(e);
+        }
         return deferred.promise;
     }
 
@@ -265,7 +197,7 @@ angular.module('won.owner').factory('wonService', function (
         var sendConnect = function(need1, need2, wonNodeUri1, wonNodeUri2) {
             //TODO: use event URI pattern specified by WoN node
             var eventUri = wonNodeUri1+ "/event/" +  utilService.getRandomInt(1,9223372036854775807);
-            var message = new won.ConnectMessageBuilder()
+            var message = new won.MessageBuilder(won.WONMSG.connectionMessage)
                 .eventURI(eventUri)
                 .hasSenderNeed(need1)
                 .hasSenderNode(wonNodeUri1)
@@ -301,14 +233,16 @@ angular.module('won.owner').factory('wonService', function (
         }
 
         //fetch the won nodes of both needs
-        linkedDataService.getWonNodeOfNeed(need1).then(
+        linkedDataService.getWonNodeUriOfNeed(need1).then(
             function (wonNodeUri1) {
-                return linkedDataService.getWonNodeOfNeed(need2).then(
+                return linkedDataService.getWonNodeUriOfNeed(need2).then(
                     function(wonNodeUri2){
                         sendConnect(need1, need2, wonNodeUri1, wonNodeUri2);
                     }
                 );
-            });
+            },
+            won.reportError("cannot connect need " + need1 + " and " + need2)
+        );
 
     }
 
@@ -317,16 +251,66 @@ angular.module('won.owner').factory('wonService', function (
      * @param need1
      * @param need2
      */
-    wonService.open = function(needUri, connectionUri){
+    wonService.openSuggestedConnection = function(connectionUri){
 
-        var sendOpen = function(needUri, connectionUri, wonNodeUri) {
+        var sendOpen = function(envelopeData) {
             //TODO: use event URI pattern specified by WoN node
-            var eventUri = wonNodeUri+ "/event/" +  utilService.getRandomInt(1,9223372036854775807);
+            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  utilService.getRandomInt(1,9223372036854775807);
+            var message = new won.MessageBuilder(won.WONMSG.connectMessage)
+                .eventURI(eventUri)
+                .forEnvelopeData(envelopeData)
+                .build();
+            var callback = new messageService.MessageCallback(
+                function (event, msg) {
+                    //check if the message we got (the create need response message) indicates that all went well
+                    console.log("got connect needs message response! TODO: check for connect response!");
+                    //TODO: if negative, use alternative need URI and send again
+                    //TODO: if positive, propagate positive response back to caller
+                    //TODO: fetch need data and store in local RDF store
+                    this.done = true;
+                    //WON.CreateResponse.equals(messageService.utils.getMessageType(msg)) &&
+                    //messageService.utils.getRefersToURIs(msg).contains(messageURI)
+
+                });
+            callback.done = false;
+            callback.shouldHandleTest = function (msg) {
+                return true;
+            };
+            callback.shouldUnregisterTest = function(msg) {
+                return this.done;
+            };
+
+            messageService.addMessageCallback(callback);
+            try {
+                messageService.sendMessage(message);
+            } catch (e) {
+                console.log("could not open suggested connection " + connectionUri + ". Reason" + e);
+            }
+        }
+
+        //fetch all data needed
+        linkedDataService.getEnvelopeDataforConnection(connectionUri)
+            .then(function(envelopeData){
+                sendOpen(envelopeData);
+            },
+            won.reportError("cannot open suggested connection " + connectionUri)
+        );
+
+    }
+
+    /**
+     * Opens the existing connection specified by connectionUri.
+     * @param need1
+     * @param need2
+     */
+    wonService.open = function(connectionUri){
+
+        var sendOpen = function(envelopeData) {
+            //TODO: use event URI pattern specified by WoN node
+            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  utilService.getRandomInt(1,9223372036854775807);
             var message = new won.MessageBuilder(won.WONMSG.openMessage)
                 .eventURI(eventUri)
-                .hasSender(connectionUri)
-                .hasSenderNode(wonNodeUri)
-                .hasSenderNeed(needUri)
+                .forEnvelopeData(envelopeData)
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {
@@ -356,11 +340,13 @@ angular.module('won.owner').factory('wonService', function (
             }
         }
 
-        //fetch the won nodes of both needs
-        linkedDataService.getWonNodeOfNeed(needUri).then(
-            function (wonNodeUri) {
-                    sendOpen(needUri, connectionUri, wonNodeUri);
-            });
+        //fetch all data needed
+        linkedDataService.getEnvelopeDataforConnection(connectionUri)
+            .then(function(envelopeData){
+                sendOpen(envelopeData);
+            },
+            won.reportError("cannot open connection " + connectionUri)
+        );
 
     }
 

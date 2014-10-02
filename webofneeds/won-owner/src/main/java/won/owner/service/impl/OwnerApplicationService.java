@@ -18,7 +18,6 @@ import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
-import won.protocol.model.FacetType;
 import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
@@ -148,17 +147,12 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
           needURI = wonMessage.getMessageEvent().getSenderNeedURI();
           otherNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
 
-          content = wonMessage.getMessageEvent().getModel();
-          com.hp.hpl.jena.rdf.model.Model facetModel =
-            WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
-              FacetType.OwnerFacet.getURI(),
-              FacetType.OwnerFacet.getURI());
-          content.add(facetModel);
+          content = wonMessage.getPayloadGraphs().get(0);
 
           final ListenableFuture<URI> newConnectionURI;
 
           wonMessageMap.put(wonMessage.getMessageEvent().getSenderNeedURI(), wonMessage);
-          newConnectionURI = ownerProtocolService.connect(needURI, otherNeedURI, content, null);
+          newConnectionURI = ownerProtocolService.connect(needURI, otherNeedURI, content, wonMessage);
 
           newConnectionURI.addListener(new Runnable(){
             @Override

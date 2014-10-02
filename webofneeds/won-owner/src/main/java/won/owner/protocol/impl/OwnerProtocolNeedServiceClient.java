@@ -2,8 +2,7 @@ package won.owner.protocol.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -304,18 +303,37 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
         final URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
         //save the connection object in the database
         Connection con = null;
+        URI connectionURI = null;
         try {
           //Create new connection object
-          con = new Connection();
-          con.setNeedURI(needURI);
-          con.setState(ConnectionState.REQUEST_SENT);
-          con.setTypeURI(facetURI);
-          con.setRemoteNeedURI(otherNeedURI);
-          con.setConnectionURI(uri.get());
-          if (logger.isDebugEnabled()) {
-            logger.debug("saving connection: {}", con);
+          connectionURI = uri.get();
+          if (logger.isDebugEnabled()){
+            logger.debug("connecting with this local connection URI: {}", connectionURI);
           }
-          connectionRepository.save(con);
+          con = connectionRepository.findOneByConnectionURI(connectionURI);
+          if (con != null) {
+            //connection already known. check if the data is consistent
+            if (
+              !needURI.equals(con.getNeedURI()) ||
+              !facetURI.equals(con.getTypeURI()) ||
+              !otherNeedURI.equals(con.getRemoteNeedURI())) {
+              logger.warn("inconsistent data detected! Connect returned this new local connection URI: {}, " +
+                "which is already known with this data: {}", connectionURI, con );
+              throw new IllegalArgumentException("Connect led to inconsistent data! See log for details");
+            }
+          } else {
+            con = new Connection();
+            con.setNeedURI(needURI);
+            con.setState(ConnectionState.REQUEST_SENT);
+            con.setTypeURI(facetURI);
+            con.setRemoteNeedURI(otherNeedURI);
+            con.setConnectionURI(uri.get());
+            if (logger.isDebugEnabled()) {
+              logger.debug("saving connection: {}", con);
+            }
+            connectionRepository.save(con);
+          }
+
           result.set(con.getConnectionURI());
         } catch (Exception e) {
           logger.info("Error creating connection {}. Stacktrace follows", con);

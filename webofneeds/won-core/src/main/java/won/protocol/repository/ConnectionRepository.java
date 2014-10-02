@@ -36,6 +36,8 @@ public interface ConnectionRepository extends WonRepository<Connection>
 {
   List<Connection> findByConnectionURI(URI URI);
 
+  Connection findOneByConnectionURI(URI URI);
+
   List<Connection> findByNeedURI(URI URI);
 
   List<Connection> findByNeedURI(URI URI, Pageable pageable);

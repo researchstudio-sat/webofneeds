@@ -2,9 +2,7 @@ package won.protocol.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +62,60 @@ public class WonMessage implements Serializable
   public Model getMessageContent(String contentResourceUri) {
     String ngName = getNamedGraphNameForUri(contentResourceUri);
     return messageContent.getNamedModel(ngName);
+  }
+
+  public List<Model> getPayloadGraphs(){
+    List<Model> ret = new ArrayList<Model>();
+    List<Model> envelopeGraphs = getEnvelopeGraphs();
+    for (Model envelopeGraph : envelopeGraphs){
+      for (Resource payloadGraphUri :getPayloadReferences(envelopeGraph)){
+        Model payload = this.messageContent.getNamedModel(payloadGraphUri.toString());
+        if (payload == null){
+          throw new IllegalStateException("payload graph " + payloadGraphUri + " reference in envelope graph but not " +
+            "found in dataset");
+        }
+        ret.add(payload);
+      }
+    }
+    return ret;
+  }
+
+  public List<Model> getEnvelopeGraphs(){
+    Model model = this.messageContent.getDefaultModel();
+    if (model == null) throw new IllegalStateException("default model must not be null");
+    boolean mustContainEnvelopeGraphRef = true;
+    List<Model> ret = new ArrayList<Model>();
+    do {
+      Resource envelopeGraphResource = getEnvelopeGraphReference(model, mustContainEnvelopeGraphRef);
+      model = null;
+      if (envelopeGraphResource != null) {
+        mustContainEnvelopeGraphRef = false; //only needed for default model
+        model = this.messageContent.getNamedModel(envelopeGraphResource.toString());
+        if (model == null) throw new IllegalStateException("envelope graph referenced in model" +
+          envelopeGraphResource + " but not found as named graph in dataset!");
+        ret.add(model);
+      }
+    } while (model != null);
+    return ret;
+  }
+
+  private Resource getEnvelopeGraphReference(Model model, boolean mustContainEnvelopeGraphRef){
+    StmtIterator it = model.listStatements(null, RDF.type, WONMSG.ENVELOPE_GRAPH);
+    if (mustContainEnvelopeGraphRef && !it.hasNext()) throw new IllegalStateException("no envelope graph found");
+    Resource envelopeGraphResource = it.nextStatement().getSubject();
+    if (it.hasNext()) throw new IllegalStateException("more than one envelope graphs " +
+      "referenced in model!");
+    return envelopeGraphResource;
+  }
+
+  private List<Resource> getPayloadReferences(Model envelopeGraph){
+    StmtIterator it = envelopeGraph.listStatements(envelopeGraph.getResource(messageEvent.getMessageURI().toString()),
+      WONMSG.HAS_CONTENT_PROPERTY, (RDFNode) null);
+    List<Resource> ret = new ArrayList<Resource>();
+    while (it.hasNext()){
+      ret.add(it.nextStatement().getObject().asResource());
+    }
+    return ret;
   }
 
   public Dataset getMessageWithSignature(String contentResourceUri) {
