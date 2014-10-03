@@ -55,11 +55,27 @@ angular.module('won.owner').factory('wonService', function (
         }
     }
 
+    /**
+     * Updates the local triple store with the data contained in the hint message.
+     * @param eventData event object that is passed as additional argument to $rootScope.$broadcast.
+     * @param message the complete message data as received from the WoN node.
+     */
+    var processConnectMessage = function(eventData, message) {
+        //load the data of the connection that the hint is about, if required
+        var connectionURI = eventData.receiverURI;
+        if (connectionURI != null) {
+            linkedDataService.fetch(connectionURI);
+        }
+        //extract hint information from message
+        //call handler if there is one - it may modify the event object
+        eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeed]);
+    }
+
 
     //mapping between message type and eventType/handler combination
     var messageTypeToEventType = {};
     messageTypeToEventType[won.WONMSG.hintNotificationMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED, handler: processHintNotificationMessage};
-    messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:null};
+    messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:processConnectMessage};
     messageTypeToEventType[won.WONMSG.openMessageCompacted] = {eventType: won.EVENT.OPEN_RECEIVED, handler:null};
     messageTypeToEventType[won.WONMSG.closeMessageCompacted] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:null};
     messageTypeToEventType[won.WONMSG.connectionMessageCompacted] = {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED, handler:null};

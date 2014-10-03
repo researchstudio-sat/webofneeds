@@ -136,11 +136,13 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
                 var needFilter = {}
                 needFilter['hasReceiverNeed'] = currentNeed.uri;
                 var filteredAgain = myfilter(filtered, needFilter);
-                newObjects[won.UNREAD.GROUP.BYNEED][key].push(
-                    {need: currentNeed,
-                     count: filteredAgain.length,
-                     events: filteredAgain}
-                );
+                if (filteredAgain.length > 0) {
+                    newObjects[won.UNREAD.GROUP.BYNEED][key].push(
+                        {need: currentNeed,
+                            count: filteredAgain.length,
+                            events: filteredAgain}
+                    );
+                }
                 //TODO: do we need the same for connection URIs?
             }
         }
