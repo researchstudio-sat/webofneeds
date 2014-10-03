@@ -2,8 +2,7 @@ package won.owner.protocol.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -304,16 +303,41 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
         final URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
         //save the connection object in the database
         Connection con = null;
+        URI connectionURI = null;
         try {
           //Create new connection object
-          con = new Connection();
-          con.setNeedURI(needURI);
-          con.setState(ConnectionState.REQUEST_SENT);
-          con.setTypeURI(facetURI);
-          con.setRemoteNeedURI(otherNeedURI);
-          con.setConnectionURI(uri.get());
-          if (logger.isDebugEnabled()) {
-            logger.debug("saving connection: {}", con);
+          connectionURI = uri.get();
+          if (logger.isDebugEnabled()){
+            logger.debug("connecting with this local connection URI: {}", connectionURI);
+          }
+          con = connectionRepository.findOneByConnectionURI(connectionURI);
+          if (con != null) {
+            //connection already known. check if the data is consistent
+            String problem = null;
+            if (!needURI.equals(con.getNeedURI())){
+              problem = "Different needURI";
+            } else if (con.getRemoteNeedURI() != null && !con.getRemoteNeedURI().equals(otherNeedURI)){
+              problem = "Different remoteNeedURI";
+            } else if (con.getTypeURI() != null && con.getTypeURI() != facetURI) {
+              problem = "Different facetURI";
+            }
+            if (problem != null) {
+              logger.warn("inconsistent data detected - connect returned this new local connection URI: {}, " +
+                "which is already known with this data: {}. Problem: " + problem+".", connectionURI, con);
+              throw new IllegalArgumentException("Connect led to inconsistent data! See log for details");
+            }
+            con.setTypeURI(facetURI);
+            con.setState(ConnectionState.REQUEST_SENT);
+          } else {
+            con = new Connection();
+            con.setNeedURI(needURI);
+            con.setState(ConnectionState.REQUEST_SENT);
+            con.setTypeURI(facetURI);
+            con.setRemoteNeedURI(otherNeedURI);
+            con.setConnectionURI(uri.get());
+            if (logger.isDebugEnabled()) {
+              logger.debug("saving connection: {}", con);
+            }
           }
           connectionRepository.save(con);
           result.set(con.getConnectionURI());

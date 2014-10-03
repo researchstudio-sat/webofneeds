@@ -16,6 +16,7 @@ import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -85,27 +86,17 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
         if (scoreConvert < 0 || scoreConvert > 1) throw new IllegalArgumentException("score is not in [0,1]");
 
+        //TODO: facet code to be refactored!
+        Connection con = findOrCreateConnection(ownNeedUriConvert, otherNeedUriConvert,
+          wonMessage.getMessageEvent().getReceiverURI(), WonRdfUtils.FacetUtils.getFacet(contentConvert), ConnectionState.SUGGESTED);
 
-        //Load need (throws exception if not found)
-        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedUriConvert);
-        if (!isNeedActive(need))
-          throw new IllegalMessageForNeedStateException(ownNeedUriConvert, ConnectionEventType.MATCHER_HINT.name(),
-                                                        need.getState());
-
-        List<Match> matches = matchRepository
-          .findByFromNeedAndToNeedAndOriginator(ownNeedUriConvert, otherNeedUriConvert, originatorUriConvert);
-        Match match = null;
-        if (matches.size() > 0) {
-          match = matches.get(0);
-        } else {
-          //save match
-          match = new Match();
-          match.setFromNeed(ownNeedUriConvert);
-          match.setToNeed(otherNeedUriConvert);
-          match.setOriginator(originatorUriConvert);
-        }
+        Match match = new Match();
+        match.setFromNeed(ownNeedUriConvert);
+        match.setToNeed(otherNeedUriConvert);
+        match.setOriginator(originatorUriConvert);
         match.setScore(scoreConvert);
-        matchRepository.save(match);
+        //TODO: save new connection or find existing one!
+
         ownerServiceCallback.onHint(match, contentConvert, wonMessage);
         //ownerService.handleHintMessageEventFromWonNode(match, contentConvert);
       } else {
@@ -124,20 +115,12 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
           throw new IllegalMessageForNeedStateException(ownNeedUriConvert, ConnectionEventType.MATCHER_HINT.name(),
                                                         need.getState());
 
-        List<Match> matches = matchRepository
-          .findByFromNeedAndToNeedAndOriginator(ownNeedUriConvert, otherNeedUriConvert, originatorUriConvert);
-        Match match = null;
-        if (matches.size() > 0) {
-          match = matches.get(0);
-        } else {
-          //save match
-          match = new Match();
-          match.setFromNeed(ownNeedUriConvert);
-          match.setToNeed(otherNeedUriConvert);
-          match.setOriginator(originatorUriConvert);
-        }
+        Match match = new Match();
+        match.setFromNeed(ownNeedUriConvert);
+        match.setToNeed(otherNeedUriConvert);
+        match.setOriginator(originatorUriConvert);
         match.setScore(scoreConvert);
-        matchRepository.save(match);
+        //TODO: save new connection or find existing one!
         ownerServiceCallback.onHint(match, contentConvert, wonMessage);
         //ownerService.handleHintMessageEventFromWonNode(match, contentConvert);
       }
@@ -199,51 +182,50 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
                                                                                    "same");
       logger.debug("owner from need: CONNECT called for own need {}, other need {}, own connection {} and content {}",
                    new Object[]{ownNeedURIConvert, otherNeedURIConvert, ownConnectionURIConvert, content});
+      Connection con = findOrCreateConnection(ownNeedURIConvert, otherNeedURIConvert, ownConnectionURIConvert,
+        facetURI, ConnectionState.REQUEST_RECEIVED);
 
-        //Load need (throws exception if not found)
-        Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURIConvert);
-        if (!isNeedActive(need))
-          throw new IllegalMessageForNeedStateException(ownNeedURIConvert, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
 
-        List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURIConvert, otherNeedURIConvert);
-        Connection con = null;
-
-        for(Connection c : connections) {
-          //TODO: check remote need type as well or create GroupMemberFacet
-          if (facetURI.equals(c.getTypeURI()))
-            con = c;
-        }
-
-        //TODO: impose unique constraint on connections
-        if(con != null) {
-            if (ConnectionState.CONNECTED == con.getState()||ConnectionState.REQUEST_RECEIVED==con.getState()){
-          //if(ConnectionEventType.PARTNER_OPEN.isMessageAllowed(con.getState())) {
-            //TODO: Move this to the transition() - Method in ConnectionState
-                throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
-          } else {
-                con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
-                con = connectionRepository.save(con);
-
-          }
-        }
-
-        if (con == null) {
-          /* Create connection */
-          con = new Connection();
-          con.setNeedURI(ownNeedURIConvert);
-          con.setState(ConnectionState.REQUEST_RECEIVED);
-          con.setRemoteNeedURI(otherNeedURIConvert);
-          con.setConnectionURI(ownConnectionURIConvert);
-          con.setTypeURI(facetURI);
-          connectionRepository.save(con);
-
-          //TODO: do we save the connection content? where? as a chat content?
-        }
-        ownerServiceCallback.onConnect(con, contentConvert, wonMessage);
+      ownerServiceCallback.onConnect(con, contentConvert, wonMessage);
       //ownerService.handleConnectMessageEventFromWonNode(con, contentConvert);
     }
 
-    @Override
+  public Connection findOrCreateConnection(final URI ownNeedURIConvert, final URI otherNeedURIConvert,
+    final URI ownConnectionURIConvert, final URI facetURI, final ConnectionState connectionState)
+    throws NoSuchNeedException, IllegalMessageForNeedStateException {
+    //Load need (throws exception if not found)
+    Need need = DataAccessUtils.loadNeed(needRepository, ownNeedURIConvert);
+    if (!isNeedActive(need))
+      throw new IllegalMessageForNeedStateException(ownNeedURIConvert, ConnectionEventType.PARTNER_OPEN.name(), need.getState());
+
+    List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(ownNeedURIConvert, otherNeedURIConvert);
+    Connection con = null;
+
+    for(Connection c : connections) {
+      //TODO: check remote need type as well or create GroupMemberFacet
+      if (facetURI.equals(c.getTypeURI())) {
+        con = c;
+        break;
+      }
+    }
+
+    if (con != null) {
+      con.setState(connectionState);
+      con = connectionRepository.save(con);
+    } else {
+      /* Create connection */
+      con = new Connection();
+      con.setNeedURI(ownNeedURIConvert);
+      con.setState(connectionState);
+      con.setRemoteNeedURI(otherNeedURIConvert);
+      con.setConnectionURI(ownConnectionURIConvert);
+      con.setTypeURI(facetURI);
+      connectionRepository.save(con);
+    }
+    return con;
+  }
+
+  @Override
     public void open(URI connectionURI, Model content, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 

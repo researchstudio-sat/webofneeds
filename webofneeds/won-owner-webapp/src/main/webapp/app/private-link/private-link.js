@@ -274,11 +274,7 @@ angular.module('won.owner')
         }
 /*    $scope.clickOnTitle = function(msgId) {
         // msgId can't be null here
-        if ($scope.prevMessageId == msgId) {
-            $scope.chosenMessage = $scope.chosenMessage == null ? getEventById(msgId) : null;
-        } else {
-            $scope.chosenMessage = getEventById(msgId);
-        }
+        $scope.chosenMessage = getEventById(msgId);
         $scope.prevMessageId = msgId;
     }*/
 
@@ -407,7 +403,8 @@ angular.module('won.owner')
 
     $scope.clickOnSendRequestMessage = function() {
         console.log('send request message');
-        wonService.open($scope.need.uri, $scope.chosenMessage.connection.uri);
+        //wonService.open($scope.chosenMessage.connection.uri);
+        wonService.openSuggestedConnection($scope.chosenMessage.connection.uri);
         $scope.showMatchControl = false;
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');

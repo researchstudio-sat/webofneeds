@@ -2206,7 +2206,7 @@
             {
                 '@id': '@id',
                 '@language': '@language',
-                '@literal': '@literal',
+                '@value': '@value',
                 '@type': '@type'
             };
 
@@ -2453,7 +2453,7 @@
             // 1. It is an Object.
             // 2. It is not a literal.
             // 3. It has more than 1 key OR any existing key is not '@id'.
-            if(value !== null && value.constructor === Object && !('@literal' in value))
+            if(value !== null && value.constructor === Object && !('@value' in value))
             {
                 var keyCount = Object.keys(value).length;
                 rval = (keyCount > 1 || !('@id' in value));
@@ -2745,9 +2745,9 @@
                                     obji2 = {'token':'uri', 'value':obji2['@id']};
                                 }
                             } else if(obji2['@type'] != null) {
-                                obji2 = {'token':'literal', 'value':obji2['@literal'], 'type':obji2['@type']};
+                                obji2 = {'token':'literal', 'value':obji2['@value'], 'type':obji2['@type']};
                             } else if(obji2['@language'] != null) {
-                                obji2 = {'token':'literal', 'value':obji2['@literal'], 'lang':obji2['@language']};
+                                obji2 = {'token':'literal', 'value':obji2['@value'], 'lang':obji2['@language']};
                             }
 
                             quit = (callback(s, {'token':'uri', 'value':p}, obji2) === false);
@@ -3044,9 +3044,9 @@
                             {
                                 rval = value['@id'];
                             }
-                            else if('@literal' in value)
+                            else if('@value' in value)
                             {
-                                rval = value['@literal'];
+                                rval = value['@value'];
                             }
                         }
                         else
@@ -3215,7 +3215,7 @@
                             value = value.toExponential(6).replace(
                                 /(e(?:\+|-))([0-9])$/, '$10$2');
                         }
-                        rval['@literal'] = '' + value;
+                        rval['@value'] = '' + value;
                     }
                 }
                 // nothing to coerce
@@ -3433,10 +3433,10 @@
             }
             else
             {
-                rval = _compareObjectKeys(o1, o2, '@literal');
+                rval = _compareObjectKeys(o1, o2, '@value');
                 if(rval === 0)
                 {
-                    if('@literal' in o1)
+                    if('@value' in o1)
                     {
                         rval = _compareObjectKeys(o1, o2, '@type');
                         if(rval === 0)
@@ -3474,8 +3474,8 @@
              3.2.1. The bnode with fewer non-bnodes is first.
              3.2.2. The bnode with a string object is first.
              3.2.3. The bnode with the alphabetically-first string is first.
-             3.2.4. The bnode with a @literal is first.
-             3.2.5. The bnode with the alphabetically-first @literal is first.
+             3.2.4. The bnode with a @value is first.
+             3.2.5. The bnode with the alphabetically-first @value is first.
              3.2.6. The bnode with the alphabetically-first @type is first.
              3.2.7. The bnode with a @language is first.
              3.2.8. The bnode with the alphabetically-first @language is first.
@@ -3639,7 +3639,7 @@
             else if(value.constructor === Object)
             {
                 // already-expanded value or special-case reference-only @type
-                if('@literal' in value || parentProperty === '@type')
+                if('@value' in value || parentProperty === '@type')
                 {
                     flattened = _clone(value);
                 }
@@ -4114,7 +4114,7 @@
                             // literal
                             else
                             {
-                                rval += '"' + o['@literal'] + '"';
+                                rval += '"' + o['@value'] + '"';
 
                                 // type literal
                                 if('@type' in o)
