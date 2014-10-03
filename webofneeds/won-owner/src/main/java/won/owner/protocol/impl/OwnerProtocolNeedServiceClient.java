@@ -313,11 +313,17 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
           con = connectionRepository.findOneByConnectionURI(connectionURI);
           if (con != null) {
             //connection already known. check if the data is consistent
-            if (
-              !needURI.equals(con.getNeedURI()) ||
-              !otherNeedURI.equals(con.getRemoteNeedURI())) {
-              logger.warn("inconsistent data detected! Connect returned this new local connection URI: {}, " +
-                "which is already known with this data: {}", connectionURI, con );
+            String problem = null;
+            if (!needURI.equals(con.getNeedURI())){
+              problem = "Different needURI";
+            } else if (con.getRemoteNeedURI() != null && !con.getRemoteNeedURI().equals(otherNeedURI)){
+              problem = "Different remoteNeedURI";
+            } else if (con.getTypeURI() != null && con.getTypeURI() != facetURI) {
+              problem = "Different facetURI";
+            }
+            if (problem != null) {
+              logger.warn("inconsistent data detected - connect returned this new local connection URI: {}, " +
+                "which is already known with this data: {}. Problem: " + problem+".", connectionURI, con);
               throw new IllegalArgumentException("Connect led to inconsistent data! See log for details");
             }
             con.setTypeURI(facetURI);
