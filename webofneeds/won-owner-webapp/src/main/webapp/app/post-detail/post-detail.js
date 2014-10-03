@@ -21,7 +21,7 @@
  * Time: 10:01 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams, applicationStateService) {
+angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams, $index, applicationStateService) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
 

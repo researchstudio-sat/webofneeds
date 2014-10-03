@@ -16,10 +16,12 @@
 
 app = angular.module('won.owner', ['ui.bootstrap', 'ngRoute', 'ui.map', 'blueimp.fileupload', 'ngMockE2E', 'smart-table']).config(function ($routeProvider, $httpProvider, $provide) {
 	$routeProvider.
-			when('/', {controller : 'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
+            when('/create-need/:step/:menuposition/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
+            when('/create-need/:step/:menuposition', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
+			when('/', {controller : 'HomeCtrl', templateUrl:'app/home/welcome.html'}).
+            when('/home', {controller : 'HomeCtrl', templateUrl: 'app/home/home.partial.html'}).
 			when('/signin', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
 			when('/register', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
-            when('/create-need/:step/:menuposition/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
             when('/need-list', {controller : 'NeedListCtrl', templateUrl:'app/need-list/need-list.partial.html'}).
 			when('/need-detail/:needId', {controller:'NeedDetailCtrl', templateUrl:'app/need-detail/need-detail.partial.html'}).
             when('/why-use', {controller:'WhyUseCtrl', templateUrl:'app/why-use/why-use.html'}).
@@ -31,7 +33,7 @@ app = angular.module('won.owner', ['ui.bootstrap', 'ngRoute', 'ui.map', 'blueimp
             when('/postbox', {controller:'PostBoxCtrl', templateUrl:'app/postbox/postbox.html'}).
             when('/private-link', {controller:'PrivateLinkCtrl', templateUrl:'app/private-link/private-link.html'}).
             when('/post-detail', {controller:'PostDetailCtrl', templateUrl:'app/post-detail/post-detail.html'}).
-			otherwise({redirectTo : '/'});
+			otherwise({redirectTo : '/home'});
 
 app.directive('header', function(){
     return {
@@ -184,12 +186,14 @@ app.run(function($httpBackend,$rootScope){
         $httpBackend.whenDELETE('/owner/rest/needs/drafts').passThrough();
         $httpBackend.whenGET('/owner/rest/needs/drafts/.+').passThrough();
         $httpBackend.whenDELETE('/owner/rest/needs/drafts/.+').passThrough();
-       // $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').passThrough();
-        $httpBackend.whenGET(/.*/).passThrough();
+        $httpBackend.whenPOST('/owner/rest/need/create/saveDraft').passThrough();
+      $httpBackend.whenGET(/.*/).passThrough();
         $httpBackend.whenPOST(/.*/).passThrough();
-       // $httpBackend.whenPOST(/\/owner\/rest\/user\/.*/).passThrough();
+       $httpBackend.whenPOST(/\/owner\/rest\/user\/.*/).passThrough();
         $httpBackend.whenPOST('/owner').passThrough();
+
         $httpBackend.whenGET('/').passThrough();
+        $httpBackend.whenGET('/home').passThrough();
         $httpBackend.whenGET('/signin').passThrough();
         $httpBackend.whenGET('/register').passThrough();
         $httpBackend.whenGET('/create-need').passThrough();

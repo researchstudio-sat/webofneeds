@@ -37,7 +37,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.wonNodeURI = "http://localhost:8080/won";
     $scope.needURIPath = "/resource/need";
     $scope.connectionURIPath = "/connection";
-
+    $scope.selectedType = -1;
     $scope.unreadObjects = applicationStateService.getUnreadObjects();
 
     //allow acces to service methods from angular expressions:

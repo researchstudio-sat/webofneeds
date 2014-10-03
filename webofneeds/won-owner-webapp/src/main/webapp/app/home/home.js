@@ -14,9 +14,11 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('HomeCtrl', function ($scope, $location, userService) {
+angular.module('won.owner').controller('HomeCtrl', function ($scope,$routeParams, $location, userService) {
     var firstDisplay = true;
     var time = 400;
+
+
 
 	$scope.goToNewNeed = function() {
 		if(userService.isAuth()) {
@@ -27,12 +29,16 @@ angular.module('won.owner').controller('HomeCtrl', function ($scope, $location, 
 	}
 
 	$scope.goToAllNeeds = function () {
+
 		if (userService.isAuth()) {
 			$location.path("/need-list");
 		} else {
 			$location.path("/signin");
 		}
 	}
+    $scope.goHome = function(){
+        $location.path("/home");
+    }
 
 	$scope.forms = new function() {
 		this.signin = ($location.path().indexOf("signin") > -1);
@@ -157,21 +163,35 @@ angular.module('won.owner').controller('HomeCtrl', function ($scope, $location, 
 
         this.reset();
     };
-    $scope.onClickIMenuItem = function(item) {
+
+    $scope.iPost.menuposition = -1;
+    $scope.$watch('selectedType', function(newVal,oldVal){
+        if(newVal != oldVal ){
+            $scope.onClickIMenuItem(newVal, oldVal);
+        } else if(oldVal != $scope.iPost.menuposition){
+            $scope.onClickIMenuItem(newVal, $scope.iPost.menuposition);
+        }
+    });
+    //$('#IMenuItem' + $scope.selectedType).addClass('active');
+    $scope.onClickIMenuItem = function(item, oldVal) {
+
         if(item > -1){
 
-            if($scope.iPost.menuposition == item){
-                $('#IMenuItem' + $scope.iPost.menuposition).removeClass('active');
-                $scope.iPost.menuposition = -1;
+            if( oldVal == item){
+                $('#IMenuItem' +  oldVal).removeClass('active');
+                $scope.$parent.selectedType = -1;
             }else{
-                if($scope.iPost.menuposition > -1){
-                    $('#IMenuItem' + $scope.iPost.menuposition).removeClass('active');
+                if(oldVal > -1){
+                    $('#IMenuItem' +  oldVal).removeClass('active');
                 }
-                $scope.iPost.menuposition = item;
-                $('#IMenuItem' + $scope.iPost.menuposition).addClass('active');
+                $scope.$parent.selectedType = item;
+                $scope.iPost.menuposition = $scope.selectedType;
+
+                $('#IMenuItem' +  item).addClass('active');
             }
         }
     }
+
     $scope.onClickOnNewPost = function() {
         //$location.path('/create-need/2');
         var validPanel = true;
@@ -261,7 +281,7 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
 	onLoginResponse = function(response) {
 		if (response.status == "OK") {
 			userService.setAuth($scope.username);
-			$location.path('/');
+			$location.path('/home');
 		} else if (response.status == "ERROR") {
 			$scope.error = response.message;
 		} else {
