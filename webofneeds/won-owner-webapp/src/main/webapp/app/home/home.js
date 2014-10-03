@@ -164,9 +164,13 @@ angular.module('won.owner').controller('HomeCtrl', function ($scope,$routeParams
         this.reset();
     };
 
-    $scope.iPost.menuposition = $scope.selectedType;
+    $scope.iPost.menuposition = -1;
     $scope.$watch('selectedType', function(newVal,oldVal){
-        $scope.onClickIMenuItem(newVal, oldVal);
+        if(newVal != oldVal ){
+            $scope.onClickIMenuItem(newVal, oldVal);
+        } else if(oldVal != $scope.iPost.menuposition){
+            $scope.onClickIMenuItem(newVal, $scope.iPost.menuposition);
+        }
     });
     //$('#IMenuItem' + $scope.selectedType).addClass('active');
     $scope.onClickIMenuItem = function(item, oldVal) {
@@ -177,11 +181,12 @@ angular.module('won.owner').controller('HomeCtrl', function ($scope,$routeParams
                 $('#IMenuItem' +  oldVal).removeClass('active');
                 $scope.$parent.selectedType = -1;
             }else{
-                if( oldVal > -1){
+                if(oldVal > -1){
                     $('#IMenuItem' +  oldVal).removeClass('active');
-                }else if(oldVal != -1) {
-                    $scope.$parent.selectedType = item;
                 }
+                $scope.$parent.selectedType = item;
+                $scope.iPost.menuposition = $scope.selectedType;
+
                 $('#IMenuItem' +  item).addClass('active');
             }
         }

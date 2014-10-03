@@ -26,6 +26,15 @@ angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, 
 
     $scope.authenticated = false;
 
+    $scope.redirectHome= function(){
+        $scope.authenticated = !userService.isAuth();
+        if(!$scope.authenticated){
+            $location.path("/home");
+        }else{
+            $location.path("/");
+        }
+    }
+
 	$scope.showPublic = function() {
         $scope.authenticated = !userService.isAuth();
 		return  $scope.authenticated;
@@ -50,6 +59,7 @@ angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, 
         }
     })
     $scope.onDropDownClick=function(num){
+
         $scope.$parent.selectedType = num;
     }
 	onResponseSignOut = function (result) {

@@ -16,11 +16,12 @@
 
 app = angular.module('won.owner', ['ui.bootstrap', 'ngRoute', 'ui.map', 'blueimp.fileupload', 'ngMockE2E', 'smart-table']).config(function ($routeProvider, $httpProvider, $provide) {
 	$routeProvider.
+            when('/create-need/:step/:menuposition/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
+            when('/create-need/:step/:menuposition', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
 			when('/', {controller : 'HomeCtrl', templateUrl:'app/home/welcome.html'}).
             when('/home', {controller : 'HomeCtrl', templateUrl: 'app/home/home.partial.html'}).
 			when('/signin', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
 			when('/register', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
-            when('/create-need/:step/:menuposition/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
             when('/need-list', {controller : 'NeedListCtrl', templateUrl:'app/need-list/need-list.partial.html'}).
 			when('/need-detail/:needId', {controller:'NeedDetailCtrl', templateUrl:'app/need-detail/need-detail.partial.html'}).
             when('/why-use', {controller:'WhyUseCtrl', templateUrl:'app/why-use/why-use.html'}).
