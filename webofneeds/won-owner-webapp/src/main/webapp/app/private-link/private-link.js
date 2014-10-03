@@ -243,7 +243,7 @@ angular.module('won.owner')
     // helper function to get message according to its id from messages
     function getEventById(msgId) {
         for(var i = 0; i < $scope.events.length; i++) {
-            if ($scope.events[i].uri == msgId) return $scope.events[i];
+            if ($scope.events[i].event.uri == msgId) return $scope.events[i];
         }
         return null; //should not get here
     }
@@ -256,7 +256,23 @@ angular.module('won.owner')
         });
     }
 
-    $scope.clickOnTitle = function(msgId) {
+        /**
+         * Updates the chosenMessage:
+         * if there was no message previously chosen, or there was a messageChosen
+         * different from the provided message, then chosenMessage is set to the
+         * provided message. Otherwise the chosenMessage is set to null (toggled)
+         * @param matchEvent the match event on which the user has clicked
+         */
+        $scope.clickOnMatch = function(matchEvent) {
+            // msgId can't be null here
+            if ($scope.prevMessageId == matchEvent.event.uri) {
+                $scope.chosenMessage = $scope.chosenMessage == null ? matchEvent : null;
+            } else {
+                $scope.chosenMessage = matchEvent;
+            }
+            $scope.prevMessageId = matchEvent.event.uri;
+        }
+/*    $scope.clickOnTitle = function(msgId) {
         // msgId can't be null here
         if ($scope.prevMessageId == msgId) {
             $scope.chosenMessage = $scope.chosenMessage == null ? getEventById(msgId) : null;
@@ -264,7 +280,7 @@ angular.module('won.owner')
             $scope.chosenMessage = getEventById(msgId);
         }
         $scope.prevMessageId = msgId;
-    }
+    }*/
 
     $scope.showConversations = function() {
         if($scope.chosenMessage != null){
@@ -362,6 +378,7 @@ angular.module('won.owner')
     $scope.clickOnRemoveMatch = function() {
         console.log('remove clicked');
         $scope.showConfirmationDialogForRemoveMatch = true;
+
     }
 
     $scope.clickOnNoForRemoveMatch = function() {
