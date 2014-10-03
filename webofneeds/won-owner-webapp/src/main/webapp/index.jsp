@@ -176,10 +176,11 @@
 					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
 						<li class="text-center grey-item">{{unreadObjects.all.message.count}}&nbsp;new messages</li>
 						<!-- TODO put real parameters into url -->
-						<li ng-repeat="entry in unreadObjects.byNeed.message"><a href="#/private-link"><img
-                                src="{{getTypePicURI
-						(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
-								class="badge pull-right">{{entry.count}}</span></a></li>
+                        <li ng-repeat="entry in unreadObjects.byNeed.message"><a
+                                ng-click="openNeedDetailView(entry.need.uri)"><img
+                                src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
+                                class="badge pull-right">{{entry.count}}</span></a>
+                        </li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
 						</li>
 					</ul>
@@ -193,10 +194,11 @@
 						<li class="text-center grey-item">{{unreadObjects.all.connect.count}}&nbsp;new
                             connects</li>
 						<!-- TODO put real parameters into url -->
-						<li ng-repeat="entry in unreadObjects.byNeed.connect"><a href="#/private-link"><img
-								src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
+                        <li ng-repeat="entry in unreadObjects.byNeed.connect"><a
+                                ng-click="openNeedDetailView(entry.need.uri)"><img
+                                src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
                                 class="badge pull-right">{{entry.count}}</span></a>
-						</li>
+                        </li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
 						</li>
 					</ul>

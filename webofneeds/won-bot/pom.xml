@@ -16,6 +16,19 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <!-- don't run the integration tests in a regular build -->
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>won.bot.integrationtest/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
   <dependencies>
       <!-- WON stuff -->
       <dependency>

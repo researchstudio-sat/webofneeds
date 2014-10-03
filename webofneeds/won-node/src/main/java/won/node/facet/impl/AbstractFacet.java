@@ -89,6 +89,8 @@ public abstract class AbstractFacet implements Facet
   public void openFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
+    //in an 'open' call the local and the remote connection URI are always known and must be present
+    //in the con object.
 
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters are not used anymore
@@ -418,9 +420,7 @@ public abstract class AbstractFacet implements Facet
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
     Model remoteFacetModel = null;
-    if (wonMessage == null) {
-       remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
-    }
+    remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
 
     final Connection connectionForRunnable = con;
     //send to need

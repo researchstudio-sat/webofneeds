@@ -53,8 +53,13 @@
         won.WON.isInStateCompacted = won.WON.prefix+":isInState";
         won.WON.hasFacet= won.WON.baseUri+"hasFacet";
         won.WON.hasFacetCompacted= won.WON.prefix+":hasFacet";
+        won.WON.hasRemoteFacet= won.WON.baseUri+"hasRemoteFacet";
+        won.WON.hasRemoteFacetCompacted= won.WON.prefix+":hasRemoteFacet";
+
         won.WON.hasRemoteNeed= won.WON.baseUri+"hasRemoteNeed";
         won.WON.hasRemoteNeedCompacted = won.WON.prefix+":hasRemoteNeed";
+        won.WON.hasRemoteConnection = won.WON.baseUri+"hasRemoteConnection";
+        won.WON.hasRemoteConnectionCompacted = won.WON.prefix+":hasRemoteConnection";
 
         //EVENT TYPES
         won.WON.OwnerClose = won.WON.baseUri + "OwnerClose";
@@ -92,7 +97,17 @@
         won.WON.BasicNeedTypeDotogetherCompacted = won.WON.prefix + ":DoTogether";
         won.WON.BasicNeedTypeCritique = won.WON.baseUri + "Critique";
         won.WON.BasicNeedTypeCritiqueCompacted = won.WON.prefix + ":Critique";
-        won.WON.belongsToNeed = won.WON.baseUri + ":belongsToNeed";
+        won.WON.OwnerFacet = won.WON.baseUri +"OwnerFacet";
+        won.WON.OwnerFacetCompacted = won.WON.prefix +":OwnerFacet";
+        won.WON.GroupFacet = won.WON.baseUri +"GroupFacet";
+        won.WON.GroupFacetCompacted = won.WON.prefix +":GroupFacet";
+        won.WON.ParticipantFacet = won.WON.baseUri +"ParticipantFacet";
+        won.WON.ParticipantFacetCompacted = won.WON.prefix +":ParticipantFacet";
+        won.WON.CommentFacet = won.WON.baseUri +"CommentFacet";
+        won.WON.CommentFacetCompacted = won.WON.prefix +":CommentFacet";
+        won.WON.CoordinatorFacet = won.WON.baseUri +"CoordinatorFacet";
+        won.WON.CoordinatorFacetCompacted = won.WON.prefix +":CoordinatorFacet";
+        won.WON.belongsToNeed = won.WON.baseUri + "belongsToNeed";
         won.WON.belongsToNeedCompacted = won.WON.prefix + ":belongsToNeed";
         won.WON.hasBasicNeedType = won.WON.baseUri + "hasBasicNeedType";
         won.WON.hasBasicNeedTypeCompacted = won.WON.prefix + ":hasBasicNeedType";
@@ -127,6 +142,8 @@
         won.WON.hasMatchScoreCompacted = won.WON.prefix + ":hasMatchScore";
         won.WON.hasMatchCounterpart = won.WON.baseURI + "hasMatchCounterpart";
         won.WON.hasMatchCounterpart = won.WON.prefix + ":hasMatchCounterpart";
+
+
 
         won.WONMSG = {};
         won.WONMSG.baseUri = "http://purl.org/webofneeds/message#";
@@ -216,6 +233,7 @@
         won.UNREAD.GROUP.BYNEED="byNeed";
 
         //UTILS
+        var UNSET_EVENT_URI= "no:uri";
 
         won.clone = function(obj){
             return JSON.parse(JSON.stringify(obj));
@@ -274,6 +292,10 @@
             return Object.prototype.toString.call( x ) === '[object Array]';
         }
 
+        won.replaceRegExp = function (string) {
+            return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        }
+
         /**
          * Deletes every element of the array for which the
          * test function returns true.
@@ -297,6 +319,31 @@
         won.deleteWhereNull = function(array){
             return won.deleteWhere(array, function(x){ return x == null});
         }
+
+        /**
+         * Visits the specified data structure. For each element, the callback is called
+         * as callback(element, key, container) where the key is the key of the element
+         * in its container or callback (element, null, null) if there is no such container).
+         */
+        won.visitDepthFirst = function(data, callback, currentKey, currentContainer){
+            if (data == null) return;
+            if (won.isArray(data) && data.length > 0){
+                for (key in data) {
+                    won.visitDepthFirst(data[key], callback, key, data);
+                }
+                return;
+            }
+            if (typeof data === 'object'){
+                for (key in data) {
+                    won.visitDepthFirst(data[key], callback, key, data);
+                }
+                return;
+            }
+            //not a container: visit value.
+            callback(data, currentKey, currentContainer);
+        }
+
+
 
         won.minimalContext = {
             "msg": "http://purl.org/webofneeds/message#",
@@ -409,6 +456,25 @@
         }
 
         /**
+         *  Adds a msg:hasContent triple for each specified graphURI into the message graph
+         * @param messageGraph
+         * @param graphURIs
+         */
+        won.addContentGraphReferencesToMessageGraph = function(messageGraph, graphURIs){
+            if (graphURIs != null) {
+                if (won.isArray(graphURIs) && graphURIs.length > 0) {
+                    //if the message graph already contains content references, fetch them:
+                    var existingContentRefs = messageGraph["@graph"][0][won.WONMSG.hasContentCompacted];
+                    var contentGraphURIs = (typeof existingContentRefs === 'undefined' || ! isArray(existingContentRefs))? []: existingContentRefs;
+                    for (var i = 0; i < graphURIs.length; i++) {
+                        contentGraphURIs.push({'@id': graphURIs[i]});
+                    }
+                    messageGraph["@graph"][0][won.WONMSG.hasContentCompacted] = contentGraphURIs;
+                }
+            }
+        }
+
+        /**
          * Adds the message graph to the json-ld structure 'builder.data' with
          * the specified messageType
          * and adds all specified graph URIs (which must be URIs of the
@@ -420,28 +486,28 @@
         won.addMessageGraph = function (builder, graphURIs, messageType) {
             graphs = builder.data['@graph'];
             //add the default graph to the graphs of the builder
-            graphs.push(
-                {
-                    "@graph": [],
-                    "@id":"@default"
-                });
+            var defaultGraph = won.JsonLdHelper.getDefaultGraph(builder.data);
+            if (defaultGraph == null) {
+                defaultGraph =
+                    {
+                        "@graph": [],
+                        "@id": "@default"
+                    };
+                graphs.push(defaultGraph);
+            }
+            defaultGraph["@graph"].push({"@id": UNSET_EVENT_URI + "#data", "@type": "msg:EnvelopeGraph" });
 
             //create the message graph, containing the message type
             var messageGraph = {
-                "@graph": [ {"msg:hasMessageType": {'@id':messageType}}]
-            };
-            //add a won:hasContent triple for each specified graphURI into the message graph
-            if (graphURIs != null) {
-                if (typeof graphURIs == 'object' && graphURIs.length > 0) {
-                    var contentGraphURIs = [];
-                    for (var i = 0; i < graphURIs.length; i++) {
-                        contentGraphURIs.push({'@id': graphURIs[i]});
-                        //workaround for a suspected bug in jena's jsonld reader: multiple properties specified as array not supported?
-                        messageGraph["@graph"][0][won.WONMSG.hasContentCompacted] = {'@id': graphURIs[i]};
+                "@graph": [
+                    {
+                        "@id":UNSET_EVENT_URI,
+                        "msg:hasMessageType": {'@id':messageType}
                     }
-                    //messageGraph["@graph"][0][won.WONMSG.hasContentCompacted] = contentGraphURIs;
-                }
-            }
+                ],
+                "@id": UNSET_EVENT_URI + "#data"
+            };
+            won.addContentGraphReferencesToMessageGraph(messageGraph, graphURIs);
             //add the message graph to the graphs of the builder
             graphs.push(messageGraph);
             //point to the messagegraph so we can later access it easily for modifications
@@ -519,19 +585,19 @@
                 return this;
             },
             ownerFacet: function(){
-                return this.hasFacet("won:OwnerFacet");
+                return this.hasFacet(won.WON.OwnerFacetCompacted);
             },
             groupFacet: function(){
-                return this.hasFacet("won:GroupFacet");
+                return this.hasFacet(won.WON.GroupFacetCompacted);
             },
             coordinatorFacet: function(){
-                return this.hasFacet("won:coordinatorFacet");
+                return this.hasFacet(won.WON.CoordinatorFacetCompacted);
             },
             participantFacet: function(){
-                return this.hasFacet("won:ParticipantFacet");
+                return this.hasFacet(won.WON.ParticipantFacetCompacted);
             },
             commentFacet: function(){
-                return this.hasFacet("won:CommentFacet");
+                return this.hasFacet(won.WON.CommentFacetCompacted);
             },
             commentModeratedFacet: function(){
                 return this.hasFacet("won:CommentModeratedFacet");
@@ -675,109 +741,7 @@
                 return this.data;
             }
         }
-       // window.NeedBuilder = NeedBuilder;
 
-        won.CreateMessageBuilder = function CreateMessageBuilder(dataset) {
-
-            this.data = won.clone(dataset);
-            this.messageGraph = null;
-            won.addMessageGraph(this, won.JsonLdHelper.getGraphNames(dataset), won.WONMSG.createMessage);
-            //add the sender need
-            this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":dataset['@graph'][0]['@graph'][0]['@id']};
-        };
-
-        won.CreateMessageBuilder.prototype = {
-            constructor: won.CreateMessageBuilder,
-
-            eventURI: function (eventUri) {
-                won.JsonLdHelper.getContext(this.data)["msg:EnvelopeGraph"]= {
-                    "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
-                    "@type": "@id"
-                };
-
-                won.JsonLdHelper.getDefaultGraph(this.data).push({"@id":eventUri+"#data", "@type": "msg:EnvelopeGraph" });
-                this.getMessageEventNode()['@id'] = eventUri;
-                this.getMessageEventGraph()['@id'] = eventUri+"#data";
-                return this;
-            },
-            hasReceiverNode: function(receiverNodeURI){
-                this.getMessageEventNode()["msg:hasReceiverNode"]={"@id":receiverNodeURI};
-                return this;
-            },
-            getMessageEventGraph: function (){
-                return this.messageGraph;
-            },
-            getMessageEventNode: function () {
-                return this.getMessageEventGraph()["@graph"][0]
-            },
-            build: function () {
-                return this.data;
-            }
-        }
-
-        won.ConnectMessageBuilder = function ConnectMessageBuilder(){
-            this.data =
-                {
-                    "@graph": [
-
-                    ],
-                    "@context" : won.clone(won.minimalContext)
-                }
-            won.addMessageGraph(this, null, won.WONMSG.connectMessageCompacted);
-        };
-
-        won.ConnectMessageBuilder.prototype = {
-            constructor: won.ConnectMessageBuilder,
-
-            eventURI: function (eventUri) {
-                var eventGraphUri = eventUri +"#data";
-                this.getContext()["msg:EnvelopeGraph"]= {
-                    "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
-                    "@type": "@id"
-                },
-                won.JsonLdHelper.getDefaultGraph(this.data).push({"@id": eventGraphUri, "@type": "msg:EnvelopeGraph" });
-                this.getMessageEventNode()['@id'] = eventUri;
-                this.getMessageEventGraph()['@id'] = eventGraphUri;
-                return this;
-            },
-            getContext :  function () {
-                return this.data["@context"];
-            },
-            hasSenderNeed: function(senderNeedURI){
-                this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":senderNeedURI};
-                return this;
-            },
-            hasSenderNode: function(senderNodeURI){
-                this.getMessageEventNode()["msg:hasSenderNode"]={"@id":senderNodeURI};
-                return this;
-            },
-            hasSender: function(){
-                this.getMessageEventNode()["msg:sender"]={"@id":this.getContext()["@base"]};
-                return this;
-            },
-            hasReceiver: function(){
-                this.getMessageEventNode()["msg:receiver"]={"@id":this.getMessageEventNode()["msg:hasReceiverNeed"]["@id"]+"/facets#owner"};
-                return this;
-            },
-            hasReceiverNeed: function(receiverNeedURI){
-                this.getMessageEventNode()["msg:hasReceiverNeed"]={"@id":receiverNeedURI};
-                return this;
-            },
-            hasReceiverNode: function(receiverURI){
-                this.getMessageEventNode()["msg:hasReceiverNode"]={"@id":receiverURI};
-                return this;
-            },
-            getMessageEventGraph: function (){
-                return this.messageGraph;
-            },
-            getMessageEventNode: function () {
-                return this.getMessageEventGraph()["@graph"][0];
-            },
-            build: function () {
-                console.log("built this message:" + JSON.stringify(this.data));
-                return this.data;
-            }
-        };
 
         /**
          * Builds a JSON-LD WoN Message or adds the relevant data to the specified
@@ -792,7 +756,7 @@
             }
             var graphNames = null;
             if (content != null) {
-                this.data = won.clone(dataset);
+                this.data = won.clone(content);
                 graphNames = won.JsonLdHelper.getGraphNames(this.data);
             } else {
                 this.data =
@@ -804,6 +768,7 @@
                 }
             }
             this.messageGraph = null;
+            this.eventUriValue = UNSET_EVENT_URI;
             won.addMessageGraph(this, graphNames , messageType);
         };
 
@@ -811,41 +776,72 @@
             constructor: won.MessageBuilder,
 
             eventURI: function (eventUri) {
-                var eventGraphUri = eventUri +"#data";
-                this.getContext()["msg:EnvelopeGraph"]= {
+                this.getContext()[won.WONMSG.EnvelopeGraphCompacted]= {
                     "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
                     "@type": "@id"
-                },
-                won.JsonLdHelper.getDefaultGraph(this.data).push({"@id": eventGraphUri, "@type": "msg:EnvelopeGraph" });
-                this.getMessageEventNode()['@id'] = eventUri;
-                this.getMessageEventGraph()['@id'] = eventGraphUri;
+                };
+                var regex = new RegExp(won.replaceRegExp(this.eventUriValue));
+                won.visitDepthFirst(this.data, function(element, key, collection){
+                    if (collection != null && key === '@id'){
+                        if (element)
+                        collection[key] = element.replace(regex, eventUri);
+                    }
+                });
+                this.eventUriValue = eventUri;
                 return this;
             },
             getContext :  function () {
                 return this.data["@context"];
             },
+            forEnvelopeData: function (envelopeData){
+                var node = this.getMessageEventNode();
+                for (key in envelopeData){
+                    node[key] = {"@id":envelopeData[key]};
+                }
+                return this;
+            },
             hasSenderNeed: function(senderNeedURI){
-                this.getMessageEventNode()["msg:hasSenderNeed"]={"@id":senderNeedURI};
+                this.getMessageEventNode()[won.WONMSG.hasSenderNeedCompacted]={"@id":senderNeedURI};
                 return this;
             },
             hasSenderNode: function(senderNodeURI){
-                this.getMessageEventNode()["msg:hasSenderNode"]={"@id":senderNodeURI};
+                this.getMessageEventNode()[won.WONMSG.hasSenderNodeCompacted]={"@id":senderNodeURI};
                 return this;
             },
             hasSender: function(senderURI){
-                this.getMessageEventNode()["msg:sender"]={"@id":senderURI};
+                this.getMessageEventNode()[won.WONMSG.hasSenderCompacted]={"@id":senderURI};
                 return this;
             },
             hasReceiver: function(receiverURI){
-                this.getMessageEventNode()["msg:receiver"]={"@id":receiverURI};
+                this.getMessageEventNode()[won.WONMSG.hasReceiverCompacted]={"@id":receiverURI};
                 return this;
             },
             hasReceiverNeed: function(receiverNeedURI){
-                this.getMessageEventNode()["msg:hasReceiverNeed"]={"@id":receiverNeedURI};
+                this.getMessageEventNode()[won.WONMSG.hasReceiverNeedCompacted]={"@id":receiverNeedURI};
                 return this;
             },
             hasReceiverNode: function(receiverURI){
-                this.getMessageEventNode()["msg:hasReceiverNode"]={"@id":receiverURI};
+                this.getMessageEventNode()[won.WONMSG.hasReceiverNodeCompacted]={"@id":receiverURI};
+                return this;
+            },
+            /**
+             * Adds the specified facet as local facets. Only needed for connect and
+             * openSuggested.
+             * @param receiverURI
+             * @returns {won.MessageBuilder}
+             */
+            hasFacet: function(facetURI){
+                this.getContentGraphNode()[won.WON.hasFacetCompacted]={"@id":facetURI};
+                return this;
+            },
+            /**
+             * Adds the specified facet as local facets. Only needed for connect and
+             * openSuggested.
+             * @param receiverURI
+             * @returns {won.MessageBuilder}
+             */
+            hasRemoteFacet: function(facetURI){
+                this.getContentGraphNode()[won.WON.hasRemoteFacetCompacted]={"@id":facetURI};
                 return this;
             },
             getMessageEventGraph: function (){
@@ -853,6 +849,30 @@
             },
             getMessageEventNode: function () {
                 return this.getMessageEventGraph()["@graph"][0];
+            },
+            /**
+             * Fetches the content graph, creating it if it doesn't exist.
+             */
+            getContentGraph: function(){
+                var graphs = this.data["@graph"];
+                for (key in graphs){
+                    var graph = graphs[key];
+                    if (graph['@id'] === this.eventUriValue + "#content"){
+                        return graph;
+                    }
+                }
+                //none found: create it
+                var contentGraph = {
+                    "@id": this.eventUriValue + "#content",
+                    "@graph" :[
+                        {"@id": this.eventUriValue}
+                    ]
+                }
+                graphs.push(contentGraph);
+                return contentGraph;
+            },
+            getContentGraphNode: function(){
+                return this.getContentGraph()["@graph"][0];
             },
             build: function () {
                 console.log("built this message:" + JSON.stringify(this.data));

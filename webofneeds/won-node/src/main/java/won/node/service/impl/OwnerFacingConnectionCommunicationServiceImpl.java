@@ -69,6 +69,10 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
     if (wonMessage != null) {
+      //TODO: currently, the WoN node does not alter (extend) the WonMessage. However,
+      //the sender (owner) could only fill in senderURI (=connectionURI) and wonNodeURI, and
+      //the WoN node could add the properties required for routing to the destination, as these
+      //properties are stored on the WoN node with the connection data.
 
       logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
       rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
@@ -76,7 +80,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
       URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
 
-      logger.debug("OPEN received from the owner side for connection {0}", connectionURIFromWonMessage);
+      logger.debug("OPEN received from the owner side for connection {}", connectionURIFromWonMessage);
 
       Connection con = dataService.nextConnectionState(connectionURIFromWonMessage, ConnectionEventType.OWNER_OPEN);
 
@@ -88,7 +92,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
     } else {
 
-      logger.debug("OPEN received from the owner side for connection {0} with content {1}", connectionURI, content);
+      logger.debug("OPEN received from the owner side for connection {} with content {}", connectionURI, content);
 
       Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
 

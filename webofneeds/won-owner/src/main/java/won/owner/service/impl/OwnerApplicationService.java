@@ -18,18 +18,17 @@ import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
-import won.protocol.model.FacetType;
 import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -89,8 +88,10 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
           throw new IllegalArgumentException("no sender need URI found!");
         }
         // get the core graph of the message for the need model
-        String coreModelURIString = senderNeedURI.toString() + "/core#data";
-        Model content = wonMessage.getMessageContent(coreModelURIString);
+
+        //TODO:this is only for old messaging style. Remove when switched
+        Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+        RdfUtils.replaceBaseURI(content, wonMessage.getMessageEvent().getMessageURI().toString());
 
         // ToDo (FS): this should be encapsulated in an own subclass of WonMessage
         // get the active status
@@ -149,37 +150,14 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
           needURI = wonMessage.getMessageEvent().getSenderNeedURI();
           otherNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
 
-          content = wonMessage.getMessageEvent().getModel();
-          com.hp.hpl.jena.rdf.model.Model facetModel =
-            WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
-              FacetType.OwnerFacet.getURI(),
-              FacetType.OwnerFacet.getURI());
-          content.add(facetModel);
+          content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageEvent().getMessageURI().toString());
 
           final ListenableFuture<URI> newConnectionURI;
 
           wonMessageMap.put(wonMessage.getMessageEvent().getSenderNeedURI(), wonMessage);
-          newConnectionURI = ownerProtocolService.connect(needURI, otherNeedURI, content, null);
+          newConnectionURI = ownerProtocolService.connect(needURI, otherNeedURI, content, wonMessage);
 
-          newConnectionURI.addListener(new Runnable(){
-            @Override
-            public void run(){
-              try {
-                if (newConnectionURI.isDone()) {
-                  sendBackResponseMessageToClient(
-                    wonMessageMap.get(newConnectionURI.get()), WONMSG.TYPE_RESPONSE_STATE_SUCCESS);
-                } else if (newConnectionURI.isCancelled()) {
-                  sendBackResponseMessageToClient(
-                    wonMessageMap.get(newConnectionURI.get()), WONMSG.TYPE_RESPONSE_STATE_FAILURE);
-                }
-              } catch (InterruptedException e) {
-                logger.warn("caught InterruptedException:", e);
-              } catch (ExecutionException e) {
-                logger.warn("caught ExecutionException:", e);
-              }
-            }
-          },executor);
-          // ToDo (FS): change connect code such that the connectionID of the messageEvent will be used
         } catch (Exception e) {
           logger.warn("caught Exception", e);
         }
@@ -204,17 +182,9 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
       case OPEN:
         try {
-
-          senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
-          URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
-
-          List<Connection> connections =
-            connectionRepository.findByNeedURIAndRemoteNeedURI(senderNeedURI, receiverNeedURI);
-
-          URI connectionURI = connections.get(0).getConnectionURI();
-
-          content = wonMessage.getMessageEvent().getModel();
-
+          URI connectionURI = wonMessage.getMessageEvent().getSenderURI();
+          content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageEvent().getMessageURI().toString());
           ownerProtocolService.open(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
@@ -223,17 +193,9 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
       case CLOSE:
         try {
-
-          senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
-          URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
-
-          List<Connection> connections =
-            connectionRepository.findByNeedURIAndRemoteNeedURI(senderNeedURI, receiverNeedURI);
-
-          URI connectionURI = connections.get(0).getConnectionURI();
-
-          content = wonMessage.getMessageEvent().getModel();
-
+          URI connectionURI = wonMessage.getMessageEvent().getSenderURI();
+          content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageEvent().getMessageURI().toString());
           ownerProtocolService.close(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
@@ -243,16 +205,9 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       case CONNECTION_MESSAGE:
         try {
 
-          senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
-          URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
-
-          List<Connection> connections =
-            connectionRepository.findByNeedURIAndRemoteNeedURI(senderNeedURI, receiverNeedURI);
-
-          URI connectionURI = connections.get(0).getConnectionURI();
-
-          content = wonMessage.getMessageEvent().getModel();
-
+          URI connectionURI = wonMessage.getMessageEvent().getSenderURI();
+          content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageEvent().getMessageURI().toString());
           ownerProtocolService.sendConnectionMessage(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);

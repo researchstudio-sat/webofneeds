@@ -127,8 +127,7 @@ public class NeedCommunicationServiceImpl implements
       Model facetModel = ModelFactory.createDefaultModel();
 
       try {
-
-        URI facet = wonMessage.getMessageEvent().getReceiverURI();
+        URI facet = dataService.getFacet(content);
         // ToDo (FS): adapt this part to the new message format (dont use content)
         if (facet == null) {
           //get the first one of the need's supported facets. TODO: implement some sort of strategy for choosing a facet here (and in the matcher)
@@ -201,7 +200,8 @@ public class NeedCommunicationServiceImpl implements
       URI senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
       URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
 
-      URI facetURI = wonMessage.getMessageEvent().getReceiverURI();
+      //TODO: when we introduce dedicated URIs for individual facets, this will be how
+      URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
 
       //create Connection in Database
       Connection con =  dataService.createConnection(senderNeedURI, receiverNeedURI, null, facetURI,
@@ -227,8 +227,7 @@ public class NeedCommunicationServiceImpl implements
 
       //invoke facet implementation
       Facet facet = reg.get(con);
-      // send an empty model until we remove this parameter
-      facet.connectFromOwner(con, ModelFactory.createDefaultModel(), newWonMessage);
+      facet.connectFromOwner(con, content, newWonMessage);
       //reg.get(con).connectFromOwner(con, content);
 
       return con.getConnectionURI();
@@ -278,7 +277,7 @@ public class NeedCommunicationServiceImpl implements
         wonMessage.getMessageContent(),
         wonMessage.getMessageEvent().getMessageURI(),
         WON.HAS_LOCAL_CONNECTION).asResource().toString());
-      URI facetURI = wonMessage.getMessageEvent().getReceiverURI();
+      URI facetURI = dataService.getFacet(content);
 
       logger.debug("CONNECT received for need {} referring to need {} (connection {})",
                    new Object[]{needURIFromWonMessage,
