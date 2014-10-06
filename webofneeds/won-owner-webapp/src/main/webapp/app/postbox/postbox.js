@@ -39,30 +39,6 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
     $scope.allNeedsCount = applicationStateService.getAllNeedsCount();
 
 
-    /*
-    $scope.$watchCollection('allNeedsWithUnreadNotifications',function(updated, old){
-        console.log("Watching allNeedsWithUnreadNotifications collection: ", updated, old);
-        $scope.updateCountOfAllUnreadMatchEvents();
-    })*/
-
-
-    /*
-    $scope.AllNeedsWithUnreadNotifications = applicationStateService.fetchUnreadEventsForAllNeeds(); */
-    /*
-    $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
-        $scope.AllNeedsWithUnreadNotifications= applicationStateService.fetchUnreadEventsForAllNeeds();
-    });   */
-  //  $scope.allPosts = applicationStateService.getAllNeeds();
-	/*$scope.line = {
-		type:'',
-		title:'',
-		newMessages:0,
-		megaphone:0,
-		puzzle:0,
-		date:''
-	};
-                */
-    //$scope.fetchNotifications();
     $scope.recordsToDisplay = 4;
     $scope.displayConfirmationDialog = false;
     var indexOfChosenDraft;
@@ -103,23 +79,6 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
         });
     }
 
-    // TODO call backend method here
-    //need to fetch: need type, need title, if unread messages exist -> icon of message + number, need create date
-   // $scope = {};
-    //how to fetch all needs of one user?
-
-    // for filtering: when number of unread notifications is 0 set appropriate value (convText, reqText or matchText) to empty string
-/*	$scope.posts = [
-		{type:'Want', title:'Want PS 4', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: '', matches: 0}, datetime: new Date('2014-08-25')},
-		{type:'Change', title:'Looking for a flatscreen TV', msg:{convText: 'unread conversations', conversations : 3, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, datetime: new Date('2014-08-20')},
-		{type:'Offer', title:'Offering IKEA couch', msg:{convText: 'unread conversations', conversations : 1, reqText: '', requests: 0, matchText: 'unread matches', matches: 5}, datetime: new Date('2014-08-15')},
-		{type:'Together', title:'Collect items for Caritas asylum', msg:{convText: '', conversations : 0, reqText: 'unread requests', requests: 4, matchText: 'unread matches', matches: 1}, datetime: new Date('2014-07-14')},
-        {type:'Change', title:'I want to change my mobile', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: '', matches: 0}, datetime: new Date('2014-05-25')},
-        {type:'Together', title:'Clean the forest', msg:{convText: 'unread conversations', conversations : 10, reqText: '', requests: 0, matchText: '', matches: 0}, datetime: new Date('2014-08-26')},
-        {type:'Offer', title:'Selling old laptop', msg:{convText: '', conversations : 0, reqText: 'unread requests', requests: 7, matchText: '', matches: 0}, datetime: new Date('2014-03-01')},
-        {type:'Want', title:'Want a plane', msg:{convText: '', conversations : 0, reqText: '', requests: 0, matchText: 'unread matches', matches: 3}, datetime: new Date('2014-02-22')}
-	];          */
-
     $scope.getTypePicURI = function (type) {
         if(type==won.WON.BasicNeedTypeDemand) return "/owner/images/type_posts/want.png";
         else if(type==won.WON.BasicNeedTypeCritique) return "/owner/images/type_posts/change.png";
@@ -145,28 +104,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
         {type:'Together', title:'Go to the cinema', datetime: new Date('2014-07-14')}
     ];
 
-    // data for notifications in menu, TODO call backend methods here and maybe more convenient controller
-   /* $scope.conversations = [
-        {type: 'Together', title:'Car sharing to Prague', msgs: 5},
-        {type: 'Offer', title:'Friendly Bicycle ...', msgs: 4},
-        {type: 'Want', title:'I want smartphone ...', msgs: 6},
-        {type: 'Change', title:'Change my stamps ...', msgs: 3},
-        {type: 'Together', title:'Study together ...', msgs: 2},
-        {type: 'Offer', title:'Good guitar ...', msgs: 1}
-    ];
 
-    $scope.requests = [
-        {type: 'Want', typeText:'Incoming Request', title:'Moved recently ...', msgs: 2},
-        {type: 'Change', typeText:'Outgoing Request', title:'Let\'s clean ...', msgs: 3},
-        {type: 'Together', typeText:'Incoming Request', title:'Bought new car ...', msgs: 1},
-        {type: 'Offer', typeText:'Outgoing Request', title:'Let\'s grill ...', msgs: 5}
-    ];
-
-    $scope.matches = [
-        {type: 'Change', title:'Old children\'s clothes ..', msgs: 3},
-        {type: 'Offer', title:'Old men\'s clothes ..', msgs: 2}
-    ];
-             */
 	$scope.clickOnMessage = function () {
 		//TODO Put here logic
 	};
@@ -211,35 +149,12 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
     $scope.clickOnNoButton = function() {
         $scope.displayConfirmationDialog = false;
     }
-});
-angular.module('won.owner').controller('MatchCountCtrl', function ($scope,$interval, $location, userService, applicationStateService) {
-    $scope.rowNeed = undefined;
-    $scope.matchCount = 0;
-    $scope.getMatchesForNeed = function(need){
-        var unreadHintEventsForNeed = {};
-        if($scope.unreadObjects.byNeed.hint!=undefined) {
-            for(var i = 0; i< $scope.unreadObjects.byNeed.hint.length;i++){
-                var unreadHint = $scope.unreadObjects.byNeed.hint[i];
-                if(need.uri==unreadHint.need.uri ){
-                    unreadHintEventsForNeed.matchEvents = unreadHint.events;
-                }
-
-            }
-            if(unreadHintEventsForNeed.matchEvents!=undefined){
-                $scope.matchCount = unreadHintEventsForNeed.matchEvents.length;
-
-            }
-        }
-
-        //return unreadHintEventsForNeed;
-    }
-    $scope.$watch('unreadObjects', function(newValue, oldValue){
-        if($scope.rowNeed!=undefined){
-            $scope.getMatchesForNeed($scope.rowNeed);
-        }
-    });
     $scope.clickOnNeedPrivateLink = function(clickedNeed) {
         applicationStateService.setCurrentNeedURI(clickedNeed.uri);
         $location.path("/private-link")
     }
+});
+angular.module('won.owner').controller('MatchCountCtrl', function ($scope,$interval, $location, userService, applicationStateService) {
+
+
 });

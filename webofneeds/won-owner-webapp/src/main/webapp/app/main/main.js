@@ -46,13 +46,11 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
 
     addEventAsUnreadEvent = function(eventData){
 
-        try{
-            applicationStateService.processEventAndUpdateUnreadEventObjects(eventData);
-            $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
-            $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
-        }catch(e) {
-            console.log("event handling error : "+e);
-        }
+
+        applicationStateService.processEventAndUpdateUnreadEventObjects(eventData);
+        $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
+        $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
+
     }
 
     $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
