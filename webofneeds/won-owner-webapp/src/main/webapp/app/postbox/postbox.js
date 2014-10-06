@@ -36,6 +36,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 
     }                         */
     $scope.allNeeds = applicationStateService.getAllNeeds();
+    $scope.allNeedsCount = applicationStateService.getAllNeedsCount();
 
 
     /*
@@ -237,8 +238,8 @@ angular.module('won.owner').controller('MatchCountCtrl', function ($scope,$inter
             $scope.getMatchesForNeed($scope.rowNeed);
         }
     });
-
     $scope.clickOnNeedPrivateLink = function(clickedNeed) {
         applicationStateService.setCurrentNeedURI(clickedNeed.uri);
+        $location.path("/private-link")
     }
 });

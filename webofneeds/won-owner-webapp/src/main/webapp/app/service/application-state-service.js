@@ -22,7 +22,7 @@
  * - removeEvent(event) : removes the event
  * addEvent(event) must only be called once for each event.
  */
-angular.module('won.owner').factory('applicationStateService', function (linkedDataService, $rootScope) {
+angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope) {
 
     //the service
     var applicationStateService = {}
@@ -46,121 +46,110 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     privateData.currentNeedURI = null;
 
     //all needs are stored in this array (in the form returned by linkedDataService.getNeed(uri)
-    privateData.allNeeds = [];
+    privateData.allNeeds = {};
+
+    privateData.unreadEventsByNeedByType = {};
+
+    privateData.unreadEventsByTypeByNeed = {
+        'hint': {count:0, timestamp: new Date().getTime() },
+        'connect': {count:0, timestamp: new Date().getTime()},
+        'message': {count:0, timestamp: new Date().getTime()},
+        'close': {count:0, timestamp: new Date().getTime()},
+        'created': {count:0, timestamp: new Date().getTime()}
+    };
+    privateData.latestEventsByNeedByConnection = {};
 
 
+    applicationStateService.processEventAndUpdateUnreadEventObjects = function(eventData){
+        var eventType = eventData.eventType;
+        var needURI = eventData.hasReceiverNeed;
+        updateUnreadEventsByNeedByType(needURI, eventType, eventData);
+        updateUnreadEventsByTypeByNeed(needURI, eventType, eventData);
+    };
 
-    //contains all unread events
-    privateData.unreadEvents = [];
 
-    //contains 'unread objects' - events, eventcounts, needs etc. see prepareEmptyUnreadObjects() below to get an idea
-    privateData.unreadObjects = {};
-    //dirty flag for the unread objects.
-    privateData.unreadObjectsDirty = false;
+    var createOrUpdateUnreadEntry = function(needURI, eventData, unreadEntry){
 
-    privateData.latestEventsForConnections = [];
-    privateData.latestEventsDirty = false;
+        if(unreadEntry == null || typeof unreadEntry === 'undefined'){
+            unreadEntry = {};
+            //unreadEntry.events = [];
+            unreadEntry.count = 0;
+        }
+        //unreadEntry.events.push(eventData);
+        unreadEntry.timestamp=eventData.timeStamp;
+        //unreadEntry.need = privateData.allNeeds[needURI];
+        unreadEntry.count ++;
+        return unreadEntry;
+    };
 
-    var prepareEmptyUnreadObjects = function() {
-        return {
-            'all': {
-                'hint': {'count': 0, 'events': []},
-                'connect': {'count': 0, 'events': []},
-                'message': {'count': 0, 'events': []},
-                'close': {'count': 0, 'events': []},
-                'created' : {'count':0, 'events': []}
-            },
-            byNeed: {
-                'hint': [],
-                'connect': [],
-                'message': [],
-                'close': [],
-                'created': []
 
-            }
-        };
+    var getUnreadEventType = function(eventType){
+        var unreadEventType = null;
+        switch (eventType){
+            case won.EVENT.HINT_RECEIVED:unreadEventType = won.UNREAD.TYPE.HINT;
+                break;
+            case won.EVENT.CONNECT_RECEIVED: unreadEventType = won.UNREAD.TYPE.CONNECT;
+                break;
+            case won.EVENT.OPEN_RECEIVED:unreadEventType = won.UNREAD.TYPE.CONNECT;
+                break;
+            //  case won.Event.Message_Rece_RECEIVED: privateData.unreadEventsByNeedByType[needURI].hint.push(eventData);
+            case won.EVENT.CLOSE_RECEIVED: unreadEventType = won.UNREAD.TYPE.CLOSE;
+                break;
+            case won.EVENT.NEED_CREATED: unreadEventType = won.UNREAD.TYPE.CREATED;
+                break;
+            // case won.Event.HINT_RECEIVED: privateData.unreadEventsByNeedByType[needURI].hint.push(eventData);
+        }
+        return unreadEventType;
     }
-    privateData.unreadObjects = prepareEmptyUnreadObjects();
 
 
+    var updateUnreadEventsByNeedByType = function (needURI, eventType,eventData){
 
-    /**
-     * filters the array of js objects by testing if all the dictionary values found in data are
-     * present in the current array object
-     * @param array
-     * @param data  containing key/value pairs. if the value is an array, one of the elements must
-     * match the value found in the array element for the key.
-     */
-    var myfilter = function(array, data) {
-        var ret = [];
-        outer:
-        for (var i = 0; i < array.length; i++) {
-            for (field in data) {
-                if (array[i][field] === 'undefined'){
-                    continue;
-                }
-                if (won.isArray(data[field])){
-                    for (var j = 0; j < data[field].length; j++){
-                        if (array[i][field] === data[field][j] ){
-                            ret.push(array[i]);
-                            continue outer;
-                        }
-                    }
-                }
-                if (array[i][field] === data[field]){
-                    ret.push(array[i]);
-                    continue outer;
-                }
+        if(!(needURI in privateData.unreadEventsByNeedByType) ){
+            var ts = new Date().getTime();
+            var need = privateData.allNeeds[needURI];
+            privateData.unreadEventsByNeedByType[needURI] = {
+                'hint': {count:0, events: [], timestamp: ts, need: need},
+                'connect': {count:0, events: [], timestamp: ts, need: need},
+                'message': {count:0, events: [], timestamp: ts, need: need},
+                'close': {count:0, events: [], timestamp: ts, need: need},
+                'created': {count:0, events: [], timestamp: ts, need: need}
             }
+            privateData.unreadEventsByNeedByType[needURI].need = need;
         }
-        return ret;
-    };
+        var now = new Date().getTime();
+        createOrUpdateUnreadEntry(needURI, eventData, privateData.unreadEventsByNeedByType[needURI][getUnreadEventType(eventType)]);
+        privateData.unreadEventsByNeedByType[needURI][getUnreadEventType(eventType)].timestamp = now;
+        privateData.unreadEventsByNeedByType[needURI].timestamp = now;
+        privateData.unreadEventsByNeedByType[needURI].count++;
 
-    /**
-     * Reconstructs the unreadObjects structure. May be expensive.
-     */
-    var updateUnreadObjects = function(){
-        var newObjects = prepareEmptyUnreadObjects(); //array used in the GUI to show message counts
-        for (key in privateData.filters) {
-            var filtered = myfilter(privateData.unreadEvents, privateData.filters[key]);
-            //first, count and add to 'all' group (count and list of events)
-            newObjects[won.UNREAD.GROUP.ALL][key] = {
-                count: filtered.length,
-                events: filtered
-            };
-            //now, filter again and add to 'byNeed' group
-            newObjects[won.UNREAD.GROUP.BYNEED][key] = [];
-            //now filter again by need URI
-            for (var i = 0; i < privateData.allNeeds.length; i++) {
-                var currentNeed = privateData.allNeeds[i];
-                var needFilter = {}
-                needFilter['hasReceiverNeed'] = currentNeed.uri;
-                var filteredAgain = myfilter(filtered, needFilter);
-                if (filteredAgain.length > 0) {
-                    newObjects[won.UNREAD.GROUP.BYNEED][key].push(
-                        {need: currentNeed,
-                            count: filteredAgain.length,
-                            events: filteredAgain}
-                    );
-                }
-                //TODO: do we need the same for connection URIs?
-            }
-        }
-        privateData.unreadObjects = newObjects;
-        privateData.unreadObjectsDirty = false;
     };
 
 
-    /**
-     * Adds a new, unread event and flags the unreadObjects structure as dirty.
-     * @param event
-     */
-    applicationStateService.addEvent=function (event){
-        privateData.unreadEvents.push(event);
-        privateData.unreadObjectsDirty = true;
-        if (event.hasReceiverNeed == privateData.currentNeedURI){
-            privateData.latestEventsDirty = true;
-        }
+
+    var updateUnreadEventsByTypeByNeed = function (needURI,eventType, eventData){
+        var unreadEventType = getUnreadEventType(eventType);
+        var now = new Date().getTime();
+        //var unreadEntry = createOrUpdateUnreadEntry(needURI,eventData, privateData.unreadEventsByTypeByNeed[unreadEventType][needURI]);
+        //privateData.unreadEventsByTypeByNeed[unreadEventType][needURI] = unreadEntry;
+        //privateData.unreadEventsByTypeByNeed[unreadEventType][needURI].timestamp = now;
+        privateData.unreadEventsByTypeByNeed[unreadEventType].timestamp = now;
+        privateData.unreadEventsByTypeByNeed[unreadEventType].count++;
+    };
+    var updatelatestEventsByNeedByConnection = function(){
+
+    };
+    applicationStateService.getUnreadEventsByNeed = function(){
+        return privateData.unreadEventsByNeed;
+    }
+    applicationStateService.getUnreadEventsByNeedByType = function(){
+        return privateData.unreadEventsByNeedByType;
+    }
+    applicationStateService.getUnreadEventsByType = function(){
+        return privateData.unreadEventsByType;
+    }
+    applicationStateService.getUnreadEventsByTypeByNeed = function(){
+        return privateData.unreadEventsByTypeByNeed;
     }
 
     /**
@@ -168,13 +157,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * @param event
      */
     applicationStateService.removeEvent=function (event){
-        for(var i = 0; i < privateData.unreadEvents.length; i++){
-            if (privateData.unreadEvents[i].uri === event.uri){
-                privateData.unreadEvents.splice(i,1);
-                i--;
-            }
-        }
-        privateData.unreadObjectsDirty = true;
+        console.log("removeEvent not yet implemented!!!");
     }
 
     /**
@@ -209,9 +192,11 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * @param need
      */
     applicationStateService.addNeed = function(need){
-        privateData.allNeeds.push(need);
+        privateData.allNeeds[need.uri] = need;
     }
-
+    applicationStateService.getAllNeedsCount = function(){
+        return utilService.getKeySize(privateData.allNeeds);
+    }
     /**
      * Fetches the unreadObjects structure, rebuilding it if it is dirty.
      * @returns

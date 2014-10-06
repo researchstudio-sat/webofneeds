@@ -22,7 +22,9 @@ angular.module('won.owner')
             $scope.initialize();
         }
     });
-
+    $scope.$on(won.EVENT.APPSTATE_EVENT_CONTAINER_UPDATED, function(event){
+        $scope.initialize();
+    });
         // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
 
@@ -406,6 +408,7 @@ angular.module('won.owner')
         //wonService.open($scope.chosenMessage.connection.uri);
         wonService.openSuggestedConnection($scope.chosenMessage.connection.uri);
         $scope.showMatchControl = false;
+
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');
         $location.path('/private-link');

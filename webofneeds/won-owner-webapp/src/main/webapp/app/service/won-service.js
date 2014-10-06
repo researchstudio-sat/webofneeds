@@ -98,6 +98,7 @@ angular.module('won.owner').factory('wonService', function (
                     }
                     //publish angular event
                     console.log("incoming message: \n  ", JSON.stringify(msg) + "\npublishing angular event");
+                    event.timestamp = new Date().getTime();
                     $rootScope.$broadcast(event.eventType, event);
                 } else {
                     console.log("Not handling message of type " + event.hasMessageType + " in incomingMessageHandler");
@@ -161,14 +162,15 @@ angular.module('won.owner').factory('wonService', function (
                     .then(
                     function (value) {
                         console.log("publishing angular event");
-                        eventData = won.clone(event);
+                        var eventData = won.clone(event);
                         eventData.eventType = won.EVENT.NEED_CREATED;
                         eventData.needURI = needURI;
-
-                        $rootScope.$broadcast(won.EVENT.NEED_CREATED, eventData);
-
-                        //inform the caller of the new need URI
-                        deferred.resolve(needURI);
+                        linkedDataService.getNeed(needURI)
+                            .then(function(need){
+                                applicationStateService.addNeed(need)
+                                $rootScope.$broadcast(won.EVENT.NEED_CREATED, eventData);
+                                deferred.resolve(needURI);
+                            });
                     },
                     function (reason) {
                         deferred.reject(reason);
@@ -288,6 +290,7 @@ angular.module('won.owner').factory('wonService', function (
                     this.done = true;
                     //WON.CreateResponse.equals(messageService.utils.getMessageType(msg)) &&
                     //messageService.utils.getRefersToURIs(msg).contains(messageURI)
+                    $rootScope.$broadcast(won.EVENT.OPEN_SENT, eventData);
 
                 });
             callback.done = false;

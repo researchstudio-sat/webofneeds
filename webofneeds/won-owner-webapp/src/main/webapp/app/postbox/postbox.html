@@ -56,36 +56,37 @@
                     </thead>
                     <tbody>
                         <tr
-                                ng-show="allNeeds.length>0"
-                                ng-repeat="post in allNeeds | orderBy: 'title': false |filter: search">
+                                ng-show="allNeedsCount() >0"
+                                ng-repeat="post in allNeeds | orderBy: 'title' |filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{post.basicNeedType}}</span>
                                 <img src="{{getTypePicURI(post.basicNeedType)}}"
                                      tooltip="{{post.basicNeedType}} (click to filter)"/>
                             </td>
-                            <td><a style="font-weight:bold;" href="#/private-link" ng-click="clickOnNeedPrivateLink(post)">{{post
+                            <td><a style="font-weight:bold;" href ng-click="clickOnNeedPrivateLink(post)">{{post
                                 .title}}</a></td>
                             <td>
                                 <span>
-                                    <span style="display: none;">{{unreadObjects}}</span>
+                                    <span style="display: none;">{{unreadEventsByNeedByType}}</span>
                                     <i
-                                            class="fa fa-comment-o fa-lg"></i>&nbsp;{{rowNeed=need}}{{getMatchesForNeed(post)}}{{matchCount}}
+                                            class="fa fa-comment-o fa-lg"></i>&nbsp;{{unreadEventsByNeedByType[post.uri].message.count}}
                                 </span>
                                 <span>
                                     <span style="display: none;">{{post.msg.reqText}}</span>
-                                    <i class="fa fa-male fa-lg"></i>&nbsp;{{post.requests.length}}
+                                    <i
+                                            class="fa fa-male fa-lg"></i>&nbsp;{{unreadEventsByNeedByType[post.uri].connect.count}}
                                 </span>
                                 <span ng-controller="MatchCountCtrl">
                                     <span style="display: none;">{{post.msg.matchText}}</span>
                                     <i
                                             class="fa fa-puzzle-piece fa-lg"></i>&nbsp;
                                     <span
-                                            ng-bind-template="{{rowNeed=need}} {{getMatchesForNeed(post)}} {{matchCount}}"/>
+                                            ng-bind-template="{{unreadEventsByNeedByType[post.uri].hint.count}}"/>
                                 </span>
                             </td>
                             <td>{{post.creationDate | date}}</td>
                         </tr>
-                        <tr ng-show="allNeeds.length<1">
+                        <tr ng-show="allNeedsCount()<1">
                             <td class="col-lg-1">
                             </td>
                             <td>You don't have posts yet. Fill it by <a style="font-weight:bold;" href="#/home">creating new

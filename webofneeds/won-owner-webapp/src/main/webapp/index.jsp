@@ -188,16 +188,16 @@
 				<li ng-show="!showPublic()" ng-cloak>
 					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
 						<!-- TODO provide here the total number of connects -->
-						<i class="fa fa-male fa-lg"></i>&nbsp;{{unreadObjects.all.connect.count}}
+						<i class="fa fa-male fa-lg"></i>&nbsp;{{unreadEventsByType.connect.length}}
 					</a>
 					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
-						<li class="text-center grey-item">{{unreadObjects.all.connect.count}}&nbsp;new
+						<li class="text-center grey-item">{{unreadEventsByType.connect.length}}&nbsp;new
                             connects</li>
 						<!-- TODO put real parameters into url -->
-                        <li ng-repeat="entry in unreadObjects.byNeed.connect"><a
+                        <li ng-repeat="entry in unreadEventsByType.connect"><a
                                 ng-click="openNeedDetailView(entry.need.uri)"><img
-                                src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
-                                class="badge pull-right">{{entry.count}}</span></a>
+                                src="{{getTypePicURI(entry.basicNeedType)}}"/>&nbsp;{{entry.title}}&nbsp;<span
+                                class="badge pull-right">{{unreadEventsByType.connect}}</span></a>
                         </li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
 						</li>
@@ -206,15 +206,15 @@
 				<li ng-show="!showPublic()" ng-cloak>
 					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
 						<!-- TODO provide here the total number of matches -->
-						<i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{unreadObjects.all.hint.count}}
+						<i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{unreadEventsByTypeByNeed.hint.count}}
 					</a>
 					<ul class="dropdown-menu" style="width: 280px;">
-						<li class="text-center grey-item">{{unreadObjects.all.hint.count}}&nbsp;new matches</li>
+						<li class="text-center grey-item">{{unreadEventsByTypeByNeed.hint.count}}&nbsp;new matches</li>
 						<!-- TODO put real parameters into url -->
-						<li ng-repeat="entry in unreadObjects.byNeed.hint"><a
+						<li ng-repeat="entry in unreadEventsByNeedByType"><a
                                 ng-click="openNeedDetailView(entry.need.uri)"><img
 								src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
-                                class="badge pull-right">{{entry.count}}</span></a>
+                                class="badge pull-right">{{entry.hint.count}}</span></a>
 						</li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
 						</li>

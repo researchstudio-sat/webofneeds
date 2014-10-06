@@ -38,46 +38,50 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.needURIPath = "/resource/need";
     $scope.connectionURIPath = "/connection";
     $scope.selectedType = -1;
-    $scope.unreadObjects = applicationStateService.getUnreadObjects();
-
+    $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
+    $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
+    $scope.latestEventsByNeedByConnection = {};
     //allow acces to service methods from angular expressions:
     $scope.openNeedDetailView = applicationControlService.openNeedDetailView;
 
+    addEventAsUnreadEvent = function(eventData){
 
-
-    addEventAsUnreadAndUpdateUnreadObjects = function(eventData) {
-        applicationStateService.addEvent(eventData);
-        //update the unread objects key by key.
-        var newUnread = applicationStateService.getUnreadObjects();
-        for(key in won.UNREAD.GROUP) {
-            var realKey = won.UNREAD.GROUP[key];
-            var entries = newUnread[realKey];
-            if (typeof (entries) != 'undefined'){
-                $scope.unreadObjects[realKey] = entries;
-            }
+        try{
+            applicationStateService.processEventAndUpdateUnreadEventObjects(eventData);
+            $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
+            $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
+        }catch(e) {
+            console.log("event handling error : "+e);
         }
     }
 
     $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
-        addEventAsUnreadAndUpdateUnreadObjects(eventData);
+        addEventAsUnreadEvent(eventData);
+
     });
     $scope.$on(won.EVENT.NEED_CREATED, function(ngEvent, eventData) {
-        addEventAsUnreadAndUpdateUnreadObjects(eventData);
+        addEventAsUnreadEvent(eventData);
+
     });
     $scope.$on(won.EVENT.CONNECT_RECEIVED, function(ngEvent, eventData) {
-        addEventAsUnreadAndUpdateUnreadObjects(eventData);
-    });
+        addEventAsUnreadEvent(eventData);
 
+    });
+    $scope.$on(won.EVENT.OPEN_SENT, function(ngEvent, eventData) {
+        addEventAsUnreadEvent(eventData);
+    });
     $scope.$on(won.EVENT.OPEN_RECEIVED, function(ngEvent, eventData) {
-        addEventAsUnreadAndUpdateUnreadObjects(eventData);
+
+        addEventAsUnreadEvent(eventData);
     });
 
     $scope.$on(won.EVENT.CLOSE_RECEIVED, function(ngEvent, eventData) {
-        addEventAsUnreadAndUpdateUnreadObjects(eventData);
+        addEventAsUnreadEvent(eventData);
     });
 
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {
-        addEventAsUnreadAndUpdateUnreadObjects(eventData);
+        addEventAsUnreadEvent(eventData);
+
     });
 
 });
