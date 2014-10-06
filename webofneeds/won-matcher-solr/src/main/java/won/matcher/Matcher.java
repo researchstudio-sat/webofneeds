@@ -221,7 +221,9 @@ public class Matcher
             Model facetModel = determineFacetsForHint(fromDocUri, toDocUri, fromDocModel, readModelFromSolrIndex(toDocUri));
             logger.debug("calling MatchProcessors for match {} -> {} :: {}", new Object[]{fromDocUri, toDocUri, normalizedScore});
             for (MatchProcessor proc: matchProcessors){
+              //we're sending the hint to both objects.
               proc.process(fromDocUri,toDocUri,normalizedScore,originatorURI,facetModel);
+              proc.process(toDocUri,fromDocUri,normalizedScore,originatorURI,facetModel);
             }
           } else {
             logger.debug("Suppressed duplicate hint {} -> {} :: {}", new Object[]{fromDocUri, toDocUri, normalizedScore});
