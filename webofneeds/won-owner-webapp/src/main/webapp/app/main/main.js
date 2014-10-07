@@ -48,7 +48,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.lastEventOfEachConnectionOfCurrentNeed = [];
 
     var reloadCurrentNeedDataIfNecessary = function(uriOfChangeNeed){
-        var currentNeedURI = linkedDataService.getCurrentNeedURI()
+        var currentNeedURI = applicationStateService.getCurrentNeedURI()
         if (currentNeedURI == null ) return; //can't update: no need selected
         if (uriOfChangeNeed == null || currentNeedURI === uriOfChangeNeed){
             reloadCurrentNeedData();
