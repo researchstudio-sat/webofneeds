@@ -33,53 +33,87 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService) {
+angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $rootScope) {
     $scope.wonNodeURI = "http://localhost:8080/won";
     $scope.needURIPath = "/resource/need";
     $scope.connectionURIPath = "/connection";
     $scope.selectedType = -1;
     $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
     $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
-    $scope.latestEventsByNeedByConnection = {};
+
     //allow acces to service methods from angular expressions:
     $scope.openNeedDetailView = applicationControlService.openNeedDetailView;
 
-    addEventAsUnreadEvent = function(eventData){
+    $scope.currentNeed = {};
+    $scope.lastEventOfEachConnectionOfCurrentNeed = [];
 
 
+    var reloadCurrentNeedData = function(){
+        applicationStateService.getCurrentNeed()
+            .then(function (need) {
+                $scope.currentNeed = need;
+            });
+        applicationStateService.getLastEventOfEachConnectionOfCurrentNeed()
+            .then(function (events) {
+                $scope.lastEventOfEachConnectionOfCurrentNeed = events;
+            });
+    }
+
+
+    var addEventAsUnreadEvent = function(eventData){
         applicationStateService.processEventAndUpdateUnreadEventObjects(eventData);
         $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
         $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
-
     }
 
     $scope.$on(won.EVENT.HINT_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
-
+        //for now, just update the current need data. Later, we can alter just the entry for
+        // the one connection we are processing the event for.
+        reloadCurrentNeedData();
     });
     $scope.$on(won.EVENT.NEED_CREATED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
-
+        //for now, just update the current need data. Later, we can alter just the entry for
+        // the one connection we are processing the event for.
+        reloadCurrentNeedData();
     });
     $scope.$on(won.EVENT.CONNECT_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
-
+        //for now, just update the current need data. Later, we can alter just the entry for
+        // the one connection we are processing the event for.
+        reloadCurrentNeedData();
     });
     $scope.$on(won.EVENT.OPEN_SENT, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
+        //for now, just update the current need data. Later, we can alter just the entry for
+        // the one connection we are processing the event for.
+        reloadCurrentNeedData();
     });
     $scope.$on(won.EVENT.OPEN_RECEIVED, function(ngEvent, eventData) {
-
         addEventAsUnreadEvent(eventData);
+        //for now, just update the current need data. Later, we can alter just the entry for
+        // the one connection we are processing the event for.
+        reloadCurrentNeedData();
     });
 
     $scope.$on(won.EVENT.CLOSE_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
+        //for now, just update the current need data. Later, we can alter just the entry for
+        // the one connection we are processing the event for.
+        reloadCurrentNeedData();
     });
 
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
+        //for now, just update the current need data. Later, we can alter just the entry for
+        // the one connection we are processing the event for.
+        reloadCurrentNeedData();
+    });
 
+
+    $scope.$on(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED, function(event){
+        reloadCurrentNeedData();
     });
 
 });

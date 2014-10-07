@@ -159,23 +159,29 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         //add the deferred to the list of deferreds for the uri
         addDeferredForUriBeingFetched(deferred, uri);
         if (first) {
-            //actually do load data
-            try {
-                console.log("fetching linked data: " + uri);
-                privateData.store.load('remote', uri, function (success, results) {
-                    $rootScope.$apply(function() {
-                        if (success) {
-                            resolveDeferredsForUrisBeingFetched(uri, success);
-                        } else {
-                            rejectDeferredsForUrisBeingFetched(uri, "failed to load " + uri);
-                        }
-                    });
-                });
-            } catch (e) {
-                $rootScope.$apply(function() {
-                    rejectDeferredsForUrisBeingFetched(uri, e);
-                });
-            }
+            linkedDataService.deleteNode(uri).then(
+                function() {
+                    //actually do load data
+                    try {
+                        console.log("fetching linked data: " + uri);
+                        privateData.store.load('remote', uri, function (success, results) {
+                            $rootScope.$apply(function () {
+                                if (success) {
+                                    resolveDeferredsForUrisBeingFetched(uri, success);
+                                } else {
+                                    rejectDeferredsForUrisBeingFetched(uri, "failed to load " + uri);
+                                }
+                            });
+                        });
+                    } catch (e) {
+                        $rootScope.$apply(function () {
+                            rejectDeferredsForUrisBeingFetched(uri, e);
+                        });
+                    }
+                }, function(reason){
+                    rejectDeferredsForUrisBeingFetched(uri, reason);
+                }
+            )
         }
         return deferred.promise;
     }
@@ -462,7 +468,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     if (resultGraph != null && resultGraph.length > 0) {
                         for (key in resultGraph.triples) {
                             var connectionsURI = resultGraph.triples[key].object.nominalValue;
-                            connectionsPromises.push(linkedDataService.ensureLoaded(connectionsURI).then(function (success) {
+                            //TODO: here, we fetch, but if we knew that the connections container didn't change
+                            //we could just ensureLoaded. See https://github.com/researchstudio-sat/webofneeds/issues/109
+                            connectionsPromises.push(linkedDataService.fetch(connectionsURI).then(function (success) {
                                 var connectionURIs = [];
                                 privateData.store.node(connectionsURI, function (success, graph) {
                                     if (graph != null && graph.length > 0) {
@@ -593,6 +601,22 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 $q.reject("could not get node " + uri + "with attributes: " + e);
             }
         });
+    }
+
+    /**
+     * Deletes all triples where the specified uri is the subect.
+     */
+    linkedDataService.deleteNode = function(uri){
+        var deferred = $q.defer();
+        var query = "delete where {<"+uri+"> ?anyP ?anyO}";
+        privateData.store.execute(query, function (success, graph) {
+            if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
+                return;
+            } else {
+                deferred.resolve();
+            }
+        });
+        return deferred.promise;
     }
     
     

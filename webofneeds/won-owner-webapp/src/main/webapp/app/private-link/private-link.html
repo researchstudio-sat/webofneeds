@@ -16,11 +16,11 @@
 
 <div style="padding-top: 40px;padding-bottom: 8em;" xmlns="http://www.w3.org/1999/html"
      xmlns="http://www.w3.org/1999/html" ng-controller="PrivateLinkCtrl">
-    <div ng-init="initialize">
+    <div >
         <div style="font-size: 1.8em; text-align: center ;">
             <img ng-show="!postClosed" src="{{img_path}}" alt="Generic placeholder thumbnail" style="z-index: 0">
             <!--TODO put here second layer on the first layer picture--><img ng-show="postClosed" src="/owner/images/closed.PNG" alt="Generic placeholder thumbnail">
-            <strong>{{need.title}}</strong>
+            <strong>{{currentNeed.title}}</strong>
         </div>
         <div style="text-align: center ;">
             <a href="#/post-detail/">Go to full description</a>
@@ -71,7 +71,7 @@
                                 </thead>
                                 <tbody>
                                     <tr
-                                            ng-repeat="event in events | messageTypeFilter:currentEventType ">
+                                            ng-repeat="event in lastEventOfEachConnectionOfCurrentNeed | messageTypeFilter:currentEventType ">
                                         <td>
                                             <span style="display: none;">{{event.typeText}}</span>
                                             <i ng-class="getIconClass(event.typeText)" tooltip="{{event.typeText}}"/>

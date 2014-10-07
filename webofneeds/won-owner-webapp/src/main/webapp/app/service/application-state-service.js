@@ -22,7 +22,7 @@
  * - removeEvent(event) : removes the event
  * addEvent(event) must only be called once for each event.
  */
-angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope) {
+angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope, $q) {
 
     //the service
     var applicationStateService = {}
@@ -57,7 +57,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         'close': {count:0, timestamp: new Date().getTime()},
         'created': {count:0, timestamp: new Date().getTime()}
     };
-    privateData.latestEventsByNeedByConnection = {};
+    privateData.lastEventOfEachConnectionOfCurrentNeed = [];
 
 
     applicationStateService.processEventAndUpdateUnreadEventObjects = function(eventData){
@@ -152,6 +152,8 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return privateData.unreadEventsByTypeByNeed;
     }
 
+
+
     /**
      * Removes an event - marking it as 'read', and flags the unreadObjects structure as dirty.
      * @param event
@@ -177,6 +179,30 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      */
     applicationStateService.getCurrentNeedURI = function(){
         return privateData.currentNeedURI;
+    }
+
+    /**
+     * Gets a promise to the current need, if one is currently set. If no need is set,
+     * the promise is rejected.
+     */
+    applicationStateService.getCurrentNeed = function(){
+        var deferred = $q.defer();
+        var needUri = privateData.currentNeedURI;
+        if (needUri == null){
+            deferred.reject("Cannot get current need: no need currently selected");
+            return deferred.promise;
+        }
+        var need = privateData.allNeeds[needUri];
+        if (need != null) {
+            deferred.resolve(need)
+            return deferred.promise;
+        }
+        linkedDataService.getNeed(needUri).then(function(need){
+            deferred.resolve(need);
+        }, function (reason){
+            deferred.reject(reason);
+        })
+        return deferred.promise;
     }
 
     /**
@@ -210,17 +236,23 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
 
     /**
      * For the current need, fetch the latest event for each connection.
+     * Returns a promise to the data. The promise is rejected if no need is currently selected.
      * @returns {Array}
      */
-    applicationStateService.getLatestEventsForConnectionsOfCurrentNeed = function(){
-        if (privateData.latestEventsDirty) {
-                linkedDataService.getLastEventOfEachConnectionOfNeed(applicationStateService.getCurrentNeedURI())
-                    .then(function(events){
-                        privateData.latestEventsForConnections = events;
-                    });
-            privateData.latestEventsDirty = false;
+    applicationStateService.getLastEventOfEachConnectionOfCurrentNeed = function(){
+        var deferred = $q.defer();
+        if (privateData.currentNeedURI == null){
+            deferred.reject("Cannot get latest events of current need: no need is currently selected");
+            return deferred.promise;
         }
-        return privateData.latestEventsForConnections;
+        linkedDataService.getLastEventOfEachConnectionOfNeed(applicationStateService.getCurrentNeedURI())
+            .then(function(events){
+                privateData.lastEventOfEachConnectionOfCurrentNeed = events;
+                deferred.resolve(privateData.lastEventOfEachConnectionOfCurrentNeed)
+            }, function(reason){
+                deferred.reject(reason);
+            });
+        return deferred.promise;
     }
 
 

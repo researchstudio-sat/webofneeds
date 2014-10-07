@@ -218,13 +218,11 @@ public class Matcher
             if (fromDocModel == null) {
               fromDocModel = convertRdfStringToModel(fromDocUri.toString(), match.getRdfContent());
             }
-            Model facetModel = determineFacetsForHint(fromDocUri, toDocUri, fromDocModel, readModelFromSolrIndex(toDocUri));
-            logger.debug("calling MatchProcessors for match {} -> {} :: {}", new Object[]{fromDocUri, toDocUri, normalizedScore});
-            for (MatchProcessor proc: matchProcessors){
-              //we're sending the hint to both objects.
-              proc.process(fromDocUri,toDocUri,normalizedScore,originatorURI,facetModel);
-              proc.process(toDocUri,fromDocUri,normalizedScore,originatorURI,facetModel);
-            }
+            Model toDocModel = readModelFromSolrIndex(toDocUri);
+            //send hint to new need
+            processMatch(fromDocUri, toDocUri, fromDocModel, toDocModel, normalizedScore);
+            //send hint to already known need
+            processMatch(toDocUri, fromDocUri, toDocModel, fromDocModel, normalizedScore);
           } else {
             logger.debug("Suppressed duplicate hint {} -> {} :: {}", new Object[]{fromDocUri, toDocUri, normalizedScore});
           }
@@ -234,6 +232,15 @@ public class Matcher
       }
     }
 
+  }
+
+  public void processMatch(final URI fromDocUri, final URI toDocUri, final Model fromDocModel, final Model toDocModel, final double normalizedScore) {
+    Model facetModel = determineFacetsForHint(fromDocUri, toDocUri, fromDocModel, toDocModel);
+    logger.debug("calling MatchProcessors for match {} -> {} :: {}", new Object[]{fromDocUri, toDocUri, normalizedScore});
+    for (MatchProcessor proc: matchProcessors){
+      //we're sending the hint to both objects.
+      proc.process(fromDocUri,toDocUri,normalizedScore,originatorURI,facetModel);
+    }
   }
 
   private Model convertRdfStringToModel(String uri, String rdf){

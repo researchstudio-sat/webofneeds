@@ -203,7 +203,9 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
     for(Connection c : connections) {
       //TODO: check remote need type as well or create GroupMemberFacet
-      if (facetURI.equals(c.getTypeURI())) {
+      if (c.getTypeURI() == null || //TODO: should not happen but currently does in case of a hint
+          facetURI.equals(c.getTypeURI()) //make sure the facet is also the same!
+        ) {
         con = c;
         break;
       }
@@ -211,7 +213,11 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
     if (con != null) {
       con.setState(connectionState);
+      if (con.getTypeURI() == null) {
+        con.setTypeURI(facetURI); //just in case it was null until now
+      }
       con = connectionRepository.save(con);
+
     } else {
       /* Create connection */
       con = new Connection();

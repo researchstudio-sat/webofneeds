@@ -8,85 +8,53 @@
 angular.module('won.owner')
     .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService, wonService) {
 
-    $scope.need = {};
-    $scope.events = [];
 
-    $scope.$on("$routeChangeSuccess", function() {
-        console.log("route change success: now initializing");
-        $scope.initialize();
-    });
-
-    $scope.$on(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED, function(event){
-        if (applicationStateService.getCurrentNeedURI() != $scope.need.uri){
-            console.log("current need changed: now initializing");
-            $scope.initialize();
-        }
-    });
-    $scope.$on(won.EVENT.APPSTATE_EVENT_CONTAINER_UPDATED, function(event){
-        $scope.initialize();
-    });
-        // all types of messages will be shown when the page is loaded
+    // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
 
-    $scope.initialize = function() {
-         $scope.need = {};
-         $scope.events = [];
-         var needUri = applicationStateService.getCurrentNeedURI();
-         if (needUri != null) {
-            linkedDataService.getNeed(needUri)
-             .then(function(need){
-               $scope.need = need;
-             }, won.reportError())
-             .then(function(){
-                linkedDataService.getLastEventOfEachConnectionOfNeed(needUri)
-                    .then(function(events){
-                        $scope.events = events;
-                    },won.reportError())
-             }, won.reportError("could not fetch need " + needUri));
-        }
-        //$scope.need.matches = linkedDataService.getMatches($scope.need.uri);
 
-        //
-        // $scope.need.events = linkedDataService.getAllEvents($scope.need.uri);
+    $scope.$watch('lastEventOfEachConnectionOfCurrentNeed', function(newValue, oldValue){
+        console.log("events changed! now have " + newValue.length + " events!" + " had: " + oldValue.length +"...");
+    });
 
-        $scope.currentEventType = [
-         won.WONMSG.connectionMessage,
-         won.WONMSG.connectMessage,
-         won.WONMSG.openMessage,
-         won.WONMSG.hintMessage];
+    $scope.currentEventType = [
+     won.WONMSG.connectionMessage,
+     won.WONMSG.connectMessage,
+     won.WONMSG.openMessage,
+     won.WONMSG.hintMessage];
 
 
-        //$scope.title = 'New Flat, Need Furniture';
-        $scope.img_path = '/owner/images/thumbnail_demo.jpg';
-        $rootScope.postClosed = false;
-        $rootScope.postShouldBeClosed = false;
-        $rootScope.postShouldBeReopened = false;
+    //$scope.title = 'New Flat, Need Furniture';
+    $scope.img_path = '/owner/images/thumbnail_demo.jpg';
+    $rootScope.postClosed = false;
+    $rootScope.postShouldBeClosed = false;
+    $rootScope.postShouldBeReopened = false;
 
 
-        //settings
-        $scope.privateLink = 'https://won.com/la3f#private'; //todo set value normaly
-        $scope.publicLink = 'http://www.webofneeds.org/'; //todo set value normaly;
-        $scope.notificationEmail = '';
-        $scope.notificationEmailValide = false;
-        $scope.notificationChecks = {
-            val1: false,
-            val2: false,
-            val3: false
-        };
+    //settings
+    $scope.privateLink = 'https://won.com/la3f#private'; //todo set value normaly
+    $scope.publicLink = 'http://www.webofneeds.org/'; //todo set value normaly;
+    $scope.notificationEmail = '';
+    $scope.notificationEmailValide = false;
+    $scope.notificationChecks = {
+        val1: false,
+        val2: false,
+        val3: false
+    };
 
-        $scope.prevMessageId = null;
-        $scope.chosenMessage = null;
-        $scope.rateValue = 0;
-        $scope.showConfirmationDialogForDeclineRequest = false;
-        $scope.showConfirmationDialogForCancelRequest = false;
-        $scope.showEditButtons = false;
-        $scope.showPencil = true;
-        $scope.textAreaContent = '';
-        $scope.showConfirmationDialogForRemoveMatch = false;
+    $scope.prevMessageId = null;
+    $scope.chosenMessage = null;
+    $scope.rateValue = 0;
+    $scope.showConfirmationDialogForDeclineRequest = false;
+    $scope.showConfirmationDialogForCancelRequest = false;
+    $scope.showEditButtons = false;
+    $scope.showPencil = true;
+    $scope.textAreaContent = '';
+    $scope.showConfirmationDialogForRemoveMatch = false;
 
-        $scope.showWarningForRating = false;
-        $scope.showMatchControl = false;
-    }
+    $scope.showWarningForRating = false;
+    $scope.showMatchControl = false;
+
 
 
     $scope.showPublic = function() {
@@ -244,8 +212,8 @@ angular.module('won.owner')
 
     // helper function to get message according to its id from messages
     function getEventById(msgId) {
-        for(var i = 0; i < $scope.events.length; i++) {
-            if ($scope.events[i].event.uri == msgId) return $scope.events[i];
+        for(var i = 0; i < $scope.lastEventOfEachConnectionOfCurrentNeed.length; i++) {
+            if ($scope.lastEventOfEachConnectionOfCurrentNeed[i].event.uri == msgId) return $scope.lastEventOfEachConnectionOfCurrentNeed[i];
         }
         return null; //should not get here
     }
