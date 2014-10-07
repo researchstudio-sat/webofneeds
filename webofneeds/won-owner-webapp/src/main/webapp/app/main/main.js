@@ -47,6 +47,13 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.currentNeed = {};
     $scope.lastEventOfEachConnectionOfCurrentNeed = [];
 
+    var reloadCurrentNeedDataIfNecessary = function(uriOfChangeNeed){
+        var currentNeedURI = linkedDataService.getCurrentNeedURI()
+        if (currentNeedURI == null ) return; //can't update: no need selected
+        if (uriOfChangeNeed == null || currentNeedURI === uriOfChangeNeed){
+            reloadCurrentNeedData();
+        }
+    }
 
     var reloadCurrentNeedData = function(){
         applicationStateService.getCurrentNeed()
@@ -70,45 +77,45 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         addEventAsUnreadEvent(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
-        reloadCurrentNeedData();
+        reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeedUri);
     });
     $scope.$on(won.EVENT.NEED_CREATED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
-        reloadCurrentNeedData();
+        reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeedUri);
     });
     $scope.$on(won.EVENT.CONNECT_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
-        reloadCurrentNeedData();
+        reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeedUri);
     });
     $scope.$on(won.EVENT.OPEN_SENT, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
-        reloadCurrentNeedData();
+        reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeedUri);
     });
     $scope.$on(won.EVENT.OPEN_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
-        reloadCurrentNeedData();
+        reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeedUri);
     });
 
     $scope.$on(won.EVENT.CLOSE_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
-        reloadCurrentNeedData();
+        reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeedUri);
     });
 
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
-        reloadCurrentNeedData();
+        reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeedUri);
     });
 
 
