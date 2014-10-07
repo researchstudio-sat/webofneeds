@@ -16,6 +16,12 @@
 
 angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService, linkedDataService, applicationStateService, $filter, $interval) {
 
+
+    //after reloading, verify if the session's still valid
+    //TODO move someone where more appropriate (sadly in app.config the service isn't available yet)
+    //userService.verifyAuth(); homepage doesn't load any more after using this here
+    // due to the wait-for-all decorator? ("everything waits for the http request to return"?)
+
     $scope.isActive = function(where) {
 		if ($location.path().indexOf(where) > -1) {
 			return 'active';

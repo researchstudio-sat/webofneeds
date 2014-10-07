@@ -1,16 +1,42 @@
-angular.module('won.owner').factory('userService', function ($window, $http) {
+angular.module('won.owner').factory('userService', function ($window, $http, $log) {
 
 	var user = {};
     var registered = false;
 	user = $window.user;
 
 	return {
-		isAuth:function () {
+        verifyAuth:function() {
+            return $http.post('/owner/rest/users/isSignedIn', user).then (
+                function(response){ //success
+                    $log.debug(response);
+                    $log.debug(response.status);
+                    user.isAuth = true;
+                    return true;
+                },
+                function(response){ //error
+                    $log.debug(response);
+                    $log.debug(response.status);
+                    this.resetAuth();
+                    return false;
+
+                    //just pass future? errors are better handled with more context information in this case
+
+                    //redirect to /login?
+                    //whenever trying to access sthg without permission (e.g. postbox)
+
+
+                }
+            );
+        },
+		isAuth:function () { //TODO verify auth first (or advise against using this variant)
+            //console.log(new Error().stack);
+            //this.verifyAuth(); //TODO tmp, sthg causes an automatic redirect (resulting in a loop) if we set off the request here
 			return (user.isAuth == true);
 		},
-		setAuth:function(username) {
+		setAuth:function(username) { //TODO verify auth with server first
 			user.isAuth = true;
 			user.username = username;
+            //this.verifyAuth(); //TODO tmp
 		},
 		getUserName:function () {
 			return user.username;
@@ -23,6 +49,7 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
             return registered;
         },
 		resetAuth:function () {
+            //TODO also deactive session at server
 			user = {
 				isAuth : false
 			}

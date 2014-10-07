@@ -14,7 +14,15 @@
  *    limitations under the License.
  */
 
-app = angular.module('won.owner', ['ui.bootstrap', 'ngRoute', 'ui.map', 'blueimp.fileupload', 'ngMockE2E', 'smart-table']).config(function ($routeProvider, $httpProvider, $provide) {
+app = angular.module('won.owner',
+        [ 'ui.bootstrap'
+        , 'ngRoute'
+        , 'ui.map'
+        , 'blueimp.fileupload'
+        , 'ngMockE2E'
+        , 'smart-table'
+        ]
+    ).config(function ($routeProvider, $httpProvider, $provide) {//, $log) {
 	$routeProvider.
             when('/create-need/:step/:menuposition/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
             when('/create-need/:step/:menuposition', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
@@ -34,6 +42,7 @@ app = angular.module('won.owner', ['ui.bootstrap', 'ngRoute', 'ui.map', 'blueimp
             when('/private-link', {controller:'PrivateLinkCtrl', templateUrl:'app/private-link/private-link.html'}).
             when('/post-detail', {controller:'PostDetailCtrl', templateUrl:'app/post-detail/post-detail.html'}).
 			otherwise({redirectTo : '/home'});
+    //TODO add access control / error handling (e.g. trying to bring up /postbox while not logged in)
 
 app.directive('header', function(){
     return {
@@ -42,7 +51,7 @@ app.directive('header', function(){
         templateUrl:'templates/header.html'
     }
 })
-	var interceptor = function ($rootScope, $q, $location, $window) {
+	/*var interceptor = function ($rootScope, $q, $location, $window) {//, $log) {
 
 		function success(response) {
 			return response;
@@ -56,13 +65,23 @@ app.directive('header', function(){
 			var url = config.url;
 
 			if (status == 401) {
-				$window.user = {
+                //TODO should this really reset all other user properties here?
+                // if yes, it's still misplaced and should be moved to some resetUser function
+                // TODO deleting the postbox entries atm!!!! (they need to be refetched!)
+				$window.user = { //reinitializes user;
 					isAuth:false
+                    $user
 				}
 
-				$location.path("/signin");
+                //// this interceptor's probably not necessary, as the backend is only a data interface any way.
+                //// Access should be limited at the view level
+                ////TODO redirect leads to an infinite loop (verifyAuth -> 401 -> redirect -> verifyAuth)
+                //// also: should redirect to original resource after login
+				//$location.path("/signin");
 			} else {
 				$rootScope.error = method + " on " + url + " failed with status " + status;
+                console.log($rootScope.error);
+                //$log.error($rootScope.error);
 			}
 
 			return $q.reject(response);
@@ -72,7 +91,7 @@ app.directive('header', function(){
 			return promise.then(success, error);
 		};
 	};
-	$httpProvider.responseInterceptors.push(interceptor);
+	$httpProvider.responseInterceptors.push(interceptor);*/
    // $provide.decorator('$httpBackend', angular.mock.e2e.$httpBackendDecorator);
 	/* http://stackoverflow.com/questions/18888104/angularjs-q-wait-for-all-even-when-1-rejected */
 	$provide.decorator('$q', ['$delegate', function ($delegate) {
