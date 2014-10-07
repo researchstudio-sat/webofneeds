@@ -69,6 +69,24 @@ angular.module('won.owner').factory('wonService', function (
         //extract hint information from message
         //call handler if there is one - it may modify the event object
         eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeed]);
+        wonService.open(eventData.framedMessage[won.WONMSG.hasReceiver()]);
+    }
+
+    /**
+     * Updates the local triple store with the data contained in the hint message.
+     * @param eventData event object that is passed as additional argument to $rootScope.$broadcast.
+     * @param message the complete message data as received from the WoN node.
+     */
+    var processOpenMessage = function(eventData, message) {
+        //load the data of the connection that the hint is about, if required
+        var connectionURI = eventData.receiverURI;
+        if (connectionURI != null) {
+            linkedDataService.fetch(connectionURI);
+        }
+        //extract hint information from message
+        //call handler if there is one - it may modify the event object
+        eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeed]);
+        wonService.sendTextMessage(eventData.framedMessage[won.WONMSG.hasReceiver()], "Hi! this is an automatic greeting!");
     }
 
 
@@ -76,7 +94,7 @@ angular.module('won.owner').factory('wonService', function (
     var messageTypeToEventType = {};
     messageTypeToEventType[won.WONMSG.hintNotificationMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED, handler: processHintNotificationMessage};
     messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:processConnectMessage};
-    messageTypeToEventType[won.WONMSG.openMessageCompacted] = {eventType: won.EVENT.OPEN_RECEIVED, handler:null};
+    messageTypeToEventType[won.WONMSG.openMessageCompacted] = {eventType: won.EVENT.OPEN_RECEIVED, handler:processOpenMessage};
     messageTypeToEventType[won.WONMSG.closeMessageCompacted] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:null};
     messageTypeToEventType[won.WONMSG.connectionMessageCompacted] = {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED, handler:null};
     messageTypeToEventType[won.WONMSG.needStateMessageCompacted] = {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED, handler:null};
@@ -371,12 +389,59 @@ angular.module('won.owner').factory('wonService', function (
 
     }
 
-
-    /*********************
-     * Angular event handling
+    /**
+     * Opens the existing connection specified by connectionUri.
+     * @param need1
+     * @param need2
      */
+    wonService.textMessage = function(text){
 
+        var sendTextMessage = function(envelopeData) {
+            //TODO: use event URI pattern specified by WoN node
+            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  utilService.getRandomInt(1,9223372036854775807);
 
+            var message = new won.MessageBuilder(won.WONMSG.openMessage)
+                .eventURI(eventUri)
+                .forEnvelopeData(envelopeData)
+                .addContentGraphData(won.WON.hasTextMessage, text)
+                .build();
+            var callback = new messageService.MessageCallback(
+                function (event, msg) {
+                    //check if the message we got (the create need response message) indicates that all went well
+                    console.log("got connect needs message response! TODO: check for connect response!");
+                    //TODO: if negative, use alternative need URI and send again
+                    //TODO: if positive, propagate positive response back to caller
+                    //TODO: fetch need data and store in local RDF store
+                    this.done = true;
+                    //WON.CreateResponse.equals(messageService.utils.getMessageType(msg)) &&
+                    //messageService.utils.getRefersToURIs(msg).contains(messageURI)
+
+                });
+            callback.done = false;
+            callback.shouldHandleTest = function (msg) {
+                return true;
+            };
+            callback.shouldUnregisterTest = function(msg) {
+                return this.done;
+            };
+
+            messageService.addMessageCallback(callback);
+            try {
+                messageService.sendMessage(message);
+            } catch (e) {
+                console.log("could not open " + connectionUri + ". Reason" + e);
+            }
+        }
+
+        //fetch all data needed
+        linkedDataService.getEnvelopeDataforConnection(connectionUri)
+            .then(function(envelopeData){
+                sendTextMessage(envelopeData);
+            },
+            won.reportError("cannot open connection " + connectionUri)
+        );
+
+    }
 
     return wonService;
 });

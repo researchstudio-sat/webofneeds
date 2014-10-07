@@ -142,7 +142,8 @@
         won.WON.hasMatchScoreCompacted = won.WON.prefix + ":hasMatchScore";
         won.WON.hasMatchCounterpart = won.WON.baseURI + "hasMatchCounterpart";
         won.WON.hasMatchCounterpart = won.WON.prefix + ":hasMatchCounterpart";
-
+        won.WON.hasTextMessage= won.WON.baseURI + "hasTextMessage";
+        won.WON.hasTextMessageCompacted= won.WON.prefix + ":hasTextMessage";
 
 
         won.WONMSG = {};
@@ -234,7 +235,7 @@
         won.UNREAD.GROUP.BYNEED="byNeed";
 
         //UTILS
-        var UNSET_EVENT_URI= "no:uri";
+        var UNSET_URI= "no:uri";
 
         won.clone = function(obj){
             return JSON.parse(JSON.stringify(obj));
@@ -450,7 +451,24 @@
                     }
                 }
                 return null;
-            } ,
+            },
+            getNodeInGraph: function(data, graphName, nodeId){
+                var graph = this.getNamedGraph(data, graphName);
+                for (key in graph['@graph']){
+                    var curNode = graph['@graph'][key];
+                    var curNodeId = node['@id'];
+                    if (curNodeId === nodeId){
+                        return curNode;
+                    }
+                }
+                return null;
+            },
+            addDataToNode: function(data, graphName, nodeId, predicate, object){
+                var node = getNodeInGraph(data, graphName, nodeId);
+                if (node != null) {
+                    node[predicate] = object;
+                }
+            },
             getContext :  function (data) {
                 return data["@context"];
             }
@@ -496,17 +514,17 @@
                     };
                 graphs.push(defaultGraph);
             }
-            defaultGraph["@graph"].push({"@id": UNSET_EVENT_URI + "#data", "@type": "msg:EnvelopeGraph" });
+            defaultGraph["@graph"].push({"@id": UNSET_URI + "#data", "@type": "msg:EnvelopeGraph" });
 
             //create the message graph, containing the message type
             var messageGraph = {
                 "@graph": [
                     {
-                        "@id":UNSET_EVENT_URI,
+                        "@id":UNSET_URI,
                         "msg:hasMessageType": {'@id':messageType}
                     }
                 ],
-                "@id": UNSET_EVENT_URI + "#data"
+                "@id": UNSET_URI + "#data"
             };
             won.addContentGraphReferencesToMessageGraph(messageGraph, graphURIs);
             //add the message graph to the graphs of the builder
@@ -743,6 +761,22 @@
             }
         }
 
+        /*
+         * Creates a JSON-LD stucture containing a named graph with default 'unset' event URI
+         * plus the specified hashFragment
+         *
+         */
+        won.newGraph = function (hashFragement) {
+            hashFragement = hashFragement || 'graph1';
+            return {"@graph": [
+                        {
+                            "@id": UNSET_URI + "#" + hashFragement,
+                            "@graph": []
+                        }
+                    ]
+                };
+        }
+
 
         /**
          * Builds a JSON-LD WoN Message or adds the relevant data to the specified
@@ -769,7 +803,7 @@
                 }
             }
             this.messageGraph = null;
-            this.eventUriValue = UNSET_EVENT_URI;
+            this.eventUriValue = UNSET_URI;
             won.addMessageGraph(this, graphNames , messageType);
         };
 
@@ -874,6 +908,10 @@
             },
             getContentGraphNode: function(){
                 return this.getContentGraph()["@graph"][0];
+            },
+            addContentGraphData: function(predicate, object){
+                this.getContentGraphNode()[predicate] = object;
+                return this;
             },
             build: function () {
                 console.log("built this message:" + JSON.stringify(this.data));
