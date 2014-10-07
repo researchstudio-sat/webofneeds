@@ -111,6 +111,12 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeedUri);
     });
 
+    $scope.$on(won.EVENT.CLOSE_SENT, function(ngEvent, eventData) {
+        //removeEventFromUnreadAndUpdateUnreadObjects(eventData);
+        applicationStateService.removeEvent(eventData);
+        reloadCurrentNeedData();
+    });
+
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for

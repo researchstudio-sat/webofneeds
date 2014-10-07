@@ -547,7 +547,6 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.ensureLoaded(connectionURI).then(function(success) {
             try {
                 var resultObject = {};
-                //TODO: use event with highest timestamp
                 var query =
                     "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
                     "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
@@ -556,7 +555,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     "<" + connectionURI + "> a " + won.WON.ConnectionCompacted + ";\n" +
                     won.WON.hasEventContainerCompacted + " ?container.\n" +
                     "?container rdfs:member ?eventURI. \n" +
-                    "} limit 1";
+                    " optional { " +
+                    "  ?eventURI msg:hasTimestamp ?timestamp .\n" +
+                    " } \n" +
+                    "} order by desc(?timestamp) limit 1";
                 privateData.store.execute(query, [], [], function (success, results) {
                     if (rejectIfFailed(success, results,{message : "Error loading last connection event URI for connection " + connectionURI +".", allowNone : false, allowMultiple: false})){
                         return;

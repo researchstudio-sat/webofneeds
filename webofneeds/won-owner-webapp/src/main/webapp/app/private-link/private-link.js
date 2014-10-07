@@ -6,7 +6,7 @@
  * To change this template use File | Settings | File Templates.
  */
 angular.module('won.owner')
-    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope,applicationStateService, linkedDataService, wonService) {
+    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, applicationStateService, linkedDataService, wonService) {
 
 
     // all types of messages will be shown when the page is loaded
@@ -355,6 +355,9 @@ angular.module('won.owner')
     $scope.clickOnYesForRemoveMatch = function() {
         console.log('yes');
         $scope.showConfirmationDialogForRemoveMatch = false;
+        wonService.closeConnection($scope.chosenMessage);
+        $scope.prevMessageId = null;
+        $scope.chosenMessage = null;
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');
         $location.path('/private-link');
