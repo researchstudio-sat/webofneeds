@@ -382,6 +382,7 @@ angular.module('won.owner')
 
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');
+        $scope.chosenMessage = null;
         $location.path('/private-link');
     }
 

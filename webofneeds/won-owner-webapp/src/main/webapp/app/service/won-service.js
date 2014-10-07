@@ -38,7 +38,7 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processHintNotificationMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        var connectionURI = eventData.receiverURI;
+        var connectionURI = eventData.hasReceiver;
         if (connectionURI != null) {
             linkedDataService.ensureLoaded(connectionURI);
         }
@@ -62,14 +62,12 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processConnectMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        var connectionURI = eventData.receiverURI;
-        if (connectionURI != null) {
-            linkedDataService.fetch(connectionURI);
-        }
+        //workaround until we get the newly created connection URI from our WoN node inside the event: don't do anything here
+        // --> in getLastEventForEachConnection... the 'connections' container is reloaded and the connect event should be loaded, too
         //extract hint information from message
         //call handler if there is one - it may modify the event object
         eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeed]);
-        wonService.open(eventData.framedMessage[won.WONMSG.hasReceiver()]);
+        //wonService.open(eventData.framedMessage[won.WONMSG.hasReceiver()]);
     }
 
     /**
@@ -79,7 +77,7 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processOpenMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        var connectionURI = eventData.receiverURI;
+        var connectionURI = eventData.hasLocalConnection;
         if (connectionURI != null) {
             linkedDataService.fetch(connectionURI);
         }
@@ -121,9 +119,6 @@ angular.module('won.owner').factory('wonService', function (
                 //only do something if a type/handler combination is registered
                 if (configForEvent.eventType != null) {
                     event.eventType = configForEvent.eventType;
-                    //store event in local triple store
-                    linkedDataService.storeJsonLdGraph(event.uri, msg);
-
                     if (configForEvent.handler != null) {
                         configForEvent.handler(event, msg);
                     }
@@ -324,7 +319,7 @@ angular.module('won.owner').factory('wonService', function (
                     this.done = true;
                     //WON.CreateResponse.equals(messageService.utils.getMessageType(msg)) &&
                     //messageService.utils.getRefersToURIs(msg).contains(messageURI)
-                    $rootScope.$broadcast(won.EVENT.OPEN_SENT, eventData);
+                    //$rootScope.$broadcast(won.EVENT.OPEN_SENT, eventData);
 
                 });
             callback.done = false;

@@ -153,6 +153,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @return a promise to a boolean which indicates success
      */
     linkedDataService.fetch = function(uri) {
+        console.log("fetching:        " + uri);
         var deferred = $q.defer();
         //check if this is the first requrest
         var first = ! isBeingFetched(uri);
@@ -167,6 +168,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         privateData.store.load('remote', uri, function (success, results) {
                             $rootScope.$apply(function () {
                                 if (success) {
+                                    console.log("fetched:         " + uri)
                                     resolveDeferredsForUrisBeingFetched(uri, success);
                                 } else {
                                     rejectDeferredsForUrisBeingFetched(uri, "failed to load " + uri);
@@ -192,6 +194,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @return a promise to a boolean which indicates success
      */
     linkedDataService.ensureLoaded = function(uri) {
+        console.log("ensuring loaded: " +uri);
+
         var deferred = $q.defer();
         privateData.store.node(uri, function (success, mygraph) {
             if (success && mygraph.triples.length > 0) {
@@ -409,6 +413,38 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         );
     }
 
+    /**
+     * Finds the resource that denotes the connection's event container and fetches its
+     * content. Used for refreshing information about connection events.
+     * TODO: improve so as to load only new events
+     * TODO: currently this does not work as the connection event container is a blank node.
+     * --> we have to fetch the whole connection
+     *
+     * @param connectionUri
+     * @returns {*}
+     */
+    linkedDataService.refreshConnectionEventContainer = function (connectionUri){
+        return linkedDataService.ensureLoaded(connectionUri).then(function(success) {
+            try {
+                var subject = connectionUri;
+                var predicate = won.WON.hasEventContainer;
+                privateData.store.node(connectionUri, function (success, graph) {
+                    var resultGraph = graph.match(subject, predicate, null);
+                    if (resultGraph != null && resultGraph.length > 0) {
+                        for (key in resultGraph.triples) {
+                            var containerURI = resultGraph.triples[key].object.nominalValue;
+                            //TODO: here, we fetch, but if we knew that the connections container didn't change
+                            //we could just ensureLoaded. See https://github.com/researchstudio-sat/webofneeds/issues/109
+                            return linkedDataService.fetch(containerURI);
+                        }
+                    }
+                });
+            } catch (e) {
+                $q.reject("could not refresh connection event container for connection " + connectionUri +". Reason:", e);
+            }
+        });
+    }
+
     linkedDataService.getLastEventOfConnection = function(connectionUri) {
         return linkedDataService.getConnection(connectionUri)
             .then(function (connection) {
@@ -432,7 +468,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
 
     linkedDataService.getAllConnectionEvents = function(connectionUri) {
-        return linkedDataService.getConnectionEventUris(connectionUri)
+        return linkedDataService.getAllConnectionEventUris(connectionUri)
             .then(function (eventUris) {
                 try {
                     var eventPromises = [];
@@ -513,7 +549,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
 
     linkedDataService.getAllConnectionEventUris = function(connectionURI) {
-        return linkedDataService.ensureLoaded(connectionURI).then(function(success) {
+        return linkedDataService.fetch(connectionURI).then(function(success) {
             try {
                 var eventURIs = [];
                 var query =
@@ -543,8 +579,26 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         });
     }
 
+    linkedDataService.crawlConnectionData = function(connectionURI){
+        return linkedDataService.fetch(connectionURI).then(
+            function(){
+                return linkedDataService.getAllConnectionEventUris(connectionURI).then(
+                    function(uris){
+                        var eventPromises = [];
+                        for (key in uris){
+                            eventPromises.push(linkedDataService.fetch(uris[key]));
+                        }
+                        return $q.all(eventPromises);
+                    }
+                );
+            }
+        );
+
+    }
+
     linkedDataService.getLastConnectionEventUri = function(connectionURI) {
-        return linkedDataService.ensureLoaded(connectionURI).then(function(success) {
+        return linkedDataService.crawlConnectionData(connectionURI).then(function(success) {
+
             try {
                 var resultObject = {};
                 var query =
@@ -586,6 +640,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      */
     linkedDataService.getNodeWithAttributes = function(uri){
         return linkedDataService.ensureLoaded(uri).then(function(success) {
+            console.log("getNodeWithAttrs:" + uri);
             try {
                 var node = {};
                 privateData.store.node(uri, function (success, graph) {
@@ -609,6 +664,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * Deletes all triples where the specified uri is the subect.
      */
     linkedDataService.deleteNode = function(uri){
+        console.log("deleting node:   " + uri);
         var deferred = $q.defer();
         var query = "delete where {<"+uri+"> ?anyP ?anyO}";
         privateData.store.execute(query, function (success, graph) {

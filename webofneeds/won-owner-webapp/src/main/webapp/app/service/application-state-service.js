@@ -75,7 +75,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             //unreadEntry.events = [];
             unreadEntry.count = 0;
         }
-        //unreadEntry.events.push(eventData);
+        unreadEntry.events.push(eventData);
         unreadEntry.timestamp=eventData.timeStamp;
         //unreadEntry.need = privateData.allNeeds[needURI];
         unreadEntry.count ++;
