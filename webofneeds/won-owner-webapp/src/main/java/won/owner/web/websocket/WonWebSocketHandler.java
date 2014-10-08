@@ -31,6 +31,7 @@ import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageEncoder;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 /**
@@ -76,15 +77,21 @@ public class WonWebSocketHandler
     logger.debug("OA Server - sending WebSocket message: {}", wonMessageJsonLdString);
 
     WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
-
+    URI needURI = wonMessage.getMessageEvent().getReceiverNeedURI();
     Set<WebSocketSession> webSocketSessions =
-      webSocketSessionService.getWebSocketSessions(wonMessage.getMessageEvent().getReceiverNeedURI());
+   webSocketSessionService.getWebSocketSessions(needURI);
 
     for (WebSocketSession session : webSocketSessions)
       try {
-        session.sendMessage(webSocketMessage);
+        if (session.isOpen()) {
+          session.sendMessage(webSocketMessage);
+        } else {
+          logger.debug("could not send message for need " + wonMessage.getMessageEvent().getReceiverURI() + ". " +
+            "Session is closed.");
+          webSocketSessionService.removeMapping(needURI, session);
+        }
       } catch (IOException e) {
-        webSocketSessions.remove(session);
+        webSocketSessionService.removeMapping(needURI, session);
         // ToDo (FS): proper handling when message could not be send (remove session from list; inform someone)
         logger.info("caught IOException:", e);
       }
