@@ -82,8 +82,8 @@ angular.module('won.owner')
     $scope.newMessage = '';
     $scope.mesagesCollapsed = false;
     $scope.messageTypeColapsed = -1;
-    $scope.settingsCollapsed = false;
-    $scope.postOptionsCollapsed = false;
+    $scope.settingsCollapsed = true;
+    $scope.postOptionsCollapsed = true;
     $scope.postOptionsCollapseClick= function() {
         $scope.postOptionsCollapsed = !$scope.postOptionsCollapsed;
     };

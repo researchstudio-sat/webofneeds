@@ -213,6 +213,7 @@
         won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
         won.EVENT.NEED_CREATED = "NeedCreatedEvent";
         won.EVENT.HINT_RECEIVED = "HintReceivedEvent";
+        won.EVENT.CONNECT.SENT ="ConnectSentEvent";
         won.EVENT.CONNECT_RECEIVED = "ConnectReceivedEvent";
         won.EVENT.OPEN_SENT = "OpenSentEvent";
         won.EVENT.OPEN_RECEIVED = "OpenReceivedEvent";
