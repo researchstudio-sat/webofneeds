@@ -135,8 +135,6 @@
         won.WON.hasTagCompacted = won.WON.prefix + ":hasTag";
         won.WON.hasTextDescription = won.WON.baseUri + "hasTextDescription";
         won.WON.hasTextDescriptionCompacted = won.WON.prefix + ":hasTextDescription";
-        won.WON.hasTimeStamp = won.WON.baseUri + "hasTimeStamp"
-        won.WON.hasTimeStampCompacted = won.WON.prefix + ":hasTimeStamp";
 
         won.WON.hasMatchScore = won.WON.baseURI + "hasMatchScore";
         won.WON.hasMatchScoreCompacted = won.WON.prefix + ":hasMatchScore";
@@ -165,6 +163,8 @@
         won.WONMSG.hasSenderNodeCompacted = won.WONMSG.prefix + ":hasSenderNode";
         won.WONMSG.hasMessageType = won.WONMSG.baseUri + ":hasMessageType";
         won.WONMSG.hasMessageTypeCompacted = won.WONMSG.prefix + ":hasMessageType";
+        won.WONMSG.hasTimestamp = won.WONMSG.baseUri + "hasTimestamp"
+        won.WONMSG.hasTimestampCompacted = won.WONMSG.prefix + ":hasTimestamp";
         won.WONMSG.refersTo = won.WONMSG.baseUri + "refersTo";
         won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
         won.WONMSG.EnvelopeGraph = won.WONMSG.baseUri + "EnvelopeGraph";
@@ -216,6 +216,7 @@
         won.EVENT.CONNECT_RECEIVED = "ConnectReceivedEvent";
         won.EVENT.OPEN_SENT = "OpenSentEvent";
         won.EVENT.OPEN_RECEIVED = "OpenReceivedEvent";
+        won.EVENT.CLOSE_SENT = "CloseSentEvent";
         won.EVENT.CLOSE_RECEIVED = "CloseReceivedEvent";
         won.EVENT.CONNECTION_MESSAGE_RECEIVED = "ConnectionMessageReceivedEvent";
         won.EVENT.NEED_STATE_MESSAGE_RECEIVED = "NeedStateMessageReceivedEvent";
@@ -857,6 +858,10 @@
             },
             hasReceiverNode: function(receiverURI){
                 this.getMessageEventNode()[won.WONMSG.hasReceiverNodeCompacted]={"@id":receiverURI};
+                return this;
+            },
+            hasTimestamp: function(){
+                this.getMessageEventNode()[won.WONMSG.hasTimestampCompacted]=new Date().getTime();
                 return this;
             },
             /**

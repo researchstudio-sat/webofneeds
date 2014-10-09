@@ -16,4 +16,5 @@ public interface UserRepository extends WonRepository<User> {
 	public User findByUsername(String username);
 
 	public User findByUsernameAndPassword(String username, String password);
+
 }

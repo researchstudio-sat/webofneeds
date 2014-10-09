@@ -19,6 +19,8 @@
 		<intercept-url pattern="/rest/users/signin" access="isAnonymous()"/>
         <intercept-url pattern="/rest/needs/drafts" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/needs/drafts/.+" access="isAuthenticated()"/>
+        <intercept-url pattern="/msg" access="isAnonymous()"/>
+
 		<!--intercept-url pattern="/rest/**" access="isAuthenticated()" /-->
 	</http>
 

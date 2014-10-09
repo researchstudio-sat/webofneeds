@@ -38,7 +38,7 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processHintNotificationMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        var connectionURI = eventData.receiverURI;
+        var connectionURI = eventData.hasReceiver;
         if (connectionURI != null) {
             linkedDataService.ensureLoaded(connectionURI);
         }
@@ -62,14 +62,12 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processConnectMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        var connectionURI = eventData.receiverURI;
-        if (connectionURI != null) {
-            linkedDataService.fetch(connectionURI);
-        }
+        //workaround until we get the newly created connection URI from our WoN node inside the event: don't do anything here
+        // --> in getLastEventForEachConnection... the 'connections' container is reloaded and the connect event should be loaded, too
         //extract hint information from message
         //call handler if there is one - it may modify the event object
         eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeed]);
-        wonService.open(eventData.framedMessage[won.WONMSG.hasReceiver()]);
+        //wonService.open(eventData.framedMessage[won.WONMSG.hasReceiver()]);
     }
 
     /**
@@ -79,7 +77,7 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processOpenMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        var connectionURI = eventData.receiverURI;
+        var connectionURI = eventData.hasLocalConnection;
         if (connectionURI != null) {
             linkedDataService.fetch(connectionURI);
         }
@@ -88,6 +86,19 @@ angular.module('won.owner').factory('wonService', function (
         eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeed]);
         wonService.sendTextMessage(eventData.framedMessage[won.WONMSG.hasReceiver()], "Hi! this is an automatic greeting!");
     }
+    /**
+     * Updates the local triple store with the data contained in the hint message.
+     * @param eventData event object that is passed as additional argument to $rootScope.$broadcast.
+     * @param message the complete message data as received from the WoN node.
+     */
+    var processCloseMessage = function(eventData, message) {
+        //load the data of the connection that the hint is about, if required
+        var connectionURI = eventData.receiverURI;
+        if (connectionURI != null) {
+            linkedDataService.fetch(connectionURI);
+        }
+        //TODO update remove connection from local store if not already removed
+    }
 
 
     //mapping between message type and eventType/handler combination
@@ -95,7 +106,7 @@ angular.module('won.owner').factory('wonService', function (
     messageTypeToEventType[won.WONMSG.hintNotificationMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED, handler: processHintNotificationMessage};
     messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:processConnectMessage};
     messageTypeToEventType[won.WONMSG.openMessageCompacted] = {eventType: won.EVENT.OPEN_RECEIVED, handler:processOpenMessage};
-    messageTypeToEventType[won.WONMSG.closeMessageCompacted] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:null};
+    messageTypeToEventType[won.WONMSG.closeMessageCompacted] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:processCloseMessage};
     messageTypeToEventType[won.WONMSG.connectionMessageCompacted] = {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED, handler:null};
     messageTypeToEventType[won.WONMSG.needStateMessageCompacted] = {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED, handler:null};
 
@@ -108,9 +119,6 @@ angular.module('won.owner').factory('wonService', function (
                 //only do something if a type/handler combination is registered
                 if (configForEvent.eventType != null) {
                     event.eventType = configForEvent.eventType;
-                    //store event in local triple store
-                    linkedDataService.storeJsonLdGraph(event.uri, msg);
-
                     if (configForEvent.handler != null) {
                         configForEvent.handler(event, msg);
                     }
@@ -163,6 +171,7 @@ angular.module('won.owner').factory('wonService', function (
             .eventURI(eventUri)
             .hasReceiverNode(wonNode)
             .hasSenderNeed(needUri)
+            .hasTimestamp()
             .build();
 
 
@@ -239,6 +248,7 @@ angular.module('won.owner').factory('wonService', function (
                 .hasSenderNode(wonNodeUri1)
                 .hasReceiverNeed(need2)
                 .hasReceiverNode(wonNodeUri2)
+                .hasTimestamp()
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {
@@ -295,6 +305,7 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.connectMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
+                .hasTimestamp()
                 .hasFacet(won.WON.OwnerFacet)
                 .hasRemoteFacet(won.WON.OwnerFacet)
                 .build();
@@ -308,7 +319,7 @@ angular.module('won.owner').factory('wonService', function (
                     this.done = true;
                     //WON.CreateResponse.equals(messageService.utils.getMessageType(msg)) &&
                     //messageService.utils.getRefersToURIs(msg).contains(messageURI)
-                    $rootScope.$broadcast(won.EVENT.OPEN_SENT, eventData);
+                    //$rootScope.$broadcast(won.EVENT.OPEN_SENT, eventData);
 
                 });
             callback.done = false;
@@ -350,6 +361,9 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.openMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
+                .hasTimestamp()
+                .hasFacet(won.WON.OwnerFacet)
+                .hasRemoteFacet(won.WON.OwnerFacet)
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {
@@ -389,11 +403,86 @@ angular.module('won.owner').factory('wonService', function (
 
     }
 
+
     /**
-     * Opens the existing connection specified by connectionUri.
+     * Closes the existing connection specified by connectionUri.
      * @param need1
      * @param need2
      */
+    wonService.closeConnection = function(msgToClose){
+
+        var sendClose = function(envelopeData, eventDataToClose) {
+            //TODO: use event URI pattern specified by WoN node
+            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  utilService.getRandomInt(1,9223372036854775807);
+            var message = new won.MessageBuilder(won.WONMSG.closeMessage)
+                .eventURI(eventUri)
+                .forEnvelopeData(envelopeData)
+                .hasTimestamp()
+                .hasFacet(won.WON.OwnerFacet)
+                .hasRemoteFacet(won.WON.OwnerFacet)
+                .build();
+            var callback = new messageService.MessageCallback(
+                function (event, msg) {
+                    //TODO: move here the code from timeout when won-node will
+                    // be changed to send  close connection message response
+                    console.log("got close connection message response! TODO: check for close connection response!");
+                    this.done = true;
+
+                });
+            callback.done = false;
+            callback.shouldHandleTest = function (msg) {
+                return true;
+            };
+            callback.shouldUnregisterTest = function(msg) {
+                return this.done;
+            };
+
+            messageService.addMessageCallback(callback);
+            try {
+                messageService.sendMessage(message);
+                // ideally should be in callback, but since there is no response coming,
+                // right now I put it in timeout, so that the close event and connection
+                // update has some time to be saved on the won-node before it gets fetched here.
+                setTimeout(
+                    function(){
+                        //linkedDataService.fetch(connection.uri);
+                        //console.log("publishing angular event");
+                        //$rootScope.$broadcast(won.EVENT.CLOSE_SENT, eventData);
+
+                        linkedDataService.fetch(msgToClose.connection.uri)
+                            .then(
+                            function (value) {
+                                linkedDataService.fetch(eventUri)
+                                    .then(
+                                    function(value2) {
+                                        console.log("publishing angular event");
+
+                                        //eventData.eventType = won.EVENT.CLOSE_SENT;
+                                        $rootScope.$broadcast(won.EVENT.CLOSE_SENT, eventDataToClose);
+                                        //$rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
+
+                                    }, won.reportError("cannot fetch closed event " + eventUri)
+                                );
+                            }, won.reportError("cannot fetch closed connection " + msgToClose.connection.uri)
+                        );
+
+                    }, 3000);
+            } catch (e) {
+                console.log("could not open suggested connection " + connection.uri + ". Reason" + e);
+            }
+        }
+
+        //fetch all data needed
+        linkedDataService.getEnvelopeDataforConnection(msgToClose.connection.uri)
+            .then(function(envelopeData){
+                sendClose(envelopeData, msgToClose.event);
+            },
+            won.reportError("cannot close connection " + msgToClose.connection.uri)
+        );
+
+    }
+
+
     wonService.textMessage = function(text){
 
         var sendTextMessage = function(envelopeData) {
@@ -402,6 +491,7 @@ angular.module('won.owner').factory('wonService', function (
 
             var message = new won.MessageBuilder(won.WONMSG.openMessage)
                 .eventURI(eventUri)
+                .hasTimestamp()
                 .forEnvelopeData(envelopeData)
                 .addContentGraphData(won.WON.hasTextMessage, text)
                 .build();
