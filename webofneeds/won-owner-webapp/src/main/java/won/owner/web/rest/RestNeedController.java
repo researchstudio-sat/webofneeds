@@ -22,6 +22,7 @@ import won.owner.linkeddata.NeedPojoNeedModelBuilder;
 import won.owner.model.DraftState;
 import won.owner.model.User;
 import won.owner.pojo.ConnectionPojo;
+import won.owner.pojo.CreateDraftPojo;
 import won.owner.pojo.DraftPojo;
 import won.owner.pojo.NeedPojo;
 import won.owner.repository.DraftStateRepository;
@@ -126,43 +127,7 @@ public class RestNeedController {
 	public void setNeedRepository(NeedRepository needRepository) {
 		this.needRepository = needRepository;
 	}
-   /*
-  @ResponseBody
-  @RequestMapping(
-    value = "/{needId}/matches",
-    produces = MediaType.APPLICATION_JSON,
-    method = RequestMethod.GET)
-  public List<MatchPojo> listMatchesForNeed(@PathVariable String needId, org.springframework.ui.Model model)
-  {
-    User user = getCurrentUser();
-    Need need = needRepository.findOne(Long.valueOf(needId));
-    if (!user.getNeeds().contains(need)){
-      throw new AccessDeniedException("Access Denied");
-    }
-    List<Match> matches = matchRepository.findByFromNeed(need.getNeedURI());
-    model.addAttribute("matches", matches);
 
-    //create an URI iterator from the matches and fetch the linked data descriptions for the needs.
-    final Iterator<Match> matchIterator = matches.iterator();
-    Iterator<Dataset> modelIterator = WonLinkedDataUtils.getModelForURIs(
-      new ProjectingIterator<Match, URI>(matchIterator)
-      {
-        @Override
-        public URI next() {
-          return this.baseIterator.next().getToNeed();
-        }
-      }, this.linkedDataSource);
-
-    Iterator<Match> matchIterator2 = matches.iterator();
-    Iterator<MatchPojo> matchPojoIterator = WonOwnerWebappUtils.toMatchPojos(modelIterator, matchIterator2);
-    //create a list of models and add all the descriptions:
-    List<MatchPojo> result = new ArrayList<MatchPojo>(matches.size());
-    while(matchPojoIterator.hasNext()){
-      result.add(matchPojoIterator.next());
-    }
-    return result;
-  }
-           */
   /**
    * returns a List containing needs belonging to the user
    * @return JSON List of need objects
@@ -190,36 +155,6 @@ public class RestNeedController {
     return (User) wonUserDetailService.loadUserByUsername(username);
   }
 
-  /**
-   * this method creates need and returns created need with its needID
-   * @return JSON object of the created need.
-   */
-  /*
-	@ResponseBody
-	@RequestMapping(
-			value = "/",
-			consumes = MediaType.APPLICATION_JSON,
-			produces = MediaType.APPLICATION_JSON,
-			method = RequestMethod.POST
-	)
-  //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
-	public ResponseEntity<NeedPojo> createNeed(@RequestBody NeedPojo needPojo) {
-    User user = getCurrentUser();
-
-    logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getCreationDate() + "/" +
-				needPojo.getLongitude() + "/" + needPojo.getLatitude() + "/" + (needPojo.getState() == NeedState.ACTIVE));
-    //TODO: using fixed Facets - change this
-    needPojo.setFacetTypes(new String[]{FacetType.OwnerFacet.getURI().toString()});
-    NeedPojo createdNeedPojo = resolve(needPojo);
-		Need need = needRepository.findOne(createdNeedPojo.getNeedId());
-		user.getNeeds().add(need);
-		wonUserDetailService.save(user);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(need.getNeedURI());
-		return new ResponseEntity<NeedPojo>(createdNeedPojo, headers, HttpStatus.CREATED);
-	}
-     */
   @ResponseBody
   @RequestMapping(
     value = "/drafts",
@@ -239,23 +174,12 @@ public class RestNeedController {
 
     LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
     List<DraftPojo> returnList = new ArrayList<DraftPojo>();
-            /*
-    Iterable<Need> needs = user.getNeeds();
-    for (Need need : needs) {
 
-      if (draftURIs.contains(need.getNeedURI())){
-        DraftPojo draftPojo = new DraftPojo(need.getNeedURI(), rdfStorage.loadModel(need.getNeedURI()),
-                                            draftStateRepository.findByDraftURI(need.getNeedURI()).get(0));
-        draftPojo.setNeedId(need.getId());
-        returnList.add(draftPojo);
-      }
-    }
-           */
     return returnList;
   }
   /**
    * saves draft of a draft
-   * @param draft an object containing information of the need draft
+   * @param createDraftObject an object containing information of the need draft
    * @return a JSON object of the draft with its temprory id.
    */
   @ResponseBody
@@ -267,18 +191,14 @@ public class RestNeedController {
   )
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
-  public String createDraft(@RequestBody String draft) throws ParseException {
+  public String createDraft(@RequestBody CreateDraftPojo createDraftObject) throws ParseException {
 
     User user = getCurrentUser();
 
-    //user.getNeeds().size();
-
-    //DraftPojo createdDraftPojo = resolveDraft(draftPojo,user);
-    //NeedPojo createdNeedPojo = (NeedPojo) createdDraftPojo;
-    user.getDrafts().add(draft);
+    user.getDrafts().add(createDraftObject.getDraft());
     wonUserDetailService.save(user);
 
-    return draft;
+    return createDraftObject.getDraftURI().toString();
 
 
   }
@@ -298,18 +218,7 @@ public class RestNeedController {
       List<URI> draftURIs = new ArrayList<>();
       while(draftIterator.hasNext()){
         draftURIs.add(draftIterator.next().getDraftURI());
-      }                                      /*
-      List<Need> needs = user.getNeeds();
-      List<Need> toDelete = new ArrayList<>();
-      for (Need need : needs){
-        if (draftURIs.contains(need.getNeedURI())){
-          toDelete.add(need);
-        }
       }
-      user.removeNeeds(toDelete);
-      wonUserDetailService.save(user);
-      needRepository.delete(toDelete);
-      draftStateRepository.delete(draftStates);  */
     }catch (Exception e){
       return new ResponseEntity(HttpStatus.CONFLICT);
     }
@@ -404,70 +313,6 @@ public class RestNeedController {
   }
 
 
-	// Matching and connecting
-
-  /**
-   * connects two needs of a match with matchId
-   * @param matchId the id of the match, for which the needs shall be connected
-   * @return a string. "noNeedFound" or ""
-   */
-  /*
-	@RequestMapping(
-			value = "/match/{matchId}/connections",
-			method = RequestMethod.POST
-	)
-  //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
-	public String connect(@PathVariable String matchId) {
-		String ret = "noNeedFound";
-
-		try {
-			List<Match> matches = matchRepository.findById(Long.valueOf(matchId));
-			if (!matches.isEmpty()) {
-				Match match = matches.get(0);
-				List<Need> needs = needRepository.findByNeedURI(match.getFromNeed());
-				if (!needs.isEmpty())
-					ret = "";
-        //TODO: this connects only ownerFacets!!!
-				ownerService.connect(match.getFromNeed(), match.getToNeed(),
-          WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(FacetType.OwnerFacet.getURI(),
-            FacetType.OwnerFacet.getURI()));
-			}
-		} catch (ConnectionAlreadyExistsException e) {
-			logger.warn("caught ConnectionAlreadyExistsException:", e);
-		} catch (IllegalMessageForNeedStateException e) {
-			logger.warn("caught IllegalMessageForNeedStateException:", e);
-		} catch (NoSuchNeedException e) {
-			logger.warn("caught NoSuchNeedException:", e);
-		} catch (Exception e) {
-      logger.warn("caught Exception", e);
-    }
-
-		return ret;
-	}
-   */
-  /**
-   * returns List of matches of a need with the needId
-   * @param needId id of the need, for which list of matches shall be retrieved
-   * @return a JSON List of matches
-   */
-  /*
-	@ResponseBody
-	@RequestMapping(
-			value = "/{needId}/matches",
-			method = RequestMethod.GET,
-			produces = MediaType.APPLICATION_JSON
-	)
-	public List<Match> listMatchesForNeed(@PathVariable String needId) {
-		List<Need> needs = needRepository.findById(Long.valueOf(needId));
-		if (needs.isEmpty())
-			return new ArrayList<>();
-
-		Need need = needs.get(0);
-
-		return matchRepository.findByFromNeed(need.getNeedURI());
-	}
-       */
   /**
    * returns List of connections of a need with the needId
    * @param needId id of the need, for which list of connections shall be retrieved
@@ -535,38 +380,7 @@ public class RestNeedController {
     return fullConnection;
   }
 
-  private DraftPojo resolveDraft(DraftPojo draftPojo, User user) throws ParseException {
-    URI needURI;
-    //Draft needDraft2 = new Draft();
 
-    Need needDraft = new Need();
-
-    URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
-    /*int draftNumber = user.getNeeds().size()+1;
-    URI draftId = URI.create(ownerURI.toString()+"/"+user.getUsername()+"/"+ draftNumber);
-
-    NeedPojoNeedModelBuilder needPojoNeedModelBuilder = new NeedPojoNeedModelBuilder(draftPojo);
-    needPojoNeedModelBuilder.setUri(draftId);
-    Model needModel = needPojoNeedModelBuilder.build();
-
-    needDraft.setNeedURI(draftId);
-
-    needDraft.setState(NeedState.INACTIVE);
-    needDraft.setOwnerURI(ownerURI);
-    try{
-      needRepository.save(needDraft);
-      rdfStorage.storeModel(needDraft.getNeedURI(), needModel);
-    } catch(Exception e){
-      e.printStackTrace();
-      int size = needRepository.findByNeedURI(needDraft.getNeedURI()).size();
-      logger.debug(String.valueOf(size));
-    }
-
-    draftPojo.setNeedURI(draftId.toString());
-
-    return draftPojo;  */
-    return null;
-  }
 
   private NeedPojo resolve(NeedPojo needPojo) {
     if (needPojo.getNeedId() >= 0) {
