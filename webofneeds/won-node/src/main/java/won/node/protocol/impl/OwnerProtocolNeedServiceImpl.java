@@ -139,7 +139,7 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
       // ToDo (FS): remove this distinction if the old parameters are not used anymore
       if (wonMessage != null) {
 
-        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
+        URI connectionURIFromWonMessage = wonMessage.getSenderURI();
 
         List<Connection> cons = connectionRepository.findByConnectionURI(connectionURIFromWonMessage);
         if (cons.size() != 0) {

@@ -104,8 +104,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
     if (wonMessage != null) {
 
       // store the wonMessage as it is
-      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
-      rdfStorage.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+      rdfStorage.storeDataset(wonMessage.getMessageURI(),
                               WonMessageEncoder.encodeAsDataset(wonMessage));
 
 
@@ -119,7 +119,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
       URI needURI = getNeedURIFromWonMessage(needContent);
 
-      if (!needURI.equals(wonMessage.getMessageEvent().getSenderNeedURI()))
+      if (!needURI.equals(wonMessage.getSenderNeedURI()))
         throw new IllegalArgumentException("receiverNeedURI and NeedURI of the content are not equal");
 
       Need need = new Need();
@@ -128,12 +128,12 @@ public class NeedManagementServiceImpl implements NeedManagementService
       need.setNeedURI(needURI);
 
       // ToDo (FS) check if the WON node URI corresponds with the WON node (maybe earlier in the message layer)
-      need.setWonNodeURI(wonMessage.getMessageEvent().getReceiverNodeURI());
+      need.setWonNodeURI(wonMessage.getReceiverNodeURI());
 
       need = needRepository.save(need);
 
       // store the message event placeholder to keep the connection between need and message event
-      messageEventRepository.save(new MessageEventPlaceholder(needURI, wonMessage.getMessageEvent()));
+      messageEventRepository.save(new MessageEventPlaceholder(needURI, wonMessage));
 
       List<Facet> facets = WonRdfUtils.NeedUtils.getFacets(needURI, needContent);
       if (facets.size() == 0)
@@ -276,18 +276,18 @@ public class NeedManagementServiceImpl implements NeedManagementService
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
-      rdfStorage.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+      rdfStorage.storeDataset(wonMessage.getMessageURI(),
                               WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
+      URI receiverNeedURI = wonMessage.getReceiverNeedURI();
       logger.debug("ACTIVATING need. needURI:{}", receiverNeedURI);
       if (receiverNeedURI == null) throw new IllegalArgumentException("receiverNeedURI is not set");
       Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
       need.setState(NeedState.ACTIVE);
       logger.debug("Setting Need State: " + need.getState());
       needRepository.save(need);
-      messageEventRepository.save(new MessageEventPlaceholder(need.getNeedURI(), wonMessage.getMessageEvent()));
+      messageEventRepository.save(new MessageEventPlaceholder(need.getNeedURI(), wonMessage));
 
       matcherProtocolMatcherClient.needActivated(need.getNeedURI(), wonMessage);
 
@@ -312,17 +312,17 @@ public class NeedManagementServiceImpl implements NeedManagementService
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
-      rdfStorage.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+      rdfStorage.storeDataset(wonMessage.getMessageURI(),
                               WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
+      URI receiverNeedURI = wonMessage.getReceiverNeedURI();
       logger.debug("DEACTIVATING need. needURI:{}", receiverNeedURI);
       if (receiverNeedURI == null) throw new IllegalArgumentException("receiverNeedURI is not set");
       Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
       need.setState(NeedState.INACTIVE);
       need = needRepository.save(need);
-      messageEventRepository.save(new MessageEventPlaceholder(need.getNeedURI(), wonMessage.getMessageEvent()));
+      messageEventRepository.save(new MessageEventPlaceholder(need.getNeedURI(), wonMessage));
 
       //close all connections
       Collection<URI> connectionURIs = connectionRepository.getConnectionURIsByNeedURIAndNotInState(need.getNeedURI

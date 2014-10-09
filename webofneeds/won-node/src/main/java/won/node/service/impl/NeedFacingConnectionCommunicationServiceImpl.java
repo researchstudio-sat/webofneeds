@@ -42,7 +42,6 @@ import won.protocol.util.RdfUtils;
 
 import java.io.StringWriter;
 import java.net.URI;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -80,17 +79,17 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters are not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+      URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
 
       Connection con = dataService.nextConnectionState(connectionURIFromWonMessage,
                                                        ConnectionEventType.PARTNER_OPEN);
 
       messageEventRepository.save(new MessageEventPlaceholder(
-        connectionURIFromWonMessage, wonMessage.getMessageEvent()));
+        connectionURIFromWonMessage, wonMessage));
       //invoke facet implementation
       reg.get(con).openFromNeed(con, content, wonMessage);
 
@@ -112,16 +111,16 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters are not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+      URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
       Connection con = dataService.nextConnectionState(
         connectionURIFromWonMessage, ConnectionEventType.PARTNER_CLOSE);
 
       messageEventRepository.save(new MessageEventPlaceholder(
-        connectionURIFromWonMessage, wonMessage.getMessageEvent()));
+        connectionURIFromWonMessage, wonMessage));
 
       //invoke facet implementation
       reg.get(con).closeFromNeed(con, content, wonMessage);
@@ -143,17 +142,17 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       // distinguish between the new message format (WonMessage) and the old parameters
       // ToDo (FS): remove this distinction if the old parameters are not used anymore
       if (wonMessage != null) {
-        logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
-        rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+        logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+        rdfStorageService.storeDataset(wonMessage.getMessageURI(),
                                        WonMessageEncoder.encodeAsDataset(wonMessage));
 
-        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+        URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
 
         Connection con = DataAccessUtils.loadConnection(
           connectionRepository, connectionURIFromWonMessage);
 
         messageEventRepository.save(new MessageEventPlaceholder(
-          connectionURIFromWonMessage, wonMessage.getMessageEvent()));
+          connectionURIFromWonMessage, wonMessage));
 
         //invoke facet implementation
         reg.get(con).sendMessageFromNeed(con, message, wonMessage);

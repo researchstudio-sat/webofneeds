@@ -33,6 +33,7 @@ public class WebSocketSessionService
 
 
   public void addMapping(URI needURI, WebSocketSession session) {
+    logger.debug("adding mapping for needURI {} to websocket session {}", needURI, session.getId());
     synchronized (lock) {
       //we want to avoid losing one of two concurrent sessions added
       //for the same needURI, so we synchronize here
@@ -46,6 +47,7 @@ public class WebSocketSessionService
   }
 
   public void removeMapping(URI needURI, WebSocketSession session) {
+    logger.debug("removing mapping from needURI {} to websocket session {}", needURI, session.getId());
     synchronized (this) {
       //we don't want add and remove to interfere
       Set<WebSocketSession> sessions = mapping.get(needURI);

@@ -65,7 +65,7 @@ public class WonWebSocketHandler
     // each message coming from the browser must contain a senderNeedURI
     // which is here connected to the webSocket session
     webSocketSessionService.addMapping(
-        wonMessage.getMessageEvent().getSenderNeedURI(),
+        wonMessage.getSenderNeedURI(),
         session);
 
     ownerApplicationService.handleMessageEventFromClient(wonMessage);
@@ -77,7 +77,7 @@ public class WonWebSocketHandler
     logger.debug("OA Server - sending WebSocket message: {}", wonMessageJsonLdString);
 
     WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
-    URI needURI = wonMessage.getMessageEvent().getReceiverNeedURI();
+    URI needURI = wonMessage.getReceiverNeedURI();
     Set<WebSocketSession> webSocketSessions =
    webSocketSessionService.getWebSocketSessions(needURI);
 
@@ -86,7 +86,7 @@ public class WonWebSocketHandler
         if (session.isOpen()) {
           session.sendMessage(webSocketMessage);
         } else {
-          logger.debug("could not send message for need " + wonMessage.getMessageEvent().getReceiverURI() + ". " +
+          logger.debug("could not send message for need " + wonMessage.getReceiverURI() + ". " +
             "Session is closed.");
           webSocketSessionService.removeMapping(needURI, session);
         }

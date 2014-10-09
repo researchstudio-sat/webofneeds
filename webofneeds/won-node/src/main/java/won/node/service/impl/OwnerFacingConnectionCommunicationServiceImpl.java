@@ -74,18 +74,18 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       //the WoN node could add the properties required for routing to the destination, as these
       //properties are stored on the WoN node with the connection data.
 
-      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
+      URI connectionURIFromWonMessage = wonMessage.getSenderURI();
 
       logger.debug("OPEN received from the owner side for connection {}", connectionURIFromWonMessage);
 
       Connection con = dataService.nextConnectionState(connectionURIFromWonMessage, ConnectionEventType.OWNER_OPEN);
 
       messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
-                                                              wonMessage.getMessageEvent()));
+                                                              wonMessage));
 
       //invoke facet implementation
       reg.get(con).openFromOwner(con, content, wonMessage);
@@ -113,8 +113,8 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
       logger.debug("CLOSE received from the owner side for connection {}", connectionURI);
@@ -122,10 +122,10 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
 
       // store wonMessage and messageEventPlaceholder
-      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
       messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(),
-                                                              wonMessage.getMessageEvent()));
+                                                              wonMessage));
 
       //invoke facet implementation
       reg.get(con).closeFromOwner(con, content, wonMessage);
@@ -153,17 +153,17 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
+      URI connectionURIFromWonMessage = wonMessage.getSenderURI();
 
       final Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURIFromWonMessage);
 
 
       messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
-                                                              wonMessage.getMessageEvent()));
+                                                              wonMessage));
 
       final Connection connection = con;
       boolean feedbackWasPresent = RdfUtils.applyMethod(wonMessage.getMessageContent(),

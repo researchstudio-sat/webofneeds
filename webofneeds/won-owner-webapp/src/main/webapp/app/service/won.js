@@ -890,9 +890,10 @@
              */
             getContentGraph: function(){
                 var graphs = this.data["@graph"];
+                var contentGraphUri = this.eventUriValue + "#content";
                 for (key in graphs){
                     var graph = graphs[key];
-                    if (graph['@id'] === this.eventUriValue + "#content"){
+                    if (graph['@id'] === contentGraphUri){
                         return graph;
                     }
                 }
@@ -904,6 +905,8 @@
                     ]
                 }
                 graphs.push(contentGraph);
+                //add a reference to it to the envelope
+                won.addContentGraphReferencesToMessageGraph(this.messageGraph, [contentGraphUri]);
                 return contentGraph;
             },
             getContentGraphNode: function(){
