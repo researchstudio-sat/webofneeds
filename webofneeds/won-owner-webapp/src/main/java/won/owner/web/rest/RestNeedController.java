@@ -255,7 +255,7 @@ public class RestNeedController {
   }
   /**
    * saves draft of a draft
-   * @param draftPojo an object containing information of the need draft
+   * @param draft an object containing information of the need draft
    * @return a JSON object of the draft with its temprory id.
    */
   @ResponseBody
@@ -267,27 +267,20 @@ public class RestNeedController {
   )
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
-  public DraftPojo createDraft(@RequestBody DraftPojo draftPojo) throws ParseException {
-          /*
+  public String createDraft(@RequestBody String draft) throws ParseException {
+
     User user = getCurrentUser();
 
-    user.getNeeds().size();
+    //user.getNeeds().size();
 
-    DraftPojo createdDraftPojo = resolveDraft(draftPojo,user);
-    NeedPojo createdNeedPojo = (NeedPojo) createdDraftPojo;
-
-    List<Need> drafts = needRepository.findByNeedURI(URI.create(createdNeedPojo.getNeedURI()));
-
-    user.getNeeds().add(drafts.get(0));
+    //DraftPojo createdDraftPojo = resolveDraft(draftPojo,user);
+    //NeedPojo createdNeedPojo = (NeedPojo) createdDraftPojo;
+    user.getDrafts().add(draft);
     wonUserDetailService.save(user);
 
-    int currentStep = draftPojo.getCurrentStep();
-    String userName = createdDraftPojo.getUserName();
-    DraftState draftState = new DraftState(URI.create(draftPojo.getNeedURI()),currentStep, userName);
-    draftStateRepository.save(draftState);
-    return createdDraftPojo;
-                           */
-    return null;
+    return draft;
+
+
   }
 
   @ResponseBody

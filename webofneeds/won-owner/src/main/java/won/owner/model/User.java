@@ -45,8 +45,9 @@ public class User implements UserDetails{
 
   //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
   //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
- // @OneToMany( fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-  //private List<Need> drafts;
+  @ElementCollection( fetch = FetchType.EAGER)
+  @Column(name="draft", length=10000)
+  private List<String> drafts;
 
 	@Transient
 	private Collection<SimpleGrantedAuthority> authorities;
@@ -136,16 +137,16 @@ public class User implements UserDetails{
     }
     return needURIs;
   }    */
-  /*
-  public List<Need> getDrafts(){
+
+  public List<String> getDrafts(){
     return drafts;
   }
-	public void setNeeds(final List<Need> needs) {
+	/*public void setNeeds(final List<Need> needs) {
 		this.needs = needs;
-	}
-  public void setDrafts(final List<Need> drafts) {
+	}     */
+  public void setDrafts(final List<String> drafts) {
     this.drafts = drafts;
-  }    */
+  }
   public void setNeedURIs(final List<URI> needURIs) {
     this.needURIs = needURIs;
   }

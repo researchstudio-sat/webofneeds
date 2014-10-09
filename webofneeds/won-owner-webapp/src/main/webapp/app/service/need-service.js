@@ -196,16 +196,12 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 		);
 	}
 
-    needService.saveDraft = function(need, currentStep,userName){
-        var needToSave = angular.copy(need);
-        needToSave.currentStep = currentStep+'';
-        needToSave.userName = userName;
-        needToSave.tags = need.tags;
-        delete needToSave.binaryFolder;
+    needService.saveDraft = function(draft){
+        var draftToSave = angular.copy(draft);
         return $http({
             method:'POST',
             url:'/owner/rest/needs/drafts',
-            data:needToSave,
+            data:JSON.stringify(draftToSave),
             success:function(content){
                 console.log(content);
             }

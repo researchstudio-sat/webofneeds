@@ -534,6 +534,7 @@
             builder.messageGraph = messageGraph;
         };
 
+
         /*
          * Creates a JSON-LD representation of the need data provided through builder functions.
          * e.g.:
@@ -559,6 +560,7 @@
                                 }
                             ]
                         }
+
                     ]
                 };
             }
@@ -574,6 +576,7 @@
             getContext: function () {               //TODO inherit from base buiilder
                 return this.data["@context"];
             },
+
             getNeedGraph: function(){
                 return this.data["@graph"][0]["@graph"];
             },
@@ -761,7 +764,54 @@
                 return this.data;
             }
         }
+        won.DraftBuilder = function DraftBuilder(data){
+            if (data != null && data != undefined) {
+                this.data = won.clone(data);
+            } else {
+                this.data =
+                {
+                    "@graph": [
+                        {
+                            "@id": "no-id-yet",
+                            "@graph": [
+                                {
+                                    "@type": "won:Need",
+                                    "won:hasContent": "_:n01"
+                                },
+                                {
+                                    "@id": "_:n01",
+                                    "@type": "won:NeedContent"
+                                }
+                            ]
+                        },
+                        {
+                            "@id":"no-id-yet",
+                            "@graph": [
+                                {
+                                    "@type":"won:DraftState",
+                                    "won:hasContent":"_:n02"
+                                },
+                                {
+                                    "@id":"_:n02",
+                                    "@type":"won:MetaInformation"
+                                }
+                            ]
+                        }
+                    ]
+                };
+            }
+        }
+        won.DraftBuilder.prototype = new won.NeedBuilder();
 
+        won.DraftBuilder.prototype.constructor = won.DraftBuilder;
+
+        won.DraftBuilder.prototype.getMetaNode =  function(){
+            return this.data["@graph"][1]["@graph"][1];
+        }
+        won.DraftBuilder.prototype.setCurrentStep = function(currentStep){
+            this.getMetaNode()["won:isInStep"]=currentStep;
+            return this;
+        }
         /*
          * Creates a JSON-LD stucture containing a named graph with default 'unset' event URI
          * plus the specified hashFragment
