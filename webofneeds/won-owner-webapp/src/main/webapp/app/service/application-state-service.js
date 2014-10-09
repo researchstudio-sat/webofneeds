@@ -220,6 +220,22 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.addNeed = function(need){
         privateData.allNeeds[need.uri] = need;
     }
+    applicationStateService.addNeeds = function(needs){
+        var needURIPromises = [];
+        for(var i = 0;i<needs.data.length;i++){
+            var needURI = needs.data[i];
+            needURIPromises.push(linkedDataService.fetch(needURI)
+                .then(function (value) {
+                var deferred = $q.defer();
+                linkedDataService.getNeed(needURI)
+                    .then(function(need){
+                        applicationStateService.addNeed(need)
+                       deferred.resolve(need);
+                    });
+            }))
+        }
+        $q.all(needURIPromises);
+    }
     applicationStateService.getAllNeedsCount = function(){
         return utilService.getKeySize(privateData.allNeeds);
     }

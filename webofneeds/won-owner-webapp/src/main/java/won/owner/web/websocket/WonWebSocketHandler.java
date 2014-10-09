@@ -24,13 +24,18 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import won.owner.model.User;
+import won.owner.repository.UserRepository;
 import won.owner.service.OwnerApplicationServiceCallback;
+import won.owner.service.UserService;
 import won.owner.service.impl.OwnerApplicationService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.WonMessageType;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 /**
@@ -49,11 +54,30 @@ public class WonWebSocketHandler
   @Autowired
   private WebSocketSessionService webSocketSessionService;
 
+  @Autowired
+  private UserRepository userRepository;
+
+  @Autowired
+  private UserService userService;
+
   @Override
   public void afterPropertiesSet() throws Exception {
     this.ownerApplicationService.setOwnerApplicationServiceCallbackToClient(this);
   }
+  /*User user = getCurrentUser();
 
+  logger.info("New Need:" + needPojo.getTextDescription() + "/" + needPojo.getCreationDate() + "/" +
+    needPojo.getLongitude() + "/" + needPojo.getLatitude() + "/" + (needPojo.getState() == NeedState.ACTIVE));
+  //TODO: using fixed Facets - change this
+  needPojo.setFacetTypes(new String[]{
+  FacetType.OwnerFacet.getURI().toString()});
+  NeedPojo createdNeedPojo = resolve(needPojo);
+  Need need = needRepository.findOne(createdNeedPojo.getNeedId());
+  user.getNeeds().add(need);
+  wonUserDetailService.save(user);
+  HttpHeaders headers = new HttpHeaders();
+  headers.setLocation(need.getNeedURI());
+  return new ResponseEntity<NeedPojo>(createdNeedPojo, headers, HttpStatus.CREATED);     */
   @Override
   public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException
   {
@@ -77,10 +101,19 @@ public class WonWebSocketHandler
 
     WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
 
+
     Set<WebSocketSession> webSocketSessions =
       webSocketSessionService.getWebSocketSessions(wonMessage.getMessageEvent().getReceiverNeedURI());
 
-    for (WebSocketSession session : webSocketSessions)
+
+    for (WebSocketSession session : webSocketSessions) {
+      if (wonMessage.getMessageEvent().getMessageType() == WonMessageType.CREATE_RESPONSE) {
+        String username = session.getPrincipal().getName();
+        URI needURI = wonMessage.getMessageEvent().getReceiverNeedURI();
+        User user = userRepository.findByUsername(username);
+        user.addNeedURI(needURI);
+        userRepository.save(user);
+      }
       try {
         session.sendMessage(webSocketMessage);
       } catch (IOException e) {
@@ -88,6 +121,7 @@ public class WonWebSocketHandler
         // ToDo (FS): proper handling when message could not be send (remove session from list; inform someone)
         logger.info("caught IOException:", e);
       }
+    }
   }
 
   public OwnerApplicationService getOwnerApplicationService() {

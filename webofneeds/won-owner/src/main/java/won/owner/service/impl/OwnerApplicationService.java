@@ -183,7 +183,9 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       case OPEN:
         try {
           URI connectionURI = wonMessage.getMessageEvent().getSenderURI();
-          content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+
+            content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+
           RdfUtils.replaceBaseURI(content, wonMessage.getMessageEvent().getMessageURI().toString());
           ownerProtocolService.open(connectionURI, content, wonMessage);
         } catch (Exception e) {

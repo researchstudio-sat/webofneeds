@@ -362,6 +362,8 @@ angular.module('won.owner').factory('wonService', function (
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
                 .hasTimestamp()
+                .hasFacet(won.WON.OwnerFacet)
+                .hasRemoteFacet(won.WON.OwnerFacet)
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {

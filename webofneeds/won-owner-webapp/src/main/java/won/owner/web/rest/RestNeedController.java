@@ -2,7 +2,6 @@ package won.owner.web.rest;
 
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -11,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -25,17 +23,18 @@ import won.owner.model.DraftState;
 import won.owner.model.User;
 import won.owner.pojo.ConnectionPojo;
 import won.owner.pojo.DraftPojo;
-import won.owner.pojo.MatchPojo;
 import won.owner.pojo.NeedPojo;
 import won.owner.repository.DraftStateRepository;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
 import won.owner.service.impl.WONUserDetailService;
-import won.owner.web.WonOwnerWebappUtils;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
-import won.protocol.model.*;
+import won.protocol.model.Connection;
+import won.protocol.model.FacetType;
+import won.protocol.model.Need;
+import won.protocol.model.NeedState;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
@@ -44,11 +43,9 @@ import won.protocol.repository.NeedRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.DataAccessUtils;
-import won.protocol.util.ProjectingIterator;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import javax.ws.rs.core.MediaType;
 import java.net.URI;
@@ -129,7 +126,7 @@ public class RestNeedController {
 	public void setNeedRepository(NeedRepository needRepository) {
 		this.needRepository = needRepository;
 	}
-
+   /*
   @ResponseBody
   @RequestMapping(
     value = "/{needId}/matches",
@@ -165,7 +162,7 @@ public class RestNeedController {
     }
     return result;
   }
-
+           */
   /**
    * returns a List containing needs belonging to the user
    * @return JSON List of need objects
@@ -176,21 +173,11 @@ public class RestNeedController {
     produces = MediaType.APPLICATION_JSON,
     method = RequestMethod.GET
   )
-  public List<NeedPojo> getAllNeedsOfUser() {
+  public List<URI> getAllNeedsOfUser() {
     logger.info("Getting all needs of user: ");
 
     User user = getCurrentUser();
-
-    LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
-    List<NeedPojo> returnList = new ArrayList<NeedPojo>();
-
-    Iterable<Need> needs = user.getNeeds();
-    for (Need need : needs) {
-      NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()).getDefaultModel());
-      needPojo.setNeedId(need.getId());
-      returnList.add(needPojo);
-    }
-    return returnList;
+    return user.getNeedURIs();
   }
 
   /**
@@ -205,9 +192,9 @@ public class RestNeedController {
 
   /**
    * this method creates need and returns created need with its needID
-   * @param needPojo object containing information needed for need creation
    * @return JSON object of the created need.
    */
+  /*
 	@ResponseBody
 	@RequestMapping(
 			value = "/",
@@ -232,7 +219,7 @@ public class RestNeedController {
     headers.setLocation(need.getNeedURI());
 		return new ResponseEntity<NeedPojo>(createdNeedPojo, headers, HttpStatus.CREATED);
 	}
-
+     */
   @ResponseBody
   @RequestMapping(
     value = "/drafts",
@@ -252,7 +239,7 @@ public class RestNeedController {
 
     LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
     List<DraftPojo> returnList = new ArrayList<DraftPojo>();
-
+            /*
     Iterable<Need> needs = user.getNeeds();
     for (Need need : needs) {
 
@@ -263,7 +250,7 @@ public class RestNeedController {
         returnList.add(draftPojo);
       }
     }
-
+           */
     return returnList;
   }
   /**
@@ -281,7 +268,7 @@ public class RestNeedController {
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
   public DraftPojo createDraft(@RequestBody DraftPojo draftPojo) throws ParseException {
-
+          /*
     User user = getCurrentUser();
 
     user.getNeeds().size();
@@ -299,7 +286,8 @@ public class RestNeedController {
     DraftState draftState = new DraftState(URI.create(draftPojo.getNeedURI()),currentStep, userName);
     draftStateRepository.save(draftState);
     return createdDraftPojo;
-
+                           */
+    return null;
   }
 
   @ResponseBody
@@ -317,7 +305,7 @@ public class RestNeedController {
       List<URI> draftURIs = new ArrayList<>();
       while(draftIterator.hasNext()){
         draftURIs.add(draftIterator.next().getDraftURI());
-      }
+      }                                      /*
       List<Need> needs = user.getNeeds();
       List<Need> toDelete = new ArrayList<>();
       for (Need need : needs){
@@ -328,7 +316,7 @@ public class RestNeedController {
       user.removeNeeds(toDelete);
       wonUserDetailService.save(user);
       needRepository.delete(toDelete);
-      draftStateRepository.delete(draftStates);
+      draftStateRepository.delete(draftStates);  */
     }catch (Exception e){
       return new ResponseEntity(HttpStatus.CONFLICT);
     }
@@ -367,13 +355,15 @@ public class RestNeedController {
     }
     Need need = draftList.get(0);
     User user = getCurrentUser();
+
     try{
+      /*
       user.removeNeeds(draftList);
       wonUserDetailService.save(user);
       List<DraftState> draftStates = draftStateRepository.findByDraftURI(need.getNeedURI());
       needRepository.delete(draftId);
       draftStateRepository.delete(draftStates);
-      rdfStorage.removeContent(need.getNeedURI());
+      rdfStorage.removeContent(need.getNeedURI());     */
     }catch (Exception e){
       return new ResponseEntity(HttpStatus.CONFLICT);
     }
@@ -559,7 +549,7 @@ public class RestNeedController {
     Need needDraft = new Need();
 
     URI ownerURI = this.uriService.getOwnerProtocolOwnerServiceEndpointURI();
-    int draftNumber = user.getNeeds().size()+1;
+    /*int draftNumber = user.getNeeds().size()+1;
     URI draftId = URI.create(ownerURI.toString()+"/"+user.getUsername()+"/"+ draftNumber);
 
     NeedPojoNeedModelBuilder needPojoNeedModelBuilder = new NeedPojoNeedModelBuilder(draftPojo);
@@ -581,7 +571,8 @@ public class RestNeedController {
 
     draftPojo.setNeedURI(draftId.toString());
 
-    return draftPojo;
+    return draftPojo;  */
+    return null;
   }
 
   private NeedPojo resolve(NeedPojo needPojo) {
