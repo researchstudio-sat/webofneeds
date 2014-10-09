@@ -183,6 +183,12 @@ angular.module('won.owner')
             if (pos == -1){
                 list.push(elem);
             } else {
+                // if the chosen message is of the type that is being removed
+                if ($scope.chosenMessage.event.hasMessageType == elem) {
+                    // then set the chosen message to null and reload the page
+                    $scope.chosenMessage = null;
+                    $location.path('/private-link');
+                }
                 list.splice(pos,1);
             }
         }
