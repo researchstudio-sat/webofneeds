@@ -426,11 +426,26 @@ angular.module('won.owner').factory('wonService', function (
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {
-                    //TODO: move here the code from timeout when won-node will
-                    // be changed to send  close connection message response
+                    // TODO: deal with failures to create close event response
+                    // (e.g. if uri is in use, one needs to resent the event with new uri)
+                    // TODO: when this works (when won-node starts sending responses to
+                    // close connection messages), comment the code from timeout below,
+                    // and check if this works or make it work, and when it works - remove
+                    // the timeout code
                     console.log("got close connection message response! TODO: check for close connection response!");
                     this.done = true;
-
+                    // fetch the updated connection and created close event from the won-node
+                    var uriOfUpdatedConnectionPromise = linkedDataService.fetch(msgToClose.connection.uri);
+                    var uriOfCloseEventPromise = linkedDataService.fetch(eventUri)
+                    // when uri promises are resolved, broadcast the event close sent event (actually
+                    // it is 'close sent response success received' event...)
+                    $q.all([uriOfUpdatedConnectionPromise, uriOfCloseEventPromise])
+                        .then(function(result) {
+                            $rootScope.$broadcast(won.EVENT.CLOSE_SENT, eventDataToClose);
+                        },
+                        function(errors) {
+                            won.reportError("cannot fetch closed connection " + msgToClose.connection.uri);
+                        });
                 });
             callback.done = false;
             callback.shouldHandleTest = function (msg) {
@@ -446,6 +461,9 @@ angular.module('won.owner').factory('wonService', function (
                 // ideally should be in callback, but since there is no response coming,
                 // right now I put it in timeout, so that the close event and connection
                 // update has some time to be saved on the won-node before it gets fetched here.
+                // As soon as getting the response for this sent message work, and the equivalent to
+                // below implementation inside the callback works,  all the setTimeout() with its
+                // inside should be removed
                 setTimeout(
                     function(){
                         //linkedDataService.fetch(connection.uri);
