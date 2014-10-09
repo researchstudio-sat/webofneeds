@@ -245,14 +245,14 @@ angular.module('won.owner')
          * provided message. Otherwise the chosenMessage is set to null (toggled)
          * @param matchEvent the match event on which the user has clicked
          */
-        $scope.clickOnMatch = function(matchEvent) {
+        $scope.clickOnMessage = function(msgEvent) {
             // msgId can't be null here
-            if ($scope.prevMessageId == matchEvent.event.uri) {
-                $scope.chosenMessage = $scope.chosenMessage == null ? matchEvent : null;
+            if ($scope.prevMessageId == msgEvent.event.uri) {
+                $scope.chosenMessage = $scope.chosenMessage == null ? msgEvent : null;
             } else {
-                $scope.chosenMessage = matchEvent;
+                $scope.chosenMessage = msgEvent;
             }
-            $scope.prevMessageId = matchEvent.event.uri;
+            $scope.prevMessageId = msgEvent.event.uri;
         }
 /*    $scope.clickOnTitle = function(msgId) {
         // msgId can't be null here
