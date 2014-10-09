@@ -27,7 +27,6 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import won.owner.model.User;
 import won.owner.repository.UserRepository;
 import won.owner.service.OwnerApplicationServiceCallback;
-import won.owner.service.UserService;
 import won.owner.service.impl.OwnerApplicationService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
@@ -57,8 +56,6 @@ public class WonWebSocketHandler
   @Autowired
   private UserRepository userRepository;
 
-  @Autowired
-  private UserService userService;
 
   @Override
   public void afterPropertiesSet() throws Exception {
