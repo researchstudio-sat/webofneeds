@@ -88,7 +88,7 @@ public class WonWebSocketHandler
     // each message coming from the browser must contain a senderNeedURI
     // which is here connected to the webSocket session
     webSocketSessionService.addMapping(
-        wonMessage.getMessageEvent().getSenderNeedURI(),
+        wonMessage.getSenderNeedURI(),
         session);
 
     ownerApplicationService.handleMessageEventFromClient(wonMessage);
@@ -103,13 +103,17 @@ public class WonWebSocketHandler
 
 
     Set<WebSocketSession> webSocketSessions =
-      webSocketSessionService.getWebSocketSessions(wonMessage.getMessageEvent().getReceiverNeedURI());
+      webSocketSessionService.getWebSocketSessions(wonMessage.getReceiverNeedURI());
 
 
     for (WebSocketSession session : webSocketSessions) {
-      if (wonMessage.getMessageEvent().getMessageType() == WonMessageType.CREATE_RESPONSE) {
+      if (!session.isOpen()){
+        webSocketSessionService.removeMapping(wonMessage.getReceiverNeedURI(), session);
+        continue;
+      }
+      if (wonMessage.getMessageType() == WonMessageType.CREATE_RESPONSE) {
         String username = session.getPrincipal().getName();
-        URI needURI = wonMessage.getMessageEvent().getReceiverNeedURI();
+        URI needURI = wonMessage.getReceiverNeedURI();
         User user = userRepository.findByUsername(username);
         user.addNeedURI(needURI);
         userRepository.save(user);
@@ -117,9 +121,9 @@ public class WonWebSocketHandler
       try {
         session.sendMessage(webSocketMessage);
       } catch (IOException e) {
-        webSocketSessions.remove(session);
+        webSocketSessionService.removeMapping(wonMessage.getReceiverNeedURI(), session);
         // ToDo (FS): proper handling when message could not be send (remove session from list; inform someone)
-        logger.info("caught IOException:", e);
+        logger.debug("caught IOException:", e);
       }
     }
   }
