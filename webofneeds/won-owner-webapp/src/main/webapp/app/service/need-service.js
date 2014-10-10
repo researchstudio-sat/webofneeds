@@ -77,7 +77,7 @@ CategorizedNeeds = function() {
 	}
 }
 
-angular.module('won.owner').factory('needService', function ($http, $q, connectionService) {
+angular.module('won.owner').factory('needService', function ($http, $q, connectionService, applicationStateService) {
 
 	var needService = {};
 
@@ -206,7 +206,8 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
                 console.log(content);
             }
         }).then(
-            function () {
+            function (draft) {
+                applicationStateService.addDraft(draft.data);
                 // success
                 return {status:"OK"};
             },
