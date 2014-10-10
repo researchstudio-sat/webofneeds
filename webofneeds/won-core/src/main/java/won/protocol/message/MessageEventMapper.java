@@ -175,7 +175,7 @@ public class MessageEventMapper implements ModelMapper<MessageEvent>
 //        case CONNECT:
 //          addPropertiesOfConnectMessage(eventRes, msgEvent, model);
 //          break;
-//        case NEED_STATE:
+//        case DEACTIVATE:
 //          addPropertiesOfNeedStateMessage(eventRes, msgEvent, model);
 //          break;
 //        default:

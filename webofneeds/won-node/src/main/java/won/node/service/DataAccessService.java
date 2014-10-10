@@ -16,15 +16,16 @@
 
 package won.node.service;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.node.service.impl.URIService;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 
 import java.net.URI;
 import java.util.Collection;
@@ -45,6 +46,7 @@ public interface DataAccessService
    * @return
    */
   URI getFacet(Model content);
+  URI getFacet(Dataset content);
 
   /**
    * Adds a triple to the model of the form <> won:hasFacet [facetURI].

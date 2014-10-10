@@ -1,6 +1,7 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.graph.TripleBoundary;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,6 +128,10 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
    */
   @Override
   public URI getFacet(Model content) {
+    return WonRdfUtils.FacetUtils.getFacet(content);
+  }
+
+  public URI getFacet(Dataset content) {
     return WonRdfUtils.FacetUtils.getFacet(content);
   }
 

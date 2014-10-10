@@ -3,6 +3,8 @@ package won.protocol.message;
 import com.hp.hpl.jena.rdf.model.Resource;
 import won.protocol.vocabulary.WONMSG;
 
+import java.net.URI;
+
 /**
  * User: ypanchenko
  * Date: 13.08.2014
@@ -12,7 +14,8 @@ public enum WonMessageType
   // main messages
   CREATE_NEED(WONMSG.TYPE_CREATE),
   CONNECT(WONMSG.TYPE_CONNECT),
-  NEED_STATE(WONMSG.TYPE_NEED_STATE),
+  DEACTIVATE(WONMSG.TYPE_DEACTIVATE),
+  ACTIVATE(WONMSG.TYPE_ACTIVATE),
   CLOSE(WONMSG.TYPE_CLOSE),
   OPEN(WONMSG.TYPE_OPEN),
   CONNECTION_MESSAGE(WONMSG.TYPE_CONNECTION_MESSAGE),
@@ -43,14 +46,21 @@ public enum WonMessageType
     return resource;
   }
 
+  public static WonMessageType getWonMessageType(URI uri){
+    return getWonMessageType(WONMSG.toResource(uri));
+  }
+
+
   public static WonMessageType getWonMessageType(Resource resource) {
 
     if (WONMSG.TYPE_CREATE.equals(resource))
       return CREATE_NEED;
     if (WONMSG.TYPE_CONNECT.equals(resource))
       return CONNECT;
-    if (WONMSG.TYPE_NEED_STATE.equals(resource))
-      return NEED_STATE;
+    if (WONMSG.TYPE_DEACTIVATE.equals(resource))
+      return DEACTIVATE;
+    if (WONMSG.TYPE_ACTIVATE.equals(resource))
+      return ACTIVATE;
     if (WONMSG.TYPE_OPEN.equals(resource))
       return OPEN;
     if (WONMSG.TYPE_CLOSE.equals(resource))

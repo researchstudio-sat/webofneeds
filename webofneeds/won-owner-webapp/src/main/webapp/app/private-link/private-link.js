@@ -9,6 +9,18 @@ angular.module('won.owner')
     .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, applicationStateService, linkedDataService, wonService) {
 
 
+        $scope.$on('$routeChangeSuccess', function(event, current) {
+            // page 33 v44 states that they should be set to null as soon as private link page is loaded:
+            // Only when the users view the Postbox page afterwards the status of the notifications will be set to unread.
+            applicationStateService.setEventsAsReadForNeed(applicationStateService.getCurrentNeedURI(), $scope.lastEventOfEachConnectionOfCurrentNeed);
+        });
+
+        $scope.$on('$locationChangeStart', function (event, next, current) {
+            // page 33 v44 states that they should be set to null as soon as private link page is loaded:
+            // Only when the users view the Postbox page afterwards the status of the notifications will be set to unread.
+            applicationStateService.setEventsAsReadForNeed(applicationStateService.getCurrentNeedURI(), $scope.lastEventOfEachConnectionOfCurrentNeed);
+        });
+
     // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
 
@@ -16,6 +28,12 @@ angular.module('won.owner')
     $scope.$watch('lastEventOfEachConnectionOfCurrentNeed', function(newValue, oldValue){
         console.log("events changed! now have " + newValue.length + " events!" + " had: " + oldValue.length +"...");
     });
+
+    // copy the references from the real data holder, used in message table for displaying
+    // and is required by smart table (st-) for sorting the items that can change
+    // see http://lorenzofox3.github.io/smart-table-website/
+    $scope.displayedMessages = [].concat($scope.lastEventOfEachConnectionOfCurrentNeed);
+
 
     $scope.currentEventType = [
      won.WONMSG.connectionMessage,
@@ -171,6 +189,12 @@ angular.module('won.owner')
             if (pos == -1){
                 list.push(elem);
             } else {
+                // if the chosen message is of the type that is being removed
+                if ($scope.chosenMessage != null && $scope.chosenMessage.event.hasMessageType == elem) {
+                    // then set the chosen message to null and reload the page
+                    $scope.chosenMessage = null;
+                    $location.path('/private-link');
+                }
                 list.splice(pos,1);
             }
         }
@@ -233,14 +257,14 @@ angular.module('won.owner')
          * provided message. Otherwise the chosenMessage is set to null (toggled)
          * @param matchEvent the match event on which the user has clicked
          */
-        $scope.clickOnMatch = function(matchEvent) {
+        $scope.clickOnMessage = function(msgEvent) {
             // msgId can't be null here
-            if ($scope.prevMessageId == matchEvent.event.uri) {
-                $scope.chosenMessage = $scope.chosenMessage == null ? matchEvent : null;
+            if ($scope.prevMessageId == msgEvent.event.uri) {
+                $scope.chosenMessage = $scope.chosenMessage == null ? msgEvent : null;
             } else {
-                $scope.chosenMessage = matchEvent;
+                $scope.chosenMessage = msgEvent;
             }
-            $scope.prevMessageId = matchEvent.event.uri;
+            $scope.prevMessageId = msgEvent.event.uri;
         }
 /*    $scope.clickOnTitle = function(msgId) {
         // msgId can't be null here

@@ -156,8 +156,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
 
-      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getSenderURI();
-      URI messageURI = wonMessage.getMessageEvent().getMessageURI();
+      URI connectionURIFromWonMessage = wonMessage.getSenderURI();
+      URI messageURI = wonMessage.getMessageURI();
       logger.debug("owner to need: MESSAGE called for connection {} with message {}",
                    connectionURIFromWonMessage, RdfUtils.toString(wonMessage.getMessageContent()));
 

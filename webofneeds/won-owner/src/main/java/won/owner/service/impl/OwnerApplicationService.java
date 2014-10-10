@@ -76,14 +76,14 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
     // ToDo (FS): don't convert messages to the old protocol interfaces instead use the new message format
 
-    WonMessageType wonMessageType = wonMessage.getMessageEvent().getMessageType();
+    WonMessageType wonMessageType = wonMessage.getMessageType();
 
     switch (wonMessageType) {
       case CREATE_NEED:
 
         Dataset messageContent = wonMessage.getMessageContent();
 
-        URI senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
+        URI senderNeedURI = wonMessage.getSenderNeedURI();
         if (senderNeedURI == null){
           throw new IllegalArgumentException("no sender need URI found!");
         }
@@ -91,13 +91,13 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
         //TODO:this is only for old messaging style. Remove when switched
         Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
-        RdfUtils.replaceBaseURI(content, wonMessage.getMessageEvent().getMessageURI().toString());
+        RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
 
         // ToDo (FS): this should be encapsulated in an own subclass of WonMessage
         // get the active status
         boolean active = false;
         switch (WonRdfUtils.NeedUtils.queryActiveStatus(
-          messageContent, wonMessage.getMessageEvent().getSenderNeedURI())) {
+          messageContent, wonMessage.getSenderNeedURI())) {
           case ACTIVE:
             active = true;
             break;
@@ -113,7 +113,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
         final ListenableFuture<URI> newNeedURI;
         try {
-          wonMessageMap.put(wonMessage.getMessageEvent().getSenderNeedURI(), wonMessage);
+          wonMessageMap.put(wonMessage.getSenderNeedURI(), wonMessage);
           newNeedURI = ownerProtocolService.createNeed(content, active, wonNodeURI,wonMessage);
 
           newNeedURI.addListener(new Runnable()
@@ -147,15 +147,15 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
           URI needURI;
           URI otherNeedURI;
 
-          needURI = wonMessage.getMessageEvent().getSenderNeedURI();
-          otherNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
+          needURI = wonMessage.getSenderNeedURI();
+          otherNeedURI = wonMessage.getReceiverNeedURI();
 
           content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
-          RdfUtils.replaceBaseURI(content, wonMessage.getMessageEvent().getMessageURI().toString());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
 
           final ListenableFuture<URI> newConnectionURI;
 
-          wonMessageMap.put(wonMessage.getMessageEvent().getSenderNeedURI(), wonMessage);
+          wonMessageMap.put(wonMessage.getSenderNeedURI(), wonMessage);
           newConnectionURI = ownerProtocolService.connect(needURI, otherNeedURI, content, wonMessage);
 
         } catch (Exception e) {
@@ -163,18 +163,21 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         }
         break;
 
-      case NEED_STATE:
+      case ACTIVATE:
         try {
           URI needURI;
-          needURI = wonMessage.getMessageEvent().getSenderNeedURI();
+          needURI = wonMessage.getSenderNeedURI();
+          ownerProtocolService.activate(needURI, wonMessage);
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
+        break;
 
-          switch (wonMessage.getMessageEvent().getNewNeedState()) {
-            case ACTIVE:
-              ownerProtocolService.activate(needURI, wonMessage);
-              break;
-            case INACTIVE:
-              ownerProtocolService.deactivate(needURI, wonMessage);
-          }
+      case DEACTIVATE:
+        try {
+          URI needURI;
+          needURI = wonMessage.getSenderNeedURI();
+          ownerProtocolService.deactivate(needURI, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
         }
@@ -182,11 +185,9 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
       case OPEN:
         try {
-          URI connectionURI = wonMessage.getMessageEvent().getSenderURI();
-
-            content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
-
-          RdfUtils.replaceBaseURI(content, wonMessage.getMessageEvent().getMessageURI().toString());
+          URI connectionURI = wonMessage.getSenderURI();
+          content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
           ownerProtocolService.open(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
@@ -195,9 +196,9 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
 
       case CLOSE:
         try {
-          URI connectionURI = wonMessage.getMessageEvent().getSenderURI();
+          URI connectionURI = wonMessage.getSenderURI();
           content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
-          RdfUtils.replaceBaseURI(content, wonMessage.getMessageEvent().getMessageURI().toString());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
           ownerProtocolService.close(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
@@ -207,9 +208,9 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       case CONNECTION_MESSAGE:
         try {
 
-          URI connectionURI = wonMessage.getMessageEvent().getSenderURI();
+          URI connectionURI = wonMessage.getSenderURI();
           content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
-          RdfUtils.replaceBaseURI(content, wonMessage.getMessageEvent().getMessageURI().toString());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
           ownerProtocolService.sendConnectionMessage(connectionURI, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception", e);
@@ -238,7 +239,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   private void sendBackResponseMessageToClient(WonMessage wonMessage, Resource responseType) {
 
     try {
-      URI responseMessageURI = URI.create(wonMessage.getMessageEvent().getSenderNeedURI().toString() +
+      URI responseMessageURI = URI.create(wonMessage.getSenderNeedURI().toString() +
                                             "/event/" +
                                             randomNumberService
                                               .generateRandomString(9));
@@ -247,10 +248,10 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
       WonMessage responseWonMessage = wonMessageBuilder
         .setWonMessageType(WonMessageType.CREATE_RESPONSE)
         .setMessageURI(responseMessageURI)
-        .setSenderNodeURI(wonMessage.getMessageEvent().getReceiverNodeURI())
-        .setReceiverNeedURI(wonMessage.getMessageEvent().getSenderNeedURI())
+        .setSenderNodeURI(wonMessage.getReceiverNodeURI())
+        .setReceiverNeedURI(wonMessage.getSenderNeedURI())
         .setResponseMessageState(responseType)
-        .addRefersToURI(wonMessage.getMessageEvent().getMessageURI())
+        .addRefersToURI(wonMessage.getMessageURI())
         .build();
 
       ownerApplicationServiceCallbackToClient.onMessage(responseWonMessage);
