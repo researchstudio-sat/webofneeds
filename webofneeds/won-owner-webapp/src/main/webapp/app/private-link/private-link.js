@@ -190,7 +190,7 @@ angular.module('won.owner')
                 list.push(elem);
             } else {
                 // if the chosen message is of the type that is being removed
-                if ($scope.chosenMessage.event.hasMessageType == elem) {
+                if ($scope.chosenMessage != null && $scope.chosenMessage.event.hasMessageType == elem) {
                     // then set the chosen message to null and reload the page
                     $scope.chosenMessage = null;
                     $location.path('/private-link');
