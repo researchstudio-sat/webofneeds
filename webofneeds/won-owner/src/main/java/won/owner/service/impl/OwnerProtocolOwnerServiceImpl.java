@@ -69,14 +69,14 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
       // ToDo (FS): remove this distinction if the old parameters not used anymore
       if (wonMessage != null) {
 
-        URI ownNeedUriConvert = wonMessage.getMessageEvent().getReceiverNeedURI();
+        URI ownNeedUriConvert = wonMessage.getReceiverNeedURI();
         URI otherNeedUriConvert = URI.create(RdfUtils.findOnePropertyFromResource(
-          wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+          wonMessage.getMessageContent(), wonMessage.getMessageURI(),
           WON.HAS_MATCH_COUNTERPART).asResource().getURI());
         double scoreConvert = RdfUtils.findOnePropertyFromResource(
-          wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+          wonMessage.getMessageContent(), wonMessage.getMessageURI(),
           WON.HAS_MATCH_SCORE).asLiteral().getDouble();
-        URI originatorUriConvert = wonMessage.getMessageEvent().getSenderNodeURI();
+        URI originatorUriConvert = wonMessage.getSenderNodeURI();
 
         Model contentConvert = ModelFactory.createDefaultModel();
         Iterator<String> i = wonMessage.getMessageContent().listNames();
@@ -88,7 +88,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
         //TODO: facet code to be refactored!
         Connection con = findOrCreateConnection(ownNeedUriConvert, otherNeedUriConvert,
-          wonMessage.getMessageEvent().getReceiverURI(), WonRdfUtils.FacetUtils.getFacet(contentConvert), ConnectionState.SUGGESTED);
+          wonMessage.getReceiverURI(), WonRdfUtils.FacetUtils.getFacet(contentConvert), ConnectionState.SUGGESTED);
 
         Match match = new Match();
         match.setFromNeed(ownNeedUriConvert);
@@ -143,18 +143,15 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
       Model contentConvert = RdfUtils.toModel(content);
 
       if (wonMessage != null) {
-        ownNeedURIConvert = wonMessage.getMessageEvent().getReceiverNeedURI();
-        otherNeedURIConvert = wonMessage.getMessageEvent().getSenderNeedURI();
+        ownNeedURIConvert = wonMessage.getReceiverNeedURI();
+        otherNeedURIConvert = wonMessage.getSenderNeedURI();
 
-        ownConnectionURIConvert = URI.create(RdfUtils.findOnePropertyFromResource(
-          wonMessage.getMessageContent(),
-          wonMessage.getMessageEvent().getMessageURI(),
-          WON.HAS_REMOTE_CONNECTION).asResource().getURI());
+        ownConnectionURIConvert = wonMessage.getReceiverURI();
 
 
         facetURI = URI.create(RdfUtils.findOnePropertyFromResource(
           wonMessage.getMessageContent(),
-          wonMessage.getMessageEvent().getMessageURI(),
+          wonMessage.getMessageURI(),
           WON.HAS_FACET)
         .asResource().getURI());
 
@@ -239,7 +236,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
       // ToDo (FS): remove this distinction if the old parameters not used anymore
       if (wonMessage != null) {
 
-        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+        URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
 
         logger.debug("owner from need: OPEN called for connection {}.", connectionURIFromWonMessage);
         if (connectionURIFromWonMessage == null) throw new IllegalArgumentException("connectionURI not defined");
@@ -278,7 +275,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
       // ToDo (FS): remove this distinction if the old parameters not used anymore
       if (wonMessage != null) {
 
-        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+        URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
 
         logger.debug("owner from need: CLOSE called for connection {}", connectionURIFromWonMessage);
         if (connectionURIFromWonMessage == null)
@@ -315,7 +312,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
       // ToDo (FS): remove this distinction if the old parameters not used anymore
       if (wonMessage != null) {
 
-        URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+        URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
         Model messageFromWonMessage = ModelFactory.createDefaultModel();
         Iterator<String> i = wonMessage.getMessageContent().listNames();
         while (i.hasNext()) {

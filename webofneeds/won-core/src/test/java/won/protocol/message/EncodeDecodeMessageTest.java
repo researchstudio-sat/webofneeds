@@ -63,7 +63,7 @@ public class EncodeDecodeMessageTest
     // for debugging
     System.out.println(RdfUtils.writeDatasetToString(msgDatasetOut, Lang.TRIG));
 
-    Assert.assertTrue(wonMessageIn.getMessageEvent().equals(wonMessageOut.getMessageEvent()));
+    Assert.assertTrue(wonMessageIn.equals(wonMessageOut));
 
     // TODO This test doesn't pass with JSONLD!!! The Jena has a bug, see:
     // https://issues.apache.org/jira/browse/JENA-758

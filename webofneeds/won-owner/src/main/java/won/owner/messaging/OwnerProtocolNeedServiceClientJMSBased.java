@@ -301,7 +301,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
   public void sendWonMessage(WonMessage wonMessage) throws Exception
   {
     // ToDo (FS): change it to won node URI and create method in the MessageEvent class
-    URI wonNodeUri = wonMessage.getMessageEvent().getSenderURI();
+    URI wonNodeUri = wonMessage.getSenderURI();
 
     CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
     String endpoint = camelConfiguration.getEndpoint();

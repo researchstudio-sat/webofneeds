@@ -47,6 +47,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
 
     //all needs are stored in this array (in the form returned by linkedDataService.getNeed(uri)
     privateData.allNeeds = {};
+    privateData.allDrafts = [];
 
     privateData.unreadEventsByNeedByType = {};
 
@@ -66,6 +67,22 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         updateUnreadEventsByNeedByType(needURI, eventType, eventData);
         updateUnreadEventsByTypeByNeed(needURI, eventType, eventData);
     };
+
+    // now just updates the counters,
+    // in future might be changed to go through all events and check
+    // if they are in 'unread' data structures, in which case remove them from there
+    applicationStateService.setEventsAsReadForNeed = function(needURI, events){
+        if(needURI in privateData.unreadEventsByNeedByType){
+            for (var i = 0; i < won.UNREAD.TYPES.length; i++) {
+                var eventType = won.UNREAD.TYPES[i];
+            //for (var eventType in won.UNREAD.TYPES) {
+                // by type
+                privateData.unreadEventsByTypeByNeed[eventType].count-=privateData.unreadEventsByNeedByType[needURI][eventType].count;
+                // by need
+                privateData.unreadEventsByNeedByType[needURI][eventType].count = 0;
+            }
+        }
+    }
 
 
     var createOrUpdateUnreadEntry = function(needURI, eventData, unreadEntry){
@@ -102,6 +119,23 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return unreadEventType;
     }
 
+    var getUnreadEventTypeFromHasMessageType = function(hasMessageType){
+        var unreadEventType = null;
+        switch (hasMessageType){
+            case won.WONMSG.hintMessage:unreadEventType = won.UNREAD.TYPE.HINT;
+                break;
+            case won.WONMSG.connectMessage: unreadEventType = won.UNREAD.TYPE.CONNECT;
+                break;
+            case won.WONMSG.openMessage:unreadEventType = won.UNREAD.TYPE.CONNECT;
+                break;
+            case won.WONMSG.closeMessage: unreadEventType = won.UNREAD.TYPE.CLOSE;
+                break;
+            case won.WONMSG.createMessage: unreadEventType = won.UNREAD.TYPE.CREATED;
+                break;
+        }
+        return unreadEventType;
+    }
+
 
     var updateUnreadEventsByNeedByType = function (needURI, eventType,eventData){
 
@@ -125,8 +159,6 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
 
     };
 
-
-
     var updateUnreadEventsByTypeByNeed = function (needURI,eventType, eventData){
         var unreadEventType = getUnreadEventType(eventType);
         var now = new Date().getTime();
@@ -136,6 +168,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         privateData.unreadEventsByTypeByNeed[unreadEventType].timestamp = now;
         privateData.unreadEventsByTypeByNeed[unreadEventType].count++;
     };
+
     var updatelatestEventsByNeedByConnection = function(){
 
     };
@@ -205,12 +238,16 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return deferred.promise;
     }
 
+
     /**
      * Gets all needs.
      * @returns {Array}
      */
     applicationStateService.getAllNeeds = function(){
         return privateData.allNeeds;
+    }
+    applicationStateService.getAllDrafts = function(){
+        return privateData.allDrafts;
     }
 
     /**
@@ -220,8 +257,41 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.addNeed = function(need){
         privateData.allNeeds[need.uri] = need;
     }
+    applicationStateService.addDraft = function(draft){
+        var draftLd = JSON.parse(draft.draft);
+        var draftBuilderObject = new window.won.DraftBuilder(draftLd).setContext();
+        var currentStep = draftBuilderObject.getCurrentStep();
+        var draftObj = draftBuilderObject.getDraftObject();
+        var draftObjWithMetaInfo = {"draftURI":draft.draftURI,"currentStep":currentStep,"draft":draftObj};
+        privateData.allDrafts.push(draftObjWithMetaInfo);
+
+    }
+    applicationStateService.addNeeds = function(needs){
+        var needURIPromises = [];
+        for(var i = 0;i<needs.data.length;i++){
+            var needURI = needs.data[i];
+            needURIPromises.push(linkedDataService.fetch(needURI)
+                .then(function (value) {
+                var deferred = $q.defer();
+                linkedDataService.getNeed(needURI)
+                    .then(function(need){
+                        applicationStateService.addNeed(need)
+                       deferred.resolve(need);
+                    });
+            }))
+        }
+        $q.all(needURIPromises);
+    }
+    applicationStateService.addDrafts = function(drafts){
+        for(var i = 0; i<drafts.data.length;i++){
+            applicationStateService.addDraft(drafts.data[i]);
+        }
+    }
     applicationStateService.getAllNeedsCount = function(){
         return utilService.getKeySize(privateData.allNeeds);
+    }
+    applicationStateService.getAllDraftsCount = function(){
+        return privateData.allDrafts.length;
     }
     /**
      * Fetches the unreadObjects structure, rebuilding it if it is dirty.

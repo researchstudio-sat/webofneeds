@@ -40,6 +40,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.selectedType = -1;
     $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
     $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
+    $scope.allDrafts = applicationStateService.getAllDrafts();
 
     //allow acces to service methods from angular expressions:
     $scope.openNeedDetailView = applicationControlService.openNeedDetailView;

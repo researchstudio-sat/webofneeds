@@ -105,6 +105,39 @@ public class WonRdfUtils
      * @param content
      * @return
      */
+    public static URI getFacet(URI subject, Model content) {
+      logger.debug("getFacet(model) called");
+      Resource baseRes = content.getResource(subject.toString());
+      StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
+      if (!stmtIterator.hasNext()) {
+        logger.debug("no facet found in model");
+        return null;
+      }
+      URI facetURI = URI.create(stmtIterator.next().getObject().asResource().getURI());
+      if (logger.isDebugEnabled()){
+        if (stmtIterator.hasNext()){
+          logger.debug("returning facet {}, but model has more facets than just this one.");
+        }
+      }
+      return facetURI;
+    }
+
+    public static URI getFacet(final URI subject, Dataset content){
+      return RdfUtils.findFirst(content, new RdfUtils.ModelVisitor<URI>()
+      {
+        @Override
+        public URI visit(final Model model) {
+          return getFacet(subject, model);
+        }
+      });
+    }
+
+    /**
+     * Returns the first facet found in the model, attached to the null relative URI '<>'.
+     * Returns null if there is no such facet.
+     * @param content
+     * @return
+     */
     public static URI getFacet(Model content) {
       logger.debug("getFacet(model) called");
       Resource baseRes = RdfUtils.getBaseResource(content);
@@ -120,6 +153,16 @@ public class WonRdfUtils
         }
       }
       return facetURI;
+    }
+
+    public static URI getFacet(Dataset content){
+      return RdfUtils.findFirst(content, new RdfUtils.ModelVisitor<URI>()
+      {
+        @Override
+        public URI visit(final Model model) {
+          return getFacet(model);
+        }
+      });
     }
 
     /**

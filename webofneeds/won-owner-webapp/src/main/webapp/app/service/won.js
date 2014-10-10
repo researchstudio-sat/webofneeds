@@ -232,6 +232,8 @@
         won.UNREAD.TYPE.MESSAGE = "message";
         won.UNREAD.TYPE.CONNECT = "connect";
         won.UNREAD.TYPE.CLOSE = "close";
+        won.UNREAD.TYPES = [won.UNREAD.TYPE.CREATED, won.UNREAD.TYPE.HINT,
+            won.UNREAD.TYPE.MESSAGE, won.UNREAD.TYPE.CONNECT, won.UNREAD.TYPE.CLOSE];
         won.UNREAD.GROUP = {};
         won.UNREAD.GROUP.ALL="all";
         won.UNREAD.GROUP.BYNEED="byNeed";
@@ -535,6 +537,7 @@
             builder.messageGraph = messageGraph;
         };
 
+
         /*
          * Creates a JSON-LD representation of the need data provided through builder functions.
          * e.g.:
@@ -560,6 +563,7 @@
                                 }
                             ]
                         }
+
                     ]
                 };
             }
@@ -575,6 +579,7 @@
             getContext: function () {               //TODO inherit from base buiilder
                 return this.data["@context"];
             },
+
             getNeedGraph: function(){
                 return this.data["@graph"][0]["@graph"];
             },
@@ -762,7 +767,64 @@
                 return this.data;
             }
         }
+        won.DraftBuilder = function DraftBuilder(data){
+            if (data != null && data != undefined) {
+                this.data = won.clone(data);
+            } else {
+                this.data =
+                {
+                    "@graph": [
+                        {
+                            "@id": "no-id-yet",
+                            "@graph": [
+                                {
+                                    "@type": "won:Need",
+                                    "won:hasContent": "_:n01"
+                                },
+                                {
+                                    "@id": "_:n01",
+                                    "@type": "won:NeedContent"
+                                }
+                            ]
+                        },
+                        {
+                            "@id":"no-id-yet",
+                            "@graph": [
+                                {
+                                    "@type":"won:DraftState",
+                                    "won:hasContent":"_:n02"
+                                },
+                                {
+                                    "@id":"_:n02",
+                                    "@type":"won:MetaInformation"
+                                }
+                            ]
+                        }
+                    ]
+                };
+            }
+        }
+        won.DraftBuilder.prototype = new won.NeedBuilder();
 
+        won.DraftBuilder.prototype.constructor = won.DraftBuilder;
+
+        won.DraftBuilder.prototype.getMetaNode =  function(){
+            return this.data["@graph"][1]["@graph"][1];
+        }
+        won.DraftBuilder.prototype.setCurrentStep = function(currentStep){
+            this.getMetaNode()["won:isInStep"]=currentStep;
+            return this;
+        }
+        won.DraftBuilder.prototype.setDraftObject = function(draft){
+            this.getMetaNode()["won:hasDraftObject"]=draft;
+            return this;
+        }
+        won.DraftBuilder.prototype.getDraftObject = function(){
+            return this.getMetaNode()["won:hasDraftObject"];
+        }
+        won.DraftBuilder.prototype.getCurrentStep = function(){
+            return this.getMetaNode()["won:isInStep"];
+        }
         /*
          * Creates a JSON-LD stucture containing a named graph with default 'unset' event URI
          * plus the specified hashFragment
@@ -861,10 +923,6 @@
                 this.getMessageEventNode()[won.WONMSG.hasReceiverNodeCompacted]={"@id":receiverURI};
                 return this;
             },
-            hasTimestamp: function(){
-                this.getMessageEventNode()[won.WONMSG.hasTimestampCompacted]=new Date().getTime();
-                return this;
-            },
             /**
              * Adds the specified facet as local facets. Only needed for connect and
              * openSuggested.
@@ -896,9 +954,10 @@
              */
             getContentGraph: function(){
                 var graphs = this.data["@graph"];
+                var contentGraphUri = this.eventUriValue + "#content";
                 for (key in graphs){
                     var graph = graphs[key];
-                    if (graph['@id'] === this.eventUriValue + "#content"){
+                    if (graph['@id'] === contentGraphUri){
                         return graph;
                     }
                 }
@@ -910,6 +969,8 @@
                     ]
                 }
                 graphs.push(contentGraph);
+                //add a reference to it to the envelope
+                won.addContentGraphReferencesToMessageGraph(this.messageGraph, [contentGraphUri]);
                 return contentGraph;
             },
             getContentGraphNode: function(){

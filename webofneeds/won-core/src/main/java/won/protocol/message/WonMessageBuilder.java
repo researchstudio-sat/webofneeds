@@ -14,10 +14,7 @@ import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class to build a WonMessage based on the specific properties.
@@ -26,6 +23,9 @@ import java.util.Set;
  */
 public class WonMessageBuilder
 {
+  private static final String CONTENT_URI_APPENDIX = "#content-";
+  private static final String SIGNATURE_URI_APPENDIX = "#signature-";
+  private static final String ENVELOPE_URI_APPENDIX = "#envelope-";
 
   // ToDo (FS): move to some vocabulary class
 
@@ -44,10 +44,13 @@ public class WonMessageBuilder
 
   private Map<URI, Model> contentMap = new HashMap<>();
   private Map<URI, Model> signatureMap = new HashMap<>();
+  private WonMessage wrappedMessage;
+  private Long timestamp;
 
   public WonMessage build() throws WonMessageBuilderException {
     return build(null);
   }
+
 
   /**
    * Builds a WonMessage by adding data to the specified dataset.
@@ -75,88 +78,139 @@ public class WonMessageBuilder
         dataset.setDefaultModel(defaultModel);
       }
     }
-
-    defaultModel.createResource(WONMSG.getGraphURI(messageURI.toString()), WONMSG.ENVELOPE_GRAPH);
-
-    Model messageEvent = ModelFactory.createDefaultModel();
-    DefaultPrefixUtils.setDefaultPrefixes(messageEvent);
+    if (messageURI == null){
+      throw new WonMessageBuilderException("No messageURI specified");
+    }
 
 
-    dataset.addNamedModel(WONMSG.getGraphURI(messageURI.toString()), messageEvent);
+
+
+
+    Model envelopeGraph = ModelFactory.createDefaultModel();
+    DefaultPrefixUtils.setDefaultPrefixes(envelopeGraph);
+
+    //add wrapped message first, including all its named graphs.
+    //This way, we can later avoid clashed when generating new graph URIs
+    if (this.wrappedMessage != null){
+        //the [wrappedMessage.envelopeGraphURI] rdf:type msg:EnvelopeGraph triple in the default graph is required to
+        // find the wrapped envelope graph.
+        envelopeGraph.createResource(wrappedMessage.getOuterEnvelopeGraphURI().toString(),
+          WONMSG.ENVELOPE_GRAPH);
+      //copy all named graphs to the new message dataset
+      for (Iterator<String> names = wrappedMessage.getCompleteDataset().listNames(); names.hasNext(); ){
+        String graphUri = names.next();
+        dataset.addNamedModel(graphUri, wrappedMessage.getCompleteDataset().getNamedModel(graphUri));
+      }
+    }
+    //create a new envelope graph uri and add the envelope graph to the dataset
+    String envelopeGraphURI = RdfUtils.createNewGraphURI(messageURI.toString(), ENVELOPE_URI_APPENDIX ,4,dataset).toString();
+
+    //the [envelopeGraphURI] rdf:type msg:EnvelopeGraph triple in the default graph is required to find the
+    //envelope graph.
+    defaultModel.createResource(envelopeGraphURI, WONMSG.ENVELOPE_GRAPH);
+    dataset.addNamedModel(envelopeGraphURI, envelopeGraph);
 
     // message URI
-    Resource messageEventResource = messageEvent.createResource(messageURI.toString());
-
-    messageEventResource.addProperty(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, wonMessageType.getResource());
+    Resource messageEventResource = envelopeGraph.createResource(messageURI.toString());
+    if (wonMessageType != null){
+      messageEventResource.addProperty(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, wonMessageType.getResource());
+    }
 
     // ToDo (FS): also add the signatures
     for (URI contentURI : contentMap.keySet()) {
       messageEventResource.addProperty(
         WONMSG.HAS_CONTENT_PROPERTY,
-        messageEvent.createResource(contentURI.toString()));
+        envelopeGraph.createResource(contentURI.toString()));
     }
 
     // add sender
     if (senderURI != null)
       messageEventResource.addProperty(
         WONMSG.SENDER_PROPERTY,
-        messageEvent.createResource(senderURI.toString()));
+        envelopeGraph.createResource(senderURI.toString()));
     if (senderNeedURI != null)
       messageEventResource.addProperty(
         WONMSG.SENDER_NEED_PROPERTY,
-        messageEvent.createResource(senderNeedURI.toString()));
+        envelopeGraph.createResource(senderNeedURI.toString()));
     if (senderNodeURI != null)
       messageEventResource.addProperty(
         WONMSG.SENDER_NODE_PROPERTY,
-        messageEvent.createResource(senderNodeURI.toString()));
+        envelopeGraph.createResource(senderNodeURI.toString()));
 
     // add receiver
     if (receiverURI != null)
       messageEventResource.addProperty(
         WONMSG.RECEIVER_PROPERTY,
-        messageEvent.createResource(receiverURI.toString()));
+        envelopeGraph.createResource(receiverURI.toString()));
     if (receiverNeedURI != null)
       messageEventResource.addProperty(
         WONMSG.RECEIVER_NEED_PROPERTY,
-        messageEvent.createResource(receiverNeedURI.toString()));
+        envelopeGraph.createResource(receiverNeedURI.toString()));
     if (receiverNodeURI != null)
       messageEventResource.addProperty(
         WONMSG.RECEIVER_NODE_PROPERTY,
-        messageEvent.createResource(receiverNodeURI.toString()));
+        envelopeGraph.createResource(receiverNodeURI.toString()));
 
     // add refersTo
     for (URI refersToURI : refersToURIs) {
       messageEventResource.addProperty(
         WONMSG.REFERS_TO_PROPERTY,
-        messageEvent.createResource(refersToURI.toString()));
+        envelopeGraph.createResource(refersToURI.toString()));
     }
 
     // add responseMessageState
     if (responseMessageState != null) {
       messageEventResource.addProperty(
         WONMSG.HAS_RESPONSE_STATE_PROPERTY,
-        messageEvent.createResource(responseMessageState.toString()));
+        envelopeGraph.createResource(responseMessageState.toString()));
     } else {
-      if (WONMSG.isResponseMessageType(wonMessageType.getResource())) {
+      if (wonMessageType != null && WONMSG.isResponseMessageType(wonMessageType.getResource())) {
         throw new WonMessageBuilderException(
           "Message type is " + wonMessageType.getResource().toString() +
             " but no response message state has been provided.");
       }
     }
 
+    if (timestamp != null){
+      messageEventResource.addProperty(
+        WONMSG.HAS_TIMESTAMP,
+        envelopeGraph.createTypedLiteral(this.timestamp));
+    }
 
     for (URI contentURI : contentMap.keySet()) {
-      dataset.addNamedModel(
-        contentURI.toString(),
-        contentMap.get(contentURI));
+      String uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), CONTENT_URI_APPENDIX, 5,
+        dataset).toString();
+      dataset.addNamedModel(uniqueContentUri, contentMap.get(contentURI));
+      Model signatureGraph = signatureMap.get(contentURI);
+      if (signatureGraph != null) {
+        uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), SIGNATURE_URI_APPENDIX, 5,
+          dataset).toString();
+        //the signature refers to the name of the other graph. We changed that name
+        //so we have to replace the resource referencing it, too:
+        signatureGraph = RdfUtils.replaceResource(signatureGraph.getResource(contentURI.toString()),
+          signatureGraph.getResource(uniqueContentUri));
+        dataset.addNamedModel(uniqueContentUri, signatureGraph);
+      }
     }
 
     // ToDo (FS): add signature of the whole message
 
-    // ToDo (FS): since all the properties are already available this can be done more efficiently
-    WonMessage wonMessage = WonMessageDecoder.decodeFromDataset(dataset);
-    return wonMessage;
+    return new WonMessage(dataset);
 
+  }
+
+  /**
+   * Adds the complete message content to the message that will be built,
+   * referencing toWrap's envelope in the envelope of the new message.
+   * The message that will be built has the same messageURI as the wrapped message.
+   *
+   * @param
+   * @return
+   */
+  public WonMessageBuilder wrap(WonMessage toWrap){
+    this.setMessageURI(toWrap.getMessageURI());
+    this.wrappedMessage = toWrap;
+    return this;
   }
 
   // complete MessageType specific setters
@@ -216,7 +270,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonMessageType(WonMessageType.NEED_STATE)
+      .setWonMessageType(WonMessageType.DEACTIVATE)
       .setSenderNeedURI(localNeed)
       .setReceiverNeedURI(localNeed)
       .setReceiverNodeURI(localWonNode)
@@ -274,15 +328,16 @@ public class WonMessageBuilder
     URI otherNeedURI,
     URI otherNeedFacet,
     URI matcherURI,
-    double score) {
+    double score,
+    long timestamp) {
 
     Model contentModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(needFacetURI, otherNeedFacet);
     Resource msgResource = contentModel.createResource(messageURI.toString());
     RdfUtils.replaceBaseResource(contentModel, msgResource);
     contentModel.add(msgResource, WON.HAS_MATCH_SCORE,
-                     contentModel.createTypedLiteral(score));
+      contentModel.createTypedLiteral(score));
     contentModel.add(msgResource, WON.HAS_MATCH_COUNTERPART,
-                     contentModel.createResource(otherNeedURI.toString()));
+      contentModel.createResource(otherNeedURI.toString()));
 
     this
       .setMessageURI(messageURI)
@@ -291,6 +346,7 @@ public class WonMessageBuilder
       .setReceiverURI(needFacetURI)
       .setReceiverNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
+      .setTimestamp(timestamp)
         // ToDo (FS): remove the hardcoded part of the URI
       .addContent(URI.create(messageURI.toString() + "/content"), contentModel, null);
 
@@ -395,6 +451,15 @@ public class WonMessageBuilder
     return this;
   }
 
+  /**
+   * Adds the specified content graph, and the specified signature graph, using the specified
+   * contentURI as the graph name. The contentURI will be made unique inside the message dataset
+   * by appending characters at the end.
+   * @param contentURI
+   * @param content
+   * @param signature, may be null
+   * @return
+   */
   public WonMessageBuilder addContent(URI contentURI, Model content, Model signature) {
     contentMap.put(contentURI, content);
     if (signature != null)
@@ -411,6 +476,43 @@ public class WonMessageBuilder
     this.responseMessageState = responseMessageState;
     return this;
   }
+
+  public WonMessageBuilder setTimestamp(final long timestamp) {
+    this.timestamp = timestamp;
+    return this;
+  }
+
+  public WonMessageBuilder copyEnvelopeFromWonMessage(final WonMessage wonMessage) {
+    return this
+      .setWonMessageType(wonMessage.getMessageType())
+      .setReceiverURI(wonMessage.getReceiverURI())
+      .setReceiverNeedURI(wonMessage.getReceiverNeedURI())
+      .setReceiverNodeURI(wonMessage.getReceiverNodeURI())
+      .setSenderURI(wonMessage.getSenderURI())
+      .setSenderNeedURI(wonMessage.getSenderNeedURI())
+      .setSenderNodeURI(wonMessage.getSenderNodeURI());
+  }
+
+  /**
+   * Copies all content graphs from the specified message, replacing all occurrences
+   * of the specified message's URI with the messageURI of this builder.
+   * @param wonMessage
+   * @return
+   */
+  public WonMessageBuilder copyContentFromMessageReplacingMessageURI(final WonMessage wonMessage) {
+    Dataset messageContent = wonMessage.getMessageContent();
+    for (Iterator<String> nameIt = messageContent.listNames(); nameIt.hasNext(); ){
+      //replace the messageURI of the specified message with that of this builder, just in case
+      //there are triples in the model that about the message
+      String modelUri = nameIt.next();
+      Model model = messageContent.getNamedModel(modelUri);
+      model = RdfUtils.replaceResource(model.getResource(wonMessage.getMessageURI().toString()),
+        model.getResource(this.messageURI.toString()));
+      addContent(URI.create(modelUri), model,null);
+    }
+    return this;
+  }
+
 
   private void checkProperties() {
 

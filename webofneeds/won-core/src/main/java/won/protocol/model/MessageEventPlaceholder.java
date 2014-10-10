@@ -1,6 +1,6 @@
 package won.protocol.model;
 
-import won.protocol.message.MessageEvent;
+import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 
 import javax.persistence.*;
@@ -15,16 +15,16 @@ public class MessageEventPlaceholder
 
   public MessageEventPlaceholder() {}
 
-  public MessageEventPlaceholder(URI parentURI, MessageEvent messageEvent){
+  public MessageEventPlaceholder(URI parentURI, WonMessage wonMessage){
     this.parentURI = parentURI;
-    this.messageURI = messageEvent.getMessageURI();
-    this.messageType = messageEvent.getMessageType();
-    this.senderURI = messageEvent.getSenderURI();
-    this.senderNeedURI = messageEvent.getSenderNeedURI();
-    this.senderNodeURI = messageEvent.getSenderNodeURI();
-    this.receiverURI = messageEvent.getReceiverURI();
-    this.receiverNeedURI = messageEvent.getReceiverNeedURI();
-    this.receiverNodeURI = messageEvent.getReceiverNodeURI();
+    this.messageURI = wonMessage.getMessageURI();
+    this.messageType = wonMessage.getMessageType();
+    this.senderURI = wonMessage.getSenderURI();
+    this.senderNeedURI = wonMessage.getSenderNeedURI();
+    this.senderNodeURI = wonMessage.getSenderNodeURI();
+    this.receiverURI = wonMessage.getReceiverURI();
+    this.receiverNeedURI = wonMessage.getReceiverNeedURI();
+    this.receiverNodeURI = wonMessage.getReceiverNodeURI();
 
     this.creationDate = new Date();
   }

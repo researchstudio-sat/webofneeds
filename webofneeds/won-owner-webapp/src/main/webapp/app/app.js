@@ -133,6 +133,23 @@ app.directive('header', function(){
 		return $q;
 	}]);
 })
+
+    .filter('orderObjectBy', function() {
+        return function(items, field, reverse) {
+            var filtered = [];
+            angular.forEach(items, function(item) {
+                filtered.push(item);
+            });
+            filtered.sort(function (a, b) {
+                return (a[field] > b[field] ? 1 : -1);
+            });
+            if(reverse) {
+                filtered.reverse();
+            }
+            return filtered;
+        };
+    })
+
     .filter('messageTypeFilter', function(){
         var getTypeText = function(lastConEvent) {
             switch (lastConEvent.event.hasMessageType) {
@@ -181,7 +198,8 @@ app.run(function($httpBackend,$rootScope){
 
         //$httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
         $httpBackend.whenPOST('/owner/rest/needs/').passThrough();
-        $httpBackend.whenGET('/owner/rest/needs/drafts').passThrough();
+        $httpBackend.whenGET('/owner/rest/needs/').passThrough();
+        $httpBackend.whenGET('/owner/rest/needs/drafts/').passThrough();
         $httpBackend.whenPOST('/owner/rest/needs/drafts').passThrough();
         $httpBackend.whenDELETE('/owner/rest/needs/drafts').passThrough();
         $httpBackend.whenGET('/owner/rest/needs/drafts/.+').passThrough();

@@ -16,10 +16,8 @@
 
 package won.node.service.impl;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +29,7 @@ import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDecoder;
+import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.*;
 import won.protocol.need.NeedProtocolNeedService;
@@ -44,12 +42,14 @@ import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.service.OwnerFacingNeedCommunicationService;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 
 
@@ -96,6 +96,8 @@ public class NeedCommunicationServiceImpl implements
   private RDFStorageService rdfStorageService;
   @Autowired
   private MessageEventRepository messageEventRepository;
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
   @Override
   public void hint(final URI needURI, final URI otherNeedURI,
@@ -106,18 +108,18 @@ public class NeedCommunicationServiceImpl implements
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageEvent().getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageEvent().getMessageURI(),
+      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      URI needURIFromWonMessage = wonMessage.getMessageEvent().getReceiverNeedURI();
+      URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
       URI otherNeedURIFromWonMessage = URI.create(RdfUtils.findOnePropertyFromResource(
-        wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+        wonMessage.getMessageContent(), wonMessage.getMessageURI(),
         WON.HAS_MATCH_COUNTERPART).asResource().getURI());
       double wmScore = RdfUtils.findOnePropertyFromResource(
-        wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+        wonMessage.getMessageContent(), wonMessage.getMessageURI(),
         WON.HAS_MATCH_SCORE).asLiteral().getDouble();
-      URI wmOriginator = wonMessage.getMessageEvent().getSenderNodeURI();
+      URI wmOriginator = wonMessage.getSenderNodeURI();
       if (wmScore < 0 || wmScore > 1) throw new IllegalArgumentException("score is not in [0,1]");
       if (wmOriginator == null)
         throw new IllegalArgumentException("originator is not set");
@@ -145,7 +147,7 @@ public class NeedCommunicationServiceImpl implements
       }
 
 
-      messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(), wonMessage.getMessageEvent()));
+      messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(), wonMessage));
 
       //invoke facet implementation
       reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wonMessage);
@@ -197,8 +199,8 @@ public class NeedCommunicationServiceImpl implements
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
 
-      URI senderNeedURI = wonMessage.getMessageEvent().getSenderNeedURI();
-      URI receiverNeedURI = wonMessage.getMessageEvent().getReceiverNeedURI();
+      URI senderNeedURI = wonMessage.getSenderNeedURI();
+      URI receiverNeedURI = wonMessage.getReceiverNeedURI();
 
       //TODO: when we introduce dedicated URIs for individual facets, this will be how
       URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
@@ -209,21 +211,15 @@ public class NeedCommunicationServiceImpl implements
                                                      ConnectionEventType.OWNER_OPEN);
 
       // add the connectionID to the wonMessage
-      URI messageURI = wonMessage.getMessageEvent().getMessageURI();
-      Model newModel = ModelFactory.createDefaultModel();
-      newModel.add(newModel.createResource(messageURI.toString()),
-                   WON.HAS_LOCAL_CONNECTION,
-                   newModel.createResource(con.getConnectionURI().toString()));
-      Dataset tempWonMessage = WonMessageEncoder.encodeAsDataset(wonMessage);
-      tempWonMessage.addNamedModel(messageURI.toString() + "/localConnectionInformation", newModel);
-      WonMessage newWonMessage = WonMessageDecoder.decodeFromDataset(tempWonMessage);
-      // store the message event placeholder to keep the connection between connection and message event
-
+      WonMessage newWonMessage = new WonMessageBuilder()
+        .wrap(wonMessage)
+        .setSenderURI(con.getConnectionURI())
+        .build();
       messageEventRepository.save(
-        new MessageEventPlaceholder(con.getConnectionURI(), newWonMessage.getMessageEvent()));
-      logger.debug("STORING message with id {}", newWonMessage.getMessageEvent().getMessageURI());
-      rdfStorageService.storeDataset(newWonMessage.getMessageEvent().getMessageURI(),
-                                     tempWonMessage);
+        new MessageEventPlaceholder(con.getConnectionURI(), newWonMessage));
+      logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+      rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+        newWonMessage.getCompleteDataset());
 
       //invoke facet implementation
       Facet facet = reg.get(con);
@@ -269,15 +265,13 @@ public class NeedCommunicationServiceImpl implements
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
 
-      URI needURIFromWonMessage = wonMessage.getMessageEvent().getReceiverNeedURI();
-      URI otherNeedURIFromWonMessage = wonMessage.getMessageEvent().getSenderNeedURI();
-      logger.debug("try to find local connection in message " + wonMessage.getMessageEvent().getMessageURI() +
-      " with content: \n" + WonMessageEncoder.encode(wonMessage, Lang.TRIG));
-      URI otherConnectionURIFromWonMessage = URI.create(RdfUtils.findOnePropertyFromResource(
-        wonMessage.getMessageContent(),
-        wonMessage.getMessageEvent().getMessageURI(),
-        WON.HAS_LOCAL_CONNECTION).asResource().toString());
-      URI facetURI = dataService.getFacet(content);
+      // a need wants to connect.
+      // get the required data from the message and create a connection
+      URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
+      URI otherNeedURIFromWonMessage = wonMessage.getSenderNeedURI();
+      URI otherConnectionURIFromWonMessage = wonMessage.getSenderURI();
+      URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage.getMessageURI(),
+        wonMessage.getMessageContent());
 
       logger.debug("CONNECT received for need {} referring to need {} (connection {})",
                    new Object[]{needURIFromWonMessage,
@@ -291,27 +285,28 @@ public class NeedCommunicationServiceImpl implements
                                                     otherConnectionURIFromWonMessage,
                                                     facetURI,
                                                     ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
+      // copy the message envelope
+      // information about the newly created connection
+      // to the message and pass it on to the owner.
+      URI wrappedMessageURI = this.wonNodeInformationService.generateMessageEventURI();
+      WonMessageBuilder builder = new WonMessageBuilder()
+        .setMessageURI(wrappedMessageURI)
+        .copyEnvelopeFromWonMessage(wonMessage)
+        .copyContentFromMessageReplacingMessageURI(wonMessage)
+        .setReceiverURI(con.getConnectionURI())
+        .setTimestamp(new Date().getTime())
+        .addRefersToURI(wonMessage.getMessageURI());
+      WonMessage wrappedMessage = builder.build(wonMessage.getMessageContent());
 
-      // add new connectionURI to wonMessage
-      URI messageURI = wonMessage.getMessageEvent().getMessageURI();
-      Model newModel = ModelFactory.createDefaultModel();
-      newModel.add(newModel.createResource(messageURI.toString()),
-                   WON.HAS_REMOTE_CONNECTION,
-                   newModel.createResource(con.getConnectionURI().toString()));
-      Dataset tempWonMessage = WonMessageEncoder.encodeAsDataset(wonMessage);
-      tempWonMessage.addNamedModel(messageURI.toString() + "/remoteConnectionInformation", newModel);
-      WonMessage newWonMessage = WonMessageDecoder.decodeFromDataset(tempWonMessage);
-
-      logger.debug("STORING message with id {}", messageURI);
-      rdfStorageService.storeDataset(messageURI, tempWonMessage);
+      rdfStorageService.storeDataset(wrappedMessageURI, wrappedMessage.getCompleteDataset());
 
       messageEventRepository.save(new MessageEventPlaceholder(
-        con.getConnectionURI(), newWonMessage.getMessageEvent()));
+        con.getConnectionURI(), wrappedMessage));
 
       //invoke facet implementation
       Facet facet = reg.get(con);
       // send an empty model until we remove this parameter
-      facet.connectFromNeed(con, content, newWonMessage);
+      facet.connectFromNeed(con, content, wrappedMessage);
 
       return con.getConnectionURI();
 

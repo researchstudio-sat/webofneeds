@@ -93,12 +93,12 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       if (wonMessage != null) {
 
         CamelConfiguration camelConfiguration = protocolCommunicationService
-          .configureCamelEndpoint(wonMessage.getMessageEvent().getSenderNeedURI(),
-                                  wonMessage.getMessageEvent().getReceiverNeedURI(),
+          .configureCamelEndpoint(wonMessage.getSenderNeedURI(),
+                                  wonMessage.getReceiverNeedURI(),
                                   openStartingEndpoint);
         Map headerMap = new HashMap<String, String>();
         headerMap.put("protocol", "NeedProtocol");
-        headerMap.put("connectionURI", wonMessage.getMessageEvent().getReceiverURI().toString());
+        headerMap.put("connectionURI", wonMessage.getReceiverURI().toString());
         headerMap.put("content", RdfUtils.toString(content));
         headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
         headerMap.put("methodName", "open");

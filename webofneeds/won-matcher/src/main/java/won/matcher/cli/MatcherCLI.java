@@ -15,6 +15,7 @@ import won.protocol.service.WonNodeInformationService;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 
 /**
  * User: gabriel
@@ -131,7 +132,7 @@ public class MatcherCLI implements CommandLineRunner
         otherNeedURI,
         FacetType.OwnerFacet.getURI(),
         originator,
-        score)
+        score, new Date().getTime())
       .build();
   }
 }

@@ -191,7 +191,10 @@ angular.module('won.owner').controller('HomeCtrl', function ($scope,$routeParams
             }
         }
     }
+    $scope.clickOnDraft = function(draft){
 
+        $location.path("#/create-need/"+draft.currentStep);
+    }
     $scope.onClickOnNewPost = function() {
         //$location.path('/create-need/2');
         var validPanel = true;
@@ -269,7 +272,7 @@ angular.module('won.owner').controller('HomeCtrl', function ($scope,$routeParams
 
 });
 
-angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$window,$location, userService) {
+angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$window,$location,$http, applicationStateService, userService) {
 
 	$scope.user = {
 		username:'',
@@ -281,6 +284,57 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
 	onLoginResponse = function(response) {
 		if (response.status == "OK") {
 			userService.setAuth($scope.username);
+            if(applicationStateService.getAllNeedsCount()>=0){
+                $http.get(
+                    '/owner/rest/needs/',
+                    user
+                ).then(
+                    function (needs) {
+                        if(needs.data.length>0){
+                            applicationStateService.addNeeds(needs)
+                        }
+                        // success
+                        return {status:"OK"};
+                    },
+                    function (response) {
+                        switch(response.status) {
+                            case 403:
+                                // normal error
+                                return {status: "ERROR", message: "getting needs of a user failed"};
+                            default:
+                                // system error
+                                return {status:"FATAL_ERROR", message: "getting needs of a user failed"};
+                                break;
+                        }
+                    }
+                )
+            }
+            if(applicationStateService.getAllDraftsCount()>=0){
+                $http.get(
+                    '/owner/rest/needs/drafts/',
+                    user
+                ).then(
+                    function (drafts) {
+                        if(drafts.data.length>0){
+                            applicationStateService.addDrafts(drafts)
+                        }
+                        // success
+                        return {status:"OK"};
+                    },
+                    function (response) {
+                        switch(response.status) {
+                            case 403:
+                                // normal error
+                                return {status: "ERROR", message: "getting drafts of a user failed"};
+                            default:
+                                // system error
+                                return {status:"FATAL_ERROR", message: "getting drafts of a user failed"};
+                                break;
+                        }
+                    }
+                )
+            }
+
 			$location.path('/home');
 		} else if (response.status == "ERROR") {
 			$scope.error = response.message;

@@ -31,62 +31,57 @@ import java.net.URI;
  */
 @Entity
 @Table(
-		name = "needDraftState",
-		uniqueConstraints = @UniqueConstraint(columnNames = {"id"})
+		name = "needDraft",
+		uniqueConstraints = @UniqueConstraint(columnNames = {"id","draftURI"})
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DraftState{
+public class Draft
+{
 
-	@Id
+  @Id
 	@GeneratedValue
 	@Column(name = "id")
 	private Long id;
 
-
-  @Column(name ="userName")
-  private String userName;
-
   @Column( name = "draftURI", unique = true)
   private URI draftURI;
 
-  private int currentStep;
+  @Column( length=10000)
+  private String content;
 
-  public DraftState(){
+  public Draft(){
   }
 
-  public DraftState(URI draftURI, int currentStep, String userName){
-    this.draftURI = draftURI;
-    this.currentStep = currentStep;
-    this.userName = userName;
+  public Draft(URI draftURI, String content){
+       this.draftURI = draftURI;
+    this.content = content;
   }
 
   public Long getId() {
     return id;
   }
 
-  public int getCurrentStep() {
-    return currentStep;
-  }
-
-  public void setCurrentStep(final int currentStep) {
-    this.currentStep = currentStep;
-  }
 
   public URI getDraftURI() {
     return draftURI;
   }
 
+
+
   public void setDraftURI(final URI draftURI) {
     this.draftURI = draftURI;
   }
 
-  public String getUserName() {
-    return userName;
+  public void setId(final Long id) {
+    this.id = id;
   }
-  public void setUserName(final String userName) {
-    this.userName = userName;
+  public String getContent() {
+    return content;
   }
 
+  public void setContent(final String content) {
+    this.content = content;
+  }
 
 
 }
