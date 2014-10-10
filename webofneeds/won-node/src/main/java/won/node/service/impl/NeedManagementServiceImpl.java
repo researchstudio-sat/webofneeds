@@ -102,11 +102,14 @@ public class NeedManagementServiceImpl implements NeedManagementService
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-
-      // store the wonMessage as it is
-      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
-      rdfStorage.storeDataset(wonMessage.getMessageURI(),
-                              WonMessageEncoder.encodeAsDataset(wonMessage));
+      WonMessage newWonMessage = new WonMessageBuilder()
+        .wrap(wonMessage)
+        .setTimestamp(System.currentTimeMillis())
+        .build();
+      // store the newWonMessage as it is
+      logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+      rdfStorage.storeDataset(newWonMessage.getMessageURI(),
+                              WonMessageEncoder.encodeAsDataset(newWonMessage));
 
 
       // the model where all the information created by the WON node is stored
@@ -115,11 +118,11 @@ public class NeedManagementServiceImpl implements NeedManagementService
       // Model needMeta = ModelFactory.createDefaultModel();
 
       // the dataset which contains the need model graphs from the owner application
-      Dataset needContent = wonMessage.getMessageContent();
+      Dataset needContent = newWonMessage.getMessageContent();
 
       URI needURI = getNeedURIFromWonMessage(needContent);
 
-      if (!needURI.equals(wonMessage.getSenderNeedURI()))
+      if (!needURI.equals(newWonMessage.getSenderNeedURI()))
         throw new IllegalArgumentException("receiverNeedURI and NeedURI of the content are not equal");
 
       Need need = new Need();
@@ -128,12 +131,12 @@ public class NeedManagementServiceImpl implements NeedManagementService
       need.setNeedURI(needURI);
 
       // ToDo (FS) check if the WON node URI corresponds with the WON node (maybe earlier in the message layer)
-      need.setWonNodeURI(wonMessage.getReceiverNodeURI());
+      need.setWonNodeURI(newWonMessage.getReceiverNodeURI());
 
       need = needRepository.save(need);
 
       // store the message event placeholder to keep the connection between need and message event
-      messageEventRepository.save(new MessageEventPlaceholder(needURI, wonMessage));
+      messageEventRepository.save(new MessageEventPlaceholder(needURI, newWonMessage));
 
       List<Facet> facets = WonRdfUtils.NeedUtils.getFacets(needURI, needContent);
       if (facets.size() == 0)
@@ -149,7 +152,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
       rdfStorage.storeDataset(needURI, needContent);
       authorizeOwnerApplicationForNeed(ownerApplicationID, need);
 
-      // ToDo (FS): send the same wonMessage or create a new one (with new type)?
+      // ToDo (FS): send the same newWonMessage or create a new one (with new type)?
 
 
       try {
@@ -276,20 +279,24 @@ public class NeedManagementServiceImpl implements NeedManagementService
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
-      rdfStorage.storeDataset(wonMessage.getMessageURI(),
-                              WonMessageEncoder.encodeAsDataset(wonMessage));
+      WonMessage newWonMessage = new WonMessageBuilder()
+        .wrap(wonMessage)
+        .setTimestamp(System.currentTimeMillis())
+        .build();
+      logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+      rdfStorage.storeDataset(newWonMessage.getMessageURI(),
+                              WonMessageEncoder.encodeAsDataset(newWonMessage));
 
-      URI receiverNeedURI = wonMessage.getReceiverNeedURI();
+      URI receiverNeedURI = newWonMessage.getReceiverNeedURI();
       logger.debug("ACTIVATING need. needURI:{}", receiverNeedURI);
       if (receiverNeedURI == null) throw new IllegalArgumentException("receiverNeedURI is not set");
       Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
       need.setState(NeedState.ACTIVE);
       logger.debug("Setting Need State: " + need.getState());
       needRepository.save(need);
-      messageEventRepository.save(new MessageEventPlaceholder(need.getNeedURI(), wonMessage));
+      messageEventRepository.save(new MessageEventPlaceholder(need.getNeedURI(), newWonMessage));
 
-      matcherProtocolMatcherClient.needActivated(need.getNeedURI(), wonMessage);
+      matcherProtocolMatcherClient.needActivated(need.getNeedURI(), newWonMessage);
 
     } else {
 
@@ -312,17 +319,21 @@ public class NeedManagementServiceImpl implements NeedManagementService
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
-      rdfStorage.storeDataset(wonMessage.getMessageURI(),
-                              WonMessageEncoder.encodeAsDataset(wonMessage));
+      WonMessage newWonMessage = new WonMessageBuilder()
+        .wrap(wonMessage)
+        .setTimestamp(System.currentTimeMillis())
+        .build();
+      logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+      rdfStorage.storeDataset(newWonMessage.getMessageURI(),
+                              WonMessageEncoder.encodeAsDataset(newWonMessage));
 
-      URI receiverNeedURI = wonMessage.getReceiverNeedURI();
+      URI receiverNeedURI = newWonMessage.getReceiverNeedURI();
       logger.debug("DEACTIVATING need. needURI:{}", receiverNeedURI);
       if (receiverNeedURI == null) throw new IllegalArgumentException("receiverNeedURI is not set");
       Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
       need.setState(NeedState.INACTIVE);
       need = needRepository.save(need);
-      messageEventRepository.save(new MessageEventPlaceholder(need.getNeedURI(), wonMessage));
+      messageEventRepository.save(new MessageEventPlaceholder(need.getNeedURI(), newWonMessage));
 
       //close all connections
       Collection<URI> connectionURIs = connectionRepository.getConnectionURIsByNeedURIAndNotInState(need.getNeedURI
@@ -339,7 +350,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
       }
       // ToDo (FS): define own message or forward the deactivate message?
-      matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), wonMessage);
+      matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), newWonMessage);
 
     } else {
 
@@ -432,6 +443,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
       .setReceiverURI(connection.getRemoteConnectionURI())
       .setReceiverNeedURI(connection.getRemoteNeedURI())
       .setReceiverNodeURI(remoteNeed.getWonNodeURI())
+      .setTimestamp(System.currentTimeMillis())
       .build();
 
   }

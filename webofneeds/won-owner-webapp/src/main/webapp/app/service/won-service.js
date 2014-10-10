@@ -171,7 +171,6 @@ angular.module('won.owner').factory('wonService', function (
             .eventURI(eventUri)
             .hasReceiverNode(wonNode)
             .hasSenderNeed(needUri)
-            .hasTimestamp()
             .build();
 
 
@@ -248,7 +247,6 @@ angular.module('won.owner').factory('wonService', function (
                 .hasSenderNode(wonNodeUri1)
                 .hasReceiverNeed(need2)
                 .hasReceiverNode(wonNodeUri2)
-                .hasTimestamp()
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {
@@ -305,7 +303,6 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.connectMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .hasTimestamp()
                 .hasFacet(won.WON.OwnerFacet)
                 .hasRemoteFacet(won.WON.OwnerFacet)
                 .build();
@@ -361,7 +358,6 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.openMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .hasTimestamp()
                 .hasFacet(won.WON.OwnerFacet)
                 .hasRemoteFacet(won.WON.OwnerFacet)
                 .build();
@@ -417,7 +413,6 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.closeMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .hasTimestamp()
                 .hasFacet(won.WON.OwnerFacet)
                 .hasRemoteFacet(won.WON.OwnerFacet)
                 .build();
@@ -491,7 +486,6 @@ angular.module('won.owner').factory('wonService', function (
 
             var message = new won.MessageBuilder(won.WONMSG.openMessage)
                 .eventURI(eventUri)
-                .hasTimestamp()
                 .forEnvelopeData(envelopeData)
                 .addContentGraphData(won.WON.hasTextMessage, text)
                 .build();

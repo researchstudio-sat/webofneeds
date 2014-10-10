@@ -112,11 +112,15 @@ public class WonWebSocketHandler
         continue;
       }
       if (wonMessage.getMessageType() == WonMessageType.CREATE_RESPONSE) {
-        String username = session.getPrincipal().getName();
-        URI needURI = wonMessage.getReceiverNeedURI();
-        User user = userRepository.findByUsername(username);
-        user.addNeedURI(needURI);
-        userRepository.save(user);
+        if (session.getPrincipal() != null) {
+          String username = session.getPrincipal().getName();
+          URI needURI = wonMessage.getReceiverNeedURI();
+          User user = userRepository.findByUsername(username);
+          user.addNeedURI(needURI);
+          userRepository.save(user);
+        } else {
+          logger.warn("could not associate need {} with currently logged in user: no principal found in session");
+        }
       }
       try {
         session.sendMessage(webSocketMessage);

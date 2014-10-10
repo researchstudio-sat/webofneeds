@@ -81,6 +81,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       //TODO: which properties are really needed to route the messae correctly?
       WonMessage newWonMessage = new WonMessageBuilder()
         .wrap(wonMessage)
+        .setTimestamp(System.currentTimeMillis())
         .setSenderURI(con.getConnectionURI())
         .setReceiverURI(con.getRemoteConnectionURI())
         .setReceiverNeedURI(con.getRemoteNeedURI())
@@ -124,22 +125,26 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
-                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+      WonMessage newWonMessage = new WonMessageBuilder()
+        .wrap(wonMessage)
+        .setTimestamp(System.currentTimeMillis())
+        .build();
+      logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+      rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(newWonMessage));
 
       logger.debug("CLOSE received from the owner side for connection {}", connectionURI);
 
       Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
 
-      // store wonMessage and messageEventPlaceholder
-      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
-                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+      // store newWonMessage and messageEventPlaceholder
+      rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(newWonMessage));
       messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(),
-                                                              wonMessage));
+        newWonMessage));
 
       //invoke facet implementation
-      reg.get(con).closeFromOwner(con, content, wonMessage);
+      reg.get(con).closeFromOwner(con, content, newWonMessage);
 
     } else {
 
@@ -164,20 +169,24 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
-                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+      WonMessage newWonMessage = new WonMessageBuilder()
+        .wrap(wonMessage)
+        .setTimestamp(System.currentTimeMillis())
+        .build();
+      logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+      rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(newWonMessage));
 
-      URI connectionURIFromWonMessage = wonMessage.getSenderURI();
+      URI connectionURIFromWonMessage = newWonMessage.getSenderURI();
 
       final Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURIFromWonMessage);
 
 
       messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
-                                                              wonMessage));
+        newWonMessage));
 
       final Connection connection = con;
-      boolean feedbackWasPresent = RdfUtils.applyMethod(wonMessage.getMessageContent(),
+      boolean feedbackWasPresent = RdfUtils.applyMethod(newWonMessage.getMessageContent(),
                            new RdfUtils.ModelVisitor<Boolean>()
                            {
                              @Override
@@ -197,7 +206,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
         //a feedback message is not forwarded to the remote connection, and facets cannot react to it.
         //invoke facet implementation
         //TODO: this may be much more responsive if done asynchronously. We dont return anything here anyway.
-        reg.get(con).sendMessageFromOwner(con, message, wonMessage);
+        reg.get(con).sendMessageFromOwner(con, message, newWonMessage);
       }
       //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.
       //return con.getConnectionURI();

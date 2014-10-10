@@ -860,10 +860,6 @@
                 this.getMessageEventNode()[won.WONMSG.hasReceiverNodeCompacted]={"@id":receiverURI};
                 return this;
             },
-            hasTimestamp: function(){
-                this.getMessageEventNode()[won.WONMSG.hasTimestampCompacted]=new Date().getTime();
-                return this;
-            },
             /**
              * Adds the specified facet as local facets. Only needed for connect and
              * openSuggested.

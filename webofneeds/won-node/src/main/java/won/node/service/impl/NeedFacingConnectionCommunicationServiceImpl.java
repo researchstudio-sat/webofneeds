@@ -87,6 +87,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
       WonMessage newWonMessage = new WonMessageBuilder()
         .setMessageURI(newMessageURI)
+        .setTimestamp(System.currentTimeMillis())
         .copyEnvelopeFromWonMessage(wonMessage)
         .copyContentFromMessageReplacingMessageURI(wonMessage)
         .build();
@@ -125,6 +126,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
       WonMessage newWonMessage = new WonMessageBuilder()
         .setMessageURI(newMessageURI)
+        .setTimestamp(System.currentTimeMillis())
         .copyEnvelopeFromWonMessage(wonMessage)
         .copyContentFromMessageReplacingMessageURI(wonMessage)
         .build();
@@ -162,6 +164,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
         URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
         WonMessage newWonMessage = new WonMessageBuilder()
           .setMessageURI(newMessageURI)
+          .setTimestamp(System.currentTimeMillis())
           .copyEnvelopeFromWonMessage(wonMessage)
           .copyContentFromMessageReplacingMessageURI(wonMessage)
           .build();
