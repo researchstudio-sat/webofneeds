@@ -29,6 +29,12 @@ angular.module('won.owner')
         console.log("events changed! now have " + newValue.length + " events!" + " had: " + oldValue.length +"...");
     });
 
+    // copy the references from the real data holder, used in message table for displaying
+    // and is required by smart table (st-) for sorting the items that can change
+    // see http://lorenzofox3.github.io/smart-table-website/
+    $scope.displayedMessages = [].concat($scope.lastEventOfEachConnectionOfCurrentNeed);
+
+
     $scope.currentEventType = [
      won.WONMSG.connectionMessage,
      won.WONMSG.connectMessage,
