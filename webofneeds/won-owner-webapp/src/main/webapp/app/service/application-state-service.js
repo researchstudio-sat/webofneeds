@@ -72,7 +72,9 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     // if they are in 'unread' data structures, in which case remove them from there
     applicationStateService.setEventsAsReadForNeed = function(needURI, events){
         if(needURI in privateData.unreadEventsByNeedByType){
-            for (var eventType in won.UNREAD.TYPES) {
+            for (var i = 0; i < won.UNREAD.TYPES.length; i++) {
+                var eventType = won.UNREAD.TYPES[i];
+            //for (var eventType in won.UNREAD.TYPES) {
                 // by type
                 privateData.unreadEventsByTypeByNeed[eventType].count-=privateData.unreadEventsByNeedByType[needURI][eventType].count;
                 // by need
