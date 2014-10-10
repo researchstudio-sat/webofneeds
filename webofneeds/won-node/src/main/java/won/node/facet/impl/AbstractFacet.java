@@ -96,7 +96,7 @@ public abstract class AbstractFacet implements Facet
     // ToDo (FS): remove this distinction if the old parameters are not used anymore
     if (wonMessage != null) {
 
-      if (wonMessage.getMessageEvent().getReceiverURI() != null) {
+      if (wonMessage.getReceiverURI() != null) {
         executorService.execute(new Runnable()
         {
           @Override
@@ -210,7 +210,7 @@ public abstract class AbstractFacet implements Facet
         @Override
         public void run() {
           try {
-            ownerFacingConnectionClient.open(wonMessage.getMessageEvent().getReceiverURI(),
+            ownerFacingConnectionClient.open(wonMessage.getReceiverURI(),
                                              content,
                                              wonMessage);
           } catch (Exception e) {
@@ -321,10 +321,10 @@ public abstract class AbstractFacet implements Facet
       WonMessageBuilder builder = new WonMessageBuilder();
       URI messageURI = wonNodeInformationService.generateMessageEventURI();
       URI localFacet = URI.create(RdfUtils.findOnePropertyFromResource(
-        wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+        wonMessage.getMessageContent(), wonMessage.getMessageURI(),
         WON.HAS_FACET).asResource().getURI());
       URI remoteFacet = URI.create(RdfUtils.findOnePropertyFromResource(
-        wonMessage.getMessageContent(), wonMessage.getMessageEvent().getMessageURI(),
+        wonMessage.getMessageContent(), wonMessage.getMessageURI(),
         WON.HAS_REMOTE_FACET).asResource().getURI());
       final WonMessage hintNotification = builder
         .setMessagePropertiesForHintNotification(
@@ -458,12 +458,12 @@ public abstract class AbstractFacet implements Facet
           .setMessageURI(wonNodeInformationService.generateMessageEventURI(
             wonNodeInformationService.getDefaultWonNode()))
           .setWonMessageType(WonMessageType.CLOSE)
-          .setSenderURI(wonMessage.getMessageEvent().getSenderURI())
-          .setSenderNeedURI(wonMessage.getMessageEvent().getSenderNeedURI())
-          .setSenderNodeURI(wonMessage.getMessageEvent().getSenderNodeURI())
-          .setReceiverURI(wonMessage.getMessageEvent().getSenderURI())
-          .setReceiverNeedURI(wonMessage.getMessageEvent().getSenderNeedURI())
-          .setReceiverNodeURI(wonMessage.getMessageEvent().getSenderNodeURI())
+          .setSenderURI(wonMessage.getSenderURI())
+          .setSenderNeedURI(wonMessage.getSenderNeedURI())
+          .setSenderNodeURI(wonMessage.getSenderNodeURI())
+          .setReceiverURI(wonMessage.getSenderURI())
+          .setReceiverNeedURI(wonMessage.getSenderNeedURI())
+          .setReceiverNodeURI(wonMessage.getSenderNodeURI())
           .build();
 
         needFacingConnectionCommunicationService.close(

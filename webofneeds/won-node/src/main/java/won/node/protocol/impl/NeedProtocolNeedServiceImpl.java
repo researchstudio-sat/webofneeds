@@ -85,7 +85,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
     // ToDo (FS): remove this distinction if the old parameters are not used anymore
     if (wonMessage != null) {
 
-      URI connectionURIFromWonMessage = wonMessage.getMessageEvent().getReceiverURI();
+      URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
 
       logger.debug("need from need: OPEN received for connection {}", connectionURIFromWonMessage);
 

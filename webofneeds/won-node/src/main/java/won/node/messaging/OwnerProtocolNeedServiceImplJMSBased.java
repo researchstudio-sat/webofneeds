@@ -1,6 +1,5 @@
 package won.node.messaging;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.Exchange;
 import org.apache.camel.Header;
@@ -89,13 +88,13 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
           ownerApplicationID,
           wonMessage);
        // if (wonMessage != null)
-       // needURI = wonMessage.getMessageEvent().getMessageURI();
+       // needURI = wonMessage.getMessageURI();
         exchange.getOut().setBody(needURI);
 
      // if (wonMessage == null)
         return needURI;
     //  else
-    //    return wonMessage.getMessageEvent().getMessageURI();
+    //    return wonMessage.getMessageURI();
     }
 
     public void activate(
