@@ -47,6 +47,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
 
     //all needs are stored in this array (in the form returned by linkedDataService.getNeed(uri)
     privateData.allNeeds = {};
+    privateData.allDrafts = [];
 
     privateData.unreadEventsByNeedByType = {};
 
@@ -205,12 +206,16 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return deferred.promise;
     }
 
+
     /**
      * Gets all needs.
      * @returns {Array}
      */
     applicationStateService.getAllNeeds = function(){
         return privateData.allNeeds;
+    }
+    applicationStateService.getAllDrafts = function(){
+        return privateData.allDrafts;
     }
 
     /**
@@ -219,6 +224,15 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      */
     applicationStateService.addNeed = function(need){
         privateData.allNeeds[need.uri] = need;
+    }
+    applicationStateService.addDraft = function(draft){
+        var draftLd = JSON.parse(draft.draft);
+        var draftBuilderObject = new window.won.DraftBuilder(draftLd).setContext();
+        var currentStep = draftBuilderObject.getCurrentStep();
+        var draftObj = draftBuilderObject.getDraftObject();
+        var draftObjWithMetaInfo = {"draftURI":draft.draftURI,"currentStep":currentStep,"draft":draftObj};
+        privateData.allDrafts.push(draftObjWithMetaInfo);
+
     }
     applicationStateService.addNeeds = function(needs){
         var needURIPromises = [];
@@ -236,8 +250,16 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         }
         $q.all(needURIPromises);
     }
+    applicationStateService.addDrafts = function(drafts){
+        for(var i = 0; i<drafts.data.length;i++){
+            applicationStateService.addDraft(drafts.data[i]);
+        }
+    }
     applicationStateService.getAllNeedsCount = function(){
         return utilService.getKeySize(privateData.allNeeds);
+    }
+    applicationStateService.getAllDraftsCount = function(){
+        return privateData.allDrafts.length;
     }
     /**
      * Fetches the unreadObjects structure, rebuilding it if it is dirty.

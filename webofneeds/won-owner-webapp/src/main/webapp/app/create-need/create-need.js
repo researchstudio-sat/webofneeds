@@ -310,6 +310,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     $scope.saveDraft = function(){
         var draftBuilderObject = new window.won.DraftBuilder().setContext();
         draftBuilderObject.setCurrentStep($scope.currentStep);
+        draftBuilderObject.setDraftObject($scope.need);
 
         if ($scope.need.basicNeedType == 'DEMAND') {
             draftBuilderObject.demand();

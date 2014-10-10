@@ -135,8 +135,10 @@
 						<li class="dropdown-submenu">
 							<a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
 							<ul class="dropdown-menu" ng-controller="PostBoxCtrl">
-								<li ng-repeat="draft in drafts | orderBy: '-datetime' | limitTo: recordsToDisplay"><a href="#/create-need/1"><i class="fa fa-file-o fa-lg">
-									&nbsp;{{draft.title}}</i></a></li>
+								<li ng-repeat="draft in allDrafts | orderBy: '-datetime' | limitTo: recordsToDisplay">
+                                    <a href="" ng-click="clickOnDraft(draft)"><i
+                                            class="fa fa-file-o fa-lg">
+									&nbsp;{{draft.draft.title}}</i></a></li>
 								<li class="divider"></li>
 								<li><a href="#/postbox"><i class="fa fa-list fa-lg"></i>&nbsp;II Others (go to full list)</a></li>
 							</ul>

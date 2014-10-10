@@ -812,6 +812,16 @@
             this.getMetaNode()["won:isInStep"]=currentStep;
             return this;
         }
+        won.DraftBuilder.prototype.setDraftObject = function(draft){
+            this.getMetaNode()["won:hasDraftObject"]=draft;
+            return this;
+        }
+        won.DraftBuilder.prototype.getDraftObject = function(){
+            return this.getMetaNode()["won:hasDraftObject"];
+        }
+        won.DraftBuilder.prototype.getCurrentStep = function(){
+            return this.getMetaNode()["won:isInStep"];
+        }
         /*
          * Creates a JSON-LD stucture containing a named graph with default 'unset' event URI
          * plus the specified hashFragment
