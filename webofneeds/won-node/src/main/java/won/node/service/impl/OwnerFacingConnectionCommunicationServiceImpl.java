@@ -28,6 +28,7 @@ import won.node.service.DataAccessService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
@@ -74,21 +75,31 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       //the WoN node could add the properties required for routing to the destination, as these
       //properties are stored on the WoN node with the connection data.
 
-      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
-                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+      Connection con = connectionRepository.findOneByConnectionURI(connectionURI);
 
-      URI connectionURIFromWonMessage = wonMessage.getSenderURI();
+      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+      //TODO: which properties are really needed to route the messae correctly?
+      WonMessage newWonMessage = new WonMessageBuilder()
+        .wrap(wonMessage)
+        .setSenderURI(con.getConnectionURI())
+        .setReceiverURI(con.getRemoteConnectionURI())
+        .setReceiverNeedURI(con.getRemoteNeedURI())
+        .build();
+
+      rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(newWonMessage));
+
+      URI connectionURIFromWonMessage = newWonMessage.getSenderURI();
 
       logger.debug("OPEN received from the owner side for connection {}", connectionURIFromWonMessage);
 
-      Connection con = dataService.nextConnectionState(connectionURIFromWonMessage, ConnectionEventType.OWNER_OPEN);
+      con = dataService.nextConnectionState(connectionURIFromWonMessage, ConnectionEventType.OWNER_OPEN);
 
       messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
-                                                              wonMessage));
+        newWonMessage));
 
       //invoke facet implementation
-      reg.get(con).openFromOwner(con, content, wonMessage);
+      reg.get(con).openFromOwner(con, content, newWonMessage);
 
     } else {
 

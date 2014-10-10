@@ -29,6 +29,7 @@ import won.node.service.DataAccessService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
@@ -37,6 +38,7 @@ import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.*;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.ConnectionCommunicationService;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 
@@ -71,6 +73,8 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   private URIService uriService;
   @Autowired
   private MessageEventRepository messageEventRepository;
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
   @Override
   public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
@@ -79,19 +83,26 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters are not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
-                                     WonMessageEncoder.encodeAsDataset(wonMessage));
 
-      URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
+      URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
+      WonMessage newWonMessage = new WonMessageBuilder()
+        .setMessageURI(newMessageURI)
+        .copyEnvelopeFromWonMessage(wonMessage)
+        .copyContentFromMessageReplacingMessageURI(wonMessage)
+        .build();
+      logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+      rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(newWonMessage));
+
+      URI connectionURIFromWonMessage = newWonMessage.getReceiverURI();
 
       Connection con = dataService.nextConnectionState(connectionURIFromWonMessage,
                                                        ConnectionEventType.PARTNER_OPEN);
 
       messageEventRepository.save(new MessageEventPlaceholder(
-        connectionURIFromWonMessage, wonMessage));
+        connectionURIFromWonMessage, newWonMessage));
       //invoke facet implementation
-      reg.get(con).openFromNeed(con, content, wonMessage);
+      reg.get(con).openFromNeed(con, content, newWonMessage);
 
     } else {
 
@@ -111,19 +122,25 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters are not used anymore
     if (wonMessage != null) {
-      logger.debug("STORING message with id {}", wonMessage.getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
-                                     WonMessageEncoder.encodeAsDataset(wonMessage));
+      URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
+      WonMessage newWonMessage = new WonMessageBuilder()
+        .setMessageURI(newMessageURI)
+        .copyEnvelopeFromWonMessage(wonMessage)
+        .copyContentFromMessageReplacingMessageURI(wonMessage)
+        .build();
+      logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+      rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(newWonMessage));
 
-      URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
+      URI connectionURIFromWonMessage = newWonMessage.getReceiverURI();
       Connection con = dataService.nextConnectionState(
         connectionURIFromWonMessage, ConnectionEventType.PARTNER_CLOSE);
 
       messageEventRepository.save(new MessageEventPlaceholder(
-        connectionURIFromWonMessage, wonMessage));
+        connectionURIFromWonMessage, newWonMessage));
 
       //invoke facet implementation
-      reg.get(con).closeFromNeed(con, content, wonMessage);
+      reg.get(con).closeFromNeed(con, content, newWonMessage);
 
     } else {
 
@@ -142,20 +159,26 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       // distinguish between the new message format (WonMessage) and the old parameters
       // ToDo (FS): remove this distinction if the old parameters are not used anymore
       if (wonMessage != null) {
-        logger.debug("STORING message with id {}", wonMessage.getMessageURI());
-        rdfStorageService.storeDataset(wonMessage.getMessageURI(),
-                                       WonMessageEncoder.encodeAsDataset(wonMessage));
+        URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
+        WonMessage newWonMessage = new WonMessageBuilder()
+          .setMessageURI(newMessageURI)
+          .copyEnvelopeFromWonMessage(wonMessage)
+          .copyContentFromMessageReplacingMessageURI(wonMessage)
+          .build();
+        logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+        rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+                                       WonMessageEncoder.encodeAsDataset(newWonMessage));
 
-        URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
+        URI connectionURIFromWonMessage = newWonMessage.getReceiverURI();
 
         Connection con = DataAccessUtils.loadConnection(
           connectionRepository, connectionURIFromWonMessage);
 
         messageEventRepository.save(new MessageEventPlaceholder(
-          connectionURIFromWonMessage, wonMessage));
+          connectionURIFromWonMessage, newWonMessage));
 
         //invoke facet implementation
-        reg.get(con).sendMessageFromNeed(con, message, wonMessage);
+        reg.get(con).sendMessageFromNeed(con, message, newWonMessage);
       } else {
 
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
