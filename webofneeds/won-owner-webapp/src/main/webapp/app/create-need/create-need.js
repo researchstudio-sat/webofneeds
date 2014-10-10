@@ -342,9 +342,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         var draftJson = draftBuilderObject.build();
         var draftURI = "http://localhost:8080/won/resource/need/" + utilService.getRandomInt(1,9223372036854775807);
         draftJson['@graph'][0]['@graph'][0]['@id'] = draftURI;
-        var createDraftObject = {draftURI:draftURI,draft:draftJson}
+        var createDraftObject = {"draftURI":draftURI,"draft":JSON.stringify(draftJson)};
 
-        needService.saveDraft(createDraftObject).then(function(){
+        needService.saveDraft(createDraftObject).then(function(draftURI){
            $scope.successShow = true;
 
         });

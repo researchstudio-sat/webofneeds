@@ -13,6 +13,7 @@ import javax.persistence.*;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * I used wonuser as table name because user is Postgres keyword - http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
@@ -46,8 +47,7 @@ public class User implements UserDetails{
   //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
   //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
   @ElementCollection( fetch = FetchType.EAGER)
-  @Column(name="draft", length=10000)
-  private List<String> drafts;
+  private Set<URI> draftURIs;
 
 	@Transient
 	private Collection<SimpleGrantedAuthority> authorities;
@@ -138,14 +138,14 @@ public class User implements UserDetails{
     return needURIs;
   }    */
 
-  public List<String> getDrafts(){
-    return drafts;
+  public Set<URI> getDraftURIs(){
+    return draftURIs;
   }
 	/*public void setNeeds(final List<Need> needs) {
 		this.needs = needs;
 	}     */
-  public void setDrafts(final List<String> drafts) {
-    this.drafts = drafts;
+  public void setDrafts(final Set<URI> draftURIs) {
+    this.draftURIs = draftURIs;
   }
   public void setNeedURIs(final List<URI> needURIs) {
     this.needURIs = needURIs;

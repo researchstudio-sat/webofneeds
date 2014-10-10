@@ -20,7 +20,7 @@
 
 package won.owner.repository;
 
-import won.owner.model.DraftState;
+import won.owner.model.Draft;
 import won.protocol.repository.WonRepository;
 
 import java.net.URI;
@@ -30,12 +30,12 @@ import java.util.List;
  * User: syim
  * Date: 11/7/13
  */
-public interface DraftStateRepository extends WonRepository<DraftState> {
+public interface DraftRepository extends WonRepository<Draft> {
 
-	public List<DraftState> findById(long id);
+	public List<Draft> findById(long id);
 
-  public List<DraftState> findByDraftURI(URI draftURI);
+  public Draft findOneByDraftURI(URI draftURI);
 
-  public List<DraftState> findByUserName(String userName);
+  public List<Draft> findByDraftURI(URI draftURI);
 
 }

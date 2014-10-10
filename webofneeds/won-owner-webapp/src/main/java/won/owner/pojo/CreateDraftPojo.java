@@ -16,10 +16,13 @@
 
 package won.owner.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * User: LEIH-NB
  * Date: 09.10.2014
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateDraftPojo
 {
 
@@ -30,7 +33,11 @@ public class CreateDraftPojo
   public CreateDraftPojo(){
 
   }
-  /*public DraftPojo(URI draftURI, Model content, DraftState draftState ){
+  public CreateDraftPojo(String draftURI, String draft){
+    this.draftURI = draftURI;
+    this.draft = draft;
+  }
+  /*public DraftPojo(URI draftURI, Model content, Draft draftState ){
     super(draftURI, content);
     this.setCurrentStep(draftState.getCurrentStep());
     this.setUserName(draftState.getUserName());

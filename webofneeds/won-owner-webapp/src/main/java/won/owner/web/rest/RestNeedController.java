@@ -19,13 +19,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import won.owner.linkeddata.NeedPojoNeedModelBuilder;
-import won.owner.model.DraftState;
+import won.owner.model.Draft;
 import won.owner.model.User;
 import won.owner.pojo.ConnectionPojo;
 import won.owner.pojo.CreateDraftPojo;
 import won.owner.pojo.DraftPojo;
 import won.owner.pojo.NeedPojo;
-import won.owner.repository.DraftStateRepository;
+import won.owner.repository.DraftRepository;
 import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
 import won.owner.service.impl.WONUserDetailService;
@@ -54,6 +54,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/rest/needs")
@@ -70,7 +71,7 @@ public class RestNeedController {
 
 
   @Autowired
-  private DraftStateRepository draftStateRepository;
+  private DraftRepository draftRepository;
 
 	@Autowired
 	private MatchRepository matchRepository;
@@ -92,6 +93,7 @@ public class RestNeedController {
 
 	@Autowired
 	private DataReloadService dataReloadService;
+
 
   @Autowired
   private LinkedDataSource linkedDataSource;
@@ -163,19 +165,20 @@ public class RestNeedController {
   )
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
-  public List<DraftPojo> getAllDrafts() {
+  public List<CreateDraftPojo> getAllDrafts() {
     User user = getCurrentUser();
-    List<DraftState> draftStates = draftStateRepository.findByUserName(user.getUsername());
-    Iterator<DraftState> draftIterator =  draftStates.iterator();
-    List<URI> draftURIs = new ArrayList<>();
-    while(draftIterator.hasNext()){
-      draftURIs.add(draftIterator.next().getDraftURI());
+
+    List<CreateDraftPojo> createDraftPojos = new ArrayList<>();
+    Set<URI> draftURIs = user.getDraftURIs();
+   Iterator<URI> draftURIIterator = draftURIs.iterator();
+    while(draftURIIterator.hasNext()){
+      URI draftURI = draftURIIterator.next();
+      Draft draft = draftRepository.findByDraftURI(draftURI).get(0);
+      CreateDraftPojo createDraftPojo = new CreateDraftPojo(draftURI.toString(), draft.getContent());
+      createDraftPojos.add(createDraftPojo);
     }
+    return createDraftPojos ;
 
-    LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
-    List<DraftPojo> returnList = new ArrayList<DraftPojo>();
-
-    return returnList;
   }
   /**
    * saves draft of a draft
@@ -191,16 +194,22 @@ public class RestNeedController {
   )
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
-  public String createDraft(@RequestBody CreateDraftPojo createDraftObject) throws ParseException {
+  public CreateDraftPojo createDraft(@RequestBody CreateDraftPojo createDraftObject) throws ParseException {
 
     User user = getCurrentUser();
-
-    user.getDrafts().add(createDraftObject.getDraft());
+    URI draftURI = URI.create(createDraftObject.getDraftURI());
+    user.getDraftURIs().add(draftURI);
     wonUserDetailService.save(user);
+    Draft draft = null;
+    draft = draftRepository.findOneByDraftURI(draftURI);
+    if(draft==null){
+      draft = new Draft(draftURI, createDraftObject.getDraft());
+    }
+    draft.setContent(createDraftObject.getDraft());
 
-    return createDraftObject.getDraftURI().toString();
+    draftRepository.save(draft);
 
-
+    return createDraftObject;
   }
 
   @ResponseBody
@@ -212,13 +221,13 @@ public class RestNeedController {
   @Transactional(propagation = Propagation.SUPPORTS)
   public ResponseEntity deleteDrafts() {
     try{
-      User user = getCurrentUser();
-      List<DraftState> draftStates = draftStateRepository.findByUserName(user.getUsername());
-      Iterator<DraftState> draftIterator =  draftStates.iterator();
+     /* User user = getCurrentUser();
+      List<Draft> draftStates = draftRepository.findByUserName(user.getUsername());
+      Iterator<Draft> draftIterator =  draftStates.iterator();
       List<URI> draftURIs = new ArrayList<>();
       while(draftIterator.hasNext()){
         draftURIs.add(draftIterator.next().getDraftURI());
-      }
+      }         */
     }catch (Exception e){
       return new ResponseEntity(HttpStatus.CONFLICT);
     }
@@ -238,7 +247,7 @@ public class RestNeedController {
     Need need = draftList.get(0);
 
     DraftPojo draftPojo = new DraftPojo(need.getNeedURI(),rdfStorage.loadModel(need.getNeedURI()),
-                                        draftStateRepository.findByDraftURI(need.getNeedURI()).get(0));
+                                        draftRepository.findByDraftURI(need.getNeedURI()).get(0));
     draftPojo.setNeedURI(need.getNeedURI().toString());
     return draftPojo;
   }
@@ -262,7 +271,7 @@ public class RestNeedController {
       /*
       user.removeNeeds(draftList);
       wonUserDetailService.save(user);
-      List<DraftState> draftStates = draftStateRepository.findByDraftURI(need.getNeedURI());
+      List<Draft> draftStates = draftStateRepository.findByDraftURI(need.getNeedURI());
       needRepository.delete(draftId);
       draftStateRepository.delete(draftStates);
       rdfStorage.removeContent(need.getNeedURI());     */

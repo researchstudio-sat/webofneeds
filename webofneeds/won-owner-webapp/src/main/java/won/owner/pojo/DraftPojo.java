@@ -1,7 +1,7 @@
 package won.owner.pojo;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import won.owner.model.DraftState;
+import won.owner.model.Draft;
 
 import java.net.URI;
 
@@ -19,10 +19,8 @@ public class DraftPojo extends NeedPojo
   public DraftPojo(){
 
   }
-  public DraftPojo(URI draftURI, Model content, DraftState draftState ){
+  public DraftPojo(URI draftURI, Model content, Draft draftState ){
     super(draftURI, content);
-    this.setCurrentStep(draftState.getCurrentStep());
-    this.setUserName(draftState.getUserName());
   }
   public int getCurrentStep() {
     return currentStep;
