@@ -299,12 +299,14 @@ angular.module('won.owner')
     // Incoming Requests
     $scope.clickOnDeclineForInRequest = function() {
         console.log('decline clicked');
+
         $scope.showConfirmationDialogForDeclineRequest = true;
     }
 
     $scope.clickOnAcceptForInRequest = function() {
         console.log('accept clicked');
         // TODO add parameter for displaying specific stuff on private-link page
+        wonService.open($scope.chosenMessage.connection.uri);
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
@@ -406,6 +408,7 @@ angular.module('won.owner')
 
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');
+        $scope.chosenMessage = null;
         $location.path('/private-link');
     }
 

@@ -27,5 +27,4 @@
 
         <bean id="ownerApplicationService" class="won.owner.service.impl.OwnerApplicationService"/>
 
-
 </beans>

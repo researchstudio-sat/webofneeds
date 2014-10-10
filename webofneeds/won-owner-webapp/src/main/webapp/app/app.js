@@ -198,6 +198,7 @@ app.run(function($httpBackend,$rootScope){
 
         //$httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
         $httpBackend.whenPOST('/owner/rest/needs/').passThrough();
+        $httpBackend.whenGET('/owner/rest/needs/').passThrough();
         $httpBackend.whenGET('/owner/rest/needs/drafts').passThrough();
         $httpBackend.whenPOST('/owner/rest/needs/drafts').passThrough();
         $httpBackend.whenDELETE('/owner/rest/needs/drafts').passThrough();
