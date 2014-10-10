@@ -231,6 +231,8 @@
         won.UNREAD.TYPE.MESSAGE = "message";
         won.UNREAD.TYPE.CONNECT = "connect";
         won.UNREAD.TYPE.CLOSE = "close";
+        won.UNREAD.TYPES = [won.UNREAD.TYPE.CREATED, won.UNREAD.TYPE.HINT,
+            won.UNREAD.TYPE.MESSAGE, won.UNREAD.TYPE.CONNECT, won.UNREAD.TYPE.CLOSE];
         won.UNREAD.GROUP = {};
         won.UNREAD.GROUP.ALL="all";
         won.UNREAD.GROUP.BYNEED="byNeed";
