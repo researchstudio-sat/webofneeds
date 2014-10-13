@@ -39,7 +39,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     privateData.filters[won.UNREAD.TYPE.CREATED] =    { 'eventType' : won.EVENT.NEED_CREATED };
     privateData.filters[won.UNREAD.TYPE.HINT] =    { 'eventType' : won.EVENT.HINT_RECEIVED };
     privateData.filters[won.UNREAD.TYPE.MESSAGE] = { 'eventType' : won.EVENT.CONNECTION_MESSAGE_RECEIVED };
-    privateData.filters[won.UNREAD.TYPE.CONNECT] = { 'eventType' : [won.EVENT.CONNECT_RECEIVED, won.EVENT.OPEN_RECEIVED] };
+    privateData.filters[won.UNREAD.TYPE.CONNECT] = { 'eventType' : [won.EVENT.CONNECT_RECEIVED, won.EVENT.OPEN_RECEIVED , won.EVENT.CONNECT_SENT]};
     privateData.filters[won.UNREAD.TYPE.CLOSE] =   { 'eventType' : won.EVENT.CLOSE_RECEIVED };
 
     //if we have a current need, that's its URI
@@ -88,12 +88,12 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     var createOrUpdateUnreadEntry = function(needURI, eventData, unreadEntry){
 
         if(unreadEntry == null || typeof unreadEntry === 'undefined'){
-            unreadEntry = {};
+            unreadEntry = {"events" : []};
             //unreadEntry.events = [];
             unreadEntry.count = 0;
         }
         unreadEntry.events.push(eventData);
-        unreadEntry.timestamp=eventData.timeStamp;
+        unreadEntry.timestamp=eventData.timestamp;
         //unreadEntry.need = privateData.allNeeds[needURI];
         unreadEntry.count ++;
         return unreadEntry;
@@ -106,6 +106,8 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             case won.EVENT.HINT_RECEIVED:unreadEventType = won.UNREAD.TYPE.HINT;
                 break;
             case won.EVENT.CONNECT_RECEIVED: unreadEventType = won.UNREAD.TYPE.CONNECT;
+                break;
+            case won.EVENT.CONNECT_SENT: unreadEventType = won.UNREAD.TYPE.CONNECT;
                 break;
             case won.EVENT.OPEN_RECEIVED:unreadEventType = won.UNREAD.TYPE.CONNECT;
                 break;

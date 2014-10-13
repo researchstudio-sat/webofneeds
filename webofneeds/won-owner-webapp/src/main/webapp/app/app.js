@@ -165,6 +165,11 @@ app.directive('header', function(){
                         return 'Outgoing Request';
                     }
                     return 'Incoming Request';
+                case won.WONMSG.connectSentMessage:
+                    if (lastConEvent.event.hasReceiverNeed == lastConEvent.remoteNeed.uri){
+                        return 'Outgoing Request';
+                    }
+                    return 'Incoming Request';
                 case won.WONMSG.hintMessage:
                     return 'Matches';
                 default:

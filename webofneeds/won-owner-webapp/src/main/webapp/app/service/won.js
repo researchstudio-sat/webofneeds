@@ -179,6 +179,8 @@
         won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
         won.WONMSG.connectMessage = won.WONMSG.baseUri + "ConnectMessage";
         won.WONMSG.connectMessageCompacted = won.WONMSG.prefix + ":ConnectMessage";
+        won.WONMSG.connectSentMessage = won.WONMSG.baseUri + "ConnectSentMessage";
+        won.WONMSG.connectSentMessageCompacted = won.WONMSG.prefix + ":ConnectSentMessage";
         won.WONMSG.needStateMessage = won.WONMSG.baseUri + "NeedStateMessage";
         won.WONMSG.needStateMessageCompacted = won.WONMSG.prefix + ":NeedStateMessage";
         won.WONMSG.closeMessage = won.WONMSG.baseUri + "CloseMessage";
@@ -213,7 +215,7 @@
         won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
         won.EVENT.NEED_CREATED = "NeedCreatedEvent";
         won.EVENT.HINT_RECEIVED = "HintReceivedEvent";
-        won.EVENT.CONNECT.SENT ="ConnectSentEvent";
+        won.EVENT.CONNECT_SENT ="ConnectSentEvent";
         won.EVENT.CONNECT_RECEIVED = "ConnectReceivedEvent";
         won.EVENT.OPEN_SENT = "OpenSentEvent";
         won.EVENT.OPEN_RECEIVED = "OpenReceivedEvent";

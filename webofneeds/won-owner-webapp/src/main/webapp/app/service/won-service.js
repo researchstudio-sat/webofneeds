@@ -69,6 +69,10 @@ angular.module('won.owner').factory('wonService', function (
         eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeed]);
         //wonService.open(eventData.framedMessage[won.WONMSG.hasReceiver()]);
     }
+    var processConnectSentMessage = function(eventData, message){
+        console.log("processing ConnectSent Message");
+
+    }
 
     /**
      * Updates the local triple store with the data contained in the hint message.
@@ -105,6 +109,7 @@ angular.module('won.owner').factory('wonService', function (
     var messageTypeToEventType = {};
     messageTypeToEventType[won.WONMSG.hintNotificationMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED, handler: processHintNotificationMessage};
     messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:processConnectMessage};
+    messageTypeToEventType[won.WONMSG.connectSentMessageCompacted] = {eventType: won.EVENT.CONNECT_SENT, handler: processConnectSentMessage}
     messageTypeToEventType[won.WONMSG.openMessageCompacted] = {eventType: won.EVENT.OPEN_RECEIVED, handler:processOpenMessage};
     messageTypeToEventType[won.WONMSG.closeMessageCompacted] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:processCloseMessage};
     messageTypeToEventType[won.WONMSG.connectionMessageCompacted] = {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED, handler:null};
@@ -289,7 +294,32 @@ angular.module('won.owner').factory('wonService', function (
         );
 
     }
+    //TODO: only added for testing, remove it afterwards
+    var getEventData = function(json) {
+        console.log("getting data from jsonld message");
+        var eventData = {};
+        //call handler if there is one - it may modify the event object
+        //frame the incoming jsonld to get the data that interest us
+        var frame = {"@context": {
+            "won": "http://purl.org/webofneeds/model#",
+            "msg": "http://purl.org/webofneeds/message#" //message is the default vocabulary
+        },
+            "msg:hasMessageType": { }
+        };
+        //copy data from the framed message to the event object
+        var framedMessage = jsonld.frame(json, frame);
+        for (key in framedMessage) {
+            var propName = won.getLocalName(key);
+            if (propName != null && !won.isJsonLdKeyword(propName)) {
+                eventData[propName] = won.getSafeJsonLdValue(framedMessage[key]);
+            }
+        }
+        eventData.uri = won.getSafeJsonLdValue(framedMessage);
+        eventData.framedMessage = framedMessage;
+        console.log("done copying the data to the event object, returning the result");
 
+        return eventData;
+    }
     /**
      * Opens the existing connection specified by connectionUri.
      * @param need1
@@ -330,6 +360,52 @@ angular.module('won.owner').factory('wonService', function (
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
+                // ideally should be in callback, but since there is no response coming,
+                // right now I put it in timeout, so that the close event and connection
+                // update has some time to be saved on the won-node before it gets fetched here.
+                // As soon as getting the response for this sent message work, and the equivalent to
+                // below implementation inside the callback works,  all the setTimeout() with its
+                // inside should be removed
+                setTimeout(
+                    function(){
+                        //linkedDataService.fetch(connection.uri);
+                        //console.log("publishing angular event");
+                        //$rootScope.$broadcast(won.EVENT.CLOSE_SENT, eventData);
+                        var messageTemp = new won.MessageBuilder(won.WONMSG.connectSentMessage)
+                            .eventURI(eventUri)
+                            .forEnvelopeData(envelopeData)
+                            .hasFacet(won.WON.OwnerFacet)
+                            .hasRemoteFacet(won.WON.OwnerFacet)
+                            .build();
+                        var eventData = getEventData(messageTemp);
+                      //  eventData.eventType = messageTypeToEventType[eventData.hasMessageType];
+                        eventData.eventType = won.EVENT.CONNECT_SENT;
+                        linkedDataService.fetch(eventData.hasSender)
+                            .then(
+                            function (value) {
+                                linkedDataService.fetch(eventUri)
+                                    .then(
+                                    function(value2) {
+                                        console.log("publishing angular event");
+
+                                        //eventData.eventType = won.EVENT.CLOSE_SENT;
+                                        eventData.timestamp = new Date().getTime();
+                                        $rootScope.$broadcast(won.EVENT.CONNECT_SENT, eventData);
+                                        //$rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
+
+                                    }, won.reportError("cannot fetch closed event " + eventUri)
+                                );
+                            }, won.reportError("cannot fetch closed connection " +eventUri)
+                        );
+
+                    }, 3000);
+
+
+            //    var handleIncomingMessage = createIncomingMessageCallback();
+            //    handleIncomingMessage.action(getEventData(message), message);
+
+
+
             } catch (e) {
                 console.log("could not open suggested connection " + connectionUri + ". Reason" + e);
             }
