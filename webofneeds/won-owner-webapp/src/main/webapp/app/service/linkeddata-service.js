@@ -79,45 +79,137 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return deferred.promise;
     }
 
-    privateData.deferredsForUrisBeingFetched = {}; //uri -> list of promise
-
-    var isBeingFetched = function(uri){
-        return typeof privateData.deferredsForUrisBeingFetched[uri] !== 'undefined' && privateData.deferredsForUrisBeingFetched[uri] != null;
-    }
-
-    var addDeferredForUriBeingFetched = function(deferred, uri){
-        var deferreds = privateData.deferredsForUrisBeingFetched[uri]
-        if (typeof deferreds === 'undefined' || deferreds == null){
-            privateData.deferredsForUrisBeingFetched[uri] = [];
-            deferreds = privateData.deferredsForUrisBeingFetched[uri];
-            console.log("new fetch:       " + uri);
-        } else {
-            console.log("already fetching: " + uri);
-        }
-        deferreds.push(deferred);
-    }
-    
-    var resolveDeferredsForUrisBeingFetched = function(uri, value){
-        var deferreds = privateData.deferredsForUrisBeingFetched[uri]
-        if (deferreds != null) {
-            for (key in deferreds){
-                console.log("delivering reslt:" + uri);
-                deferreds[key].resolve(value);
+    /**
+     * An emulation of a lock that can be acquired by any number of readers
+     * as long as there is no updater trying to acquire it. An updater that tries
+     * to acquire the lock is blocked until all readers have released their lock.
+     * All updaters acquiring the lock are blocked until the update function is execeuted,
+     * then all writers are unblocked. The update function can be passed with every
+     * acquireUpdateLock(function) call, but the function passed in the first call
+     * since the last update is really used.
+     *
+     * @constructor
+     */
+    var ReadUpdateLock = function(uri){
+        //arrays holding deferred objects until they may proceeed
+        this.uri = uri;
+        this.blockedUpdaters = [];
+        this.blockedReaders = [];
+        //number of readers currently in possession of the lock
+        this.activeReaderCount = 0;
+        this.updateInProgress = false;
+        this.updateFunction = null;
+    };
+    ReadUpdateLock.prototype = {
+        constructor: won.ReadUpdateLock,
+        acquireReadLock: function(){
+            var deferred = $q.defer();
+            if (this.updateInProgress || this.blockedUpdaters.length > 0){
+                //updates are already in progress or are waiting. block.
+                console.log("rul:read:block:  " + this.uri);
+                this.blockedReaders.push(deferred);
+            } else {
+                //nobody wishes to update the resource, the caller may read it
+                //add the deferred execution to the blocked list, just in case
+                //there are others blocket there, and then grant access to all
+                console.log("rul:read:grant:  " + this.uri);
+                this.blockedReaders.push(deferred);
+                this.grantLockToReaders();
+            }
+            return deferred.promise;
+        },
+        runAsUpdate: function(updateFunction){
+            if (this.updateFunction == null) {
+                this.updateFunction = updateFunction;
+            }
+            var deferred = $q.defer();
+            if (this.activeReaderCount > 0 ) {
+                //readers are present, we have to wait till they are done
+                console.log("rul:updt:block:  " + this.uri);
+                this.blockedUpdaters.push(deferred);
+            } else {
+                console.log("rul:updt:grant:  " + this.uri);
+                //add the deferred update to the list of blocked updates just
+                //in case there are more, then grant the lock to all of them
+                this.blockedUpdaters.push(deferred);
+                this.grantLockToUpdaters();
+            }
+            return deferred.promise;
+        },
+        releaseReadLock: function(){
+            this.activeReaderCount --;
+            if (this.activeReaderCount < 0){
+                throw {message: "Released a read lock that was never acquired"}
+            } else if (this.activeReaderCount == 0) {
+                //no readers currently have a lock: we can update - if we should
+                this.grantLockToUpdaters();
+            }
+        },
+        grantLockToUpdaters: function() {
+            if (this.blockedUpdaters.length > 0 && ! this.updateInProgress) {
+                console.log("rul:updt:all:    " + this.uri + "(unblocking " + this.blockedUpdaters.length +")");
+                //there are blocked updaters. let them proceed.
+                this.updateInProgress = true;
+                var updatePromise = null;
+                if (this.updateFunction != null){
+                    updatePromise = this.updateFunction();
+                    this.updateFunction = null;
+                }
+                if (updatePromise == null){
+                    var deferred = $q.defer();
+                    deferred.resolve();
+                    updatePromise = deferred.promise;
+                }
+                var that = this;
+                updatePromise.then(
+                    function(value){
+                        for (var i = 0; i < that.blockedUpdaters.length; i++) {
+                            var deferredUpdate = that.blockedUpdaters[i];
+                            deferredUpdate.resolve(value);
+                            that.blockedUpdaters.splice(i, 1);
+                            i--;
+                        }
+                        that.updateInProgress = false;
+                    },
+                    function(reason){
+                        for (var i = 0; i < that.blockedUpdaters.length; i++) {
+                            var deferredUpdate = that.blockedUpdaters[i];
+                            deferredUpdate.reject(reason);
+                            that.blockedUpdaters.splice(i, 1);
+                            i--;
+                        }
+                        that.updateInProgress = false;
+                    }
+                );
+            }
+        },
+        grantLockToReaders: function() {
+            if (this.blockedReaders.length > 0) {
+                console.log("rul:readers:all: " + this.uri + "(unblocking " + this.blockedReaders.length +")");
+                //there are blocked readers. let them proceed.
+                for (var i = 0; i < this.blockedReaders.length; i++) {
+                    var deferredRead = this.blockedReaders[i];
+                    this.activeReaderCount++;
+                    deferredRead.resolve();
+                    this.blockedReaders.splice(i, 1);
+                    i--;
+                }
             }
         }
-        delete privateData.deferredsForUrisBeingFetched[uri];
-    }
 
-    var rejectDeferredsForUrisBeingFetched = function(uri, value){
-        var deferreds = privateData.deferredsForUrisBeingFetched[uri]
-        if (typeof deferreds !== 'undefined' && deferreds != null) {
-            for (key in deferreds){
-                deferreds[key].reject("failed to load uri: " + uri +". Reason: "+ value);
-            }
+    };
+
+    privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
+
+
+    var getReadUpdateLockPerUri = function(uri){
+        var lock = privateData.readUpdateLocksPerUri[uri];
+        if (typeof lock === 'undefined' || lock == null) {
+            lock = new ReadUpdateLock(uri);
+            privateData.readUpdateLocksPerUri[uri] = lock;
         }
-        delete privateData.deferredsForUrisBeingFetched[uri];
+        return lock;
     }
-
 
 
     /**
@@ -164,43 +256,48 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "fetch: uri must not be null"};
         }
-        console.log("fetch starts:    " + uri);
-        var deferred = $q.defer();
-        //check if this is the first requrest
-        var first = ! isBeingFetched(uri);
-        //add the deferred to the list of deferreds for the uri
-        addDeferredForUriBeingFetched(deferred, uri);
-        if (first) {
-            //actually do load data
-            try {
-                console.log("deleting :       " + uri);
-                var query = "delete where {<"+uri+"> ?anyP ?anyO}";
-                privateData.store.execute(query, function (success, graph) {
-
-                    if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
-                        return;
-                    }
-                    console.log("deleted:         " + uri)
-                });
-                //the execute call above is not asynchronous, so we can safely continue outside the callback.
-                console.log("fetching:        " + uri);
-                privateData.store.load('remote', uri, function (success, results) {
-                    $rootScope.$apply(function () {
-                        if (success) {
-                            console.log("fetched:         " + uri)
-                            resolveDeferredsForUrisBeingFetched(uri, success);
-                        } else {
-                            rejectDeferredsForUrisBeingFetched(uri, "failed to load " + uri);
+        console.log("fetch announced: " + uri);
+        return getReadUpdateLockPerUri(uri)
+            .runAsUpdate(
+                function() {
+                    var deferred = $q.defer();
+                    console.log("updating:        " + uri);
+                    try {
+                        console.log("deleting :       " + uri);
+                        var query = "delete where {<" + uri + "> ?anyP ?anyO}";
+                        var failed = {};
+                        privateData.store.execute(query, function (success, graph) {
+                            if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
+                                failed.failed = true;
+                                return;
+                            }
+                            console.log("deleted:         " + uri)
+                        });
+                        if (failed.failed) {
+                            return deferred.promise;
                         }
-                    });
-                });
-            } catch (e) {
-                $rootScope.$apply(function () {
-                    rejectDeferredsForUrisBeingFetched(uri, e);
-                });
-            }
-        }
-        return deferred.promise;
+                        //the execute call above is not asynchronous, so we can safely continue outside the callback.
+                        console.log("fetching:        " + uri);
+                        privateData.store.load('remote', uri, function (success, results) {
+                            $rootScope.$apply(function () {
+                                if (success) {
+                                    console.log("fetched:         " + uri)
+                                    deferred.resolve(uri);
+                                    return deferred.promise;
+                                } else {
+                                    $q.reject("failed to load " + uri);
+                                    return deferred.promise;
+                                }
+                            });
+                        });
+                    } catch (e) {
+                        $rootScope.$apply(function () {
+                            deferred.reject("failed to load " + uri + ". Reason: " + e);
+                        });
+                    }
+                    return deferred.promise;
+                }
+            );
     }
 
     /**
@@ -215,23 +312,25 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         console.log("ensuring loaded: " +uri);
 
         var deferred = $q.defer();
-        if (isBeingFetched(uri)){
-            //The uri is being fetched. Add the deferred object to the list of deferred objects that
-            //will be resolved/rejected in response to fetching the uri
-            addDeferredForUriBeingFetched(deferred, uri);
-            return deferred;
-        }
-        // The uri is not being fetched. Check if it exists as subject in the store, if not, fetch it.
-        privateData.store.node(uri, function (success, mygraph) {
-            if (success && mygraph.triples.length > 0) {
-                deferred.resolve(true);
-            } else {
-                deferred.resolve(false);
+
+        var lock = getReadUpdateLockPerUri(uri);
+        return lock.acquireReadLock().then(function() {
+            try {
+                privateData.store.node(uri, function (success, mygraph) {
+
+                    if (success && mygraph.triples.length > 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+            } finally {
+                lock.releaseReadLock();
             }
-        });
-        return deferred.promise.then(
+        }).then(
             function(isAlreadyLoaded){
                 if (isAlreadyLoaded) {
+                    console.log("already loaded:  " +uri);
                     return true;
                 } else {
                     return linkedDataService.fetch(uri);
@@ -260,62 +359,69 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "getNeed: uri must not be null"};
         }
-       return linkedDataService.ensureLoaded(uri).then(function(){
-            try {
-                var resultObject = null;
-                var query =
-                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-                    "prefix " + "dc" + ":<" + "http://purl.org/dc/elements/1.1/>\n" +
-                    "prefix " + "geo" + ":<" + "http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
-                    "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime where { " +
-                    //TODO: add as soon as named graphs are handled by the rdf store
-                    //
-                    //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
-                    //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
-                    //                "GRAPH ?coreURI {"+
-                    "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ." +
-                    "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ." +
-                    "?content dc:title ?title ." +
-                    "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}" +
-                    "OPTIONAL {?content " + "geo:latitude" + " ?latitude .}" +
-                    "OPTIONAL {?content " + "geo:longitude" + " ?longitude .}" +
-                    "OPTIONAL {?content " + won.WON.hasEndTimeCompacted + " ?endTime .}" +
-                    "OPTIONAL {?content " + won.WON.hasRecurInfiniteTimesCompacted + " ?recurInfinite .}" +
-                    "OPTIONAL {?content " + won.WON.hasRecursInCompacted + " ?recursIn .}" +
-                    "OPTIONAL {?content " + won.WON.hasStartTimeCompacted + " ?startTime .}" +
-                    "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}" +
-                    "OPTIONAL {?content " + won.WON.hasTextDescriptionCompacted + " ?textDescription ." +
-                    //TODO: add as soon as named graphs are handled by the rdf store
-                    //                "}" +
-                    //                "GRAPH ?metaURI {" +
-                    "<" + uri + ">" + " <" + "http://purl.org/dc/terms/created" + "> " + "?creationDate ." +
-                    "<" + uri + ">" + won.WON.hasConnectionsCompacted + " ?connections ." +
-                    "<" + uri + ">" + won.WON.hasWonNodeCompacted + " ?wonNode ." +
-                    "<" + uri + ">" + won.WON.isInStateCompacted + " ?state ." +
-                    "OPTIONAL {<" + uri + "> " + won.WON.hasEventContainerCompacted + " ?eventContainer .}" +
-                    "OPTIONAL {?eventContainer " + "rdfs:member" + " ?event .}" +
-                    //TODO: add as soon as named graphs are handled by the rdf store
-                    //                "}" +
-                    "}}";
-                resultObject = {};
-                privateData.store.execute(query, [], [], function (success, results) {
-                    if (rejectIfFailed(success, results,{message : "Could not load need " + uri +".", allowNone : false, allowMultiple: false})){
-                        return;
-                    }
-                    var result = results[0];
-                    resultObject.uri = uri;
-                    resultObject.basicNeedType = getSafeValue(result.basicNeedType);
-                    resultObject.title = getSafeValue(result.title);
-                    resultObject.tags = getSafeValue(result.tags);
-                    resultObject.textDescription = getSafeValue(result.textDescription);
-                    resultObject.creationDate = getSafeValue(result.creationDate);
-                });
-                return resultObject;
-            } catch (e){
-                $q.reject("could not load need " + uri + ". Reason: " + e);
-            }
-        });
+       return linkedDataService.ensureLoaded(uri).then(
+           function() {
+               var lock = getReadUpdateLockPerUri(uri);
+               return lock.acquireReadLock().then(
+                   function () {
+                       try {
+                           var resultObject = null;
+                           var query =
+                               "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                               "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+                               "prefix " + "dc" + ":<" + "http://purl.org/dc/elements/1.1/>\n" +
+                               "prefix " + "geo" + ":<" + "http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
+                               "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime where { " +
+                               //TODO: add as soon as named graphs are handled by the rdf store
+                               //
+                               //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
+                               //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
+                               //                "GRAPH ?coreURI {"+
+                               "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ." +
+                               "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ." +
+                               "?content dc:title ?title ." +
+                               "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}" +
+                               "OPTIONAL {?content " + "geo:latitude" + " ?latitude .}" +
+                               "OPTIONAL {?content " + "geo:longitude" + " ?longitude .}" +
+                               "OPTIONAL {?content " + won.WON.hasEndTimeCompacted + " ?endTime .}" +
+                               "OPTIONAL {?content " + won.WON.hasRecurInfiniteTimesCompacted + " ?recurInfinite .}" +
+                               "OPTIONAL {?content " + won.WON.hasRecursInCompacted + " ?recursIn .}" +
+                               "OPTIONAL {?content " + won.WON.hasStartTimeCompacted + " ?startTime .}" +
+                               "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}" +
+                               "OPTIONAL {?content " + won.WON.hasTextDescriptionCompacted + " ?textDescription ." +
+                               //TODO: add as soon as named graphs are handled by the rdf store
+                               //                "}" +
+                               //                "GRAPH ?metaURI {" +
+                               "<" + uri + ">" + " <" + "http://purl.org/dc/terms/created" + "> " + "?creationDate ." +
+                               "<" + uri + ">" + won.WON.hasConnectionsCompacted + " ?connections ." +
+                               "<" + uri + ">" + won.WON.hasWonNodeCompacted + " ?wonNode ." +
+                               "<" + uri + ">" + won.WON.isInStateCompacted + " ?state ." +
+                               "OPTIONAL {<" + uri + "> " + won.WON.hasEventContainerCompacted + " ?eventContainer .}" +
+                               "OPTIONAL {?eventContainer " + "rdfs:member" + " ?event .}" +
+                               //TODO: add as soon as named graphs are handled by the rdf store
+                               //                "}" +
+                               "}}";
+                           resultObject = {};
+                           privateData.store.execute(query, [], [], function (success, results) {
+                               if (rejectIfFailed(success, results, {message: "Could not load need " + uri + ".", allowNone: false, allowMultiple: false})) {
+                                   return;
+                               }
+                               var result = results[0];
+                               resultObject.uri = uri;
+                               resultObject.basicNeedType = getSafeValue(result.basicNeedType);
+                               resultObject.title = getSafeValue(result.title);
+                               resultObject.tags = getSafeValue(result.tags);
+                               resultObject.textDescription = getSafeValue(result.textDescription);
+                               resultObject.creationDate = getSafeValue(result.creationDate);
+                           });
+                           return resultObject;
+                       } catch (e) {
+                           $q.reject("could not load need " + uri + ". Reason: " + e);
+                       } finally {
+                           lock.releaseReadLock();
+                       }
+                   })
+               });
     }
 
     /**
@@ -332,26 +438,33 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof propertyURI === 'undefined' || propertyURI == null  ){
             throw {message : "getUniqueObjectOfProperty: propertyURI must not be null"};
         }
-        return linkedDataService.ensureLoaded(resourceURI)
-            .then(function () {
-                try {
-                    var resultData = {};
-                    privateData.store.node(resourceURI, function (success, graph) {
-                        if (rejectIfFailed(success, graph,{message : "Error loading object of property " + propertyURI + " of resource " + resourceURI + ".", allowNone : false, allowMultiple: true})){
-                            return;
+        return linkedDataService.ensureLoaded(resourceURI).then(
+            function(){
+                var lock = getReadUpdateLockPerUri(resourceURI);
+                return lock.acquireReadLock().then(
+                    function () {
+                        try {
+                            var resultData = {};
+                            privateData.store.node(resourceURI, function (success, graph) {
+                                if (rejectIfFailed(success, graph,{message : "Error loading object of property " + propertyURI + " of resource " + resourceURI + ".", allowNone : false, allowMultiple: true})){
+                                    return;
+                                }
+                                var results = graph.match(resourceURI, propertyURI, null);
+                                if (rejectIfFailed(success, results,{message : "Error loading object of property " + propertyURI + " of resource " + resourceURI + ".", allowNone : false, allowMultiple: false})){
+                                    return;
+                                }
+                                resultData.result = results.triples[0].object.nominalValue;
+                            });
+                            return resultData.result;
+                        } catch (e) {
+                            $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
+                        } finally {
+                            lock.releaseReadLock();
                         }
-                        var results = graph.match(resourceURI, propertyURI, null);
-                        if (rejectIfFailed(success, results,{message : "Error loading object of property " + propertyURI + " of resource " + resourceURI + ".", allowNone : false, allowMultiple: false})){
-                            return;
-                        }
-                        resultData.result = results.triples[0].object.nominalValue;
-                    });
-                    return resultData.result;
-                } catch (e) {
-                    $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
-                }
-                $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
-            });
+                        $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
+                    }
+                );
+            })
     }
 
     linkedDataService.getWonNodeUriOfNeed = function(needUri){
@@ -482,25 +595,33 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "refreshConnectionEventContainer: connectionUri must not be null"};
         }
-        return linkedDataService.ensureLoaded(connectionUri).then(function(success) {
-            try {
-                var subject = connectionUri;
-                var predicate = won.WON.hasEventContainer;
-                privateData.store.node(connectionUri, function (success, graph) {
-                    var resultGraph = graph.match(subject, predicate, null);
-                    if (resultGraph != null && resultGraph.length > 0) {
-                        for (key in resultGraph.triples) {
-                            var containerURI = resultGraph.triples[key].object.nominalValue;
-                            //TODO: here, we fetch, but if we knew that the connections container didn't change
-                            //we could just ensureLoaded. See https://github.com/researchstudio-sat/webofneeds/issues/109
-                            return linkedDataService.fetch(containerURI);
+        return linkedDataService.ensureLoaded(connectionUri).then(
+            function(){
+                var lock = getReadUpdateLockPerUri(connectionUri);
+                return lock.acquireReadLock().then(
+                    function() {
+                        try {
+                            var subject = connectionUri;
+                            var predicate = won.WON.hasEventContainer;
+                            privateData.store.node(connectionUri, function (success, graph) {
+                                var resultGraph = graph.match(subject, predicate, null);
+                                if (resultGraph != null && resultGraph.length > 0) {
+                                    for (key in resultGraph.triples) {
+                                        var containerURI = resultGraph.triples[key].object.nominalValue;
+                                        //TODO: here, we fetch, but if we knew that the connections container didn't change
+                                        //we could just ensureLoaded. See https://github.com/researchstudio-sat/webofneeds/issues/109
+                                        return linkedDataService.fetch(containerURI);
+                                    }
+                                }
+                            });
+                        } catch (e) {
+                            $q.reject("could not refresh connection event container for connection " + connectionUri +". Reason:", e);
+                        } finally {
+                            lock.releaseReadLock();
                         }
                     }
-                });
-            } catch (e) {
-                $q.reject("could not refresh connection event container for connection " + connectionUri +". Reason:", e);
-            }
-        });
+                );
+            });
     }
 
     linkedDataService.getLastEventOfConnection = function(connectionUri) {
@@ -564,46 +685,55 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "getconnectionUrisOfNeed: uri must not be null"};
         }
-        return linkedDataService.ensureLoaded(uri).then(function(success) {
-            try {
-                var subject = uri;
-                var predicate = won.WON.hasConnections;
-                var connectionsPromises = [];
-                privateData.store.node(uri, function (success, graph) {
-                    var resultGraph = graph.match(subject, predicate, null);
-                    if (resultGraph != null && resultGraph.length > 0) {
-                        for (key in resultGraph.triples) {
-                            var connectionsURI = resultGraph.triples[key].object.nominalValue;
-                            //TODO: here, we fetch, but if we knew that the connections container didn't change
-                            //we could just ensureLoaded. See https://github.com/researchstudio-sat/webofneeds/issues/109
-                            connectionsPromises.push(linkedDataService.fetch(connectionsURI).then(function (success) {
-                                var connectionUris = [];
-                                privateData.store.node(connectionsURI, function (success, graph) {
-                                    if (graph != null && graph.length > 0) {
-                                        var memberTriples = graph.match(connectionsURI, createNameNodeInStore("rdfs:member"), null);
-                                        for (var memberKey in memberTriples.triples) {
-                                            var member = memberTriples.triples[memberKey].object.nominalValue;
-                                            connectionUris.push(member);
-                                        }
+        return linkedDataService.ensureLoaded(uri).then(
+            function(){
+                var lock = getReadUpdateLockPerUri(uri);
+                return lock.acquireReadLock().then(
+                    function() {
+                        try {
+                            var subject = uri;
+                            var predicate = won.WON.hasConnections;
+                            var connectionsPromises = [];
+                            privateData.store.node(uri, function (success, graph) {
+                                var resultGraph = graph.match(subject, predicate, null);
+                                if (resultGraph != null && resultGraph.length > 0) {
+                                    for (key in resultGraph.triples) {
+                                        var connectionsURI = resultGraph.triples[key].object.nominalValue;
+                                        //TODO: here, we fetch, but if we knew that the connections container didn't change
+                                        //we could just ensureLoaded. See https://github.com/researchstudio-sat/webofneeds/issues/109
+                                        connectionsPromises.push(linkedDataService.fetch(connectionsURI).then(function (success) {
+                                            var connectionUris = [];
+                                            privateData.store.node(connectionsURI, function (success, graph) {
+                                                if (graph != null && graph.length > 0) {
+                                                    var memberTriples = graph.match(connectionsURI, createNameNodeInStore("rdfs:member"), null);
+                                                    for (var memberKey in memberTriples.triples) {
+                                                        var member = memberTriples.triples[memberKey].object.nominalValue;
+                                                        connectionUris.push(member);
+                                                    }
+                                                }
+                                            });
+                                            return connectionUris;
+                                        }));
                                     }
+                                }
+                            });
+                            return $q.all(connectionsPromises)
+                                .then(function (listOfLists) {
+                                    //for each hasConnections triple (should only be one, but hey) we get a list of connections.
+                                    //now flatten the list.
+                                    var merged = [];
+                                    merged = merged.concat.apply(merged, listOfLists);
+                                    return merged;
                                 });
-                                return connectionUris;
-                            }));
+                        } catch (e) {
+                            $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
+                        } finally {
+                            lock.releaseReadLock();
                         }
                     }
-                });
-                return $q.all(connectionsPromises)
-                    .then(function (listOfLists) {
-                        //for each hasConnections triple (should only be one, but hey) we get a list of connections.
-                        //now flatten the list.
-                        var merged = [];
-                        merged = merged.concat.apply(merged, listOfLists);
-                        return merged;
-                    });
-            } catch (e) {
-                $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
-            }
-         });
+                )
+            });
+
     }
     
     
@@ -628,34 +758,42 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
         }
-        return linkedDataService.fetch(connectionUri).then(function(success) {
-            try {
-                var eventUris = [];
-                var query =
-                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                    "select ?eventUri where { " +
-                    "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
-                    won.WON.hasEventContainerCompacted + " ?container.\n" +
-                    "?container rdfs:member ?eventUri. \n" +
-                    "}";
-                privateData.store.execute(query, [], [], function (success, results) {
-                    if (rejectIfFailed(success, results,{message : "Error loading all connection event URIs for connection " + connectionUri +".", allowNone : false, allowMultiple: true})){
-                        return;
-                    }
-                    for (var key in results) {
-                        var eventUri = getSafeValue(results[key].eventUri);
-                        if (eventUri != null) {
-                            eventUris.push(eventUri);
-                        }
-                    }
-                });
-                return eventUris;
-            } catch (e) {
-                $q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
-            }
-        });
+        return linkedDataService.fetch(connectionUri).then(
+            function(){
+               var lock = getReadUpdateLockPerUri(connectionUri);
+               return lock.acquireReadLock().then(
+                   function() {
+                       try {
+                           var eventUris = [];
+                           var query =
+                               "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                               "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+                               "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                               "select ?eventUri where { " +
+                               "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
+                               won.WON.hasEventContainerCompacted + " ?container.\n" +
+                               "?container rdfs:member ?eventUri. \n" +
+                               "}";
+                           privateData.store.execute(query, [], [], function (success, results) {
+                               if (rejectIfFailed(success, results,{message : "Error loading all connection event URIs for connection " + connectionUri +".", allowNone : false, allowMultiple: true})){
+                                   return;
+                               }
+                               for (var key in results) {
+                                   var eventUri = getSafeValue(results[key].eventUri);
+                                   if (eventUri != null) {
+                                       eventUris.push(eventUri);
+                                   }
+                               }
+                           });
+                           return eventUris;
+                       } catch (e) {
+                           $q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
+                       } finally {
+                           lock.releaseReadLock();
+                       }
+                   }
+               );
+            });
     }
 
     linkedDataService.crawlConnectionData = function(connectionUri){
@@ -682,39 +820,47 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastConnectioneventUri: connectionUri must not be null"};
         }
-        return linkedDataService.crawlConnectionData(connectionUri).then(function(success) {
-
-            try {
-                var resultObject = {};
-                var query =
-                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                    "select ?eventUri where { " +
-                    "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
-                    won.WON.hasEventContainerCompacted + " ?container.\n" +
-                    "?container rdfs:member ?eventUri. \n" +
-                    " optional { " +
-                    "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
-                    " } \n" +
-                    "} order by desc(?timestamp) limit 1";
-                privateData.store.execute(query, [], [], function (success, results) {
-                    if (rejectIfFailed(success, results,{message : "Error loading last connection event URI for connection " + connectionUri +".", allowNone : false, allowMultiple: false})){
-                        return;
-                    }
-                    for (var key in results) {
-                        var eventUri = getSafeValue(results[key].eventUri);
-                        if (eventUri != null) {
-                            resultObject.eventUri = eventUri;
-                            return;
+        return linkedDataService.crawlConnectionData(connectionUri).then(
+            function() {
+                var lock = getReadUpdateLockPerUri(connectionUri);
+                return lock.acquireReadLock().then(
+                    function (success) {
+                        try {
+                            var resultObject = {};
+                            var query =
+                                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+                                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                                "select ?eventUri where { " +
+                                "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
+                                won.WON.hasEventContainerCompacted + " ?container.\n" +
+                                "?container rdfs:member ?eventUri. \n" +
+                                " optional { " +
+                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                " } \n" +
+                                "} order by desc(?timestamp) limit 1";
+                            privateData.store.execute(query, [], [], function (success, results) {
+                                if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: false, allowMultiple: false})) {
+                                    return;
+                                }
+                                for (var key in results) {
+                                    var eventUri = getSafeValue(results[key].eventUri);
+                                    if (eventUri != null) {
+                                        resultObject.eventUri = eventUri;
+                                        return;
+                                    }
+                                }
+                            });
+                            return resultObject.eventUri;
+                        } catch (e) {
+                            $q.reject("Could not get last connection event URI for connection " + connectionUri + ". Reason: " + e);
+                        } finally {
+                            lock.releaseReadLock();
                         }
-                    }
-                });
-                return resultObject.eventUri;
-            } catch (e) {
-                $q.reject("Could not get last connection event URI for connection " + connectionUri +". Reason: " + e);
+                    })
             }
-        });
+        );
+
     }
 
     /**
@@ -727,32 +873,41 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "getNodeWithAttributes: uri must not be null"};
         }
-        return linkedDataService.ensureLoaded(uri).then(function(success) {
-            console.log("getNodeWithAttrs:" + uri);
-            try {
-                var node = {};
-                privateData.store.node(uri, function (success, graph) {
-                    if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
-                        return;
+        return linkedDataService.ensureLoaded(uri).then(
+            function(){
+                var lock = getReadUpdateLockPerUri(uri);
+                return lock.acquireReadLock().then(
+                    function() {
+                        console.log("getNodeWithAttrs:" + uri);
+                        try {
+                            var node = {};
+                            privateData.store.node(uri, function (success, graph) {
+                                if (graph.length == 0){
+                                    console.log("warn: could not load any attributes for node with uri: " + uri);
+                                }
+                                if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
+                                    return;
+                                }
+                                for (key in graph.triples) {
+                                    var propName = won.getLocalName(graph.triples[key].predicate.nominalValue);
+                                    node[propName] = graph.triples[key].object.nominalValue;
+                                }
+                            });
+                            node.uri = uri;
+                            return node;
+                        } catch (e) {
+                            $q.reject("could not get node " + uri + "with attributes: " + e);
+                        } finally {
+                            lock.releaseReadLock();
+                        }
                     }
-                    for (key in graph.triples) {
-                        var propName = won.getLocalName(graph.triples[key].predicate.nominalValue);
-                        node[propName] = graph.triples[key].object.nominalValue;
-                    }
-                });
-                if (node.length == 0){
-                    console.log("warn: could not load any attributes for uri: " + uri);
-                }
-                node.uri = uri;
-                return node;
-            } catch (e) {
-                $q.reject("could not get node " + uri + "with attributes: " + e);
-            }
-        });
+                )
+            });
     }
 
     /**
-     * Deletes all triples where the specified uri is the subect.
+     * Deletes all triples where the specified uri is the subect. May have side effects on concurrent
+     * reads on the rdf store if called without a read lock.
      */
     linkedDataService.deleteNode = function(uri){
         if (typeof uri === 'undefined' || uri == null  ){
