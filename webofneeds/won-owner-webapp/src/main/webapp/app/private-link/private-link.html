@@ -56,19 +56,17 @@
                                 <button id="3" ng-click="clickOnMessageButton(3)" type="button"
                                         class="btn btn-success"><img src="/owner/images/matches.svg">Matches</button>
                             </div>
-                            <table st-table="displayedMessages"
-                                   st-safe-src="lastEventOfEachConnectionOfCurrentNeed"
-                                   class="table table-bordered table-striped">
+                            <table class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
                                         <th>Type</th>
-                                        <th st-sort="remoteNeed.title">Title</th>
-                                        <th st-sort="event.hasCreationDate">Date</th>
+                                        <th ng-click="setSortParams('remoteNeed.title')">Title</th>
+                                        <th  ng-click="setSortParams('event.hasTimestamp')">Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr
-                                            ng-repeat="event in displayedMessages | messageTypeFilter:currentEventType ">
+                                            ng-repeat="event in lastEventOfEachConnectionOfCurrentNeed | messageTypeFilter:currentEventType | orderBy:sortedField:reversedSort">
                                         <td>
                                             <span style="display: none;">{{event.typeText}}</span>
                                             <i ng-class="getIconClass(event.typeText)" tooltip="{{event.typeText}}"/>
@@ -76,7 +74,7 @@
                                         <td><a style="font-weight:bold;" href=""
                                                ng-click="clickOnMessage(event)">{{event
                                             .remoteNeed.title}}</a></td>
-                                        <td>{{event.event.hasCreationDate | date}}</td>
+                                        <td>{{event.event.hasTimestamp | date}}</td>
                                     </tr>
                                 </tbody>
                             </table>
