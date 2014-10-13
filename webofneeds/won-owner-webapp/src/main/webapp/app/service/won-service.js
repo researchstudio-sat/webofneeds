@@ -66,7 +66,7 @@ angular.module('won.owner').factory('wonService', function (
         // --> in getLastEventForEachConnection... the 'connections' container is reloaded and the connect event should be loaded, too
         //extract hint information from message
         //call handler if there is one - it may modify the event object
-        eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeed]);
+        //eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeedCompacted]['@id']);
         //wonService.open(eventData.framedMessage[won.WONMSG.hasReceiver()]);
     }
 
@@ -77,14 +77,14 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processOpenMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        var connectionURI = eventData.hasLocalConnection;
-        if (connectionURI != null) {
-            linkedDataService.fetch(connectionURI);
-        }
+        //var connectionURI = eventData.hasLocalConnection;
+        //if (connectionURI != null) {
+        //    linkedDataService.fetch(connectionURI);
+        //}
         //extract hint information from message
         //call handler if there is one - it may modify the event object
-        eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeed]);
-        wonService.sendTextMessage(eventData.framedMessage[won.WONMSG.hasReceiver()], "Hi! this is an automatic greeting!");
+        //eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeedCompacted]['@id']);
+        //wonService.sendTextMessage(eventData.framedMessage[won.WONMSG.hasReceiver()], "Hi! this is an automatic greeting!");
     }
     /**
      * Updates the local triple store with the data contained in the hint message.

@@ -9,6 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>webofneeds</groupId>
+    <name>Utilities</name>
     <artifactId>won-utils</artifactId>
     <version>0.1-SNAPSHOT</version>
     <modules>

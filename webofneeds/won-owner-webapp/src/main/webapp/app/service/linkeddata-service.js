@@ -32,7 +32,6 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     privateData.store.setPrefix("won","http://purl.org/webofneeds/model#");
 
 
-
     var createNameNodeInStore = function(uri){
         return privateData.store.rdf.createNamedNode(privateData.store.rdf.resolve(uri));
     }
@@ -65,6 +64,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 results[key] = value;
                 if (!(--counter)) deferred.resolve(results);
             }, function(reason) {
+                console.log("warning: promise failed. Reason " + JSON.stringify(reason));
                 if (results.hasOwnProperty(key)) return;
                 results[key] = null;
                 handler(key, reason);
@@ -82,14 +82,17 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     privateData.deferredsForUrisBeingFetched = {}; //uri -> list of promise
 
     var isBeingFetched = function(uri){
-        return privateData.deferredsForUrisBeingFetched[uri] != null;
+        return typeof privateData.deferredsForUrisBeingFetched[uri] !== 'undefined' && privateData.deferredsForUrisBeingFetched[uri] != null;
     }
 
     var addDeferredForUriBeingFetched = function(deferred, uri){
         var deferreds = privateData.deferredsForUrisBeingFetched[uri]
-        if (deferreds == null){
+        if (typeof deferreds === 'undefined' || deferreds == null){
             privateData.deferredsForUrisBeingFetched[uri] = [];
             deferreds = privateData.deferredsForUrisBeingFetched[uri];
+            console.log("new fetch:       " + uri);
+        } else {
+            console.log("already fetching: " + uri);
         }
         deferreds.push(deferred);
     }
@@ -98,6 +101,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         var deferreds = privateData.deferredsForUrisBeingFetched[uri]
         if (deferreds != null) {
             for (key in deferreds){
+                console.log("delivering reslt:" + uri);
                 deferreds[key].resolve(value);
             }
         }
@@ -106,13 +110,15 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     var rejectDeferredsForUrisBeingFetched = function(uri, value){
         var deferreds = privateData.deferredsForUrisBeingFetched[uri]
-        if (deferreds != null) {
+        if (typeof deferreds !== 'undefined' && deferreds != null) {
             for (key in deferreds){
                 deferreds[key].reject("failed to load uri: " + uri +". Reason: "+ value);
             }
         }
         delete privateData.deferredsForUrisBeingFetched[uri];
     }
+
+
 
     /**
      * Checks the query results (success, data) as returned by store.execute or store.node
@@ -126,7 +132,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      */
     var rejectIfFailed = function(success, data, options){
         var errorMessage = null;
-        if (options == null) {
+        if (typeof options === 'undefined' || options == null) {
             options = {};
         }
         if (!options.message){
@@ -148,42 +154,51 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
 
     /**
-     * Fetches the linked data for the specified URI and saves it in the local triplestore.
+     * Deletes the node with specified uri from the local triplestore, then
+     * fetches the linked data for the specified uri and saves it
+     * in the local triplestore.
      * @param uri
      * @return a promise to a boolean which indicates success
      */
     linkedDataService.fetch = function(uri) {
-        console.log("fetching:        " + uri);
+        if (typeof uri === 'undefined' || uri == null  ){
+            throw {message : "fetch: uri must not be null"};
+        }
+        console.log("fetch starts:    " + uri);
         var deferred = $q.defer();
         //check if this is the first requrest
         var first = ! isBeingFetched(uri);
         //add the deferred to the list of deferreds for the uri
         addDeferredForUriBeingFetched(deferred, uri);
         if (first) {
-            linkedDataService.deleteNode(uri).then(
-                function() {
-                    //actually do load data
-                    try {
-                        console.log("fetching linked data: " + uri);
-                        privateData.store.load('remote', uri, function (success, results) {
-                            $rootScope.$apply(function () {
-                                if (success) {
-                                    console.log("fetched:         " + uri)
-                                    resolveDeferredsForUrisBeingFetched(uri, success);
-                                } else {
-                                    rejectDeferredsForUrisBeingFetched(uri, "failed to load " + uri);
-                                }
-                            });
-                        });
-                    } catch (e) {
-                        $rootScope.$apply(function () {
-                            rejectDeferredsForUrisBeingFetched(uri, e);
-                        });
+            //actually do load data
+            try {
+                console.log("deleting :       " + uri);
+                var query = "delete where {<"+uri+"> ?anyP ?anyO}";
+                privateData.store.execute(query, function (success, graph) {
+
+                    if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
+                        return;
                     }
-                }, function(reason){
-                    rejectDeferredsForUrisBeingFetched(uri, reason);
-                }
-            )
+                    console.log("deleted:         " + uri)
+                });
+                //the execute call above is not asynchronous, so we can safely continue outside the callback.
+                console.log("fetching:        " + uri);
+                privateData.store.load('remote', uri, function (success, results) {
+                    $rootScope.$apply(function () {
+                        if (success) {
+                            console.log("fetched:         " + uri)
+                            resolveDeferredsForUrisBeingFetched(uri, success);
+                        } else {
+                            rejectDeferredsForUrisBeingFetched(uri, "failed to load " + uri);
+                        }
+                    });
+                });
+            } catch (e) {
+                $rootScope.$apply(function () {
+                    rejectDeferredsForUrisBeingFetched(uri, e);
+                });
+            }
         }
         return deferred.promise;
     }
@@ -194,9 +209,19 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @return a promise to a boolean which indicates success
      */
     linkedDataService.ensureLoaded = function(uri) {
+        if (typeof uri === 'undefined' || uri == null  ){
+            throw {message : "ensureLoaded: uri must not be null"};
+        }
         console.log("ensuring loaded: " +uri);
 
         var deferred = $q.defer();
+        if (isBeingFetched(uri)){
+            //The uri is being fetched. Add the deferred object to the list of deferred objects that
+            //will be resolved/rejected in response to fetching the uri
+            addDeferredForUriBeingFetched(deferred, uri);
+            return deferred;
+        }
+        // The uri is not being fetched. Check if it exists as subject in the store, if not, fetch it.
         privateData.store.node(uri, function (success, mygraph) {
             if (success && mygraph.triples.length > 0) {
                 deferred.resolve(true);
@@ -221,6 +246,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @param jsonld the data
      */
     linkedDataService.storeJsonLdGraph = function(graphURI, jsonld) {
+        if (typeof graphURI === 'undefined' || graphURI == null  ){
+            throw {message : "storeJsonLdGraph: graphURI must not be null"};
+        }
         privateData.store.load("application/ld+json", jsonld, graphURI, function (success, results) {});
     }
 
@@ -229,6 +257,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @return the object or null if no data is found for that URI in the local datastore
      */
     linkedDataService.getNeed = function(uri) {
+        if (typeof uri === 'undefined' || uri == null  ){
+            throw {message : "getNeed: uri must not be null"};
+        }
        return linkedDataService.ensureLoaded(uri).then(function(){
             try {
                 var resultObject = null;
@@ -295,6 +326,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @returns {*}
      */
     linkedDataService.getUniqueObjectOfProperty = function(resourceURI, propertyURI){
+        if (typeof resourceURI === 'undefined' || resourceURI == null  ){
+            throw {message : "getUniqueObjectOfProperty: resourceURI must not be null"};
+        }
+        if (typeof propertyURI === 'undefined' || propertyURI == null  ){
+            throw {message : "getUniqueObjectOfProperty: propertyURI must not be null"};
+        }
         return linkedDataService.ensureLoaded(resourceURI)
             .then(function () {
                 try {
@@ -318,61 +355,76 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     }
 
     linkedDataService.getWonNodeUriOfNeed = function(needUri){
+        if (typeof needUri === 'undefined' || needUri == null  ){
+            throw {message : "getWonNodeUriOfNeed: needUri must not be null"};
+        }
         return linkedDataService.getUniqueObjectOfProperty(needUri, won.WON.hasWonNode)
             .then(
                 function(result){return result;},
                 function(reason) { $q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
     }
 
-    linkedDataService.getNeedUriOfConnection = function(connectionURI){
-        return linkedDataService.getUniqueObjectOfProperty(connectionURI, won.WON.belongsToNeed)
+    linkedDataService.getneedUriOfConnection = function(connectionUri){
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "getneedUriOfConnection: connectionUri must not be null"};
+        }
+        return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.belongsToNeed)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get need uri of connection " + connectionURI + ". Reason: " + reason)});
+                function(reason) { $q.reject("could not get need uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
-    linkedDataService.getRemoteConnectionUriOfConnection = function(connectionURI){
-        return linkedDataService.getUniqueObjectOfProperty(connectionURI, won.WON.hasRemoteConnection)
+    linkedDataService.getRemoteconnectionUriOfConnection = function(connectionUri){
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "getRemoteconnectionUriOfConnection: connectionUri must not be null"};
+        }
+        return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteConnection)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get remote connection uri of connection " + connectionURI + ". Reason: " + reason)});
+                function(reason) { $q.reject("could not get remote connection uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
-    linkedDataService.getRemoteNeedUriOfConnection = function(connectionURI){
-        return linkedDataService.getUniqueObjectOfProperty(connectionURI, won.WON.hasRemoteNeed)
+    linkedDataService.getRemoteneedUriOfConnection = function(connectionUri){
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "getRemoteneedUriOfConnection: connectionUri must not be null"};
+        }
+        return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteNeed)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get remote need uri of connection " + connectionURI + ". Reason: " + reason)});
+                function(reason) { $q.reject("could not get remote need uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
     /**
      * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
-     * to send a message via the specified connectionURI (that is interpreted as a local connection.
+     * to send a message via the specified connectionUri (that is interpreted as a local connection.
      * @param connectionUri
      * @returns a promise to the data
      */
     linkedDataService.getEnvelopeDataforConnection = function(connectionUri){
-        return linkedDataService.getNeedUriOfConnection(connectionUri)
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "getEnvelopeDataforConnection: connectionUri must not be null"};
+        }
+        return linkedDataService.getneedUriOfConnection(connectionUri)
             .then(function(needUri) {
                 return linkedDataService.getWonNodeUriOfNeed(needUri)
                     .then(function (wonNodeUri) {
-                        return linkedDataService.getRemoteNeedUriOfConnection(connectionUri)
-                            .then(function(remoteNeedUri){
-                                return linkedDataService.getWonNodeUriOfNeed(remoteNeedUri)
+                        return linkedDataService.getRemoteneedUriOfConnection(connectionUri)
+                            .then(function(remoteneedUri){
+                                return linkedDataService.getWonNodeUriOfNeed(remoteneedUri)
                                     .then(function(remoteWonNodeUri){
                                         //if the local connection was created through a hint message (most likely)
                                         //the remote connection is not known or doesn't exist yet. Hence, the next call
                                         //may or may not succeed.
-                                        return linkedDataService.getRemoteConnectionUriOfConnection(connectionUri).then(
-                                            function(remoteConnectionUri) {
+                                        return linkedDataService.getRemoteconnectionUriOfConnection(connectionUri).then(
+                                            function(remoteconnectionUri) {
                                                 var ret = {};
                                                 ret[won.WONMSG.hasSender] = connectionUri;
                                                 ret[won.WONMSG.hasSenderNeed] = needUri;
                                                 ret[won.WONMSG.hasSenderNode] = wonNodeUri;
-                                                if (remoteConnectionUri != null) {
-                                                    ret[won.WONMSG.hasReceiver] = remoteConnectionUri;
+                                                if (remoteconnectionUri != null) {
+                                                    ret[won.WONMSG.hasReceiver] = remoteconnectionUri;
                                                 }
-                                                ret[won.WONMSG.hasReceiverNeed] = remoteNeedUri;
+                                                ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
                                                 ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
                                                 return ret;
                                             },function(reason) {
@@ -382,7 +434,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                                 ret[won.WONMSG.hasSender] = connectionUri;
                                                 ret[won.WONMSG.hasSenderNeed] = needUri;
                                                 ret[won.WONMSG.hasSenderNode] = wonNodeUri;
-                                                ret[won.WONMSG.hasReceiverNeed] = remoteNeedUri;
+                                                ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
                                                 ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
                                                 return ret;
                                                 deferred.resolve(ret);
@@ -396,7 +448,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
 
     linkedDataService.getLastEventOfEachConnectionOfNeed = function(uri) {
-        return linkedDataService.getConnectionURIsOfNeed(uri)
+        if (typeof uri === 'undefined' || uri == null  ){
+            throw {message : "getLastEventOfEachConnectionOfNeed: uri must not be null"};
+        }
+        return linkedDataService.getconnectionUrisOfNeed(uri)
             .then(function(conUris) {
                 try {
                     var promises = [];
@@ -424,6 +479,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @returns {*}
      */
     linkedDataService.refreshConnectionEventContainer = function (connectionUri){
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "refreshConnectionEventContainer: connectionUri must not be null"};
+        }
         return linkedDataService.ensureLoaded(connectionUri).then(function(success) {
             try {
                 var subject = connectionUri;
@@ -446,6 +504,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     }
 
     linkedDataService.getLastEventOfConnection = function(connectionUri) {
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "getLastEventOfConnection: connectionUri must not be null"};
+        }
         return linkedDataService.getConnection(connectionUri)
             .then(function (connection) {
                 return linkedDataService.getNeed(connection.hasRemoteNeed)
@@ -468,7 +529,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
 
     linkedDataService.getAllConnectionEvents = function(connectionUri) {
-        return linkedDataService.getAllConnectionEventUris(connectionUri)
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "getAllConnectionEvents: connectionUri must not be null"};
+        }
+        return linkedDataService.getAllConnectioneventUris(connectionUri)
             .then(function (eventUris) {
                 try {
                     var eventPromises = [];
@@ -483,7 +547,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     }
 
     linkedDataService.getLastConnectionEvent = function(connectionUri) {
-        return linkedDataService.getLastConnectionEventUri(connectionUri)
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "getLastConnectionEvent: connectionUri must not be null"};
+        }
+        return linkedDataService.getLastConnectioneventUri(connectionUri)
             .then(function (eventUri) {
                     return linkedDataService.getConnectionEvent(eventUri);
             })
@@ -493,7 +560,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     /**
      * Loads all URIs of a need's connections.
      */
-    linkedDataService.getConnectionURIsOfNeed = function(uri) {
+    linkedDataService.getconnectionUrisOfNeed = function(uri) {
+        if (typeof uri === 'undefined' || uri == null  ){
+            throw {message : "getconnectionUrisOfNeed: uri must not be null"};
+        }
         return linkedDataService.ensureLoaded(uri).then(function(success) {
             try {
                 var subject = uri;
@@ -507,17 +577,17 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             //TODO: here, we fetch, but if we knew that the connections container didn't change
                             //we could just ensureLoaded. See https://github.com/researchstudio-sat/webofneeds/issues/109
                             connectionsPromises.push(linkedDataService.fetch(connectionsURI).then(function (success) {
-                                var connectionURIs = [];
+                                var connectionUris = [];
                                 privateData.store.node(connectionsURI, function (success, graph) {
                                     if (graph != null && graph.length > 0) {
                                         var memberTriples = graph.match(connectionsURI, createNameNodeInStore("rdfs:member"), null);
                                         for (var memberKey in memberTriples.triples) {
                                             var member = memberTriples.triples[memberKey].object.nominalValue;
-                                            connectionURIs.push(member);
+                                            connectionUris.push(member);
                                         }
                                     }
                                 });
-                                return connectionURIs;
+                                return connectionUris;
                             }));
                         }
                     }
@@ -539,50 +609,62 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     
 
     linkedDataService.getConnection = function(connectionUri) {
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "getConnection: connectionUri must not be null"};
+        }
         return linkedDataService.getNodeWithAttributes(connectionUri);
     }
 
     linkedDataService.getConnectionEvent = function(eventUri) {
+        if (typeof eventUri === 'undefined' || eventUri == null  ){
+            throw {message : "getConnectionEvent: eventUri must not be null"};
+        }
         return linkedDataService.getNodeWithAttributes(eventUri);
     }
 
 
 
-    linkedDataService.getAllConnectionEventUris = function(connectionURI) {
-        return linkedDataService.fetch(connectionURI).then(function(success) {
+    linkedDataService.getAllConnectioneventUris = function(connectionUri) {
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
+        }
+        return linkedDataService.fetch(connectionUri).then(function(success) {
             try {
-                var eventURIs = [];
+                var eventUris = [];
                 var query =
                     "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
                     "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
                     "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                    "select ?eventURI where { " +
-                    "<" + connectionURI + "> a " + won.WON.ConnectionCompacted + ";\n" +
+                    "select ?eventUri where { " +
+                    "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
                     won.WON.hasEventContainerCompacted + " ?container.\n" +
-                    "?container rdfs:member ?eventURI. \n" +
+                    "?container rdfs:member ?eventUri. \n" +
                     "}";
                 privateData.store.execute(query, [], [], function (success, results) {
-                    if (rejectIfFailed(success, results,{message : "Error loading all connection event URIs for connection " + connectionURI +".", allowNone : false, allowMultiple: true})){
+                    if (rejectIfFailed(success, results,{message : "Error loading all connection event URIs for connection " + connectionUri +".", allowNone : false, allowMultiple: true})){
                         return;
                     }
                     for (var key in results) {
-                        var eventURI = getSafeValue(results[key].eventURI);
-                        if (eventURI != null) {
-                            eventURIs.push(eventURI);
+                        var eventUri = getSafeValue(results[key].eventUri);
+                        if (eventUri != null) {
+                            eventUris.push(eventUri);
                         }
                     }
                 });
-                return eventURIs;
+                return eventUris;
             } catch (e) {
-                $q.reject("Could not get all connection event URIs for connection " + connectionURI +". Reason: " + e);
+                $q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
             }
         });
     }
 
-    linkedDataService.crawlConnectionData = function(connectionURI){
-        return linkedDataService.fetch(connectionURI).then(
+    linkedDataService.crawlConnectionData = function(connectionUri){
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "crawlConnectionData: connectionUri must not be null"};
+        }
+        return linkedDataService.fetch(connectionUri).then(
             function(){
-                return linkedDataService.getAllConnectionEventUris(connectionURI).then(
+                return linkedDataService.getAllConnectioneventUris(connectionUri).then(
                     function(uris){
                         var eventPromises = [];
                         for (key in uris){
@@ -596,8 +678,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     }
 
-    linkedDataService.getLastConnectionEventUri = function(connectionURI) {
-        return linkedDataService.crawlConnectionData(connectionURI).then(function(success) {
+    linkedDataService.getLastConnectioneventUri = function(connectionUri) {
+        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
+            throw {message : "getLastConnectioneventUri: connectionUri must not be null"};
+        }
+        return linkedDataService.crawlConnectionData(connectionUri).then(function(success) {
 
             try {
                 var resultObject = {};
@@ -605,29 +690,29 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
                     "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
                     "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                    "select ?eventURI where { " +
-                    "<" + connectionURI + "> a " + won.WON.ConnectionCompacted + ";\n" +
+                    "select ?eventUri where { " +
+                    "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
                     won.WON.hasEventContainerCompacted + " ?container.\n" +
-                    "?container rdfs:member ?eventURI. \n" +
+                    "?container rdfs:member ?eventUri. \n" +
                     " optional { " +
-                    "  ?eventURI msg:hasTimestamp ?timestamp .\n" +
+                    "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
                     " } \n" +
                     "} order by desc(?timestamp) limit 1";
                 privateData.store.execute(query, [], [], function (success, results) {
-                    if (rejectIfFailed(success, results,{message : "Error loading last connection event URI for connection " + connectionURI +".", allowNone : false, allowMultiple: false})){
+                    if (rejectIfFailed(success, results,{message : "Error loading last connection event URI for connection " + connectionUri +".", allowNone : false, allowMultiple: false})){
                         return;
                     }
                     for (var key in results) {
-                        var eventURI = getSafeValue(results[key].eventURI);
-                        if (eventURI != null) {
-                            resultObject.eventURI = eventURI;
+                        var eventUri = getSafeValue(results[key].eventUri);
+                        if (eventUri != null) {
+                            resultObject.eventUri = eventUri;
                             return;
                         }
                     }
                 });
-                return resultObject.eventURI;
+                return resultObject.eventUri;
             } catch (e) {
-                $q.reject("Could not get last connection event URI for connection " + connectionURI +". Reason: " + e);
+                $q.reject("Could not get last connection event URI for connection " + connectionUri +". Reason: " + e);
             }
         });
     }
@@ -636,9 +721,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * Fetches the triples where URI is subject and add objects of those triples to the
      * resulting structure by the localname of the predicate.
      * The URI is added as property 'uri'.
-     * @param eventURI
+     * @param eventUri
      */
     linkedDataService.getNodeWithAttributes = function(uri){
+        if (typeof uri === 'undefined' || uri == null  ){
+            throw {message : "getNodeWithAttributes: uri must not be null"};
+        }
         return linkedDataService.ensureLoaded(uri).then(function(success) {
             console.log("getNodeWithAttrs:" + uri);
             try {
@@ -652,6 +740,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         node[propName] = graph.triples[key].object.nominalValue;
                     }
                 });
+                if (node.length == 0){
+                    console.log("warn: could not load any attributes for uri: " + uri);
+                }
                 node.uri = uri;
                 return node;
             } catch (e) {
@@ -664,6 +755,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * Deletes all triples where the specified uri is the subect.
      */
     linkedDataService.deleteNode = function(uri){
+        if (typeof uri === 'undefined' || uri == null  ){
+            throw {message : "deleteNode: uri must not be null"};
+        }
         console.log("deleting node:   " + uri);
         var deferred = $q.defer();
         var query = "delete where {<"+uri+"> ?anyP ?anyO}";
