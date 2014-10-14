@@ -36,6 +36,8 @@ angular.module('won.owner')
     // see http://lorenzofox3.github.io/smart-table-website/
     $scope.displayedMessages = [].concat($scope.lastEventOfEachConnectionOfCurrentNeed);
 
+
+
     $scope.$watch($scope.lastEventOfEachConnectionOfCurrentNeed, function(newValue, oldValue){
         $scope.displayedMessages = [].concat($scope.lastEventOfEachConnectionOfCurrentNeed);
     })

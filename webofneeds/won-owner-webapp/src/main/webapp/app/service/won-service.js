@@ -92,6 +92,10 @@ angular.module('won.owner').factory('wonService', function (
             linkedDataService.cacheItemMarkDirty(connectionURI);
         }
     }
+    var processErrorMessage = function(eventData, message){
+        eventData.commState = won.COMMUNUCATION_STATE.NOT_TRANSMITTED;
+
+    }
     /**
      * Updates the local triple store with the data contained in the hint message.
      * @param eventData event object that is passed as additional argument to $rootScope.$broadcast.
@@ -125,6 +129,7 @@ angular.module('won.owner').factory('wonService', function (
     messageTypeToEventType[won.WONMSG.closeMessageCompacted] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:processCloseMessage};
     messageTypeToEventType[won.WONMSG.connectionMessageCompacted] = {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED, handler:processConnectionMessage};
     messageTypeToEventType[won.WONMSG.needStateMessageCompacted] = {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED, handler:null};
+    messageTypeToEventType[won.WONMSG.errorMessageCompacted] = {eventType: won.EVENT.NOT_TRANSMITTED, handler:processErrorMessage}
 
     //callback to be used in message-service to handle incoming messages
     var createIncomingMessageCallback = function() {
@@ -391,6 +396,7 @@ angular.module('won.owner').factory('wonService', function (
                         var eventData = getEventData(messageTemp);
                       //  eventData.eventType = messageTypeToEventType[eventData.hasMessageType];
                         eventData.eventType = won.EVENT.CONNECT_SENT;
+                        eventData.commState = won.COMMUNUCATION_STATE.PENDING;
                         linkedDataService.fetch(eventData.hasSender)
                             .then(
                             function (value) {
@@ -418,6 +424,8 @@ angular.module('won.owner').factory('wonService', function (
 
 
             } catch (e) {
+                var eventData = {"uri":eventUri,"commState":won.COMMUNUCATION_STATE.NOT_CONNECTED};
+                $rootScope.$broadcast(won.EVENT.NO_CONNECTION, eventData);
                 console.log("could not open suggested connection " + connectionUri + ". Reason" + e);
             }
         }

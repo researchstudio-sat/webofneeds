@@ -223,6 +223,14 @@
         won.EVENT.CLOSE_RECEIVED = "CloseReceivedEvent";
         won.EVENT.CONNECTION_MESSAGE_RECEIVED = "ConnectionMessageReceivedEvent";
         won.EVENT.NEED_STATE_MESSAGE_RECEIVED = "NeedStateMessageReceivedEvent";
+        won.EVENT.NO_CONNECTION = "NoConnectionErrorEvent";
+        won.EVENT.NOT_TRANSMITTED = "NotTransmittedErrorEvent";
+
+        won.COMMUNUCATION_STATE = {};
+        won.COMMUNUCATION_STATE.NOT_CONNECTED = "NoConnectionEvent";
+        won.COMMUNUCATION_STATE.NOT_TRANSMITTED = "NotTransmittedEvent";
+        won.COMMUNUCATION_STATE.PENDING = "Pending";
+        won.COMMUNUCATION_STATE.ACCEPTED = "Accepted";
 
         won.EVENT.APPSTATE_CURRENT_NEED_CHANGED = "AppState.CurrentNeedChangedEvent";
 
