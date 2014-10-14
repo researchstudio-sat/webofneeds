@@ -40,7 +40,11 @@ angular.module('won.owner').factory('wonService', function (
         //load the data of the connection that the hint is about, if required
         var connectionURI = eventData.hasReceiver;
         if (connectionURI != null) {
-            linkedDataService.ensureLoaded(connectionURI);
+            linkedDataService.cacheItemMarkDirty(connectionURI);
+        }
+        var connectionsUri = linkedDataService.getNeedConnectionsUri(eventData.hasReceiverNeed);
+        if (connectionsUri != null){
+            linkedDataService.cacheItemMarkDirty(connectionsUri);
         }
         //extract hint information from message
         //call handler if there is one - it may modify the event object
@@ -62,12 +66,14 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processConnectMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        //workaround until we get the newly created connection URI from our WoN node inside the event: don't do anything here
-        // --> in getLastEventForEachConnection... the 'connections' container is reloaded and the connect event should be loaded, too
-        //extract hint information from message
-        //call handler if there is one - it may modify the event object
-        //eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeedCompacted]['@id']);
-        //wonService.open(eventData.framedMessage[won.WONMSG.hasReceiver()]);
+        var connectionURI = eventData.hasReceiver;
+        if (connectionURI != null) {
+            linkedDataService.cacheItemMarkDirty(connectionURI);
+        }
+        var connectionsUri = linkedDataService.getNeedConnectionsUri(eventData.hasReceiverNeed);
+        if (connectionsUri != null){
+            linkedDataService.cacheItemMarkDirty(connectionsUri);
+        }
     }
 
     /**
@@ -77,14 +83,10 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processOpenMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        //var connectionURI = eventData.hasLocalConnection;
-        //if (connectionURI != null) {
-        //    linkedDataService.fetch(connectionURI);
-        //}
-        //extract hint information from message
-        //call handler if there is one - it may modify the event object
-        //eventData.remoteNeed = won.getSafeJsonLdValue(eventData.framedMessage[won.WONMSG.hasSenderNeedCompacted]['@id']);
-        //wonService.sendTextMessage(eventData.framedMessage[won.WONMSG.hasReceiver()], "Hi! this is an automatic greeting!");
+        var connectionURI = eventData.hasReceiver;
+        if (connectionURI != null) {
+            linkedDataService.cacheItemMarkDirty(connectionURI);
+        }
     }
     /**
      * Updates the local triple store with the data contained in the hint message.
@@ -93,9 +95,18 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processCloseMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        var connectionURI = eventData.receiverURI;
+        var connectionURI = eventData.hasReceiver;
         if (connectionURI != null) {
-            linkedDataService.fetch(connectionURI);
+            linkedDataService.cacheItemMarkDirty(connectionURI);
+        }
+        //TODO update remove connection from local store if not already removed
+    }
+
+    var processConnectionMessage = function(eventData, message) {
+        //load the data of the connection that the hint is about, if required
+        var connectionURI = eventData.hasReceiver;
+        if (connectionURI != null) {
+            linkedDataService.cacheItemMarkDirty(connectionURI);
         }
         //TODO update remove connection from local store if not already removed
     }
@@ -107,7 +118,7 @@ angular.module('won.owner').factory('wonService', function (
     messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:processConnectMessage};
     messageTypeToEventType[won.WONMSG.openMessageCompacted] = {eventType: won.EVENT.OPEN_RECEIVED, handler:processOpenMessage};
     messageTypeToEventType[won.WONMSG.closeMessageCompacted] = {eventType: won.EVENT.CLOSE_RECEIVED, handler:processCloseMessage};
-    messageTypeToEventType[won.WONMSG.connectionMessageCompacted] = {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED, handler:null};
+    messageTypeToEventType[won.WONMSG.connectionMessageCompacted] = {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED, handler:processConnectionMessage};
     messageTypeToEventType[won.WONMSG.needStateMessageCompacted] = {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED, handler:null};
 
     //callback to be used in message-service to handle incoming messages

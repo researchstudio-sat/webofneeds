@@ -200,6 +200,82 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     };
 
     privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
+    var CACHE_DIRTY = -1;
+    privateData.cacheStatus = {} //uri -> [last access timestamp, 0 if dirty]
+
+    linkedDataService.cacheItemInsertOrOverwrite = function(uri){
+        console.log("add to cache:    " + uri);
+        privateData.cacheStatus[uri] = new Date().getTime();
+    }
+
+    linkedDataService.cacheItemIsLoaded = function(uri){
+        var ret = typeof privateData.cacheStatus[uri] !== 'undefined';
+        var retStr = (ret + "     ").substr(0,5);
+        console.log("inCache: " + retStr + "   " + uri);
+        return ret;
+    }
+
+    /**
+     * Returns true iff the uri is loaded and marked as dirty. (i.e. last access
+     * timestamp == CACHE_DIRTY ( == -1)
+     * @param uri
+     * @returns {boolean}
+     */
+    linkedDataService.cacheItemIsDirty = function(uri){
+        var lastAccess = privateData.cacheStatus[uri];
+        var ret = false;
+        if (typeof lastAccess === 'undefined') {
+            ret = false
+        } else {
+            ret = lastAccess == CACHE_DIRTY;
+        }
+        var retStr = (ret + "     ").substr(0,5);
+        console.log("isDirty: " + retStr + "   " + uri);
+        return ret;
+    }
+
+    /**
+     * Returns true iff the uri is loaded and not marked as dirty.
+     * @param uri
+     * @returns {boolean}
+     */
+    linkedDataService.cacheItemIsOk = function(uri){
+        var lastAccess = privateData.cacheStatus[uri];
+        var ret = false;
+        if (typeof lastAccess === 'undefined') {
+            ret = false
+        } else {
+            ret = lastAccess != CACHE_DIRTY;
+        }
+        var retStr = (ret + "     ").substr(0,5);
+        console.log("isCacheOk: " + retStr + " " + uri);
+        return ret;
+    }
+
+    linkedDataService.cacheItemMarkAccessed = function(uri){
+        var lastAccess = privateData.cacheStatus[uri];
+        if (typeof lastAccess === 'undefined') {
+            throw {message : "Trying to mark unloaded uri " + uri +" as accessed"}
+        } else if (lastAccess === CACHE_DIRTY){
+            throw {message : "Trying to mark uri " + uri +" as accessed, but it is already dirty"}
+        }
+        console.log("mark accessed:   " + uri);
+        privateData.cacheStatus[uri] = new Date().getTime();
+    }
+
+    linkedDataService.cacheItemMarkDirty = function(uri){
+        var lastAccess = privateData.cacheStatus[uri];
+        if (typeof lastAccess === 'undefined') {
+            throw {message : "Trying to mark unloaded uri " + uri +" as dirty"}
+        }
+        console.log("mark dirty:      " + uri);
+        privateData.cacheStatus[uri] = CACHE_DIRTY;
+    }
+
+    linkedDataService.cacheItemRemove = function(uri){
+        delete privateData.cacheStatus[uri];
+    }
+
 
 
     var getReadUpdateLockPerUri = function(uri){
@@ -282,11 +358,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             $rootScope.$apply(function () {
                                 if (success) {
                                     console.log("fetched:         " + uri)
+                                    linkedDataService.cacheItemInsertOrOverwrite(uri);
                                     deferred.resolve(uri);
-                                    return deferred.promise;
                                 } else {
                                     $q.reject("failed to load " + uri);
-                                    return deferred.promise;
                                 }
                             });
                         });
@@ -310,33 +385,14 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             throw {message : "ensureLoaded: uri must not be null"};
         }
         console.log("ensuring loaded: " +uri);
-
-        var deferred = $q.defer();
-
-        var lock = getReadUpdateLockPerUri(uri);
-        return lock.acquireReadLock().then(function() {
-            try {
-                privateData.store.node(uri, function (success, mygraph) {
-
-                    if (success && mygraph.triples.length > 0) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                });
-            } finally {
-                lock.releaseReadLock();
-            }
-        }).then(
-            function(isAlreadyLoaded){
-                if (isAlreadyLoaded) {
-                    console.log("already loaded:  " +uri);
-                    return true;
-                } else {
-                    return linkedDataService.fetch(uri);
-                }
-            }
-        );
+        if (linkedDataService.cacheItemIsOk(uri)){
+            var deferred = $q.defer();
+            linkedDataService.cacheItemMarkAccessed(uri);
+            deferred.resolve(uri);
+            return deferred.promise;
+        }
+        //uri isn't loaded or needs to be refrehed. fetch it.
+        return linkedDataService.fetch(uri);
     }
 
     /**
@@ -581,48 +637,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         );
     }
 
-    /**
-     * Finds the resource that denotes the connection's event container and fetches its
-     * content. Used for refreshing information about connection events.
-     * TODO: improve so as to load only new events
-     * TODO: currently this does not work as the connection event container is a blank node.
-     * --> we have to fetch the whole connection
-     *
-     * @param connectionUri
-     * @returns {*}
-     */
-    linkedDataService.refreshConnectionEventContainer = function (connectionUri){
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "refreshConnectionEventContainer: connectionUri must not be null"};
-        }
-        return linkedDataService.ensureLoaded(connectionUri).then(
-            function(){
-                var lock = getReadUpdateLockPerUri(connectionUri);
-                return lock.acquireReadLock().then(
-                    function() {
-                        try {
-                            var subject = connectionUri;
-                            var predicate = won.WON.hasEventContainer;
-                            privateData.store.node(connectionUri, function (success, graph) {
-                                var resultGraph = graph.match(subject, predicate, null);
-                                if (resultGraph != null && resultGraph.length > 0) {
-                                    for (key in resultGraph.triples) {
-                                        var containerURI = resultGraph.triples[key].object.nominalValue;
-                                        //TODO: here, we fetch, but if we knew that the connections container didn't change
-                                        //we could just ensureLoaded. See https://github.com/researchstudio-sat/webofneeds/issues/109
-                                        return linkedDataService.fetch(containerURI);
-                                    }
-                                }
-                            });
-                        } catch (e) {
-                            $q.reject("could not refresh connection event container for connection " + connectionUri +". Reason:", e);
-                        } finally {
-                            lock.releaseReadLock();
-                        }
-                    }
-                );
-            });
-    }
+
 
     linkedDataService.getLastEventOfConnection = function(connectionUri) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
@@ -701,7 +716,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                         var connectionsURI = resultGraph.triples[key].object.nominalValue;
                                         //TODO: here, we fetch, but if we knew that the connections container didn't change
                                         //we could just ensureLoaded. See https://github.com/researchstudio-sat/webofneeds/issues/109
-                                        connectionsPromises.push(linkedDataService.fetch(connectionsURI).then(function (success) {
+                                        connectionsPromises.push(linkedDataService.ensureLoaded(connectionsURI).then(function (success) {
                                             var connectionUris = [];
                                             privateData.store.node(connectionsURI, function (success, graph) {
                                                 if (graph != null && graph.length > 0) {
@@ -735,6 +750,36 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             });
 
     }
+
+    linkedDataService.getConnectionsUri = function(needUri) {
+        if (typeof needUri === 'undefined' || needUri == null  ){
+            throw {message : "getConnectionsUri: needUri must not be null"};
+        }
+        return linkedDataService.ensureLoaded(needUri).then(
+            function(){
+                var lock = getReadUpdateLockPerUri(needUri);
+                return lock.acquireReadLock().then(
+                    function() {
+                        try {
+                            var subject = needUri;
+                            var predicate = won.WON.hasConnections;
+                            var result = {}
+                            privateData.store.node(needUri, function (success, graph) {
+                                var resultGraph = graph.match(subject, predicate, null);
+                                if (!rejectIfFailed(success, resultGraph, {allowMultiple:false, allowNone: false, message:"Failed to load connections uri of need " + needUri})){
+                                        result.result = resultGraph.triples[0].object.nominalValue;
+                                }
+                            });
+                            return result.result;
+                        } catch (e) {
+                            $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
+                        } finally {
+                            lock.releaseReadLock();
+                        }
+                    }
+                )
+            });
+    }
     
     
 
@@ -758,7 +803,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
         }
-        return linkedDataService.fetch(connectionUri).then(
+        return linkedDataService.ensureLoaded(connectionUri).then(
             function(){
                var lock = getReadUpdateLockPerUri(connectionUri);
                return lock.acquireReadLock().then(
@@ -800,13 +845,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "crawlConnectionData: connectionUri must not be null"};
         }
-        return linkedDataService.fetch(connectionUri).then(
+        return linkedDataService.ensureLoaded(connectionUri).then(
             function(){
                 return linkedDataService.getAllConnectioneventUris(connectionUri).then(
                     function(uris){
                         var eventPromises = [];
                         for (key in uris){
-                            eventPromises.push(linkedDataService.fetch(uris[key]));
+                            eventPromises.push(linkedDataService.ensureLoaded(uris[key]));
                         }
                         return $q.all(eventPromises);
                     }
@@ -920,6 +965,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
                 return;
             } else {
+                linkedDataService.cacheItemRemove(uri);
                 deferred.resolve();
             }
         });

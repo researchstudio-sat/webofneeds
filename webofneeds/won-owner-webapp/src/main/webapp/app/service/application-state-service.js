@@ -256,15 +256,12 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         var needURIPromises = [];
         for(var i = 0;i<needs.data.length;i++){
             var needURI = needs.data[i];
-            needURIPromises.push(linkedDataService.fetch(needURI)
-                .then(function (value) {
-                var deferred = $q.defer();
-                linkedDataService.getNeed(needURI)
-                    .then(function(need){
-                        applicationStateService.addNeed(need)
-                       deferred.resolve(need);
-                    });
-            }))
+            needURIPromises.push(linkedDataService.getNeed(needURI).then(
+                function(need){
+                   applicationStateService.addNeed(need)
+                   return need;
+                })
+            )
         }
         $q.all(needURIPromises);
     }
