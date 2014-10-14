@@ -167,8 +167,8 @@ angular.module('won.owner')
 
     $scope.getIconClass = function (typeText) {
         if (typeText=='Conversation') return 'fa fa-comment-o fa-lg';
-        else if (typeText=='Incoming Request') return 'fa fa-share fa-lg';
-        else if (typeText=='Outgoing Request') return 'fa fa-reply fa-lg';
+        else if (typeText=='Incoming Request') return 'fa fa-reply fa-lg';
+        else if (typeText=='Outgoing Request') return 'fa fa-share fa-lg';
         else return 'fa fa-puzzle-piece fa-lg';
     };
 

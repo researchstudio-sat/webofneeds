@@ -266,7 +266,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.cacheItemMarkDirty = function(uri){
         var lastAccess = privateData.cacheStatus[uri];
         if (typeof lastAccess === 'undefined') {
-            throw {message : "Trying to mark unloaded uri " + uri +" as dirty"}
+            return;
         }
         console.log("mark dirty:      " + uri);
         privateData.cacheStatus[uri] = CACHE_DIRTY;

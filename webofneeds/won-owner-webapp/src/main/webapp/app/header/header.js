@@ -44,7 +44,7 @@ angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, 
         return userService.getRegistered();
     };
     $scope.userdata = { username : userService.getUnescapeUserName()};
-    $scope.message = "successfully registered";
+
 
     $scope.$watch(userService.isAuth, function(logged_in){
         if(logged_in){
