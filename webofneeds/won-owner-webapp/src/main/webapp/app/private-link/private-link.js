@@ -26,7 +26,9 @@ angular.module('won.owner')
 
 
     $scope.$watch('lastEventOfEachConnectionOfCurrentNeed', function(newValue, oldValue){
-        console.log("events changed! now have " + newValue.length + " events!" + " had: " + oldValue.length +"...");
+        var newCnt = newValue != null ? newValue.length : "null";
+        var oldCnt = oldValue != null ? oldValue.length : "null";
+        console.log("events changed! now have " + newCnt + " events!" + " had: " + oldCnt +"...");
     });
 
     // copy the references from the real data holder, used in message table for displaying

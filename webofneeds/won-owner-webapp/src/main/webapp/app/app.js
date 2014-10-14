@@ -187,10 +187,12 @@ app.directive('header', function(){
 
             for(var i = 0; i < inputArray.length; i++) {
                 var item = inputArray[i];
-                if(eventTypes.indexOf(item.event.hasMessageType)!=-1){
-                    item.id = i;
-                    item.typeText = getTypeText(item);
-                    outputArray.push(item);
+                if (item != null) {
+                    if (eventTypes.indexOf(item.event.hasMessageType) != -1) {
+                        item.id = i;
+                        item.typeText = getTypeText(item);
+                        outputArray.push(item);
+                    }
                 }
             }
 

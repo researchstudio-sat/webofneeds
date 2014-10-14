@@ -295,6 +295,10 @@
             }
         }
 
+        won.isNull = function(value){
+            return typeof(value) === 'undefined' || value == null;
+        }
+
         //helper function: is x an array?
         won.isArray = function(x){
             return Object.prototype.toString.call( x ) === '[object Array]';
@@ -987,8 +991,12 @@
                 return this.data;
             }
         };
-        
-        
+
+
+
+            
+
+
         return won;
     };
     var factory = function() {
