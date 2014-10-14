@@ -92,7 +92,9 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
     });
     $scope.$on(won.EVENT.OPEN_SENT, function(ngEvent, eventData) {
-        addEventAsUnreadEvent(eventData);
+        //addEventAsUnreadEvent(eventData);
+        applicationStateService.removeEvent(eventData);
+        reloadCurrentNeedData();
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);

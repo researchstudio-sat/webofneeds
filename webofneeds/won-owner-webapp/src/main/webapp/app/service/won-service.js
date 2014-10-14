@@ -350,9 +350,9 @@ angular.module('won.owner').factory('wonService', function (
      * @param need1
      * @param need2
      */
-    wonService.open = function(connectionUri){
+    wonService.open = function(msgToOpenFor){
 
-        var sendOpen = function(envelopeData) {
+        var sendOpen = function(envelopeData, eventToOpenFor) {
             //TODO: use event URI pattern specified by WoN node
             var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  utilService.getRandomInt(1,9223372036854775807);
             var message = new won.MessageBuilder(won.WONMSG.openMessage)
@@ -384,17 +384,40 @@ angular.module('won.owner').factory('wonService', function (
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
+
+                setTimeout(
+                    function(){
+
+                        linkedDataService.fetch(msgToOpenFor.connection.uri)
+                            .then(
+                            function (value) {
+                                linkedDataService.fetch(eventUri)
+                                    .then(
+                                    function(value2) {
+                                        console.log("publishing angular event");
+
+                                        //eventData.eventType = won.EVENT.CLOSE_SENT;
+                                        $rootScope.$broadcast(won.EVENT.OPEN_SENT, eventToOpenFor);
+                                        //$rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
+
+                                    }, won.reportError("cannot fetch closed event " + eventUri)
+                                );
+                            }, won.reportError("cannot fetch closed connection " + msgToOpenFor.connection.uri)
+                        );
+
+                    }, 3000);
+
             } catch (e) {
-                console.log("could not open " + connectionUri + ". Reason" + e);
+                console.log("could not open " + msgToOpenFor.connection.uri + ". Reason" + e);
             }
         }
 
         //fetch all data needed
-        linkedDataService.getEnvelopeDataforConnection(connectionUri)
+        linkedDataService.getEnvelopeDataforConnection(msgToOpenFor.connection.uri)
             .then(function(envelopeData){
-                sendOpen(envelopeData);
+                sendOpen(envelopeData, msgToOpenFor.event);
             },
-            won.reportError("cannot open connection " + connectionUri)
+            won.reportError("cannot open connection " + msgToOpenFor.connection.uri)
         );
 
     }
