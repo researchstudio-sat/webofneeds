@@ -751,7 +751,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     }
 
-    linkedDataService.getConnectionsUri = function(needUri) {
+    linkedDataService.getNeedConnectionsUri = function(needUri) {
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getConnectionsUri: needUri must not be null"};
         }
