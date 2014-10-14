@@ -257,12 +257,39 @@
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
-                                    <h3 class="panel-title col-md-9">Request for conversation</h3>
-                                    <div clss="col-md-2">{{chosenMessage.event.timestamp | date}}</div>
+                                    <h3 class="panel-title col-md-9">Request for conversation with <a href="#/post-detail"
+                                                                                                      class="underline">{{chosenMessage
+                                        .remoteNeed.title}}</a></h3>
+                                    <div  class="col-md-2">Pending</div>
                                 </div>
                             </div>
 
-                            <div class="col-lg-12">
+                            <div class="row">
+
+                                <div class="col-lg-8">
+                                    <h4 class="pull-left">{{chosenMessage.event.hasTimestamp|date}}</h4>
+                                </div>
+
+                                <div class ="col-lg-4">
+                                    <a href="#/post-detail"
+                                       class="underline">{{applicationStateService.getAllNeeds()[chosenMessage.connection.belongsToNeed].title}}</a></h4>
+                                </div>
+                             </div>
+
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <h4 class="pull-left">{{chosenMessage.event.timestamp}}</h4>
+                                </div>
+
+                                <div class ="col-lg-4">
+                                    <a href="#/post-detail"
+                                       class="underline">{{chosenMessage.need.title}}</a></h4>
+                                </div>
+                            </div>
+                            <div class = "row">
+                                <div class = "col-lg-8">{{chosenMessage.need.hasDescription}}</div>
+                                <div class = "col-lg-4">Thumbnail</div>
+                            </div>
                                 <div class="row col-lg-12">
                                     <h4 class="pull-left">Waiting for reply from&nbsp;<a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a></h4>
                                 </div>
