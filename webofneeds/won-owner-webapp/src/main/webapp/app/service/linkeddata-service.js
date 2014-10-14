@@ -266,7 +266,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.cacheItemMarkDirty = function(uri){
         var lastAccess = privateData.cacheStatus[uri];
         if (typeof lastAccess === 'undefined') {
-            throw {message : "Trying to mark unloaded uri " + uri +" as dirty"}
+            return;
         }
         console.log("mark dirty:      " + uri);
         privateData.cacheStatus[uri] = CACHE_DIRTY;
@@ -751,7 +751,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     }
 
-    linkedDataService.getConnectionsUri = function(needUri) {
+    linkedDataService.getNeedConnectionsUri = function(needUri) {
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getConnectionsUri: needUri must not be null"};
         }
