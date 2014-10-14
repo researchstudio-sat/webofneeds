@@ -150,8 +150,8 @@
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
-                                    <h3 class="panel-title col-md-9">Request for conversation</h3>
-                                    <div class="col-md-2">{{chosenMessage.event.timestamp | date}}</div>
+                                    <h3 class="panel-title col-md-9" >Request from <span ng-bind="chosenMessage.remoteNeed.title"></span> </h3>
+                                    <div class="col-md-2">{{chosenMessage.event.hasTimestamp | date}}</div>
                                 </div>
                             </div>
 
@@ -174,51 +174,53 @@
                             </div>
 
                             <!-- Post exists IMPLICITLY DISPLAYED -->
-                            <div ng-show="true" class="col-lg-12">
-                                <div class="row col-lg-12">
-                                    <h4 class="pull-left"><a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a>&nbsp;has sent you a request:</h4>
-                                </div>
+                            <div ng-show="true" class="col-lg-12 " >
+                                <div class="row col-lg-12 panel">
+                                    <div class = "row " >
+                                        <div class="col-lg-3">
+                                            Thumbnail placeholder
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <div class="row">
+                                                <div class="col-lg-6"
+                                                     ng-bind="chosenMessage.remoteNeed.title"></div>
+                                                <div class="col-lg-3"
+                                                     ng-bind="chosenMessage.event.hasTimeStamp|date"></div>
+                                            </div>
+                                            <div class="row col-lg-12" ng-bind="chosenMessage.remoteNeed.textDescription">
 
-                                <div class="row col-lg-12">
-                                    <p class="text-justify">
-                                        Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
-                                        Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
-                                        pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
-                                        Pellentesque sollicitudin nec sem ut porttitor
-                                    </p>
-                                </div>
-
-                                <div class="row col-lg-12">
-                                    <h4 class="pull-left"><a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a>&nbsp;wants to connect to this post:</h4>
-                                </div>
-
-                                <div class="row col-lg-12">
-                                    <div class="media">
-                                        <img class="thumbnail thumbnail-size media-object pull-left" src="/owner/images/need.jpg"/>
-                                        <div class="media-body">
-                                            <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.remoteNeed.title}}</a>
-                                            <p class="text-justify">
-                                                Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
-                                                Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
-                                                pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
-                                                Pellentesque sollicitudin nec sem ut porttitor eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
-                                                pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
-                                                Pellentesque sollicitudin nec sem ut porttitor (<a href="#/post-detail/">go to full description</a>).
-                                                <!-- TODO link needs to be extended by parameters -->
-                                            </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row col-lg-12">
-                                    <p class="text-center">What to do with this conversation request?</p>
-                                </div>
 
-                                <div class="row col-lg-12">
-                                    <div class="text-center">
-                                        <button class="btn btn-default" ng-click="clickOnDeclineForInRequest()">Decline</button>
-                                        <button class="btn btn-default" ng-click="clickOnAcceptForInRequest()">Accept</button>
-                                    </div>
+                                </div>
+                                <div class="row col-lg-12 ">
+                                    <form class="form-horizontal container" novalidate name="sendMessageForm" ng-submit="sendMessage()">
+                                        <fieldset>
+                                            <div class="form-group ">
+                                                <div class="col-md-12 panel">
+                                                    <textarea style="resize: none;" class="form-control" rows="8" id="textMessage" name="textMessage"
+                                                              ng-model="newMessage"
+                                                              placeholder="Write a reply..."
+                                                              required>
+                                                    </textarea>
+                                                    <!--<span class="label label-warning" ng-show="contactAuthForm.textMessage.$invalid">Please write a message</span>  -->
+                                                </div>
+                                                <!--<span class="help-block">Message mustn't be empty</span> -->
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-3 pull-left">
+                                                    <button class="btn btn-default" ng-click="clickOnDeclineForInRequest()">Decline</button>
+                                                </div>
+                                                <div class="col-lg-9"></div>
+                                                <div class="col-lg-3 pull-right">
+                                                    <button class="btn btn-primary " type="submit"
+                                                            ng-click="clickOnAcceptForInRequest()">Accept</button>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
                                 </div>
 
                             </div>
@@ -255,12 +257,39 @@
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
-                                    <h3 class="panel-title col-md-9">Request for conversation</h3>
-                                    <div clss="col-md-2">{{chosenMessage.event.timestamp | date}}</div>
+                                    <h3 class="panel-title col-md-9">Request for conversation with <a href="#/post-detail"
+                                                                                                      class="underline">{{chosenMessage
+                                        .remoteNeed.title}}</a></h3>
+                                    <div  class="col-md-2" ng-bind=eventCommState[chosenMessage.event.uri]></div>
                                 </div>
                             </div>
 
-                            <div class="col-lg-12">
+                            <div class="row">
+
+                                <div class="col-lg-8">
+                                    <h4 class="pull-left">{{chosenMessage.event.hasTimestamp|date}}</h4>
+                                </div>
+
+                                <div class ="col-lg-4">
+                                    <a href="#/post-detail"
+                                       class="underline">{{applicationStateService.getAllNeeds()[chosenMessage.connection.belongsToNeed].title}}</a></h4>
+                                </div>
+                             </div>
+
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <h4 class="pull-left">{{chosenMessage.event.timestamp}}</h4>
+                                </div>
+
+                                <div class ="col-lg-4">
+                                    <a href="#/post-detail"
+                                       class="underline">{{chosenMessage.need.title}}</a></h4>
+                                </div>
+                            </div>
+                            <div class = "row">
+                                <div class = "col-lg-8">{{chosenMessage.need.hasDescription}}</div>
+                                <div class = "col-lg-4">Thumbnail</div>
+                            </div>
                                 <div class="row col-lg-12">
                                     <h4 class="pull-left">Waiting for reply from&nbsp;<a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a></h4>
                                 </div>

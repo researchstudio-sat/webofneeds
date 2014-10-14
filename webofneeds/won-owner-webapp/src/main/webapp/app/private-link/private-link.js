@@ -26,7 +26,9 @@ angular.module('won.owner')
 
 
     $scope.$watch('lastEventOfEachConnectionOfCurrentNeed', function(newValue, oldValue){
-        console.log("events changed! now have " + newValue.length + " events!" + " had: " + oldValue.length +"...");
+        var newCnt = newValue != null ? newValue.length : "null";
+        var oldCnt = oldValue != null ? oldValue.length : "null";
+        console.log("events changed! now have " + newCnt + " events!" + " had: " + oldCnt +"...");
     });
 
     $scope.sortedField = 'event.hasTimestamp';
@@ -40,6 +42,12 @@ angular.module('won.owner')
             $scope.sortedField = fieldName;
         }
     }
+
+
+    $scope.$watch($scope.lastEventOfEachConnectionOfCurrentNeed, function(newValue, oldValue){
+        $scope.displayedMessages = [].concat($scope.lastEventOfEachConnectionOfCurrentNeed);
+    })
+
 
     $scope.currentEventType = [
      won.WONMSG.connectionMessage,
@@ -106,8 +114,8 @@ angular.module('won.owner')
     $scope.newMessage = '';
     $scope.mesagesCollapsed = false;
     $scope.messageTypeColapsed = -1;
-    $scope.settingsCollapsed = false;
-    $scope.postOptionsCollapsed = false;
+    $scope.settingsCollapsed = true;
+    $scope.postOptionsCollapsed = true;
     $scope.postOptionsCollapseClick= function() {
         $scope.postOptionsCollapsed = !$scope.postOptionsCollapsed;
     };

@@ -145,17 +145,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-show="drafts.length>0" ng-repeat="draft in drafts | filter: search">
+                        <tr ng-show="allDrafts.length>0" ng-repeat="draft in allDrafts | filter: search">
                             <td class="col-lg-1">
-                                <span style="display: none;">{{draft.type}}</span>
-                                <img src="{{getTypePicURI(draft.type)}}" tooltip="{{draft.type}} (click to filter)"/>
+                                <span style="display: none;">{{draft.draft.basicNeedType}}</span>
+                                <img src="{{getTypePicURI(draft.draft.basicNeedType)}}" tooltip="{{draft.draft.basicNeedType}} (click to filter)"/>
                             </td>
                             <!-- TODO step in create need needs to be specified -->
-                            <td><a href="#/create-need/1" style="font-weight:bold;">{{draft.title}}</a></td>
+                            <td><a href="#/create-need/1" style="font-weight:bold;">{{draft.draft.title}}</a></td>
                             <td>{{draft.datetime | date}}</td>
                             <td><a href="" ng-click="clickOnRemoveButton($index);"><i class="fa fa-times-circle-o fa-lg"></i></a></td>
                         </tr>
-                        <tr ng-show="drafts.length<1">
+                        <tr ng-show="allDrafts.length<1">
                             <td class="col-lg-1">
                             </td>
                             <td>You don't have drafts yet. </td>

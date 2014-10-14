@@ -102,13 +102,13 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 
     // TODO call backend method here
     //need to fetch: need type, need title, need create date
-    $scope.drafts = [
+   /* $scope.drafts = [
         {type:'Together', title:'Car sharing to Prague', datetime: new Date('2014-08-20')},
         {type:'Want', title:'Moved recently ...', datetime: new Date('2014-08-25')},
         {type:'Change', title:'Let\'s clean ...', datetime: new Date('2014-05-01')},
         {type:'Offer', title:'Friendly Bicycle ...', datetime: new Date('2014-07-10')},
         {type:'Offer', title:'Old children\'s clothes ..', datetime: new Date('2013-09-09')}
-    ];
+    ];            */
 
     // TODO call backend method here
     //need to fetch: need type, need title, need close date

@@ -56,6 +56,7 @@ public class WonWebSocketHandler
   @Autowired
   private UserRepository userRepository;
 
+
   @Override
   public void afterPropertiesSet() throws Exception {
     this.ownerApplicationService.setOwnerApplicationServiceCallbackToClient(this);

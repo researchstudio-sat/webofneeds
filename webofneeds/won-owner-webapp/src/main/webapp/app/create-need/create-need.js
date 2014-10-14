@@ -308,7 +308,44 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
     }
     $scope.saveDraft = function(){
-        needService.saveDraft($scope.need, $scope.currentStep,userService.getUnescapeUserName()).then(function(){
+        var draftBuilderObject = new window.won.DraftBuilder().setContext();
+        draftBuilderObject.setCurrentStep($scope.currentStep);
+        draftBuilderObject.setDraftObject($scope.need);
+
+        if ($scope.need.basicNeedType == 'DEMAND') {
+            draftBuilderObject.demand();
+        } else if ($scope.need.basicNeedType == 'SUPPLY') {
+            draftBuilderObject.supply();
+        } else if ($scope.need.basicNeedType == 'DO_TOGETHER') {
+            draftBuilderObject.doTogether();
+        } else {
+            draftBuilderObject.critique();
+        }
+
+        draftBuilderObject.title($scope.need.title)
+            .ownerFacet()               // mandatory
+            .description($scope.need.textDescription)
+            .hasTag($scope.need.tags)
+            .hasContentDescription()    // mandatory
+            //.hasPriceSpecification("EUR",5.0,10.0)
+            .active()                   // mandatory: active or inactive
+
+        if (hasLocationSpecification($scope.need)) {
+            // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
+            draftBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
+        }
+
+        if (hasTimeSpecification($scope.need)) {
+            draftBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
+        }
+
+        // building need as JSON object
+        var draftJson = draftBuilderObject.build();
+        var draftURI = "http://localhost:8080/won/resource/need/" + utilService.getRandomInt(1,9223372036854775807);
+        draftJson['@graph'][0]['@graph'][0]['@id'] = draftURI;
+        var createDraftObject = {"draftURI":draftURI,"draft":JSON.stringify(draftJson)};
+
+        needService.saveDraft(createDraftObject).then(function(draftURI){
            $scope.successShow = true;
 
         });

@@ -77,7 +77,7 @@ CategorizedNeeds = function() {
 	}
 }
 
-angular.module('won.owner').factory('needService', function ($http, $q, connectionService) {
+angular.module('won.owner').factory('needService', function ($http, $q, connectionService, applicationStateService) {
 
 	var needService = {};
 
@@ -196,21 +196,18 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 		);
 	}
 
-    needService.saveDraft = function(need, currentStep,userName){
-        var needToSave = angular.copy(need);
-        needToSave.currentStep = currentStep+'';
-        needToSave.userName = userName;
-        needToSave.tags = need.tags;
-        delete needToSave.binaryFolder;
+    needService.saveDraft = function(draft){
+        var draftToSave = angular.copy(draft);
         return $http({
             method:'POST',
             url:'/owner/rest/needs/drafts',
-            data:needToSave,
+            data:JSON.stringify(draftToSave),
             success:function(content){
                 console.log(content);
             }
         }).then(
-            function () {
+            function (draft) {
+                applicationStateService.addDraft(draft.data);
                 // success
                 return {status:"OK"};
             },

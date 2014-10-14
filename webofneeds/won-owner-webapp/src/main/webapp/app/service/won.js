@@ -179,6 +179,8 @@
         won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
         won.WONMSG.connectMessage = won.WONMSG.baseUri + "ConnectMessage";
         won.WONMSG.connectMessageCompacted = won.WONMSG.prefix + ":ConnectMessage";
+        won.WONMSG.connectSentMessage = won.WONMSG.baseUri + "ConnectSentMessage";
+        won.WONMSG.connectSentMessageCompacted = won.WONMSG.prefix + ":ConnectSentMessage";
         won.WONMSG.needStateMessage = won.WONMSG.baseUri + "NeedStateMessage";
         won.WONMSG.needStateMessageCompacted = won.WONMSG.prefix + ":NeedStateMessage";
         won.WONMSG.closeMessage = won.WONMSG.baseUri + "CloseMessage";
@@ -213,6 +215,7 @@
         won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
         won.EVENT.NEED_CREATED = "NeedCreatedEvent";
         won.EVENT.HINT_RECEIVED = "HintReceivedEvent";
+        won.EVENT.CONNECT_SENT ="ConnectSentEvent";
         won.EVENT.CONNECT_RECEIVED = "ConnectReceivedEvent";
         won.EVENT.OPEN_SENT = "OpenSentEvent";
         won.EVENT.OPEN_RECEIVED = "OpenReceivedEvent";
@@ -220,6 +223,14 @@
         won.EVENT.CLOSE_RECEIVED = "CloseReceivedEvent";
         won.EVENT.CONNECTION_MESSAGE_RECEIVED = "ConnectionMessageReceivedEvent";
         won.EVENT.NEED_STATE_MESSAGE_RECEIVED = "NeedStateMessageReceivedEvent";
+        won.EVENT.NO_CONNECTION = "NoConnectionErrorEvent";
+        won.EVENT.NOT_TRANSMITTED = "NotTransmittedErrorEvent";
+
+        won.COMMUNUCATION_STATE = {};
+        won.COMMUNUCATION_STATE.NOT_CONNECTED = "NoConnectionEvent";
+        won.COMMUNUCATION_STATE.NOT_TRANSMITTED = "NotTransmittedEvent";
+        won.COMMUNUCATION_STATE.PENDING = "Pending";
+        won.COMMUNUCATION_STATE.ACCEPTED = "Accepted";
 
         won.EVENT.APPSTATE_CURRENT_NEED_CHANGED = "AppState.CurrentNeedChangedEvent";
 
@@ -290,6 +301,10 @@
             return function(reason) {
                 console.log("Error! reason: " + reason);
             }
+        }
+
+        won.isNull = function(value){
+            return typeof(value) === 'undefined' || value == null;
         }
 
         //helper function: is x an array?
@@ -536,6 +551,7 @@
             builder.messageGraph = messageGraph;
         };
 
+
         /*
          * Creates a JSON-LD representation of the need data provided through builder functions.
          * e.g.:
@@ -561,6 +577,7 @@
                                 }
                             ]
                         }
+
                     ]
                 };
             }
@@ -576,6 +593,7 @@
             getContext: function () {               //TODO inherit from base buiilder
                 return this.data["@context"];
             },
+
             getNeedGraph: function(){
                 return this.data["@graph"][0]["@graph"];
             },
@@ -763,7 +781,64 @@
                 return this.data;
             }
         }
+        won.DraftBuilder = function DraftBuilder(data){
+            if (data != null && data != undefined) {
+                this.data = won.clone(data);
+            } else {
+                this.data =
+                {
+                    "@graph": [
+                        {
+                            "@id": "no-id-yet",
+                            "@graph": [
+                                {
+                                    "@type": "won:Need",
+                                    "won:hasContent": "_:n01"
+                                },
+                                {
+                                    "@id": "_:n01",
+                                    "@type": "won:NeedContent"
+                                }
+                            ]
+                        },
+                        {
+                            "@id":"no-id-yet",
+                            "@graph": [
+                                {
+                                    "@type":"won:DraftState",
+                                    "won:hasContent":"_:n02"
+                                },
+                                {
+                                    "@id":"_:n02",
+                                    "@type":"won:MetaInformation"
+                                }
+                            ]
+                        }
+                    ]
+                };
+            }
+        }
+        won.DraftBuilder.prototype = new won.NeedBuilder();
 
+        won.DraftBuilder.prototype.constructor = won.DraftBuilder;
+
+        won.DraftBuilder.prototype.getMetaNode =  function(){
+            return this.data["@graph"][1]["@graph"][1];
+        }
+        won.DraftBuilder.prototype.setCurrentStep = function(currentStep){
+            this.getMetaNode()["won:isInStep"]=currentStep;
+            return this;
+        }
+        won.DraftBuilder.prototype.setDraftObject = function(draft){
+            this.getMetaNode()["won:hasDraftObject"]=draft;
+            return this;
+        }
+        won.DraftBuilder.prototype.getDraftObject = function(){
+            return this.getMetaNode()["won:hasDraftObject"];
+        }
+        won.DraftBuilder.prototype.getCurrentStep = function(){
+            return this.getMetaNode()["won:isInStep"];
+        }
         /*
          * Creates a JSON-LD stucture containing a named graph with default 'unset' event URI
          * plus the specified hashFragment
@@ -924,8 +999,12 @@
                 return this.data;
             }
         };
-        
-        
+
+
+
+            
+
+
         return won;
     };
     var factory = function() {

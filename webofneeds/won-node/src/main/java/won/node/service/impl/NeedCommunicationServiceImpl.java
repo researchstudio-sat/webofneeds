@@ -213,6 +213,7 @@ public class NeedCommunicationServiceImpl implements
       // add the connectionID to the wonMessage
       WonMessage newWonMessage = new WonMessageBuilder()
         .wrap(wonMessage)
+        .setTimestamp(new Date().getTime())
         .setSenderURI(con.getConnectionURI())
         .build();
       messageEventRepository.save(

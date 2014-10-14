@@ -165,6 +165,11 @@ app.directive('header', function(){
                         return 'Outgoing Request';
                     }
                     return 'Incoming Request';
+                case won.WONMSG.connectSentMessage:
+                    if (lastConEvent.event.hasReceiverNeed == lastConEvent.remoteNeed.uri){
+                        return 'Outgoing Request';
+                    }
+                    return 'Incoming Request';
                 case won.WONMSG.hintMessage:
                     return 'Matches';
                 default:
@@ -182,10 +187,12 @@ app.directive('header', function(){
 
             for(var i = 0; i < inputArray.length; i++) {
                 var item = inputArray[i];
-                if(eventTypes.indexOf(item.event.hasMessageType)!=-1){
-                    item.id = i;
-                    item.typeText = getTypeText(item);
-                    outputArray.push(item);
+                if (item != null) {
+                    if (eventTypes.indexOf(item.event.hasMessageType) != -1) {
+                        item.id = i;
+                        item.typeText = getTypeText(item);
+                        outputArray.push(item);
+                    }
                 }
             }
 
@@ -199,7 +206,7 @@ app.run(function($httpBackend,$rootScope){
         //$httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
         $httpBackend.whenPOST('/owner/rest/needs/').passThrough();
         $httpBackend.whenGET('/owner/rest/needs/').passThrough();
-        $httpBackend.whenGET('/owner/rest/needs/drafts').passThrough();
+        $httpBackend.whenGET('/owner/rest/needs/drafts/').passThrough();
         $httpBackend.whenPOST('/owner/rest/needs/drafts').passThrough();
         $httpBackend.whenDELETE('/owner/rest/needs/drafts').passThrough();
         $httpBackend.whenGET('/owner/rest/needs/drafts/.+').passThrough();
