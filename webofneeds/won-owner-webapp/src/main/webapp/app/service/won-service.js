@@ -38,17 +38,7 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processHintNotificationMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        var connectionURI = eventData.hasReceiver;
-        if (connectionURI != null) {
-            linkedDataService.cacheItemMarkDirty(connectionURI);
-        }
-        var connectionsUri = linkedDataService.getNeedConnectionsUri(eventData.hasReceiverNeed);
-        if (connectionsUri != null){
-            linkedDataService.cacheItemMarkDirty(connectionsUri);
-        }
-        //extract hint information from message
-        //call handler if there is one - it may modify the event object
-
+        linkedDataService.invalidateCacheForNewConnection(eventData.hasReceiver, eventData.hasReceiverNeed);
         eventData.matchScore = eventData.framedMessage[won.WON.hasMatchScoreCompacted];
         eventData.matchCounterpartURI = won.getSafeJsonLdValue(eventData.framedMessage[won.WON.hasMatchCounterpart]);
         //add some properties to the eventData so as to make them easily accessible to consumers
@@ -66,18 +56,11 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processConnectMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        var connectionURI = eventData.hasReceiver;
-        if (connectionURI != null) {
-            linkedDataService.cacheItemMarkDirty(connectionURI);
-        }
-        var connectionsUri = linkedDataService.getNeedConnectionsUri(eventData.hasReceiverNeed);
-        if (connectionsUri != null){
-            linkedDataService.cacheItemMarkDirty(connectionsUri);
-        }
+        linkedDataService.invalidateCacheForNewConnection(eventData.hasReceiver, eventData.hasReceiverNeed);
     }
     var processConnectSentMessage = function(eventData, message){
         console.log("processing ConnectSent Message");
-
+        linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
     }
 
     /**
@@ -88,9 +71,7 @@ angular.module('won.owner').factory('wonService', function (
     var processOpenMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
         var connectionURI = eventData.hasReceiver;
-        if (connectionURI != null) {
-            linkedDataService.cacheItemMarkDirty(connectionURI);
-        }
+        linkedDataService.invalidateCacheForNewMessage(connectionURI);
     }
     var processErrorMessage = function(eventData, message){
         eventData.commState = won.COMMUNUCATION_STATE.NOT_TRANSMITTED;
@@ -104,19 +85,13 @@ angular.module('won.owner').factory('wonService', function (
     var processCloseMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
         var connectionURI = eventData.hasReceiver;
-        if (connectionURI != null) {
-            linkedDataService.cacheItemMarkDirty(connectionURI);
-        }
-        //TODO update remove connection from local store if not already removed
+        linkedDataService.invalidateCacheForNewMessage(connectionURI);
     }
 
     var processConnectionMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
         var connectionURI = eventData.hasReceiver;
-        if (connectionURI != null) {
-            linkedDataService.cacheItemMarkDirty(connectionURI);
-        }
-        //TODO update remove connection from local store if not already removed
+        linkedDataService.invalidateCacheForNewMessage(connectionURI);
     }
 
 

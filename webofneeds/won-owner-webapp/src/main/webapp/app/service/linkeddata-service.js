@@ -276,6 +276,42 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         delete privateData.cacheStatus[uri];
     }
 
+    /**
+     * Invalidates the appropriate linked data cache items such that all information about a
+     * newly created connection is loaded. Should be called when receiving hint or connect.
+     *
+     * Note that this causes an asynchronous call - the cache items may only be invalidated
+     * after some delay.
+     *
+     * @param connectionUri - the uri of the new connection
+     * @param needUri - the uri of the need that now has a new connection
+     */
+    linkedDataService.invalidateCacheForNewConnection = function(connectionUri, needUri){
+        if (connectionURI != null) {
+            linkedDataService.cacheItemMarkDirty(connectionURI);
+        }
+        linkedDataService.getNeedConnectionsUri(needUri).then(
+            function(connectionsUri){
+                if (connectionsUri != null){
+                    linkedDataService.cacheItemMarkDirty(connectionsUri);
+                }
+            }
+        );
+    }
+
+    /**
+     * Invalidates the appropriate linked data cache items such that all information about a
+     * newly received connection message is loaded. Should be called when receiving open, close, or message.
+     *
+     * Note that this causes an asynchronous call - the cache items may only be invalidated
+     * after some delay.
+     *
+     * @param connectionUri - the uri of the connection
+     */
+    linkedDataService.invalidateCacheForNewMessage = function(connectionUri){
+
+    }
+
 
 
     var getReadUpdateLockPerUri = function(uri){
