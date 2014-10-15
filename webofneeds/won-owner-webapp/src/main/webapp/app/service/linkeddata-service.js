@@ -581,9 +581,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 function(reason) { $q.reject("could not get need uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
-    linkedDataService.getRemoteconnectionUriOfConnection = function(connectionUri){
+    linkedDataService.getRemoteConnectionUriOfConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getRemoteconnectionUriOfConnection: connectionUri must not be null"};
+            throw {message : "getRemoteConnectionUriOfConnection: connectionUri must not be null"};
         }
         return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteConnection)
             .then(
@@ -622,7 +622,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                         //if the local connection was created through a hint message (most likely)
                                         //the remote connection is not known or doesn't exist yet. Hence, the next call
                                         //may or may not succeed.
-                                        return linkedDataService.getRemoteconnectionUriOfConnection(connectionUri).then(
+                                        return linkedDataService.getRemoteConnectionUriOfConnection(connectionUri).then(
                                             function(remoteconnectionUri) {
                                                 var ret = {};
                                                 ret[won.WONMSG.hasSender] = connectionUri;
@@ -998,8 +998,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         }
         console.log("deleting node:   " + uri);
         var deferred = $q.defer();
-        //var query = "delete where {<"+uri+"> ?anyP ?anyO}";
-        var query = "select ?anyO where {<"+uri+"> ?anyP ?anyO}";
+        var query = "delete where {<"+uri+"> ?anyP ?anyO}";
+        //var query = "select ?anyO where {<"+uri+"> ?anyP ?anyO}";
         privateData.store.execute(query, function (success, graph) {
             if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
                 return;

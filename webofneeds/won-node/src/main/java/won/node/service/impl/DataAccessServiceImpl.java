@@ -84,20 +84,21 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     if (con == null) {
       /* Create connection */
       con = new Connection();
-      con.setNeedURI(needURI);
-      con.setState(connectionState);
-      con.setRemoteNeedURI(otherNeedURI);
-      con.setRemoteConnectionURI(otherConnectionURI);
-      con.setTypeURI(facetURI);
-      //save connection (this creates a new id)
-      con = connectionRepository.save(con);
-      //create and set new uri
-      con.setConnectionURI(wonNodeInformationService.generateConnectionURI(
-        needURI, wonNodeInformationService.getDefaultWonNode()));
-      con = connectionRepository.save(con);
-
-      //TODO: do we save the connection content? where? as a chat content?
     }
+
+    con.setNeedURI(needURI);
+    con.setState(connectionState);
+    con.setRemoteNeedURI(otherNeedURI);
+    con.setRemoteConnectionURI(otherConnectionURI);
+    con.setTypeURI(facetURI);
+    //save connection (this creates a new id)
+    con = connectionRepository.save(con);
+    //create and set new uri
+    con.setConnectionURI(wonNodeInformationService.generateConnectionURI(
+      needURI, wonNodeInformationService.getDefaultWonNode()));
+    con = connectionRepository.save(con);
+
+
 
     return con;
   }
