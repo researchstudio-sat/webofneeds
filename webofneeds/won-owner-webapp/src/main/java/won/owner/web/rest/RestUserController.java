@@ -4,6 +4,8 @@
 
 package won.owner.web.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -44,6 +46,8 @@ import javax.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping("/rest/users")
 public class RestUserController {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private WONUserDetailService wonUserDetailService;
 
@@ -133,7 +137,7 @@ public class RestUserController {
     //
 	@RequestMapping(
 			value = "/isSignedIn",
-			method = RequestMethod.POST
+			method = RequestMethod.GET
     )
     //TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -141,7 +145,14 @@ public class RestUserController {
     public ResponseEntity isSignedIn() {
         // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
         // code by itself if the session isn't valid any more
-        return new ResponseEntity("Current session is still valid.", HttpStatus.OK);
+        SecurityContext context = SecurityContextHolder.getContext();
+        //if(context.getAuthentication() )
+        logger.debug("lhljh {}", context.getAuthentication().isAuthenticated());
+        if (context.getAuthentication() == null || !context.getAuthentication().isAuthenticated()) {
+            return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+        } else {
+            return new ResponseEntity("Current session is still valid. asdf", HttpStatus.OK);
+        }
     }
 
     /**

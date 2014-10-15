@@ -8,7 +8,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
     privateData.verifiedOnce = false; //gets reset on reload, will be set true after verifying the session cookie with the server
 
     userService.verifyAuth = function() {
-        return $http.post('/owner/rest/users/isSignedIn', user).then ( //after merging: isLoggedIn
+        return $http.get('rest/users/isSignedIn').then ( //after merging: isLoggedIn
 
             function(response){ //success
                 user.isAuth = true;
