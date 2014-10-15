@@ -17,12 +17,39 @@
 /**
  * Created by syim on 08.08.2014.
  */
-angular.module('won.owner').factory('messageService', function ($http, $q, $rootScope) {
+angular.module('won.owner').factory('messageService', function ($http, $q, $rootScope, $interval, $location) {
     //the service object we're constructing here
     var messageService = {};
 
     //private data of the service
     var privateData = {};
+
+    //until this is no longer an issue: https://github.com/rstoyanchev/spring-websocket-portfolio/issues/42
+    //we'll send http requests in regular intervals to keep the server's http session open
+    privateData.HTTP_HEARTBEAT_INTERVAL = 25 * 1000;
+    privateData.HTTP_HEARTBEAT_URL = "rest/users/isLoggedIn";
+    //set to true while waiting for the response to the heartbeat request
+    privateData.httpHeartbeatPending = false;
+
+    var sendHeartbeat = function(){
+        if (!privateData.httpHeartbeatPending) {
+            $http.get(privateData.HTTP_HEARTBEAT_URL)
+                .success(
+                function (data, status, headers, config) {
+                    privateData.httpHeartbeatPending = false;
+                    if (status != 200){
+                        console.log("warn: successful http heartbeat returned status " + status);
+                    }
+                })
+                .error(
+                function(data, status, headers, config){
+                    privateData.httpHeartbeatPending = false;
+                    console.log("warn: failed http heartbeat returned status " + status);
+                });
+        }
+    }
+
+    $interval(sendHeartbeat,privateData.HTTP_HEARTBEAT_INTERVAL);
 
     //currently registered callbacks
     privateData.callbacks = [];
@@ -168,6 +195,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
 
 
 
+
     messageService.closeConnection = function () {
         console.log("closing Websocket via messageService.closeConnection()");
         if (privateData.socket != null && ! isClosingOrClosed()) {
@@ -255,6 +283,8 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         }
 
     };
+
+    createSocket();
 
     return messageService;
 });

@@ -287,8 +287,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @param needUri - the uri of the need that now has a new connection
      */
     linkedDataService.invalidateCacheForNewConnection = function(connectionUri, needUri){
-        if (connectionURI != null) {
-            linkedDataService.cacheItemMarkDirty(connectionURI);
+        if (connectionUri != null) {
+            linkedDataService.cacheItemMarkDirty(connectionUri);
         }
         linkedDataService.getNeedConnectionsUri(needUri).then(
             function(connectionsUri){
@@ -309,7 +309,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @param connectionUri - the uri of the connection
      */
     linkedDataService.invalidateCacheForNewMessage = function(connectionUri){
-
+        if (connectionUri != null) {
+            linkedDataService.cacheItemMarkDirty(connectionUri);
+        }
     }
 
 
@@ -569,9 +571,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 function(reason) { $q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
     }
 
-    linkedDataService.getneedUriOfConnection = function(connectionUri){
+    linkedDataService.getNeedUriOfConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getneedUriOfConnection: connectionUri must not be null"};
+            throw {message : "getNeedUriOfConnection: connectionUri must not be null"};
         }
         return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.belongsToNeed)
             .then(
@@ -609,7 +611,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getEnvelopeDataforConnection: connectionUri must not be null"};
         }
-        return linkedDataService.getneedUriOfConnection(connectionUri)
+        return linkedDataService.getNeedUriOfConnection(connectionUri)
             .then(function(needUri) {
                 return linkedDataService.getWonNodeUriOfNeed(needUri)
                     .then(function (wonNodeUri) {
@@ -996,7 +998,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         }
         console.log("deleting node:   " + uri);
         var deferred = $q.defer();
-        var query = "delete where {<"+uri+"> ?anyP ?anyO}";
+        //var query = "delete where {<"+uri+"> ?anyP ?anyO}";
+        var query = "select ?anyO where {<"+uri+"> ?anyP ?anyO}";
         privateData.store.execute(query, function (success, graph) {
             if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
                 return;
