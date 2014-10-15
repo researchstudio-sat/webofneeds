@@ -107,40 +107,62 @@ public class RestUserController {
 	@RequestMapping(
 			value = "/signin",
 			method = RequestMethod.POST
-	)
-  //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
-	public ResponseEntity logIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
-    SecurityContext context = SecurityContextHolder.getContext();
-		UsernamePasswordAuthenticationToken token =	new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
-		try {
-			Authentication auth = authenticationManager.authenticate(token);
-      SecurityContextHolder.getContext().setAuthentication(auth);
-      securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
-			return new ResponseEntity("Signed in.", HttpStatus.OK);
-		} catch (BadCredentialsException ex) {
-			return new ResponseEntity("No such username/password combination registered.", HttpStatus.FORBIDDEN);
-		}
+    )
+    //TODO: move transactionality annotation into the service layer
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public ResponseEntity logIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
+        SecurityContext context = SecurityContextHolder.getContext();
+        UsernamePasswordAuthenticationToken token =	new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
+        try {
+            Authentication auth = authenticationManager.authenticate(token);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+            return new ResponseEntity("Signed in.", HttpStatus.OK);
+        } catch (BadCredentialsException ex) {
+            return new ResponseEntity("No such username/password combination registered.", HttpStatus.FORBIDDEN);
+        }
 	}
 
-  /**
-   *
-   * @return
-   */
+    /**
+    * Method only accessible if the user's still signed in / the session's still valid -> Use it to check the session cookie.
+    */
+    //* @param user user object
+    //* @param request
+    //* @param response
+    //* @return
+    //
 	@RequestMapping(
-			value = "/signout",
+			value = "/isSignedIn",
 			method = RequestMethod.POST
-	)
-  //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
-	public ResponseEntity logOut(HttpServletRequest request, HttpServletResponse response) {
-		SecurityContext context = SecurityContextHolder.getContext();
-    if (context.getAuthentication() == null) {
-      return new ResponseEntity("No user is signed in, ignoring this request.", HttpStatus.NOT_MODIFIED);
+    )
+    //TODO: move transactionality annotation into the service layer
+    @Transactional(propagation = Propagation.SUPPORTS)
+    //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity isSignedIn() {
+        // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
+        // code by itself if the session isn't valid any more
+        return new ResponseEntity("Current session is still valid.", HttpStatus.OK);
     }
-    myLogoff(request, response);
-    return new ResponseEntity("Signed out", HttpStatus.OK);
-	}
+
+    /**
+     *
+     * @return
+     */
+    @RequestMapping(
+            value = "/signout",
+            method = RequestMethod.POST
+    )
+    //TODO: move transactionality annotation into the service layer
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public ResponseEntity logOut (HttpServletRequest request, HttpServletResponse response){
+        SecurityContext context = SecurityContextHolder.getContext();
+        if (context.getAuthentication() == null) {
+            return new ResponseEntity("No user is signed in, ignoring this request.", HttpStatus.NOT_MODIFIED);
+        }
+        myLogoff(request, response);
+        return new ResponseEntity("Signed out", HttpStatus.OK);
+    }
+
 
   @RequestMapping(
     value = "/{userId}/favourites",

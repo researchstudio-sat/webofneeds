@@ -14,7 +14,23 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, userService, linkedDataService, applicationStateService, $filter, $interval) {
+angular.module('won.owner').controller("HeaderCtrl",
+    function ( $scope
+             , $location
+             , userService
+             , linkedDataService
+             , applicationStateService
+             , $filter
+             , $interval
+             , $log
+             ) {
+
+    $log.debug("Initializing HeaderCtrl.")
+
+    //after reloading, verify if the session's still valid
+    //TODO move someone where more appropriate (sadly in app.config the service isn't available yet)
+    //userService.verifyAuth(); homepage doesn't load any more after using this here
+    // due to the wait-for-all decorator? ("everything waits for the http request to return"?)
 
     $scope.isActive = function(where) {
 		if ($location.path().indexOf(where) > -1) {
@@ -24,9 +40,16 @@ angular.module('won.owner').controller("HeaderCtrl", function($scope,$location, 
 		}
 	};
 
+    //TODO debug output. deletme
+    $scope.$on('$locationChangeStart', function logRouteChange(e, to, from) {
+        $log.debug("changing route: " + JSON.stringify(from)
+                   + " to "  + JSON.stringify(to)
+        )});
+
     $scope.authenticated = false;
 
     $scope.redirectHome= function(){
+        // TODO might cause redirect loop
         $scope.authenticated = !userService.isAuth();
         if(!$scope.authenticated){
             $location.path("/home");

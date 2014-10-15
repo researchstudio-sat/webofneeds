@@ -33,7 +33,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $rootScope) {
+angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $rootScope, $log) {
     $scope.wonNodeURI = "http://localhost:8080/won";
     $scope.needURIPath = "/resource/need";
     $scope.connectionURIPath = "/connection";
