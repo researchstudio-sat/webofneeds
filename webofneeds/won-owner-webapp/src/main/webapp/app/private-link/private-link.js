@@ -217,10 +217,10 @@ angular.module('won.owner')
     $scope.clickOnMessageButton = function(buttonId) {
         switch (buttonId) {
             case 1:
-                toggleEventTypes([won.WONMSG.connectionMessage]);
+                toggleEventTypes([won.WONMSG.connectionMessage, won.WONMSG.openMessage]);
                 break;
             case 2:
-                toggleEventTypes([won.WONMSG.connectMessage, won.WONMSG.openMessage]);
+                toggleEventTypes([won.WONMSG.connectMessage]);
                 break;
             case 3:
                 toggleEventTypes([won.WONMSG.hintMessage]);
