@@ -33,7 +33,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService) {
+angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $log) {
     $scope.wonNodeURI = "http://localhost:8080/won";
     $scope.needURIPath = "/resource/need";
     $scope.connectionURIPath = "/connection";
@@ -43,6 +43,8 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     //allow acces to service methods from angular expressions:
     $scope.openNeedDetailView = applicationControlService.openNeedDetailView;
 
+
+    $log.debug("Initializing MainCtrl.");
 
 
     addEventAsUnreadAndUpdateUnreadObjects = function(eventData) {
