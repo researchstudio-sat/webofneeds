@@ -109,9 +109,9 @@
 				<li ng-class="isActive()"><a href="" ng-click="redirectHome()">
 					<i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
 				</li>
-					</ul>
+			</ul>
 			<ul class="nav navbar-nav">
-				<li class="dropdown" ng-show="!showPublic()" ng-class="isActive('create-need')" ng-cloak>
+                <li class="dropdown" ng-class="isActive('create-need')" ng-cloak>
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
 					</a>
@@ -131,8 +131,8 @@
 						<li><a href="#/create-need/1/3/title"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
                                 src="/owner/images/type_posts/change.png"/>&nbsp;I
 							want to <strong>change</strong> something</a></li>
-						<li class="divider"></li>
-						<li class="dropdown-submenu">
+						<li class="divider" ng-show="!showPublic()"></li>
+						<li class="dropdown-submenu" ng-show="!showPublic()">
 							<a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
 							<ul class="dropdown-menu" ng-controller="PostBoxCtrl">
 								<li ng-repeat="draft in allDrafts | orderBy: '-datetime' | limitTo: recordsToDisplay">
@@ -143,28 +143,6 @@
 								<li><a href="#/postbox"><i class="fa fa-list fa-lg"></i>&nbsp;II Others (go to full list)</a></li>
 							</ul>
 						</li>
-					</ul>
-				</li>
-				<li class="dropdown" ng-show="showPublic()" ng-class="isActive('create-need')" ng-cloak>
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
-					</a>
-					<ul class="dropdown-menu">
-                        <li><a href="#/create-need/1/0"><!--<i class="fa fa-circle fa-lg"></i>--><img
-                                src="/owner/images/type_posts/want.png"/>&nbsp;I want
-                            to <strong>have</strong> something</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#/create-need/1/1"><!--<i class="fa fa-circle-o fa-lg"></i>--><img
-                                src="/owner/images/type_posts/offer.png"/>&nbsp;I
-                            <strong>offer</strong> something</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#/create-need/1/2"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img
-                                src="/owner/images/type_posts/todo.png"/>&nbsp;I
-                            want to do something <strong>together</strong></a></li>
-                        <li class="divider"></li>
-                        <li><a href="#/create-need/1/3"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
-                                src="/owner/images/type_posts/change.png"/>&nbsp;I
-                            want to <strong>change</strong> something</a></li>
 					</ul>
 				</li>
 				<li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
