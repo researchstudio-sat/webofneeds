@@ -203,6 +203,12 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         }
     }
 
+    messageService.reconnect = function(){
+        console.log("reconnecting Websocket");
+        messageService.closeConnection();
+        createSocket();
+    }
+
     messageService.sendMessage = function(msg) {
         var jsonMsg = JSON.stringify(msg);
         if (isConnected()) {

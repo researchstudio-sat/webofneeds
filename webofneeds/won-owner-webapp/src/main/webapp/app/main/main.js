@@ -33,7 +33,8 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $rootScope) {
+angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $rootScope, messageService) {
+    //we use the messageService dependency in order to force websocket creation from the very beginning
     $scope.wonNodeURI = "http://localhost:8080/won";
     $scope.needURIPath = "/resource/need";
     $scope.connectionURIPath = "/connection";
@@ -144,6 +145,14 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
 
     $scope.$on(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED, function(event){
         reloadCurrentNeedData();
+    });
+
+    $scope.$on(won.EVENT.USER_SIGNED_IN, function(event){
+       messageService.reconnect();
+    });
+
+    $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
+        messageService.reconnect();
     });
 
 });

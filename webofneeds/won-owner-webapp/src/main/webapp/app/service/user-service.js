@@ -1,4 +1,4 @@
-angular.module('won.owner').factory('userService', function ($window, $http) {
+angular.module('won.owner').factory('userService', function ($window, $http, $rootScope) {
 
 	var user = {};
     var registered = false;
@@ -58,6 +58,7 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 			).then(
                 function () {
                     // success
+                    $rootScope.$broadcast(won.EVENT.USER_SIGNED_IN);
                     return {status:"OK"};
                 },
                 function (response) {
@@ -78,6 +79,7 @@ angular.module('won.owner').factory('userService', function ($window, $http) {
 					'/owner/rest/users/signout'
 			).then(
 				function (data, status) {
+                    $rootScope.$broadcast(won.EVENT.USER_SIGNED_OUT);
 					return {status:"OK"};
 				},
 				function (data, status) {

@@ -38,15 +38,19 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processHintNotificationMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        linkedDataService.invalidateCacheForNewConnection(eventData.hasReceiver, eventData.hasReceiverNeed);
-        eventData.matchScore = eventData.framedMessage[won.WON.hasMatchScoreCompacted];
-        eventData.matchCounterpartURI = won.getSafeJsonLdValue(eventData.framedMessage[won.WON.hasMatchCounterpart]);
-        //add some properties to the eventData so as to make them easily accessible to consumers
-        //of the hint event
-        if (eventData.matchCounterpartURI != null) {
-            //load the data of the need the hint is about, if required
-            linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
-        }
+        linkedDataService.invalidateCacheForNewConnection(eventData.hasReceiver, eventData.hasReceiverNeed)
+            ['finally'](function(){
+                eventData.matchScore = eventData.framedMessage[won.WON.hasMatchScoreCompacted];
+                eventData.matchCounterpartURI = won.getSafeJsonLdValue(eventData.framedMessage[won.WON.hasMatchCounterpart]);
+                //add some properties to the eventData so as to make them easily accessible to consumers
+                //of the hint event
+                if (eventData.matchCounterpartURI != null) {
+                    //load the data of the need the hint is about, if required
+                    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
+                }
+                console.log("publishing angular event");
+                $rootScope.$broadcast(eventData.eventType, eventData);
+            });
     }
 
     /**
@@ -56,11 +60,20 @@ angular.module('won.owner').factory('wonService', function (
      */
     var processConnectMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
-        linkedDataService.invalidateCacheForNewConnection(eventData.hasReceiver, eventData.hasReceiverNeed);
+        linkedDataService.invalidateCacheForNewConnection(eventData.hasReceiver, eventData.hasReceiverNeed).
+            then(function(){
+                console.log("publishing angular event");
+                $rootScope.$broadcast(eventData.eventType, eventData);
+            });
     }
     var processConnectSentMessage = function(eventData, message){
         console.log("processing ConnectSent Message");
-        linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
+        linkedDataService.invalidateCacheForNewMessage(eventData.hasSender)
+            .then(function(){
+                console.log("publishing angular event");
+                $rootScope.$broadcast(eventData.eventType, eventData);
+            });
+
     }
 
     /**
@@ -71,7 +84,11 @@ angular.module('won.owner').factory('wonService', function (
     var processOpenMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
         var connectionURI = eventData.hasReceiver;
-        linkedDataService.invalidateCacheForNewMessage(connectionURI);
+        linkedDataService.invalidateCacheForNewMessage(connectionURI)
+            .then(function(){
+                console.log("publishing angular event");
+                $rootScope.$broadcast(eventData.eventType, eventData);
+            });
     }
     var processErrorMessage = function(eventData, message){
         eventData.commState = won.COMMUNUCATION_STATE.NOT_TRANSMITTED;
@@ -85,13 +102,21 @@ angular.module('won.owner').factory('wonService', function (
     var processCloseMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
         var connectionURI = eventData.hasReceiver;
-        linkedDataService.invalidateCacheForNewMessage(connectionURI);
+        linkedDataService.invalidateCacheForNewMessage(connectionURI)
+            .then(function(){
+                console.log("publishing angular event");
+                $rootScope.$broadcast(eventData.eventType, eventData);
+            });
     }
 
     var processConnectionMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
         var connectionURI = eventData.hasReceiver;
-        linkedDataService.invalidateCacheForNewMessage(connectionURI);
+        linkedDataService.invalidateCacheForNewMessage(connectionURI)
+            .then(function(){
+                console.log("publishing angular event");
+                $rootScope.$broadcast(eventData.eventType, eventData);
+            })
     }
 
 
@@ -115,13 +140,17 @@ angular.module('won.owner').factory('wonService', function (
                 //only do something if a type/handler combination is registered
                 if (configForEvent.eventType != null) {
                     event.eventType = configForEvent.eventType;
-                    if (configForEvent.handler != null) {
-                        configForEvent.handler(event, msg);
-                    }
-                    //publish angular event
-                    console.log("incoming message: \n  ", JSON.stringify(msg) + "\npublishing angular event");
                     event.timestamp = new Date().getTime();
-                    $rootScope.$broadcast(event.eventType, event);
+                    console.log("incoming message: \n  ", JSON.stringify(msg));
+                    if (configForEvent.handler != null) {
+                        //the handler is responsible for broadcasting the event!
+                        configForEvent.handler(event, msg);
+                    } else {
+                        //publish angular event
+                        console.log("publishing angular event");
+                        $rootScope.$broadcast(event.eventType, event);
+                    }
+
                 } else {
                     console.log("Not handling message of type " + event.hasMessageType + " in incomingMessageHandler");
                 }

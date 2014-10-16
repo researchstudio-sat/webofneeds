@@ -285,12 +285,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      *
      * @param connectionUri - the uri of the new connection
      * @param needUri - the uri of the need that now has a new connection
+     * @return a promise so the caller can chain promises after this one
      */
     linkedDataService.invalidateCacheForNewConnection = function(connectionUri, needUri){
         if (connectionUri != null) {
             linkedDataService.cacheItemMarkDirty(connectionUri);
         }
-        linkedDataService.getNeedConnectionsUri(needUri).then(
+        return linkedDataService.getNeedConnectionsUri(needUri).then(
             function(connectionsUri){
                 if (connectionsUri != null){
                     linkedDataService.cacheItemMarkDirty(connectionsUri);
@@ -307,11 +308,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * after some delay.
      *
      * @param connectionUri - the uri of the connection
+     * @return a promise so that the caller can chain another promise
      */
     linkedDataService.invalidateCacheForNewMessage = function(connectionUri){
         if (connectionUri != null) {
             linkedDataService.cacheItemMarkDirty(connectionUri);
         }
+        return $q.when(true); //return a promise for chaining
     }
 
 
