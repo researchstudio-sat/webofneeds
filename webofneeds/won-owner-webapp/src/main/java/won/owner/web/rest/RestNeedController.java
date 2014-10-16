@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import won.owner.linkeddata.NeedPojoNeedModelBuilder;
 import won.owner.model.Draft;
 import won.owner.model.User;
+import won.owner.model.UserNeed;
 import won.owner.pojo.ConnectionPojo;
 import won.owner.pojo.CreateDraftPojo;
 import won.owner.pojo.DraftPojo;
@@ -144,7 +145,12 @@ public class RestNeedController {
     logger.info("Getting all needs of user: ");
 
     User user = getCurrentUser();
-    return user.getNeedURIs();
+    List<UserNeed> userNeeds = user.getUserNeeds();
+    List<URI> needUris = new ArrayList(userNeeds.size());
+    for(UserNeed userNeed: userNeeds){
+      needUris.add(userNeed.getUri());
+    }
+    return needUris;
   }
 
   /**

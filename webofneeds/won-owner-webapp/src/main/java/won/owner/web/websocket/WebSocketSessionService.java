@@ -1,72 +1,57 @@
+/*
+ * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package won.owner.web.websocket;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.web.socket.WebSocketSession;
+import won.owner.model.User;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
-/**
- * This service stores the connection between the WebSocket sessions and the
- * Need URIs. If a OA client authenticates to a OA server it sends a list of
- * Need URIs which will then be mapped to the session to the client. If a
- * messageEvent comes through the session which has a unmapped Need URI the
- * URI will be mapped to the session as well.
- *
- * @author Fabian Salcher
- */
 public class WebSocketSessionService
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  // ToDo (FS): make this persistent
-  private Map<URI, Set<WebSocketSession>> mapping = new HashMap<URI, Set<WebSocketSession>>();
-  private Object lock ;
+  private WebSocketSessionMapping<Long> userIdToSession = new WebSocketSessionMapping<Long>();
+  private WebSocketSessionMapping<URI> needUriToSession = new WebSocketSessionMapping<URI>();
 
-  public WebSocketSessionService() {
-    this.lock = new Object();
+  public void addMapping(User user, WebSocketSession session) {
+    this.userIdToSession.addMapping(user.getId(), session);
+  }
+
+  public void addMapping(URI needUri, WebSocketSession session) {
+    this.needUriToSession.addMapping(needUri, session);
+  }
+
+  public void removeMapping(User user, WebSocketSession session) {
+    this.userIdToSession.removeMapping(user.getId(), session);
+  }
+
+  public void removeMapping(URI needUri, WebSocketSession session) {
+    this.needUriToSession.removeMapping(needUri, session);
+  }
+
+  public Set<WebSocketSession> getWebSocketSessions(User user) {
+    return this.userIdToSession.getWebSocketSessions(user.getId());
+  }
+
+  public Set<WebSocketSession> getWebSocketSessions(URI needUri) {
+    return this.needUriToSession.getWebSocketSessions(needUri);
   }
 
 
-  public void addMapping(URI needURI, WebSocketSession session) {
-    logger.debug("adding mapping for needURI {} to websocket session {}", needURI, session.getId());
-    synchronized (lock) {
-      //we want to avoid losing one of two concurrent sessions added
-      //for the same needURI, so we synchronize here
-      if (!mapping.containsKey(needURI)) {
-        //we use the CopyOnWriteArraySet so we are safe across threads. We
-        //assume that reads outnumber writes by far.
-        mapping.put(needURI, new CopyOnWriteArraySet<WebSocketSession>());
-      }
-    }
-    mapping.get(needURI).add(session);
-  }
-
-  public void removeMapping(URI needURI, WebSocketSession session) {
-    logger.debug("removing mapping from needURI {} to websocket session {}", needURI, session.getId());
-    synchronized (this) {
-      //we don't want add and remove to interfere
-      Set<WebSocketSession> sessions = mapping.get(needURI);
-      if (sessions != null) {
-        sessions.remove(session);
-        if (sessions.isEmpty()) mapping.remove(sessions);
-      }
-    }
-  }
-
-  public Set<WebSocketSession> getWebSocketSessions(URI needURI) {
-    Set<WebSocketSession> sessions = mapping.get(needURI);
-    if (sessions != null) {
-      Set<WebSocketSession> ret = new HashSet(sessions.size());
-      ret.addAll(sessions);
-      return ret;
-    } else {
-      return null;
-    }
-  }
 
 }

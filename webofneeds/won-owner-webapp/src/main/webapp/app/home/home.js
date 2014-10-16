@@ -14,9 +14,14 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('HomeCtrl', function ($scope,$routeParams, $location, userService) {
+angular.module('won.owner').controller('HomeCtrl',
+    function ($scope,$routeParams, $location, userService, $log) {
+
     var firstDisplay = true;
     var time = 400;
+
+
+    $log.debug("Initializing HeaderCtrl.")
 
 
 

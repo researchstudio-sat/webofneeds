@@ -243,7 +243,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
     public void sendConnectionMessage(URI connectionURI, Model message, WonMessage wonMessage) throws Exception {
         String messageConvert = RdfUtils.toString(message);
 
-        URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithConnectionUri(connectionURI);
+        URI wonNodeUri = wonMessage.getSenderNodeURI();
 
         CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
         String endpoint = camelConfiguration.getEndpoint();
@@ -262,7 +262,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
     @Override
     public void close(URI connectionURI, Model content, WonMessage wonMessage) throws Exception {
 
-        URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithConnectionUri(connectionURI);
+        URI wonNodeUri = wonMessage.getSenderNodeURI();
 
         CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
         String endpoint = camelConfiguration.getEndpoint();
@@ -281,7 +281,7 @@ public class OwnerProtocolNeedServiceClientJMSBased
     @Override
     public void open(URI connectionURI, Model content, WonMessage wonMessage) throws Exception {
 
-        URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithConnectionUri(connectionURI);
+        URI wonNodeUri = wonMessage.getSenderNodeURI();
 
         CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
         String endpoint = camelConfiguration.getEndpoint();
