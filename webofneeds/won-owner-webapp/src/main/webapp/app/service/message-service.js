@@ -27,7 +27,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
     //until this is no longer an issue: https://github.com/rstoyanchev/spring-websocket-portfolio/issues/42
     //we'll send http requests in regular intervals to keep the server's http session open
     privateData.HTTP_HEARTBEAT_INTERVAL = 25 * 1000;
-    privateData.HTTP_HEARTBEAT_URL = "rest/users/isLoggedIn";
+    privateData.HTTP_HEARTBEAT_URL = "rest/needs/";
     //set to true while waiting for the response to the heartbeat request
     privateData.httpHeartbeatPending = false;
 

@@ -147,8 +147,9 @@ public class RestUserController {
         // code by itself if the session isn't valid any more
         SecurityContext context = SecurityContextHolder.getContext();
         //if(context.getAuthentication() )
-        logger.debug("lhljh {}", context.getAuthentication().isAuthenticated());
-        if (context.getAuthentication() == null || !context.getAuthentication().isAuthenticated()) {
+        if (context == null || context.getAuthentication() == null) {
+            return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+        } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
             return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
         } else {
             return new ResponseEntity("Current session is still valid. asdf", HttpStatus.OK);
@@ -182,15 +183,6 @@ public class RestUserController {
   @Transactional(propagation = Propagation.SUPPORTS)
   public ResponseEntity saveAsFavourite(){
     return null;
-  }
-
-  @RequestMapping(
-    value = "/isLoggedIn",
-    method = RequestMethod.GET
-  )
-  @Transactional(propagation = Propagation.SUPPORTS)
-  public ResponseEntity isLoggedIn(){
-    return new ResponseEntity("[]", HttpStatus.OK);
   }
 
   @RequestMapping(

@@ -1,4 +1,4 @@
-angular.module('won.owner').factory('userService', function ($window, $http, $log) {
+angular.module('won.owner').factory('userService', function ($window, $http, $log, $rootScope) {
 
 	var user = {};
     var registered = false;
