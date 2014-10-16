@@ -176,7 +176,7 @@ app.directive('header', function(){
                     return 'Conversation';
                 case won.WONMSG.openMessage:
                     if (lastConEvent.event.hasReceiverNeed == lastConEvent.remoteNeed.uri){
-                        return 'Outgoing Request';
+                        return 'Conversation';
                     }
                     return 'Incoming Request';
                 case won.WONMSG.connectMessage:

@@ -31,11 +31,17 @@ angular.module('won.owner')
         console.log("events changed! now have " + newCnt + " events!" + " had: " + oldCnt +"...");
     });
 
-    // copy the references from the real data holder, used in message table for displaying
-    // and is required by smart table (st-) for sorting the items that can change
-    // see http://lorenzofox3.github.io/smart-table-website/
-    $scope.displayedMessages = [].concat($scope.lastEventOfEachConnectionOfCurrentNeed);
+    $scope.sortedField = 'event.hasTimestamp';
+    $scope.reversedSort = true;
 
+    $scope.setSortParams = function(fieldName) {
+        if ($scope.sortedField == fieldName) {
+            $scope.reversedSort = !$scope.reversedSort;
+        } else {
+            $scope.reversedSort = false;
+            $scope.sortedField = fieldName;
+        }
+    }
 
 
     $scope.$watch($scope.lastEventOfEachConnectionOfCurrentNeed, function(newValue, oldValue){
@@ -211,10 +217,10 @@ angular.module('won.owner')
     $scope.clickOnMessageButton = function(buttonId) {
         switch (buttonId) {
             case 1:
-                toggleEventTypes([won.WONMSG.connectionMessage]);
+                toggleEventTypes([won.WONMSG.connectionMessage, won.WONMSG.openMessage]);
                 break;
             case 2:
-                toggleEventTypes([won.WONMSG.connectMessage, won.WONMSG.openMessage]);
+                toggleEventTypes([won.WONMSG.connectMessage]);
                 break;
             case 3:
                 toggleEventTypes([won.WONMSG.hintMessage]);
@@ -314,7 +320,9 @@ angular.module('won.owner')
     $scope.clickOnAcceptForInRequest = function() {
         console.log('accept clicked');
         // TODO add parameter for displaying specific stuff on private-link page
-        wonService.open($scope.chosenMessage.connection.uri);
+        wonService.open($scope.chosenMessage);
+        $scope.prevMessageId = null;
+        $scope.chosenMessage = null;
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
@@ -328,6 +336,9 @@ angular.module('won.owner')
         console.log('yes');
         $scope.showConfirmationDialogForDeclineRequest = false;
         // TODO add parameter for displaying specific stuff on private-link page
+        wonService.closeConnection($scope.chosenMessage);
+        $scope.prevMessageId = null;
+        $scope.chosenMessage = null;
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
