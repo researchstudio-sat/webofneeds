@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * I used wonuser as table name because user is Postgres keyword - http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
- *
+ * 'wonuser' used as table name because 'user' is a Postgres keyword
+ * see http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
  */
 @Entity
 @Table(
-		name = "wonUser",
+		name = "wonuser", //don't use 'user' - see above
 		uniqueConstraints = @UniqueConstraint(columnNames = {"username"})
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -32,17 +32,15 @@ public class User implements UserDetails{
 	@Column(name = "id")
 	private Long id;
 
+  @Column(name = "username")
 	private String username;
 
+  @Column(name = "password")
 	private String password;
 
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  private List<URI> needURIs;
-  //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
-  //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
-/*	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-	private List<Need> needs;                               */
+  @OneToMany(fetch = FetchType.EAGER)
+  private List<UserNeed> userNeeds;
 
   //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
   //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
@@ -112,31 +110,30 @@ public class User implements UserDetails{
 		return username;
 	}
 
-           /*
+  public void setUsername(final String username) {
+    this.username = username;
+  }
+
+  public void setPassword(final String password) {
+    this.password = password;
+  }
+
+  /*
 	public List<Need> getNeeds() {
 		return needs;
 	}          */
 
-  public void addNeedURI(URI uri){
-    this.needURIs.add(uri);
+  public void addNeedUri(UserNeed userNeed){
+    this.userNeeds.add(userNeed);
   }
-  public List<URI> getNeedURIs(){
-    return needURIs;
-  }
-  /*
-  public boolean removeNeeds(List<Need> needsToRemove){
-    return needs.removeAll(needsToRemove);
 
-  } */
-  /*
-  public List<URI> getNeedURIs(){
-    List<Need> needs = getNeeds();
-    List<URI> needURIs = new ArrayList <>();
-    for(Need need : needs){
-      needURIs.add(need.getNeedURI());
-    }
-    return needURIs;
-  }    */
+  public List<UserNeed> getUserNeeds() {
+    return userNeeds;
+  }
+
+  public void setUserNeeds(final List<UserNeed> userNeeds) {
+    this.userNeeds = userNeeds;
+  }
 
   public Set<URI> getDraftURIs(){
     return draftURIs;
@@ -147,9 +144,7 @@ public class User implements UserDetails{
   public void setDrafts(final Set<URI> draftURIs) {
     this.draftURIs = draftURIs;
   }
-  public void setNeedURIs(final List<URI> needURIs) {
-    this.needURIs = needURIs;
-  }
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) return true;
@@ -158,7 +153,7 @@ public class User implements UserDetails{
 		final User user = (User) o;
 
 		if (id != null ? !id.equals(user.id) : user.id != null) return false;
-		if (needURIs!= null ? !needURIs.equals(user.needURIs) : user.needURIs != null) return false;
+		if (userNeeds != null ? !userNeeds.equals(user.userNeeds) : user.userNeeds != null) return false;
 		if (password != null ? !password.equals(user.password) : user.password != null) return false;
 		if (username != null ? !username.equals(user.username) : user.username != null) return false;
 
@@ -170,7 +165,7 @@ public class User implements UserDetails{
 		int result = id != null ? id.hashCode() : 0;
 		result = 31 * result + (username != null ? username.hashCode() : 0);
 		result = 31 * result + (password != null ? password.hashCode() : 0);
-		result = 31 * result + (needURIs != null ? needURIs.hashCode() : 0);
+		result = 31 * result + (userNeeds != null ? userNeeds.hashCode() : 0);
 		return result;
 	}
 }

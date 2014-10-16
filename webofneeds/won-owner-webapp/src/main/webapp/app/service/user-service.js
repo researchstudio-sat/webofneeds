@@ -54,6 +54,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         ).then(
             function() {
                 // success
+                $rootScope.$broadcast(won.EVENT.USER_SIGNED_IN);
                 registered = true;
                 return {status : "OK"};
             },
@@ -78,6 +79,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         ).then(
             function () {
                 // success
+                $rootScope.$broadcast(won.EVENT.USER_SIGNED_IN);
                 return {status:"OK"};
             },
             function (response) {
@@ -98,6 +100,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
                 '/owner/rest/users/signout'
         ).then(
             function (data, status) {
+                $rootScope.$broadcast(won.EVENT.USER_SIGNED_OUT);
                 return {status:"OK"};
             },
             function (data, status) {

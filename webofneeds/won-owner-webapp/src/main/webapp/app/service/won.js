@@ -225,6 +225,8 @@
         won.EVENT.NEED_STATE_MESSAGE_RECEIVED = "NeedStateMessageReceivedEvent";
         won.EVENT.NO_CONNECTION = "NoConnectionErrorEvent";
         won.EVENT.NOT_TRANSMITTED = "NotTransmittedErrorEvent";
+        won.EVENT.USER_SIGNED_IN = "UserSignedInEvent";
+        won.EVENT.USER_SIGNED_OUT = "UserSignedOutEvent";
 
         won.COMMUNUCATION_STATE = {};
         won.COMMUNUCATION_STATE.NOT_CONNECTED = "NoConnectionEvent";

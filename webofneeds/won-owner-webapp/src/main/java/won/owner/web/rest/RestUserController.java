@@ -1,3 +1,4 @@
+
 /*
  * This file is subject to the terms and conditions defined in file 'LICENSE.txt', which is part of this source code package.
  */
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -183,6 +183,16 @@ public class RestUserController {
   public ResponseEntity saveAsFavourite(){
     return null;
   }
+
+  @RequestMapping(
+    value = "/isLoggedIn",
+    method = RequestMethod.GET
+  )
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity isLoggedIn(){
+    return new ResponseEntity("[]", HttpStatus.OK);
+  }
+
   @RequestMapping(
     value="/{userId}/resetPassword",
     method = RequestMethod.POST
