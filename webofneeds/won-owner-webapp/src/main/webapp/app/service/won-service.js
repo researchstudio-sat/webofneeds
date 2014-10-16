@@ -401,20 +401,24 @@ angular.module('won.owner').factory('wonService', function (
                       //  eventData.eventType = messageTypeToEventType[eventData.hasMessageType];
                         eventData.eventType = won.EVENT.CONNECT_SENT;
                         eventData.commState = won.COMMUNUCATION_STATE.PENDING;
-
-                        linkedDataService.fetch(eventUri)
+                        linkedDataService.fetch(eventData.hasSender)
                             .then(
-                            function(value2) {
-                                console.log("publishing angular event");
+                            function (value) {
+                                linkedDataService.fetch(eventUri)
+                                    .then(
+                                    function(value2) {
+                                        console.log("publishing angular event");
 
-                                //eventData.eventType = won.EVENT.CLOSE_SENT;
-                                eventData.timestamp = new Date().getTime();
-                                $rootScope.$broadcast(won.EVENT.CONNECT_SENT, eventData);
-                                //$rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
+                                        //eventData.eventType = won.EVENT.CLOSE_SENT;
+                                        eventData.timestamp = new Date().getTime();
+                                        $rootScope.$broadcast(won.EVENT.CONNECT_SENT, eventData);
+                                        //$rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
 
-                            }, won.reportError("cannot fetch closed event " + eventUri)
-
+                                    }, won.reportError("cannot fetch closed event " + eventUri)
+                                );
+                            }, won.reportError("cannot fetch closed connection " +eventUri)
                         );
+
                     }, 3000);
 
 

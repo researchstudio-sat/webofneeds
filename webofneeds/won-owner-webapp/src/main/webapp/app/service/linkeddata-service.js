@@ -295,6 +295,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             function(connectionsUri){
                 if (connectionsUri != null){
                     linkedDataService.cacheItemMarkDirty(connectionsUri);
+                    return connectionsUri;
                 }
             }
         );
@@ -314,7 +315,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (connectionUri != null) {
             linkedDataService.cacheItemMarkDirty(connectionUri);
         }
-        return $q.when(true); //return a promise for chaining
+        var deferred = $q.defer();
+        deferred.resolve();
+        return deferred.promise;
     }
 
 
