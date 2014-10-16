@@ -85,12 +85,8 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     if (wonMessage != null) {
 
       URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
-      WonMessage newWonMessage = new WonMessageBuilder()
-        .setMessageURI(newMessageURI)
-        .setTimestamp(System.currentTimeMillis())
-        .copyEnvelopeFromWonMessage(wonMessage)
-        .copyContentFromMessageReplacingMessageURI(wonMessage)
-        .build();
+      WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
+        newMessageURI, connectionURI, wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(newWonMessage));
@@ -124,12 +120,8 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     // ToDo (FS): remove this distinction if the old parameters are not used anymore
     if (wonMessage != null) {
       URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
-      WonMessage newWonMessage = new WonMessageBuilder()
-        .setMessageURI(newMessageURI)
-        .setTimestamp(System.currentTimeMillis())
-        .copyEnvelopeFromWonMessage(wonMessage)
-        .copyContentFromMessageReplacingMessageURI(wonMessage)
-        .build();
+      WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
+        newMessageURI, connectionURI, wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(newWonMessage));
@@ -162,12 +154,8 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
       // ToDo (FS): remove this distinction if the old parameters are not used anymore
       if (wonMessage != null) {
         URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
-        WonMessage newWonMessage = new WonMessageBuilder()
-          .setMessageURI(newMessageURI)
-          .setTimestamp(System.currentTimeMillis())
-          .copyEnvelopeFromWonMessage(wonMessage)
-          .copyContentFromMessageReplacingMessageURI(wonMessage)
-          .build();
+        WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
+          newMessageURI, connectionURI, wonMessage);
         logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
         rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
                                        WonMessageEncoder.encodeAsDataset(newWonMessage));

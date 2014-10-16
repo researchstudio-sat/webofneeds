@@ -25,6 +25,7 @@ import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
 import java.io.StringWriter;
@@ -43,7 +44,11 @@ public abstract class AbstractFacet implements Facet
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private WonNodeInformationService wonNodeInformationService;
+  protected WonNodeInformationService wonNodeInformationService;
+
+  @Autowired
+  protected LinkedDataSource linkedDataSource;
+
 
   /**
    * Client talking another need via the need protocol
@@ -73,6 +78,7 @@ public abstract class AbstractFacet implements Facet
   protected DataAccessService dataService;
 
   protected RDFStorageService rdfStorageService;
+
 
   /**
    *

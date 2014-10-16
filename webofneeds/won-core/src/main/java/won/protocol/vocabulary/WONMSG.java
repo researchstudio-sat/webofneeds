@@ -20,6 +20,7 @@ public class WONMSG
   public static final String BASE_URI = "http://purl.org/webofneeds/message#";
   public static final String DEFAULT_PREFIX = "msg";
 
+
   private static Model m = ModelFactory.createDefaultModel();
 
 
@@ -78,6 +79,7 @@ public class WONMSG
   //public static final String MESSAGE_TYPE_NEED_STATE_RESOURCE = BASE_URI + "NeedStateMessage";
 
   public static final Resource ENVELOPE_GRAPH = m.createResource(BASE_URI+ "EnvelopeGraph");
+  public static final Resource FORWARDED_ENVELOPE_GRAPH = m.createResource(BASE_URI+ "ForwardedEnvelopeGraph");
 
   public static final Property RECEIVER_PROPERTY = m.createProperty(BASE_URI, "hasReceiver");
   public static final Property RECEIVER_NEED_PROPERTY = m.createProperty(BASE_URI, "hasReceiverNeed");

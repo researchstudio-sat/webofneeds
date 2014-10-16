@@ -29,7 +29,6 @@ import won.protocol.model.FacetType;
 import won.protocol.service.WonNodeInformationService;
 
 import java.net.URI;
-import java.util.Date;
 
 /**
  * User: fkleedorfer
@@ -82,7 +81,7 @@ public class HintSender implements MatchProcessor
         otherNeedURI,
         FacetType.OwnerFacet.getURI(),
         originator,
-        score, new Date().getTime())
+        score)
       .build();
   }
 }

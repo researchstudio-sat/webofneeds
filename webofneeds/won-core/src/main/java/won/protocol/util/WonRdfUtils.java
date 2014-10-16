@@ -122,12 +122,45 @@ public class WonRdfUtils
       return facetURI;
     }
 
+    /**
+     * Returns the first RemoteFacet found in the model, attached to the specified subject.
+     * Returns null if there is no such facet.
+     * @param content
+     * @return
+     */
+    public static URI getRemoteFacet(URI subject, Model content) {
+      logger.debug("getFacet(model) called");
+      Resource baseRes = content.getResource(subject.toString());
+      StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_REMOTE_FACET);
+      if (!stmtIterator.hasNext()) {
+        logger.debug("no RemoteFacet found in model");
+        return null;
+      }
+      URI remoteFacetURI = URI.create(stmtIterator.next().getObject().asResource().getURI());
+      if (logger.isDebugEnabled()){
+        if (stmtIterator.hasNext()){
+          logger.debug("returning RemoteFacet {}, but model has more RemoteFacets than just this one.");
+        }
+      }
+      return remoteFacetURI;
+    }
+
     public static URI getFacet(final URI subject, Dataset content){
       return RdfUtils.findFirst(content, new RdfUtils.ModelVisitor<URI>()
       {
         @Override
         public URI visit(final Model model) {
           return getFacet(subject, model);
+        }
+      });
+    }
+
+    public static URI getRemoteFacet(final URI subject, Dataset content){
+      return RdfUtils.findFirst(content, new RdfUtils.ModelVisitor<URI>()
+      {
+        @Override
+        public URI visit(final Model model) {
+          return getRemoteFacet(subject, model);
         }
       });
     }

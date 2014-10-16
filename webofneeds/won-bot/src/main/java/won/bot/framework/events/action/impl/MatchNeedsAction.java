@@ -27,7 +27,6 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -77,8 +76,7 @@ public class MatchNeedsAction extends BaseEventBotAction
         otherNeedURI,
         FacetType.OwnerFacet.getURI(),
         originator,
-        score,
-        new Date().getTime())
+        score)
       .build();
   }
 
