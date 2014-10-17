@@ -887,6 +887,28 @@ public class RdfUtils
   }
 
   /**
+   * Finds the first triple in the specified model that has the specified propery and object.
+   * The subject is expected to be a resource.
+   * @param model
+   * @param property
+   * @param object
+   * @param allowMultiple if false, will throw an IllegalArgumentException if more than one triple is found
+   * @param allowNone if false, will throw an IllegalArgumentException if no triple is found
+   * @return
+   */
+  public static URI findFirstObjectUri(Model model, Property property, RDFNode object, boolean allowMultiple,
+    boolean allowNone){
+    URI retVal = null;
+    StmtIterator it = model.listStatements(null, property, object);
+    if (!it.hasNext() && !allowNone) throw new IllegalArgumentException("expecting at least one triple");
+    if (it.hasNext()){
+      retVal = URI.create(it.nextStatement().getSubject().asResource().toString());
+    }
+    if (!allowMultiple && it.hasNext()) throw new IllegalArgumentException("not expecting more than one triple");
+    return retVal;
+  }
+
+  /**
    * Creates a new graph URI for the specified dataset by appending
    * a specified string (toAppend) and then n alphanumeric characters to the
    * specified String.
