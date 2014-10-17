@@ -98,10 +98,6 @@ public abstract class AbstractFacet implements Facet
     //in an 'open' call the local and the remote connection URI are always known and must be present
     //in the con object.
 
-    // distinguish between the new message format (WonMessage) and the old parameters
-    // ToDo (FS): remove this distinction if the old parameters are not used anymore
-    if (wonMessage != null) {
-
       if (wonMessage.getReceiverURI() != null) {
         executorService.execute(new Runnable()
         {
@@ -116,22 +112,6 @@ public abstract class AbstractFacet implements Facet
         });
       }
 
-    } else {
-
-      if (con.getRemoteConnectionURI() != null) {
-        executorService.execute(new Runnable()
-        {
-          @Override
-          public void run() {
-            try {
-              needFacingConnectionClient.open(con, content, wonMessage);
-            } catch (Exception e) {
-              logger.warn("caught Exception in openFromOwner", e);
-            }
-          }
-        });
-      }
-    }
   }
 
   /**
@@ -208,9 +188,6 @@ public abstract class AbstractFacet implements Facet
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
 
-    // distinguish between the new message format (WonMessage) and the old parameters
-    // ToDo (FS): remove this distinction if the old parameters are not used anymore
-    if (wonMessage != null) {
       executorService.execute(new Runnable()
       {
         @Override
@@ -224,19 +201,7 @@ public abstract class AbstractFacet implements Facet
           }
         }
       });
-    } else {
-      executorService.execute(new Runnable()
-      {
-        @Override
-        public void run() {
-          try {
-            ownerFacingConnectionClient.open(con.getConnectionURI(), content, wonMessage);
-          } catch (Exception e) {
-            logger.warn("caught Exception in openFromNeed:", e);
-          }
-        }
-      });
-    }
+
   }
 
   /**

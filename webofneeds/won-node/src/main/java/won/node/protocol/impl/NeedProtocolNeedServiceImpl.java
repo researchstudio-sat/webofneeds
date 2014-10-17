@@ -80,10 +80,6 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
   public void open(final URI connectionURI, final Model content, final WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
 
-    // distinguish between the new message format (WonMessage) and the old parameters
-    // ToDo (FS): remove this distinction if the old parameters are not used anymore
-    if (wonMessage != null) {
-
       URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
 
       logger.debug("need from need: OPEN received for connection {}", connectionURIFromWonMessage);
@@ -101,23 +97,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
         throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(), "open", needs.get(0).getState());
       }
       connectionCommunicationService.open(connectionURIFromWonMessage, content, wonMessage);
-    } else {
 
-      logger.debug("need from need: OPEN received for connection {} with content {}", connectionURI, content);
-
-      List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
-      Connection con = cons.get(0);
-      List<Need> needs = needRepository.findByNeedURI(con.getNeedURI());
-      if (needs.size() > 0 && needs.get(0).getState() != NeedState.ACTIVE) {
-        try {
-          needFacingConnectionClient.close(con, content, wonMessage);
-        } catch (Exception e) {
-          logger.warn("caught Exception in closeFromOwner: ", e);
-        }
-        throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(), "open", needs.get(0).getState());
-      }
-      connectionCommunicationService.open(connectionURI, content, wonMessage);
-    }
   }
 
   @Override

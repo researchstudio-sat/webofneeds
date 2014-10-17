@@ -135,9 +135,6 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
     public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
 
-      // distinguish between the new message format (WonMessage) and the old parameters
-      // ToDo (FS): remove this distinction if the old parameters are not used anymore
-      if (wonMessage != null) {
 
         URI connectionURIFromWonMessage = wonMessage.getSenderURI();
 
@@ -152,18 +149,6 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
 
         this.connectionCommunicationService.open(connectionURIFromWonMessage, content, wonMessage);
 
-      } else {
-        List<Connection> cons = connectionRepository.findByConnectionURI(connectionURI);
-        if (cons.size() != 0) {
-          Connection con = cons.get(0);
-          List<Need> needs = needRepository.findByNeedURI(con.getNeedURI());
-
-          if (needs.get(0).getState() != NeedState.ACTIVE)
-            throw new IllegalMessageForNeedStateException(needs.get(0).getNeedURI(), "open", needs.get(0).getState());
-        }
-
-        this.connectionCommunicationService.open(connectionURI, content, wonMessage);
-      }
     }
 
     @Override
