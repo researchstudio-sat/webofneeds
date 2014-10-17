@@ -51,48 +51,6 @@ app.directive('header', function(){
         templateUrl:'templates/header.html'
     }
 })
-	/*var interceptor = function ($rootScope, $q, $location, $window) {//, $log) {
-
-		function success(response) {
-			return response;
-		}
-
-		function error(response) {
-
-			var status = response.status;
-			var config = response.config;
-			var method = config.method;
-			var url = config.url;
-
-			if (status == 401) {
-                //TODO should this really reset all other user properties here?
-                // if yes, it's still misplaced and should be moved to some resetUser function
-                // TODO deleting the postbox entries atm!!!! (they need to be refetched!)
-				$window.user = { //reinitializes user;
-					isAuth:false
-                    $user
-				}
-
-                //// this interceptor's probably not necessary, as the backend is only a data interface any way.
-                //// Access should be limited at the view level
-                ////TODO redirect leads to an infinite loop (verifyAuth -> 401 -> redirect -> verifyAuth)
-                //// also: should redirect to original resource after login
-				//$location.path("/signin");
-			} else {
-				$rootScope.error = method + " on " + url + " failed with status " + status;
-                console.log($rootScope.error);
-                //$log.error($rootScope.error);
-			}
-
-			return $q.reject(response);
-		}
-
-		return function (promise) {
-			return promise.then(success, error);
-		};
-	};
-	$httpProvider.responseInterceptors.push(interceptor);*/
-   // $provide.decorator('$httpBackend', angular.mock.e2e.$httpBackendDecorator);
 	/* http://stackoverflow.com/questions/18888104/angularjs-q-wait-for-all-even-when-1-rejected */
 	$provide.decorator('$q', ['$delegate', function ($delegate) {
 		var $q = $delegate;

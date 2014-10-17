@@ -148,7 +148,7 @@
 				<li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
 					<i class="fa fa-clipboard fa-lg"></i>&nbsp;Post box</a>
 				</li>
-				<li ng-show="!showPublic()">
+				<li ng-show="!showPublic()" ng-cloak>
 					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
 						<!-- TODO provide here the total number of messages -->
 						<i class="fa fa-comment-o fa-lg"></i>&nbsp;{{unreadEventsByTypeByNeed.message.count}}
