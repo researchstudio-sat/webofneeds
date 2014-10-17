@@ -149,9 +149,9 @@
 					-->
 					<div class="form-group">
 						<div class="col-md-12">
-                            <label for="signUsername">Username</label>
+                            <label for="signUsername">Email address</label>
                             <input type="email" class="form-control" name="signUsername" id="signUsername" ng-model="user.username"
-                                       placeholder="Username" required>
+                                       placeholder="Email address" required>
                             <!--TODO put in reg form in login form crosses in input fields from http://getbootstrap.com/css/-->
                             <span class="label label-warning" ng-show="signInForm.signUsername.$invalid && !signInForm.signUsername.$pristine">Please write valid email address</span>
                             <span class="label label-warning" ng-show="error.length > 0">{{error}}</span>
@@ -256,7 +256,7 @@
                             <label for="registerUsername">Email address</label>
                             <!--<div class="input-group">     -->
                                 <input type="email" class="form-control" name="registerUsername" id="registerUsername" ng-model="registerUser.username"
-                                       placeholder="Username"
+                                       placeholder="Email address"
                                        required>
                                 <!--<span class="input-group-btn">
                                     <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-remove-circle"/></button>
