@@ -145,6 +145,15 @@
 						</li>
 					</ul>
 				</li>
+
+                <li notif-dropdown></li>
+                    <!--
+                    unread-events-by-type-by-need="{{ unreadEventsByTypeByNeed }}"
+                    unread-events-by-need-by-type="{{ unreadEventsByNeedByType }}"
+                    open-need-detail-view="openNeedDetailView"
+                    getTypePicURI="getTypePicURI"
+                        ></li>-->
+
 				<li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
 					<i class="fa fa-clipboard fa-lg"></i>&nbsp;Post box</a>
 				</li>
@@ -231,7 +240,7 @@
 		<div ng-view id="content" class="container">
 		</div>
 		
-<nav class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-default navbar-bottom" role="navigation">
 	<div class="container" style="padding:0">
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
 			<ul class="nav navbar-nav">
