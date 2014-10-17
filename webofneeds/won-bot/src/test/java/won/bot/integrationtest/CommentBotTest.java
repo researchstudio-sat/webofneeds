@@ -242,12 +242,15 @@ public class CommentBotTest
 
       String queryString = sparqlPrefix +
         "SELECT ?need ?connection ?need2 WHERE {" +
-        "?need won:hasConnections ?connections."+
-        "?connections rdfs:member ?connection."+
-        "?connection won:hasFacet won:CommentFacet."+
+        "GRAPH ?g1 {" +
+        "   ?need won:hasConnections ?connections." +
+        "   ?need sioc:hasReply ?need2 " +
+        "} ." +
+        "GRAPH ?g2 {?connections rdfs:member ?connection } ."+
+        "Graph ?g3 {?connection won:hasFacet won:CommentFacet."+
         "?connection won:hasRemoteConnection ?connection2."+
-        "?connection2 won:belongsToNeed ?need2."+
-        "?need sioc:hasReply ?need2."+
+        "?connection2 won:belongsToNeed ?need2 } ."+
+        ""+
         "}";
 
       Query query = QueryFactory.create(queryString);

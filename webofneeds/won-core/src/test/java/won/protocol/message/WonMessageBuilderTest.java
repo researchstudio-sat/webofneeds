@@ -28,6 +28,7 @@ import won.protocol.util.RdfUtils;
 
 import java.net.URI;
 import java.util.Iterator;
+import java.util.List;
 
 public class WonMessageBuilderTest
 {
@@ -38,6 +39,17 @@ public class WonMessageBuilderTest
   private static final URI TYPE_URI_2 = URI.create("http://example.com/type/2");
   private static final URI RECEIVER_URI_1 = URI.create("http://example.com/receiver/1");
 
+  @Test
+  public void test_content_is_referenced_from_envelope(){
+    WonMessage msg1 = createMessageWithDummyContent();
+    List<String> contentGraphUris = msg1.getContentGraphURIs();
+    Assert.assertFalse("envelope graph does not contain any content graph URI", contentGraphUris.isEmpty());
+    Assert.assertEquals(1, msg1.getContentGraphURIs().size());
+    for (String cgu : msg1.getContentGraphURIs() ){
+      Assert.assertTrue("message does not contain content graph " + cgu +" referenced from envelope",
+        msg1.getCompleteDataset().containsNamedModel(cgu));
+    }
+  }
 
   @Test
   public void test_wrap_retains_envelope_graph_properties(){
@@ -135,6 +147,14 @@ public class WonMessageBuilderTest
     Assert.assertEquals(3, Iterators.size(subjectIt));
   }
 
+  private WonMessage createMessageWithDummyContent(){
+      WonMessage msg1 = new WonMessageBuilder()
+        .setMessageURI(MSG_URI_1)
+        .addContent(CONTENT_GRAPH_URI_1, createDummyContent(), null)
+        .setWonMessageType(WonMessageType.HINT_MESSAGE)
+        .build();
+      return msg1;
+  }
 
   private WonMessage createMessageAndCopyEnvelopeAndContent() {
     WonMessage msg1 = new WonMessageBuilder()
