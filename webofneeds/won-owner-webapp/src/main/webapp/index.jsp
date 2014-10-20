@@ -133,9 +133,9 @@
                                 src="/owner/images/type_posts/change.png"/>&nbsp;I
 							want to <strong>change</strong> something</a></li>
 						<li class="divider" ng-show="!showPublic()"></li>
-						<li class="dropdown-submenu" ng-controller="DraftCtrl" ng-show="!showPublic()">
+						<li class="dropdown-submenu"ng-show="!showPublic()">
 							<a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
-							<ul class="dropdown-menu" >
+							<ul class="dropdown-menu" ng-controller="DraftCtrl"  >
 								<li ng-repeat="draft in allDrafts | orderBy: '-datetime' | limitTo: recordsToDisplay">
                                     <a href ng-click="clickOnDraft(draft)">
                                         <i class="fa fa-file-o fa-lg" ng-bind="draft.draft.title"> &nbsp;</i></a></li>

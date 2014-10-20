@@ -47,15 +47,10 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 
     $scope.recordsToDisplay = 4;
     $scope.displayConfirmationDialog = false;
-    var indexOfChosenDraft;
+
 	$scope.search = '';
 
-    // TODO call here backend method
-    function deleteDraft(index) {
-        if (index >= 0) {
-            $scope.drafts.splice(index, 1);
-        }
-    }
+
 
     $scope.setSortParams = function(fieldName) {
         if ($scope.sortedField == fieldName) {
@@ -101,16 +96,6 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
     };
 
     // TODO call backend method here
-    //need to fetch: need type, need title, need create date
-   /* $scope.drafts = [
-        {type:'Together', title:'Car sharing to Prague', datetime: new Date('2014-08-20')},
-        {type:'Want', title:'Moved recently ...', datetime: new Date('2014-08-25')},
-        {type:'Change', title:'Let\'s clean ...', datetime: new Date('2014-05-01')},
-        {type:'Offer', title:'Friendly Bicycle ...', datetime: new Date('2014-07-10')},
-        {type:'Offer', title:'Old children\'s clothes ..', datetime: new Date('2013-09-09')}
-    ];            */
-
-    // TODO call backend method here
     //need to fetch: need type, need title, need close date
     $scope.closedList = [
         {type:'Want', title:'Playing soccer together', datetime: new Date('2014-08-23')},
@@ -140,35 +125,14 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
         $scope.inboxCollapsed = !$scope.inboxCollapsed;
     };
 
-    $scope.draftsCollapsed = true;
-    $scope.draftsCollapseClick = function () {
-        $scope.draftsCollapsed = !$scope.draftsCollapsed;
-    };
 
     $scope.closedCollapsed = true;
     $scope.closedCollapseClick = function () {
         $scope.closedCollapsed = !$scope.closedCollapsed;
     };
 
-    $scope.clickOnRemoveButton = function (index) {
-        $scope.displayConfirmationDialog = true;
-        indexOfChosenDraft = index;
-    }
-
-    $scope.clickOnYesButton = function() {
-        deleteDraft(indexOfChosenDraft);
-        $scope.displayConfirmationDialog = false;
-    }
-
-    $scope.clickOnNoButton = function() {
-        $scope.displayConfirmationDialog = false;
-    }
     $scope.clickOnNeedPrivateLink = function(clickedNeed) {
         applicationStateService.setCurrentNeedURI(clickedNeed.uri);
         $location.path("/private-link")
     }
-});
-angular.module('won.owner').controller('MatchCountCtrl', function ($scope,$interval, $location, userService, applicationStateService) {
-
-
 });

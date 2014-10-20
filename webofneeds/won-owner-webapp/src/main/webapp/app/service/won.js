@@ -831,6 +831,10 @@
             this.getMetaNode()["won:isInStep"]=currentStep;
             return this;
         }
+        won.DraftBuilder.prototype.setCurrentMenuposition = function(menuposition){
+            this.getMetaNode()["won:hasMenuposition"]=menuposition;
+            return this;
+        }
         won.DraftBuilder.prototype.setDraftObject = function(draft){
             this.getMetaNode()["won:hasDraftObject"]=draft;
             return this;
@@ -840,6 +844,9 @@
         }
         won.DraftBuilder.prototype.getCurrentStep = function(){
             return this.getMetaNode()["won:isInStep"];
+        }
+        won.DraftBuilder.prototype.getCurrentMenuposition = function(){
+            return this.getMetaNode()["won:hasMenuposition"];
         }
         /*
          * Creates a JSON-LD stucture containing a named graph with default 'unset' event URI
@@ -1005,6 +1012,12 @@
 
 
             
+
+
+
+
+
+
 
 
         return won;
