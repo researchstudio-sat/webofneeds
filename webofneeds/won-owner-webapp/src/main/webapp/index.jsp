@@ -84,6 +84,7 @@
         <script type="text/javascript" src="<c:url value="/app/main/main.js"/>"></script>
 
         <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/draft/draft.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
 
@@ -132,13 +133,12 @@
                                 src="/owner/images/type_posts/change.png"/>&nbsp;I
 							want to <strong>change</strong> something</a></li>
 						<li class="divider" ng-show="!showPublic()"></li>
-						<li class="dropdown-submenu" ng-show="!showPublic()">
+						<li class="dropdown-submenu" ng-controller="DraftCtrl" ng-show="!showPublic()">
 							<a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
-							<ul class="dropdown-menu" ng-controller="PostBoxCtrl">
+							<ul class="dropdown-menu" >
 								<li ng-repeat="draft in allDrafts | orderBy: '-datetime' | limitTo: recordsToDisplay">
-                                    <a href="" ng-click="clickOnDraft(draft)"><i
-                                            class="fa fa-file-o fa-lg">
-									&nbsp;{{draft.draft.title}}</i></a></li>
+                                    <a href ng-click="clickOnDraft(draft)">
+                                        <i class="fa fa-file-o fa-lg" ng-bind="draft.draft.title"> &nbsp;</i></a></li>
 								<li class="divider"></li>
 								<li><a href="#/postbox"><i class="fa fa-list fa-lg"></i>&nbsp;II Others (go to full list)</a></li>
 							</ul>
