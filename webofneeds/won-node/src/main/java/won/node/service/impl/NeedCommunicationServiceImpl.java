@@ -49,7 +49,6 @@ import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 
 
@@ -211,11 +210,9 @@ public class NeedCommunicationServiceImpl implements
                                                      ConnectionEventType.OWNER_OPEN);
 
       // add the connectionID to the wonMessage
-      WonMessage newWonMessage = new WonMessageBuilder()
-        .wrap(wonMessage)
-        .setTimestamp(new Date().getTime())
-        .setSenderURI(con.getConnectionURI())
-        .build();
+      WonMessage newWonMessage = WonMessageBuilder.wrapOutboundWonMessageForLocalStorage(con.getConnectionURI(),
+        wonMessage);
+
       messageEventRepository.save(
         new MessageEventPlaceholder(con.getConnectionURI(), newWonMessage));
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
@@ -271,8 +268,9 @@ public class NeedCommunicationServiceImpl implements
       URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
       URI otherNeedURIFromWonMessage = wonMessage.getSenderNeedURI();
       URI otherConnectionURIFromWonMessage = wonMessage.getSenderURI();
-      URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage.getMessageURI(),
+      URI facetURI = WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage.getMessageURI(),
         wonMessage.getMessageContent());
+
 
       logger.debug("CONNECT received for need {} referring to need {} (connection {})",
                    new Object[]{needURIFromWonMessage,
@@ -290,14 +288,9 @@ public class NeedCommunicationServiceImpl implements
       // information about the newly created connection
       // to the message and pass it on to the owner.
       URI wrappedMessageURI = this.wonNodeInformationService.generateMessageEventURI();
-      WonMessageBuilder builder = new WonMessageBuilder()
-        .setMessageURI(wrappedMessageURI)
-        .copyEnvelopeFromWonMessage(wonMessage)
-        .copyContentFromMessageReplacingMessageURI(wonMessage)
-        .setReceiverURI(con.getConnectionURI())
-        .setTimestamp(new Date().getTime())
-        .addRefersToURI(wonMessage.getMessageURI());
-      WonMessage wrappedMessage = builder.build(wonMessage.getMessageContent());
+      WonMessage wrappedMessage  =  WonMessageBuilder
+        .copyInboundWonMessageForLocalStorage(wrappedMessageURI, con.getConnectionURI(), wonMessage);
+
 
       rdfStorageService.storeDataset(wrappedMessageURI, wrappedMessage.getCompleteDataset());
 

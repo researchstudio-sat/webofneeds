@@ -132,7 +132,7 @@ public class MatcherCLI implements CommandLineRunner
         otherNeedURI,
         FacetType.OwnerFacet.getURI(),
         originator,
-        score, new Date().getTime())
+        score)
       .build();
   }
 }

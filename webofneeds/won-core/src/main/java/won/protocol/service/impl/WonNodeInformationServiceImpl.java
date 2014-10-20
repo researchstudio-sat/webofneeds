@@ -56,6 +56,7 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService
   }
 
   @Override
+  //TODO: replace hardcoded localhost URI with the one specified in the config file!
   public URI getDefaultWonNode() {
     return URI.create("http://localhost:8080/won/");
   }
@@ -75,7 +76,7 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService
     return randomNumberService.generateRandomString(9);
   }
 
-
+  //TODO: replace hardcoded localhost URI with the one specified in the config file!
   private WonNodeInformation getDefaultWonNodeInformation() {
     return new WonNodeInformation(
       "http://localhost:8080/won/resource/event/<ID>",

@@ -7,11 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -45,6 +48,13 @@ public class GroupFacetImpl extends AbstractFacet
           for (final Connection c : cons) {
             try {
               if(! c.equals(con)) {
+                URI forwardedMessageURI = wonNodeInformationService.generateMessageEventURI(con.getNeedURI(),
+                  wonNodeInformationService.getDefaultWonNode());
+                URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(con.getRemoteConnectionURI(),
+                  linkedDataSource);
+                WonMessage newWonMessage = WonMessageBuilder.forwardReceivedWonMessage(forwardedMessageURI, wonMessage,
+                  con.getConnectionURI(), con.getNeedURI(), wonNodeInformationService.getDefaultWonNode(),
+                  con.getRemoteConnectionURI(), con.getRemoteNeedURI(), remoteWonNodeUri);
                 needFacingConnectionClient.sendMessage(c, message, wonMessage);
               }
           } catch (Exception e) {

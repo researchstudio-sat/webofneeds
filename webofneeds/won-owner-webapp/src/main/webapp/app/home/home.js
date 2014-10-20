@@ -337,7 +337,7 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
                 )
             }
 
-			$location.path('/home');
+			$location.path('/postbox');
 		} else if (response.status == "ERROR") {
 			$scope.error = response.message;
 		} else {
@@ -376,7 +376,8 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
 
     onLoginSuccessful = function() {
         userService.setAuth($scope.username);
-        $window.location.href = '/owner';
+        //$window.location.href = '/owner';
+        $location.path("/postbox");
 
     }
 

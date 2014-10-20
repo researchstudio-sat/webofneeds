@@ -28,7 +28,6 @@ import won.node.service.impl.URIService;
 import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
@@ -168,15 +167,14 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
     Need remoteNeed = needRepository.findByNeedURI(connection.getRemoteNeedURI()).get(0);
 
     WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
-      .setMessageURI(wonNodeInformationService.generateMessageEventURI())
-      .setWonMessageType(WonMessageType.CLOSE)
-      .setSenderURI(connection.getConnectionURI())
-      .setSenderNeedURI(connection.getNeedURI())
-      .setSenderNodeURI(need.getWonNodeURI())
-      .setReceiverURI(connection.getRemoteConnectionURI())
-      .setReceiverNeedURI(connection.getRemoteNeedURI())
-      .setReceiverNodeURI(remoteNeed.getWonNodeURI())
+    return builder.setMessagePropertiesForClose(
+      wonNodeInformationService.generateMessageEventURI(),
+      connection.getConnectionURI(),
+      connection.getNeedURI(),
+      need.getWonNodeURI(),
+      connection.getRemoteConnectionURI(),
+      connection.getRemoteNeedURI(),
+      remoteNeed.getWonNodeURI())
       .build();
 
   }

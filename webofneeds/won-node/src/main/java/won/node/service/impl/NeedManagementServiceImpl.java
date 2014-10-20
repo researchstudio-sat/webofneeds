@@ -36,7 +36,6 @@ import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
-import won.protocol.message.WonMessageType;
 import won.protocol.model.*;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.*;
@@ -102,10 +101,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      WonMessage newWonMessage = new WonMessageBuilder()
-        .wrap(wonMessage)
-        .setTimestamp(System.currentTimeMillis())
-        .build();
+      WonMessage newWonMessage = WonMessageBuilder.wrapOwnerToNeedWonMessageForLocalStorage(wonMessage);
       // store the newWonMessage as it is
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorage.storeDataset(newWonMessage.getMessageURI(),
@@ -159,10 +155,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
         Dataset needDataset = linkedDataService.getNeedDataset(need.getNeedURI());
         WonMessage newNeedNotificationMessage =
           new WonMessageBuilder()
-            .setWonMessageType(WonMessageType.NEED_CREATED_NOTIFICATION)
-            .setMessageURI(wonNodeInformationService.generateMessageEventURI())
-            .setSenderNeedURI(need.getNeedURI())
-            .setSenderNodeURI(need.getWonNodeURI())
+            .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateMessageEventURI(),
+              need.getNeedURI(), need.getWonNodeURI())
             .build(needDataset);
         matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(), newNeedNotificationMessage);
       } catch (Exception e) {
@@ -279,10 +273,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      WonMessage newWonMessage = new WonMessageBuilder()
-        .wrap(wonMessage)
-        .setTimestamp(System.currentTimeMillis())
-        .build();
+      WonMessage newWonMessage =  WonMessageBuilder.wrapOwnerToNeedWonMessageForLocalStorage(wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorage.storeDataset(newWonMessage.getMessageURI(),
                               WonMessageEncoder.encodeAsDataset(newWonMessage));
@@ -319,10 +310,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     // distinguish between the new message format (WonMessage) and the old parameters
     // ToDo (FS): remove this distinction if the old parameters not used anymore
     if (wonMessage != null) {
-      WonMessage newWonMessage = new WonMessageBuilder()
-        .wrap(wonMessage)
-        .setTimestamp(System.currentTimeMillis())
-        .build();
+      WonMessage newWonMessage = WonMessageBuilder.wrapOwnerToNeedWonMessageForLocalStorage(wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorage.storeDataset(newWonMessage.getMessageURI(),
                               WonMessageEncoder.encodeAsDataset(newWonMessage));
@@ -434,16 +422,14 @@ public class NeedManagementServiceImpl implements NeedManagementService
     Need remoteNeed = needRepository.findByNeedURI(connection.getRemoteNeedURI()).get(0);
 
     WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
-      .setMessageURI(wonNodeInformationService.generateMessageEventURI())
-      .setWonMessageType(WonMessageType.CLOSE)
-      .setSenderURI(connection.getConnectionURI())
-      .setSenderNeedURI(connection.getNeedURI())
-      .setSenderNodeURI(need.getWonNodeURI())
-      .setReceiverURI(connection.getRemoteConnectionURI())
-      .setReceiverNeedURI(connection.getRemoteNeedURI())
-      .setReceiverNodeURI(remoteNeed.getWonNodeURI())
-      .setTimestamp(System.currentTimeMillis())
+    return builder.setMessagePropertiesForClose(
+      wonNodeInformationService.generateMessageEventURI(),
+      connection.getConnectionURI(),
+      connection.getNeedURI(),
+      need.getWonNodeURI(),
+      connection.getRemoteConnectionURI(),
+      connection.getRemoteNeedURI(),
+      remoteNeed.getWonNodeURI())
       .build();
 
   }

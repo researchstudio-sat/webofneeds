@@ -23,20 +23,6 @@
  */
 angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval, $location, userService, applicationStateService) {
     $scope.countOfAllUnreadMatchEvents = 0;
-  //  $scope.emptyListText = 'You don\'t have posts yet. Fill it by creating new posts';
-   // $scope.allUnreadEvents = applicationStateService.getUnreadObjects();
-   /* $scope.updateCountOfAllUnreadMatchEvents= function(){
-        var allMatchEvents = [];
-
-        for(var i = 0; i<$scope.allNeedsWithUnreadNotifications.length;i++){
-            var need = $scope.allNeedsWithUnreadNotifications[i];
-            allMatchEvents.push(need.matches);
-        }
-        $scope.countOfAllUnreadMatchEvents = allMatchEvents.length;
-
-    } */
-
-
     // TODO if we want to remember the last sortedField selected by the user,
     // we should store it in e.g. applicationStateService
     $scope.sortedField = 'creationDate';
