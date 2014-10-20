@@ -262,6 +262,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.addDraft = function(draft){
         var draftLd = JSON.parse(draft.draft);
         var draftBuilderObject = new window.won.DraftBuilder(draftLd).setContext();
+        var menuposition = draftBuilderObject.getCurrentMenuposition();
         var currentStep = draftBuilderObject.getCurrentStep();
         var draftObj = draftBuilderObject.getDraftObject();
         var draftObjWithMetaInfo = {"draftURI":draft.draftURI,"currentStep":currentStep,"draft":draftObj};
