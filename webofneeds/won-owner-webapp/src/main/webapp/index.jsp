@@ -117,23 +117,23 @@
 						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
 					</a>
 					<ul class="dropdown-menu">
-						<li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img
                                 src="/owner/images/type_posts/want.png"/>&nbsp;I want
 							to <strong>have</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img
                                 src="/owner/images/type_posts/offer.png"/>&nbsp;I
 							<strong>offer</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img
                                 src="/owner/images/type_posts/todo.png"/>&nbsp;I
 							want to do something <strong>together</strong></a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/3/title"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/3/title"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
                                 src="/owner/images/type_posts/change.png"/>&nbsp;I
 							want to <strong>change</strong> something</a></li>
 						<li class="divider" ng-show="!showPublic()"></li>
-						<li class="dropdown-submenu"ng-show="!showPublic()">
+						<li class="dropdown-submenu top-layer"ng-show="!showPublic()">
 							<a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
 							<ul class="dropdown-menu" ng-controller="DraftCtrl"  >
 								<li ng-repeat="draft in allDrafts | orderBy: '-datetime' | limitTo: recordsToDisplay">
@@ -161,7 +161,7 @@
                                 ng-repeat="entry in unreadEventsByNeedByType"
                                 ng-show="entry.message.count > 0"><a
                                 ng-click="openNeedDetailView(entry.need.uri)"><img
-                                src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
+                                ng-src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
                                 class="badge pull-right">{{entry.message.count}}</span></a>
                         </li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
@@ -181,7 +181,7 @@
                                 ng-repeat="entry in unreadEventsByNeedByType"
                                 ng-show="entry.connect.count > 0"><a
                                 ng-click="openNeedDetailView(entry.need.uri)"><img
-                                src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
+                                ng-src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
                                 class="badge pull-right">{{entry.connect.count}}</span></a>
                         </li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
@@ -200,7 +200,7 @@
                                 ng-repeat="entry in unreadEventsByNeedByType"
                                 ng-show="entry.hint.count > 0"><a
                                 ng-click="openNeedDetailView(entry.need.uri)"><img
-								src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
+								ng-src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
                                 class="badge pull-right">{{entry.hint.count}}</span></a>
 						</li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>

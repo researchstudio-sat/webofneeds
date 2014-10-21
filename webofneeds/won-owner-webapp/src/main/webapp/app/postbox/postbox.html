@@ -64,7 +64,7 @@
                                 ng-repeat="post in allNeeds | orderObjectBy:sortedField:reversedSort |filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{post.basicNeedType}}</span>
-                                <img src="{{getTypePicURI(post.basicNeedType)}}"
+                                <img ng-src="{{getTypePicURI(post.basicNeedType)}}"
                                      tooltip="{{post.basicNeedType}} (click to filter)"/>
                             </td>
                             <td><a style="font-weight:bold;" href ng-click="clickOnNeedPrivateLink(post)">{{post
@@ -153,7 +153,8 @@
                         <tr ng-show="allDrafts.length>0" ng-repeat="draft in allDrafts | filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{draft.draft.basicNeedType}}</span>
-                                <img src="{{getTypePicURI(draft.draft.basicNeedType)}}" tooltip="{{draft.draft.basicNeedType}} (click to filter)"/>
+                                <img ng-src="{{getTypePicURI(draft.draft.basicNeedType)}}"
+                                     tooltip="{{draft.draft.basicNeedType}} (click to filter)"/>
                             </td>
                             <!-- TODO step in create need needs to be specified -->
                             <td><a href="#/create-need/1" style="font-weight:bold;">{{draft.draft.title}}</a></td>
@@ -205,7 +206,8 @@
                         <tr ng-show="closedList.length>0" ng-repeat="closed in closedList | filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{closed.type}}</span>
-                                <img src="{{getTypePicURI(closed.type)}}" tooltip="{{closed.type}} (click to filter)"/>
+                                <img ng-src="{{getTypePicURI(closed.type)}}"
+                                     tooltip="{{closed.type}} (click to filter)"/>
                             </td>
                             <td>{{closed.title}}</a></td>
                             <td>{{closed.datetime | date}}</td>

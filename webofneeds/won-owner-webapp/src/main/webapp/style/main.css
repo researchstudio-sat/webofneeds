@@ -48,6 +48,10 @@
 	margin-bottom: 20px;
 }
 
+.top-layer {
+    position:relative;
+    z-index:10001
+}
 .fill {
 	min-height: 100%;
 }
@@ -396,6 +400,10 @@ h1#main-heading {
 For submenu functionality
 http://stackoverflow.com/questions/18023493/bootstrap-3-dropdown-sub-menu-missing
 */
+.dropdown-submenu-z {
+    position:relative;
+    z-index:10001
+}
 .dropdown-submenu {
     position:relative;
 }
