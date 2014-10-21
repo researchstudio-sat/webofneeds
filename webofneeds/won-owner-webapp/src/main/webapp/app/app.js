@@ -133,10 +133,10 @@ app.directive('header', function(){
                 case won.WONMSG.connectionMessage:
                     return 'Conversation';
                 case won.WONMSG.openMessage:
-                    if (lastConEvent.event.hasReceiverNeed == lastConEvent.remoteNeed.uri){
+                    //if (lastConEvent.event.hasReceiverNeed == lastConEvent.remoteNeed.uri){
                         return 'Conversation';
-                    }
-                    return 'Incoming Request';
+                    //}
+                    //return 'Incoming Request';
                 case won.WONMSG.connectMessage:
                     if (lastConEvent.event.hasReceiverNeed == lastConEvent.remoteNeed.uri){
                         return 'Outgoing Request';
