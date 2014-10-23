@@ -87,68 +87,9 @@
             <div class="div-table-row col-lg-12">
                 <div class="div-table-cell col-lg-12">
                     <div class="row col-lg-12 text-center">
+                       <conversation chosen-message='chosenMessage'>
+                       </conversation>
 
-                        <!-- Conversations -->
-                        <div class="panel panel-default" ng-show="showConversations()">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
-                                    <h3 class="panel-title col-md-9">Conversation with <a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a></h3>  <!--TODO put parameter into url -->
-                                </div>
-                            </div>
-                            <table class="table table-hover">
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="row col-lg-3">
-                                            <img src="/owner/images/house.gif" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.lastMessages[0]
-                                            .timestamp | date}}</br>{{chosenMessage.lastMessages[0].timestamp | date:'HH:mm'}}
-                                            <!--TODO put here time-->
-                                        </div>
-                                        <p class="row col-lg-9 text-justify">
-                                            {{chosenMessage.lastMessages[0].text}}
-                                        </p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p class="row col-lg-11 text-justify">
-                                            {{chosenMessage.event.hasTextMessage}}
-                                        </p>
-                                        <div class="row col-lg-1">
-                                            <img src="/owner/images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.event.hasTimestamp |
-                                            date}}</br>{{chosenMessage.event.hasTimestamp | date:'HH:mm'}}
-                                            <!--TODO put here time-->
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <form class="form-horizontal container" novalidate name="sendMessageForm" ng-submit="sendMessage()">
-                                            <fieldset>
-                                                <div class="form-group">
-                                                    <div class="col-md-12">
-                                                        <textarea style="resize: none;" class="form-control" rows="8" id="textMessage" name="textMessage"
-                                                                  ng-model="newMessage"
-                                                                  placeholder="Write a reply..."
-                                                                  required>
-                                                        </textarea>
-                                                        <!--<span class="label label-warning" ng-show="contactAuthForm.textMessage.$invalid">Please write a message</span>  -->
-                                                    </div>
-                                                    <!--<span class="help-block">Message mustn't be empty</span> -->
-                                                </div>
-                                                <div class="pull-right">
-                                                    <button ng-disabled="sendMessageForm.$invalid" type="submit" class="btn btn-primary">Send</button>
-                                                </div>
-                                            </fieldset>
-                                        </form>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
 
                         <!-- Incoming requests -->
                         <div class="panel panel-default" ng-show="showIncomingRequests()">

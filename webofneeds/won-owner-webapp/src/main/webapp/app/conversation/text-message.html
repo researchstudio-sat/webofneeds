@@ -1,0 +1,10 @@
+<tr ng-show="showPublic()" ng-repeat="message in chosenMessage.lastMessages | orderBy:sortedField:reversedSort">
+    <td>
+        <div class="row col-lg-3">
+            <img src="/owner/images/house.gif" width="50" height="50"> <!--TODO change size-->
+            </br>{{message.timestamp}}</br>{{message.timestamp |date:'HH:mm'}} <!--TODO put here time-->
+        </div>
+        <p class="row col-lg-9 text-justify" ng-bind="message.text">
+        </p>
+    </td>
+</tr>

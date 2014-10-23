@@ -1,0 +1,36 @@
+<!-- Conversations -->
+<div class="panel panel-default" ng-show="showConversations()">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
+            <h3 class="panel-title col-md-9">Conversation with <a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a></h3>  <!--TODO put parameter into url -->
+        </div>
+    </div>
+    <table class="table table-hover">
+        <tbody>
+        <text-message chosen-message='chosenMessage'></text-message>
+        <tr>
+            <td>
+                <form class="form-horizontal container" novalidate name="sendMessageForm" ng-submit="sendMessage()">
+                    <fieldset>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <textarea style="resize: none;" class="form-control" rows="8" id="textMessage" name="textMessage"
+                                          ng-model="newMessage"
+                                          placeholder="Write a reply..."
+                                          required>
+                                </textarea>
+                                <!--<span class="label label-warning" ng-show="contactAuthForm.textMessage.$invalid">Please write a message</span>  -->
+                            </div>
+                            <!--<span class="help-block">Message mustn't be empty</span> -->
+                        </div>
+                        <div class="pull-right">
+                            <button ng-disabled="sendMessageForm.$invalid" type="submit" class="btn btn-primary">Send</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
