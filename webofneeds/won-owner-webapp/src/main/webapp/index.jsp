@@ -79,6 +79,7 @@
 
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/header/notification-dropdown.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/faq/faq.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/impressum/impressum.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/main/main.js"/>"></script>
@@ -197,7 +198,7 @@
 					</ul>
 				</li>
 
-                <li notif-dropdown></li>
+                <li ng-show="!showPublic()" ng-cloak notif-dropdown></li>
 			</ul>
 					<ul class="nav navbar-nav navbar-right" ng-cloak>
                         <li><span ng-show="checkRegistered()"></span></li>
