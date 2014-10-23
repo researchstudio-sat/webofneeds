@@ -240,17 +240,17 @@ app.directive(('notifDropdown'), function notifDropdownFct($rootScope) { //TODO 
         },*/
         template:
             '<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl"> ' +
-            '    <i class="fa fa-comment-o fa-lg"></i>&nbsp;{{unreadEventsByTypeByNeed.message.count}} ' +
+            '    <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{unreadEventsByTypeByNeed.hint.count}} ' +
             '</a> ' +
             '<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;"> ' +
-            '    <li class="text-center grey-item">{{unreadEventsByTypeByNeed.message.count}}&nbsp;new ' +
-            '    messages</li> ' +
+            '    <li class="text-center grey-item">{{unreadEventsByTypeByNeed.hint.count}}&nbsp;new ' +
+            '    matches</li> ' +
             '<li ' +
             'ng-repeat="entry in unreadEventsByNeedByType" ' +
-            'ng-show="entry.message && entry.message.count > 0">' +
+            'ng-show="entry.hint && entry.hint.count > 0">' +
             '    <a g-click="openNeedDetailView(entry.need.uri)"><img ' +
             '    src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span ' +
-            '    class="badge pull-right">{{entry.message.count}}</span></a> ' +
+            '    class="badge pull-right">{{entry.hint.count}}</span></a> ' +
             '</li> ' +
             '<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a> ' +
             '</li> ' +

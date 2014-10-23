@@ -146,7 +146,6 @@
 					</ul>
 				</li>
 
-                <li notif-dropdown></li>
                     <!--
                     unread-events-by-type-by-need="{{ unreadEventsByTypeByNeed }}"
                     unread-events-by-need-by-type="{{ unreadEventsByNeedByType }}"
@@ -197,25 +196,8 @@
 						</li>
 					</ul>
 				</li>
-				<li ng-show="!showPublic()" ng-cloak>
-					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
-						<!-- TODO provide here the total number of matches -->
-						<i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{unreadEventsByTypeByNeed.hint.count}}
-					</a>
-					<ul class="dropdown-menu" style="width: 280px;">
-						<li class="text-center grey-item">{{unreadEventsByTypeByNeed.hint.count}}&nbsp;new matches</li>
-						<!-- TODO put real parameters into url -->
-						<li
-                                ng-repeat="entry in unreadEventsByNeedByType"
-                                ng-show="entry.hint.count > 0"><a
-                                ng-click="openNeedDetailView(entry.need.uri)"><img
-								src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
-                                class="badge pull-right">{{entry.hint.count}}</span></a>
-						</li>
-						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
-						</li>
-					</ul>
-				</li>
+
+                <li notif-dropdown></li>
 			</ul>
 					<ul class="nav navbar-nav navbar-right" ng-cloak>
                         <li><span ng-show="checkRegistered()"></span></li>
