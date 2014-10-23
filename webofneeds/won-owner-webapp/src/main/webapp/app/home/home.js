@@ -41,9 +41,6 @@ angular.module('won.owner').controller('HomeCtrl',
 			$location.path("/signin");
 		}
 	}
-    $scope.goHome = function(){
-        $location.path("/home");
-    }
 
 	$scope.forms = new function() {
 		this.signin = ($location.path().indexOf("signin") > -1);

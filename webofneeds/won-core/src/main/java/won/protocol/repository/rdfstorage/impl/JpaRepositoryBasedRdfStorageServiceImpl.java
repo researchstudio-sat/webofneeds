@@ -20,6 +20,8 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.DatasetHolder;
 import won.protocol.repository.DatasetHolderRepository;
@@ -36,16 +38,19 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   @Autowired
   private DatasetHolderRepository datasetHolderRepository;
 
+  @Transactional(propagation = Propagation.SUPPORTS)
   @Override
   public void storeModel(final ConnectionEvent event, final Model graph) {
     storeModel(createEventURI(event), graph);
   }
 
+  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
   @Override
   public Model loadModel(final ConnectionEvent event) {
     return loadModel(createEventURI(event));
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void storeModel(final URI resourceURI, final Model model) {
     Dataset dataset = DatasetFactory.createMem();
@@ -54,6 +59,7 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
     storeDataset(resourceURI, dataset);
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void storeDataset(final URI resourceURI, final Dataset dataset) {
     DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
@@ -65,18 +71,22 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
     datasetHolderRepository.save(datasetHolder);
   }
 
+  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
   @Override
   public Model loadModel(final URI resourceURI) {
     DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
     return datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel();
   }
 
+
+  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
   @Override
   public Dataset loadDataset(final URI resourceURI) {
     DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
     return datasetHolder == null ? null : datasetHolder.getDataset();
   }
 
+  @Transactional(propagation = Propagation.SUPPORTS)
   @Override
   public boolean removeContent(final URI resourceURI) {
     try{

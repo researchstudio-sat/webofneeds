@@ -58,6 +58,10 @@ angular.module('won.owner').controller("HeaderCtrl",
         }
     }
 
+    $scope.goLandingPage = function() {
+        $location.path("/");
+    }
+
 	$scope.showPublic = function() {
         $scope.authenticated = !userService.isAuth();
 		return  $scope.authenticated;

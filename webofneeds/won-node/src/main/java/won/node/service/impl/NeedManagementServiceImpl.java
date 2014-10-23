@@ -22,8 +22,8 @@ package won.node.service.impl;
  */
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
@@ -45,9 +45,7 @@ import won.protocol.service.NeedInformationService;
 import won.protocol.service.NeedManagementService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -97,10 +95,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
     String ownerApplicationID,
     WonMessage wonMessage) throws IllegalNeedContentException {
 
-
-    // distinguish between the new message format (WonMessage) and the old parameters
-    // ToDo (FS): remove this distinction if the old parameters not used anymore
-    if (wonMessage != null) {
       WonMessage newWonMessage = WonMessageBuilder.wrapOwnerToNeedWonMessageForLocalStorage(wonMessage);
       // store the newWonMessage as it is
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
@@ -163,66 +157,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
         logger.warn("could not create NeedCreatedNotification", e);
       }
       return needURI;
-
-    } else {
-
-      // do it the traditional way
-
-      String stopwatchName = getClass().getName() + ".createNeed";
-
-      Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase1");
-      Split split = stopwatch.start();
-      logger.debug("CREATING need. OwnerApplicationId:{}", ownerApplicationID);
-      Need need = new Need();
-      need.setState(activate ? NeedState.ACTIVE : NeedState.INACTIVE);
-      need = needRepository.save(need);
-      split.stop();
-
-      stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase2");
-      split = stopwatch.start();
-      //now, create the need URI and save again
-      need.setNeedURI(uriService.createNeedURI(need));
-      need.setWonNodeURI(URI.create(uriService.getGeneralURIPrefix()));
-      need = needRepository.save(need);
-      split.stop();
-
-      stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase3");
-      split = stopwatch.start();
-      String baseURI = need.getNeedURI().toString();
-      RdfUtils.replaceBaseURI(content, baseURI);
-      rdfStorage.storeModel(need.getNeedURI(), content);
-      split.stop();
-
-      stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase4");
-      split = stopwatch.start();
-      ResIterator needIt = content.listSubjectsWithProperty(RDF.type, WON.NEED);
-      if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
-
-      Resource needRes = needIt.next();
-      logger.debug("processing need resource {}", needRes.getURI());
-
-      StmtIterator stmtIterator = content.listStatements(needRes, WON.HAS_FACET, (RDFNode) null);
-      if (!stmtIterator.hasNext())
-        throw new IllegalArgumentException("at least one RDF node must be of type won:HAS_FACET");
-      else
-        //TODO: check if there is a implementation for the facet on the node
-        do {
-          Facet facet = new Facet();
-          facet.setNeedURI(need.getNeedURI());
-          facet.setTypeURI(URI.create(stmtIterator.next().getObject().asResource().getURI()));
-          facetRepository.save(facet);
-        } while (stmtIterator.hasNext());
-      split.stop();
-
-      stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase5");
-      split = stopwatch.start();
-      authorizeOwnerApplicationForNeed(ownerApplicationID, need);
-      split.stop();
-      matcherProtocolMatcherClient.needCreated(need.getNeedURI(), content, wonMessage);
-      return need.getNeedURI();
-
-    }
-
   }
 
   @Override
@@ -269,10 +203,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
   @Override
   public void activate(final URI needURI, WonMessage wonMessage) throws NoSuchNeedException {
-
-    // distinguish between the new message format (WonMessage) and the old parameters
-    // ToDo (FS): remove this distinction if the old parameters not used anymore
-    if (wonMessage != null) {
       WonMessage newWonMessage =  WonMessageBuilder.wrapOwnerToNeedWonMessageForLocalStorage(wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorage.storeDataset(newWonMessage.getMessageURI(),
@@ -288,28 +218,12 @@ public class NeedManagementServiceImpl implements NeedManagementService
       messageEventRepository.save(new MessageEventPlaceholder(need.getNeedURI(), newWonMessage));
 
       matcherProtocolMatcherClient.needActivated(need.getNeedURI(), newWonMessage);
-
-    } else {
-
-      logger.debug("ACTIVATING need. needURI:{}", needURI);
-      if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-      Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-      need.setState(NeedState.ACTIVE);
-      logger.debug("Setting Need State: " + need.getState());
-      needRepository.save(need);
-
-      matcherProtocolMatcherClient.needActivated(need.getNeedURI(), wonMessage);
-    }
-
   }
 
   @Override
   public void deactivate(final URI needURI, WonMessage wonMessage)
     throws NoSuchNeedException, NoSuchConnectionException {
 
-    // distinguish between the new message format (WonMessage) and the old parameters
-    // ToDo (FS): remove this distinction if the old parameters not used anymore
-    if (wonMessage != null) {
       WonMessage newWonMessage = WonMessageBuilder.wrapOwnerToNeedWonMessageForLocalStorage(wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorage.storeDataset(newWonMessage.getMessageURI(),
@@ -340,27 +254,6 @@ public class NeedManagementServiceImpl implements NeedManagementService
       // ToDo (FS): define own message or forward the deactivate message?
       matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), newWonMessage);
 
-    } else {
-
-      logger.debug("DEACTIVATING need. needURI:{}", needURI);
-      if (needURI == null) throw new IllegalArgumentException("needURI is not set");
-      Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-      need.setState(NeedState.INACTIVE);
-      need = needRepository.save(need);
-      //close all connections
-      Collection<URI> connectionURIs = connectionRepository.getConnectionURIsByNeedURIAndNotInState(need.getNeedURI
-        (), ConnectionState.CLOSED);
-      for (URI connURI : connectionURIs) {
-        try {
-          // ToDo (FS): create appropriate wonMessage
-          ownerFacingConnectionCommunicationService.close(connURI, null, wonMessage);
-        } catch (IllegalMessageForConnectionStateException e) {
-          logger.warn("wrong connection state", e);
-        }
-
-      }
-      matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), wonMessage);
-    }
   }
 
   private boolean isNeedActive(final Need need) {
