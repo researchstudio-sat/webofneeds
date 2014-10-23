@@ -106,7 +106,7 @@
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
 
 			<ul class="nav navbar-nav">
-				<li ng-class="isActive()"><a href="" ng-click="redirectHome()">
+				<li ng-class="isActive()"><a href="" ng-click="goHome()">
 					<i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
 				</li>
 			</ul>
@@ -220,6 +220,7 @@
 						{{userdata.username}}&nbsp;<span class="caret"/>
 					</a>
 					<ul class="dropdown-menu">
+                        <li><a href="" ng-click="goLandingPage()">What can I do with the Web of Needs?</a></li>
 						<li><a href="" ng-click="onClickSignOut()">Sign out</a></li>
 					</ul>
 				</li>
