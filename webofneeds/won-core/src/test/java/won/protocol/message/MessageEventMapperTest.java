@@ -3,6 +3,7 @@ package won.protocol.message;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,11 +25,12 @@ public class MessageEventMapperTest
 
 
   private Model createMessageEventTestModel() throws IOException {
-    Dataset dataset = TestUtils.createTestDataset(RESOURCE_FILE);
+    Dataset dataset = Utils.createTestDataset(RESOURCE_FILE);
     return dataset.getNamedModel(MESSAGE_EVENT_GRAPH_URI);
   }
 
   @Test
+  @Ignore
   public void testMessageEventMappingRT() throws Exception {
 
     Model eventModel = createMessageEventTestModel();

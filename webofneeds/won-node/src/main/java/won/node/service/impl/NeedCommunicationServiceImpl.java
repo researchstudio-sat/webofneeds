@@ -104,9 +104,6 @@ public class NeedCommunicationServiceImpl implements
                    final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException {
 
-    // distinguish between the new message format (WonMessage) and the old parameters
-    // ToDo (FS): remove this distinction if the old parameters not used anymore
-    if (wonMessage != null) {
       logger.debug("STORING message with id {}", wonMessage.getMessageURI());
       rdfStorageService.storeDataset(wonMessage.getMessageURI(),
                                      WonMessageEncoder.encodeAsDataset(wonMessage));
@@ -151,52 +148,12 @@ public class NeedCommunicationServiceImpl implements
       //invoke facet implementation
       reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wonMessage);
 
-    } else {
-
-      if (score < 0 || score > 1) throw new IllegalArgumentException("score is not in [0,1]");
-      if (originator == null) throw new IllegalArgumentException("originator is not set");
-
-      //create Connection in Database
-      Connection con = null;
-      try {
-        //see if there is a facet specified in the content
-        URI facet = dataService.getFacet(content);
-        if (facet == null) {
-          //get the first one of the need's supported facets. TODO: implement some sort of strategy for choosing a facet here (and in the matcher)
-          Collection<URI> facets = dataService.getSupportedFacets(needURI);
-          if (facets.isEmpty()) throw new IllegalArgumentException(
-            "hint does not specify facets, falling back to using one of the need's supported facets failed as the need does not support any facets");
-          //add the facet to the model.
-          facet = facets.iterator().next();
-        }
-        con = dataService.createConnection(needURI, otherNeedURI, null, facet, ConnectionState.SUGGESTED,
-                                           ConnectionEventType.MATCHER_HINT);
-      } catch (ConnectionAlreadyExistsException e) {
-        logger.warn("could not create connection", e);
-      }
-
-      //create ConnectionEvent in Database
-      ConnectionEvent event = dataService
-        .createConnectionEvent(con.getConnectionURI(), originator, ConnectionEventType.MATCHER_HINT);
-
-      String baseURI = con.getConnectionURI().toString();
-      RdfUtils.replaceBaseURI(content, baseURI);
-      //create rdf content for the ConnectionEvent and save it to disk
-      dataService.saveAdditionalContentForEvent(content, con, event, score);
-
-      //invoke facet implementation
-      reg.get(con).hint(con, score, originator, content, wonMessage);
-    }
   }
 
   @Override
   public URI connect(final URI needURI, final URI otherNeedURI, final Model content, final WonMessage wonMessage)
           throws NoSuchNeedException,
     IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-
-    // distinguish between the new message format (WonMessage) and the old parameters
-    // ToDo (FS): remove this distinction if the old parameters not used anymore
-    if (wonMessage != null) {
 
       URI senderNeedURI = wonMessage.getSenderNeedURI();
       URI receiverNeedURI = wonMessage.getReceiverNeedURI();
@@ -226,31 +183,6 @@ public class NeedCommunicationServiceImpl implements
 
       return con.getConnectionURI();
 
-    } else {
-
-      URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
-
-      //create Connection in Database
-      Connection con = dataService.createConnection(needURI, otherNeedURI, null, facetURI, ConnectionState.REQUEST_SENT,
-                                                    ConnectionEventType.OWNER_OPEN);
-
-      //create ConnectionEvent in Database
-      ConnectionEvent event = dataService
-        .createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.OWNER_OPEN);
-
-      String baseURI = con.getConnectionURI().toString();
-      RdfUtils.replaceBaseURI(content, baseURI);
-      //create rdf content for the ConnectionEvent and save it to disk
-      dataService.saveAdditionalContentForEvent(content, con, event, null);
-
-      //invoke facet implementation
-      Facet facet = reg.get(con);
-      facet.connectFromOwner(con, content, wonMessage);
-      //reg.get(con).connectFromOwner(con, content);
-
-      return con.getConnectionURI();
-
-    }
   }
 
   @Override
@@ -259,9 +191,6 @@ public class NeedCommunicationServiceImpl implements
                      final WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
-    // distinguish between the new message format (WonMessage) and the old parameters
-    // ToDo (FS): remove this distinction if the old parameters not used anymore
-    if (wonMessage != null) {
 
       // a need wants to connect.
       // get the required data from the message and create a connection
@@ -304,32 +233,6 @@ public class NeedCommunicationServiceImpl implements
 
       return con.getConnectionURI();
 
-    } else {
-
-      logger.debug("CONNECT received for need {} referring to need {} (connection {}) with content '{}'",
-                   new Object[]{needURI, otherNeedURI, otherConnectionURI, content});
-      if (otherConnectionURI == null) throw new IllegalArgumentException("otherConnectionURI is not set");
-
-      URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
-
-      //create Connection in Database
-    Connection con = dataService.createConnection(needURI, otherNeedURI, otherConnectionURI, facetURI,
-                                                    ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
-      String baseURI = con.getConnectionURI().toString();
-      RdfUtils.replaceBaseURI(content, baseURI);
-      //create ConnectionEvent in Database
-      ConnectionEvent event = dataService
-        .createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_OPEN);
-
-      //create rdf content for the ConnectionEvent and save it to disk
-      dataService.saveAdditionalContentForEvent(content, con, event, null);
-
-      //invoke facet implementation
-      Facet facet = reg.get(con);
-      facet.connectFromNeed(con, content, wonMessage);
-
-      return con.getConnectionURI();
-    }
   }
 
 
