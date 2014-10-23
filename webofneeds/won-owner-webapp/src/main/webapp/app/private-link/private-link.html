@@ -102,24 +102,27 @@
                                     <td>
                                         <div class="row col-lg-3">
                                             <img src="/owner/images/house.gif" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.lastMessages[0]
-                                            .timestamp | date}}</br>{{chosenMessage.lastMessages[0].timestamp | date:'HH:mm'}}
+                                            </br>{{chosenMessage.lastMessages[1]
+                                            .timestamp | date}}</br>{{chosenMessage.lastMessages[1].timestamp |
+                                            date:'HH:mm'}}
                                             <!--TODO put here time-->
                                         </div>
                                         <p class="row col-lg-9 text-justify">
-                                            {{chosenMessage.lastMessages[0].text}}
+                                            {{chosenMessage.lastMessages[1].text}}
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <p class="row col-lg-11 text-justify">
-                                            {{chosenMessage.event.hasTextMessage}}
+                                            {{chosenMessage.lastMessages[0].text}}
                                         </p>
                                         <div class="row col-lg-1">
                                             <img src="/owner/images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.event.hasTimestamp |
-                                            date}}</br>{{chosenMessage.event.hasTimestamp | date:'HH:mm'}}
+                                            </br>{{chosenMessage.lastMessages[0]
+                                            .timestamp |
+                                            date}}</br>{{chosenMessage.lastMessages[0]
+                                            .timestamp | date:'HH:mm'}}
                                             <!--TODO put here time-->
                                         </div>
                                     </td>
