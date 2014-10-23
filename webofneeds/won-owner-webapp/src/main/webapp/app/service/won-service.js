@@ -345,7 +345,7 @@ angular.module('won.owner').factory('wonService', function (
      * @param need1
      * @param need2
      */
-    wonService.openSuggestedConnection = function(connectionUri){
+    wonService.openSuggestedConnection = function(connectionUri, textMessage){
 
         var sendOpen = function(envelopeData) {
             //TODO: use event URI pattern specified by WoN node
@@ -355,6 +355,7 @@ angular.module('won.owner').factory('wonService', function (
                 .forEnvelopeData(envelopeData)
                 .hasFacet(won.WON.OwnerFacet)
                 .hasRemoteFacet(won.WON.OwnerFacet)
+                .hasTextMessage(textMessage)
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {
@@ -449,7 +450,7 @@ angular.module('won.owner').factory('wonService', function (
      * @param need1
      * @param need2
      */
-    wonService.open = function(msgToOpenFor){
+    wonService.open = function(msgToOpenFor, textMessage){
 
         var sendOpen = function(envelopeData, eventToOpenFor) {
             //TODO: use event URI pattern specified by WoN node
@@ -459,6 +460,7 @@ angular.module('won.owner').factory('wonService', function (
                 .forEnvelopeData(envelopeData)
                 .hasFacet(won.WON.OwnerFacet)
                 .hasRemoteFacet(won.WON.OwnerFacet)
+                .hasTextMessage(textMessage)
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {

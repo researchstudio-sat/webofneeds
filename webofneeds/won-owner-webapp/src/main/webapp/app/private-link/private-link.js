@@ -279,12 +279,24 @@ angular.module('won.owner')
                 $scope.chosenMessage = msgEvent;
             }
             $scope.prevMessageId = msgEvent.event.uri;
+            // store the text of this message connection previous event, if any
+            // (this is temp functionality here as it probably should be loaded elsewhere - when the event itself is loaded)
+            if ($scope.chosenMessage != null) {
+                $scope.addConnectionLastTextMessages($scope.chosenMessage);
+            }
         }
 /*    $scope.clickOnTitle = function(msgId) {
         // msgId can't be null here
         $scope.chosenMessage = getEventById(msgId);
         $scope.prevMessageId = msgId;
     }*/
+        $scope.addConnectionLastTextMessages = function(currentMessage){
+            linkedDataService.getConnectionTextMessages(currentMessage.connection.uri, currentMessage.event.hasTimestamp, 1)
+                .then(function(messages){
+                    currentMessage.lastMessages = messages;
+                    return;
+                });
+        }
 
     $scope.showConversations = function() {
         if($scope.chosenMessage != null){
@@ -320,7 +332,7 @@ angular.module('won.owner')
     $scope.clickOnAcceptForInRequest = function() {
         console.log('accept clicked');
         // TODO add parameter for displaying specific stuff on private-link page
-        wonService.open($scope.chosenMessage);
+        wonService.open($scope.chosenMessage, $scope.newMessage);
         $scope.prevMessageId = null;
         $scope.chosenMessage = null;
         console.log('redirect: /private-link');
@@ -422,7 +434,7 @@ angular.module('won.owner')
     $scope.clickOnSendRequestMessage = function() {
         console.log('send request message');
         //wonService.open($scope.chosenMessage.connection.uri);
-        wonService.openSuggestedConnection($scope.chosenMessage.connection.uri);
+        wonService.openSuggestedConnection($scope.chosenMessage.connection.uri, $scope.textboxInMatchModel);
         $scope.showMatchControl = false;
 
         // TODO add parameter for displaying specific stuff on private-link page

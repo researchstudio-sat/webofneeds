@@ -355,6 +355,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             errorMessage = "More than one result found.";
         }
         if (errorMessage != null){
+            console.log(errorMessage);
             $q.reject(options.message + " " + errorMessage);
             return true;
         }
@@ -947,6 +948,56 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             }
         );
 
+    }
+
+    linkedDataService.getConnectionTextMessages = function(connectionUri, timestamp, limit) {
+        return linkedDataService.crawlConnectionData(connectionUri).then(
+            function collectTextMessages() {
+                var lock = getReadUpdateLockPerUri(connectionUri);
+                return lock.acquireReadLock().then(
+                    function (success) {
+                        try {
+                            var textMessages = [];
+                            var query =
+                                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+                                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                                "select distinct ?eventUri ?timestamp ?text where { " +
+                                "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
+                                won.WON.hasEventContainerCompacted + " ?container.\n" +
+                                "?container rdfs:member ?eventUri. \n" +
+                                "?eventURI won:hasTextMessage ?text. \n" +
+                                " optional { " +
+                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                " } \n" +
+                                //" filter ( ?timestamp >= " + timestamp + " ) \n" +
+                                "} order by desc(?timestamp) ";//limit " + limit;
+                            privateData.store.execute(query, [], [], function (success, results) {
+                                if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: true, allowMultiple: true})) {
+                                    return;
+                                }
+                                for (var key in results) {
+                                    var textMessage = {};
+                                    var eventUri = getSafeValue(results[key].eventUri);
+                                    var timestamp = getSafeValue(results[key].timestamp);
+                                    var text = getSafeValue(results[key].text);
+                                    if (eventUri != null && timestamp != null && text != null) {
+                                        textMessage.eventUri = eventUri;
+                                        textMessage.timestamp = timestamp;
+                                        textMessage.text = text;
+                                        textMessages.push(textMessage);
+                                    }
+                                }
+                            });
+                            return textMessages;
+                        } catch (e) {
+                            $q.reject("Could not get connection events' text messages " + connectionUri + ". Reason: " + e);
+                        } finally {
+                            lock.releaseReadLock();
+                        }
+                })
+             }
+        );
     }
 
     /**
