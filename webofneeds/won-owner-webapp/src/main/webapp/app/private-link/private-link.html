@@ -102,10 +102,12 @@
                                     <td>
                                         <div class="row col-lg-3">
                                             <img src="/owner/images/house.gif" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.event.timeStamp}}</br>{{chosenMessage.event.timeStamp |date:'HH:mm'}} <!--TODO put here time-->
+                                            </br>{{chosenMessage.lastMessages[0]
+                                            .timestamp | date}}</br>{{chosenMessage.lastMessages[0].timestamp | date:'HH:mm'}}
+                                            <!--TODO put here time-->
                                         </div>
                                         <p class="row col-lg-9 text-justify">
-                                            {{chosenMessage.event.hasTextMessage}}
+                                            {{chosenMessage.lastMessages[0].text}}
                                         </p>
                                     </td>
                                 </tr>
@@ -116,8 +118,9 @@
                                         </p>
                                         <div class="row col-lg-1">
                                             <img src="/owner/images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.event
-                                            .timeStamp}}</br>{{chosenMessage.event.timeStamp}} <!--TODO put here time-->
+                                            </br>{{chosenMessage.event.hasTimestamp |
+                                            date}}</br>{{chosenMessage.event.hasTimestamp | date:'HH:mm'}}
+                                            <!--TODO put here time-->
                                         </div>
                                     </td>
                                 </tr>
@@ -155,6 +158,14 @@
                                     <h3 class="panel-title col-md-9" >Request from <span ng-bind="chosenMessage.remoteNeed.title"></span> </h3>
                                     <div class="col-md-2">{{chosenMessage.event.hasTimestamp | date}}</div>
                                 </div>
+                            </div>
+                            <div class="row col-lg-12">
+                                <p class="row col-lg-11 text-justify">
+                                    {{chosenMessage.event.hasTextMessage}}
+                                </p>
+                                <!--<textarea id="incomingRequestMessage" class="col-lg-12" style="resize: none;" rows=8
+                                          disabled>{{chosenMessage.event.hasTextMessage}}
+                                </textarea>-->
                             </div>
 
 
@@ -298,7 +309,7 @@
 
                                 <div class="row col-lg-12">
                                     <a id="pencil" href="" ng-click="changeToEditable()" ng-show="showPencil"><i class="fa fa-pencil pull-right"></i></a>
-                                    <textarea id="textboxInRequest" class="col-lg-12" style="resize: none;" rows=8 disabled>Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat. Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                    <textarea id="textboxInRequest" class="col-lg-12" style="resize: none;" rows=8 disabled>{{chosenMessage.event.hasTextMessage}}
                                     </textarea>
                                 </div>
 
@@ -317,12 +328,7 @@
                                         <div class="media-body">
                                             <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.remoteNeed.title}}</a>
                                             <p class="text-justify">
-                                                Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
-                                                Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
-                                                pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
-                                                Pellentesque sollicitudin nec sem ut porttitor eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
-                                                pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
-                                                Pellentesque sollicitudin nec sem ut porttitor (<a href="#/post-detail/">go to full description</a>).
+                                                {{chosenMessage.remoteNeed.textDescription}}(<a href="#/post-detail/">go to full description</a>).
                                                 <!-- TODO link needs to be extended by parameters -->
                                             </p>
                                         </div>
@@ -424,6 +430,7 @@
 
                                 <div id="matchControl" ng-show="showMatchControl">
                                     <textarea id="textboxInMatch"
+                                              ng-model="textboxInMatchModel"
                                               class="col-lg-12"
                                               style="resize: none;" rows="8"
                                               placeholder="Write your message here ..."

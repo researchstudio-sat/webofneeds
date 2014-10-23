@@ -325,6 +325,5 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return deferred.promise;
     }
 
-
     return applicationStateService;
 });
