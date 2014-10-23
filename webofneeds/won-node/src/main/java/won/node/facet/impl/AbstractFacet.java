@@ -1,6 +1,7 @@
 package won.node.facet.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -41,6 +42,9 @@ import java.util.concurrent.ExecutorService;
  */
 public abstract class AbstractFacet implements Facet
 {
+  //string to be appended to the need uri, and prepended to a facet-specific identifier
+  // so as to form a unique graph name used for storing data that is managed by the facet
+  private static final String FACET_GRAPH_PATH = "facetgraph";
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
@@ -79,6 +83,14 @@ public abstract class AbstractFacet implements Facet
 
   protected RDFStorageService rdfStorageService;
 
+  /**
+   * A string that is used to create a graph URI used for need data managed by this
+   * facet.
+   * @return
+   */
+  protected String getIdentifierForFacetManagedGraph(){
+     return getClass().getSimpleName();
+  }
 
   /**
    *
@@ -445,6 +457,40 @@ public abstract class AbstractFacet implements Facet
     } catch (Exception e) {
         logger.warn("caught Exception in connectFromOwner: ",e);
     }
+  }
+
+  /**
+   * The facet may store data into the need dataset; this method finds the graph
+   * that the facet may write to and creates a new Graph in the dataset if needed.
+   * @param needURI
+   * @return the facet-managed graph
+   */
+  protected Model getFacetManagedGraph(URI needURI, Dataset needDataset){
+    String graphURI = getFacetManagedGraphName(needURI);
+    Model facetManagedGraph = needDataset.getNamedModel(graphURI);
+    if (facetManagedGraph == null){
+      facetManagedGraph = ModelFactory.createDefaultModel();
+      needDataset.addNamedModel(graphURI, facetManagedGraph);
+    }
+    return facetManagedGraph;
+  }
+
+  /**
+   * The facet may store data into the need dataset; this method removes
+   * that data from the need dataset.
+   * @param needURI
+   */
+  protected void removeFacetManagedGraph(URI needURI, Dataset needDataset){
+    String graphURI = getFacetManagedGraphName(needURI);
+    Model facetManagedGraph = needDataset.getNamedModel(graphURI);
+    if (facetManagedGraph != null){
+      needDataset.removeNamedModel(graphURI);
+    }
+  }
+
+  private String getFacetManagedGraphName(final URI needURI) {
+    //TODO: these checks can be made mor throrough once graph signing is in place
+    return needURI.toString() + "/" + FACET_GRAPH_PATH + getIdentifierForFacetManagedGraph();
   }
 
   /**

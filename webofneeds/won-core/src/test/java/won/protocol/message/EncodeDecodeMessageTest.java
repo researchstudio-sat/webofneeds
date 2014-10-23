@@ -4,6 +4,7 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.sparql.lib.DatasetLib;
 import org.apache.jena.riot.Lang;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import won.protocol.util.RdfUtils;
 
@@ -31,15 +32,17 @@ public class EncodeDecodeMessageTest
 
 
   @Test
+  @Ignore
   public void testEncodeDecodeOneMessage() throws Exception {
-    Dataset msgDatasetIn = TestUtils.createTestDataset(RESOURCE_FILE);
+    Dataset msgDatasetIn = Utils.createTestDataset(RESOURCE_FILE);
     performTest(msgDatasetIn);
   }
 
   @Test
+  @Ignore
   public void testEncodeDecodeAllMessagesWithoutSignature() throws Exception {
     for (String inResource : RESOURCE_FILES_WITHOUT_SIG) {
-      Dataset msgDatasetIn = TestUtils.createTestDataset(inResource);
+      Dataset msgDatasetIn = Utils.createTestDataset(inResource);
       performTest(msgDatasetIn);
     }
   }

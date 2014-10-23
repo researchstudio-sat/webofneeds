@@ -598,7 +598,6 @@ public class RdfUtils
   public static Iterator<Node> getNodesForPropertyPath(final Model model, URI resourceURI, Path propertyPath) {
     Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
                                            propertyPath, Context.emptyContext);
-    logger.debug("running path eval: "+ RdfUtils.toString(model));
     return result;
   }
 
@@ -1044,5 +1043,23 @@ public class RdfUtils
         baseDataset.addNamedModel(modelName, toBeAddedtoBase.getNamedModel(modelName));
       }
     }
+  }
+
+  /**
+   * Adds all triples of the dataset to the model.
+   * @param dataset
+   * @param model
+   */
+  public static void copyDatasetTriplesToModel(final Dataset dataset, final Model model) {
+    assert dataset != null : "dataset must not be null";
+    assert model != null : "model must not be null";
+    visit(dataset, new ModelVisitor<Object>()
+    {
+      @Override
+      public Object visit(final Model datasetModel) {
+        model.add(datasetModel);
+        return null;
+      }
+    });
   }
 }

@@ -90,6 +90,7 @@ public class DatasetHolder
     synchronized(this){
       RDFDataMgr.write(out, dataset, Lang.TRIG);
       this.datasetBytes = out.toByteArray();
+      this.cachedDataset = dataset;
       if (logger.isDebugEnabled()){
         logger.debug("wrote dataset {} to byte array of length {}", this.uri, this.datasetBytes.length);
       }

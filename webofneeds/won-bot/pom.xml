@@ -20,10 +20,11 @@
         <plugins>
             <plugin>
                 <!-- don't run the integration tests in a regular build -->
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>won.bot.integrationtest/**</exclude>
+                        <exclude>won/bot/integrationtest/*.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
