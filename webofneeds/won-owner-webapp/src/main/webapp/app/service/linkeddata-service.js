@@ -965,11 +965,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
                                 "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
                                 "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                                "select distinct ?eventUri ?timestamp ?text where { " +
+                                "select distinct ?eventUri ?timestamp ?text ?senderNeed where { " +
                                 "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
                                 won.WON.hasEventContainerCompacted + " ?container.\n" +
                                 "?container rdfs:member ?eventUri. \n" +
-                                "?eventURI won:hasTextMessage ?text. \n" +
+                                "?eventUri won:hasTextMessage ?text. \n" +
+                                "?eventUri msg:hasSenderNeed ?senderNeed. \n" +
                                 " optional { " +
                                 "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
                                 " } \n" +
@@ -984,10 +985,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                     var eventUri = getSafeValue(results[key].eventUri);
                                     var timestamp = getSafeValue(results[key].timestamp);
                                     var text = getSafeValue(results[key].text);
+                                    var senderNeed = getSafeValue(results[key].senderNeed);
                                     if (eventUri != null && timestamp != null && text != null) {
                                         textMessage.eventUri = eventUri;
                                         textMessage.timestamp = timestamp;
                                         textMessage.text = text;
+                                        textMessage.senderNeed = senderNeed;
                                         textMessages.push(textMessage);
                                     }
                                 }
