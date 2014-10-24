@@ -620,13 +620,13 @@ angular.module('won.owner').factory('wonService', function (
     }
 
 
-    wonService.textMessage = function(text){
+    wonService.textMessage = function(text, connectionUri){
 
         var sendTextMessage = function(envelopeData) {
             //TODO: use event URI pattern specified by WoN node
             var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  utilService.getRandomInt(1,9223372036854775807);
 
-            var message = new won.MessageBuilder(won.WONMSG.openMessage)
+            var message = new won.MessageBuilder(won.WONMSG.connectionMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
                 .addContentGraphData(won.WON.hasTextMessage, text)
@@ -654,6 +654,41 @@ angular.module('won.owner').factory('wonService', function (
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
+                setTimeout(
+                    function(){
+                        //linkedDataService.fetch(connection.uri);
+                        //console.log("publishing angular event");
+                        //$rootScope.$broadcast(won.EVENT.CLOSE_SENT, eventData);
+                        var messageTemp = new won.MessageBuilder(won.WONMSG.connectionMessageSentMessage)
+                            .eventURI(eventUri)
+                            .forEnvelopeData(envelopeData)
+                            .hasFacet(won.WON.OwnerFacet)
+                            .hasRemoteFacet(won.WON.OwnerFacet)
+                            .build();
+                        var eventData = getEventData(messageTemp);
+                        //  eventData.eventType = messageTypeToEventType[eventData.hasMessageType];
+                        eventData.eventType = won.EVENT.CONNECTION_MESSAGE_SENT;
+                        eventData.commState = won.COMMUNUCATION_STATE.PENDING;
+                        linkedDataService.fetch(eventData.hasSender)
+                            .then(
+                            function (value) {
+                                linkedDataService.fetch(eventUri)
+                                    .then(
+                                    function(value2) {
+                                        console.log("publishing angular event");
+
+                                        //eventData.eventType = won.EVENT.CLOSE_SENT;
+                                        eventData.timestamp = new Date().getTime();
+                                        $rootScope.$broadcast(won.EVENT.connectionMessageSentMessage, eventData);
+                                        //$rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
+
+                                    }, won.reportError("cannot fetch closed event " + eventUri)
+                                );
+                            }, won.reportError("cannot fetch closed connection " +eventUri)
+                        );
+
+                    }, 3000);
+
             } catch (e) {
                 console.log("could not open " + connectionUri + ". Reason" + e);
             }

@@ -130,6 +130,10 @@ app.directive('header', function(){
     .filter('messageTypeFilter', function(){
         var getTypeText = function(lastConEvent) {
             switch (lastConEvent.event.hasMessageType) {
+                case won.WONMSG.connectionMessageSentMessage:
+                    return 'Conversation';
+                case won.WONMSG.connectionMessageResponseMessage:
+                    return 'Conversation';
                 case won.WONMSG.connectionMessage:
                     return 'Conversation';
                 case won.WONMSG.openMessage:

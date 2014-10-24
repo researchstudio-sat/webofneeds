@@ -223,12 +223,6 @@ angular.module('won.owner')
         $scope.mesagesCollapsed = !$scope.mesagesCollapsed;
     };
 
-    //send new message
-
-    $scope.sendMessage = function() {
-        //TODO logic
-        $scope.newMessage = '';
-    };
 
 
     // helper function to get message according to its id from messages
@@ -435,51 +429,14 @@ angular.module('won.owner')
             $scope.addConnectionLastTextMessages($scope.chosenMessage);
         }
     });
-
-})
-
-angular.module('won.owner')
-    .directive('textMessage', function factory(){
-    return{
-        restrict: 'AE',
-        templateUrl : 'app/conversation/text-message.html',
-        scope : {
-            chosenMessage: '='
-        },
-        controller : function($scope){
-            $scope.showPublic = function(){
-                if($scope.chosenMessage.lastMessages.length>0){
-                    return true;
-                }else{
-                    return false;
-                }
-            }
+    $scope.$on(won.EVENT.CONNECTION_MESSAGE_SENT, function(ngEvent, eventData) {
+        if($scope.chosenMessage.needURI == eventData.hasSenderNeed){
+            $scope.addConnectionLastTextMessages($scope.chosenMessage);
         }
-    }
-})
-angular.module('won.owner')
-    .directive('conversation', function factory(){
-    return{
-        restrict: 'AE',
-        templateUrl : 'app/conversation/conversation.html',
-        scope : {
-            chosenMessage: '='
-        },
+    });
 
-        controller : function($scope){
-            $scope.showConversations = function() {
-                if($scope.chosenMessage != null){
-                    console.log("checking show conversations") ;
-                    if($scope.chosenMessage.typeText == 'Conversation') return true;
-                }else return false;
-            }
-        },
-        link: function(scope, element, attrs){
-            console.log("conversation container");
-        }
-
-    }
 })
+
 angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService, $rootScope) {
 
     $scope.close = false;

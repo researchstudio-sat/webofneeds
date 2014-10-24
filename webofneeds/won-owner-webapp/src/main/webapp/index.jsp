@@ -84,6 +84,7 @@
         <script type="text/javascript" src="<c:url value="/app/main/main.js"/>"></script>
 
         <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/conversation/conversation.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/draft/draft.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
