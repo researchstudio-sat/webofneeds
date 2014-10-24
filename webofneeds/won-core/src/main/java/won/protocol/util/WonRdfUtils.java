@@ -39,7 +39,6 @@ public class WonRdfUtils
     public static Model textMessage(String message) {
       Model messageModel = createModelWithBaseResource();
       Resource baseRes = messageModel.createResource(messageModel.getNsPrefixURI(""));
-      baseRes.addProperty(RDF.type, WON.TEXT_MESSAGE);
       baseRes.addProperty(WON.HAS_TEXT_MESSAGE,message, XSDDatatype.XSDstring);
       return messageModel;
     }

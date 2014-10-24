@@ -15,6 +15,7 @@ import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Class to build a WonMessage based on the specific properties.
@@ -593,14 +594,20 @@ public class WonMessageBuilder
   public WonMessageBuilder copyContentFromMessage(final WonMessage wonMessage, boolean replaceMessageUri) {
     Dataset messageContent = wonMessage.getMessageContent();
     for (Iterator<String> nameIt = messageContent.listNames(); nameIt.hasNext(); ){
-      //replace the messageURI of the specified message with that of this builder, just in case
-      //there are triples in the model that about the message
       String modelUri = nameIt.next();
       Model model = messageContent.getNamedModel(modelUri);
+      String otherMessageUri = wonMessage.getMessageURI().toString();
       if (replaceMessageUri) {
-        model = RdfUtils.replaceResource(model.getResource(wonMessage.getMessageURI().toString()),
+        //replace the messageURI of the specified message with that of this builder, just in case
+        //there are triples in the model referring to it
+        model = RdfUtils.replaceResource(model.getResource(otherMessageUri),
           model.getResource(this.messageURI.toString()));
       }
+      //change the model name: replace the message uri of the specified message with our uri
+      //we have to do that in any case as the content graph's URI must be one within the
+      //'URI space' of the message
+      String newModelUri = this.messageURI.toString();
+      modelUri = modelUri.replaceFirst(Pattern.quote(otherMessageUri), this.messageURI.toString());
       addContent(URI.create(modelUri), model,null);
     }
     return this;
