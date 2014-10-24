@@ -950,7 +950,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     }
 
-    linkedDataService.getConnectionTextMessages = function(connectionUri, timestamp, limit) {
+    linkedDataService.getConnectionTextMessages = function(connectionUri) {
         return linkedDataService.crawlConnectionData(connectionUri).then(
             function collectTextMessages() {
                 var lock = getReadUpdateLockPerUri(connectionUri);
@@ -971,8 +971,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 " optional { " +
                                 "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
                                 " } \n" +
-                                //" filter ( ?timestamp >= " + timestamp + " ) \n" +
-                                "} order by desc(?timestamp) ";//limit " + limit;
+                                "} order by asc(?timestamp) ";//limit " + limit;
+
                             privateData.store.execute(query, [], [], function (success, results) {
                                 if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: true, allowMultiple: true})) {
                                     return;
@@ -1000,6 +1000,56 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         }
                 })
              }
+        );
+    }
+
+    linkedDataService.getLastEventTypeBeforeTime = function(connectionUri, beforeTimestamp) {
+        return linkedDataService.crawlConnectionData(connectionUri).then(
+            function queryLastEventBeforeTime() {
+                var lock = getReadUpdateLockPerUri(connectionUri);
+                return lock.acquireReadLock().then(
+                    function (success) {
+                        try {
+                            var lastEventTypeBeforeTime;
+                            var filterPart = "";
+                            if (typeof beforeTimestamp != 'undefined') {
+                                filterPart = " filter ( ?timestamp > " + timestamp + " ) \n";
+                            }
+                            var query =
+                                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+                                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                                "select distinct ?msgType where { " +
+                                "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
+                                won.WON.hasEventContainerCompacted + " ?container.\n" +
+                                "?container rdfs:member ?eventUri. \n" +
+                                "?eventUri won:hasMessageType ?msgType. \n" +
+                                " optional { " +
+                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                " } \n" +
+                                filterPart + //" filter ( ?timestamp > " + timestamp + " ) \n" +
+                                "} order by desc(?timestamp) ";//limit " + limit;
+
+                            privateData.store.execute(query, [], [], function (success, results) {
+                                if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: true, allowMultiple: true})) {
+                                    return;
+                                }
+                                for (var key in results) {
+                                    var msgType = getSafeValue(results[key].msgType);
+                                    if (msgType != null) {
+                                        lastEventTypeBeforeTime = msgType;
+                                    }
+                                    break;
+                                }
+                            });
+                            return lastEventTypeBeforeTime;
+                        } catch (e) {
+                            $q.reject("Could not get connection event type before time " + connectionUri + ". Reason: " + e);
+                        } finally {
+                            lock.releaseReadLock();
+                        }
+                    })
+            }
         );
     }
 

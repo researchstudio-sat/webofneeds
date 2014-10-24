@@ -15,7 +15,7 @@
   -->
 
 <div style="padding-top: 40px;padding-bottom: 8em;" xmlns="http://www.w3.org/1999/html"
-     xmlns="http://www.w3.org/1999/html" ng-controller="PrivateLinkCtrl">
+     xmlns="http://www.w3.org/1999/html">
     <div >
         <div style="font-size: 1.8em; text-align: center ;">
             <img ng-show="!postClosed" src="{{img_path}}" alt="Generic placeholder thumbnail" style="z-index: 0">
@@ -87,6 +87,8 @@
             <div class="div-table-row col-lg-12">
                 <div class="div-table-cell col-lg-12">
                     <div class="row col-lg-12 text-center">
+                       <conversation chosen-message='chosenMessage'>
+                       </conversation>
 
                         <!-- Conversations -->
                         <div class="panel panel-default" ng-show="showConversations()">
@@ -102,27 +104,24 @@
                                     <td>
                                         <div class="row col-lg-3">
                                             <img src="/owner/images/house.gif" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.lastMessages[1]
-                                            .timestamp | date}}</br>{{chosenMessage.lastMessages[1].timestamp |
-                                            date:'HH:mm'}}
+                                            </br>{{chosenMessage.lastMessages[0]
+                                            .timestamp | date}}</br>{{chosenMessage.lastMessages[0].timestamp | date:'HH:mm'}}
                                             <!--TODO put here time-->
                                         </div>
                                         <p class="row col-lg-9 text-justify">
-                                            {{chosenMessage.lastMessages[1].text}}
+                                            {{chosenMessage.lastMessages[0].text}}
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <p class="row col-lg-11 text-justify">
-                                            {{chosenMessage.lastMessages[0].text}}
+                                            {{chosenMessage.event.hasTextMessage}}
                                         </p>
                                         <div class="row col-lg-1">
                                             <img src="/owner/images/User-blue-icon.png" width="50" height="50"> <!--TODO change size-->
-                                            </br>{{chosenMessage.lastMessages[0]
-                                            .timestamp |
-                                            date}}</br>{{chosenMessage.lastMessages[0]
-                                            .timestamp | date:'HH:mm'}}
+                                            </br>{{chosenMessage.event.hasTimestamp |
+                                            date}}</br>{{chosenMessage.event.hasTimestamp | date:'HH:mm'}}
                                             <!--TODO put here time-->
                                         </div>
                                     </td>
