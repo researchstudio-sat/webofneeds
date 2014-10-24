@@ -971,7 +971,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 " optional { " +
                                 "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
                                 " } \n" +
-                                "} order by desc(?timestamp) ";//limit " + limit;
+                                "} order by asc(?timestamp) ";//limit " + limit;
 
                             privateData.store.execute(query, [], [], function (success, results) {
                                 if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: true, allowMultiple: true})) {

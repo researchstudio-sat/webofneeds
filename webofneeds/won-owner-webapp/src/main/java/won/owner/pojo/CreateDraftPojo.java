@@ -25,8 +25,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateDraftPojo
 {
-
-
   private String draftURI;
   private String draft;
 

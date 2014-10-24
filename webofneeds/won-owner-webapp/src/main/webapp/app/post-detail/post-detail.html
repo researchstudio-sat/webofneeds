@@ -20,13 +20,13 @@
             <div class="row">
                 <div class="inline"><i class="fa fa-star fa-lg"></i></div>
                 <div class="inline"><i class="fa fa-circle fa-lg"></i></div>
-                <div class="inline" style="font-size: 1.8em;">{{need.title}}</div>
+                <div class="inline" style="font-size: 1.8em;" ng-bind="need.title" ></div>
                 <div class="inline pull-right"><i class="fa fa-copy fa-lg"></i></div>
             </div>
             <div class="row">
                 <div class="inline"><i class="fa fa-star fa-lg"></i></div>
                 <div class="inline"><i class="fa fa-circle fa-lg"></i></div>
-                <div class="inline" style="font-size: 1.8em;">{{need.creationDate}}</div>
+                <div class="inline" style="font-size: 1.8em;" ng-bind="need.creationDate"></div>
                 <div class="inline pull-right"><i class="fa fa-copy fa-lg"></i></div>
             </div>
             <div class="row">
@@ -53,13 +53,14 @@
                 <h4>Tagged with:</h4>
                 <span style="margin-right:5px;cursor:pointer;"
                       class="label label-primary btnTag"
-                      ng-repeat="tag in need.tags.split(', ')">{{need.tags.split(', ')[$index]}}
+                      ng-repeat="tag in need.tags.split(', ')"
+                      ng-bind="need.tags.split(',')[$index]">
                 </span>
             </div>
 
             <div class="row">
-                <p class="text-justify">
-                    {{need.textDescription}}
+                <p class="text-justify" ng-bind="need.textDescription">
+
                 </p>
             </div>
 
@@ -96,7 +97,8 @@
             <div class="row">
                 <div id="timeInfoCollapsed" class="well div-table col-lg-12">
                     <div class="div-table-row">
-                        <div class="col-lg-8 div-table centered-text additional-info-title">{{need.startDate}} - {{need.endDate}}</div>
+                        <div class="col-lg-8 div-table centered-text additional-info-title">{{need.startDate}} -
+                            {{need.endDate}}</div>
                         <div class="col-lg-1 div-table-cell centered-text pull-right">
                             <span ng-show="timeInputFieldCollapsed">
                                 <a href="" class="glyphicon glyphicon-chevron-right" ng-click="timeInputFieldCollapsedClick()"></a>

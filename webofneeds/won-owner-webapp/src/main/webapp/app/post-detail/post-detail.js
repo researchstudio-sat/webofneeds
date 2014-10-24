@@ -21,7 +21,8 @@
  * Time: 10:01 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams, $index, applicationStateService) {
+
+angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams, applicationStateService) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
 
@@ -218,11 +219,6 @@ angular.module('won.owner').directive('wonContact',function factory(userService)
         restrict: 'AE',
         templateUrl : "app/post-detail/contact.html",
         scope: {},
-        /*scope : {
-         numberOfSteps : '=numberOfSteps',
-         currentStep : '=currentStep',
-         jumpToStep : '&'
-         } ,     */
         controller : function($scope){
             $scope.message = '';
             $scope.sendStatus = false; //todo refresh this var each time when we click on show contact form
