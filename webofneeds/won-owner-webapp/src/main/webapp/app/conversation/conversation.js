@@ -22,24 +22,27 @@ angular.module('won.owner')
     .directive('textMessage', function factory(){
         return{
             restrict: 'AE',
-            templateUrl : 'app/conversation/text-message.html',
             scope : {
-                chosenMessage: '='
+                chosenMessage: '=',
+                message: '='
             },
-            controller : function($scope){
-                $scope.showPublic = function(){
-                    if($scope.chosenMessage.lastMessages.length>0){
-                        return true;
-                    }else{
-                        return false;
-                    }
+            link: function(scope, element, attrs) {
+                scope.getContentUrl = function () {
+                    if (scope.message.senderNeed == scope.chosenMessage.connection.belongsToNeed) {
+                        return "/owner/app/conversation/sent-text-message.html";
+                    } else return "/owner/app/conversation/received-text-message.html";
                 }
+            },
+            template: '<div class="row col-lg-12" ng-include="getContentUrl()"></div>',
+            controller : function($scope){
+
                 $scope.getImageForMessage = function(message){
                     if(message.senderNeed == $scope.chosenMessage.connection.belongsToNeed){
                         return "/owner/images/house.gif";
                     }else return "/owner/images/User-blue-icon.png";
                 }
             }
+
         }
     })
 angular.module('won.owner')
@@ -59,7 +62,13 @@ angular.module('won.owner')
                         if($scope.chosenMessage.typeText == 'Conversation') return true;
                     }else return false;
                 }
-
+                $scope.showPublic = function(){
+                    if($scope.chosenMessage.lastMessages.length>0){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }
                 $scope.sendMessage = function() {
                     //TODO logic
                     wonService.textMessage($scope.newMessage, $scope.chosenMessage.connection.uri);
