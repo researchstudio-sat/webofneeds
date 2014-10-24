@@ -116,6 +116,8 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
                 break;
             case won.EVENT.NEED_CREATED: unreadEventType = won.UNREAD.TYPE.CREATED;
                 break;
+            case won.EVENT.CONNECTION_MESSAGE_RECEIVED: unreadEventType = won.UNREAD.TYPE.MESSAGE;
+                break;
             // case won.Event.HINT_RECEIVED: privateData.unreadEventsByNeedByType[needURI].hint.push(eventData);
         }
         return unreadEventType;

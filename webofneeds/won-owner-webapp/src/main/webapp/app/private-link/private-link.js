@@ -425,14 +425,10 @@ angular.module('won.owner')
     }
 
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {
-        if($scope.chosenMessage.needURI == eventData.hasReceiverNeed){
             $scope.addConnectionLastTextMessages($scope.chosenMessage);
-        }
     });
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_SENT, function(ngEvent, eventData) {
-        if($scope.chosenMessage.needURI == eventData.hasSenderNeed){
             $scope.addConnectionLastTextMessages($scope.chosenMessage);
-        }
     });
 
 })

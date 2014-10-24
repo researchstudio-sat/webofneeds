@@ -192,6 +192,8 @@
         won.WONMSG.connectionMessageCompacted = won.WONMSG.prefix + ":ConnectionMessage";
         won.WONMSG.connectionMessageSentMessage = won.WONMSG.baseUri + "ConnectionMessageSentMessage";
         won.WONMSG.connectionMessageSentMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageSentMessage";
+        won.WONMSG.connectionMessageReceivedMessage = won.WONMSG.baseUri + "ConnectionMessageReceivedMessage";
+        won.WONMSG.connectionMessageReceivedMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageReceivedMessage";
 
         //response types
         won.WONMSG.hasResponseStateProperty = won.WONMSG.baseUri + "hasResponseStateProperty";

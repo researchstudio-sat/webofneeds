@@ -132,8 +132,6 @@ app.directive('header', function(){
             switch (lastConEvent.event.hasMessageType) {
                 case won.WONMSG.connectionMessageSentMessage:
                     return 'Conversation';
-                case won.WONMSG.connectionMessageResponseMessage:
-                    return 'Conversation';
                 case won.WONMSG.connectionMessage:
                     return 'Conversation';
                 case won.WONMSG.openMessage:

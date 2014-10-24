@@ -41,6 +41,7 @@ angular.module('won.owner')
                         return "/owner/images/house.gif";
                     }else return "/owner/images/User-blue-icon.png";
                 }
+
             }
 
         }
@@ -73,6 +74,7 @@ angular.module('won.owner')
                     //TODO logic
                     wonService.textMessage($scope.newMessage, $scope.chosenMessage.connection.uri);
                 };
+
 
             },
             link: function(scope, element, attrs){
