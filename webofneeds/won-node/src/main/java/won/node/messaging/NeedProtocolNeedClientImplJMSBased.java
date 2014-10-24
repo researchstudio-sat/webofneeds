@@ -86,12 +86,6 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
 
     public void open(final Connection connection, final Model content, final WonMessage wonMessage)
             throws Exception {
-
-
-      // distinguish between the new message format (WonMessage) and the old parameters
-      // ToDo (FS): remove this distinction if the old parameters are not used anymore
-      if (wonMessage != null) {
-
         CamelConfiguration camelConfiguration = protocolCommunicationService
           .configureCamelEndpoint(wonMessage.getSenderNeedURI(),
                                   wonMessage.getReceiverNeedURI(),
@@ -104,18 +98,6 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
         headerMap.put("methodName", "open");
         headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
         messagingService.sendInOnlyMessage(null, headerMap, null, openStartingEndpoint);
-      } else {
-        CamelConfiguration camelConfiguration = protocolCommunicationService
-          .configureCamelEndpoint(connection.getNeedURI(), connection.getRemoteNeedURI(), openStartingEndpoint);
-        Map headerMap = new HashMap<String, String>();
-        headerMap.put("protocol", "NeedProtocol");
-        headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString());
-        headerMap.put("content", RdfUtils.toString(content));
-        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
-        headerMap.put("methodName", "open");
-        headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-        messagingService.sendInOnlyMessage(null, headerMap, null, openStartingEndpoint);
-      }
     }
 
 

@@ -135,13 +135,6 @@ public class WonMessageBuilder
       messageEventResource.addProperty(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, wonMessageType.getResource());
     }
 
-    // ToDo (FS): also add the signatures
-    for (URI contentURI : contentMap.keySet()) {
-      messageEventResource.addProperty(
-        WONMSG.HAS_CONTENT_PROPERTY,
-        envelopeGraph.createResource(contentURI.toString()));
-    }
-
     // add sender
     if (senderURI != null)
       messageEventResource.addProperty(
@@ -190,7 +183,7 @@ public class WonMessageBuilder
       }
     }
 
-    if (timestamp != null){
+    if (timestamp != null) {
       messageEventResource.addProperty(
         WONMSG.HAS_TIMESTAMP,
         envelopeGraph.createTypedLiteral(this.timestamp));
@@ -200,16 +193,25 @@ public class WonMessageBuilder
       String uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), CONTENT_URI_APPENDIX, 5,
         dataset).toString();
       dataset.addNamedModel(uniqueContentUri, contentMap.get(contentURI));
+      messageEventResource.addProperty(
+        WONMSG.HAS_CONTENT_PROPERTY, messageEventResource
+          .getModel().createResource(uniqueContentUri));
       Model signatureGraph = signatureMap.get(contentURI);
       if (signatureGraph != null) {
-        uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), SIGNATURE_URI_APPENDIX, 5,
+        throw new UnsupportedOperationException("signatures are not supported yet");
+        /* in principle, this should work, but its untested:
+
+          uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), SIGNATURE_URI_APPENDIX, 5,
           dataset).toString();
         //the signature refers to the name of the other graph. We changed that name
         //so we have to replace the resource referencing it, too:
         signatureGraph = RdfUtils.replaceResource(signatureGraph.getResource(contentURI.toString()),
           signatureGraph.getResource(uniqueContentUri));
         dataset.addNamedModel(uniqueContentUri, signatureGraph);
+        */
       }
+
+      //now replace the content URIs
     }
 
     // ToDo (FS): add signature of the whole message

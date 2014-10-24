@@ -79,6 +79,7 @@
 
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/header/notification-dropdown.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/faq/faq.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/impressum/impressum.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/main/main.js"/>"></script>
@@ -106,7 +107,7 @@
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
 
 			<ul class="nav navbar-nav">
-				<li ng-class="isActive()"><a href="" ng-click="redirectHome()">
+				<li ng-class="isActive()"><a href="" ng-click="goHome()">
 					<i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
 				</li>
 			</ul>
@@ -145,6 +146,14 @@
 						</li>
 					</ul>
 				</li>
+
+                    <!--
+                    unread-events-by-type-by-need="{{ unreadEventsByTypeByNeed }}"
+                    unread-events-by-need-by-type="{{ unreadEventsByNeedByType }}"
+                    open-need-detail-view="openNeedDetailView"
+                    getTypePicURI="getTypePicURI"
+                        ></li>-->
+
 				<li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
 					<i class="fa fa-clipboard fa-lg"></i>&nbsp;Post box</a>
 				</li>
@@ -188,25 +197,8 @@
 						</li>
 					</ul>
 				</li>
-				<li ng-show="!showPublic()" ng-cloak>
-					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
-						<!-- TODO provide here the total number of matches -->
-						<i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{unreadEventsByTypeByNeed.hint.count}}
-					</a>
-					<ul class="dropdown-menu" style="width: 280px;">
-						<li class="text-center grey-item">{{unreadEventsByTypeByNeed.hint.count}}&nbsp;new matches</li>
-						<!-- TODO put real parameters into url -->
-						<li
-                                ng-repeat="entry in unreadEventsByNeedByType"
-                                ng-show="entry.hint.count > 0"><a
-                                ng-click="openNeedDetailView(entry.need.uri)"><img
-								src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
-                                class="badge pull-right">{{entry.hint.count}}</span></a>
-						</li>
-						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
-						</li>
-					</ul>
-				</li>
+
+                <li ng-show="!showPublic()" ng-cloak notif-dropdown></li>
 			</ul>
 					<ul class="nav navbar-nav navbar-right" ng-cloak>
                         <li><span ng-show="checkRegistered()"></span></li>
@@ -220,6 +212,7 @@
 						{{userdata.username}}&nbsp;<span class="caret"/>
 					</a>
 					<ul class="dropdown-menu">
+                        <li><a href="" ng-click="goLandingPage()">What can I do with the Web of Needs?</a></li>
 						<li><a href="" ng-click="onClickSignOut()">Sign out</a></li>
 					</ul>
 				</li>
@@ -231,7 +224,7 @@
 		<div ng-view id="content" class="container">
 		</div>
 		
-<nav class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-default navbar-bottom" role="navigation">
 	<div class="container" style="padding:0">
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
 			<ul class="nav navbar-nav">

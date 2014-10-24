@@ -35,27 +35,31 @@ import java.net.URI;
  */
 public class CloseConnectionAction extends BaseEventBotAction
 {
-  public CloseConnectionAction(final EventListenerContext context)
-  {
+  public CloseConnectionAction(final EventListenerContext context) {
     super(context);
   }
 
   @Override
   protected void doRun(final Event event) throws Exception {
-    logger.debug("trying to close connection related to event {}", event);
-    try {
-      URI connectionURI = null;
-      if (event instanceof ConnectionSpecificEvent){
-        connectionURI = ((ConnectionSpecificEvent)event).getConnectionURI();
-      }
-      logger.debug("Extracted connection uri {}", connectionURI);
-      if (connectionURI != null) {
-        logger.debug("closing connection {}", connectionURI);
+    if (event instanceof ConnectionSpecificEvent) {
+      ConnectionSpecificEvent connectionSpecificEvent = (ConnectionSpecificEvent) event;
+      logger.debug("trying to close connection related to event {}", connectionSpecificEvent);
+      try {
+        URI connectionURI = null;
+        connectionURI = connectionSpecificEvent.getConnectionURI();
+        logger.debug("Extracted connection uri {}", connectionURI);
+        if (connectionURI != null) {
+          logger.debug("closing connection {}", connectionURI);
 
-        getEventListenerContext().getOwnerService().close(connectionURI, null, createWonMessage(connectionURI));
+          getEventListenerContext().getOwnerService().close(connectionURI, null, createWonMessage(connectionURI));
+        } else {
+          logger.warn("could not determine which connection to close for event {}", event);
+        }
+      } catch (Exception e) {
+        logger.warn("error trying to close connection", e);
       }
-    } catch (Exception e){
-      logger.warn("error trying to close connection", e);
+    } else {
+      logger.warn("could not determine which connection to close for event {}", event);
     }
   }
 

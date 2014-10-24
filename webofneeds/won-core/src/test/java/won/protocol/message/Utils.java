@@ -16,12 +16,12 @@ import java.io.InputStream;
  * User: ypanchenko
  * Date: 05.08.2014
  */
-public class TestUtils
+public class Utils
 {
 
   public static Dataset createTestDataset(String resourceName) throws IOException {
 
-    InputStream is = TestUtils.class.getResourceAsStream(resourceName);
+    InputStream is = Utils.class.getResourceAsStream(resourceName);
     Dataset dataset = DatasetFactory.createMem();
     RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
     is.close();
@@ -31,7 +31,7 @@ public class TestUtils
 
   public static Model createTestModel(String resourceName) throws IOException {
 
-    InputStream is = TestUtils.class.getResourceAsStream(resourceName);
+    InputStream is = Utils.class.getResourceAsStream(resourceName);
     Model model = ModelFactory.createDefaultModel();
     RDFDataMgr.read(model, is, RDFFormat.TURTLE.getLang());
     //model1.read(new InputStreamReader(is1), RESOURCE_URI, FileUtils.langTurtle);

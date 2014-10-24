@@ -17,6 +17,7 @@
 package won.protocol.message;
 
 import com.google.common.collect.Iterators;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -27,33 +28,48 @@ import org.junit.Test;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class WonMessageBuilderTest
 {
   private static final URI MSG_URI_1 = URI.create("http://example.com/msg/1234");
   private static final URI MSG_URI_2 = URI.create("http://example.com/msg/5678");
   private static final URI CONTENT_GRAPH_URI_1 = URI.create("http://example.com/content/1");
+  private static final URI CONTENT_GRAPH_URI_2 = URI.create("http://example.com/content/2");
   private static final URI TYPE_URI_1 = URI.create("http://example.com/type/1");
   private static final URI TYPE_URI_2 = URI.create("http://example.com/type/2");
   private static final URI RECEIVER_URI_1 = URI.create("http://example.com/receiver/1");
 
+  @Test
+  public void test_content_is_referenced_from_envelope(){
+    WonMessage msg1 = createMessageWithContent().build();
+    List<String> contentGraphUris = msg1.getContentGraphURIs();
+    Assert.assertFalse("envelope graph does not contain any content graph URI", contentGraphUris.isEmpty());
+    Assert.assertEquals(1, msg1.getContentGraphURIs().size());
+    for (String cgu : msg1.getContentGraphURIs() ){
+      Assert.assertTrue("message does not contain content graph " + cgu +" referenced from envelope",
+        msg1.getCompleteDataset().containsNamedModel(cgu));
+    }
+  }
 
   @Test
   public void test_wrap_retains_envelope_graph_properties(){
-    WonMessage msg2 = createMessageAndWrapIt();
+    WonMessage msg2 = wrapMessage(createMessageWithContent().build()).build();
     Assert.assertEquals(WonMessageType.HINT_MESSAGE, msg2.getMessageType());
   }
 
   @Test
   public void test_wrap_allows_new_envelope_graph_properties(){
-    WonMessage msg2 = createMessageAndWrapIt();
+    WonMessage msg2 = wrapMessage(createMessageWithContent().build()).build();
     Assert.assertEquals(RECEIVER_URI_1, msg2.getReceiverURI());
   }
 
   @Test
   public void test_wrap_retains_content_graphs(){
-    WonMessage msg2 = createMessageAndWrapIt();
+    WonMessage msg2 = wrapMessage(createMessageWithContent().build()).build();
     Assert.assertEquals(MSG_URI_1.toString(), RdfUtils.findOne(msg2.getMessageContent(),
       new RdfUtils.ModelVisitor<String>()
     {
@@ -73,7 +89,7 @@ public class WonMessageBuilderTest
 
   @Test
   public void test_wrap_allows_new_content_graphs(){
-    WonMessage msg2 = createMessageAndWrapIt();
+    WonMessage msg2 = addContentWithDifferentURI(wrapMessage(createMessageWithoutContent().build())).build();
     Assert.assertEquals(MSG_URI_2.toString(), RdfUtils.findOne(msg2.getMessageContent(),
       new RdfUtils.ModelVisitor<String>()
       {
@@ -92,33 +108,25 @@ public class WonMessageBuilderTest
   }
 
   @Test
-  public void test_wraped_message_contains_correct_number_of_envelope_graphs() {
-    WonMessage msg2 = createMessageAndWrapIt();
+  public void test_wrapped_message_contains_correct_number_of_envelope_graphs() {
+    WonMessage msg2 = addContent(wrapMessage(createMessageWithContent().build())).build();
     Assert.assertEquals(2, msg2.getEnvelopeGraphs().size());
   }
 
-  private WonMessage createMessageAndWrapIt() {
-    WonMessage msg1 = new WonMessageBuilder()
-      .setMessageURI(MSG_URI_1)
-      .addContent(CONTENT_GRAPH_URI_1, createDummyContent(), null)
-      .setWonMessageType(WonMessageType.HINT_MESSAGE)
-      .build();
-    return new WonMessageBuilder()
-      .wrap(msg1)
-      .setReceiverURI(RECEIVER_URI_1)
-      .addContent(CONTENT_GRAPH_URI_1, createDifferentDummyContent(), null)
-      .build();
-  }
+
+
+
+
 
   @Test
   public void test_copy_yields_correct_number_of_content_graphs(){
-    WonMessage msg = createMessageAndCopyEnvelopeAndContent();
+    WonMessage msg = copyEnvelopeAndContent(createMessageWithContent().build()).build();
     Assert.assertEquals(2, Iterators.size(msg.getMessageContent().listNames()));
   }
 
   @Test
   public void test_copy_replaces_messageURI(){
-    final WonMessage msg = createMessageAndCopyEnvelopeAndContent();
+    final WonMessage msg = copyEnvelopeAndContent(createMessageWithContent().build()).build();
     Iterator<RDFNode> subjectIt = RdfUtils.visit(
       msg.getMessageContent(), new RdfUtils.ModelVisitor<RDFNode>()
       {
@@ -136,31 +144,128 @@ public class WonMessageBuilderTest
   }
 
 
-  private WonMessage createMessageAndCopyEnvelopeAndContent() {
-    WonMessage msg1 = new WonMessageBuilder()
+  @Test
+  public void test_get_content_in_message_without_content(){
+    final WonMessage msg = this.createMessageWithoutContent().build();
+    check_get_content_in_message_without_content(msg);
+  }
+
+  @Test
+  public void test_get_content_in_wrapped_message_without_content(){
+    final WonMessage msg = wrapMessage(createMessageWithoutContent().build()).build();
+    check_get_content_in_message_without_content(msg);
+  }
+
+
+  public void check_get_content_in_message_without_content(final WonMessage msg) {
+    Dataset content = msg.getMessageContent();
+    Assert.assertTrue("messageContent dataset of message without content has non-empty default graph",
+      content.getDefaultModel().isEmpty());
+    Assert.assertFalse("messageContent dataset of message without content has named graphs",
+      content.listNames().hasNext());
+  }
+
+  @Test
+  public void test_get_content_in_message_with_content(){
+    final WonMessage msg = this.createMessageWithContent().build();
+    check_get_content_in_message_with_content(msg);
+  }
+
+  @Test
+  public void test_get_content_in_wrapped_message_with_content(){
+    final WonMessage msg = wrapMessage(createMessageWithContent().build()).build();
+    check_get_content_in_message_with_content(msg);
+  }
+
+  public void check_get_content_in_message_with_content(final WonMessage msg) {
+    Dataset content = msg.getMessageContent();
+    Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
+      content.getDefaultModel().isEmpty());
+    Assert.assertTrue("messageContent dataset of message with content has no named graphs",
+      content.listNames().hasNext());
+    Set<String> names = new HashSet<String>();
+    Iterators.addAll(names, content.listNames());
+    Assert.assertEquals("incorrect number of named graphs", names.size(), 1);
+  }
+
+  @Test
+  public void test_get_content_in_message_with_two_content_graphs(){
+    final WonMessage msg = this.createMessageWithTwoContentGraphs().build();
+    check_get_content_in_message_with_two_content_graphs(msg);
+  }
+
+  @Test
+  public void test_get_content_in_wrapped_message_with_two_content_graphs(){
+    WonMessage msg = this.createMessageWithTwoContentGraphs().build();
+    msg = wrapMessage(msg).build();
+    check_get_content_in_message_with_two_content_graphs(msg);
+  }
+
+  public void check_get_content_in_message_with_two_content_graphs(final WonMessage msg) {
+    Dataset content = msg.getMessageContent();
+    Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
+      content.getDefaultModel().isEmpty());
+    Set<String> names = new HashSet<String>();
+    Iterators.addAll(names, content.listNames());
+
+    Assert.assertEquals("incorrect number of named graphs", names.size(), 2);
+  }
+
+  private WonMessageBuilder createMessageWithoutContent(){
+    return new WonMessageBuilder()
       .setMessageURI(MSG_URI_1)
-      .addContent(CONTENT_GRAPH_URI_1, createDummyContent(), null)
-      .setWonMessageType(WonMessageType.HINT_MESSAGE)
-      .build();
+      .setWonMessageType(WonMessageType.HINT_MESSAGE);
+  }
+
+
+  private WonMessageBuilder addContent(WonMessageBuilder builder) {
+    return builder.addContent(CONTENT_GRAPH_URI_1, createDifferentContent(), null);
+  }
+
+  private WonMessageBuilder addContentWithDifferentURI(WonMessageBuilder builder) {
+    return builder.addContent(CONTENT_GRAPH_URI_2, createDifferentContent(), null);
+  }
+
+  private WonMessageBuilder wrapMessage(final WonMessage msg1) {
+    return new WonMessageBuilder()
+      .wrap(msg1)
+      .setReceiverURI(RECEIVER_URI_1);
+  }
+
+  private WonMessageBuilder createMessageWithContent(){
+      return new WonMessageBuilder()
+        .setMessageURI(MSG_URI_1)
+        .addContent(CONTENT_GRAPH_URI_1, createContent(), null)
+        .setWonMessageType(WonMessageType.HINT_MESSAGE);
+  }
+
+  private WonMessageBuilder createMessageWithTwoContentGraphs(){
+    return new WonMessageBuilder()
+      .setMessageURI(MSG_URI_1)
+      .addContent(CONTENT_GRAPH_URI_1, createContent(), null)
+      .addContent(CONTENT_GRAPH_URI_2, createDifferentContent(), null)
+      .setWonMessageType(WonMessageType.HINT_MESSAGE);
+  }
+
+  private WonMessageBuilder copyEnvelopeAndContent(WonMessage msg) {
     return new WonMessageBuilder()
       .setMessageURI(MSG_URI_2)
-      .copyEnvelopeFromWonMessage(msg1)
-      .copyContentFromMessageReplacingMessageURI(msg1)
+      .copyEnvelopeFromWonMessage(msg)
+      .copyContentFromMessageReplacingMessageURI(msg)
       .setReceiverURI(RECEIVER_URI_1)
-      .addContent(CONTENT_GRAPH_URI_1, createDifferentDummyContent(), null)
-      .build();
+      .addContent(CONTENT_GRAPH_URI_1, createDifferentContent(), null);
   }
 
-  private Model createDummyContent(){
-    Model dummyContent = ModelFactory.createDefaultModel();
-    dummyContent.createResource(MSG_URI_1.toString(), dummyContent.createResource(TYPE_URI_1.toString()));
-    return dummyContent;
+  private Model createContent(){
+    Model Content = ModelFactory.createDefaultModel();
+    Content.createResource(MSG_URI_1.toString(), Content.createResource(TYPE_URI_1.toString()));
+    return Content;
   }
 
-  private Model createDifferentDummyContent(){
-    Model dummyContent = ModelFactory.createDefaultModel();
-    dummyContent.createResource(MSG_URI_2.toString(), dummyContent.createResource(TYPE_URI_2.toString()));
-    return dummyContent;
+  private Model createDifferentContent(){
+    Model Content = ModelFactory.createDefaultModel();
+    Content.createResource(MSG_URI_2.toString(), Content.createResource(TYPE_URI_2.toString()));
+    return Content;
   }
 
 }

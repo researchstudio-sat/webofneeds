@@ -18,8 +18,11 @@ package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.impl.*;
 import won.bot.framework.events.bus.EventBus;
+import won.bot.framework.events.event.BaseEvent;
+import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.impl.*;
 import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
@@ -57,7 +60,7 @@ public class CommentBot extends EventBot
   protected void initializeEventListeners()
   {
     EventListenerContext ctx = getEventListenerContext();
-    EventBus bus = getEventBus();
+    final EventBus bus = getEventBus();
 
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(
@@ -82,19 +85,22 @@ public class CommentBot extends EventBot
       bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
       bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
-      //add a listener that closes the connection after it has seen 10 messages
-      this.connectionCloser = new ActionOnceAfterNEventsListener(
-              ctx,
-          2, new CloseConnectionAction(ctx)
-      );
-      bus.subscribe(ConnectFromOtherNeedEvent.class, this.connectionCloser);
-      bus.subscribe(OpenFromOtherNeedEvent.class,this.connectionCloser);
+    BaseEventListener assertionRunner = new ActionOnceAfterNEventsListener(
+      ctx, 1, new BaseEventBotAction(ctx)
+    {
+      @Override
+      protected void doRun(final Event event) throws Exception {
+        executeAssertionsForEstablishedConnectionInternal(bus);
+      }
+    }
+    );
 
-      //add a listener that auto-responds to a close message with a deactivation of both needs.
-      //subscribe it to:
-      // * close events
+      bus.subscribe(OpenFromOtherNeedEvent.class, assertionRunner);
+
+
+      //deactivate all needs when the assertion was executed
       this.allNeedsDeactivator = new ActionOnEventListener(ctx,new DeactivateAllNeedsAction(ctx),1);
-      bus.subscribe(CloseFromOtherNeedEvent.class, this.allNeedsDeactivator);
+      bus.subscribe(AssertionsExecutedEvent.class, this.allNeedsDeactivator);
 
       //add a listener that counts two NeedDeactivatedEvents and then tells the
       //framework that the bot's work is done
@@ -104,6 +110,23 @@ public class CommentBot extends EventBot
       );
       bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
 
+  }
+
+
+
+  private void executeAssertionsForEstablishedConnectionInternal(EventBus bus){
+    executeAssertionsForEstablishedConnection();
+    bus.publish(new AssertionsExecutedEvent());
+  }
+
+  protected void executeAssertionsForEstablishedConnection() {
+
+  }
+
+  private class AssertionsExecutedEvent extends BaseEvent
+  {
+    private AssertionsExecutedEvent() {
+    }
   }
 
 }

@@ -18,6 +18,7 @@ package won.protocol.util.linkeddata;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -117,7 +118,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
 
   @Override
   public com.hp.hpl.jena.query.Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,
-    final int maxRequest, final int maxDepth) {
+    final int maxRequest, final int maxDepth, final boolean moveAllTriplesInDefaultGraph) {
 
     Set<URI> crawledURIs = new HashSet<URI>();
     Set<URI> newlyDiscoveredURIs = new HashSet<URI>();
@@ -126,7 +127,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     int depth = 0;
     int requests = 0;
 
-    Dataset model = DatasetFactory.createMem();
+    Dataset resultDataset = DatasetFactory.createMem();
 
     OUTER: while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest){
       urisToCrawl = newlyDiscoveredURIs;
@@ -134,10 +135,14 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
       for (URI currentURI: urisToCrawl) {
         //add all models from urisToCrawl
 
-        Dataset currentModel =  getDataForResource(currentURI);
-        logger.debug("currentModel : "+RdfUtils.toString(currentModel));
-        RdfUtils.addDatasetToDataset(model, currentModel);
-        newlyDiscoveredURIs.addAll(getURIsToCrawlWithPropertyPath(model, resourceURI,crawledURIs, properties));
+        Dataset currentDataset =  getDataForResource(currentURI);
+        //logger.debug("current dataset: {} "+RdfUtils.toString(currentModel));
+        if (moveAllTriplesInDefaultGraph){
+          RdfUtils.copyDatasetTriplesToModel(currentDataset, resultDataset.getDefaultModel());
+        } else {
+          RdfUtils.addDatasetToDataset(resultDataset, currentDataset);
+        }
+        newlyDiscoveredURIs.addAll(getURIsToCrawlWithPropertyPath(resultDataset, resourceURI, crawledURIs, properties));
         crawledURIs.add(currentURI);
         requests++;
         logger.debug("current Request: "+requests);
@@ -147,34 +152,62 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
       depth++;
       logger.debug("current Depth: "+depth);
     }
-    return model;
+    return resultDataset;
 
   }
 
-  private Set<URI> getURIsToCrawlWithPropertyPath(Dataset dataset, URI resourceURI, Set<URI> crawled,
+  /**
+   * For the specified resourceURI, evaluates the specified property paths and adds the identified
+   * resources to the returned set if they are not contained in the specified exclude set.
+   * @param dataset
+   * @param resourceURI
+   * @param excludedUris
+   * @param properties
+   * @return
+   */
+  private Set<URI> getURIsToCrawlWithPropertyPath(Dataset dataset, URI resourceURI, Set<URI> excludedUris,
                                                   List<Path> properties){
     Set<URI> toCrawl = new HashSet<URI>();
     for (int i = 0; i<properties.size();i++){
-      Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPath(dataset.getDefaultModel(), resourceURI,
+      Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPath(dataset,
+        resourceURI,
         properties.get(i));
       while (newURIs.hasNext()){
-        toCrawl.add(newURIs.next());
+        URI newUri = newURIs.next();
+        if (!excludedUris.contains(newUri)) {
+          toCrawl.add(newUri);
+        }
       }
     }
     return toCrawl;
   }
 
-  private Set<URI> getURIsToCrawl(Dataset dataset, Set<URI> crawled, List<URI> properties) {
+  /**
+   * For the specified properties, finds their objects and adds the identified
+   * resources to the returned set if they are not contained in the specified exclude set.
+   * @param dataset
+     @param excludedUris
+   * @param properties
+   * @return
+   */
+  private Set<URI> getURIsToCrawl(Dataset dataset, Set<URI> excludedUris, final List<URI> properties) {
     Set<URI> toCrawl = new HashSet<>();
     for (int i = 0; i<properties.size();i++){
-      Property p = dataset.getDefaultModel().createProperty(properties.get(i).toString());
-      NodeIterator objectIterator = dataset.getDefaultModel().listObjectsOfProperty(p);
+      final URI property = properties.get(i);
+      NodeIterator objectIterator = RdfUtils.visitFlattenedToNodeIterator(dataset, new RdfUtils.ModelVisitor<NodeIterator>()
+      {
+        @Override
+        public NodeIterator visit(final Model model) {
+          final Property p = model.createProperty(property.toString());
+          return model.listObjectsOfProperty(p);
+        }
+      });
       for (;objectIterator.hasNext();){
         RDFNode objectNode = objectIterator.next();
 
         if (objectNode.isURIResource()) {
           URI discoveredUri = URI.create(objectNode.asResource().getURI());
-          if (!crawled.contains(discoveredUri)){
+          if (!excludedUris.contains(discoveredUri)){
             toCrawl.add(discoveredUri);
           }
         }
