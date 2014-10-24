@@ -149,6 +149,11 @@ app.directive('header', function(){
                     return 'Incoming Request';
                 case won.WONMSG.hintMessage:
                     return 'Matches';
+                case won.WONMSG.closeMessage:
+                    if (lastConEvent.event.hasReceiverNeed == lastConEvent.remoteNeed.uri){
+                        return 'Outgoing Closed';
+                    }
+                    return 'Incoming Closed';
                 default:
                     return 'Unknown';
             }

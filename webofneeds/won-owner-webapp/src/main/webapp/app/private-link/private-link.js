@@ -53,7 +53,8 @@ angular.module('won.owner')
      won.WONMSG.connectionMessage,
      won.WONMSG.connectMessage,
      won.WONMSG.openMessage,
-     won.WONMSG.hintMessage];
+     won.WONMSG.hintMessage,
+     won.WONMSG.closeMessage];
 
 
     //$scope.title = 'New Flat, Need Furniture';
@@ -175,6 +176,8 @@ angular.module('won.owner')
         if (typeText=='Conversation') return 'fa fa-comment-o fa-lg';
         else if (typeText=='Incoming Request') return 'fa fa-reply fa-lg';
         else if (typeText=='Outgoing Request') return 'fa fa-share fa-lg';
+        else if (typeText=='Incoming Closed') return 'fa fa-times fa-lg';
+        else if (typeText=='Outgoing Closed') return 'fa fa-trash-o fa-lg';
         else return 'fa fa-puzzle-piece fa-lg';
     };
 
@@ -291,7 +294,7 @@ angular.module('won.owner')
         $scope.prevMessageId = msgId;
     }*/
         $scope.addConnectionLastTextMessages = function(currentMessage){
-            linkedDataService.getConnectionTextMessages(currentMessage.connection.uri, currentMessage.event.hasTimestamp, 1)
+            linkedDataService.getConnectionTextMessages(currentMessage.connection.uri)
                 .then(function(messages){
                     currentMessage.lastMessages = messages;
                     return;
