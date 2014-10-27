@@ -51,9 +51,9 @@ public class MatchNeedsAction extends BaseEventBotAction
             need1,
             need2,
             1.0,
-            URI.create("http://localhost:8080/matcher"),
+            URI.create("http://example.com/matcher"),
             null,
-            createWonMessage(need1, need2, 1.0, URI.create("http://localhost:8080/matcher")));
+            createWonMessage(need1, need2, 1.0, URI.create("http://example.com/matcher")));
   }
 
   private WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
