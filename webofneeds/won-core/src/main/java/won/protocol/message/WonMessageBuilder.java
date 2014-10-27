@@ -24,10 +24,11 @@ import java.util.*;
  */
 public class WonMessageBuilder
 {
-  private static final String CONTENT_URI_APPENDIX = "#content-";
-  private static final String SIGNATURE_URI_APPENDIX = "#signature-";
-  private static final String ENVELOPE_URI_APPENDIX = "#envelope-";
-  private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString(3);
+  private static final String CONTENT_URI_SUFFIX = "#content-";
+  private static final String SIGNATURE_URI_SUFFIX = "#signature-";
+  private static final String ENVELOPE_URI_SUFFIX = "#envelope-";
+  private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
+  private static final int RANDOM_SUFFIX_LENGTH = 5;
 
   // ToDo (FS): move to some vocabulary class
 
@@ -124,7 +125,7 @@ public class WonMessageBuilder
       }
     }
     //create a new envelope graph uri and add the envelope graph to the dataset
-    String envelopeGraphURI = RdfUtils.createNewGraphURI(messageURI.toString(), ENVELOPE_URI_APPENDIX ,4,dataset).toString();
+    String envelopeGraphURI = RdfUtils.createNewGraphURI(messageURI.toString(), ENVELOPE_URI_SUFFIX,4,dataset).toString();
 
     //the [envelopeGraphURI] rdf:type msg:EnvelopeGraph triple in the default graph is required to find the
     //envelope graph.
@@ -192,7 +193,7 @@ public class WonMessageBuilder
     }
 
     for (URI contentURI : contentMap.keySet()) {
-      String uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), CONTENT_URI_APPENDIX, 5,
+      String uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), CONTENT_URI_SUFFIX, 5,
         dataset).toString();
       dataset.addNamedModel(uniqueContentUri, contentMap.get(contentURI));
       messageEventResource.addProperty(
@@ -203,7 +204,7 @@ public class WonMessageBuilder
         throw new UnsupportedOperationException("signatures are not supported yet");
         /* in principle, this should work, but its untested:
 
-          uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), SIGNATURE_URI_APPENDIX, 5,
+          uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), SIGNATURE_URI_SUFFIX, 5,
           dataset).toString();
         //the signature refers to the name of the other graph. We changed that name
         //so we have to replace the resource referencing it, too:
@@ -520,7 +521,7 @@ public class WonMessageBuilder
     URI originalContentUri = contentURI;
     //add a random suffix to the uri
     while (contentMap.containsKey(contentURI)){
-      contentURI = URI.create(originalContentUri.toString() + randomString.nextString());
+      contentURI = URI.create(originalContentUri.toString() + randomString.nextString(RANDOM_SUFFIX_LENGTH));
     }
     contentMap.put(contentURI, content);
     if (signature != null)

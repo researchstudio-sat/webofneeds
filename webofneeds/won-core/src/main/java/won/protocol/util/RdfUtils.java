@@ -34,7 +34,7 @@ import java.util.*;
 public class RdfUtils
 {
   public static final RDFNode EMPTY_RDF_NODE = null;
-
+  private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
 
   private static final Logger logger = LoggerFactory.getLogger(RdfUtils.class);
 
@@ -933,10 +933,9 @@ public class RdfUtils
          baseURI = baseURI.substring(0,hashIndex);
        }
      }
-     CheapInsecureRandomString randomString = new CheapInsecureRandomString(length);
      int maxTries = 5;
      for (int i = 0; i < maxTries; i++){
-       String graphName = baseURI + toAppend + randomString.nextString();
+       String graphName = baseURI + toAppend + randomString.nextString(length);
        if (!dataset.containsNamedModel(graphName)){
          return URI.create(graphName);
        }

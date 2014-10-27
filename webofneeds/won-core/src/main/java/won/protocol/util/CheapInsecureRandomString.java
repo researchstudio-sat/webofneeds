@@ -37,17 +37,15 @@ public class CheapInsecureRandomString {
 
   private final Random random = new Random(System.currentTimeMillis());
 
-  private final char[] buf;
 
-  public CheapInsecureRandomString(int length) {
-    if (length < 1)
-      throw new IllegalArgumentException("length < 1: " + length);
-    buf = new char[length];
+  public CheapInsecureRandomString() {
+
   }
 
-  public String nextString() {
-    for (int idx = 0; idx < buf.length; ++idx)
-      buf[idx] = symbols[random.nextInt(symbols.length)];
-    return new String(buf);
+  public String nextString(int length) {
+    StringBuilder sb = new StringBuilder();
+    for (int idx = 0; idx < length; ++idx)
+      sb.append(symbols[random.nextInt(symbols.length)]);
+    return sb.toString();
   }
 }
