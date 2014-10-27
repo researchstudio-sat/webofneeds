@@ -358,6 +358,9 @@ angular.module('won.owner')
         console.log('yes');
         $scope.showConfirmationDialogForCancelRequest = false;
         // TODO add parameter for displaying specific stuff on private-link page
+        wonService.closeConnection($scope.chosenMessage);
+        $scope.prevMessageId = null;
+        $scope.chosenMessage = null;
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
