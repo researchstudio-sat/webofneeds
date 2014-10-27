@@ -26,7 +26,9 @@
          Load properties but ignore unresolvable properties so that
          they are searched in other property configurers defined in the context
     -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" ignore-unresolvable="true"/>
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/
+
+    .properties" ignore-unresolvable="true"/>
     <import resource="classpath:/spring/component/matcherProtocolNeedServiceClient/matcherProtocolNeedServiceClient-jms.xml" />
     <import resource="classpath:/spring/component/MatcherProtocolMatcherService/matcherProtocolMatcherService-jms.xml"/>
     <import resource="classpath:/spring/component/camel/matcher-camel.xml" />
