@@ -529,7 +529,7 @@ angular.module('won.owner').factory('wonService', function (
      * @param need1
      * @param need2
      */
-    wonService.closeConnection = function(msgToClose){
+    wonService.closeConnection = function(msgToClose, textMessage){
 
         var sendClose = function(envelopeData, eventDataToClose) {
             //TODO: use event URI pattern specified by WoN node
@@ -539,6 +539,7 @@ angular.module('won.owner').factory('wonService', function (
                 .forEnvelopeData(envelopeData)
                 .hasFacet(won.WON.OwnerFacet)
                 .hasRemoteFacet(won.WON.OwnerFacet)
+                .hasTextMessage(textMessage)
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {
