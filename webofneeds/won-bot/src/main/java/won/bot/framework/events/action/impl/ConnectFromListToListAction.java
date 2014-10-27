@@ -145,8 +145,8 @@ public class ConnectFromListToListAction extends BaseEventBotAction
     WonMessageBuilder builder = new WonMessageBuilder();
     return  builder
       .setMessagePropertiesForConnect(
-        wonNodeInformationService.generateMessageEventURI(
-          fromUri, localWonNode),
+        wonNodeInformationService.generateEventURI(
+          localWonNode),
         fromFacet,
         fromUri,
         localWonNode,

@@ -73,8 +73,8 @@ public class TwoPhaseCommitNoVoteDeactivateAllNeedsAction extends BaseEventBotAc
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
       .setMessagePropertiesForNeedState(
-        wonNodeInformationService.generateMessageEventURI(
-          needURI, localWonNode),
+        wonNodeInformationService.generateEventURI(
+          localWonNode),
         NeedState.INACTIVE,
         needURI,
         localWonNode)

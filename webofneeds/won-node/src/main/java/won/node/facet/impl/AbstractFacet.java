@@ -302,7 +302,7 @@ public abstract class AbstractFacet implements Facet
     try {
       // ToDo (FS): copy all the content models from the hint message
       WonMessageBuilder builder = new WonMessageBuilder();
-      URI messageURI = wonNodeInformationService.generateMessageEventURI();
+      URI messageURI = wonNodeInformationService.generateEventURI();
       URI localFacet = URI.create(RdfUtils.findOnePropertyFromResource(
         wonMessage.getMessageContent(), wonMessage.getMessageURI(),
         WON.HAS_FACET).asResource().getURI());
@@ -438,8 +438,8 @@ public abstract class AbstractFacet implements Facet
         // but it should be replaced with a response message anyway
         WonMessageBuilder builder = new WonMessageBuilder();
         WonMessage closeWonMessage = builder
-          .setMessageURI(wonNodeInformationService.generateMessageEventURI(
-            wonNodeInformationService.getDefaultWonNode()))
+          .setMessageURI(wonNodeInformationService.generateEventURI(
+            wonNodeInformationService.getDefaultWonNodeURI()))
           .setWonMessageType(WonMessageType.CLOSE)
           .setSenderURI(wonMessage.getSenderURI())
           .setSenderNeedURI(wonMessage.getSenderNeedURI())

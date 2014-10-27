@@ -3,63 +3,65 @@ package won.protocol.service;
 import java.net.URI;
 
 /**
- * User: fsalcher
- * Date: 17.09.2014
+ * Service for managing won node related information and for
+ * generating URIs required for messaging and creation of resources.
  */
 public interface WonNodeInformationService
 {
 
-  public class WonNodeInformation
-  {
+  public WonNodeInfo getWonNodeInformation(URI wonNodeURI);
 
-    public WonNodeInformation(
-      String needMessageEventURIPattern,
-      String connectionURIPattern,
-      String needURIPattern,
-      String idPlaceholder) {
+  /**
+   * Generates a random event URI according to the URI pattern of the
+   * default won node.
+   *
+   * @return
+   */
+  public URI generateEventURI();
 
-      this.needMessageEventURIPattern = needMessageEventURIPattern;
-      this.connectionURIPattern = connectionURIPattern;
-      this.needURIPattern = needURIPattern;
-      this.idPlaceholder = idPlaceholder;
-    }
+  /**
+   * Generates a random event URI according to the URI pattern of the
+   * specified won node.
+   *
+   * @param wonNodeURI
+   * @return
+   */
+  public URI generateEventURI(URI wonNodeURI);
 
-    private String needMessageEventURIPattern;
-    private String connectionURIPattern;
-    private String needURIPattern;
+  /**
+   * Generates a random connection URI according to the URI pattern of the
+   * default won node.
+   *
+   * @return
+   */
+  public URI generateConnectionURI();
 
-    private String idPlaceholder;
+  /**
+   * Generates a random connection URI according to the URI pattern of the
+   * specified won node.
+   *
+   * @param wonNodeURI
+   * @return
+   */
+  public URI generateConnectionURI(URI wonNodeURI);
 
-    public String getNeedMessageEventURIPattern() {
-      return needMessageEventURIPattern;
-    }
+  /**
+   * Generates a random need URI according to the URI pattern of the
+   * default won node.
+   *
+   * @return
+   */
+  public URI generateNeedURI();
 
-    public String getConnectionURIPattern() {
-      return connectionURIPattern;
-    }
-
-    public String getNeedURIPattern() {
-      return needURIPattern;
-    }
-
-    public String getIdPlaceholder() {
-      return idPlaceholder;
-    }
-
-  }
-
-  public WonNodeInformation getWonNodeInformation(URI wonNodeURI);
-
-  public URI generateMessageEventURI(URI needURI, URI wonNodeURI);
-
-  public URI generateMessageEventURI(URI wonNodeURI);
-
-  public URI generateMessageEventURI();
-
-  public URI generateConnectionURI(URI needURI, URI wonNodeURI);
-
+  /**
+   * Generates a random need URI according to the URI pattern of the
+   * specified won node.
+   *
+   * @param wonNodeURI
+   * @return
+   */
   public URI generateNeedURI(URI wonNodeURI);
 
-  public URI getDefaultWonNode();
+  public URI getDefaultWonNodeURI();
 
 }

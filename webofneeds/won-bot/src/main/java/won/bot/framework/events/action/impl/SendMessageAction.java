@@ -85,7 +85,7 @@ public class SendMessageAction extends BaseEventBotAction
     Dataset remoteNeedRDF =
       getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
-    URI messageURI = wonNodeInformationService.generateMessageEventURI(wonNode);
+    URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
     RdfUtils.replaceBaseURI(content, messageURI.toString());
 
     WonMessageBuilder builder = new WonMessageBuilder();

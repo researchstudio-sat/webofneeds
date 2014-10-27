@@ -216,7 +216,7 @@ public class NeedCommunicationServiceImpl implements
       // copy the message envelope
       // information about the newly created connection
       // to the message and pass it on to the owner.
-      URI wrappedMessageURI = this.wonNodeInformationService.generateMessageEventURI();
+      URI wrappedMessageURI = this.wonNodeInformationService.generateEventURI();
       WonMessage wrappedMessage  =  WonMessageBuilder
         .copyInboundWonMessageForLocalStorage(wrappedMessageURI, con.getConnectionURI(), wonMessage);
 

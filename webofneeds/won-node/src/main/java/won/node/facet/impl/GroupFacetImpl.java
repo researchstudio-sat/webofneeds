@@ -48,12 +48,12 @@ public class GroupFacetImpl extends AbstractFacet
           for (final Connection c : cons) {
             try {
               if(! c.equals(con)) {
-                URI forwardedMessageURI = wonNodeInformationService.generateMessageEventURI(con.getNeedURI(),
-                  wonNodeInformationService.getDefaultWonNode());
+                URI forwardedMessageURI = wonNodeInformationService.generateEventURI(
+                  wonNodeInformationService.getDefaultWonNodeURI());
                 URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(con.getRemoteConnectionURI(),
                   linkedDataSource);
                 WonMessage newWonMessage = WonMessageBuilder.forwardReceivedWonMessage(forwardedMessageURI, wonMessage,
-                  con.getConnectionURI(), con.getNeedURI(), wonNodeInformationService.getDefaultWonNode(),
+                  con.getConnectionURI(), con.getNeedURI(), wonNodeInformationService.getDefaultWonNodeURI(),
                   con.getRemoteConnectionURI(), con.getRemoteNeedURI(), remoteWonNodeUri);
                 needFacingConnectionClient.sendMessage(c, message, wonMessage);
               }

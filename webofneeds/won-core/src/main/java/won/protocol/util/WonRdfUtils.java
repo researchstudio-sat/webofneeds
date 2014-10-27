@@ -12,6 +12,7 @@ import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.Facet;
 import won.protocol.model.NeedState;
+import won.protocol.service.WonNodeInfo;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -30,7 +31,47 @@ public class WonRdfUtils
   public static final String NAMED_GRAPH_SUFFIX = "#data";
 
   private static final Logger logger = LoggerFactory.getLogger(WonRdfUtils.class);
-  public static class MessageUtils {
+
+  public static class WonNodeUtils
+  {
+    /**
+     * Creates a WonNodeInfo object based on the specified dataset. The first model
+     * found in the dataset that seems to contain the data needed for a WonNodeInfo
+     * object is used.
+     * @param wonNodeUri
+     * @param dataset
+     * @return
+     */
+    public static WonNodeInfo getWonNodeInfo(final URI wonNodeUri, Dataset dataset){
+      return RdfUtils.findFirst(dataset, new RdfUtils.ModelVisitor<WonNodeInfo>()
+        {
+          @Override
+          public WonNodeInfo visit(final Model model) {
+
+            //use the first blank node found for [wonNodeUri] won:hasUriPatternSpecification [blanknode]
+            NodeIterator it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()),
+              WON.HAS_URI_PATTERN_SPECIFICATION);
+            if (!it.hasNext()) return null;
+            WonNodeInfo wonNodeInfo = new WonNodeInfo();
+            RDFNode node = it.next();
+            it = model.listObjectsOfProperty(node.asResource(), WON.HAS_NEED_URI_PREFIX);
+            if (! it.hasNext() ) return null;
+            wonNodeInfo.setNeedURIPrefix(it.next().asLiteral().getString());
+            it = model.listObjectsOfProperty(node.asResource(), WON.HAS_CONNECTION_URI_PREFIX);
+            if (! it.hasNext() ) return null;
+            wonNodeInfo.setConnectionURIPrefix(it.next().asLiteral().getString());
+            it = model.listObjectsOfProperty(node.asResource(), WON.HAS_EVENT_URI_PREFIX);
+            if (! it.hasNext() ) return null;
+            wonNodeInfo.setEventURIPrefix(it.next().asLiteral().getString());
+            return wonNodeInfo;
+          }
+      });
+    }
+
+  }
+
+  public static class MessageUtils
+  {
     /**
      * Creates an RDF model containing a text message.
      * @param message

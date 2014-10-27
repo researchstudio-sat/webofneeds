@@ -58,6 +58,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String needResourceURIPrefix;
   //prefix of a connection resource
   private String connectionResourceURIPrefix;
+  //prefix of a event resource
+  private String eventResourceURIPrefix;
   //prefix for URISs of RDF data
   private String dataURIPrefix;
   //prefix for URIs referring to real-world things
@@ -265,7 +267,13 @@ public class LinkedDataServiceImpl implements LinkedDataService
               .addProperty(WON.HAS_MATCHER_PROTOCOL_ENDPOINT,model.createResource(this.matcherProtocolEndpoint))
               .addProperty(WON.HAS_NEED_PROTOCOL_ENDPOINT,model.createResource(this.needProtocolEndpoint))
               .addProperty(WON.HAS_OWNER_PROTOCOL_ENDPOINT,model.createResource(this.ownerProtocolEndpoint));
-
+      Resource blankNodeUriSpec = model.createResource();
+      res.addProperty(WON.HAS_URI_PATTERN_SPECIFICATION, blankNodeUriSpec);
+      blankNodeUriSpec.addProperty(WON.HAS_NEED_URI_PREFIX,
+        model.createLiteral(this.needResourceURIPrefix));
+      blankNodeUriSpec.addProperty(WON.HAS_CONNECTION_URI_PREFIX,
+        model.createLiteral(this.connectionResourceURIPrefix));
+      blankNodeUriSpec.addProperty(WON.HAS_EVENT_URI_PREFIX, model.createLiteral(this.eventResourceURIPrefix));
   }
 
   public Dataset getConnectionDataset(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException
@@ -426,6 +434,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public void setConnectionResourceURIPrefix(final String connectionResourceURIPrefix)
   {
     this.connectionResourceURIPrefix = connectionResourceURIPrefix;
+  }
+
+  public void setEventResourceURIPrefix(final String eventResourceURIPrefix) {
+    this.eventResourceURIPrefix = eventResourceURIPrefix;
   }
 
   public void setDataURIPrefix(final String dataURIPrefix)

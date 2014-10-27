@@ -79,8 +79,8 @@ public class CloseConnectionAction extends BaseEventBotAction
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
       .setMessagePropertiesForClose(
-        wonNodeInformationService.generateMessageEventURI(
-          localNeed, wonNode),
+        wonNodeInformationService.generateEventURI(
+          wonNode),
         connectionURI,
         localNeed,
         wonNode,

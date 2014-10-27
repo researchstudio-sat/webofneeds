@@ -148,7 +148,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
 
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder.setMessagePropertiesForClose(
-      wonNodeInformationService.generateMessageEventURI(),
+      wonNodeInformationService.generateEventURI(),
       connection.getConnectionURI(),
       connection.getNeedURI(),
       need.getWonNodeURI(),

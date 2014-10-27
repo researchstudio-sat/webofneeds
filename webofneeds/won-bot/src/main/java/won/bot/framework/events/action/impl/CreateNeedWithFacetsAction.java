@@ -117,8 +117,8 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
       .setMessagePropertiesForCreate(
-        wonNodeInformationService.generateMessageEventURI(
-          needURI, wonNodeURI),
+        wonNodeInformationService.generateEventURI(
+          wonNodeURI),
         needURI,
         wonNodeURI)
       .addContent(URI.create(needURI.toString()), needModel, null)

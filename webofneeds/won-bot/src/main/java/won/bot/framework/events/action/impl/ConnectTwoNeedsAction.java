@@ -77,8 +77,8 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction
     WonMessageBuilder builder = new WonMessageBuilder();
     return  builder
       .setMessagePropertiesForConnect(
-        wonNodeInformationService.generateMessageEventURI(
-          fromUri, localWonNode),
+        wonNodeInformationService.generateEventURI(
+          localWonNode),
         localFacet,
         fromUri,
         localWonNode,

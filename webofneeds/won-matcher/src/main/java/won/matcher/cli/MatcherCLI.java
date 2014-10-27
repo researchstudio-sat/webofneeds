@@ -15,7 +15,6 @@ import won.protocol.service.WonNodeInformationService;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
 
 /**
  * User: gabriel
@@ -119,13 +118,13 @@ public class MatcherCLI implements CommandLineRunner
   private static WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
     throws WonMessageBuilderException {
 
-    URI wonNode = wonNodeInformationService.getDefaultWonNode();
+    URI wonNode = wonNodeInformationService.getDefaultWonNodeURI();
 
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
       .setMessagePropertiesForHint(
-        wonNodeInformationService.generateMessageEventURI(
-          needURI, wonNode),
+        wonNodeInformationService.generateEventURI(
+          wonNode),
         needURI,
         FacetType.OwnerFacet.getURI(),
         wonNode,

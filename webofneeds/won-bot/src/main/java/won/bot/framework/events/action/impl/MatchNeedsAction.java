@@ -68,8 +68,8 @@ public class MatchNeedsAction extends BaseEventBotAction
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
       .setMessagePropertiesForHint(
-        wonNodeInformationService.generateMessageEventURI(
-          needURI, localWonNode),
+        wonNodeInformationService.generateEventURI(
+          localWonNode),
         needURI,
         FacetType.OwnerFacet.getURI(),
         localWonNode,

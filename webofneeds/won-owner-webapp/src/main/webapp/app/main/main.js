@@ -35,9 +35,6 @@
 
 angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $rootScope, $log, messageService) {
     //we use the messageService dependency in order to force websocket creation from the very beginning
-    $scope.wonNodeURI = "http://localhost:8080/won";
-    $scope.needURIPath = "/resource/need";
-    $scope.connectionURIPath = "/connection";
     $scope.selectedType = -1;
     $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
     $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
