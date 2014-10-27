@@ -35,7 +35,7 @@ public class CheapInsecureRandomString {
     symbols = tmp.toString().toCharArray();
   }
 
-  private final Random random = new Random();
+  private final Random random = new Random(System.currentTimeMillis());
 
   private final char[] buf;
 

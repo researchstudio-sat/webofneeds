@@ -41,7 +41,8 @@ public class WonMessageBuilderTest
   private static final URI CONTENT_GRAPH_URI_2 = URI.create("http://example.com/content/2");
   private static final URI TYPE_URI_1 = URI.create("http://example.com/type/1");
   private static final URI TYPE_URI_2 = URI.create("http://example.com/type/2");
-  private static final URI RECEIVER_URI_1 = URI.create("http://example.com/receiver/1");
+  private static final URI CONNECTION_URI_1 = URI.create("http://example.com/won/res/con/1");
+  private static final URI CONNECTION_URI_2 = URI.create("http://example.com/won/res/con/2");
 
   @Test
   public void test_content_is_referenced_from_envelope(){
@@ -64,7 +65,7 @@ public class WonMessageBuilderTest
   @Test
   public void test_wrap_allows_new_envelope_graph_properties(){
     WonMessage msg2 = wrapMessage(createMessageWithContent().build()).build();
-    Assert.assertEquals(RECEIVER_URI_1, msg2.getReceiverURI());
+    Assert.assertEquals(CONNECTION_URI_1, msg2.getReceiverURI());
   }
 
   @Test
@@ -201,6 +202,13 @@ public class WonMessageBuilderTest
     check_get_content_in_message_with_two_content_graphs(msg);
   }
 
+  @Test
+  public void test_copyInboundWonMessageForLocalStorage(){
+    WonMessageBuilder msg = this.createMessageWithContent();
+    WonMessage msg2 = WonMessageBuilder.copyInboundWonMessageForLocalStorage(MSG_URI_2, CONNECTION_URI_2, msg.build());
+
+  }
+
   public void check_get_content_in_message_with_two_content_graphs(final WonMessage msg) {
     Dataset content = msg.getMessageContent();
     Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
@@ -229,7 +237,7 @@ public class WonMessageBuilderTest
   private WonMessageBuilder wrapMessage(final WonMessage msg1) {
     return new WonMessageBuilder()
       .wrap(msg1)
-      .setReceiverURI(RECEIVER_URI_1);
+      .setReceiverURI(CONNECTION_URI_1);
   }
 
   private WonMessageBuilder createMessageWithContent(){
@@ -252,7 +260,7 @@ public class WonMessageBuilderTest
       .setMessageURI(MSG_URI_2)
       .copyEnvelopeFromWonMessage(msg)
       .copyContentFromMessageReplacingMessageURI(msg)
-      .setReceiverURI(RECEIVER_URI_1)
+      .setReceiverURI(CONNECTION_URI_1)
       .addContent(CONTENT_GRAPH_URI_1, createDifferentContent(), null);
   }
 

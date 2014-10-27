@@ -7,6 +7,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.model.NeedState;
+import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -15,7 +16,6 @@ import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Class to build a WonMessage based on the specific properties.
@@ -27,6 +27,7 @@ public class WonMessageBuilder
   private static final String CONTENT_URI_APPENDIX = "#content-";
   private static final String SIGNATURE_URI_APPENDIX = "#signature-";
   private static final String ENVELOPE_URI_APPENDIX = "#envelope-";
+  private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString(3);
 
   // ToDo (FS): move to some vocabulary class
 
@@ -515,6 +516,12 @@ public class WonMessageBuilder
    * @return
    */
   public WonMessageBuilder addContent(URI contentURI, Model content, Model signature) {
+    Random rnd = new Random(System.currentTimeMillis());
+    URI originalContentUri = contentURI;
+    //add a random suffix to the uri
+    while (contentMap.containsKey(contentURI)){
+      contentURI = URI.create(originalContentUri.toString() + randomString.nextString());
+    }
     contentMap.put(contentURI, content);
     if (signature != null)
       signatureMap.put(contentURI, signature);
@@ -606,9 +613,9 @@ public class WonMessageBuilder
       //change the model name: replace the message uri of the specified message with our uri
       //we have to do that in any case as the content graph's URI must be one within the
       //'URI space' of the message
-      String newModelUri = this.messageURI.toString();
-      modelUri = modelUri.replaceFirst(Pattern.quote(otherMessageUri), this.messageURI.toString());
-      addContent(URI.create(modelUri), model,null);
+      String newModelUri = this.messageURI.toString()+"/copied";
+
+      addContent(URI.create(newModelUri), model,null);
     }
     return this;
   }
@@ -640,7 +647,7 @@ public class WonMessageBuilder
       .setReceiverURI(localConnectionUri)
       .setTimestamp(new Date().getTime())
       .addRefersToURI(inboundWonMessage.getMessageURI())
-      .build(inboundWonMessage.getMessageContent());
+      .build();
   }
 
   public static WonMessage wrapOutboundWonMessageForLocalStorage(final URI localConnectionUri, final WonMessage
