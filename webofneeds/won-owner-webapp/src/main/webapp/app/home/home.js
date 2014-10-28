@@ -125,8 +125,7 @@ angular.module('won.owner').controller('HomeCtrl',
     }
 
     $scope.showPublic = function() {
-        $scope.authenticated = !userService.isAuth();
-        return  $scope.authenticated;
+        return !userService.isAuth();
     };
 
     $scope.clickOnIButton = function() {

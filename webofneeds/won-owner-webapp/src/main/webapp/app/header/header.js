@@ -48,16 +48,8 @@ angular.module('won.owner').controller("HeaderCtrl",
                    + " to "  + JSON.stringify(to)
         )});
 
-    $scope.authenticated = false;
-
     $scope.redirectHome= function(){
-        // TODO might cause redirect loop
-        $scope.authenticated = !userService.isAuth();
-        if(!$scope.authenticated){
-            $location.path("/home");
-        }else{
-            $location.path("/");
-        }
+        $location.path("/home");
     }
 
     $scope.goLandingPage = function() {
@@ -65,8 +57,7 @@ angular.module('won.owner').controller("HeaderCtrl",
     }
 
 	$scope.showPublic = function() {
-        $scope.authenticated = !userService.isAuth();
-		return  $scope.authenticated;
+        return !userService.isAuth();
 	};
 
     $scope.checkRegistered = function(){
@@ -78,22 +69,11 @@ angular.module('won.owner').controller("HeaderCtrl",
     $scope.$watch(userService.isAuth, function(logged_in){
         if(logged_in){
             $scope.userdata = { username : userService.getUnescapeUserName()};
-            $scope.authenticated = true; //TODO this information should come from the user object *only* (atm it's a redundant model)
-            //$window.location.reload();
-          //  $location.path('/');
-
-      //      $window.location.reload();
-       //     $scope.showPublic();
-      //      $scope.$apply();
         }
     })
     $scope.onDropDownClick=function(num){
-
         $scope.$parent.selectedType = num;
     }
-
-
-
 
 	onResponseSignOut = function (result) {
 		if (result.status == 'OK') {
