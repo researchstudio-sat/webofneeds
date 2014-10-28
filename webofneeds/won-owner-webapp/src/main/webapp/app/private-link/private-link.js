@@ -329,7 +329,6 @@ angular.module('won.owner')
     // Incoming Requests
     $scope.clickOnDeclineForInRequest = function() {
         console.log('decline clicked');
-
         $scope.showConfirmationDialogForDeclineRequest = true;
     }
 
@@ -339,6 +338,8 @@ angular.module('won.owner')
         wonService.open($scope.chosenMessage, $scope.newMessage);
         $scope.prevMessageId = null;
         $scope.chosenMessage = null;
+        //clean textarea
+        $scope.newMessage = "";
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
@@ -355,6 +356,8 @@ angular.module('won.owner')
         wonService.closeConnection($scope.chosenMessage, $scope.newMessage);
         $scope.prevMessageId = null;
         $scope.chosenMessage = null;
+        // clean textarea
+        $scope.newMessage = "";
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
@@ -443,10 +446,14 @@ angular.module('won.owner')
         //wonService.open($scope.chosenMessage.connection.uri);
         wonService.openSuggestedConnection($scope.chosenMessage.connection.uri, $scope.textboxInMatchModel);
         $scope.showMatchControl = false;
-
+        // clean textarea
+        $scope.textboxInMatchModel = "";
+        // TODO clean rating
+        // $scope.rateValue = 0;
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');
         $scope.chosenMessage = null;
+        $scope.prevMessageId = null;
         $location.path('/private-link');
     }
 
