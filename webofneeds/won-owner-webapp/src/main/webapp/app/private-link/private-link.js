@@ -25,7 +25,17 @@ angular.module('won.owner')
         var newCnt = newValue != null ? newValue.length : "null";
         var oldCnt = oldValue != null ? oldValue.length : "null";
         console.log("events changed! now have " + newCnt + " events!" + " had: " + oldCnt +"...");
+        //if chosen message not null then use connection uri to find and update
+        updateChosenMessageIfAny();
     });
+
+    var updateChosenMessageIfAny = function(){
+        if ($scope.chosenMessage != null) {
+            $scope.chosenMessage = getEventByConnectionUri($scope.chosenMessage.connection.uri);
+            $scope.addConnectionLastTextMessages($scope.chosenMessage);
+            $scope.prevMessageId = null;
+        }
+    }
 
     $scope.sortedField = 'event.hasTimestamp';
     $scope.reversedSort = true;
@@ -38,10 +48,6 @@ angular.module('won.owner')
             $scope.sortedField = fieldName;
         }
     }
-
-    $scope.$watch($scope.lastEventOfEachConnectionOfCurrentNeed, function(newValue, oldValue){
-        $scope.displayedMessages = [].concat($scope.lastEventOfEachConnectionOfCurrentNeed);
-    })
 
     $scope.currentEventType = [
      won.WONMSG.connectionMessage,
@@ -235,6 +241,16 @@ angular.module('won.owner')
         }
         return null; //should not get here
     }
+    // helper function to get message according to its connection id from messages
+    function getEventByConnectionUri(connUri) {
+        for(var i = 0; i < $scope.lastEventOfEachConnectionOfCurrentNeed.length; i++) {
+            if ($scope.lastEventOfEachConnectionOfCurrentNeed[i].connection.uri == connUri) {
+                return $scope.lastEventOfEachConnectionOfCurrentNeed[i];
+            }
+        }
+        return null; //should not get here
+    }
+
     $scope.initRater = function() {
         $("#rater").rating({
             starCaptions: function(val) {
@@ -313,7 +329,6 @@ angular.module('won.owner')
     // Incoming Requests
     $scope.clickOnDeclineForInRequest = function() {
         console.log('decline clicked');
-
         $scope.showConfirmationDialogForDeclineRequest = true;
     }
 
@@ -323,6 +338,8 @@ angular.module('won.owner')
         wonService.open($scope.chosenMessage, $scope.newMessage);
         $scope.prevMessageId = null;
         $scope.chosenMessage = null;
+        //clean textarea
+        $scope.newMessage = "";
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
@@ -336,9 +353,11 @@ angular.module('won.owner')
         console.log('yes');
         $scope.showConfirmationDialogForDeclineRequest = false;
         // TODO add parameter for displaying specific stuff on private-link page
-        wonService.closeConnection($scope.chosenMessage);
+        wonService.closeConnection($scope.chosenMessage, $scope.newMessage);
         $scope.prevMessageId = null;
         $scope.chosenMessage = null;
+        // clean textarea
+        $scope.newMessage = "";
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
@@ -358,6 +377,9 @@ angular.module('won.owner')
         console.log('yes');
         $scope.showConfirmationDialogForCancelRequest = false;
         // TODO add parameter for displaying specific stuff on private-link page
+        wonService.closeConnection($scope.chosenMessage);
+        $scope.prevMessageId = null;
+        $scope.chosenMessage = null;
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
@@ -424,10 +446,14 @@ angular.module('won.owner')
         //wonService.open($scope.chosenMessage.connection.uri);
         wonService.openSuggestedConnection($scope.chosenMessage.connection.uri, $scope.textboxInMatchModel);
         $scope.showMatchControl = false;
-
+        // clean textarea
+        $scope.textboxInMatchModel = "";
+        // TODO clean rating
+        // $scope.rateValue = 0;
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');
         $scope.chosenMessage = null;
+        $scope.prevMessageId = null;
         $location.path('/private-link');
     }
 
