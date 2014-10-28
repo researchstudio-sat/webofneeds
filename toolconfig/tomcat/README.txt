@@ -6,6 +6,7 @@ contains the name of the jar files that should not be scanned for taglibs etc. d
 copy the content and paste it as the value of 
 
 tomcat.util.scan.DefaultJarScanner.jarsToSkip
+org.apache.catalina.startup.TldConfig.jarsToSkip
 
 in catalina.properties, which you find in /etc/tomcat7 or in [TOMCAT-HOME]/conf
 
