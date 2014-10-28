@@ -979,7 +979,12 @@
              * @returns {won.MessageBuilder}
              */
             hasTextMessage: function (text){
-                this.getContentGraphNode()[won.WON.hasTextMessageCompacted] = text;
+                if (text == null || text === ""){
+                    // text is either null, undefined, or empty
+                    // do nothing
+                } else {
+                    this.getContentGraphNode()[won.WON.hasTextMessageCompacted] = text;
+                }
                 return this;
             },
 
