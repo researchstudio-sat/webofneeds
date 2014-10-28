@@ -28,7 +28,9 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
     $scope.sortedField = 'creationDate';
     $scope.reversedSort = true;
 
-    $scope.allNeeds = applicationStateService.getAllNeeds();
+    //$scope.applicationStateService = applicationStateService;
+
+    $scope.allNeeds = applicationStateService.getAllNeeds(); //DEBUG never gets updated/synched again? needs binding / watch / pass-through
     $scope.allNeedsCount = applicationStateService.getAllNeedsCount();
 
     $scope.recordsToDisplay = 4;

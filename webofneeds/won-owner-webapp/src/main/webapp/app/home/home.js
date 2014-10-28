@@ -275,7 +275,7 @@ angular.module('won.owner').controller('HomeCtrl',
 
 angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$window,$location,$http, applicationStateService, userService) {
 
-	$scope.user = {
+	$scope.user = { //TODO yet another user object. We need to refactor this so there's only one of these (e.g. in user-service) and all calls go directly to that
 		username:'',
 		password:''
 	};
@@ -286,6 +286,7 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
 		if (response.status == "OK") {
 			userService.setAuth($scope.username);
             if(applicationStateService.getAllNeedsCount()>=0){
+                //TODO move all this stuff here to a different function/object and also call it after reloading
                 $http.get(
                     '/owner/rest/needs/',
                     user
