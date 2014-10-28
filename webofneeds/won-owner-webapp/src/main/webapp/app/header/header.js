@@ -25,6 +25,8 @@ angular.module('won.owner').controller("HeaderCtrl",
              , $log
              ) {
 
+
+
     $log.debug("Initializing HeaderCtrl.")
 
     //after reloading, verify if the session's still valid
@@ -76,7 +78,7 @@ angular.module('won.owner').controller("HeaderCtrl",
     $scope.$watch(userService.isAuth, function(logged_in){
         if(logged_in){
             $scope.userdata = { username : userService.getUnescapeUserName()};
-            $scope.authenticated = true;
+            $scope.authenticated = true; //TODO this information should come from the user object *only* (atm it's a redundant model)
             //$window.location.reload();
           //  $location.path('/');
 
@@ -89,6 +91,10 @@ angular.module('won.owner').controller("HeaderCtrl",
 
         $scope.$parent.selectedType = num;
     }
+
+
+
+
 	onResponseSignOut = function (result) {
 		if (result.status == 'OK') {
 			userService.resetAuth();
@@ -97,6 +103,9 @@ angular.module('won.owner').controller("HeaderCtrl",
 	};
 
 	$scope.onClickSignOut = function() {
+		//TODO reset ALL the services
+		applicationStateService.reset();
+		linkedDataService.reset();
 		userService.logOut().then(onResponseSignOut);
 	};
 
