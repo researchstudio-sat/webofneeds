@@ -21,7 +21,7 @@ angular.module('won.owner').controller('HomeCtrl',
     var time = 400;
 
 
-    $log.debug("Initializing HeaderCtrl.")
+    $log.debug("Initializing HeaderCtrl.");
 
 
 
