@@ -21,7 +21,7 @@ jaxws-api-2.2.8.jar, jaxws-rt-2.2.8-promoted-b146.jar, jaxws-tools-2.2.8-promote
 jboss-logging-annotations-1.2.0.Beta1.jar, jboss-transaction-api_1.2_spec-1.0.0.Final.jar, jcl-over-slf4j-1.6.1.jar, \
 jcl-over-slf4j-1.7.1.jar, jcl-over-slf4j-1.7.7.jar, jdom-1.0.jar, jena-arq-2.12.0.jar, jena-core-2.12.0.jar, \
 jena-iri-1.1.0.jar, jena-tdb-1.0.0.jar, jersey-client-1.17.1.jar, jersey-core-1.17.1.jar, jline-2.11.jar, \
-jms-1.1.jar, joda-time-2.3.jar, jopt-simple-4.6.jar, jsonld-java-0.5.0.jar, jsoup-1.7.3.jar, jstl-1.2.jar, \
+jms-1.1.jar, joda-time-2.3.jar, jopt-simple-4.6.jar, jsonld-java-0.5.0.jar, jsoup-1.7.3.jar, \
 junit-4.11.jar, log4j-1.2.17.jar, logback-classic-1.0.13.jar, logback-core-1.0.13.jar, mail-1.4.5.jar, \
 management-api-3.0.0-b012.jar, maven-aether-provider-3.2.1.jar, maven-model-3.2.1.jar, maven-model-builder-3.2.1.jar, \
 maven-repository-metadata-3.2.1.jar, maven-settings-3.1.1.jar, maven-settings-builder-3.1.1.jar, \
