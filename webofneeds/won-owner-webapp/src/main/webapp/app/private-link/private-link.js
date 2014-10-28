@@ -448,12 +448,12 @@ angular.module('won.owner')
         $scope.showMatchControl = false;
         // clean textarea
         $scope.textboxInMatchModel = "";
-        // TODO clean rating
-        // $scope.rateValue = 0;
-        // TODO add parameter for displaying specific stuff on private-link page
-        console.log('redirect: /private-link');
+        // reset rating
+        $('#rater').rating('reset');
         $scope.chosenMessage = null;
         $scope.prevMessageId = null;
+        // TODO add parameter for displaying specific stuff on private-link page
+        console.log('redirect: /private-link');
         $location.path('/private-link');
     }
 
