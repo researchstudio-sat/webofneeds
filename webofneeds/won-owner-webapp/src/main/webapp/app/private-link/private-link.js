@@ -25,7 +25,17 @@ angular.module('won.owner')
         var newCnt = newValue != null ? newValue.length : "null";
         var oldCnt = oldValue != null ? oldValue.length : "null";
         console.log("events changed! now have " + newCnt + " events!" + " had: " + oldCnt +"...");
+        //if chosen message not null then use connection uri to find and update
+        updateChosenMessageIfAny();
     });
+
+    var updateChosenMessageIfAny = function(){
+        if ($scope.chosenMessage != null) {
+            $scope.chosenMessage = getEventByConnectionUri($scope.chosenMessage.connection.uri);
+            $scope.addConnectionLastTextMessages($scope.chosenMessage);
+            $scope.prevMessageId = null;
+        }
+    }
 
     $scope.sortedField = 'event.hasTimestamp';
     $scope.reversedSort = true;
@@ -38,10 +48,6 @@ angular.module('won.owner')
             $scope.sortedField = fieldName;
         }
     }
-
-    $scope.$watch($scope.lastEventOfEachConnectionOfCurrentNeed, function(newValue, oldValue){
-        $scope.displayedMessages = [].concat($scope.lastEventOfEachConnectionOfCurrentNeed);
-    })
 
     $scope.currentEventType = [
      won.WONMSG.connectionMessage,
@@ -235,6 +241,16 @@ angular.module('won.owner')
         }
         return null; //should not get here
     }
+    // helper function to get message according to its connection id from messages
+    function getEventByConnectionUri(connUri) {
+        for(var i = 0; i < $scope.lastEventOfEachConnectionOfCurrentNeed.length; i++) {
+            if ($scope.lastEventOfEachConnectionOfCurrentNeed[i].connection.uri == connUri) {
+                return $scope.lastEventOfEachConnectionOfCurrentNeed[i];
+            }
+        }
+        return null; //should not get here
+    }
+
     $scope.initRater = function() {
         $("#rater").rating({
             starCaptions: function(val) {
