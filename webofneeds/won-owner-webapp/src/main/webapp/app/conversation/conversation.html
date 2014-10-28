@@ -6,37 +6,49 @@
             <h3 class="panel-title col-md-9">Conversation with <a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a></h3>  <!--TODO put parameter into url -->
         </div>
     </div>
-    <table class="table table-hover">
-        <tbody>
-        <tr class="col-lg-12" ng-show="showPublic()"
-            ng-repeat="message in chosenMessage.lastMessages | orderBy:sortedField:reversedSort">
-            <td class="col-lg-12">
-                <text-message class="col-lg-12" chosen-message='chosenMessage' message="message"></text-message>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <form class="form-horizontal container" novalidate name="sendMessageForm" ng-submit="sendMessage()">
-                    <fieldset>
-                        <div class="form-group">
-                            <div class="col-md-12">
-                                <textarea style="resize: none;" class="form-control" rows="8" id="textMessage" name="textMessage"
-                                          ng-model="newMessage"
-                                          placeholder="Write a reply..."
-                                          required>
-                                </textarea>
-                                <!--<span class="label label-warning" ng-show="contactAuthForm.textMessage.$invalid">Please write a message</span>  -->
-                            </div>
-                            <!--<span class="help-block">Message mustn't be empty</span> -->
-                        </div>
-                        <div class="pull-right">
-                            <button ng-disabled="sendMessageForm.$invalid" type="submit" class="btn btn-primary">Send</button>
-                        </div>
-                    </fieldset>
-                </form>
-            </td>
-        </tr>
+    <!--scrollable-table watch="chosenMessage.lastMessages"-->
+        <table class="tableSection table table-hover table-striped table-bordered" >
+            <tbody  ng-scrollbar is-bar-shown="barShown" class="messageTable">
 
-        </tbody>
-    </table>
+
+            <tr class="col-lg-12 pre-scrollable" ng-show="showPublic()"
+                ng-repeat="message in chosenMessage.lastMessages | orderBy:sortedField:reversedSort" notify-render-finished>
+                <td class="col-lg-12">
+                    <text-message class="col-lg-12" chosen-message='chosenMessage' message="message"></text-message>
+                </td>
+            </tr>
+            </tbody>
+        <table class="table table-hover table-striped table-bordered">
+            <tbody>
+            <tr>
+                <td>
+                    <form class="form-horizontal container" novalidate name="sendMessageForm" ng-submit="sendMessage()">
+                        <fieldset>
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <textarea style="resize: none;" class="form-control" rows="8" id="textMessage" name="textMessage"
+                                              ng-model="newMessage"
+                                              placeholder="Write a reply..."
+                                              required>
+                                    </textarea>
+                                    <!--<span class="label label-warning" ng-show="contactAuthForm.textMessage.$invalid">Please write a message</span>  -->
+                                </div>
+                                <!--<span class="help-block">Message mustn't be empty</span> -->
+                            </div>
+                            <div class="pull-right">
+                                <button ng-disabled="sendMessageForm.$invalid" type="submit" class="btn btn-primary">Send</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+
+
+
+        </table>
+    <!--/scrollable-table-->
+
 </div>

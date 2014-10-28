@@ -679,7 +679,7 @@ angular.module('won.owner').factory('wonService', function (
 
                                         //eventData.eventType = won.EVENT.CLOSE_SENT;
                                         eventData.timestamp = new Date().getTime();
-                                        $rootScope.$broadcast(won.EVENT.connectionMessageSentMessage, eventData);
+                                        $rootScope.$broadcast(won.EVENT.CONNECTION_MESSAGE_SENT,eventData);
                                         //$rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
 
                                     }, won.reportError("cannot fetch closed event " + eventUri)

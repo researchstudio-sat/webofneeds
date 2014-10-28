@@ -144,14 +144,12 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
-
     });
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_SENT, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
-
     });
 
 
@@ -162,7 +160,9 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.$on(won.EVENT.USER_SIGNED_IN, function(event){
        messageService.reconnect();
     });
-
+    $scope.$on('RenderFinishedEvent', function(event){
+       console.log("render finished event") ;
+    });
     $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
         messageService.reconnect();
     });

@@ -55,7 +55,7 @@ angular.module('won.owner')
                 chosenMessage: '='
             },
 
-            controller : function($scope, wonService){
+            controller : function($scope, $location, $anchorScroll, wonService){
                 $scope.newMessage = '';
                 $scope.showConversations = function() {
                     if($scope.chosenMessage != null){
@@ -74,7 +74,13 @@ angular.module('won.owner')
                     //TODO logic
                     wonService.textMessage($scope.newMessage, $scope.chosenMessage.connection.uri);
                 };
-
+                $scope.$on('RenderFinishedEvent', function(ngEvent, eventData) {
+                    $scope.goToLastMessage(eventData.id);
+                });
+                $scope.goToLastMessage = function(id){
+                    $location.hash(id);
+                    $anchorScroll();
+                }
 
             },
             link: function(scope, element, attrs){
@@ -83,3 +89,24 @@ angular.module('won.owner')
 
         }
     })
+angular.module('won.owner')
+    .directive('notifyRenderFinished', function factory($timeout) {
+        return{
+            restrict: 'A',
+            controller: function($scope, $rootScope){
+                $scope.renderFinish = function(event){
+                    $rootScope.$broadcast('RenderFinishedEvent',event);
+                }
+            },
+            link: function(scope, element, attrs){
+                console.log('notify render finished directive') ;
+                if (scope.$last){
+                    $timeout(function(){
+                        scope.renderFinish({id:scope.$index});
+                    }, 100)
+
+
+                 }
+            }
+        };
+    });

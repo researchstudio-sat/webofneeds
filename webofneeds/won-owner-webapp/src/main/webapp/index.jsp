@@ -32,7 +32,9 @@
 	<link rel="stylesheet" href="style/lightbox.css"/>
 	<link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
     <link rel="stylesheet" href="style/star-rating.css"/>
+        <link rel="stylesheet" href="scripts/angular-scrollable-table/scrollable-table.css"/>
 
+        <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.min.css"/>
 		<script src="scripts/jquery.10.2.js"></script>
 	<script src="scripts/jquery.fs.scroller.min.js"></script>
 		<script src="bower_components/angular/angular.js"></script>
@@ -44,7 +46,7 @@
 		<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
 		<script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
-
+        <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>
 		<script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
@@ -57,6 +59,7 @@
         <script type="text/javascript" src="scripts/bootstrap-tagsinput.min.js"></script>
         <script type="text/javascript" src="scripts/jsonld.js"></script>
         <script type="text/javascript" src="scripts/rdfstore-js/rdf_store.js"></script>
+        <script type="text/javascript" src="scripts/angular-scrollable-table/angular-scrollable-table.js"></script>
 
         <script type="text/javascript" src="scripts/star-rating.min.js"></script>
 

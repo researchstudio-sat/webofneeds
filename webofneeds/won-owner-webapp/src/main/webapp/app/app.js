@@ -21,6 +21,8 @@ app = angular.module('won.owner',
         , 'blueimp.fileupload'
         , 'ngMockE2E'
         , 'smart-table'
+        , 'ngScrollbar'
+        , 'scrollable-table'
         ]
     ).config(function ($routeProvider, $httpProvider, $provide) {//, $log) {
 	$routeProvider.
