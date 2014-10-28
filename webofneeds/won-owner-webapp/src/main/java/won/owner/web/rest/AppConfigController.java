@@ -28,7 +28,7 @@ import java.net.URI;
 
 @Controller
 @RequestMapping("/rest/wonNode")
-public class RestWonNodeInfoController
+public class AppConfigController
 {
   @Autowired
   private WonNodeInformationService wonNodeInformationService;
