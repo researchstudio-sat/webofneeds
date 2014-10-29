@@ -50,8 +50,10 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     /**
     * Empties the current lists of needs, drafts and events (call e.g. when logging out so no data's left)
     * (or creates those if they didn't exist before for some reason)
-    */
     //TODO initialize these from the server here if the session's still "logged in"?
+     * Resets the services internal data-structure to actual values.
+     * @param needURIs any needs from previous sessions, fetched from the server
+     */
     applicationStateService.reset = function() {
         //if we have a current need, that's its URI
         privateData.currentNeedURI = null;
@@ -165,11 +167,14 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             }
             privateData.unreadEventsByNeedByType[needURI].need = need;
         }
-        var now = new Date().getTime();
-        createOrUpdateUnreadEntry(needURI, eventData, privateData.unreadEventsByNeedByType[needURI][getUnreadEventType(eventType)]);
-        privateData.unreadEventsByNeedByType[needURI][getUnreadEventType(eventType)].timestamp = now;
-        privateData.unreadEventsByNeedByType[needURI].timestamp = now;
-        privateData.unreadEventsByNeedByType[needURI].count++;
+
+        if(eventType != undefined && eventData != undefined ) {
+            var now = new Date().getTime();
+            createOrUpdateUnreadEntry(needURI, eventData, privateData.unreadEventsByNeedByType[needURI][getUnreadEventType(eventType)]);
+            privateData.unreadEventsByNeedByType[needURI][getUnreadEventType(eventType)].timestamp = now;
+            privateData.unreadEventsByNeedByType[needURI].timestamp = now;
+            privateData.unreadEventsByNeedByType[needURI].count++;
+        }
 
     };
 
@@ -269,6 +274,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * @param need
      */
     applicationStateService.addNeed = function(need){
+        updateUnreadEventsByNeedByType(need.uri);
         privateData.allNeeds[need.uri] = need;
     }
     applicationStateService.addDraft = function(draft){
