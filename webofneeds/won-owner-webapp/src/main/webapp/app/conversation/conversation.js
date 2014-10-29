@@ -75,8 +75,31 @@ angular.module('won.owner')
                 $scope.sendMessage = function() {
                     //TODO logic
                     wonService.textMessage($scope.newMessage, $scope.chosenMessage.connection.uri);
+                    // clean textarea
+                    $scope.newMessage = "";
                 };
+                $scope.goToLastMessage = function(id){
+                    $location.hash(id);
+                    $anchorScroll();
+                };
+                $scope.clickOnLeaveConversation = function() {
+                    console.log('leave conversation clicked');
+                    $scope.showConfirmationDialogForLeaveConversation = true;
+                };
+                $scope.clickOnNoForLeaveConversation = function() {
+                    console.log('no');
+                    $scope.showConfirmationDialogForLeaveConversation = false;
+                }
 
+                $scope.clickOnYesForLeaveConversation = function() {
+                    console.log('yes');
+                    $scope.showConfirmationDialogForLeaveConversation = false;
+                    wonService.closeConnection($scope.chosenMessage, $scope.newMessage);
+                    // clean textarea
+                    $scope.newMessage = "";
+                    //console.log('redirect: /private-link');
+                    //$location.path('/private-link');
+                }
 
             },
             link: function(scope, element, attrs){

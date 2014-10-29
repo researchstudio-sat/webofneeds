@@ -40,6 +40,10 @@
                             <div class="pull-right">
                                 <button ng-disabled="sendMessageForm.$invalid" type="submit" class="btn btn-primary">Send</button>
                             </div>
+                            <div class="pull-left">
+                                <button class="btn btn-default" type="button" ng-click="clickOnLeaveConversation()"
+                                        >Leave</button>
+                            </div>
                         </fieldset>
                     </form>
                 </td>
@@ -52,5 +56,23 @@
 
         </table>
     <!--/scrollable-table-->
+
+
+    <!-- Confirmation dialog for leaving a conversation -->
+    <div ng-show="showConfirmationDialogForLeaveConversation">
+        <form class="form-horizontal container">
+            <div class="col-md-5 col-md-offset-4">
+                <div class="well">
+                    <fieldset>
+                        <legend>Do you really want to leave this conversation?</legend>
+                        <div class="row col-lg-12">
+                            <button type="button" ng-click="clickOnNoForLeaveConversation()" class="btn btn-primary col-lg-6">No</button>
+                            <button type="button" ng-click="clickOnYesForLeaveConversation()" class="btn btn-primary col-lg-6">Yes</button>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </form>
+    </div>
 
 </div>
