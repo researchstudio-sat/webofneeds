@@ -31,6 +31,7 @@ table.tableSection tr {
     width: 100%;
     display: table;
     text-align: left;
+    border-bottom:1px solid black;
 }
 table.tableSection th, table.tableSection td {
     width: 33%;

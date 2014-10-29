@@ -657,6 +657,7 @@ angular.module('won.owner').factory('wonService', function (
                 messageService.sendMessage(message);
                 setTimeout(
                     function(){
+
                         //linkedDataService.fetch(connection.uri);
                         //console.log("publishing angular event");
                         //$rootScope.$broadcast(won.EVENT.CLOSE_SENT, eventData);

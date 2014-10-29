@@ -24,7 +24,8 @@ angular.module('won.owner')
             restrict: 'AE',
             scope : {
                 chosenMessage: '=',
-                message: '='
+                message: '=',
+                id: '@'
             },
             link: function(scope, element, attrs) {
                 scope.getContentUrl = function () {
@@ -33,7 +34,7 @@ angular.module('won.owner')
                     } else return "/owner/app/conversation/received-text-message.html";
                 }
             },
-            template: '<div class="row col-lg-12" ng-include="getContentUrl()"></div>',
+            template: '<div ng-attr-id="id" class="row col-lg-12" ng-include="getContentUrl()"></div>',
             controller : function($scope){
 
                 $scope.getImageForMessage = function(message){
@@ -55,7 +56,7 @@ angular.module('won.owner')
                 chosenMessage: '='
             },
 
-            controller : function($scope, $location, $anchorScroll, wonService){
+            controller : function($scope, $location, $anchorScroll, $rootScope, wonService){
                 $scope.newMessage = '';
                 $scope.showConversations = function() {
                     if($scope.chosenMessage != null){
@@ -63,6 +64,7 @@ angular.module('won.owner')
                         if($scope.chosenMessage.typeText == 'Conversation') return true;
                     }else return false;
                 }
+                $scope.messageIndex ='';
                 $scope.showPublic = function(){
                     if($scope.chosenMessage.lastMessages.length>0){
                         return true;
@@ -74,13 +76,7 @@ angular.module('won.owner')
                     //TODO logic
                     wonService.textMessage($scope.newMessage, $scope.chosenMessage.connection.uri);
                 };
-                $scope.$on('RenderFinishedEvent', function(ngEvent, eventData) {
-                    $scope.goToLastMessage(eventData.id);
-                });
-                $scope.goToLastMessage = function(id){
-                    $location.hash(id);
-                    $anchorScroll();
-                }
+
 
             },
             link: function(scope, element, attrs){
@@ -93,16 +89,42 @@ angular.module('won.owner')
     .directive('notifyRenderFinished', function factory($timeout) {
         return{
             restrict: 'A',
-            controller: function($scope, $rootScope){
-                $scope.renderFinish = function(event){
-                    $rootScope.$broadcast('RenderFinishedEvent',event);
-                }
+            controller: function($scope, $rootScope,$anchorScroll,$location){
+
+                $scope.$on('RenderFinishedEvent', function(scope, element, attrs){
+                    $timeout(function(){
+                        var old = $location.hash();
+                        $location.hash($scope.$index);
+                        $anchorScroll();
+                        $location.hash(old);
+                    },200)
+                });
+              /*  var scrollToHash = function(hash){
+
+                    if(id && hash && id === hash){
+
+                        if(delay && firstTimeScrolling){
+                            $timeout(function(){
+                                $anchorScroll();
+                            }, delay);
+                        }else{
+                            $anchorScroll();
+                        }
+
+                        //only run the delay the first time this scrolling function executes
+                        //if the hash didn't match, then this function didn't execute!
+                        firstTimeScrolling = false;
+
+                    }
+
+                };  */
             },
             link: function(scope, element, attrs){
                 console.log('notify render finished directive') ;
                 if (scope.$last){
                     $timeout(function(){
-                        scope.renderFinish({id:scope.$index});
+                            scope.$emit('RenderFinishedEvent', element, attrs);
+
                     }, 100)
 
 
