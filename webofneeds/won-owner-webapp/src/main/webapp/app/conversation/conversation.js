@@ -61,7 +61,9 @@ angular.module('won.owner')
                 $scope.showConversations = function() {
                     if($scope.chosenMessage != null){
                         console.log("checking show conversations") ;
-                        if($scope.chosenMessage.typeText == 'Conversation') return true;
+                        if($scope.chosenMessage.typeText == 'Conversation'
+                            || ($scope.chosenMessage.typeText == "Incoming Closed" && $scope.showPublic())
+                            || $scope.chosenMessage.typeText == "Outgoing Closed" && $scope.showPublic()) return true;
                     }else return false;
                 }
                 $scope.messageIndex ='';
@@ -70,6 +72,16 @@ angular.module('won.owner')
                         return true;
                     }else{
                         return false;
+                    }
+                }
+                $scope.showSendMessageForm = function() {
+                    if($scope.chosenMessage != null) {
+                        if ($scope.chosenMessage.typeText == "Incoming Closed"
+                            || $scope.chosenMessage.typeText == "Outgoing Closed") {
+                            return false;
+                        } else {
+                            return true;
+                        }
                     }
                 }
                 $scope.sendMessage = function() {
