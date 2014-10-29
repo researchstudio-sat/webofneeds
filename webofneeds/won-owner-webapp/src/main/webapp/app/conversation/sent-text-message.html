@@ -15,7 +15,7 @@
   ~    limitations under the License.
   -->
 
-<div id="textMessageContent" class="col-lg-9">
+<div id="textMessageContent" class="col-lg-11">
     <div class="row col-lg-12">
         <div class="col-lg-3" ng-bind="message.timestamp |date:'yy/MM/dd HH:mm'"></div>
         <div class="col-lg-9 text-right">
@@ -27,6 +27,6 @@
         </div>
     </div>
 </div>
-<div id="textMessageIcon" class="col-lg-3 text-right">
+<div id="textMessageIcon" class="col-lg-1 text-right">
     <img ng-src="{{getImageForMessage(message)}}" width="50" height="50">
 </div>
