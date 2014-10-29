@@ -293,7 +293,7 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
                 ).then(
                     function (needs) {
                         if(needs.data.length>0){
-                            applicationStateService.addNeeds(needs)
+                            applicationStateService.addNeeds(needs);
                         }
                         // success
                         return {status:"OK"};
