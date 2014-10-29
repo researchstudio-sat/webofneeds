@@ -127,7 +127,7 @@ table.tableSection th, table.tableSection td {
 .messageTable {
     display: block;
     overflow: auto;
-    height: 200px;
+    height: 400px;
 }
 
 @media (min-width: 768px) {
