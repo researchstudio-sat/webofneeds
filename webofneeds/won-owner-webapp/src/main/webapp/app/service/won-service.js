@@ -21,6 +21,7 @@ angular.module('won.owner').factory('wonService', function (
     messageService,
     $q,
     $http,
+    $location,
     linkedDataService,
     $rootScope,
     applicationStateService,
@@ -29,13 +30,13 @@ angular.module('won.owner').factory('wonService', function (
     var wonService = {};
     var privateData = {}
     //set a default WoN node uri, but immediately replace by the one obtained from the server
-    privateData.defaultWonNodeUri = "http://localhost:8080/won/resource"
-    $http.get("/rest/wonNode/default")
+    privateData.defaultWonNodeUri = $location.protocol()+"://"+$location.host()+"/won/resource";
+    $http.get("appConfig/getDefaultWonNodeUri")
         .success(
         function onGetDefaultWonNodeUri(data, status, headers, config) {
             if (status == 200){
                 console.log("setting default won node uri to value obtained from server: " + JSON.stringify(data));
-                privateData.defaultWonNodeUri = data;
+                privateData.defaultWonNodeUri = JSON.parse(data);
             } else {
                 console.log("warn: error obtaining default won node uri, http status=" + status);
             }
