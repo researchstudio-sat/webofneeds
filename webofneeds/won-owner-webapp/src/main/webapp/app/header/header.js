@@ -30,7 +30,7 @@ angular.module('won.owner').controller("HeaderCtrl",
     $log.debug("Initializing HeaderCtrl.")
 
     //after reloading, verify if the session's still valid
-    //TODO move someone where more appropriate (sadly in app.config the service isn't available yet)
+    //TODO move somewhere more appropriate (sadly in app.config the service isn't available yet)
     //userService.verifyAuth(); homepage doesn't load any more after using this here
     // due to the wait-for-all decorator? ("everything waits for the http request to return"?)
 
@@ -83,7 +83,6 @@ angular.module('won.owner').controller("HeaderCtrl",
 	};
 
 	$scope.onClickSignOut = function() {
-		//TODO reset ALL the services
 		applicationStateService.reset();
 		linkedDataService.reset();
 		userService.logOut().then(onResponseSignOut);
