@@ -64,4 +64,12 @@ public interface WonNodeInformationService
 
   public URI getDefaultWonNodeURI();
 
+  /**
+   * Obtains the won node uri associated with the specified need or
+   * connection resource.
+   *
+   * @param resourceURI
+   * @return the won node URI or null if none is found.
+   */
+  public URI getWonNodeUri(URI resourceURI);
 }

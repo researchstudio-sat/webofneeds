@@ -86,7 +86,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
       con = new Connection();
       //create and set new uri
       con.setConnectionURI(wonNodeInformationService.generateConnectionURI(
-        wonNodeInformationService.getDefaultWonNodeURI()));
+        wonNodeInformationService.getWonNodeUri(needURI)));
     }
 
     con.setNeedURI(needURI);

@@ -439,7 +439,7 @@ public abstract class AbstractFacet implements Facet
         WonMessageBuilder builder = new WonMessageBuilder();
         WonMessage closeWonMessage = builder
           .setMessageURI(wonNodeInformationService.generateEventURI(
-            wonNodeInformationService.getDefaultWonNodeURI()))
+            wonMessage.getSenderNodeURI())) //not sure if this is correct
           .setWonMessageType(WonMessageType.CLOSE)
           .setSenderURI(wonMessage.getSenderURI())
           .setSenderNeedURI(wonMessage.getSenderNeedURI())

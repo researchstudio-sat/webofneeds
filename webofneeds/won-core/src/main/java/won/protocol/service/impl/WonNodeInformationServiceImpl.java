@@ -8,6 +8,7 @@ import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import java.net.URI;
 
@@ -67,6 +68,11 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService
     WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
     return URI.create(wonNodeInformation.getNeedURIPrefix() + "/"+
                                           generateRandomID());
+  }
+
+  @Override
+  public URI getWonNodeUri(final URI resourceURI) {
+    return WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(resourceURI, linkedDataSource);
   }
 
   @Override
