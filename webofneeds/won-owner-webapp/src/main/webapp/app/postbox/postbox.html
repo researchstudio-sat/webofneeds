@@ -60,8 +60,8 @@
                     </thead>
                     <tbody>
                         <tr
-                                ng-show="allNeedsCount>0"
-                                ng-repeat="post in allNeeds | orderObjectBy:sortedField:reversedSort |filter: search">
+                                ng-show="hasNeeds()"
+                                ng-repeat="post in allNeeds() | orderObjectBy:sortedField:reversedSort |filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{post.basicNeedType}}</span>
                                 <img src="{{getTypePicURI(post.basicNeedType)}}"
@@ -90,7 +90,8 @@
                             </td>
                             <td>{{post.creationDate | date}}</td>
                         </tr>
-                        <tr ng-show="allNeedsCount<1">
+                        <tr ng-show="!hasNeeds()">
+                        <!--<tr ng-show="applicationStateService.getAllNeedsCount()<1">-->
                             <td class="col-lg-1">
                             </td>
                             <td>You don't have posts yet. Fill it by <a style="font-weight:bold;" href="#/home">creating new

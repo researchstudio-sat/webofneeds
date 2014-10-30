@@ -149,6 +149,11 @@ app.directive('header', function(){
                     return 'Incoming Request';
                 case won.WONMSG.hintMessage:
                     return 'Matches';
+                case won.WONMSG.closeMessage:
+                    if (lastConEvent.event.hasReceiverNeed == lastConEvent.remoteNeed.uri){
+                        return 'Outgoing Closed';
+                    }
+                    return 'Incoming Closed';
                 default:
                     return 'Unknown';
             }
@@ -226,39 +231,3 @@ angular.resetForm = function (scope, formName, defaults) {
 		scope[d] = defaults[d];
 	}
 };
-
-//TODO use MainCtrls scope instead of rootScope to prevent js library name-clashes
-app.directive(('notifDropdown'), function notifDropdownFct($rootScope) { //TODO $rootScope is very hacky for a directive (reduces reusability)
-    console.log("registering directive: notifDropdown");
-    console.log($rootScope.unreadEventsByNeedByType);
-    var dtv = {
-        /*scope: {
-            unreadEventsByTypeByNeed: '@',
-            unreadEventsByNeedByType: '@',
-            openNeedDetailView: '&',
-            getTypePicURI: '&',
-        },*/
-        template:
-            '<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl"> ' +
-            '    <i class="fa fa-puzzle-piece fa-lg"></i>&nbsp;{{unreadEventsByTypeByNeed.hint.count}} ' +
-            '</a> ' +
-            '<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;"> ' +
-            '    <li class="text-center grey-item">{{unreadEventsByTypeByNeed.hint.count}}&nbsp;new ' +
-            '    matches</li> ' +
-            '<li ' +
-            'ng-repeat="entry in unreadEventsByNeedByType" ' +
-            'ng-show="entry.hint && entry.hint.count > 0">' +
-            '    <a g-click="openNeedDetailView(entry.need.uri)"><img ' +
-            '    src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span ' +
-            '    class="badge pull-right">{{entry.hint.count}}</span></a> ' +
-            '</li> ' +
-            '<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a> ' +
-            '</li> ' +
-            '</ul> ',
-        link: function notifDropDownLink(scope) {
-            console.log("notif dropdown link ----------");
-            console.log(scope.unreadEventsByTypeByNeed);
-        }
-    }
-    return dtv;
-});
