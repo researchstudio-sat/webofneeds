@@ -235,7 +235,7 @@ public class BAAtomicCCActiveNotCompletingBotTest
       Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0),
         PropertyPathConfigurator
           .configurePropertyPaths
-            (), 300, 4);
+            (), 300, 4, true);
       logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
 
       String queryString = sparqlPrefix +
@@ -289,7 +289,7 @@ public class BAAtomicCCActiveNotCompletingBotTest
       Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0),
         PropertyPathConfigurator
           .configurePropertyPaths
-            (), 300, 4);
+            (), 300, 4, true);
 
       logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
 

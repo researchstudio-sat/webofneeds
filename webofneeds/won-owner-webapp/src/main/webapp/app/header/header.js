@@ -25,10 +25,12 @@ angular.module('won.owner').controller("HeaderCtrl",
              , $log
              ) {
 
+
+
     $log.debug("Initializing HeaderCtrl.")
 
     //after reloading, verify if the session's still valid
-    //TODO move someone where more appropriate (sadly in app.config the service isn't available yet)
+    //TODO move somewhere more appropriate (sadly in app.config the service isn't available yet)
     //userService.verifyAuth(); homepage doesn't load any more after using this here
     // due to the wait-for-all decorator? ("everything waits for the http request to return"?)
 
@@ -46,21 +48,16 @@ angular.module('won.owner').controller("HeaderCtrl",
                    + " to "  + JSON.stringify(to)
         )});
 
-    $scope.authenticated = false;
-
     $scope.redirectHome= function(){
-        // TODO might cause redirect loop
-        $scope.authenticated = !userService.isAuth();
-        if(!$scope.authenticated){
-            $location.path("/home");
-        }else{
-            $location.path("/");
-        }
+        $location.path("/home");
+    }
+
+    $scope.goLandingPage = function() {
+        $location.path("/");
     }
 
 	$scope.showPublic = function() {
-        $scope.authenticated = !userService.isAuth();
-		return  $scope.authenticated;
+        return !userService.isAuth();
 	};
 
     $scope.checkRegistered = function(){
@@ -72,19 +69,12 @@ angular.module('won.owner').controller("HeaderCtrl",
     $scope.$watch(userService.isAuth, function(logged_in){
         if(logged_in){
             $scope.userdata = { username : userService.getUnescapeUserName()};
-            $scope.authenticated = true;
-            //$window.location.reload();
-          //  $location.path('/');
-
-      //      $window.location.reload();
-       //     $scope.showPublic();
-      //      $scope.$apply();
         }
     })
     $scope.onDropDownClick=function(num){
-
         $scope.$parent.selectedType = num;
     }
+
 	onResponseSignOut = function (result) {
 		if (result.status == 'OK') {
 			userService.resetAuth();
@@ -93,6 +83,8 @@ angular.module('won.owner').controller("HeaderCtrl",
 	};
 
 	$scope.onClickSignOut = function() {
+		applicationStateService.reset();
+		linkedDataService.reset();
 		userService.logOut().then(onResponseSignOut);
 	};
 

@@ -23,13 +23,20 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     var privateData = {};
 
-    //create an rdfstore-js based store as a cache for rdf data.
-    privateData.store =  rdfstore.create();
-    privateData.store.setPrefix("msg","http://purl.org/webofneeds/message#");
-    privateData.store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-    privateData.store.setPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-    privateData.store.setPrefix("xsd","http://www.w3.org/2001/XMLSchema#");
-    privateData.store.setPrefix("won","http://purl.org/webofneeds/model#");
+    linkedDataService.reset = function() {
+        privateData = {};
+        //create an rdfstore-js based store as a cache for rdf data.
+        privateData.store =  rdfstore.create();
+        privateData.store.setPrefix("msg","http://purl.org/webofneeds/message#");
+        privateData.store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+        privateData.store.setPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+        privateData.store.setPrefix("xsd","http://www.w3.org/2001/XMLSchema#");
+        privateData.store.setPrefix("won","http://purl.org/webofneeds/model#");
+
+        privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
+        privateData.cacheStatus = {} //uri -> [last access timestamp, 0 if dirty]
+    }
+    linkedDataService.reset();
 
 
     var createNameNodeInStore = function(uri){
@@ -199,9 +206,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     };
 
-    privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
     var CACHE_DIRTY = -1;
-    privateData.cacheStatus = {} //uri -> [last access timestamp, 0 if dirty]
 
     linkedDataService.cacheItemInsertOrOverwrite = function(uri){
         console.log("add to cache:    " + uri);
@@ -358,6 +363,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             errorMessage = "More than one result found.";
         }
         if (errorMessage != null){
+            console.log(errorMessage);
             $q.reject(options.message + " " + errorMessage);
             return true;
         }
@@ -950,6 +956,109 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             }
         );
 
+    }
+
+    linkedDataService.getConnectionTextMessages = function(connectionUri) {
+        return linkedDataService.crawlConnectionData(connectionUri).then(
+            function collectTextMessages() {
+                var lock = getReadUpdateLockPerUri(connectionUri);
+                return lock.acquireReadLock().then(
+                    function (success) {
+                        try {
+                            var textMessages = [];
+                            var query =
+                                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+                                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                                "select distinct ?eventUri ?timestamp ?text ?senderNeed where { " +
+                                "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
+                                won.WON.hasEventContainerCompacted + " ?container.\n" +
+                                "?container rdfs:member ?eventUri. \n" +
+                                "?eventUri won:hasTextMessage ?text. \n" +
+                                "?eventUri msg:hasSenderNeed ?senderNeed. \n" +
+                                " optional { " +
+                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                " } \n" +
+                                "} order by desc(?timestamp) ";//limit " + limit;
+
+                            privateData.store.execute(query, [], [], function (success, results) {
+                                if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: true, allowMultiple: true})) {
+                                    return;
+                                }
+                                for (var key in results) {
+                                    var textMessage = {};
+                                    var eventUri = getSafeValue(results[key].eventUri);
+                                    var timestamp = getSafeValue(results[key].timestamp);
+                                    var text = getSafeValue(results[key].text);
+                                    var senderNeed = getSafeValue(results[key].senderNeed);
+                                    if (eventUri != null && timestamp != null && text != null) {
+                                        textMessage.eventUri = eventUri;
+                                        textMessage.timestamp = timestamp;
+                                        textMessage.text = text;
+                                        textMessage.senderNeed = senderNeed;
+                                        textMessages.push(textMessage);
+                                    }
+                                }
+                            });
+                            return textMessages;
+                        } catch (e) {
+                            $q.reject("Could not get connection events' text messages " + connectionUri + ". Reason: " + e);
+                        } finally {
+                            lock.releaseReadLock();
+                        }
+                })
+             }
+        );
+    }
+
+    linkedDataService.getLastEventTypeBeforeTime = function(connectionUri, beforeTimestamp) {
+        return linkedDataService.crawlConnectionData(connectionUri).then(
+            function queryLastEventBeforeTime() {
+                var lock = getReadUpdateLockPerUri(connectionUri);
+                return lock.acquireReadLock().then(
+                    function (success) {
+                        try {
+                            var lastEventTypeBeforeTime;
+                            var filterPart = "";
+                            if (typeof beforeTimestamp != 'undefined') {
+                                filterPart = " filter ( ?timestamp > " + timestamp + " ) \n";
+                            }
+                            var query =
+                                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
+                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
+                                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                                "select distinct ?msgType where { " +
+                                "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
+                                won.WON.hasEventContainerCompacted + " ?container.\n" +
+                                "?container rdfs:member ?eventUri. \n" +
+                                "?eventUri won:hasMessageType ?msgType. \n" +
+                                " optional { " +
+                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                " } \n" +
+                                filterPart + //" filter ( ?timestamp > " + timestamp + " ) \n" +
+                                "} order by desc(?timestamp) ";//limit " + limit;
+
+                            privateData.store.execute(query, [], [], function (success, results) {
+                                if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: true, allowMultiple: true})) {
+                                    return;
+                                }
+                                for (var key in results) {
+                                    var msgType = getSafeValue(results[key].msgType);
+                                    if (msgType != null) {
+                                        lastEventTypeBeforeTime = msgType;
+                                    }
+                                    break;
+                                }
+                            });
+                            return lastEventTypeBeforeTime;
+                        } catch (e) {
+                            $q.reject("Could not get connection event type before time " + connectionUri + ". Reason: " + e);
+                        } finally {
+                            lock.releaseReadLock();
+                        }
+                    })
+            }
+        );
     }
 
     /**

@@ -966,6 +966,17 @@
                 this.getContentGraphNode()[won.WON.hasRemoteFacetCompacted]={"@id":facetURI};
                 return this;
             },
+            /**
+             * Adds the specified text as text message inside the content. Can be
+             * used with connectMessage, openMessage and connectionMessage.
+             * @param text - text of the message
+             * @returns {won.MessageBuilder}
+             */
+            hasTextMessage: function (text){
+                this.getContentGraphNode()[won.WON.hasTextMessageCompacted] = text;
+                return this;
+            },
+
             getMessageEventGraph: function (){
                 return this.messageGraph;
             },

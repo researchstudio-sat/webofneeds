@@ -17,6 +17,7 @@
 package won.owner.repository;
 
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class UserRepositoryTest
   private UserRepository userRepository;
 
   @Test
+  @Ignore
   public void dummyTest(){
     //only there to have a quick way of instantiating the context.
   }

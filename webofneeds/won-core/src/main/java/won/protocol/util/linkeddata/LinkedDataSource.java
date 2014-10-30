@@ -33,5 +33,5 @@ public interface LinkedDataSource
     int maxRequest, int maxDepth);
 
   public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties, int maxRequest,
-    int maxDepth);
+    int maxDepth, final boolean moveAllTriplesInDefaultGraph);
 }

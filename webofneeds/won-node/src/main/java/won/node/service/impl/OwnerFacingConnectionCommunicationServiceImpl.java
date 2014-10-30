@@ -18,8 +18,6 @@ package won.node.service.impl;
 
 import com.hp.hpl.jena.graph.TripleBoundary;
 import com.hp.hpl.jena.rdf.model.*;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +29,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.ConnectionRepository;
@@ -42,7 +39,6 @@ import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
-import java.io.StringWriter;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,12 +64,6 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
   @Override
   public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-
-    if (wonMessage != null) {
-      //TODO: currently, the WoN node does not alter (extend) the WonMessage. However,
-      //the sender (owner) could only fill in senderURI (=connectionURI) and wonNodeURI, and
-      //the WoN node could add the properties required for routing to the destination, as these
-      //properties are stored on the WoN node with the connection data.
 
       Connection con = connectionRepository.findOneByConnectionURI(connectionURI);
 
@@ -102,29 +92,11 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       //invoke facet implementation
       reg.get(con).openFromOwner(con, content, newWonMessage);
 
-    } else {
-
-      logger.debug("OPEN received from the owner side for connection {} with content {}", connectionURI, content);
-
-      Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_OPEN);
-
-      ConnectionEvent event = dataService
-        .createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_OPEN);
-
-      dataService.saveAdditionalContentForEvent(content, con, event);
-
-      //invoke facet implementation
-      reg.get(con).openFromOwner(con, content, wonMessage);
-    }
   }
 
   @Override
   public void close(final URI connectionURI, final Model content, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-
-    // distinguish between the new message format (WonMessage) and the old parameters
-    // ToDo (FS): remove this distinction if the old parameters not used anymore
-    if (wonMessage != null) {
       WonMessage newWonMessage = new WonMessageBuilder()
         .wrap(wonMessage)
         .setTimestamp(System.currentTimeMillis())
@@ -145,30 +117,11 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
 
       //invoke facet implementation
       reg.get(con).closeFromOwner(con, content, newWonMessage);
-
-    } else {
-
-      logger.debug("CLOSE received from the owner side for connection {} with content {}", connectionURI, content);
-
-      Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.OWNER_CLOSE);
-
-      ConnectionEvent event = dataService
-        .createConnectionEvent(connectionURI, connectionURI, ConnectionEventType.OWNER_CLOSE);
-
-      dataService.saveAdditionalContentForEvent(content, con, event);
-
-      //invoke facet implementation
-      reg.get(con).closeFromOwner(con, content, wonMessage);
-    }
   }
 
   @Override
   public void sendMessage(final URI connectionURI, final Model message, WonMessage wonMessage)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-
-    // distinguish between the new message format (WonMessage) and the old parameters
-    // ToDo (FS): remove this distinction if the old parameters not used anymore
-    if (wonMessage != null) {
       WonMessage newWonMessage = new WonMessageBuilder()
         .wrap(wonMessage)
         .setTimestamp(System.currentTimeMillis())
@@ -210,35 +163,6 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       }
       //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.
       //return con.getConnectionURI();
-
-    } else {
-
-      Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-
-      //create ConnectionEvent in Database
-
-      ConnectionEvent event = dataService
-        .createConnectionEvent(con.getConnectionURI(), connectionURI, ConnectionEventType.OWNER_MESSAGE);
-      Resource eventNode = message.createResource(this.URIService.createEventURI(con, event).toString());
-      RdfUtils.replaceBaseResource(message, eventNode);
-      //create rdf content for the ConnectionEvent and save it to disk
-      dataService.saveAdditionalContentForEvent(message, con, event);
-      if (logger.isDebugEnabled()) {
-        StringWriter writer = new StringWriter();
-        RDFDataMgr.write(writer, message, Lang.TTL);
-        logger.debug("message after saving:\n{}", writer.toString());
-      }
-      boolean feedbackWasPresent = processFeedbackMessage(con, message);
-
-      if (!feedbackWasPresent) {
-        //a feedback message is not forwarded to the remote connection, and facets cannot react to it.
-        //invoke facet implementation
-        //TODO: this may be much more responsive if done asynchronously. We dont return anything here anyway.
-        reg.get(con).sendMessageFromOwner(con, message, wonMessage);
-      }
-      //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.
-      //return con.getConnectionURI();
-    }
   }
 
   /*

@@ -32,21 +32,18 @@ public class PropertyPathConfigurator
 {
   public static List<Path> configurePropertyPaths(){
     List<Path> propertyPaths = new ArrayList<>();
-    String pathString = "<"+ WON.HAS_CONNECTIONS+">";
+    addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS +">");
+    addPropertyPath(propertyPaths, "<"+WON.HAS_CONNECTIONS+">"+"/"+"rdfs:member");
+    addPropertyPath(propertyPaths, "<"+WON.HAS_CONNECTIONS+">"+"/"+"rdfs:member"+"/<"+WON
+      .HAS_REMOTE_CONNECTION+">");
+    addPropertyPath(propertyPaths, "<"+WON.HAS_CONNECTIONS+">"+"/"+"rdfs:member"+"/<"+WON
+      .HAS_REMOTE_CONNECTION+">/<"+WON
+      .BELONGS_TO_NEED+">");
+    return propertyPaths;
+  }
+
+  public static void addPropertyPath(final List<Path> propertyPaths, String pathString) {
     Path path = PathParser.parse(pathString, PrefixMapping.Standard);
     propertyPaths.add(path);
-    pathString = "<"+WON.HAS_CONNECTIONS+">"+"/"+"rdfs:member";
-    path = PathParser.parse(pathString, PrefixMapping.Standard);
-    propertyPaths.add(path);
-    pathString = "<"+WON.HAS_CONNECTIONS+">"+"/"+"rdfs:member"+"/<"+WON
-      .HAS_REMOTE_CONNECTION+">";
-    path = PathParser.parse(pathString, PrefixMapping.Standard);
-    propertyPaths.add(path);
-    pathString = "<"+WON.HAS_CONNECTIONS+">"+"/"+"rdfs:member"+"/<"+WON
-      .HAS_REMOTE_CONNECTION+">/<"+WON
-      .BELONGS_TO_NEED+">";
-    path = PathParser.parse(pathString, PrefixMapping.Standard);
-    propertyPaths.add(path);
-    return propertyPaths;
   }
 }

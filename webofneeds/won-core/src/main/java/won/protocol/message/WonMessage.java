@@ -6,6 +6,7 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -45,6 +46,7 @@ public class WonMessage implements Serializable
   private URI receiverNodeURI;
   private List<URI> refersTo = new ArrayList<>();
   private URI responseState;
+  private List<String> contentGraphNames;
 
 
   //private Resource msgBnode;
@@ -120,19 +122,41 @@ public class WonMessage implements Serializable
   public List<Model> getEnvelopeGraphs(){
     if (envelopeGraphs != null) return envelopeGraphs;
     this.envelopeGraphNames = new ArrayList<String>();
+    this.contentGraphNames = new ArrayList<String>();
     Model model = this.completeDataset.getDefaultModel();
     if (model == null) throw new IllegalStateException("default model must not be null");
     boolean mustContainEnvelopeGraphRef = true;
     List<Model> ret = new ArrayList<Model>();
     do {
+      //find the reference to the envelope graph in the current model (the default model in the first iteration)
       Resource envelopeGraphResource = getEnvelopeGraphReference(model, mustContainEnvelopeGraphRef);
       model = null;
       if (envelopeGraphResource != null) {
+        //look at the envelope graph (model):
         this.envelopeGraphNames.add(envelopeGraphResource.toString());
         mustContainEnvelopeGraphRef = false; //only needed for default model
         model = this.completeDataset.getNamedModel(envelopeGraphResource.toString());
         if (model == null) throw new IllegalStateException("envelope graph referenced in model" +
           envelopeGraphResource + " but not found as named graph in dataset!");
+        //find all content graphs referenced in it
+        if (this.messageURI == null) {
+          //this can only happen when this method is called before getMessageURI.
+          //we will search for the msg:hasMessageType triple.
+          this.messageURI = RdfUtils.findFirstObjectUri(model, WONMSG.HAS_MESSAGE_TYPE_PROPERTY, null, false, true);
+        }
+        if (this.messageURI == null) {
+          //this can only happen when this method is called before getMessageURI.
+          //we will search for the msg:hasContent triple (because we need it for the code below
+          this.messageURI = RdfUtils.findFirstObjectUri(model, WONMSG.HAS_CONTENT_PROPERTY, null, true, true);
+        }
+        if (this.messageURI != null) {
+          for (NodeIterator it = getContentGraphReferences(model, model.getResource(getMessageURI().toString())); it
+            .hasNext(); ) {
+            RDFNode node = it.next();
+            this.contentGraphNames.add(node.asResource().toString());
+          }
+        }
+        //add it to the list of envelope graph models
         ret.add(model);
       }
     } while (model != null);
@@ -141,11 +165,20 @@ public class WonMessage implements Serializable
   }
 
   public List<String> getEnvelopeGraphURIs(){
-    if (this.envelopeGraphNames != null) {
-      return Collections.unmodifiableList(this.envelopeGraphNames);
+    if (this.envelopeGraphs == null) {
+      getEnvelopeGraphs(); //also sets envelopeGraphNames
     }
-    getEnvelopeGraphs(); //also sets envelopeGraphNames
     return Collections.unmodifiableList(this.envelopeGraphNames);
+  }
+
+  public List<String> getContentGraphURIs(){
+    //since there may not be any content graphs, we can't check
+    //if this.contentGraphNames == null. We instead have to check
+    //if we ran the detection of the envelope graphs at least once.
+    if (this.envelopeGraphs == null) {
+      getEnvelopeGraphs(); //also sets envelopeGraphNames
+    }
+    return Collections.unmodifiableList(this.contentGraphNames);
   }
 
   private Resource getEnvelopeGraphReference(Model model, boolean mustContainEnvelopeGraphRef){
@@ -162,6 +195,11 @@ public class WonMessage implements Serializable
       "referenced in model!");
     return envelopeGraphResource;
   }
+
+  private NodeIterator getContentGraphReferences(Model model, Resource envelopeGraphResource){
+    return model.listObjectsOfProperty(envelopeGraphResource, WONMSG.HAS_CONTENT_PROPERTY);
+  }
+
 
 
   public URI getMessageURI() {
@@ -255,9 +293,9 @@ public class WonMessage implements Serializable
 
   private URI getEnvelopeSubjectURIValue(Property property, RDFNode object){
     for (Model envelopeGraph: getEnvelopeGraphs()){
-      StmtIterator it = envelopeGraph.listStatements(null, property, object);
-      if (it.hasNext()){
-        return URI.create(it.nextStatement().getSubject().asResource().toString());
+      URI val = RdfUtils.findFirstObjectUri(envelopeGraph, property, object, true, true);
+      if (val != null) {
+        return val;
       }
     }
     return null;

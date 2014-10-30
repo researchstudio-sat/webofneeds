@@ -15,6 +15,9 @@
  */
 
 /** Common **/
+.navbar-bottom {
+    z-index: -1;
+}
 .div-border-bottom {
     border-bottom: 1px solid;
 
