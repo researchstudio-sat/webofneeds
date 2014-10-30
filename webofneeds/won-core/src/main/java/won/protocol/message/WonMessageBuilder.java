@@ -7,6 +7,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.model.NeedState;
+import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -23,9 +24,11 @@ import java.util.*;
  */
 public class WonMessageBuilder
 {
-  private static final String CONTENT_URI_APPENDIX = "#content-";
-  private static final String SIGNATURE_URI_APPENDIX = "#signature-";
-  private static final String ENVELOPE_URI_APPENDIX = "#envelope-";
+  private static final String CONTENT_URI_SUFFIX = "#content-";
+  private static final String SIGNATURE_URI_SUFFIX = "#signature-";
+  private static final String ENVELOPE_URI_SUFFIX = "#envelope-";
+  private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
+  private static final int RANDOM_SUFFIX_LENGTH = 5;
 
   // ToDo (FS): move to some vocabulary class
 
@@ -122,7 +125,7 @@ public class WonMessageBuilder
       }
     }
     //create a new envelope graph uri and add the envelope graph to the dataset
-    String envelopeGraphURI = RdfUtils.createNewGraphURI(messageURI.toString(), ENVELOPE_URI_APPENDIX ,4,dataset).toString();
+    String envelopeGraphURI = RdfUtils.createNewGraphURI(messageURI.toString(), ENVELOPE_URI_SUFFIX,4,dataset).toString();
 
     //the [envelopeGraphURI] rdf:type msg:EnvelopeGraph triple in the default graph is required to find the
     //envelope graph.
@@ -190,7 +193,7 @@ public class WonMessageBuilder
     }
 
     for (URI contentURI : contentMap.keySet()) {
-      String uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), CONTENT_URI_APPENDIX, 5,
+      String uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), CONTENT_URI_SUFFIX, 5,
         dataset).toString();
       dataset.addNamedModel(uniqueContentUri, contentMap.get(contentURI));
       messageEventResource.addProperty(
@@ -201,7 +204,7 @@ public class WonMessageBuilder
         throw new UnsupportedOperationException("signatures are not supported yet");
         /* in principle, this should work, but its untested:
 
-          uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), SIGNATURE_URI_APPENDIX, 5,
+          uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), SIGNATURE_URI_SUFFIX, 5,
           dataset).toString();
         //the signature refers to the name of the other graph. We changed that name
         //so we have to replace the resource referencing it, too:
@@ -514,6 +517,12 @@ public class WonMessageBuilder
    * @return
    */
   public WonMessageBuilder addContent(URI contentURI, Model content, Model signature) {
+    Random rnd = new Random(System.currentTimeMillis());
+    URI originalContentUri = contentURI;
+    //add a random suffix to the uri
+    while (contentMap.containsKey(contentURI)){
+      contentURI = URI.create(originalContentUri.toString() + randomString.nextString(RANDOM_SUFFIX_LENGTH));
+    }
     contentMap.put(contentURI, content);
     if (signature != null)
       signatureMap.put(contentURI, signature);
@@ -593,15 +602,21 @@ public class WonMessageBuilder
   public WonMessageBuilder copyContentFromMessage(final WonMessage wonMessage, boolean replaceMessageUri) {
     Dataset messageContent = wonMessage.getMessageContent();
     for (Iterator<String> nameIt = messageContent.listNames(); nameIt.hasNext(); ){
-      //replace the messageURI of the specified message with that of this builder, just in case
-      //there are triples in the model that about the message
       String modelUri = nameIt.next();
       Model model = messageContent.getNamedModel(modelUri);
+      String otherMessageUri = wonMessage.getMessageURI().toString();
       if (replaceMessageUri) {
-        model = RdfUtils.replaceResource(model.getResource(wonMessage.getMessageURI().toString()),
+        //replace the messageURI of the specified message with that of this builder, just in case
+        //there are triples in the model referring to it
+        model = RdfUtils.replaceResource(model.getResource(otherMessageUri),
           model.getResource(this.messageURI.toString()));
       }
-      addContent(URI.create(modelUri), model,null);
+      //change the model name: replace the message uri of the specified message with our uri
+      //we have to do that in any case as the content graph's URI must be one within the
+      //'URI space' of the message
+      String newModelUri = this.messageURI.toString()+"/copied";
+
+      addContent(URI.create(newModelUri), model,null);
     }
     return this;
   }
@@ -633,7 +648,7 @@ public class WonMessageBuilder
       .setReceiverURI(localConnectionUri)
       .setTimestamp(new Date().getTime())
       .addRefersToURI(inboundWonMessage.getMessageURI())
-      .build(inboundWonMessage.getMessageContent());
+      .build();
   }
 
   public static WonMessage wrapOutboundWonMessageForLocalStorage(final URI localConnectionUri, final WonMessage

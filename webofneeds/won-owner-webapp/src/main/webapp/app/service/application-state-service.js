@@ -130,6 +130,10 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
                 break;
             case won.EVENT.NEED_CREATED: unreadEventType = won.UNREAD.TYPE.CREATED;
                 break;
+            case won.EVENT.CONNECTION_MESSAGE_RECEIVED: unreadEventType = won.UNREAD.TYPE.MESSAGE;
+                break;
+            case won.EVENT.CONNECTION_MESSAGE_SENT: unreadEventType = won.UNREAD.TYPE.MESSAGE;
+                break;
             // case won.Event.HINT_RECEIVED: privateData.unreadEventsByNeedByType[needURI].hint.push(eventData);
         }
         return unreadEventType;
@@ -280,6 +284,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.addDraft = function(draft){
         var draftLd = JSON.parse(draft.draft);
         var draftBuilderObject = new window.won.DraftBuilder(draftLd).setContext();
+        var menuposition = draftBuilderObject.getCurrentMenuposition();
         var currentStep = draftBuilderObject.getCurrentStep();
         var draftObj = draftBuilderObject.getDraftObject();
         var draftObjWithMetaInfo = {"draftURI":draft.draftURI,"currentStep":currentStep,"draft":draftObj};

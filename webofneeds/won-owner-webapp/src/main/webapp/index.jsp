@@ -32,7 +32,9 @@
 	<link rel="stylesheet" href="style/lightbox.css"/>
 	<link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
     <link rel="stylesheet" href="style/star-rating.css"/>
+        <link rel="stylesheet" href="scripts/angular-scrollable-table/scrollable-table.css"/>
 
+        <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.min.css"/>
 		<script src="scripts/jquery.10.2.js"></script>
 	<script src="scripts/jquery.fs.scroller.min.js"></script>
 		<script src="bower_components/angular/angular.js"></script>
@@ -44,7 +46,7 @@
 		<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
 		<script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
-
+        <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>
 		<script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
 		<script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
@@ -57,6 +59,7 @@
         <script type="text/javascript" src="scripts/bootstrap-tagsinput.min.js"></script>
         <script type="text/javascript" src="scripts/jsonld.js"></script>
         <script type="text/javascript" src="scripts/rdfstore-js/rdf_store.js"></script>
+        <script type="text/javascript" src="scripts/angular-scrollable-table/angular-scrollable-table.js"></script>
 
         <script type="text/javascript" src="scripts/star-rating.min.js"></script>
 
@@ -85,6 +88,8 @@
         <script type="text/javascript" src="<c:url value="/app/main/main.js"/>"></script>
 
         <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/conversation/conversation.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/draft/draft.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
 		<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
 
@@ -117,29 +122,28 @@
 						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
 					</a>
 					<ul class="dropdown-menu">
-						<li><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img
                                 src="/owner/images/type_posts/want.png"/>&nbsp;I want
 							to <strong>have</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img
                                 src="/owner/images/type_posts/offer.png"/>&nbsp;I
 							<strong>offer</strong> something</a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img
                                 src="/owner/images/type_posts/todo.png"/>&nbsp;I
 							want to do something <strong>together</strong></a></li>
 						<li class="divider"></li>
-						<li><a href="#/create-need/1/3/title"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/3/title"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
                                 src="/owner/images/type_posts/change.png"/>&nbsp;I
 							want to <strong>change</strong> something</a></li>
 						<li class="divider" ng-show="!showPublic()"></li>
-						<li class="dropdown-submenu" ng-show="!showPublic()">
+						<li class="dropdown-submenu top-layer"ng-show="!showPublic()">
 							<a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
-							<ul class="dropdown-menu" ng-controller="PostBoxCtrl">
+							<ul class="dropdown-menu" ng-controller="DraftCtrl"  >
 								<li ng-repeat="draft in allDrafts | orderBy: '-datetime' | limitTo: recordsToDisplay">
-                                    <a href="" ng-click="clickOnDraft(draft)"><i
-                                            class="fa fa-file-o fa-lg">
-									&nbsp;{{draft.draft.title}}</i></a></li>
+                                    <a href ng-click="clickOnDraft(draft)">
+                                        <i class="fa fa-file-o fa-lg" ng-bind="draft.draft.title"> &nbsp;</i></a></li>
 								<li class="divider"></li>
 								<li><a href="#/postbox"><i class="fa fa-list fa-lg"></i>&nbsp;II Others (go to full list)</a></li>
 							</ul>
@@ -170,7 +174,7 @@
                                 ng-repeat="entry in unreadEventsByNeedByType"
                                 ng-show="entry.message.count > 0"><a
                                 ng-click="openNeedDetailView(entry.need.uri)"><img
-                                src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
+                                ng-src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
                                 class="badge pull-right">{{entry.message.count}}</span></a>
                         </li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
@@ -190,7 +194,7 @@
                                 ng-repeat="entry in unreadEventsByNeedByType"
                                 ng-show="entry.connect.count > 0"><a
                                 ng-click="openNeedDetailView(entry.need.uri)"><img
-                                src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
+                                ng-src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
                                 class="badge pull-right">{{entry.connect.count}}</span></a>
                         </li>
 						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>

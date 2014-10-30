@@ -34,10 +34,16 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
     }
 });
 
-angular.module('won.owner').directive('wonPostDetail', function factory(userService) {
+angular.module('won.owner').directive('wonPostDetail', function factory() {
     return {
+        scope:{
+            need: '=need'
+        },
         restrict:'AE',
-        templateUrl:"app/post-detail/post-detail.html"//,
+        templateUrl:"app/post-detail/post-detail.html",
+        link: function(scope, element, attrs){
+            console.log("wonPostDetail");
+        }//,
         //scope:{},
     }
 });

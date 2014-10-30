@@ -7,14 +7,11 @@
  */
 angular.module('won.owner')
     .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, applicationStateService, linkedDataService, wonService) {
-
-
         $scope.$on('$routeChangeSuccess', function(event, current) {
             // page 33 v44 states that they should be set to null as soon as private link page is loaded:
             // Only when the users view the Postbox page afterwards the status of the notifications will be set to unread.
             applicationStateService.setEventsAsReadForNeed(applicationStateService.getCurrentNeedURI(), $scope.lastEventOfEachConnectionOfCurrentNeed);
         });
-
         $scope.$on('$locationChangeStart', function (event, next, current) {
             // page 33 v44 states that they should be set to null as soon as private link page is loaded:
             // Only when the users view the Postbox page afterwards the status of the notifications will be set to unread.
@@ -24,12 +21,21 @@ angular.module('won.owner')
     // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
 
-
     $scope.$watch('lastEventOfEachConnectionOfCurrentNeed', function(newValue, oldValue){
         var newCnt = newValue != null ? newValue.length : "null";
         var oldCnt = oldValue != null ? oldValue.length : "null";
         console.log("events changed! now have " + newCnt + " events!" + " had: " + oldCnt +"...");
+        //if chosen message not null then use connection uri to find and update
+        updateChosenMessageIfAny();
     });
+
+    var updateChosenMessageIfAny = function(){
+        if ($scope.chosenMessage != null) {
+            $scope.chosenMessage = getEventByConnectionUri($scope.chosenMessage.connection.uri);
+            $scope.addConnectionLastTextMessages($scope.chosenMessage);
+            $scope.prevMessageId = $scope.chosenMessage.event.uri;
+        }
+    }
 
     $scope.sortedField = 'event.hasTimestamp';
     $scope.reversedSort = true;
@@ -42,12 +48,6 @@ angular.module('won.owner')
             $scope.sortedField = fieldName;
         }
     }
-
-
-    $scope.$watch($scope.lastEventOfEachConnectionOfCurrentNeed, function(newValue, oldValue){
-        $scope.displayedMessages = [].concat($scope.lastEventOfEachConnectionOfCurrentNeed);
-    })
-
 
     $scope.currentEventType = [
      won.WONMSG.connectionMessage,
@@ -164,14 +164,6 @@ angular.module('won.owner')
         else $scope.messageTypeColapsed = -1;
     };
 
-    /*$scope.getFilter = function() {
-        alert($scope.messageTypeColapsed ) ;
-        if($scope.messageTypeColapsed == -1) return "";
-        else if($scope.messageTypeColapsed == 0) return "| filter: {type: message}";
-        else if($scope.messageTypeColapsed == 1) return "| filter: {type: request}";
-        else return "| filter: {type: match}";
-    };   */
-
     $scope.getIconClass = function (typeText) {
         if (typeText=='Conversation') return 'fa fa-comment-o fa-lg';
         else if (typeText=='Incoming Request') return 'fa fa-reply fa-lg';
@@ -181,9 +173,6 @@ angular.module('won.owner')
         else return 'fa fa-puzzle-piece fa-lg';
     };
 
-    /*$scope.messageFilter = function(msg) {
-        return msgFilterCriteria.indexOf(msg.type) >= 0 ? true : false;
-    } */
     $scope.changeEventTypeButtonsDisplay = function(buttonId){
         var button = $('#' + buttonId);
         if (button.hasClass('btn-success')) {
@@ -243,12 +232,6 @@ angular.module('won.owner')
         $scope.mesagesCollapsed = !$scope.mesagesCollapsed;
     };
 
-    //send new message
-
-    $scope.sendMessage = function() {
-        //TODO logic
-        $scope.newMessage = '';
-    };
 
 
     // helper function to get message according to its id from messages
@@ -258,6 +241,16 @@ angular.module('won.owner')
         }
         return null; //should not get here
     }
+    // helper function to get message according to its connection id from messages
+    function getEventByConnectionUri(connUri) {
+        for(var i = 0; i < $scope.lastEventOfEachConnectionOfCurrentNeed.length; i++) {
+            if ($scope.lastEventOfEachConnectionOfCurrentNeed[i].connection.uri == connUri) {
+                return $scope.lastEventOfEachConnectionOfCurrentNeed[i];
+            }
+        }
+        return null; //should not get here
+    }
+
     $scope.initRater = function() {
         $("#rater").rating({
             starCaptions: function(val) {
@@ -284,7 +277,10 @@ angular.module('won.owner')
             $scope.prevMessageId = msgEvent.event.uri;
             // store the text of this message connection previous event, if any
             // (this is temp functionality here as it probably should be loaded elsewhere - when the event itself is loaded)
-            if ($scope.chosenMessage != null) {
+            if ($scope.chosenMessage != null &&
+                ($scope.chosenMessage.typeText == 'Conversation'
+                    || $scope.chosenMessage.typeText == "Incoming Closed"
+                    || $scope.chosenMessage.typeText == "Outgoing Closed")) {
                 $scope.addConnectionLastTextMessages($scope.chosenMessage);
             }
         }
@@ -293,6 +289,12 @@ angular.module('won.owner')
         $scope.chosenMessage = getEventById(msgId);
         $scope.prevMessageId = msgId;
     }*/
+   /* $scope.addConnectionLastTextMessages = function(currentMessage){
+        linkedDataService.getConnectionTextMessages(currentMessage.connection.uri, currentMessage.event.hasTimestamp, 1)
+            .then(function(messages){
+                currentMessage.lastMessages = messages;
+                return;
+            });          */
         $scope.addConnectionLastTextMessages = function(currentMessage){
             linkedDataService.getConnectionTextMessages(currentMessage.connection.uri)
                 .then(function(messages){
@@ -306,6 +308,8 @@ angular.module('won.owner')
             if($scope.chosenMessage.typeText == 'Conversation') return true;
         }else return false;
     }
+
+
 
     $scope.showIncomingRequests = function() {
         if($scope.chosenMessage != null){
@@ -328,7 +332,6 @@ angular.module('won.owner')
     // Incoming Requests
     $scope.clickOnDeclineForInRequest = function() {
         console.log('decline clicked');
-
         $scope.showConfirmationDialogForDeclineRequest = true;
     }
 
@@ -336,8 +339,10 @@ angular.module('won.owner')
         console.log('accept clicked');
         // TODO add parameter for displaying specific stuff on private-link page
         wonService.open($scope.chosenMessage, $scope.newMessage);
-        $scope.prevMessageId = null;
-        $scope.chosenMessage = null;
+        //$scope.prevMessageId = null;
+        //$scope.chosenMessage = null;
+        //clean textarea
+        $scope.newMessage = "";
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
@@ -351,9 +356,11 @@ angular.module('won.owner')
         console.log('yes');
         $scope.showConfirmationDialogForDeclineRequest = false;
         // TODO add parameter for displaying specific stuff on private-link page
-        wonService.closeConnection($scope.chosenMessage);
-        $scope.prevMessageId = null;
-        $scope.chosenMessage = null;
+        wonService.closeConnection($scope.chosenMessage, $scope.newMessage);
+        //$scope.prevMessageId = null;
+        //$scope.chosenMessage = null;
+        // clean textarea
+        $scope.newMessage = "";
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
@@ -373,6 +380,9 @@ angular.module('won.owner')
         console.log('yes');
         $scope.showConfirmationDialogForCancelRequest = false;
         // TODO add parameter for displaying specific stuff on private-link page
+        wonService.closeConnection($scope.chosenMessage);
+        $scope.prevMessageId = null;
+        $scope.chosenMessage = null;
         console.log('redirect: /private-link');
         $location.path('/private-link');
     }
@@ -439,10 +449,14 @@ angular.module('won.owner')
         //wonService.open($scope.chosenMessage.connection.uri);
         wonService.openSuggestedConnection($scope.chosenMessage.connection.uri, $scope.textboxInMatchModel);
         $scope.showMatchControl = false;
-
+        // clean textarea
+        $scope.textboxInMatchModel = "";
+        // reset rating
+        $('#rater').rating('reset');
+        //$scope.chosenMessage = null;
+        //$scope.prevMessageId = null;
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');
-        $scope.chosenMessage = null;
         $location.path('/private-link');
     }
 
@@ -454,9 +468,14 @@ angular.module('won.owner')
         return false;
     }
 
+    $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {
+            $scope.addConnectionLastTextMessages($scope.chosenMessage);
+    });
+    $scope.$on(won.EVENT.CONNECTION_MESSAGE_SENT, function(ngEvent, eventData) {
+            $scope.addConnectionLastTextMessages($scope.chosenMessage);
+    });
+
 })
-
-
 
 angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService, $rootScope) {
 

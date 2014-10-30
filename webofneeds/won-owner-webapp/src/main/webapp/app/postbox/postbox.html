@@ -64,7 +64,7 @@
                                 ng-repeat="post in allNeeds() | orderObjectBy:sortedField:reversedSort |filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{post.basicNeedType}}</span>
-                                <img src="{{getTypePicURI(post.basicNeedType)}}"
+                                <img ng-src="{{getTypePicURI(post.basicNeedType)}}"
                                      tooltip="{{post.basicNeedType}} (click to filter)"/>
                             </td>
                             <td><a style="font-weight:bold;" href ng-click="clickOnNeedPrivateLink(post)">{{post
@@ -80,7 +80,7 @@
                                     <i
                                             class="fa fa-male fa-lg"></i>&nbsp;{{unreadEventsByNeedByType[post.uri].connect.count}}
                                 </span>
-                                <span ng-controller="MatchCountCtrl">
+                                <span>
                                     <span style="display: none;">{{post.msg.matchText}}</span>
                                     <i
                                             class="fa fa-puzzle-piece fa-lg"></i>&nbsp;
@@ -105,7 +105,7 @@
             </div>
 
             <!-- Confirmation dialog for deleting a draft -->
-            <div ng-show="displayConfirmationDialog">
+            <div ng-controller = "DraftCtrl" ng-show="displayConfirmationDialog">
                 <form class="form-horizontal container">
                     <div class="col-md-5 col-md-offset-4">
                         <div class="well">
@@ -122,10 +122,11 @@
             </div>
 
             <!--Drafts-->
-            <div id="draftsCollapse" class="well div-table col-lg-12">
-                <div class="div-table-row">
-                    <div class="div-table-cell pull-left additional-info-title text-center">Drafts</div>
-                    <div class="div-table-cell pull-right">
+            <div id="drafts" ng-controller = "DraftCtrl" class="col-lg-12">
+                <div id="draftsCollapse" class="well div-table col-lg-12">
+                    <div class="div-table-row">
+                        <div class="div-table-cell pull-left additional-info-title text-center">Drafts</div>
+                        <div class="div-table-cell pull-right">
                         <span >
                             <a href="" ng-show="draftsCollapsed" class="glyphicon glyphicon-chevron-down"
                                ng-click="draftsCollapseClick()"></a>
@@ -134,12 +135,12 @@
                             <a href="" ng-show="!draftsCollapsed" class="glyphicon glyphicon-chevron-up"
                                ng-click="draftsCollapseClick()"></a>
                         </span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div id="draftsArea" ng-show="!draftsCollapsed" class="div-table col-lg-12">
-                <table id="draft-table" st-table="drafts" class="table table-hover table-striped" ng-init="resizableColumns('draft-table');">
-                    <thead>
+                <div id="draftsArea" ng-show="!draftsCollapsed" class="div-table col-lg-12">
+                    <table id="draft-table" st-table="drafts" class="table table-hover table-striped" ng-init="resizableColumns('draft-table');">
+                        <thead>
                         <tr>
                             <th st-sort="type">Type</th>
                             <th st-sort="title">Title</th>
@@ -148,12 +149,13 @@
                             </th>
                             <th></th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <tr ng-show="allDrafts.length>0" ng-repeat="draft in allDrafts | filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{draft.draft.basicNeedType}}</span>
-                                <img src="{{getTypePicURI(draft.draft.basicNeedType)}}" tooltip="{{draft.draft.basicNeedType}} (click to filter)"/>
+                                <img ng-src="{{getTypePicURI(draft.draft.basicNeedType)}}"
+                                     tooltip="{{draft.draft.basicNeedType}} (click to filter)"/>
                             </td>
                             <!-- TODO step in create need needs to be specified -->
                             <td><a href="#/create-need/1" style="font-weight:bold;">{{draft.draft.title}}</a></td>
@@ -168,9 +170,11 @@
                             </td>
                             <td></td>
                         </tr>
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
 
             <!--Closed-->
             <div id="closedCollapse" class="well div-table col-lg-12">
@@ -203,7 +207,8 @@
                         <tr ng-show="closedList.length>0" ng-repeat="closed in closedList | filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{closed.type}}</span>
-                                <img src="{{getTypePicURI(closed.type)}}" tooltip="{{closed.type}} (click to filter)"/>
+                                <img ng-src="{{getTypePicURI(closed.type)}}"
+                                     tooltip="{{closed.type}} (click to filter)"/>
                             </td>
                             <td>{{closed.title}}</a></td>
                             <td>{{closed.datetime | date}}</td>

@@ -78,6 +78,7 @@
         won.WON.HintCompacted = won.WON.prefix + ":Hint";
 
 
+
         won.WON.hasGraph = won.WON.baseUri + "hasGraph";
         won.WON.hasGraphCompacted = won.WON.prefix + ":hasGraph";
 
@@ -136,11 +137,11 @@
         won.WON.hasTextDescription = won.WON.baseUri + "hasTextDescription";
         won.WON.hasTextDescriptionCompacted = won.WON.prefix + ":hasTextDescription";
 
-        won.WON.hasMatchScore = won.WON.baseURI + "hasMatchScore";
+        won.WON.hasMatchScore = won.WON.baseUri + "hasMatchScore";
         won.WON.hasMatchScoreCompacted = won.WON.prefix + ":hasMatchScore";
-        won.WON.hasMatchCounterpart = won.WON.baseURI + "hasMatchCounterpart";
+        won.WON.hasMatchCounterpart = won.WON.baseUri + "hasMatchCounterpart";
         won.WON.hasMatchCounterpart = won.WON.prefix + ":hasMatchCounterpart";
-        won.WON.hasTextMessage= won.WON.baseURI + "hasTextMessage";
+        won.WON.hasTextMessage= won.WON.baseUri + "hasTextMessage";
         won.WON.hasTextMessageCompacted= won.WON.prefix + ":hasTextMessage";
 
 
@@ -189,6 +190,10 @@
         won.WONMSG.openMessageCompacted = won.WONMSG.prefix + ":OpenMessage";
         won.WONMSG.connectionMessage = won.WONMSG.baseUri + "ConnectionMessage";
         won.WONMSG.connectionMessageCompacted = won.WONMSG.prefix + ":ConnectionMessage";
+        won.WONMSG.connectionMessageSentMessage = won.WONMSG.baseUri + "ConnectionMessageSentMessage";
+        won.WONMSG.connectionMessageSentMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageSentMessage";
+        won.WONMSG.connectionMessageReceivedMessage = won.WONMSG.baseUri + "ConnectionMessageReceivedMessage";
+        won.WONMSG.connectionMessageReceivedMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageReceivedMessage";
 
         //response types
         won.WONMSG.hasResponseStateProperty = won.WONMSG.baseUri + "hasResponseStateProperty";
@@ -222,6 +227,7 @@
         won.EVENT.CLOSE_SENT = "CloseSentEvent";
         won.EVENT.CLOSE_RECEIVED = "CloseReceivedEvent";
         won.EVENT.CONNECTION_MESSAGE_RECEIVED = "ConnectionMessageReceivedEvent";
+        won.EVENT.CONNECTION_MESSAGE_SENT = "ConnectionMessageSentEvent";
         won.EVENT.NEED_STATE_MESSAGE_RECEIVED = "NeedStateMessageReceivedEvent";
         won.EVENT.NO_CONNECTION = "NoConnectionErrorEvent";
         won.EVENT.NOT_TRANSMITTED = "NotTransmittedErrorEvent";
@@ -831,6 +837,10 @@
             this.getMetaNode()["won:isInStep"]=currentStep;
             return this;
         }
+        won.DraftBuilder.prototype.setCurrentMenuposition = function(menuposition){
+            this.getMetaNode()["won:hasMenuposition"]=menuposition;
+            return this;
+        }
         won.DraftBuilder.prototype.setDraftObject = function(draft){
             this.getMetaNode()["won:hasDraftObject"]=draft;
             return this;
@@ -840,6 +850,9 @@
         }
         won.DraftBuilder.prototype.getCurrentStep = function(){
             return this.getMetaNode()["won:isInStep"];
+        }
+        won.DraftBuilder.prototype.getCurrentMenuposition = function(){
+            return this.getMetaNode()["won:hasMenuposition"];
         }
         /*
          * Creates a JSON-LD stucture containing a named graph with default 'unset' event URI
@@ -966,7 +979,12 @@
              * @returns {won.MessageBuilder}
              */
             hasTextMessage: function (text){
-                this.getContentGraphNode()[won.WON.hasTextMessageCompacted] = text;
+                if (text == null || text === ""){
+                    // text is either null, undefined, or empty
+                    // do nothing
+                } else {
+                    this.getContentGraphNode()[won.WON.hasTextMessageCompacted] = text;
+                }
                 return this;
             },
 
@@ -1016,6 +1034,12 @@
 
 
             
+
+
+
+
+
+
 
 
         return won;

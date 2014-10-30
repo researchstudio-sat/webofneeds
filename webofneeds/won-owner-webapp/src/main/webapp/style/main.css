@@ -14,6 +14,28 @@
  *    limitations under the License.
  */
 
+
+table.tableSection {
+    display: table;
+    width: 100%;
+}
+table.tableSection thead, table.tableSection tbody {
+    float: left;
+    width: 100%;
+}
+table.tableSection tbody {
+    overflow: auto;
+    height: 150px;
+}
+table.tableSection tr {
+    width: 100%;
+    display: table;
+    text-align: left;
+    border-bottom:1px solid black;
+}
+table.tableSection th, table.tableSection td {
+    width: 33%;
+}
 /** Common **/
 .navbar-bottom {
     z-index: -1;
@@ -51,6 +73,10 @@
 	margin-bottom: 20px;
 }
 
+.top-layer {
+    position:relative;
+    z-index:10001
+}
 .fill {
 	min-height: 100%;
 }
@@ -97,6 +123,11 @@
 .nav-progress-justified > .disabled > a:focus {
 	color: #cccccc;
 	background-color: transparent;
+}
+.messageTable {
+    display: block;
+    overflow: auto;
+    height: 400px;
 }
 
 @media (min-width: 768px) {
@@ -399,6 +430,10 @@ h1#main-heading {
 For submenu functionality
 http://stackoverflow.com/questions/18023493/bootstrap-3-dropdown-sub-menu-missing
 */
+.dropdown-submenu-z {
+    position:relative;
+    z-index:10001
+}
 .dropdown-submenu {
     position:relative;
 }

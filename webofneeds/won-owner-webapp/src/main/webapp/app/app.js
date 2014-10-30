@@ -21,6 +21,8 @@ app = angular.module('won.owner',
         , 'blueimp.fileupload'
         , 'ngMockE2E'
         , 'smart-table'
+        , 'ngScrollbar'
+        , 'scrollable-table'
         ]
     ).config(function ($routeProvider, $httpProvider, $provide) {//, $log) {
 	$routeProvider.
@@ -130,6 +132,8 @@ app.directive('header', function(){
     .filter('messageTypeFilter', function(){
         var getTypeText = function(lastConEvent) {
             switch (lastConEvent.event.hasMessageType) {
+                case won.WONMSG.connectionMessageSentMessage:
+                    return 'Conversation';
                 case won.WONMSG.connectionMessage:
                     return 'Conversation';
                 case won.WONMSG.openMessage:

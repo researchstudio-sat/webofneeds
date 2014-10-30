@@ -192,10 +192,7 @@ angular.module('won.owner').controller('HomeCtrl',
             }
         }
     }
-    $scope.clickOnDraft = function(draft){
 
-        $location.path("#/create-need/"+draft.currentStep);
-    }
     $scope.onClickOnNewPost = function() {
         //$location.path('/create-need/2');
         var validPanel = true;
