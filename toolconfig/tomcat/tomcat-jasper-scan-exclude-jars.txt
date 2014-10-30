@@ -37,7 +37,7 @@ spring-boot-loader-tools-1.0.2.RELEASE.jar, spring-context-4.0.4.RELEASE.jar, sp
 spring-core-4.0.4.RELEASE.jar, spring-data-commons-1.6.1.RELEASE.jar, spring-data-commons-core-1.4.0.RELEASE.jar, \
 spring-data-jpa-1.2.0.RELEASE.jar, spring-data-solr-1.0.0.RELEASE.jar, spring-expression-4.0.4.RELEASE.jar,\
 spring-jdbc-4.0.4.RELEASE.jar, spring-jms-4.0.4.RELEASE.jar, spring-messaging-4.0.4.RELEASE.jar, spring-orm-4.0.4.RELEASE.jar, spring-security-acl-3.1.3.RELEASE.jar,\ spring-security-config-3.1.3.RELEASE.jar, spring-security-core-3.1.3.RELEASE.jar, \
-spring-security-taglibs-3.1.3.RELEASE.jar, spring-security-web-3.1.3.RELEASE.jar, spring-test-4.0.4.RELEASE.jar, \
+spring-security-web-3.1.3.RELEASE.jar, spring-test-4.0.4.RELEASE.jar, \
 spring-tx-4.0.4.RELEASE.jar, spring-web-4.0.4.RELEASE.jar, spring-webmvc-4.0.4.RELEASE.jar, spring-websocket-4.0.4.RELEASE.jar, \
 stax2-api-3.1.1.jar, stax-ex-1.7.1.jar, streambuffer-1.5.jar, super-csv-2.1.0.jar, tagsoup-0.9.7.jar, validation-api-1.1.0.Final.jar, \
 woodstox-core-asl-4.1.2.jar, wstx-asl-3.2.7.jar, xalan-2.7.1.jar, xbean-spring-3.14.jar, xercesImpl-2.9.1.jar, \
