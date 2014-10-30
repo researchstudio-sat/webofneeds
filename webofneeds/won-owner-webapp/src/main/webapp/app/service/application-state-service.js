@@ -98,7 +98,29 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         }
     }
 
+    applicationStateService.setEventsAsReadForType=function(eventType){
+    /*    switch (eventType) {
+            case won.UNREAD.TYPE.HINT:
+                privateData.unreadEventsByTypeByNeed[won.UNREAD.TYPE.HINT].count = 0;
 
+                break;
+            case won.UNREAD.TYPE.CONNECT:
+                privateData.unreadEventsByTypeByNeed[won.UNREAD.TYPE.CONNECT].count = 0;
+                break;
+            case won.UNREAD.TYPE.MESSAGE:
+
+                break;
+        }    */
+        privateData.unreadEventsByTypeByNeed[eventType].count = 0;
+        privateData.unreadEventsByTypeByNeed[eventType].timestamp = new Date().getTime();
+        Object.keys(privateData.unreadEventsByNeedByType).forEach(function(element, index, array){
+            privateData.unreadEventsByNeedByType[element][eventType].count=0;
+            privateData.unreadEventsByNeedByType[element][eventType].events=[];
+            privateData.unreadEventsByNeedByType[element][eventType].timestamp = new Date().getTime();
+
+        })
+
+    }
     var createOrUpdateUnreadEntry = function(needURI, eventData, unreadEntry){
 
         if(unreadEntry == null || typeof unreadEntry === 'undefined'){

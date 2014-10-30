@@ -7,22 +7,30 @@
  */
 //TODO use MainCtrls scope instead of rootScope to prevent js library name-clashes
 app.directive(('notifDropdown'), function notifDropdownFct($rootScope) { //TODO $rootScope is very hacky for a directive (reduces reusability)
-    console.log("registering directive: notifDropdown");
-    console.log($rootScope.unreadEventsByNeedByType);
-    var dtv = {
-        /*scope: {
-         unreadEventsByTypeByNeed: '=',
-         unreadEventsByNeedByType: '@',
-         openNeedDetailView: '&',
-         getTypePicURI: '&',
-         },*/
-        templateUrl: "app/header/notification-dropdown.html",
-        link: function notifDropDownLink(scope) {
-            console.log("notif dropdown link ----------");
-            console.log(scope.unreadEventsByTypeByNeed);
+        console.log("registering directive: notifDropdown");
+        console.log($rootScope.unreadEventsByNeedByType);
+        var dtv = {
+            /*scope: {
+             unreadEventsByTypeByNeed: '=',
+             unreadEventsByNeedByType: '@',
+             openNeedDetailView: '&',
+             getTypePicURI: '&',
+             },*/
+            templateUrl: "app/header/notification-dropdown.html",
+            link: function notifDropDownLink(scope) {
+                console.log("notif dropdown link ----------");
+                console.log(scope.unreadEventsByTypeByNeed);
+            },
+            controller: function ($scope, applicationStateService) {
+                $scope.clickOnNotification = function (unreadEventType) {
+
+                    applicationStateService.setEventsAsReadForType(unreadEventType);
+
+                }
+            }
         }
+        return dtv;
     }
-    return dtv;
-});
+);
 
 

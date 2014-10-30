@@ -145,6 +145,8 @@
         won.WON.hasTextMessageCompacted= won.WON.prefix + ":hasTextMessage";
 
 
+
+
         won.WONMSG = {};
         won.WONMSG.baseUri = "http://purl.org/webofneeds/message#";
         won.WONMSG.prefix = "msg";
