@@ -22,6 +22,10 @@
  * - removeEvent(event) : removes the event
  * addEvent(event) must only be called once for each event.
  */
+ //TODO this object/service imho tries to do three separate things (which conflicts with the single responsibility principle):
+ // * managing events (as an event-queue)
+ // * managing information about the currently viewed need (that's what we've got a browser/routing for)
+ // * holding information about the loaded needs/drafts (we got a user object elsewhere for that)
 angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope, $q) {
 
     //the service
@@ -42,24 +46,34 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     privateData.filters[won.UNREAD.TYPE.CONNECT] = { 'eventType' : [won.EVENT.CONNECT_RECEIVED, won.EVENT.OPEN_RECEIVED , won.EVENT.CONNECT_SENT]};
     privateData.filters[won.UNREAD.TYPE.CLOSE] =   { 'eventType' : won.EVENT.CLOSE_RECEIVED };
 
-    //if we have a current need, that's its URI
-    privateData.currentNeedURI = null;
 
-    //all needs are stored in this array (in the form returned by linkedDataService.getNeed(uri)
-    privateData.allNeeds = {};
-    privateData.allDrafts = [];
+    /**
+    * Empties the current lists of needs, drafts and events (call e.g. when logging out so no data's left)
+    * (or creates those if they didn't exist before for some reason)
+    //TODO initialize these from the server here if the session's still "logged in"?
+     * Resets the services internal data-structure to actual values.
+     * @param needURIs any needs from previous sessions, fetched from the server
+     */
+    applicationStateService.reset = function() {
+        //if we have a current need, that's its URI
+        privateData.currentNeedURI = null;
 
-    privateData.unreadEventsByNeedByType = {};
+        //all needs are stored in this array (in the form returned by linkedDataService.getNeed(uri)
+        privateData.allNeeds = {};
+        privateData.allDrafts = [];
 
-    privateData.unreadEventsByTypeByNeed = {
-        'hint': {count:0, timestamp: new Date().getTime() },
-        'connect': {count:0, timestamp: new Date().getTime()},
-        'message': {count:0, timestamp: new Date().getTime()},
-        'close': {count:0, timestamp: new Date().getTime()},
-        'created': {count:0, timestamp: new Date().getTime()}
-    };
-    privateData.lastEventOfEachConnectionOfCurrentNeed = [];
+        privateData.unreadEventsByNeedByType = {};
 
+        privateData.unreadEventsByTypeByNeed = {
+            'hint': {count:0, timestamp: new Date().getTime() },
+            'connect': {count:0, timestamp: new Date().getTime()},
+            'message': {count:0, timestamp: new Date().getTime()},
+            'close': {count:0, timestamp: new Date().getTime()},
+            'created': {count:0, timestamp: new Date().getTime()}
+        };
+        privateData.lastEventOfEachConnectionOfCurrentNeed = [];
+    }
+    applicationStateService.reset();
 
     applicationStateService.processEventAndUpdateUnreadEventObjects = function(eventData){
         var eventType = eventData.eventType;
@@ -157,11 +171,14 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             }
             privateData.unreadEventsByNeedByType[needURI].need = need;
         }
-        var now = new Date().getTime();
-        createOrUpdateUnreadEntry(needURI, eventData, privateData.unreadEventsByNeedByType[needURI][getUnreadEventType(eventType)]);
-        privateData.unreadEventsByNeedByType[needURI][getUnreadEventType(eventType)].timestamp = now;
-        privateData.unreadEventsByNeedByType[needURI].timestamp = now;
-        privateData.unreadEventsByNeedByType[needURI].count++;
+
+        if(eventType != undefined && eventData != undefined ) {
+            var now = new Date().getTime();
+            createOrUpdateUnreadEntry(needURI, eventData, privateData.unreadEventsByNeedByType[needURI][getUnreadEventType(eventType)]);
+            privateData.unreadEventsByNeedByType[needURI][getUnreadEventType(eventType)].timestamp = now;
+            privateData.unreadEventsByNeedByType[needURI].timestamp = now;
+            privateData.unreadEventsByNeedByType[needURI].count++;
+        }
 
     };
 
@@ -205,7 +222,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * Sets the current need URI.
      * @param needURI
      */
-    applicationStateService.setCurrentNeedURI = function(needURI){
+    applicationStateService.setCurrentNeedURI = function(needURI){ //TODO this should be done via routing
         if (needURI != null && needURI != '' && needURI != privateData.currentNeedURI) {
             privateData.currentNeedURI = needURI;
             $rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
@@ -261,6 +278,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * @param need
      */
     applicationStateService.addNeed = function(need){
+        updateUnreadEventsByNeedByType(need.uri);
         privateData.allNeeds[need.uri] = need;
     }
     applicationStateService.addDraft = function(draft){

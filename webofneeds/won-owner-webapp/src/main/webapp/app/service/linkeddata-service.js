@@ -23,13 +23,20 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     var privateData = {};
 
-    //create an rdfstore-js based store as a cache for rdf data.
-    privateData.store =  rdfstore.create();
-    privateData.store.setPrefix("msg","http://purl.org/webofneeds/message#");
-    privateData.store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-    privateData.store.setPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-    privateData.store.setPrefix("xsd","http://www.w3.org/2001/XMLSchema#");
-    privateData.store.setPrefix("won","http://purl.org/webofneeds/model#");
+    linkedDataService.reset = function() {
+        privateData = {};
+        //create an rdfstore-js based store as a cache for rdf data.
+        privateData.store =  rdfstore.create();
+        privateData.store.setPrefix("msg","http://purl.org/webofneeds/message#");
+        privateData.store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+        privateData.store.setPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+        privateData.store.setPrefix("xsd","http://www.w3.org/2001/XMLSchema#");
+        privateData.store.setPrefix("won","http://purl.org/webofneeds/model#");
+
+        privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
+        privateData.cacheStatus = {} //uri -> [last access timestamp, 0 if dirty]
+    }
+    linkedDataService.reset();
 
 
     var createNameNodeInStore = function(uri){
@@ -199,9 +206,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     };
 
-    privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
     var CACHE_DIRTY = -1;
-    privateData.cacheStatus = {} //uri -> [last access timestamp, 0 if dirty]
 
     linkedDataService.cacheItemInsertOrOverwrite = function(uri){
         console.log("add to cache:    " + uri);
