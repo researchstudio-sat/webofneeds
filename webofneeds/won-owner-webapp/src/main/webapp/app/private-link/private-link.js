@@ -33,7 +33,7 @@ angular.module('won.owner')
         if ($scope.chosenMessage != null) {
             $scope.chosenMessage = getEventByConnectionUri($scope.chosenMessage.connection.uri);
             $scope.addConnectionLastTextMessages($scope.chosenMessage);
-            $scope.prevMessageId = null;
+            $scope.prevMessageId = $scope.chosenMessage.event.uri;
         }
     }
 
@@ -277,7 +277,10 @@ angular.module('won.owner')
             $scope.prevMessageId = msgEvent.event.uri;
             // store the text of this message connection previous event, if any
             // (this is temp functionality here as it probably should be loaded elsewhere - when the event itself is loaded)
-            if ($scope.chosenMessage != null && $scope.chosenMessage.typeText == 'Conversation') {
+            if ($scope.chosenMessage != null &&
+                ($scope.chosenMessage.typeText == 'Conversation'
+                    || $scope.chosenMessage.typeText == "Incoming Closed"
+                    || $scope.chosenMessage.typeText == "Outgoing Closed")) {
                 $scope.addConnectionLastTextMessages($scope.chosenMessage);
             }
         }
@@ -336,8 +339,8 @@ angular.module('won.owner')
         console.log('accept clicked');
         // TODO add parameter for displaying specific stuff on private-link page
         wonService.open($scope.chosenMessage, $scope.newMessage);
-        $scope.prevMessageId = null;
-        $scope.chosenMessage = null;
+        //$scope.prevMessageId = null;
+        //$scope.chosenMessage = null;
         //clean textarea
         $scope.newMessage = "";
         console.log('redirect: /private-link');
@@ -354,8 +357,8 @@ angular.module('won.owner')
         $scope.showConfirmationDialogForDeclineRequest = false;
         // TODO add parameter for displaying specific stuff on private-link page
         wonService.closeConnection($scope.chosenMessage, $scope.newMessage);
-        $scope.prevMessageId = null;
-        $scope.chosenMessage = null;
+        //$scope.prevMessageId = null;
+        //$scope.chosenMessage = null;
         // clean textarea
         $scope.newMessage = "";
         console.log('redirect: /private-link');
@@ -448,12 +451,12 @@ angular.module('won.owner')
         $scope.showMatchControl = false;
         // clean textarea
         $scope.textboxInMatchModel = "";
-        // TODO clean rating
-        // $scope.rateValue = 0;
+        // reset rating
+        $('#rater').rating('reset');
+        //$scope.chosenMessage = null;
+        //$scope.prevMessageId = null;
         // TODO add parameter for displaying specific stuff on private-link page
         console.log('redirect: /private-link');
-        $scope.chosenMessage = null;
-        $scope.prevMessageId = null;
         $location.path('/private-link');
     }
 
