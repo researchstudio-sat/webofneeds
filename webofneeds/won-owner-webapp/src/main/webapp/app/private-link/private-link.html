@@ -67,8 +67,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr
-                                            ng-repeat="event in lastEventOfEachConnectionOfCurrentNeed | messageTypeFilter:currentEventType | orderBy:sortedField:reversedSort">
+                                    <tr ng-repeat="event in lastEventOfEachConnectionOfCurrentNeed | messageTypeFilter:currentEventType | orderBy:sortedField:reversedSort">
                                         <td>
                                             <span style="display: none;">{{event.typeText}}</span>
                                             <i ng-class="getIconClass(event.typeText)" tooltip="{{event.typeText}}"/>
