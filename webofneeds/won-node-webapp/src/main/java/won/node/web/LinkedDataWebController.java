@@ -264,8 +264,8 @@ public class
     @RequestMapping(
       value="${uri.path.resource}/**",
       method = RequestMethod.GET,
-      produces={"application/trig",
-                "application/ld+json",
+      produces={"application/ld+json",
+                "application/trig",
                 "application/n-quads"})
   public ResponseEntity<Dataset> redirectToData(
       HttpServletRequest request) {
@@ -282,11 +282,13 @@ public class
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = new HttpHeaders();
     headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
-    headers.add("Location",redirectToURI);
-    return new ResponseEntity<Dataset>(null, headers, HttpStatus.SEE_OTHER);
+    headers.setLocation(URI.create(redirectToURI));
+    addCORSHeader(headers);
+      return new ResponseEntity<Dataset>(null, headers, HttpStatus.SEE_OTHER);
   }
 
-    /**
+
+  /**
      * If the HTTP 'Accept' header is 'text/html'
      * (as listed in the 'produces' value of the RequestMapping annotation),
      * a redirect to a page uri is sent.
@@ -312,7 +314,7 @@ public class
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = new HttpHeaders();
     headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
-
+    addCORSHeader(headers);
     //add a location header
     headers.add("Location",redirectToURI);
     return new ResponseEntity<String>("", headers, HttpStatus.SEE_OTHER);
@@ -343,8 +345,8 @@ public class
   @RequestMapping(
       value="${uri.path.data.need}",
       method = RequestMethod.GET,
-      produces={"application/trig",
-              "application/ld+json",
+    produces={"application/ld+json",
+              "application/trig",
               "application/n-quads"})
   public ResponseEntity<Dataset> listNeedURIs(
       HttpServletRequest request,
@@ -352,14 +354,15 @@ public class
     logger.debug("listNeedURIs() called");
     Dataset model = linkedDataService.listNeedURIs(page);
     HttpHeaders headers = addAlreadyExpiredHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), URI.create(this.needResourceURIPrefix)));
+    addCORSHeader(headers);
     return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
   }
 
   @RequestMapping(
       value="${uri.path.data.connection}",
       method = RequestMethod.GET,
-      produces={"application/trig",
-              "application/ld+json",
+    produces={"application/ld+json",
+              "application/trig",
               "application/n-quads"})
   public ResponseEntity<Dataset> listConnectionURIs(
       HttpServletRequest request,
@@ -367,6 +370,7 @@ public class
     logger.debug("listNeedURIs() called");
     Dataset model = linkedDataService.listConnectionURIs(page);
     HttpHeaders headers = addAlreadyExpiredHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), URI.create(this.connectionResourceURIPrefix)));
+    addCORSHeader(headers);
     return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
   }
 
@@ -374,8 +378,8 @@ public class
   @RequestMapping(
       value="${uri.path.data.need}/{identifier}",
       method = RequestMethod.GET,
-      produces={"application/trig",
-              "application/ld+json",
+    produces={"application/ld+json",
+              "application/trig",
               "application/n-quads"})
   public ResponseEntity<Dataset> readNeed(
       HttpServletRequest request,
@@ -386,6 +390,7 @@ public class
       Dataset dataset = linkedDataService.getNeedDataset(needUri);
       //TODO: need information does change over time. The immutable need information should never expire, the mutable should
       HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), needUri));
+      addCORSHeader(headers);
       return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
     } catch (NoSuchNeedException e) {
 
@@ -397,8 +402,8 @@ public class
     @RequestMapping(
         value="${uri.path.data}",
         method = RequestMethod.GET,
-        produces={"application/trig",
-                "application/ld+json",
+      produces={"application/ld+json",
+                "application/trig",
                 "application/n-quads"})
     public ResponseEntity<Dataset> readNode(
             HttpServletRequest request) {
@@ -407,14 +412,15 @@ public class
         Dataset model = linkedDataService.getNodeDataset();
         //TODO: need information does change over time. The immutable need information should never expire, the mutable should
         HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), nodeUri));
-        return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
+      addCORSHeader(headers);
+      return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
     }
 
   @RequestMapping(
       value="${uri.path.data.connection}/{identifier}",
       method = RequestMethod.GET,
-      produces={"application/trig",
-              "application/ld+json",
+    produces={"application/ld+json",
+              "application/trig",
               "application/n-quads"})
   public ResponseEntity<Dataset> readConnection(
       HttpServletRequest request,
@@ -425,6 +431,7 @@ public class
       Dataset model = linkedDataService.getConnectionDataset(connectionUri, true);
       //TODO: connection information does change over time. The immutable connection information should never expire, the mutable should
       HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), connectionUri));
+      addCORSHeader(headers);
       return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
 
     } catch (NoSuchConnectionException e) {
@@ -435,8 +442,8 @@ public class
   @RequestMapping(
     value="${uri.path.data.event}/{identifier}",
     method = RequestMethod.GET,
-    produces={"application/trig",
-              "application/ld+json",
+    produces={"application/ld+json",
+              "application/trig",
               "application/n-quads"})
   public ResponseEntity<Dataset> readEvent(
     HttpServletRequest request,
@@ -449,6 +456,7 @@ public class
       HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(),
                                                                                 URI.create(request.getRequestURI()),
                                                                                 eventURI));
+      addCORSHeader(headers);
       return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
     } else {
       return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
@@ -466,8 +474,8 @@ public class
   @RequestMapping(
       value="${uri.path.data.need}/{identifier}/connections",
       method = RequestMethod.GET,
-      produces={"application/trig",
-              "application/ld+json",
+    produces={"application/ld+json",
+              "application/trig",
               "application/n-quads"})
   public ResponseEntity<Dataset> readConnectionsOfNeed(
       HttpServletRequest request,
@@ -488,7 +496,7 @@ public class
         //append the required headers
         headers = addAlreadyExpiredHeaders(addLocationHeaderIfNecessary(
                 new HttpHeaders(), URI.create(request.getRequestURI()), needUri));
-
+      addCORSHeader(headers);
       return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
     } catch (NoSuchNeedException e) {
       return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
@@ -555,6 +563,16 @@ public class
     cal.set(Calendar.YEAR,cal.get(Calendar.YEAR)+1);
     return cal.getTime();
   }
+
+  /**
+   * Adds the CORS headers required for client side cross-site requests.
+   * See http://www.w3.org/TR/cors/
+   * @param headers
+   */
+  private void addCORSHeader(final HttpHeaders headers) {
+    headers.add("Access-Control-Allow-Origin", "*");
+  }
+
 
 
 

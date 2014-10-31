@@ -53,7 +53,7 @@ public class NeedCreatorBot extends EventBot
     final Counter needCreationFailedCounter = new CounterImpl("needCreationFailed");
     final Counter needCreationStartedCounter = new CounterImpl("creationStarted");
 
-    //create a targeted counter that will publish an event when the taget is reached
+    //create a targeted counter that will publish an event when the target is reached
     //in this case, 0 unfinished need creations means that all needs were created
     final Counter creationUnfinishedCounter = new TargetCounterDecorator(ctx, new CounterImpl("creationUnfinished"), 0);
 

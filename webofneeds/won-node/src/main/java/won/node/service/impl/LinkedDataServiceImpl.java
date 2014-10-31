@@ -58,6 +58,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String needResourceURIPrefix;
   //prefix of a connection resource
   private String connectionResourceURIPrefix;
+  //prefix of a event resource
+  private String eventResourceURIPrefix;
   //prefix for URISs of RDF data
   private String dataURIPrefix;
   //prefix for URIs referring to real-world things
@@ -140,52 +142,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return DatasetFactory.create(model);
   }
 
-  public Model getNeedModel(final URI needUri) throws NoSuchNeedException
-  {
-    Need need = needInformationService.readNeed(needUri);
-
-    // load the dataset from storage
-    Dataset dataset = rdfStorage.loadDataset(need.getNeedURI());
-
-    // with the old messaging system the model is stored as default model in the dataset
-    // with the new messaging system the triples are stored as named graphs
-    // therefore we merge all together to one model
-    Model model = dataset.getDefaultModel();
-    Iterator<String> i = dataset.listNames();
-    while (i.hasNext()) {
-      model.add(dataset.getNamedModel(i.next()));
-    }
-    setNsPrefixes(model);
-
-    Model needModel = needModelMapper.toModel(need);
-    //merge needModel and model
-    model.add(needModel.listStatements());
-    //model.setNsPrefix("",need.getNeedURI().toString());
-
-    Resource needResource = model.getResource(needUri.toString());
-
-    // add connections
-    Resource connectionsContainer = model.createResource(need.getNeedURI().toString() + "/connections/");
-    model.add(model.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
-
-    // add need event container
-    Resource needEventContainer = model.createResource(WON.EVENT_CONTAINER);
-    model.add(model.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
-
-    // add need event URIs
-    List<MessageEventPlaceholder> messageEvents = messageEventRepository.findByParentURI(needUri);
-    for (MessageEventPlaceholder messageEvent : messageEvents) {
-      model.add(model.createStatement(needEventContainer,
-                                      RDFS.member,
-                                      model.getResource(messageEvent.getMessageURI().toString())));
-    }
-
-    // add WON node link
-    needResource.addProperty(WON.HAS_WON_NODE, model.createResource(this.resourceURIPrefix));
-
-    return model;
-  }
-
   public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException {
     Need need = needInformationService.readNeed(needUri);
 
@@ -201,7 +157,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
 
     // add need event container
-    Resource needEventContainer = metaModel.createResource(WON.EVENT_CONTAINER);
+    Resource needEventContainer = metaModel.createResource(need.getNeedURI().toString()+"/events", WON.EVENT_CONTAINER);
     metaModel.add(metaModel.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
 
     // add need event URIs
@@ -265,7 +221,13 @@ public class LinkedDataServiceImpl implements LinkedDataService
               .addProperty(WON.HAS_MATCHER_PROTOCOL_ENDPOINT,model.createResource(this.matcherProtocolEndpoint))
               .addProperty(WON.HAS_NEED_PROTOCOL_ENDPOINT,model.createResource(this.needProtocolEndpoint))
               .addProperty(WON.HAS_OWNER_PROTOCOL_ENDPOINT,model.createResource(this.ownerProtocolEndpoint));
-
+      Resource blankNodeUriSpec = model.createResource();
+      res.addProperty(WON.HAS_URI_PATTERN_SPECIFICATION, blankNodeUriSpec);
+      blankNodeUriSpec.addProperty(WON.HAS_NEED_URI_PREFIX,
+        model.createLiteral(this.needResourceURIPrefix));
+      blankNodeUriSpec.addProperty(WON.HAS_CONNECTION_URI_PREFIX,
+        model.createLiteral(this.connectionResourceURIPrefix));
+      blankNodeUriSpec.addProperty(WON.HAS_EVENT_URI_PREFIX, model.createLiteral(this.eventResourceURIPrefix));
   }
 
   public Dataset getConnectionDataset(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException
@@ -290,7 +252,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     if (includeEventData) {
       //create event container and attach it to the member
       List<ConnectionEvent> events = needInformationService.readEvents(connectionUri);
-      Resource eventContainer = model.createResource(WON.EVENT_CONTAINER);
+      Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events", WON.EVENT_CONTAINER);
       connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
       connectionResource.addProperty(WON.HAS_REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
       addAdditionalData(model, connection.getConnectionURI(), connectionResource);
@@ -426,6 +388,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public void setConnectionResourceURIPrefix(final String connectionResourceURIPrefix)
   {
     this.connectionResourceURIPrefix = connectionResourceURIPrefix;
+  }
+
+  public void setEventResourceURIPrefix(final String eventResourceURIPrefix) {
+    this.eventResourceURIPrefix = eventResourceURIPrefix;
   }
 
   public void setDataURIPrefix(final String dataURIPrefix)

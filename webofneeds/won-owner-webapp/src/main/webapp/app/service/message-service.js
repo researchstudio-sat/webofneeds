@@ -185,7 +185,8 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
     }
     var createSocket = function() {
         var options = {debug: true};
-        var url = 'http://localhost:8080/owner/msg'; //TODO: get socket URI from server
+        //TODO: this depends on the owner application being deployed under the context root '/owner/'! Change!
+        var url = '/owner/msg';
         privateData.socket = new SockJS(url, null, options);
         attachListenersToSocket(privateData.socket);
     }

@@ -68,13 +68,12 @@ public class HintSender implements MatchProcessor
   private WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
     throws WonMessageBuilderException {
 
-    URI wonNode = wonNodeInformationService.getDefaultWonNode();
-
+    URI wonNode = wonNodeInformationService.getWonNodeUri(needURI);
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
       .setMessagePropertiesForHint(
-        wonNodeInformationService.generateMessageEventURI(
-          needURI, wonNode),
+        wonNodeInformationService.generateEventURI(
+          wonNode),
         needURI,
         FacetType.OwnerFacet.getURI(),
         wonNode,

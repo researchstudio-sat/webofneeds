@@ -77,7 +77,6 @@
         <script type="text/javascript" src="<c:url value="/app/service/won-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/linkeddata-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-factory-service.js"/>"></script>
-		<script type="text/javascript" src="<c:url value="/app/service/connection-service.js"/>"></script>
 
 
 		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>

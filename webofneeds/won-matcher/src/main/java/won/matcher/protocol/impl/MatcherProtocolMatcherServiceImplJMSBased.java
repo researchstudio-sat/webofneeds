@@ -52,7 +52,6 @@ public class MatcherProtocolMatcherServiceImplJMSBased
 
   private MatcherProtocolCommunicationService matcherProtocolCommunicationService;
 
-  private URI defaultNodeURI;
 
 
     public void needCreated(@Header("wonNodeURI") final String wonNodeURI,
@@ -91,12 +90,12 @@ public class MatcherProtocolMatcherServiceImplJMSBased
             try {
                 configureMatcherProtocolOutTopics(wonNodeURI);
             } catch (Exception e) {
-              logger.warn("Could not get topic lists from default node {}", defaultNodeURI,e);
+              logger.warn("Could not get topic lists from won node {}", wonNodeURI,e);
             }
           }
         }.start();
       } catch (Exception e) {
-        logger.warn("getting topic lists from the node {} failed",defaultNodeURI);
+        logger.warn("getting topic lists from the node {} failed",wonNodeURI);
       }
 
   }
@@ -106,19 +105,19 @@ public class MatcherProtocolMatcherServiceImplJMSBased
         new Thread(){
           @Override
           public void run() {
-            try {
               Iterator iter = matcherNodeURISource.getNodeURIIterator();
               while (iter.hasNext()){
-                configureMatcherProtocolOutTopics((URI)iter.next());
+                URI wonNodeUri = (URI)iter.next();
+                try {
+                  configureMatcherProtocolOutTopics(wonNodeUri);
+                } catch (Exception e) {
+                  logger.warn("Could not get topic lists from default node {}", wonNodeUri,e);
+                }
               }
-
-            } catch (Exception e) {
-              logger.warn("Could not get topic lists from default node {}", defaultNodeURI,e);
-            }
           }
         }.start();
       } catch (Exception e) {
-        logger.warn("getting topic lists from the node {} failed",defaultNodeURI);
+        logger.warn("could not register",e );
       }
   }
 
@@ -128,10 +127,6 @@ public class MatcherProtocolMatcherServiceImplJMSBased
 
   public void setMatcherProtocolCommunicationService(final MatcherProtocolCommunicationService matcherProtocolCommunicationService) {
     this.matcherProtocolCommunicationService = matcherProtocolCommunicationService;
-  }
-
-  public void setDefaultNodeURI(final URI defaultNodeURI) {
-    this.defaultNodeURI = defaultNodeURI;
   }
 
   public void setMatcherNodeURISource(final MatcherNodeURISource matcherNodeURISource) {

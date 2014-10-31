@@ -149,7 +149,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
         Dataset needDataset = linkedDataService.getNeedDataset(need.getNeedURI());
         WonMessage newNeedNotificationMessage =
           new WonMessageBuilder()
-            .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateMessageEventURI(),
+            .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(),
               need.getNeedURI(), need.getWonNodeURI())
             .build(needDataset);
         matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(), newNeedNotificationMessage);
@@ -316,7 +316,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder.setMessagePropertiesForClose(
-      wonNodeInformationService.generateMessageEventURI(),
+      wonNodeInformationService.generateEventURI(),
       connection.getConnectionURI(),
       connection.getNeedURI(),
       need.getWonNodeURI(),

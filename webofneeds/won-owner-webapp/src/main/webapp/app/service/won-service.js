@@ -20,12 +20,32 @@
 angular.module('won.owner').factory('wonService', function (
     messageService,
     $q,
+    $http,
+    $location,
     linkedDataService,
     $rootScope,
     applicationStateService,
     utilService) {
 
     var wonService = {};
+    var privateData = {}
+    //set a default WoN node uri, but immediately replace by the one obtained from the server
+    privateData.defaultWonNodeUri = $location.protocol()+"://"+$location.host()+"/won/resource";
+    $http.get("appConfig/getDefaultWonNodeUri")
+        .success(
+        function onGetDefaultWonNodeUri(data, status, headers, config) {
+            if (status == 200){
+                console.log("setting default won node uri to value obtained from server: " + JSON.stringify(data));
+                privateData.defaultWonNodeUri = JSON.parse(data);
+            } else {
+                console.log("warn: error obtaining default won node uri, http status=" + status);
+            }
+        })
+        .error(
+        function onGetDefaultWonNodeUriError(data, status, headers, config) {
+            console.log("warn: error obtaining default won node uri, http status=" + status);
+        }
+        );
 
 
 
@@ -177,6 +197,10 @@ angular.module('won.owner').factory('wonService', function (
     //add callback to messageService
     messageService.addMessageCallback(createIncomingMessageCallback());
 
+    wonService.getDefaultWonNodeUri = function(){
+        return privateData.defaultWonNodeUri;
+    }
+
     /**
      * Creates a need and returns a Promise to the URI of the newly created need (which may differ from the one
      * specified in the need object here.
@@ -187,9 +211,9 @@ angular.module('won.owner').factory('wonService', function (
         var deferred = $q.defer();
         var needData = won.clone(needAsJsonLd);
         //TODO: Fix hard-coded URIs here!
-        var eventUri = "http://localhost:8080/won/resource/event/" + utilService.getRandomInt(1,9223372036854775807);
-        var needUri = "http://localhost:8080/won/resource/need/" + utilService.getRandomInt(1,9223372036854775807);
-        var wonNode = "http://localhost:8080/won";
+        var eventUri = privateData.defaultWonNodeUri + "/event/" + utilService.getRandomInt(1,9223372036854775807);
+        var needUri =  privateData.defaultWonNodeUri + "/need/" + utilService.getRandomInt(1,9223372036854775807);
+        var wonNode = privateData.defaultWonNodeUri;
         needData['@graph'][0]['@id'] = needUri + "/core/#data";
         needData['@graph'][0]['@graph'][0]['@id'] = needUri;
         var message = new won.MessageBuilder(won.WONMSG.createMessage, needData)

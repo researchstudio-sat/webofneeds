@@ -77,7 +77,7 @@ CategorizedNeeds = function() {
 	}
 }
 
-angular.module('won.owner').factory('needService', function ($http, $q, connectionService, applicationStateService) {
+angular.module('won.owner').factory('needService', function ($http, $q, applicationStateService) {
 
 	var needService = {};
 

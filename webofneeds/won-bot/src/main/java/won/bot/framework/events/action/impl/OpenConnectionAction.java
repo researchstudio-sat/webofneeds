@@ -93,8 +93,8 @@ public class OpenConnectionAction extends BaseEventBotAction
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
       .setMessagePropertiesForOpen(
-        wonNodeInformationService.generateMessageEventURI(
-          localNeed, wonNode),
+        wonNodeInformationService.generateEventURI(
+          wonNode),
         connectionURI,
         localNeed,
         wonNode,
@@ -122,8 +122,8 @@ public class OpenConnectionAction extends BaseEventBotAction
     WonMessageBuilder builder = new WonMessageBuilder();
     return  builder
       .setMessagePropertiesForConnect(
-        wonNodeInformationService.generateMessageEventURI(
-          fromUri, localWonNode),
+        wonNodeInformationService.generateEventURI(
+          localWonNode),
         localFacet,
         fromUri,
         localWonNode,

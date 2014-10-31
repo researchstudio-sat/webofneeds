@@ -45,16 +45,6 @@ public interface LinkedDataService
    */
   public Dataset listConnectionURIs(final int page);
 
-
-  /**
-   * Returns a model describing the need with the specified URI.
-   * @param needUri
-   * @return
-   * @throws NoSuchNeedException
-   */
-  @Deprecated
-  public Model getNeedModel(final URI needUri) throws NoSuchNeedException;
-
   /**
    * Returns a dataset describing the need with the specified URI.
    * @param needUri

@@ -289,6 +289,8 @@ public class RestNeedController {
 
   }
 
+
+
   /**
    *
    * @param needId id of the need for which information shall be retrieved
@@ -300,6 +302,7 @@ public class RestNeedController {
 			produces = MediaType.APPLICATION_JSON,
 			method = RequestMethod.GET
 	)
+  @Deprecated
 	public NeedPojo getNeed(@PathVariable("needId") long needId) {
 		logger.info("Getting need: " + needId);
 
@@ -321,6 +324,7 @@ public class RestNeedController {
     produces = MediaType.APPLICATION_JSON,
     method = RequestMethod.PUT
   )
+  @Deprecated
   public NeedPojo updateNeed(@PathVariable("needId") long needId, @RequestBody NeedPojo needPojo) {
     //TODO: won node currently doesn't support updates.
 
@@ -339,6 +343,7 @@ public class RestNeedController {
 			method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON
 	)
+  @Deprecated
 	public List<Connection> listConnections(@PathVariable String needId) {
 
 		List<Need> needs = needRepository.findById(Long.valueOf(needId));
@@ -365,6 +370,7 @@ public class RestNeedController {
     consumes = MediaType.APPLICATION_JSON,
     produces = MediaType.APPLICATION_JSON
   )
+  @Deprecated
   public ConnectionPojo connect(@PathVariable String needId, @RequestBody ConnectionPojo connectionPojo) {
 
     ConnectionPojo fullConnection = null;
@@ -396,7 +402,7 @@ public class RestNeedController {
   }
 
 
-
+  @Deprecated
   private NeedPojo resolve(NeedPojo needPojo) {
     if (needPojo.getNeedId() >= 0) {
       List<Need> needs = needRepository.findById(needPojo.getNeedId());

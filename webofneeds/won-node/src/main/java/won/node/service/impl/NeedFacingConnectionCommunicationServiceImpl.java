@@ -76,7 +76,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   @Override
   public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-      URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
+      URI newMessageURI = this.wonNodeInformationService.generateEventURI();
       WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
         newMessageURI, connectionURI, wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
@@ -98,7 +98,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   public void close(final URI connectionURI, final Model content, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
-      URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
+      URI newMessageURI = this.wonNodeInformationService.generateEventURI();
       WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
         newMessageURI, connectionURI, wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
@@ -119,7 +119,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     @Override
     public void sendMessage(final URI connectionURI, final Model message, WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        URI newMessageURI = this.wonNodeInformationService.generateMessageEventURI();
+        URI newMessageURI = this.wonNodeInformationService.generateEventURI();
         WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
           newMessageURI, connectionURI, wonMessage);
         logger.debug("STORING message with id {}", newWonMessage.getMessageURI());

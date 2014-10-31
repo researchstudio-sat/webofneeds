@@ -1,8 +1,14 @@
 package won.protocol.service.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import won.cryptography.service.RandomNumberService;
+import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import java.net.URI;
 
@@ -13,76 +19,78 @@ import java.net.URI;
 public class WonNodeInformationServiceImpl implements WonNodeInformationService
 {
 
+  private static final int RANDOM_ID_STRING_LENGTH = 20;
   @Autowired
   private RandomNumberService randomNumberService;
 
+  @Autowired
+  private LinkedDataSource linkedDataSource;
+
+  @Value(value = "${uri.node.default}")
+  private URI defaultWonNodeUri;
+
   @Override
-  public WonNodeInformation getWonNodeInformation(URI wonNodeURI) {
-    return getDefaultWonNodeInformation();
+  public WonNodeInfo getWonNodeInformation(URI wonNodeURI) {
+    Dataset nodeDataset = linkedDataSource.getDataForResource(wonNodeURI);
+    return WonRdfUtils.WonNodeUtils.getWonNodeInfo(wonNodeURI, nodeDataset);
   }
 
   @Override
-  public URI generateMessageEventURI(URI needURI, URI wonNodeURI) {
-    WonNodeInformation wonNodeInformation = getWonNodeInformation(wonNodeURI);
-    return URI.create(wonNodeInformation.getNeedMessageEventURIPattern()
-                                        .replace(wonNodeInformation.getIdPlaceholder(),
-                                                 generateRandomMessageEventID()));
+  public URI generateNeedURI() {
+    return generateNeedURI(getDefaultWonNodeURI());
   }
 
   @Override
-  public URI generateMessageEventURI(URI wonNodeURI) {
-    return generateMessageEventURI(null, wonNodeURI);
+  public URI generateEventURI(URI wonNodeURI) {
+    WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
+    return URI.create(wonNodeInformation.getEventURIPrefix() + "/"+
+                                          generateRandomID());
   }
 
   @Override
-  public URI generateMessageEventURI() {
-    return generateMessageEventURI(null, getDefaultWonNode());
+  public URI generateConnectionURI() {
+    return generateConnectionURI(getDefaultWonNodeURI());
   }
 
   @Override
-  public URI generateConnectionURI(URI needURI, URI wonNodeURI) {
-    WonNodeInformation wonNodeInformation = getWonNodeInformation(wonNodeURI);
-    return URI.create(wonNodeInformation.getConnectionURIPattern()
-                                        .replace(wonNodeInformation.getIdPlaceholder(),
-                                                 generateRandomConnectionID()));
+  public URI generateConnectionURI(URI wonNodeURI) {
+    WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
+    return URI.create(wonNodeInformation.getConnectionURIPrefix() +"/"+ generateRandomID());
+  }
+
+  @Override
+  public URI generateEventURI() {
+    return generateEventURI(getDefaultWonNodeURI());
   }
 
   @Override
   public URI generateNeedURI(URI wonNodeURI) {
-    WonNodeInformation wonNodeInformation = getWonNodeInformation(wonNodeURI);
-    return URI.create(wonNodeInformation.getNeedURIPattern()
-                                        .replace(wonNodeInformation.getIdPlaceholder(),
-                                                 generateRandomNeedID()));
+    WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
+    return URI.create(wonNodeInformation.getNeedURIPrefix() + "/"+
+                                          generateRandomID());
   }
 
   @Override
-  //TODO: replace hardcoded localhost URI with the one specified in the config file!
-  public URI getDefaultWonNode() {
-    return URI.create("http://localhost:8080/won/");
+  public URI getWonNodeUri(final URI resourceURI) {
+    return WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(resourceURI, linkedDataSource);
   }
 
-  private String generateRandomMessageEventID() {
-    // ToDo (FS): take length from configuration and choose good length value (maybe change value to bytes)
-    return randomNumberService.generateRandomString(9);
+  @Override
+  public URI getDefaultWonNodeURI() {
+    return defaultWonNodeUri;
   }
 
-  private String generateRandomConnectionID() {
-    // ToDo (FS): take length from configuration and choose good length value (maybe change value to bytes)
-    return randomNumberService.generateRandomString(9);
+  public void setDefaultWonNodeUri(final URI defaultWonNodeUri) {
+    this.defaultWonNodeUri = defaultWonNodeUri;
   }
 
-  private String generateRandomNeedID() {
-    // ToDo (FS): take length from configuration and choose good length value (maybe change value to bytes)
-    return randomNumberService.generateRandomString(9);
+  public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
+    this.linkedDataSource = linkedDataSource;
   }
 
-  //TODO: replace hardcoded localhost URI with the one specified in the config file!
-  private WonNodeInformation getDefaultWonNodeInformation() {
-    return new WonNodeInformation(
-      "http://localhost:8080/won/resource/event/<ID>",
-      "http://localhost:8080/won/resource/connection/<ID>",
-      "http://localhost:8080/won/resource/need/<ID>",
-      "<ID>");
+  private String generateRandomID() {
+    return randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
   }
+
 
 }
