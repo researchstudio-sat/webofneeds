@@ -35,17 +35,31 @@ import java.net.MalformedURLException;
 //import org.apache.solr.common.SolrInputDocument;
 
 /**
-* User: fkleedorfer
-* Date: 28.03.14
-*/
+ * Action that sends the need data from a NeedSpecificEvent to solr based matcher.
+ * By default, will not to commit if subsequent calls are made within a certain minimal time
+ * span (1s), this is intended for bulk operations. In that case, the server is expected to
+ * perform a commit from time to time.
+ *
+ */
 public class IndexNeedAction extends BaseEventBotAction
 {
   private String uriListName;
   private SolrServer server;
+  private transient long lastInvocation = 0;
+  private boolean suppressCommitsInBulkOperation = true;
 
-  public IndexNeedAction(final EventListenerContext eventListenerContext)
+  //if the last run was less than this value ago (in millis), don't commit.
+  //thus, we can avoid committing all the time during bulk creation.
+  private long SUPPRESS_COMMIT_TIMESPAN=1000;
+
+  public IndexNeedAction(final EventListenerContext eventListenerContext){
+    this(eventListenerContext, false);
+  }
+
+    public IndexNeedAction(final EventListenerContext eventListenerContext, boolean suppressCommitsInBulkOperation)
   {
     this(eventListenerContext, null);
+    this.suppressCommitsInBulkOperation = suppressCommitsInBulkOperation;
     init();
   }
 
@@ -84,7 +98,13 @@ public class IndexNeedAction extends BaseEventBotAction
     SolrInputDocument doc = builder.build();
 
     server.add(doc);
-    server.commit();
+    long now = System.currentTimeMillis();
+
+    if (!suppressCommitsInBulkOperation || Math.abs(now - lastInvocation) > SUPPRESS_COMMIT_TIMESPAN){
+      server.commit();
+    }
+    this.lastInvocation = now;
+
     getEventListenerContext().getEventBus().publish(new NeedAddedToSolrEvent(((NeedCreatedEventForMatcher) event)
       .getNeedURI()));
     logger.debug("need {} added to solr", ((NeedCreatedEventForMatcher) event).getNeedURI());
