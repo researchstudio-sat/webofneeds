@@ -200,8 +200,13 @@
 						</li>
 					</ul>
 				</li>
+                <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                    unread-events-by-type-by-need="unreadEventsByTypeByNeed"
+                    unread-events-by-need-by-type="unreadEventsByNeedByType"
+                    open-need-detail-view="openNeedDetailView(entry.need.uri)"
+                    get-type-pic-uri = "getTypePicURI(entry.need.basicNeedType)">
+                </li>
 
-                <li ng-show="!showPublic()" ng-cloak notif-dropdown></li>
 			</ul>
 					<ul class="nav navbar-nav navbar-right" ng-cloak>
                         <li><span ng-show="checkRegistered()"></span></li>
