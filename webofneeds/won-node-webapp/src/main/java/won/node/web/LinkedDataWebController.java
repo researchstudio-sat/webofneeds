@@ -335,6 +335,7 @@ public class
     String requestPath = requestUriAsURI.getPath();
     if (! (requestPath.replaceAll("/$","").endsWith(this.connectionResourceURIPath.replaceAll("/$", "")) ||
            requestPath.replaceAll("/$","").endsWith(this.needResourceURIPath.replaceAll("/$", "")))) {
+
     } else {
       headers = addAlreadyExpiredHeaders(headers);
     }
@@ -429,7 +430,8 @@ public class
     try {
       Dataset model = linkedDataService.getConnectionDataset(connectionUri, true);
       //TODO: connection information does change over time. The immutable connection information should never expire, the mutable should
-      HttpHeaders headers = new HttpHeaders();
+      HttpHeaders headers =new HttpHeaders();
+      addCORSHeader(headers);
       return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
 
     } catch (NoSuchConnectionException e) {
@@ -520,6 +522,19 @@ public class
       //the canonical URI in the lcoation header here
       headers.add(HTTP.HEADER_LOCATION, canonicalURI.toString());
     }
+    return headers;
+  }
+
+  /**
+   * Sets the Date and Expires header fields such that the response will be treated as 'never expires'
+   * (and will therefore be cached forever)
+   * @param headers
+   * @return the headers map with added header values
+   */
+  private HttpHeaders addNeverExpiresHeaders(HttpHeaders headers){
+    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC_1123);
+    headers.add(HTTP.HEADER_EXPIRES, dateFormat.format(getNeverExpiresDate()));
+    headers.add(HTTP.HEADER_DATE, dateFormat.format(new Date()));
     return headers;
   }
 
