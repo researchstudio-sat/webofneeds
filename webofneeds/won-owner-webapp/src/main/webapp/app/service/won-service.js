@@ -512,6 +512,16 @@ angular.module('won.owner').factory('wonService', function (
 
                 setTimeout(
                     function(){
+                        var messageTemp = new won.MessageBuilder(won.WONMSG.openSentMessage)
+                            .eventURI(eventUri)
+                            .forEnvelopeData(envelopeData)
+                            .hasFacet(won.WON.OwnerFacet)
+                            .hasRemoteFacet(won.WON.OwnerFacet)
+                            .build();
+                        var eventData = getEventData(messageTemp);
+                        //  eventData.eventType = messageTypeToEventType[eventData.hasMessageType];
+                        eventData.eventType = won.EVENT.OPEN_SENT;
+                        eventData.commState = won.COMMUNUCATION_STATE.PENDING;
 
                         linkedDataService.fetch(msgToOpenFor.connection.uri)
                             .then(
@@ -520,9 +530,9 @@ angular.module('won.owner').factory('wonService', function (
                                     .then(
                                     function(value2) {
                                         console.log("publishing angular event");
-
+                                        linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
                                         //eventData.eventType = won.EVENT.CLOSE_SENT;
-                                        $rootScope.$broadcast(won.EVENT.OPEN_SENT, eventToOpenFor);
+                                        $rootScope.$broadcast(won.EVENT.OPEN_SENT, eventData);
                                         //$rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
 
                                     }, won.reportError("cannot fetch closed event " + eventUri)
@@ -582,6 +592,7 @@ angular.module('won.owner').factory('wonService', function (
                     // it is 'close sent response success received' event...)
                     $q.all([uriOfUpdatedConnectionPromise, uriOfCloseEventPromise])
                         .then(function(result) {
+                            linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
                             $rootScope.$broadcast(won.EVENT.CLOSE_SENT, eventDataToClose);
                         },
                         function(errors) {
@@ -702,7 +713,7 @@ angular.module('won.owner').factory('wonService', function (
                                     .then(
                                     function(value2) {
                                         console.log("publishing angular event");
-
+                                        linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
                                         //eventData.eventType = won.EVENT.CLOSE_SENT;
                                         eventData.timestamp = new Date().getTime();
                                         $rootScope.$broadcast(won.EVENT.CONNECTION_MESSAGE_SENT,eventData);

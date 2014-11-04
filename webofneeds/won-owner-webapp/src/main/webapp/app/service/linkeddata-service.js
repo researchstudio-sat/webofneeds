@@ -18,7 +18,7 @@
  * Created by fkleedorfer on 05.09.2014.
  */
 
-angular.module('won.owner').factory('linkedDataService', function ($q, $rootScope) {
+angular.module('won.owner').factory('linkedDataService', function ($q, $rootScope, utilService) {
     linkedDataService = {};
 
     var privateData = {};
@@ -376,6 +376,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @return a promise to a boolean which indicates success
      */
     linkedDataService.fetch = function(uri) {
+        var tempUri = uri+'?prev='+new Date().getTime();
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "fetch: uri must not be null"};
         }
@@ -401,7 +402,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         }
                         //the execute call above is not asynchronous, so we can safely continue outside the callback.
                         console.log("fetching:        " + uri);
-                        privateData.store.load('remote', uri, function (success, results) {
+                        privateData.store.load('remote', tempUri, function (success, results) {
                             $rootScope.$apply(function () {
                                 if (success) {
                                     console.log("fetched:         " + uri)

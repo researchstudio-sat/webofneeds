@@ -190,6 +190,8 @@
         won.WONMSG.closeMessageCompacted = won.WONMSG.prefix + ":CloseMessage";
         won.WONMSG.openMessage = won.WONMSG.baseUri + "OpenMessage";
         won.WONMSG.openMessageCompacted = won.WONMSG.prefix + ":OpenMessage";
+        won.WONMSG.openSentMessage = won.WONMSG.baseUri + "OpenSentMessage";
+        won.WONMSG.openSentMessageCompacted = won.WONMSG.prefix + ":OpenSentMessage";
         won.WONMSG.connectionMessage = won.WONMSG.baseUri + "ConnectionMessage";
         won.WONMSG.connectionMessageCompacted = won.WONMSG.prefix + ":ConnectionMessage";
         won.WONMSG.connectionMessageSentMessage = won.WONMSG.baseUri + "ConnectionMessageSentMessage";
