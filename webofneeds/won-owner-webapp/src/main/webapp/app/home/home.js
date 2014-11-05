@@ -282,7 +282,7 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
 	onLoginResponse = function(response) {
 		if (response.status == "OK") {
 			userService.setAuth($scope.user.username);
-            if(applicationStateService.getAllNeedsCount()>=0){
+            //if(applicationStateService.getAllNeedsCount()>=0){
                 //TODO move all this stuff here to a different function/object and also call it after reloading
                 $http.get(
                     '/owner/rest/needs/',
@@ -307,33 +307,32 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
                         }
                     }
                 )
-            }
-            if(applicationStateService.getAllDraftsCount()>=0){
-                $http.get(
-                    '/owner/rest/needs/drafts/',
-                    user
-                ).then(
-                    function (drafts) {
-                        if(drafts.data.length>0){
-                            applicationStateService.addDrafts(drafts)
-                        }
-                        // success
-                        return {status:"OK"};
-                    },
-                    function (response) {
-                        switch(response.status) {
-                            case 403:
-                                // normal error
-                                return {status: "ERROR", message: "getting drafts of a user failed"};
-                            default:
-                                // system error
-                                return {status:"FATAL_ERROR", message: "getting drafts of a user failed"};
-                                break;
-                        }
+            //}
+            //if(applicationStateService.getAllDraftsCount()>=0){
+            $http.get(
+                '/owner/rest/needs/drafts/',
+                user
+            ).then(
+                function (drafts) {
+                    if(drafts.data.length>0){
+                        applicationStateService.addDrafts(drafts)
                     }
-                )
-            }
-
+                    // success
+                    return {status:"OK"};
+                },
+                function (response) {
+                    switch(response.status) {
+                        case 403:
+                            // normal error
+                            return {status: "ERROR", message: "getting drafts of a user failed"};
+                        default:
+                            // system error
+                            return {status:"FATAL_ERROR", message: "getting drafts of a user failed"};
+                            break;
+                    }
+                }
+            )
+            //}
 			$location.path('/postbox');
 		} else if (response.status == "ERROR") {
 			$scope.error = response.message;
