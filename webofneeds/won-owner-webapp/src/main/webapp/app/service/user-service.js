@@ -1,4 +1,4 @@
-angular.module('won.owner').factory('userService', function ($window, $http, $log, $rootScope) {
+angular.module('won.owner').factory('userService', function ($window, $http, $log, $rootScope, applicationStateService) {
 
 	var user = {};
     var registered = false;
@@ -6,6 +6,60 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
     var userService = {};
     var privateData = {}
     privateData.verifiedOnce = false; //gets reset on reload, will be set true after verifying the session cookie with the server
+
+    userService.fetchPostsAndDrafts = function() {
+        //if(applicationStateService.getAllNeedsCount()>=0){
+        //TODO move all this stuff here to a different function/object and also call it after reloading
+        $http.get(
+            '/owner/rest/needs/',
+            user
+        ).then(
+            function (needs) {
+                if(needs.data.length>0){
+                    applicationStateService.addNeeds(needs);
+                }
+                // success
+                return {status:"OK"};
+            },
+            function (response) {
+                switch(response.status) {
+                    case 403:
+                        // normal error
+                        return {status: "ERROR", message: "getting needs of a user failed"};
+                    default:
+                        // system error
+                        return {status:"FATAL_ERROR", message: "getting needs of a user failed"};
+                        break;
+                }
+            }
+        )
+        //}
+        //if(applicationStateService.getAllDraftsCount()>=0){
+        $http.get(
+            '/owner/rest/needs/drafts/',
+            user
+        ).then(
+            function (drafts) {
+                if(drafts.data.length>0){
+                    applicationStateService.addDrafts(drafts)
+                }
+                // success
+                return {status:"OK"};
+            },
+            function (response) {
+                switch(response.status) {
+                    case 403:
+                        // normal error
+                        return {status: "ERROR", message: "getting drafts of a user failed"};
+                    default:
+                        // system error
+                        return {status:"FATAL_ERROR", message: "getting drafts of a user failed"};
+                        break;
+                }
+            }
+        )
+        //}
+    }
 
     userService.verifyAuth = function() {
         return $http.get('rest/users/isSignedIn').then (
@@ -108,6 +162,14 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
             }
         );
 	};
+    //TODO implement fetching posts on page reload
+    /*init = function () {
+     if(userService.verifyAuth()) {
+     userService.fetchPostsAndDrafts()
+     $location.path('/postbox');
+     }
+     }
+     init()*/
     return userService;
 
 });
