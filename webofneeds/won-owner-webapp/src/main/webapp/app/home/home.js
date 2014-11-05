@@ -281,7 +281,7 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
 
 	onLoginResponse = function(response) {
 		if (response.status == "OK") {
-			userService.setAuth($scope.username);
+			userService.setAuth($scope.user.username);
             if(applicationStateService.getAllNeedsCount()>=0){
                 //TODO move all this stuff here to a different function/object and also call it after reloading
                 $http.get(
