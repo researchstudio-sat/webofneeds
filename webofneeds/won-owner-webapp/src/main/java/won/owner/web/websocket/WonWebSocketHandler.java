@@ -204,7 +204,8 @@ public class WonWebSocketHandler
     return userRepository.findByNeedUri(needUri);
   }
 
-  private void sendMessageForSession(final WonMessage wonMessage, final WebSocketMessage<String> webSocketMessage,
+  private synchronized void sendMessageForSession(final WonMessage wonMessage, final WebSocketMessage<String>
+    webSocketMessage,
     final WebSocketSession session, URI needUri, User user) {
     if (!session.isOpen()){
       logger.debug("session {} is closed, can't send message", session.getId());

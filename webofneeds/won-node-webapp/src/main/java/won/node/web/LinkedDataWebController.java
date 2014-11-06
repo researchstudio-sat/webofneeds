@@ -335,7 +335,7 @@ public class
     String requestPath = requestUriAsURI.getPath();
     if (! (requestPath.replaceAll("/$","").endsWith(this.connectionResourceURIPath.replaceAll("/$", "")) ||
            requestPath.replaceAll("/$","").endsWith(this.needResourceURIPath.replaceAll("/$", "")))) {
-      headers = addNeverExpiresHeaders(headers);
+
     } else {
       headers = addAlreadyExpiredHeaders(headers);
     }
@@ -389,7 +389,7 @@ public class
     try {
       Dataset dataset = linkedDataService.getNeedDataset(needUri);
       //TODO: need information does change over time. The immutable need information should never expire, the mutable should
-      HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), needUri));
+      HttpHeaders headers = new HttpHeaders();
       addCORSHeader(headers);
       return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
     } catch (NoSuchNeedException e) {
@@ -411,7 +411,7 @@ public class
         URI nodeUri = URI.create(this.nodeResourceURIPrefix);
         Dataset model = linkedDataService.getNodeDataset();
         //TODO: need information does change over time. The immutable need information should never expire, the mutable should
-        HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), nodeUri));
+        HttpHeaders headers = new HttpHeaders();
       addCORSHeader(headers);
       return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
     }
@@ -430,7 +430,7 @@ public class
     try {
       Dataset model = linkedDataService.getConnectionDataset(connectionUri, true);
       //TODO: connection information does change over time. The immutable connection information should never expire, the mutable should
-      HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), connectionUri));
+      HttpHeaders headers =new HttpHeaders();
       addCORSHeader(headers);
       return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
 
@@ -453,9 +453,7 @@ public class
     URI eventURI = uriService.createEventURIForId(identifier);
     Dataset rdfDataset = linkedDataService.getEventDataset(eventURI);
     if (rdfDataset != null) {
-      HttpHeaders headers = addNeverExpiresHeaders(addLocationHeaderIfNecessary(new HttpHeaders(),
-                                                                                URI.create(request.getRequestURI()),
-                                                                                eventURI));
+      HttpHeaders headers = new HttpHeaders();
       addCORSHeader(headers);
       return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
     } else {

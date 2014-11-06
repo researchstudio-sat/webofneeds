@@ -46,6 +46,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/rest")
+@Deprecated
 public class RestController
 {
 
