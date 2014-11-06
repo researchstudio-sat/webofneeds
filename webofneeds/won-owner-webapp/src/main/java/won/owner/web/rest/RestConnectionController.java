@@ -40,6 +40,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/rest/connections")
+@Deprecated
 public class RestConnectionController
 {
   @Autowired

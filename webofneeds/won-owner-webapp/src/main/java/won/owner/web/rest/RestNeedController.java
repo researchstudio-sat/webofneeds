@@ -59,6 +59,7 @@ import java.util.Set;
 
 @Controller
 @RequestMapping("/rest/needs")
+@Deprecated
 public class RestNeedController {
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
