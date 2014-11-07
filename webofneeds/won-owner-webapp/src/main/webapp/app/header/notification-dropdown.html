@@ -5,11 +5,9 @@
     <ul class="dropdown-menu" style="width: 280px;">
         <li class="text-center grey-item">{{unreadEventsByTypeByNeed.hint.count}}&nbsp;new
             matches</li>
-        <li
-                ng-repeat="entry in unreadEventsByNeedByType"
-                ng-show="entry.hint && entry.hint.count > 0">
-            <a ng-click="openNeedDetailView(entry.need.uri)"><img
-                    src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
+        <li ng-repeat="entry in unreadEventsByNeedByType" ng-show="entry.hint && entry.hint.count > 0">
+            <a ng-click="openNeedDetailView({needURI:entry.hint.need.uri})"><img
+                    ng-src="{{getTypePicURI(entry.hint.need.basicNeedType)}}"/>&nbsp;{{entry.hint.need.uri}}{{entry.hint.need.title}}&nbsp;<span
                     class="badge pull-right">{{entry.hint.count}}</span></a>
         </li>
         <li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>

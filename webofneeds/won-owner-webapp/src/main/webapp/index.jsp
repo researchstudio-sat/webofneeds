@@ -150,12 +150,7 @@
 					</ul>
 				</li>
 
-                    <!--
-                    unread-events-by-type-by-need="{{ unreadEventsByTypeByNeed }}"
-                    unread-events-by-need-by-type="{{ unreadEventsByNeedByType }}"
-                    open-need-detail-view="openNeedDetailView"
-                    getTypePicURI="getTypePicURI"
-                        ></li>-->
+
 
 				<li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
 					<i class="fa fa-clipboard fa-lg"></i>&nbsp;Post box</a>
@@ -203,8 +198,8 @@
                 <li ng-show="!showPublic()" ng-cloak notif-dropdown
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"
                     unread-events-by-need-by-type="unreadEventsByNeedByType"
-                    open-need-detail-view="openNeedDetailView(entry.need.uri)"
-                    get-type-pic-uri = "getTypePicURI(entry.need.basicNeedType)">
+                    open-need-detail-view="openNeedDetailView(needURI)"
+                    get-type-pic-uri = "getTypePicURI(type)">
                 </li>
 
 			</ul>

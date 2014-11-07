@@ -21,7 +21,7 @@
  * Time: 8:08 AM
  * To change this template use File | Settings | File Templates.
  */
-angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval, $location, userService, applicationStateService) {
+angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval, $location, userService, applicationStateService, applicationControlService) {
     $scope.countOfAllUnreadMatchEvents = 0;
     // TODO if we want to remember the last sortedField selected by the user,
     // we should store it in e.g. applicationStateService
@@ -76,12 +76,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
         });
     }
 
-    $scope.getTypePicURI = function (type) {
-        if(type==won.WON.BasicNeedTypeDemand) return "/owner/images/type_posts/want.png";
-        else if(type==won.WON.BasicNeedTypeCritique) return "/owner/images/type_posts/change.png";
-        else if(type==won.WON.BasicNeedTypeSupply) return "/owner/images/type_posts/offer.png";
-        else return "/owner/images/type_posts/todo.png";
-    };
+
 
     // TODO call backend method here
     //need to fetch: need type, need title, need close date

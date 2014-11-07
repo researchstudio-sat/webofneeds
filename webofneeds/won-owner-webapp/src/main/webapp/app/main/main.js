@@ -42,7 +42,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
 
     //allow acces to service methods from angular expressions:
     $scope.openNeedDetailView = applicationControlService.openNeedDetailView;
-
+    $scope.getTypePicURI = applicationControlService.getTypePicURI;
     $scope.currentNeed = {};
     $scope.lastEventOfEachConnectionOfCurrentNeed = [];
     $scope.eventCommState = {};

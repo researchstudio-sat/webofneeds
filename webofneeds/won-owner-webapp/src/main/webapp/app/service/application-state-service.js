@@ -97,27 +97,27 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             }
         }
     }
+    /**
+     *  reset count of a specific event type for a need
+     * @param needURI
+     * @param eventType
+     */
+    applicationStateService.resetUnreadEventsForByNeedByType = function (needURI, eventType){
+        privateData.unreadEventsByNeedByType[needURI][eventType].count=0;
+        privateData.unreadEventsByNeedByType[needURI][eventType].events=[];
+        privateData.unreadEventsByNeedByType[needURI][eventType].timestamp = new Date().getTime();
+    }
+    /**
+     * reset all counts of a specific event type for all needs
+     * @param eventType
+     */
     applicationStateService.setEventsAsReadForByNeedByType = function(eventType){
         Object.keys(privateData.unreadEventsByNeedByType).forEach(function(element, index, array){
-            privateData.unreadEventsByNeedByType[element][eventType].count=0;
-            privateData.unreadEventsByNeedByType[element][eventType].events=[];
-            privateData.unreadEventsByNeedByType[element][eventType].timestamp = new Date().getTime();
-
+            applicationStateService.resetUnreadEventsForByNeedByType(element, eventType);
         } )
     }
+
     applicationStateService.setEventsAsReadForType=function(eventType){
-    /*    switch (eventType) {
-            case won.UNREAD.TYPE.HINT:
-                privateData.unreadEventsByTypeByNeed[won.UNREAD.TYPE.HINT].count = 0;
-
-                break;
-            case won.UNREAD.TYPE.CONNECT:
-                privateData.unreadEventsByTypeByNeed[won.UNREAD.TYPE.CONNECT].count = 0;
-                break;
-            case won.UNREAD.TYPE.MESSAGE:
-
-                break;
-        }    */
         privateData.unreadEventsByTypeByNeed[eventType].count = 0;
         privateData.unreadEventsByTypeByNeed[eventType].timestamp = new Date().getTime();
 
@@ -131,7 +131,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         }
         unreadEntry.events.push(eventData);
         unreadEntry.timestamp=eventData.timestamp;
-        //unreadEntry.need = privateData.allNeeds[needURI];
+        unreadEntry.need = privateData.allNeeds[needURI];
         unreadEntry.count ++;
         return unreadEntry;
     };

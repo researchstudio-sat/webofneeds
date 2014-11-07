@@ -134,25 +134,7 @@ angular.module('won.owner')
                         $location.hash(old);
                     },200)
                 });
-              /*  var scrollToHash = function(hash){
 
-                    if(id && hash && id === hash){
-
-                        if(delay && firstTimeScrolling){
-                            $timeout(function(){
-                                $anchorScroll();
-                            }, delay);
-                        }else{
-                            $anchorScroll();
-                        }
-
-                        //only run the delay the first time this scrolling function executes
-                        //if the hash didn't match, then this function didn't execute!
-                        firstTimeScrolling = false;
-
-                    }
-
-                };  */
             },
             link: function(scope, element, attrs){
                 console.log('notify render finished directive') ;

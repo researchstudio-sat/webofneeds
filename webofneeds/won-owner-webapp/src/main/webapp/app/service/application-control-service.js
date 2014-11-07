@@ -30,7 +30,7 @@ angular.module('won.owner').factory('applicationControlService', function (appli
      * Sets the currentNeedURI in the applicationStateService and opens the private-link page.
      * @param needURI
      */
-    applicationControlService.openNeedDetailView = function(needURI){
+    applicationControlService.openNeedDetailView = function openNeedDetailView(needURI){
         if (typeof needURI === 'undefined') {
             console.log("needURI must be defined!");
             return;
@@ -38,6 +38,11 @@ angular.module('won.owner').factory('applicationControlService', function (appli
         applicationStateService.setCurrentNeedURI(needURI);
         $location.path("/private-link");
     }
-
+    applicationControlService.getTypePicURI = function (type) {
+        if(type==won.WON.BasicNeedTypeDemand) return "/owner/images/type_posts/want.png";
+        else if(type==won.WON.BasicNeedTypeCritique) return "/owner/images/type_posts/change.png";
+        else if(type==won.WON.BasicNeedTypeSupply) return "/owner/images/type_posts/offer.png";
+        else return "/owner/images/type_posts/todo.png";
+    };
     return applicationControlService;
 });

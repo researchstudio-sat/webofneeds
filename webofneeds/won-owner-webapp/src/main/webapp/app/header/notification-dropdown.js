@@ -5,6 +5,7 @@
  * even better: abstract to take list of (icon,text,nr,link)
  * Created by moru on 23/10/14.
  */
+app.directive
 //TODO use MainCtrls scope instead of rootScope to prevent js library name-clashes
 app.directive(('notifDropdown'), function notifDropdownFct() { //TODO $rootScope is very hacky for a directive (reduces reusability)
         console.log("registering directive: notifDropdown");
@@ -14,8 +15,8 @@ app.directive(('notifDropdown'), function notifDropdownFct() { //TODO $rootScope
             scope: {
                 unreadEventsByTypeByNeed: '=',
                 unreadEventsByNeedByType: '=',
-                openNeedDetailView: '&',
-                getTypePicURI: '&'
+                getTypePicURI: '&',
+                openNeedDetailView: '&'
              },
 
             templateUrl: "app/header/notification-dropdown.html",
@@ -23,15 +24,17 @@ app.directive(('notifDropdown'), function notifDropdownFct() { //TODO $rootScope
                 console.log("notif dropdown link ----------");
                 console.log(scope.unreadEventsByTypeByNeed);
             },
-            controller: function ($scope, applicationStateService) {
+            controller: function ($scope, applicationStateService, applicationControlService) {
+
                 $scope.clickOnNotification = function (unreadEventType) {
-
                     applicationStateService.setEventsAsReadForType(unreadEventType);
-
                 }
+
                 $scope.getHintCount = function(){
                     return $scope.unreadEventsByTypeByNeed.hint.count;
                 }
+                //$scope.getTypePicURI = applicationControlService.getTypePicURI;
+                //$scope.openNeedDetailView = applicationControlService.openNeedDetailView;
             }
         }
         return dtv;
