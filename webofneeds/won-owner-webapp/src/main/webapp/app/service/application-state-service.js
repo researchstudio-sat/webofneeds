@@ -238,7 +238,15 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * @param event
      */
     applicationStateService.removeEvent=function (event){
-        console.log("removeEvent not yet implemented!!!");
+        console.log("removing Event");
+        var allEventsOfTypeOfNeed=privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].events;
+        for(var i =0; i<allEventsOfTypeOfNeed.length;i++){
+            if(allEventsOfTypeOfNeed[i].uri == event.event.uri){
+                allEventsOfTypeOfNeed.splice(i,1);
+                privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.hasMessageType)].count--;
+            }
+        }
+        privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].timestamp = new Date().getTime();
     }
 
     /**

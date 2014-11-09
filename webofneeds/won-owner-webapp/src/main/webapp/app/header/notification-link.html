@@ -14,12 +14,14 @@
   ~    See the License for the specific language governing permissions and
   ~    limitations under the License.
   -->
+    <ng-transclude>
+        <div class="row col-lg-12">
+            <a ng-click="onClick({needURI:need.need.uri})">
+                <img ng-src="{{getTypePicURI({type:need.need.basicNeedType})}}"/>
+                &nbsp;{{need.need.title}}&nbsp;
+                <span class="badge pull-right">{{need.count}}</span>
+            </a>
+        </div>
+    </ng-transclude>
 
-    <div ng-transclude class="row col-lg-12">
-        <a ng-click="onClick({needURI:need.need.uri})">
-            <img ng-src="{{getTypePicURI({type:need.need.basicNeedType})}}"/>
-            &nbsp;{{need.need.title}}&nbsp;
-            <span class="badge pull-right">{{need.count}}</span>
-        </a>
-    </div>
 

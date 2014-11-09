@@ -7,16 +7,6 @@
  */
 angular.module('won.owner')
     .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, applicationStateService, linkedDataService, wonService) {
-       /* $scope.$on('$routeChangeSuccess', function(event, current) {
-            // page 33 v44 states that they should be set to null as soon as private link page is loaded:
-            // Only when the users view the Postbox page afterwards the status of the notifications will be set to unread.
-            applicationStateService.setEventsAsReadForNeed(applicationStateService.getCurrentNeedURI(), $scope.lastEventOfEachConnectionOfCurrentNeed);
-        });
-        $scope.$on('$locationChangeStart', function (event, next, current) {
-            // page 33 v44 states that they should be set to null as soon as private link page is loaded:
-            // Only when the users view the Postbox page afterwards the status of the notifications will be set to unread.
-            applicationStateService.setEventsAsReadForNeed(applicationStateService.getCurrentNeedURI(), $scope.lastEventOfEachConnectionOfCurrentNeed);
-        });      */
 
     // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
@@ -283,6 +273,7 @@ angular.module('won.owner')
                     || $scope.chosenMessage.typeText == "Outgoing Closed")) {
                 $scope.addConnectionLastTextMessages($scope.chosenMessage);
             }
+            applicationStateService.removeEvent(msgEvent)
         }
 /*    $scope.clickOnTitle = function(msgId) {
         // msgId can't be null here

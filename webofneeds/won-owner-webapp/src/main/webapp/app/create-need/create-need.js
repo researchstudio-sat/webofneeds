@@ -23,44 +23,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         applicationStateService.setCurrentNeedURI($scope.needURI);
         $location.path("/private-link");
     });
-    /*Text constants for new Need form*/
-    /*$rootScope.createNewPost = {
 
-        step1Texts :{
-            typeText : "Type *",
-            titleText : "Title *",
-            typeChangeText : "(change)",
-            titlePlaceholderText : "Roughly, what's it about?",
-            descriptionText : "Description *",
-            descriptionPlaceholderText : "And now with details! (By the way, there's specialised textboxes for things like pickup adress or time of availability",
-            tagsText : "Tags",
-            tagsPlaceholderText : "e.g. furniture, electronics, for children,...",
-            kindOfTypes : {
-                want : {title : "Want", comment : "I'm looking for..."},
-                offer : {title : "Offer", comment : "I'm offering..."},
-                activity : {title : "Activity", comment : "Looking for people to..."},
-                critique : {title : "Critique", comment : "Let's do something about..."}
-            }
-        },
-        step2Texts :{
-            comment1 : "Filling out the following categories makes it easier for people, who need what you have to offer, to find this post and start messaging with you.",
-            comment2 : "You can add ",
-            comment3 : "photos or sketches",
-            comment4 : " of the thing you're offering, or specify ",
-            comment5 : "where",
-            comment6 : "and ",
-            comment7 : "when",
-            comment8 : "it will be available.",
-            images : {
-                title : "Images",
-                commentWant : "Add photos of similar things or sketches to give people a better idea what you have in mind.",
-                commentOffer : "Add photos or sketches to give people a better idea what you're offering.",
-                commentActivity : "If you want you can add an image or photo here to illustrate the activity.",
-                commentCritique : "Add a photo, sketch (or screenshot) of the problem you want to point out."
-            }
-
-        }
-    }          */
     /*Block for working with checking another post type */
     $scope.getCurrentTypeOfOffer = function(){
         if($scope.menuposition == 0) return "Want - I'm looking for...";
