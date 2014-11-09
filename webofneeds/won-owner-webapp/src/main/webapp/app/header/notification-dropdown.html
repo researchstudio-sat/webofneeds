@@ -4,7 +4,7 @@
         </a>
         <ul class="dropdown-menu" style="width: 280px;">
             <li class="text-center grey-item">{{getCount()}}&nbsp;new
-                matches</li>
+                <ng-bind>{{getTypeText()}}</ng-bind></li>
             <li ng-repeat="entry in unreadEventsByNeedByType" ng-show="showPublic()">
                 <notif-link>
                 </notif-link>

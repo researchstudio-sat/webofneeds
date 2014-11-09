@@ -42,8 +42,8 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     privateData.filters = {};
     privateData.filters[won.UNREAD.TYPE.CREATED] =    { 'eventType' : won.EVENT.NEED_CREATED };
     privateData.filters[won.UNREAD.TYPE.HINT] =    { 'eventType' : won.EVENT.HINT_RECEIVED };
-    privateData.filters[won.UNREAD.TYPE.MESSAGE] = { 'eventType' : won.EVENT.CONNECTION_MESSAGE_RECEIVED };
-    privateData.filters[won.UNREAD.TYPE.CONNECT] = { 'eventType' : [won.EVENT.CONNECT_RECEIVED, won.EVENT.OPEN_RECEIVED , won.EVENT.CONNECT_SENT]};
+    privateData.filters[won.UNREAD.TYPE.MESSAGE] = { 'eventType' : [won.EVENT.CONNECTION_MESSAGE_RECEIVED,won.EVENT.OPEN_SENT,won.EVENT.OPEN_RECEIVED]};
+    privateData.filters[won.UNREAD.TYPE.CONNECT] = { 'eventType' : [won.EVENT.CONNECT_RECEIVED , won.EVENT.CONNECT_SENT]};
     privateData.filters[won.UNREAD.TYPE.CLOSE] =   { 'eventType' : won.EVENT.CLOSE_RECEIVED };
 
 

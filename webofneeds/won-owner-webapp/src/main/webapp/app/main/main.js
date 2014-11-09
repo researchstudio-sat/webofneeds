@@ -97,6 +97,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.$on(won.EVENT.CONNECT_SENT, function(ngEvent, eventData) {
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
+        addEventAsUnreadEvent(eventData);
         reloadCurrentNeedDataIfNecessary(eventData.hasSenderNeed);
         $scope.eventCommState[eventData.uri] = eventData.commState;
       // $scope.changeLastEventOfConnection(connectionURI, eventData);

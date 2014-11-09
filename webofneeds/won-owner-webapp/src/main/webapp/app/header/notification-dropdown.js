@@ -39,6 +39,13 @@ app.directive(('notifDropdown'), function notifDropdownFct() { //TODO $rootScope
                         case won.UNREAD.TYPE.CONNECT: return $scope.unreadEventsByTypeByNeed.connect.count;
                     }
                 }
+                $scope.getTypeText= function(){
+                    switch ($scope.eventType){
+                        case won.UNREAD.TYPE.HINT: return "matches";
+                        case won.UNREAD.TYPE.MESSAGE: return "messages";
+                        case won.UNREAD.TYPE.CONNECT: return "connects";
+                    }
+                }
 
 
             }
