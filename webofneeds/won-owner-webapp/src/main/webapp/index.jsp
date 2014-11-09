@@ -196,9 +196,10 @@
 					</ul>
 				</li>
                 <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                    event-type = "hint"
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"
                     unread-events-by-need-by-type="unreadEventsByNeedByType"
-                    open-need-detail-view="openNeedDetailView(needURI)"
+                    on-click="openNeedDetailView(needURI)"
                     get-type-pic-uri = "getTypePicURI(type)">
                 </li>
 

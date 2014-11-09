@@ -15,10 +15,11 @@
   ~    limitations under the License.
   -->
 
-<a ng-click="openNeedDetailView(entry.need.hint.uri)" >
-    <img ng-src="{{getTypePicURI(entry.need.hint.basicNeedType)}}"/>&nbsp;{{entry.hint.need.uri}}{{entry.hint.need.title}}&nbsp;
-    <span class="badge pull-right">
-        {{entry.hint.count}}
-    </span>
-</a>
+    <div ng-transclude class="row col-lg-12">
+        <a ng-click="onClick({needURI:need.need.uri})">
+            <img ng-src="{{getTypePicURI({type:need.need.basicNeedType})}}"/>
+            &nbsp;{{need.need.title}}&nbsp;
+            <span class="badge pull-right">{{need.count}}</span>
+        </a>
+    </div>
 

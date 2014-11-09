@@ -5,7 +5,7 @@
  * even better: abstract to take list of (icon,text,nr,link)
  * Created by moru on 23/10/14.
  */
-app.directive
+
 //TODO use MainCtrls scope instead of rootScope to prevent js library name-clashes
 app.directive(('notifDropdown'), function notifDropdownFct() { //TODO $rootScope is very hacky for a directive (reduces reusability)
         console.log("registering directive: notifDropdown");
@@ -16,29 +16,65 @@ app.directive(('notifDropdown'), function notifDropdownFct() { //TODO $rootScope
                 unreadEventsByTypeByNeed: '=',
                 unreadEventsByNeedByType: '=',
                 getTypePicURI: '&',
-                openNeedDetailView: '&'
+                onClick: '&'
              },
 
             templateUrl: "app/header/notification-dropdown.html",
-            link: function notifDropDownLink(scope) {
+            link: function notifDropDownLink(scope,elem, attr) {
+                scope.eventType = attr.eventType;
                 console.log("notif dropdown link ----------");
                 console.log(scope.unreadEventsByTypeByNeed);
             },
             controller: function ($scope, applicationStateService, applicationControlService) {
-
+                $scope.setEventType= function(type){
+                    $scope.eventType = type;
+                }
                 $scope.clickOnNotification = function (unreadEventType) {
                     applicationStateService.setEventsAsReadForType(unreadEventType);
                 }
-
-                $scope.getHintCount = function(){
-                    return $scope.unreadEventsByTypeByNeed.hint.count;
+                $scope.getCount = function(){
+                    switch ($scope.eventType){
+                        case won.UNREAD.TYPE.HINT: return $scope.unreadEventsByTypeByNeed.hint.count;
+                        case won.UNREAD.TYPE.MESSAGE: return $scope.unreadEventsByTypeByNeed.message.count;
+                        case won.UNREAD.TYPE.CONNECT: return $scope.unreadEventsByTypeByNeed.connect.count;
+                    }
                 }
-                //$scope.getTypePicURI = applicationControlService.getTypePicURI;
-                //$scope.openNeedDetailView = applicationControlService.openNeedDetailView;
+
+
             }
         }
         return dtv;
     }
 );
+app.directive(('notifLink'), function notifLinkFct(){
+    var dtv = {
+        restrict: 'E',
+        transclude: true,
+        templateUrl: "app/header/notification-link.html",
+        link: function(scope, elem, attr){
+          scope.need = scope.getUnreadEventsOfNeed();
+        },
+        controller: function($scope){
+            $scope.getUnreadEventsOfNeed = function(){
+                switch($scope.eventType){
+                    case won.UNREAD.TYPE.HINT: return $scope.entry.hint;
+                    case won.UNREAD.TYPE.CONNECT: return $scope.entry.connect;
+                    case won.UNREAD.TYPE.MESSAGE: return $scope.entry.message;
+                }
+            }
+            $scope.showPublic = function(){
+                if($scope.need!=undefined && $scope.need.count>0){
+                    return true
+                }else{
+                    return false;
+                }
+            }
+            $scope.$watch('need.count',function(newVal,oldVal){
+                $scope.need = $scope.getUnreadEventsOfNeed();
+            })
+        }
+    }
+    return dtv;
+})
 
 
