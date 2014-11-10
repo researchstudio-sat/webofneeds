@@ -74,6 +74,8 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
             }
         );
     };
+
+    // TODO fix bug: looks like a bug: returns before userService.verifyAuth() returns
     userService.isAuth = function () {
         if(user.isAuth == false && privateData.verifiedOnce == false) {
             userService.verifyAuth();
