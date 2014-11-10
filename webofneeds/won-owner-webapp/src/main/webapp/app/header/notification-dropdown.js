@@ -22,10 +22,29 @@ app.directive(('notifDropdown'), function notifDropdownFct() { //TODO $rootScope
             templateUrl: "app/header/notification-dropdown.html",
             link: function notifDropDownLink(scope,elem, attr) {
                 scope.eventType = attr.eventType;
+                scope.setData();
                 console.log("notif dropdown link ----------");
                 console.log(scope.unreadEventsByTypeByNeed);
             },
             controller: function ($scope, applicationStateService, applicationControlService) {
+                $scope.setData = function(){
+                    $scope.data = {};
+                    switch ($scope.eventType){
+                        case won.UNREAD.TYPE.HINT:
+                            $scope.data.buttonImageClass = "fa fa-puzzle-piece fa-lg";
+                            $scope.data.typeText =  "matches";
+                            break;
+                        case won.UNREAD.TYPE.MESSAGE:
+                            $scope.data.buttonImageClass = "fa fa-comment-o fa-lg";
+                            $scope.data.typeText =  "messages";
+                            break;
+                        case won.UNREAD.TYPE.CONNECT:
+                            $scope.data.buttonImageClass = "fa fa-male fa-lg";
+                            $scope.data.typeText =  "connects";
+                            break;
+                    }
+                }
+
                 $scope.setEventType= function(type){
                     $scope.eventType = type;
                 }
@@ -33,20 +52,21 @@ app.directive(('notifDropdown'), function notifDropdownFct() { //TODO $rootScope
                     applicationStateService.setEventsAsReadForType(unreadEventType);
                 }
                 $scope.getCount = function(){
-                    switch ($scope.eventType){
-                        case won.UNREAD.TYPE.HINT: return $scope.unreadEventsByTypeByNeed.hint.count;
-                        case won.UNREAD.TYPE.MESSAGE: return $scope.unreadEventsByTypeByNeed.message.count;
-                        case won.UNREAD.TYPE.CONNECT: return $scope.unreadEventsByTypeByNeed.connect.count;
+                    switch ($scope.eventType) {
+                        case won.UNREAD.TYPE.HINT:
+                            return $scope.unreadEventsByTypeByNeed.hint.count;
+                        case won.UNREAD.TYPE.MESSAGE:
+                            return $scope.unreadEventsByTypeByNeed.message.count;
+                        case won.UNREAD.TYPE.CONNECT:
+                            return $scope.unreadEventsByTypeByNeed.connect.count;
                     }
                 }
                 $scope.getTypeText= function(){
-                    switch ($scope.eventType){
-                        case won.UNREAD.TYPE.HINT: return "matches";
-                        case won.UNREAD.TYPE.MESSAGE: return "messages";
-                        case won.UNREAD.TYPE.CONNECT: return "connects";
-                    }
+                    return $scope.data.typeText;
                 }
-
+                $scope.getButtonImageClass = function(){
+                    return $scope.data.buttonImageClass;
+                }
 
             }
         }

@@ -155,46 +155,14 @@
 				<li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
 					<i class="fa fa-clipboard fa-lg"></i>&nbsp;Post box</a>
 				</li>
-				<li ng-show="!showPublic()" ng-cloak>
-					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
-						<!-- TODO provide here the total number of messages -->
-						<i class="fa fa-comment-o fa-lg"></i>&nbsp;{{unreadEventsByTypeByNeed.message.count}}
-					</a>
-					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
-						<li class="text-center grey-item">{{unreadEventsByTypeByNeed.message.count}}&nbsp;new
-                            messages</li>
-						<!-- TODO put real parameters into url -->
-                        <li
-                                ng-repeat="entry in unreadEventsByNeedByType"
-                                ng-show="entry.message.count > 0"><a
-                                ng-click="openNeedDetailView(entry.need.uri)"><img
-                                ng-src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
-                                class="badge pull-right">{{entry.message.count}}</span></a>
-                        </li>
-						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
-						</li>
-					</ul>
-				</li>
-				<li ng-show="!showPublic()" ng-cloak>
-					<a href="" class="dropdown-toggle" data-toggle="dropdown" ng-controller="PostBoxCtrl">
-						<!-- TODO provide here the total number of connects -->
-						<i class="fa fa-male fa-lg"></i>&nbsp;{{unreadEventsByTypeByNeed.connect.count}}
-					</a>
-					<ul class="dropdown-menu" ng-controller="PostBoxCtrl" style="width: 280px;">
-						<li class="text-center grey-item">{{unreadEventsByTypeByNeed.connect.count}}&nbsp;new
-                            connects</li>
-						<!-- TODO put real parameters into url -->
-                        <li
-                                ng-repeat="entry in unreadEventsByNeedByType"
-                                ng-show="entry.connect.count > 0"><a
-                                ng-click="openNeedDetailView(entry.need.uri)"><img
-                                ng-src="{{getTypePicURI(entry.need.basicNeedType)}}"/>&nbsp;{{entry.need.title}}&nbsp;<span
-                                class="badge pull-right">{{entry.connect.count}}</span></a>
-                        </li>
-						<li><a href="#/postbox" class="text-center grey-item">See all&nbsp;<span class="glyphicon glyphicon-new-window"></span></a>
-						</li>
-					</ul>
-				</li>
+
+                <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                    event-type = "message"
+                    unread-events-by-type-by-need="unreadEventsByTypeByNeed"
+                    unread-events-by-need-by-type="unreadEventsByNeedByType"
+                    on-click="openNeedDetailView(needURI)"
+                    get-type-pic-uri = "getTypePicURI(type)">
+                </li>
                 <li ng-show="!showPublic()" ng-cloak notif-dropdown
                     event-type = "connect"
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"

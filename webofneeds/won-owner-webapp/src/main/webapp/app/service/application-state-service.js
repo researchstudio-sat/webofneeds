@@ -146,7 +146,9 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
                 break;
             case won.EVENT.CONNECT_SENT: unreadEventType = won.UNREAD.TYPE.CONNECT;
                 break;
-            case won.EVENT.OPEN_RECEIVED:unreadEventType = won.UNREAD.TYPE.CONNECT;
+            case won.EVENT.OPEN_RECEIVED:unreadEventType = won.UNREAD.TYPE.MESSAGE;
+                break;
+            case won.EVENT.OPEN_SENT:unreadEventType = won.UNREAD.TYPE.MESSAGE;
                 break;
             //  case won.Event.Message_Rece_RECEIVED: privateData.unreadEventsByNeedByType[needURI].hint.push(eventData);
             case won.EVENT.CLOSE_RECEIVED: unreadEventType = won.UNREAD.TYPE.CLOSE;
