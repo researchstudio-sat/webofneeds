@@ -40,7 +40,6 @@ import won.owner.web.validator.UserRegisterValidator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
-import java.security.Principal;
 
 /**
  * User: t.kozel
@@ -224,7 +223,6 @@ public class RestUserController
     method = RequestMethod.GET
   )
   public String doPing() {
-
     if (SecurityContextHolder.getContext().getAuthentication() == null) {
       logger.info("ping from a user with auth null");
     } else {
