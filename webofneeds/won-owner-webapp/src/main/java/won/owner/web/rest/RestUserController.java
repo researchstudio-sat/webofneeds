@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
@@ -38,6 +39,8 @@ import won.owner.web.validator.UserRegisterValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+import java.security.Principal;
 
 /**
  * User: t.kozel
@@ -45,135 +48,138 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Controller
 @RequestMapping("/rest/users")
-public class RestUserController {
+public class RestUserController
+{
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	private WONUserDetailService wonUserDetailService;
+  private WONUserDetailService wonUserDetailService;
 
-	private AuthenticationManager authenticationManager;
+  private AuthenticationManager authenticationManager;
 
-	private SecurityContextRepository securityContextRepository;
+  private SecurityContextRepository securityContextRepository;
 
-	private UserRegisterValidator userRegisterValidator;
+  private UserRegisterValidator userRegisterValidator;
 
-	@Autowired
-	public RestUserController(final WONUserDetailService wonUserDetailService, final AuthenticationManager authenticationManager,
-	                          final SecurityContextRepository securityContextRepository, final UserRegisterValidator userRegisterValidator) {
-		this.wonUserDetailService = wonUserDetailService;
-		this.authenticationManager = authenticationManager;
-		this.securityContextRepository = securityContextRepository;
-		this.userRegisterValidator = userRegisterValidator;
-	}
+  @Autowired
+  public RestUserController(final WONUserDetailService wonUserDetailService, final AuthenticationManager authenticationManager,
+                            final SecurityContextRepository securityContextRepository, final UserRegisterValidator userRegisterValidator) {
+    this.wonUserDetailService = wonUserDetailService;
+    this.authenticationManager = authenticationManager;
+    this.securityContextRepository = securityContextRepository;
+    this.userRegisterValidator = userRegisterValidator;
+  }
 
   /**
    * registers user
-   * @param user registration data of a user
+   *
+   * @param user   registration data of a user
    * @param errors
    * @return ResponseEntity with Http Status Code
    */
-	@ResponseBody
-	@RequestMapping(
-			value = "/",
-			method = RequestMethod.POST
-	)
+  @ResponseBody
+  @RequestMapping(
+    value = "/",
+    method = RequestMethod.POST
+  )
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
-	public ResponseEntity registerUser(@RequestBody UserPojo user, Errors errors) {
-		try {
-			userRegisterValidator.validate(user, errors);
-			if (errors.hasErrors()) {
-				if (errors.getFieldErrorCount() > 0) {
-					// someone trying to go around js validation
-					return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
-				} else {
-					// username is already in database
-					return new ResponseEntity("Cannot create user: name is already in use.",HttpStatus.CONFLICT);
-				}
-			} else {
-				PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-				wonUserDetailService.save(new User(user.getUsername(), passwordEncoder.encode(user.getPassword())));
-			}
-		} catch (DataIntegrityViolationException e) {
-			// username is already in database
-			return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
-		}
-		return new ResponseEntity("New user was created", HttpStatus.CREATED);
-	}
+  public ResponseEntity registerUser(@RequestBody UserPojo user, Errors errors) {
+    try {
+      userRegisterValidator.validate(user, errors);
+      if (errors.hasErrors()) {
+        if (errors.getFieldErrorCount() > 0) {
+          // someone trying to go around js validation
+          return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+        } else {
+          // username is already in database
+          return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+        }
+      } else {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        wonUserDetailService.save(new User(user.getUsername(), passwordEncoder.encode(user.getPassword())));
+      }
+    } catch (DataIntegrityViolationException e) {
+      // username is already in database
+      return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+    }
+    return new ResponseEntity("New user was created", HttpStatus.CREATED);
+  }
 
   /**
    * check authentication and returrn ResponseEntity with HTTP status code
-   * @param user user object
+   *
+   * @param user     user object
    * @param request
    * @param response
    * @return
    */
-	@RequestMapping(
-			value = "/signin",
-			method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public ResponseEntity logIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
-        SecurityContext context = SecurityContextHolder.getContext();
-        UsernamePasswordAuthenticationToken token =	new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
-        try {
-            Authentication auth = authenticationManager.authenticate(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
-            return new ResponseEntity("Signed in.", HttpStatus.OK);
-        } catch (BadCredentialsException ex) {
-            return new ResponseEntity("No such username/password combination registered.", HttpStatus.FORBIDDEN);
-        }
-	}
-
-    /**
-    * Method only accessible if the user's still signed in / the session's still valid -> Use it to check the session cookie.
-    */
-    //* @param user user object
-    //* @param request
-    //* @param response
-    //* @return
-    //
-	@RequestMapping(
-			value = "/isSignedIn",
-			method = RequestMethod.GET
-    )
-    //TODO: move transactionality annotation into the service layer
-    @Transactional(propagation = Propagation.SUPPORTS)
-    //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
-    public ResponseEntity isSignedIn() {
-        // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
-        // code by itself if the session isn't valid any more
-        SecurityContext context = SecurityContextHolder.getContext();
-        //if(context.getAuthentication() )
-        if (context == null || context.getAuthentication() == null) {
-            return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
-        } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
-            return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
-        } else {
-            return new ResponseEntity("Current session is still valid. asdf", HttpStatus.OK);
-        }
+  @RequestMapping(
+    value = "/signin",
+    method = RequestMethod.POST
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity logIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
+    SecurityContext context = SecurityContextHolder.getContext();
+    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getUsername(),
+                                                                                        user.getPassword());
+    try {
+      Authentication auth = authenticationManager.authenticate(token);
+      SecurityContextHolder.getContext().setAuthentication(auth);
+      securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+      return new ResponseEntity("Signed in.", HttpStatus.OK);
+    } catch (BadCredentialsException ex) {
+      return new ResponseEntity("No such username/password combination registered.", HttpStatus.FORBIDDEN);
     }
+  }
 
-    /**
-     *
-     * @return
-     */
-    @RequestMapping(
-            value = "/signout",
-            method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public ResponseEntity logOut (HttpServletRequest request, HttpServletResponse response){
-        SecurityContext context = SecurityContextHolder.getContext();
-        if (context.getAuthentication() == null) {
-            return new ResponseEntity("No user is signed in, ignoring this request.", HttpStatus.NOT_MODIFIED);
-        }
-        myLogoff(request, response);
-        return new ResponseEntity("Signed out", HttpStatus.OK);
+  /**
+   * Method only accessible if the user's still signed in / the session's still valid -> Use it to check the session cookie.
+   */
+  //* @param user user object
+  //* @param request
+  //* @param response
+  //* @return
+  //
+  @RequestMapping(
+    value = "/isSignedIn",
+    method = RequestMethod.GET
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
+  public ResponseEntity isSignedIn() {
+    // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
+    // code by itself if the session isn't valid any more
+    SecurityContext context = SecurityContextHolder.getContext();
+    //if(context.getAuthentication() )
+    if (context == null || context.getAuthentication() == null) {
+      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+    } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
+      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+    } else {
+      return new ResponseEntity("Current session is still valid. asdf", HttpStatus.OK);
     }
+  }
+
+  /**
+   * @return
+   */
+  @RequestMapping(
+    value = "/signout",
+    method = RequestMethod.POST
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity logOut(HttpServletRequest request, HttpServletResponse response) {
+    SecurityContext context = SecurityContextHolder.getContext();
+    if (context.getAuthentication() == null) {
+      return new ResponseEntity("No user is signed in, ignoring this request.", HttpStatus.NOT_MODIFIED);
+    }
+    myLogoff(request, response);
+    return new ResponseEntity("Signed out", HttpStatus.OK);
+  }
 
 
   @RequestMapping(
@@ -181,17 +187,17 @@ public class RestUserController {
     method = RequestMethod.POST
   )
   @Transactional(propagation = Propagation.SUPPORTS)
-  public ResponseEntity saveAsFavourite(){
+  public ResponseEntity saveAsFavourite() {
     return null;
   }
 
   @RequestMapping(
-    value="/{userId}/resetPassword",
+    value = "/{userId}/resetPassword",
     method = RequestMethod.POST
   )
   @Transactional(propagation = Propagation.SUPPORTS)
-  public ResponseEntity resetPassword(@RequestBody String password){
-     return null;
+  public ResponseEntity resetPassword(@RequestBody String password) {
+    return null;
   }
 
   private static void myLogoff(HttpServletRequest request, HttpServletResponse response) {
@@ -200,6 +206,43 @@ public class RestUserController {
     SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
     cookieClearingLogoutHandler.logout(request, response, null);
     securityContextLogoutHandler.logout(request, response, null);
+  }
+
+
+  /**
+   * Provides a possibility to ping the app. A temporary solution
+   * for the client to avoid session timeout when the user is not
+   * making http requests to the app but is still active (i.e. gui
+   * events or chatting over web-socket) is to call this method.
+   *
+   * @return 'pong' as answer to ping
+   */
+  @ResponseBody
+  @RequestMapping(
+    value = "/ping",
+    produces = MediaType.APPLICATION_JSON,
+    method = RequestMethod.GET
+  )
+  public String doPing() {
+
+    if (SecurityContextHolder.getContext().getAuthentication() == null) {
+      logger.info("ping from a user with auth null");
+    } else {
+      if (SecurityContextHolder.getContext()
+                               .getAuthentication().getDetails() == null) {
+
+        logger.info("ping from a user "
+                      + SecurityContextHolder.getContext().getAuthentication().getName());
+      } else {
+        logger.info("ping from a user "
+                      + SecurityContextHolder.getContext().getAuthentication().getName()
+                      + " with session id "
+                      + ((WebAuthenticationDetails) SecurityContextHolder.getContext()
+                                                                         .getAuthentication().getDetails())
+          .getSessionId());
+      }
+    }
+    return "pong";
   }
 
 }

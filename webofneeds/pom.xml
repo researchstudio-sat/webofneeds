@@ -836,7 +836,7 @@
         <org.springframework.data.commons-core.version>1.4.1.RELEASE</org.springframework.data.commons-core.version>
         <org.springframework.data.commons.version>1.9.0.RELEASE</org.springframework.data.commons.version>
         <org.springframework.data.jpa.version>1.7.0.RELEASE</org.springframework.data.jpa.version>
-        <org.springframework.version>4.0.4.RELEASE</org.springframework.version>
+        <org.springframework.version>4.1.1.RELEASE</org.springframework.version>
         <org.springframework.security.version>3.1.3.RELEASE</org.springframework.security.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
         <org.hsqldb.version>2.3.2</org.hsqldb.version>
