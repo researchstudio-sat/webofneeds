@@ -9,7 +9,6 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
 
     userService.fetchPostsAndDrafts = function() {
         //if(applicationStateService.getAllNeedsCount()>=0){
-        //TODO move all this stuff here to a different function/object and also call it after reloading
         $http.get(
             '/owner/rest/needs/',
             user
@@ -62,7 +61,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
     }
 
     userService.verifyAuth = function() {
-        return $http.get('rest/users/isSignedIn').then (
+        $http.get('rest/users/isSignedIn').then (
 
             function(response){ //success
                 user.isAuth = true;
@@ -73,6 +72,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
                 return false;
             }
         );
+        return user.isAuth
     };
 
     // TODO fix bug: looks like a bug: returns before userService.verifyAuth() returns
@@ -172,6 +172,12 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
      }
      }
      init()*/
+     //TODO fetches a lot of needs (13k) if called while logged out (?)
+
+    if(userService.isAuth()) {
+        //reload while signed in
+        userService.fetchPostsAndDrafts();
+    }
     return userService;
 
 });
