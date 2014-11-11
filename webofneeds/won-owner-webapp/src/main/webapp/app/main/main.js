@@ -90,6 +90,8 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     });
     $scope.$on(won.EVENT.CONNECT_RECEIVED, function(ngEvent, eventData) {
         addEventAsUnreadEvent(eventData);
+        //unread events of previous event state, in case of "connect received" it's 'hint' unread events.
+        applicationStateService.removePreviousUnreadEventIfExists(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
@@ -118,9 +120,12 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         // the one connection we are processing the event for.
     });
     $scope.$on(won.EVENT.OPEN_RECEIVED, function(ngEvent, eventData) {
+        //a receiving event is not a unread event if current need is equal to receiver need
         if(eventData.hasReceiverNeed!=applicationStateService.getCurrentNeedURI()){
             addEventAsUnreadEvent(eventData);
         }
+
+
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
@@ -143,6 +148,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         if(eventData.hasReceiverNeed!=applicationStateService.getCurrentNeedURI()){
             addEventAsUnreadEvent(eventData);
         }
+        applicationStateService.removePreviousUnreadEventIfExists(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);

@@ -165,7 +165,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return unreadEventType;
     }
 
-    var getUnreadEventTypeFromHasMessageType = function(hasMessageType){
+    applicationStateService.getUnreadEventTypeFromHasMessageType = function(hasMessageType){
         var unreadEventType = null;
         switch (hasMessageType){
             case won.WONMSG.hintMessage:unreadEventType = won.UNREAD.TYPE.HINT;
@@ -234,12 +234,63 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return privateData.unreadEventsByTypeByNeed;
     }
 
-
-
+    /**
+     * used for updating unread event notifications.
+     * e.g. if connect_received event is received, but there's still a hint event of the affected need of the incoming event is still in the unread event container,
+     * it should be removed.
+      * @param eventType
+     * @returns {string}
+     */
+    applicationStateService.getPreviousUnreadState = function(eventType){
+        switch(eventType){
+            case won.EVENT.CONNECT_RECEIVED:
+                return won.UNREAD.TYPE.HINT;
+            case won.EVENT.CONNECTION_MESSAGE_RECEIVED:
+                return won.UNREAD.TYPE.CONNECT;
+        }
+    }
     /**
      * Removes an event - marking it as 'read', and flags the unreadObjects structure as dirty.
      * @param event
      */
+    //TODO: handling unread event and notifications shall be refactored. maybe with a state machine?
+    applicationStateService.decreaseUnreadEventCountByTypeByNeed = function(unreadEventType){
+        if(privateData.unreadEventsByTypeByNeed[unreadEventType].count>0){
+            privateData.unreadEventsByTypeByNeed[unreadEventType].count--;
+        }
+    }
+    /**
+     * unread event handling method.
+     * if there's still a unread event of the previous "state" in the unread event containers, when the a new event is received,
+     * it shall be removed.
+     * the previous unread event might already have been removed, if the user has already clicked on the event in the private link page.
+     *
+     * @param eventData
+     */
+    applicationStateService.removePreviousUnreadEventIfExists = function(eventData){
+        var receiverNeed = eventData.hasReceiverNeed;
+        var receiverConnection = eventData.hasReceiver;
+        applicationStateService.removeEvent(applicationStateService.getPreviousUnreadState(eventData.eventType),receiverConnection);
+    }
+
+    applicationStateService.removeEvent=function (unreadEventType, connectionURI){
+        console.log("removing Event");
+        if(unreadEventType == undefined){
+            unreadEventType = applicationStateService.getUnreadEventTypeFromHasMessageType(event.event.hasMessageType);
+        }
+        var allEventsOfTypeOfNeed=privateData.unreadEventsByNeedByType[privateData.currentNeedURI][unreadEventType].events;
+        for(var i =0; i<allEventsOfTypeOfNeed.length;i++){
+            if(allEventsOfTypeOfNeed[i].hasReceiver == connectionURI){
+                allEventsOfTypeOfNeed.splice(i,1);
+                privateData.unreadEventsByNeedByType[privateData.currentNeedURI][unreadEventType].count--;
+                privateData.unreadEventsByTypeByNeed[unreadEventType].timestamp = new Date();
+                applicationStateService.decreaseUnreadEventCountByTypeByNeed(unreadEventType);
+            }
+        }
+
+        privateData.unreadEventsByNeedByType[privateData.currentNeedURI][unreadEventType].timestamp = new Date().getTime();
+    }
+    /*
     applicationStateService.removeEvent=function (event){
         console.log("removing Event");
         var allEventsOfTypeOfNeed=privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].events;
@@ -248,13 +299,13 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
                 allEventsOfTypeOfNeed.splice(i,1);
                 privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].count--;
                 privateData.unreadEventsByTypeByNeed[getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].timestamp = new Date();
-                privateData.unreadEventsByTypeByNeed[getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].count--;
+                applicationStateService.decreaseUnreadEventCountByTypeByNeed(getUnreadEventTypeFromHasMessageType(event.event.hasMessageType))
             }
         }
 
         privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].timestamp = new Date().getTime();
     }
-
+                  */
     /**
      * Sets the current need URI.
      * @param needURI

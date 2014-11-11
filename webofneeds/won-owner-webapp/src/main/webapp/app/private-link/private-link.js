@@ -273,19 +273,9 @@ angular.module('won.owner')
                     || $scope.chosenMessage.typeText == "Outgoing Closed")) {
                 $scope.addConnectionLastTextMessages($scope.chosenMessage);
             }
-            applicationStateService.removeEvent(msgEvent)
+            applicationStateService.removeEvent(applicationStateService.getUnreadEventTypeFromHasMessageType(msgEvent.event.hasMessageType), msgEvent.connection.uri)
         }
-/*    $scope.clickOnTitle = function(msgId) {
-        // msgId can't be null here
-        $scope.chosenMessage = getEventById(msgId);
-        $scope.prevMessageId = msgId;
-    }*/
-   /* $scope.addConnectionLastTextMessages = function(currentMessage){
-        linkedDataService.getConnectionTextMessages(currentMessage.connection.uri, currentMessage.event.hasTimestamp, 1)
-            .then(function(messages){
-                currentMessage.lastMessages = messages;
-                return;
-            });          */
+
         $scope.addConnectionLastTextMessages = function(currentMessage){
             linkedDataService.getConnectionTextMessages(currentMessage.connection.uri)
                 .then(function(messages){
