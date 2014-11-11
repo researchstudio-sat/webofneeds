@@ -61,7 +61,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
     }
 
     userService.verifyAuth = function() {
-        $http.get('rest/users/isSignedIn').then (
+        promise = $http.get('rest/users/isSignedIn').then (
 
             function(response){ //success
                 user.isAuth = true;
@@ -71,11 +71,12 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
                 userService.resetAuth();
                 return false;
             }
-        );
-        return user.isAuth
+        );//.done() make sure exceptions aren't lost?
+        return user.isAuth //TODO bad as it can return before the http request resolves (see "TODO fix bug" below)
     };
-
+    
     // TODO fix bug: looks like a bug: returns before userService.verifyAuth() returns
+    // ^--> make isAuth always return a future
     userService.isAuth = function () {
         if(user.isAuth == false && privateData.verifiedOnce == false) {
             userService.verifyAuth();
