@@ -56,7 +56,7 @@ angular.module('won.owner').factory('wonService', function (
      * @param eventData event object that is passed as additional argument to $rootScope.$broadcast.
      * @param message the complete message data as received from the WoN node.
      */
-    var processHintNotificationMessage = function(eventData, message) {
+    var processHintMessage = function(eventData, message) {
         //load the data of the connection that the hint is about, if required
         linkedDataService.invalidateCacheForNewConnection(eventData.hasReceiver, eventData.hasReceiverNeed)
             ['finally'](function(){
@@ -66,6 +66,7 @@ angular.module('won.owner').factory('wonService', function (
                 //of the hint event
                 if (eventData.matchCounterpartURI != null) {
                     //load the data of the need the hint is about, if required
+                    linkedDataService.ensureLoaded(eventData.uri);
                     linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
                 }
                 console.log("publishing angular event");
@@ -142,7 +143,7 @@ angular.module('won.owner').factory('wonService', function (
 
     //mapping between message type and eventType/handler combination
     var messageTypeToEventType = {};
-    messageTypeToEventType[won.WONMSG.hintNotificationMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED, handler: processHintNotificationMessage};
+    messageTypeToEventType[won.WONMSG.hintMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED, handler: processHintMessage};
     messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED,handler:processConnectMessage};
     messageTypeToEventType[won.WONMSG.connectSentMessageCompacted] = {eventType: won.EVENT.CONNECT_SENT, handler: processConnectSentMessage}
     messageTypeToEventType[won.WONMSG.openMessageCompacted] = {eventType: won.EVENT.OPEN_RECEIVED, handler:processOpenMessage};

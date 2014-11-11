@@ -215,9 +215,6 @@
         won.WONMSG.connectionMessageResponseMessage = won.WONMSG.baseUri + "ConnectionMessageResponseMessage";
         won.WONMSG.connectionMessageResponseMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageResponseMessage";
 
-        //notification types
-        won.WONMSG.hintNotificationMessage = won.WONMSG.baseUri + "HintNotificationMessage";
-        won.WONMSG.hintNotificationMessageCompacted = won.WONMSG.prefix + ":HintNotificationMessage";
 
 
         won.EVENT = {};

@@ -42,8 +42,8 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     privateData.filters = {};
     privateData.filters[won.UNREAD.TYPE.CREATED] =    { 'eventType' : won.EVENT.NEED_CREATED };
     privateData.filters[won.UNREAD.TYPE.HINT] =    { 'eventType' : won.EVENT.HINT_RECEIVED };
-    privateData.filters[won.UNREAD.TYPE.MESSAGE] = { 'eventType' : [won.EVENT.CONNECTION_MESSAGE_RECEIVED,won.EVENT.OPEN_SENT,won.EVENT.OPEN_RECEIVED]};
-    privateData.filters[won.UNREAD.TYPE.CONNECT] = { 'eventType' : [won.EVENT.CONNECT_RECEIVED , won.EVENT.CONNECT_SENT]};
+    privateData.filters[won.UNREAD.TYPE.MESSAGE] = { 'eventType' : [won.EVENT.CONNECTION_MESSAGE_RECEIVED,won.EVENT.OPEN_RECEIVED]};
+    privateData.filters[won.UNREAD.TYPE.CONNECT] = { 'eventType' : won.EVENT.CONNECT_RECEIVED };
     privateData.filters[won.UNREAD.TYPE.CLOSE] =   { 'eventType' : won.EVENT.CLOSE_RECEIVED };
 
 
@@ -57,6 +57,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.reset = function() {
         //if we have a current need, that's its URI
         privateData.currentNeedURI = null;
+        privateData.currentEvent = null;
 
         //all needs are stored in this array (in the form returned by linkedDataService.getNeed(uri)
         privateData.allNeeds = {};
@@ -245,7 +246,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         for(var i =0; i<allEventsOfTypeOfNeed.length;i++){
             if(allEventsOfTypeOfNeed[i].uri == event.event.uri){
                 allEventsOfTypeOfNeed.splice(i,1);
-                privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.hasMessageType)].count--;
+                privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].count--;
             }
         }
         privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].timestamp = new Date().getTime();
@@ -261,6 +262,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             $rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
         }
     }
+
 
     /**
      * Gets the current need URI.

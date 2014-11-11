@@ -30,8 +30,10 @@ import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageEncoder;
-import won.protocol.model.*;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionEventType;
+import won.protocol.model.ConnectionState;
+import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
@@ -105,8 +107,6 @@ public class NeedCommunicationServiceImpl implements
           throws NoSuchNeedException, IllegalMessageForNeedStateException {
 
       logger.debug("STORING message with id {}", wonMessage.getMessageURI());
-      rdfStorageService.storeDataset(wonMessage.getMessageURI(),
-                                     WonMessageEncoder.encodeAsDataset(wonMessage));
 
       URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
       URI otherNeedURIFromWonMessage = URI.create(RdfUtils.findOnePropertyFromResource(
@@ -142,11 +142,31 @@ public class NeedCommunicationServiceImpl implements
         logger.warn("could not create connection", e);
       }
 
+      URI wrappedMessageURI = this.wonNodeInformationService.generateEventURI();
+    //TODO; hint messages are strictly said, not an inbound message since it doesn't have a remote counterpart. should be refactored
+      WonMessage wrappedMessage  =  WonMessageBuilder
+      .copyInboundWonMessageForLocalStorage(wrappedMessageURI, con.getConnectionURI(), wonMessage);
 
-      messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(), wonMessage));
+      rdfStorageService.storeDataset(wrappedMessageURI, wrappedMessage.getCompleteDataset());
+
+      messageEventRepository.save(new MessageEventPlaceholder(
+      con.getConnectionURI(), wrappedMessage));
+      reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wrappedMessage);
+             /*
+      WonMessage newWonMessage = WonMessageBuilder.wrapOutboundWonMessageForLocalStorage(con.getConnectionURI(),
+                                                                                       wonMessage);
+
+      messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(), newWonMessage));
+      logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+      rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+                                     newWonMessage.getCompleteDataset());
+
+      reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wonMessage);
+                                */
+     // messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(), wonMessage));
 
       //invoke facet implementation
-      reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wonMessage);
+      //reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wonMessage);
 
   }
 

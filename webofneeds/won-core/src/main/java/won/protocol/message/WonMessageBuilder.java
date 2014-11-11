@@ -414,7 +414,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonMessageType(WonMessageType.HINT_NOTIFICATION)
+      .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
       .setReceiverURI(needConnectionURI)
       .setReceiverNeedURI(needURI)

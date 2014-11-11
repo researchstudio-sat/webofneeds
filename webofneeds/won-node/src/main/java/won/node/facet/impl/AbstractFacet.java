@@ -25,7 +25,6 @@ import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
@@ -298,31 +297,7 @@ public abstract class AbstractFacet implements Facet
     if (wonMessage == null)
       remoteFacetModelCandidate = changeHasRemoteFacetToHasFacet(content);
     final Model remoteFacetModel = remoteFacetModelCandidate;
-
     try {
-      // ToDo (FS): copy all the content models from the hint message
-      WonMessageBuilder builder = new WonMessageBuilder();
-      URI messageURI = wonNodeInformationService.generateEventURI();
-      URI localFacet = URI.create(RdfUtils.findOnePropertyFromResource(
-        wonMessage.getMessageContent(), wonMessage.getMessageURI(),
-        WON.HAS_FACET).asResource().getURI());
-      URI remoteFacet = URI.create(RdfUtils.findOnePropertyFromResource(
-        wonMessage.getMessageContent(), wonMessage.getMessageURI(),
-        WON.HAS_REMOTE_FACET).asResource().getURI());
-      final WonMessage hintNotification = builder
-        .setMessagePropertiesForHintNotification(
-          messageURI,
-          con.getNeedURI(),
-          localFacet,
-          con.getConnectionURI(),
-          URI.create(URIService.getGeneralURIPrefix()),
-          con.getRemoteNeedURI(),
-          remoteFacet,
-          originator,
-          score
-        )
-        .build();
-
       executorService.execute(new Runnable()
       {
         @Override
@@ -331,7 +306,7 @@ public abstract class AbstractFacet implements Facet
           try {
             ownerProtocolOwnerService.hint(
               con.getNeedURI(), con.getRemoteNeedURI(),
-              score, originator, remoteFacetModel, hintNotification);
+              score, originator, remoteFacetModel, wonMessage);
           } catch (NoSuchNeedException e) {
             logger.warn("error sending hint message to owner - no such need:", e);
           } catch (IllegalMessageForNeedStateException e) {
@@ -342,7 +317,7 @@ public abstract class AbstractFacet implements Facet
         }
       });
     } catch (WonMessageBuilderException e) {
-      logger.warn("error creating HintNotificationMessage", e);
+      logger.warn("error creating HintMessage", e);
     }
   }
 
