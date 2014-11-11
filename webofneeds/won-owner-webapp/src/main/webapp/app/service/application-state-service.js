@@ -75,7 +75,12 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         privateData.lastEventOfEachConnectionOfCurrentNeed = [];
     }
     applicationStateService.reset();
-
+    applicationStateService.setCurrentConnectionURI= function (connectionURI){
+        privateData.currentEvent = connectionURI;
+    }
+    applicationStateService.getCurrentConnectionURI = function(){
+        return privateData.currentEvent;
+    }
     applicationStateService.processEventAndUpdateUnreadEventObjects = function(eventData){
         var eventType = eventData.eventType;
         var needURI = eventData.hasReceiverNeed;
@@ -171,6 +176,8 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             case won.WONMSG.hintMessage:unreadEventType = won.UNREAD.TYPE.HINT;
                 break;
             case won.WONMSG.connectMessage: unreadEventType = won.UNREAD.TYPE.CONNECT;
+                break;
+            case won.WONMSG.connectionMessage: unreadEventType = won.UNREAD.TYPE.MESSAGE;
                 break;
             case won.WONMSG.openMessage:unreadEventType = won.UNREAD.TYPE.CONNECT;
                 break;

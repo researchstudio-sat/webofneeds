@@ -39,7 +39,8 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
     $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
     $scope.allDrafts = applicationStateService.getAllDrafts();
-
+    //TODO; reafactor this. move it to applicationStateService. it is used by private link controller
+    $scope.chosenMessage = undefined;
     //allow acces to service methods from angular expressions:
     $scope.openNeedDetailView = applicationControlService.openNeedDetailView;
     $scope.getTypePicURI = applicationControlService.getTypePicURI;
@@ -89,7 +90,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
     });
     $scope.$on(won.EVENT.CONNECT_RECEIVED, function(ngEvent, eventData) {
-        addEventAsUnreadEvent(eventData);
+        $scope.checkIfMessageViewIsOpen(eventData);
         //unread events of previous event state, in case of "connect received" it's 'hint' unread events.
         applicationStateService.removePreviousUnreadEventIfExists(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
@@ -121,10 +122,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     });
     $scope.$on(won.EVENT.OPEN_RECEIVED, function(ngEvent, eventData) {
         //a receiving event is not a unread event if current need is equal to receiver need
-        if(eventData.hasReceiverNeed!=applicationStateService.getCurrentNeedURI()){
-            addEventAsUnreadEvent(eventData);
-        }
-
+        $scope.checkIfMessageViewIsOpen(eventData);
 
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
@@ -143,11 +141,17 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         //applicationStateService.removeEvent(eventData);
         reloadCurrentNeedData();
     });
+    $scope.checkIfMessageViewIsOpen = function(eventData){
+        //TODO: this should be reafactored. chosenMessage.connection.uri is only used in private.link page.
 
+            if(eventData.hasReceiver!=applicationStateService.getCurrentConnectionURI()){
+                addEventAsUnreadEvent(eventData);
+            }
+
+    }
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {
-        if(eventData.hasReceiverNeed!=applicationStateService.getCurrentNeedURI()){
-            addEventAsUnreadEvent(eventData);
-        }
+        $scope.checkIfMessageViewIsOpen(eventData);
+
         applicationStateService.removePreviousUnreadEventIfExists(eventData);
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.

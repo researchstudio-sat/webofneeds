@@ -325,7 +325,7 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
     $scope.mail_s = false;
 
     onLoginSuccessful = function() {
-        userService.setAuth($scope.username);
+        userService.setAuth($scope.registerUser.username);
         //$window.location.href = '/owner';
         $location.path("/postbox");
 

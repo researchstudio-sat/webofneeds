@@ -10,7 +10,8 @@ angular.module('won.owner')
 
     // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
-
+        //TODO: refactor this.
+    $scope.chosenMessage = $scope.$parent.chosenMessage;
     $scope.$watch('lastEventOfEachConnectionOfCurrentNeed', function(newValue, oldValue){
         var newCnt = newValue != null ? newValue.length : "null";
         var oldCnt = oldValue != null ? oldValue.length : "null";
@@ -66,7 +67,7 @@ angular.module('won.owner')
     };
 
     $scope.prevMessageId = null;
-    $scope.chosenMessage = null;
+
     $scope.rateValue = 0;
     $scope.showConfirmationDialogForDeclineRequest = false;
     $scope.showConfirmationDialogForCancelRequest = false;
@@ -261,8 +262,10 @@ angular.module('won.owner')
             // msgId can't be null here
             if ($scope.prevMessageId == msgEvent.event.uri) {
                 $scope.chosenMessage = $scope.chosenMessage == null ? msgEvent : null;
+                applicationStateService.setCurrentConnectionURI(null);
             } else {
                 $scope.chosenMessage = msgEvent;
+                applicationStateService.setCurrentConnectionURI(msgEvent.connection.uri)
             }
             $scope.prevMessageId = msgEvent.event.uri;
             // store the text of this message connection previous event, if any
