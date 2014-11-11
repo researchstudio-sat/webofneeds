@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.session.Session;
+import org.springframework.session.SessionRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.CloseStatus;
@@ -66,6 +68,9 @@ public class WonWebSocketHandler
 
   @Autowired
   private UserNeedRepository userNeedRepository;
+
+  @Autowired
+  SessionRepository sessionRepository;
 
 
   @Override
@@ -122,6 +127,8 @@ public class WonWebSocketHandler
   {
     logger.debug("OA Server - WebSocket message received: {}", message.getPayload());
 
+    updateSession(session);
+
     WonMessage wonMessage = WonMessageDecoder.decodeFromJsonLd(message.getPayload());
     //remember which user or (if not logged in) which needUri the session is bound to
     User user = getUserForSession(session);
@@ -137,11 +144,26 @@ public class WonWebSocketHandler
     ownerApplicationService.handleMessageEventFromClient(wonMessage);
   }
 
+  /* update the session last accessed time, - spring-session was added to synchronize
+  // http sessions with websocket session
+  // see: http://spring.io/blog/2014/09/16/preview-spring-security-websocket-support-sessions
+  // Currently used here Sping's MapSession implementation of Spring has default timeout of 30 minutes
+  */
+  private void updateSession(final WebSocketSession session) {
+    String sessionId = (String) session.getAttributes().get(WonHandshakeInterceptor.SESSION_ATTR);
+    if (sessionId != null) {
+      Session activeSession = sessionRepository.getSession(sessionId);
+      if (session != null) {
+        sessionRepository.save(activeSession);
+      }
+    }
+  }
+
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
   public void onMessage(final WonMessage wonMessage) {
-    String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
 
+    String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
     WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
     URI needUri = wonMessage.getReceiverNeedURI();
     User user = getUserForWonMessage(wonMessage);

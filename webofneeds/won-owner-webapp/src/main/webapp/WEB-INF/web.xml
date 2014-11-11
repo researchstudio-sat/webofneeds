@@ -72,4 +72,9 @@
 	    <welcome-file>index.html</welcome-file>
     </welcome-file-list>
 
+    <!-- for testing closing websocket connection purposes -->
+    <!--session-config>
+        <session-timeout>1</session-timeout>
+    </session-config-->
+
 </web-app>

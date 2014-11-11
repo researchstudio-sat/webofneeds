@@ -12,6 +12,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>won-owner-webapp</artifactId>
 
+    <repositories>
+        <repository>
+            <id>spring-snapshot</id>
+            <url>https://repo.spring.io/libs-milestone</url>
+        </repository>
+    </repositories>
 
 
 	<dependencies>
@@ -132,6 +138,14 @@
             <artifactId>commons-collections</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
+
+        <!-- spring-session -->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session</artifactId>
+            <version>1.0.0.M1</version>
+        </dependency>
+
     </dependencies>
 
 

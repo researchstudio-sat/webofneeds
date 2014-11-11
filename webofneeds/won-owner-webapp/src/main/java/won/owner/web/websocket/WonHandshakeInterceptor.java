@@ -18,10 +18,14 @@ package won.owner.web.websocket;
 
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,12 +34,44 @@ import java.util.Map;
  */
 public class WonHandshakeInterceptor  extends HttpSessionHandshakeInterceptor
 {
+  // TODO why do we need this if there is a session cookie?
+  public static final String SESSION_ATTR = "httpSession.id";
+  // TODO  probably we don't need it any more, the user in WonWebSocketHandler
+  // is obtained directly from session.getPrincipal().getName();
+  public static final String USERNAME_ATTR = "username";
+
+  private static final List<String> ATTRIBUTE_NAMES = new ArrayList<>(2);
+  static {
+    ATTRIBUTE_NAMES.add(SESSION_ATTR);
+    ATTRIBUTE_NAMES.add(USERNAME_ATTR);
+  }
+
+  public WonHandshakeInterceptor() {
+    super(ATTRIBUTE_NAMES);
+  }
+
   @Override
   public boolean beforeHandshake(ServerHttpRequest request,
                                  ServerHttpResponse response, WebSocketHandler wsHandler,
                                  Map<String, Object> attributes) throws Exception{
-    attributes.put("username", SecurityContextHolder.getContext().getAuthentication().getName());
+
+    addSessionIdAttribute(request, attributes);
+    attributes.put(USERNAME_ATTR, SecurityContextHolder.getContext().getAuthentication().getName());
     return super.beforeHandshake(request, response, wsHandler, attributes);
+  }
+
+  /* added for integrating spring-session, which we added to synchronize
+    http sessions with websocket sessions.
+    see: http://spring.io/blog/2014/09/16/preview-spring-security-websocket-support-sessions
+    */
+  private void addSessionIdAttribute(final ServerHttpRequest request, final Map<String, Object> attributes) {
+    if (request instanceof ServletServerHttpRequest) {
+      ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
+      HttpSession session = servletRequest.getServletRequest().getSession(false);
+      if (session != null) {
+        attributes.put(SESSION_ATTR, session.getId());
+      }
+    }
   }
 
   @Override

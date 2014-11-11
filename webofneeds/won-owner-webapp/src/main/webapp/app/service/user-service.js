@@ -9,7 +9,6 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
 
     userService.fetchPostsAndDrafts = function() {
         //if(applicationStateService.getAllNeedsCount()>=0){
-        //TODO move all this stuff here to a different function/object and also call it after reloading
         $http.get(
             '/owner/rest/needs/',
             user
@@ -62,7 +61,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
     }
 
     userService.verifyAuth = function() {
-        return $http.get('rest/users/isSignedIn').then (
+        promise = $http.get('rest/users/isSignedIn').then (
 
             function(response){ //success
                 user.isAuth = true;
@@ -72,8 +71,12 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
                 userService.resetAuth();
                 return false;
             }
-        );
+        );//.done() make sure exceptions aren't lost?
+        return user.isAuth //TODO bad as it can return before the http request resolves (see "TODO fix bug" below)
     };
+    
+    // TODO fix bug: looks like a bug: returns before userService.verifyAuth() returns
+    // ^--> make isAuth always return a future
     userService.isAuth = function () {
         if(user.isAuth == false && privateData.verifiedOnce == false) {
             userService.verifyAuth();
@@ -170,6 +173,12 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
      }
      }
      init()*/
+     //TODO fetches a lot of needs (13k) if called while logged out (?)
+
+    if(userService.isAuth()) {
+        //reload while signed in
+        userService.fetchPostsAndDrafts();
+    }
     return userService;
 
 });
