@@ -66,7 +66,7 @@ angular.module('won.owner').factory('wonService', function (
                 //of the hint event
                 if (eventData.matchCounterpartURI != null) {
                     //load the data of the need the hint is about, if required
-                    linkedDataService.ensureLoaded(eventData.uri);
+                    //linkedDataService.ensureLoaded(eventData.uri);
                     linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
                 }
                 console.log("publishing angular event");

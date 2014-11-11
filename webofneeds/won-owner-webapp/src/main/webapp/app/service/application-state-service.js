@@ -247,8 +247,11 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             if(allEventsOfTypeOfNeed[i].uri == event.event.uri){
                 allEventsOfTypeOfNeed.splice(i,1);
                 privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].count--;
+                privateData.unreadEventsByTypeByNeed[getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].timestamp = new Date();
+                privateData.unreadEventsByTypeByNeed[getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].count--;
             }
         }
+
         privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].timestamp = new Date().getTime();
     }
 

@@ -51,6 +51,13 @@ app.directive(('notifDropdown'), function notifDropdownFct() { //TODO $rootScope
                 $scope.clickOnNotification = function (unreadEventType) {
                     applicationStateService.setEventsAsReadForType(unreadEventType);
                 }
+                $scope.getAllUnreadEventCountsByNeed = function(){
+                    var count = 0;
+                    for(var eventByNeed in $scope.unreadEventsByNeedByType) {
+                        count += $scope.unreadEventsByNeedByType[eventByNeed][$scope.eventType].count;
+                    }
+                    return count;
+                }
                 $scope.getCount = function(){
                     switch ($scope.eventType) {
                         case won.UNREAD.TYPE.HINT:
