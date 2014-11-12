@@ -11,7 +11,6 @@ angular.module('won.owner')
     // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
         //TODO: refactor this.
-    $scope.chosenMessage = $scope.$parent.chosenMessage;
     $scope.$watch('lastEventOfEachConnectionOfCurrentNeed', function(newValue, oldValue){
         var newCnt = newValue != null ? newValue.length : "null";
         var oldCnt = oldValue != null ? oldValue.length : "null";

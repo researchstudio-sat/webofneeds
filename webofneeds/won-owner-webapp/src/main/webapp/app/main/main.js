@@ -40,7 +40,6 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
     $scope.allDrafts = applicationStateService.getAllDrafts();
     //TODO; reafactor this. move it to applicationStateService. it is used by private link controller
-    $scope.chosenMessage = undefined;
     //allow acces to service methods from angular expressions:
     $scope.openNeedDetailView = applicationControlService.openNeedDetailView;
     $scope.getTypePicURI = applicationControlService.getTypePicURI;
@@ -142,7 +141,6 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         reloadCurrentNeedData();
     });
     $scope.checkIfMessageViewIsOpen = function(eventData){
-        //TODO: this should be reafactored. chosenMessage.connection.uri is only used in private.link page.
 
             if(eventData.hasReceiver!=applicationStateService.getCurrentConnectionURI()){
                 addEventAsUnreadEvent(eventData);
