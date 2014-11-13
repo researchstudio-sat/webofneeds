@@ -33,9 +33,10 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $rootScope, $log, messageService) {
+angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $rootScope, $log, messageService, userService) {
     //we use the messageService dependency in order to force websocket creation from the very beginning
     $scope.selectedType = -1;
+    $scope.applicationStateService = applicationStateService;
     $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
     $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
     $scope.allDrafts = applicationStateService.getAllDrafts();
@@ -169,7 +170,8 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
 
     $scope.$on(won.EVENT.USER_SIGNED_IN, function(event){
        messageService.reconnect();
-       userService.fetchPostsAndDrafts();
+       //userService.fetchPostsAndDrafts();
+        applicationStateService.reset();
     });
     $scope.$on('RenderFinishedEvent', function(event){
        console.log("render finished event") ;
