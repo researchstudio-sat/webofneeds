@@ -68,7 +68,7 @@ angular.module('won.owner')
                 }
                 $scope.messageIndex ='';
                 $scope.showPublic = function(){
-                    if($scope.chosenMessage.lastMessages.length>0){
+                    if($scope.chosenMessage != null && $scope.chosenMessage.lastMessages != null && $scope.chosenMessage.lastMessages.length>0){
                         return true;
                     }else{
                         return false;
