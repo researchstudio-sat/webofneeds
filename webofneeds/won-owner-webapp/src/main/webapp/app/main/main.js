@@ -169,6 +169,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
 
     $scope.$on(won.EVENT.USER_SIGNED_IN, function(event){
        messageService.reconnect();
+       userService.fetchPostsAndDrafts();
     });
     $scope.$on('RenderFinishedEvent', function(event){
        console.log("render finished event") ;

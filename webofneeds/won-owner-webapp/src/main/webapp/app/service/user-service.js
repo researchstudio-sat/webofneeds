@@ -1,17 +1,18 @@
 angular.module('won.owner').factory('userService', function ($window, $http, $log, $rootScope, applicationStateService) {
 
-	var user = {};
-    var registered = false;
-	user = $window.user;
+
     var userService = {};
-    var privateData = {}
+    var privateData = {
+        registered:false,
+        user : $window.user
+    }
     privateData.verifiedOnce = false; //gets reset on reload, will be set true after verifying the session cookie with the server
 
     userService.fetchPostsAndDrafts = function() {
         //if(applicationStateService.getAllNeedsCount()>=0){
         $http.get(
             '/owner/rest/needs/',
-            user
+            privateData.user
         ).then(
             function (needs) {
                 if(needs.data.length>0){
@@ -36,7 +37,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         //if(applicationStateService.getAllDraftsCount()>=0){
         $http.get(
             '/owner/rest/needs/drafts/',
-            user
+            privateData.user
         ).then(
             function (drafts) {
                 if(drafts.data.length>0){
@@ -64,7 +65,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         promise = $http.get('rest/users/isSignedIn').then (
 
             function(response){ //success
-                user.isAuth = true;
+                privateData.user.isAuth = true;
                 return true;
             },
             function(response){ //error
@@ -72,35 +73,35 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
                 return false;
             }
         );//.done() make sure exceptions aren't lost?
-        return user.isAuth //TODO bad as it can return before the http request resolves (see "TODO fix bug" below)
+        return privateData.user.isAuth //TODO bad as it can return before the http request resolves (see "TODO fix bug" below)
     };
     
     // TODO fix bug: looks like a bug: returns before userService.verifyAuth() returns
     // ^--> make isAuth always return a future
     userService.isAuth = function () {
-        if(user.isAuth == false && privateData.verifiedOnce == false) {
+        if(privateData.user.isAuth == false && privateData.verifiedOnce == false) {
             userService.verifyAuth();
             privateData.verifiedOnce = true;
         }
-        return (user.isAuth == true);
+        return (privateData.user.isAuth == true);
     };
     userService.setAuth = function(username) { //TODO deletme?
-        user.isAuth = true;
-        user.username = username;
+        privateData.user.isAuth = true;
+        privateData.user.username = username;
     };
     userService.getUserName = function () {
-        return user.username;
+        return privateData.user.username;
     };
     userService.getUnescapeUserName = function() {
-        if(user.username != null) return user.username.replace("&#64;", '@').replace("&#46;", '.');
+        if(privateData.user.username != null) return privateData.user.username.replace("&#64;", '@').replace("&#46;", '.');
         else return null;
     };
     userService.getRegistered = function (){
-        return registered;
+        return privateData.registered;
     };
     userService.resetAuth = function () {
         //TODO also deactive session at server
-        user = {
+        privateData.user = {
             isAuth : false
         }
     };
@@ -111,8 +112,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         ).then(
             function() {
                 // success
-                $rootScope.$broadcast(won.EVENT.USER_SIGNED_IN);
-                registered = true;
+                privateData.registered = true;
                 return {status : "OK"};
             },
             function(response) {
@@ -136,6 +136,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         ).then(
             function () {
                 // success
+                userService.setAuth(user.username);
                 $rootScope.$broadcast(won.EVENT.USER_SIGNED_IN);
                 return {status:"OK"};
             },

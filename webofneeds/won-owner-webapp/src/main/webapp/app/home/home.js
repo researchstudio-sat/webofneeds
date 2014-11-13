@@ -283,8 +283,6 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
     //TODO move to userService.login
 	onLoginResponse = function(response) {
 		if (response.status == "OK") {
-            userService.setAuth($scope.user.username);
-            userService.fetchPostsAndDrafts();
 			$location.path('/postbox');
 		} else if (response.status == "ERROR") {
 			$scope.error = response.message;
@@ -325,10 +323,7 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
     $scope.mail_s = false;
 
     onLoginSuccessful = function() {
-        userService.setAuth($scope.registerUser.username);
-        //$window.location.href = '/owner';
         $location.path("/postbox");
-
     }
 
     onLoginError = function(response) {
