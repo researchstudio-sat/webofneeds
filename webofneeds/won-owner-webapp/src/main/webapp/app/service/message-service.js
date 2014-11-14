@@ -199,8 +199,8 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
 
 
     messageService.closeConnection = function () {
-        console.log("closing Websocket via messageService.closeConnection()");
         if (privateData.socket != null && ! isClosingOrClosed()) {
+            console.log("closing Websocket via messageService.closeConnection()");
             privateData.socket.close();
         }
     }

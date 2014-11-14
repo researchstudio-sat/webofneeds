@@ -44,7 +44,7 @@
 
     <beans:bean name="sessionRepository" class="org.springframework.session.MapSessionRepository" />
 
-    <beans:bean name="sessionRepositoryFilter" class="org.springframework.session.web.SessionRepositoryFilter">
+    <beans:bean name="sessionRepositoryFilter" class="org.springframework.session.web.http.SessionRepositoryFilter">
         <beans:constructor-arg ref="sessionRepository"/>
     </beans:bean>
 
