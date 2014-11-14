@@ -47,30 +47,29 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         )
         //}
         //if(applicationStateService.getAllDraftsCount()>=0){
-        // TODO uncomment when bug with needs redirected after logout-login is fixed
-//        $http.get(
-//            '/owner/rest/needs/drafts/',
-//            privateData.user
-//        ).then(
-//            function (drafts) {
-//                if(drafts.data.length>0){
-//                    applicationStateService.addDrafts(drafts)
-//                }
-//                // success
-//                return {status:"OK"};
-//            },
-//            function (response) {
-//                switch(response.status) {
-//                    case 403:
-//                        // normal error
-//                        return {status: "ERROR", message: "getting drafts of a user failed"};
-//                    default:
-//                        // system error
-//                        return {status:"FATAL_ERROR", message: "getting drafts of a user failed"};
-//                        break;
-//                }
-//            }
-//        )
+        $http.get(
+            '/owner/rest/needs/drafts/',
+            privateData.user
+        ).then(
+            function (drafts) {
+                if(drafts.data.length>0){
+                    applicationStateService.addDrafts(drafts)
+                }
+                // success
+                return {status:"OK"};
+            },
+            function (response) {
+                switch(response.status) {
+                    case 403:
+                        // normal error
+                        return {status: "ERROR", message: "getting drafts of a user failed"};
+                    default:
+                        // system error
+                        return {status:"FATAL_ERROR", message: "getting drafts of a user failed"};
+                        break;
+                }
+            }
+        )
         //}
     }
 
