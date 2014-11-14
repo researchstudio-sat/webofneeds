@@ -25,7 +25,8 @@ app = angular.module('won.owner',
         , 'scrollable-table'
         ]
     ).config(function ($routeProvider, $httpProvider, $provide) {//, $log) {
-	$routeProvider.
+        $httpProvider.responseInterceptors.push('redirectInterceptor');
+	    $routeProvider.
             when('/create-need/:step/:menuposition/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
             when('/create-need/:step/:menuposition', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
 			when('/', {controller : 'HomeCtrl', templateUrl:'app/home/welcome.html'}).
@@ -53,6 +54,7 @@ app.directive('header', function(){
         templateUrl:'templates/header.html'
     }
 })
+
 	/* http://stackoverflow.com/questions/18888104/angularjs-q-wait-for-all-even-when-1-rejected */
 	$provide.decorator('$q', ['$delegate', function ($delegate) {
 		var $q = $delegate;
@@ -187,7 +189,7 @@ app.directive('header', function(){
     }
 );
 
-app.run(function($httpBackend,$rootScope){
+app.run(function($httpBackend,$rootScope ){
 
         //$httpBackend.whenGET('/owner/rest/need/\d+').respond('test');
         $httpBackend.whenPOST('/owner/rest/needs/').passThrough();
@@ -217,7 +219,24 @@ app.run(function($httpBackend,$rootScope){
        // $httpBackend.whenGET('/app.*/').passThrough();
     }
 );
+app.factory('redirectInterceptor', ['$location', '$q', function($location, $q) { return function(promise) {
+    promise.then(
+        function(response) {
 
+
+            return response;
+        },
+        function(response) {
+            if (response.status == 401 && $location.path("/postbox")) {
+
+                $location.path("/signin");
+            }
+            return $q.reject(response);
+        }
+    );
+    return promise;
+};
+}]);
 angular.resetForm = function (scope, formName, defaults) {
 	$('form[name=' + formName + '], form[name=' + formName + '] .ng-dirty').removeClass('ng-dirty').addClass('ng-pristine');
 	var form = scope[formName];
