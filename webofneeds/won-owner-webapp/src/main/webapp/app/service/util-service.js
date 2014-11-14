@@ -20,7 +20,11 @@
 
 angular.module('won.owner').factory('utilService', function ($http, $q) {
     var utilService = {};
-
+    utilService.removeAllProperties = function (obj){
+        Object.keys(obj).forEach(function(element,index,array){
+            delete obj[element];
+        })
+    }
     utilService.getKeySize = function(obj) {
         return Object.keys(obj).length;
         /*var size = 0, key;

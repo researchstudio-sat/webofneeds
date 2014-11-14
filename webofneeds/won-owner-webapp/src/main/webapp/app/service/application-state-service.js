@@ -58,23 +58,38 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         //if we have a current need, that's its URI
         privateData.currentNeedURI = null;
         privateData.currentEvent = null;
-
         //all needs are stored in this array (in the form returned by linkedDataService.getNeed(uri)
-        privateData.allNeeds = {};
+        utilService.removeAllProperties(privateData.allNeeds);
+        privateData.allDrafts.splice(0,privateData.allDrafts.length);
+
+        utilService.removeAllProperties(privateData.unreadEventsByNeedByType);
+
+        applicationStateService.resetUnreadEventsByTypeByNeed();
+        privateData.lastEventOfEachConnectionOfCurrentNeed.splice(0, privateData.lastEventOfEachConnectionOfCurrentNeed.length);
+    }
+    applicationStateService.init = function(){
+        privateData.allNeeds = {}
         privateData.allDrafts = [];
+        privateData.currentNeedURI = null;
+        privateData.currentEvent = null;
 
         privateData.unreadEventsByNeedByType = {};
-
         privateData.unreadEventsByTypeByNeed = {
-            'hint': {count:0, timestamp: new Date().getTime() },
-            'connect': {count:0, timestamp: new Date().getTime()},
-            'message': {count:0, timestamp: new Date().getTime()},
-            'close': {count:0, timestamp: new Date().getTime()},
-            'created': {count:0, timestamp: new Date().getTime()}
-        };
+            'hint': {count: 0, timestamp: new Date().getTime() },
+            'connect': {count: 0, timestamp: new Date().getTime()},
+            'message': {count: 0, timestamp: new Date().getTime()},
+            'close': {count: 0, timestamp: new Date().getTime()},
+            'created': {count: 0, timestamp: new Date().getTime()}
+        }
         privateData.lastEventOfEachConnectionOfCurrentNeed = [];
     }
-    applicationStateService.reset();
+    applicationStateService.resetUnreadEventsByTypeByNeed= function(){
+        Object.keys(privateData.unreadEventsByTypeByNeed).forEach(function(element, index, array){
+            privateData.unreadEventsByTypeByNeed[element].count = 0;
+            privateData.unreadEventsByTypeByNeed.timestamp = new Date().getTime();
+        })
+    }
+    applicationStateService.init();
     applicationStateService.setCurrentConnectionURI= function (connectionURI){
         privateData.currentEvent = connectionURI;
     }
