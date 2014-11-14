@@ -13,9 +13,13 @@
     <artifactId>won-owner-webapp</artifactId>
 
     <repositories>
-        <repository>
+        <!--<repository>
             <id>spring-snapshot</id>
             <url>https://repo.spring.io/libs-milestone</url>
+        </repository>-->
+        <repository>
+            <id>spring-snapshot</id>
+            <url>https://repo.spring.io/libs-snapshot</url>
         </repository>
     </repositories>
 
@@ -143,7 +147,8 @@
         <dependency>
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session</artifactId>
-            <version>1.0.0.M1</version>
+            <!--<version>1.0.0.M1</version>-->
+            <version>1.0.0.BUILD-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
