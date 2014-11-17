@@ -21,7 +21,28 @@
  * Time: 10:01 AM
  * To change this template use File | Settings | File Templates.
  */
-
+angular.module('won.owner')
+    .directive('starFavourite', function factory(){
+        return {
+            restrict : 'E',
+            templateUrl : 'app/post-detail/favourite.html',
+            scope : {
+            },
+            controller : function($scope){
+                $scope.activeState= false;
+                $scope.getStar = function(){
+                    if($scope.activeState == false){
+                        return 'glyphicon glyphicon-star';
+                    }else{
+                        return 'glyphicon glyphicon-star-empty';
+                    }
+                }
+                $scope.changeActiveState = function(){
+                    $scope.activeState = !$scope.activeState;
+                }
+            }
+        }
+    });
 angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams, applicationStateService) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
@@ -31,6 +52,7 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     linkedDataService.getNeed(applicationStateService.getCurrentNeedURI()).then(function(need){
         $scope.need.title = need['title'];
         $scope.need.tags = need['tags'];
+        $scope.need.basicNeedType = need['basicNeedType'];
         $scope.need.textDescription = need['textDescription'];
         $scope.need.creationDate = need['creationDate'];
         $scope.need.longitude = need['longitude'];

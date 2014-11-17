@@ -18,15 +18,13 @@
     <div class="row">
         <div class="col-md-12">
             <div class="row">
-                <div class="inline"><i class="fa fa-star fa-lg"></i></div>
-                <div class="inline"><i class="fa fa-circle fa-lg"></i></div>
+                <div class="inline"><star-favourite></star-favourite></div>
+                <div class="inline"><img ng-src="{{getTypePicURI(need.basicNeedType)}}"/></div>
                 <div class="inline" style="font-size: 1.8em;" ng-bind="need.title" ></div>
                 <div class="inline pull-right"><i class="fa fa-copy fa-lg"></i></div>
             </div>
             <div class="row">
-                <div class="inline"><i class="fa fa-star fa-lg"></i></div>
-                <div class="inline"><i class="fa fa-circle fa-lg"></i></div>
-                <div class="inline" style="font-size: 1.8em;" ng-bind="need.creationDate"></div>
+                <div class="inline" style="font-size: 1.8em;" ng-bind="need.creationDate | date:'yy/MM/dd HH:mm'"></div>
                 <div class="inline pull-right"><i class="fa fa-copy fa-lg"></i></div>
             </div>
             <div class="row">
