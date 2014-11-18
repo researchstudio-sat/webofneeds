@@ -99,9 +99,9 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 		//TODO Put here logic
 	};
 
-	$scope.showPublic = function () {
-		return userService.isAuth();
-	};
+	$scope.showPublic = userService.isAuth().then( function(isAuth) {
+        return !isAuth
+    })
 
     $scope.inboxCollapsed = false;
     $scope.inboxCollapseClick = function () {

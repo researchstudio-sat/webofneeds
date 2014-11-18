@@ -23,8 +23,8 @@ angular.module('won.owner').controller('HomeCtrl',
 
     $log.debug("Initializing HeaderCtrl.");
 
-
-
+	/*
+	incorrect as isAuth returns a promise now (but it's not used, so i'll just remove these here)
 	$scope.goToNewNeed = function() {
 		if(userService.isAuth()) {
 			$location.path("/create-need");
@@ -32,7 +32,6 @@ angular.module('won.owner').controller('HomeCtrl',
 			$location.path("/signin");
 		}
 	}
-
 	$scope.goToAllNeeds = function () {
 
 		if (userService.isAuth()) {
@@ -40,7 +39,7 @@ angular.module('won.owner').controller('HomeCtrl',
 		} else {
 			$location.path("/signin");
 		}
-	}
+	}*/
 
 	$scope.forms = new function() {
 		this.signin = ($location.path().indexOf("signin") > -1);

@@ -80,9 +80,9 @@ angular.module('won.owner')
 
 
 
-    $scope.showPublic = function() {
-        return userService.isAuth();
-    };
+    $scope.showPublic = userService.isAuth().then( function(isAuth) {
+        return !isAuth
+    })
 
     $scope.copyLinkToClipboard = function() {
         //todo maybe we can use http://zeroclipboard.org/

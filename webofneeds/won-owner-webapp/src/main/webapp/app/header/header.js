@@ -56,9 +56,10 @@ angular.module('won.owner').controller("HeaderCtrl",
         $location.path("/");
     }
 
-	$scope.showPublic = function() {
-        return !userService.isAuth();
-	};
+	$scope.showPublic = userService.isAuth().then( function(isAuth) {
+        return !isAuth
+    })
+        //return !userService.isAuth();
 
     $scope.checkRegistered = function(){
         return userService.getRegistered();
