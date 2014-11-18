@@ -27,28 +27,47 @@ angular.module('won.owner')
             restrict : 'E',
             templateUrl : 'app/post-detail/favourite.html',
             scope : {
+                showPublic: '&'
             },
-            controller : function($scope){
-                $scope.activeState= false;
+            priority: 1,
+            link : function(scope, elem, attrs){
+
+                scope.hoverStarToolTip = 'save post as favourite';
+                scope.activeState= false;
+                scope.hoverState = false;
+            },
+            controller : function($scope, userService){
+
+                $scope.changeHoverState = function(){
+                    $scope.hoverState = !$scope.hoverState;
+                }
                 $scope.getStar = function(){
-                    if($scope.activeState == false){
-                        return 'glyphicon glyphicon-star';
-                    }else{
+                    if($scope.activeState == false && $scope.hoverState==false){
                         return 'glyphicon glyphicon-star-empty';
+                    }else{
+                        return 'glyphicon glyphicon-star';
                     }
                 }
-                $scope.changeActiveState = function(){
+                $scope.changeActiveState = function($event){
                     $scope.activeState = !$scope.activeState;
                 }
             }
         }
     });
-angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams, applicationStateService) {
+angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams,applicationControlService, applicationStateService, userService) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
+    $scope.showPublic = function(){
+        return userService.isAuth();
+    }
+    $scope.clickOnCopy = function(){
+        $location.path("create-need/1/"+applicationControlService.getMenuPositionForNeedType($scope.need.basicNeedType));
+    }
 
+    $scope.hoverCopyToolTip ="I want this too";
     //$scope.need = $scope.$parent.need;
     $scope.need = {};
+
     linkedDataService.getNeed(applicationStateService.getCurrentNeedURI()).then(function(need){
         $scope.need.title = need['title'];
         $scope.need.tags = need['tags'];

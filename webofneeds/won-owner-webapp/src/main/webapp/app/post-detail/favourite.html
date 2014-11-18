@@ -16,7 +16,8 @@
   -->
 
 
-        <a ng-click="changeActiveState()">
-            <span ng-class="getStar()"/>
+        <a ng-show="showPublic()" ng-click="changeActiveState()" >
+            <span  ng-class="getStar()" tooltip="{{hoverStarToolTip}}"
+                   tooltip-trigger="mouseenter"/>
         </a>
 
