@@ -171,6 +171,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
                 '/owner/rest/users/signout'
         ).then(
             function (data, status) {
+                userService.resetAuth();
                 $rootScope.$broadcast(won.EVENT.USER_SIGNED_OUT);
                 return {status:"OK"};
             },
