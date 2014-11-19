@@ -186,6 +186,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         if(loggedIn) {
             userService.fetchPostsAndDrafts();
         }
+        $rootScope.$apply()
     });
     return userService;
 
