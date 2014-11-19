@@ -200,10 +200,12 @@ angular.module('won.owner').factory('userService',
      init()*/
      //TODO fetches a lot of needs (13k) if called while logged out (?)
 
+        /* TODO comment in and adapt to promise
     if(userService.isAuth()) {
         //reload while signed in
         userService.fetchPostsAndDrafts();
     }
+    */
     return userService;
 
 });

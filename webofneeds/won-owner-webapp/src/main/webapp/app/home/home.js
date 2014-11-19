@@ -123,9 +123,7 @@ angular.module('won.owner').controller('HomeCtrl',
         });
     }
 
-    $scope.showPublic = function() {
-        return !userService.isAuth();
-    };
+    $scope.showPublic = !userService.isAuth() //TODO negate
 
     $scope.clickOnIButton = function() {
         $('#i_panel').show();

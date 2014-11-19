@@ -56,9 +56,10 @@ angular.module('won.owner').controller("HeaderCtrl",
         $location.path("/");
     }
 
-	$scope.showPublic = userService.isAuth().then( function(isAuth) {
+	/*$scope.showPublic = userService.isAuth().then( function(isAuth) {
         return !isAuth
-    })
+    })*/
+    $scope.showPublic = userService.isAuth() //TODO negate
         //return !userService.isAuth();
 
     $scope.checkRegistered = function(){
@@ -66,12 +67,16 @@ angular.module('won.owner').controller("HeaderCtrl",
     };
     $scope.userdata = { username : userService.getUnescapeUserName()};
 
-
+    /*
+        TODO fix code, reintroduce
+         */
+        /*
     $scope.$watch(userService.isAuth, function(logged_in){
         if(logged_in){
             $scope.userdata = { username : userService.getUnescapeUserName()};
         }
     })
+        */
     $scope.onDropDownClick=function(num){
         $scope.$parent.selectedType = num;
     }

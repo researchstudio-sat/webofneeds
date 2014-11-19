@@ -233,9 +233,10 @@ angular.module('won.owner').directive('wonContact',function factory(userService)
             $scope.copyLinkToClipboard = function() {
                 //todo maybe we can use http://zeroclipboard.org/
             };
-            $scope.showPublic = userService.isAuth().then( function(isAuth) {
+            /*$scope.showPublic = userService.isAuth().then( function(isAuth) {
                 return !isAuth
-            })
+            })*/
+            $scope.showPublic = userService.isAuth() //TODO negate
 
 
         } ,
