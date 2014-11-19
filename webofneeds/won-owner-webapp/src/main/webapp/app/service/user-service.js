@@ -85,16 +85,17 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
                 return false;
             }
         );//.done() make sure exceptions aren't lost?
-        return privateData.user.isAuth //TODO bad as it can return before the http request resolves (see "TODO fix bug" below)
+        return promise
+        //return privateData.user.isAuth //TODO bad as it can return before the http request resolves (see "TODO fix bug" below)
     };
     
     // TODO fix bug: looks like a bug: returns before userService.verifyAuth() returns
     // ^--> make isAuth always return a future
     userService.isAuth = function () {
-        if(privateData.user.isAuth == false && privateData.verifiedOnce == false) {
+        /*if(privateData.user.isAuth == false && privateData.verifiedOnce == false) {
             userService.verifyAuth();
             privateData.verifiedOnce = true;
-        }
+        }*/
         return (privateData.user.isAuth == true);
     };
     userService.setAuth = function(username) { //TODO deletme?
@@ -178,20 +179,13 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
             }
         );
 	};
-    //TODO implement fetching posts on page reload
-    /*init = function () {
-     if(userService.verifyAuth()) {
-     userService.fetchPostsAndDrafts()
-     $location.path('/postbox');
-     }
-     }
-     init()*/
-     //TODO fetches a lot of needs (13k) if called while logged out (?)
 
-    if(userService.isAuth()) {
-        //reload while signed in
-        userService.fetchPostsAndDrafts();
-    }
+    var verified = userService.verifyAuth(); //checking login status
+    verified.then(function reloadWhileLoggedIn(loggedIn){
+        if(loggedIn) {
+            userService.fetchPostsAndDrafts();
+        }
+    });
     return userService;
 
 });
