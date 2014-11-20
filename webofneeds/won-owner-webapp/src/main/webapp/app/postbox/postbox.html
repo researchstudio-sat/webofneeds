@@ -105,7 +105,8 @@
             </div>
 
             <!-- Confirmation dialog for deleting a draft -->
-            <div ng-controller = "DraftCtrl" ng-show="displayConfirmationDialog">
+            <div ng-controller = "DraftCtrl">
+            <div ng-show="displayConfirmationDialog()">
                 <form class="form-horizontal container">
                     <div class="col-md-5 col-md-offset-4">
                         <div class="well">
@@ -122,7 +123,7 @@
             </div>
 
             <!--Drafts-->
-            <div id="drafts" ng-controller = "DraftCtrl" class="col-lg-12">
+            <div id="drafts" class="col-lg-12">
                 <div id="draftsCollapse" class="well div-table col-lg-12">
                     <div class="div-table-row">
                         <div class="div-table-cell pull-left additional-info-title text-center">Drafts</div>
@@ -151,16 +152,19 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-show="allDrafts.length>0" ng-repeat="draft in allDrafts | filter: search">
+
+                        <tr ng-show="hasDrafts()" ng-repeat="draft in allDrafts | filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{draft.draft.basicNeedType}}</span>
                                 <img ng-src="{{getTypePicURI(draft.draft.basicNeedType)}}"
                                      tooltip="{{draft.draft.basicNeedType}} (click to filter)"/>
                             </td>
                             <!-- TODO step in create need needs to be specified -->
-                            <td><a href="#/create-need/1" style="font-weight:bold;">{{draft.draft.title}}</a></td>
+                            <td><a href="" ng-click="clickOnDraft(draft);" style="font-weight:bold;">{{draft.draft
+                                .title}}</a></td>
                             <td>{{draft.datetime | date}}</td>
-                            <td><a href="" ng-click="clickOnRemoveButton($index);"><i class="fa fa-times-circle-o fa-lg"></i></a></td>
+                            <td><a href="" ng-click="clickOnRemoveButton(draft);"><i class
+                                                                                         ="fa fa-times-circle-o fa-lg"></i></a></td>
                         </tr>
                         <tr ng-show="allDrafts.length<1">
                             <td class="col-lg-1">
@@ -174,7 +178,7 @@
                     </table>
                 </div>
             </div>
-
+            </div>
 
             <!--Closed-->
             <div id="closedCollapse" class="well div-table col-lg-12">

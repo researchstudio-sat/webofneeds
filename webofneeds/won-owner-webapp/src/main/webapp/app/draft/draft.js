@@ -18,17 +18,15 @@
  * Created by LEIH-NB on 20.10.2014.
  */
 
-angular.module('won.owner').controller("DraftCtrl", function($scope,$location, applicationStateService, applicationControlService) {
-    var indexOfChosenDraft;
-    $scope.recordsToDisplay = 4;
+angular.module('won.owner').controller("DraftCtrl", function($scope,$location, applicationStateService, applicationControlService, userService) {
 
-    function deleteDraft(index) {
-        if (index >= 0) {
-            $scope.drafts.splice(index, 1);
-        }
-    }
+    $scope.recordsToDisplay = 4;
+    $scope.displayConfirmation = false;
+    $scope.chosenDraftUri = null;
+
     $scope.clickOnDraft = function(draft){
-        $location.path("create-need/"+draft.currentStep+"/"+draft.menuposition);
+        //$location.path("create-need/"+draft.currentStep+"/"+draft.menuposition);
+        $location.path("create-need/"+draft.currentStep+"/"+draft.menuposition+"/"+draft.draft.title).search({"draft": draft.draftURI});
     }
     $scope.allDrafts = applicationStateService.getAllDrafts();
     // TODO call here backend method
@@ -37,16 +35,25 @@ angular.module('won.owner').controller("DraftCtrl", function($scope,$location, a
     $scope.draftsCollapseClick = function () {
         $scope.draftsCollapsed = !$scope.draftsCollapsed;
     };
-    $scope.clickOnRemoveButton = function (index) {
-        $scope.displayConfirmationDialog = true;
-        indexOfChosenDraft = index;
+    $scope.clickOnRemoveButton = function (draft) {
+        $scope.displayConfirmation = true;
+        $scope.chosenDraftUri = draft.draftURI;
+    }
+
+    $scope.displayConfirmationDialog = function() {
+        return  $scope.displayConfirmation;
     }
 
     $scope.clickOnYesButton = function() {
-        deleteDraft(indexOfChosenDraft);
-        $scope.displayConfirmationDialog = false;
+        $scope.displayConfirmation = false;
+        userService.removeDraft($scope.chosenDraftUri);
+        $scope.chosenDraftURI = null;
     }
     $scope.clickOnNoButton = function() {
-        $scope.displayConfirmationDialog = false;
+        $scope.displayConfirmation = false;
+    }
+
+    $scope.hasDrafts = function () {
+        return applicationStateService.getAllDraftsCount() > 0;
     }
 })

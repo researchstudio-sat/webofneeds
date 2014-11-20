@@ -15,13 +15,16 @@
  */
 
 angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService,applicationStateService, mapService, userService, utilService, wonService) {
+    $scope.currentStep = $routeParams.step;
     $scope.menuposition = $routeParams.menuposition;
     $scope.title = $routeParams.title;
+    // we pass draft uri in query param "draft". Care should be taken to remove this param when redirecting with location.path(...).search("draft", null)
+    $scope.draftURI = $routeParams.draft;
 
     $scope.$on(won.EVENT.NEED_CREATED, onNeedCreated = function(event, eventData){
         $scope.needURI = eventData.needURI;
         applicationStateService.setCurrentNeedURI($scope.needURI);
-        $location.path("/private-link");
+        $location.path("/private-link").search("draft", null);
     });
 
     /*Block for working with checking another post type */
@@ -88,18 +91,10 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 		maxFileSize:5000000,
 		acceptFileTypes:/(\.|\/)(gif|jpe?g|png)$/i
 	};
-    if($scope.currentStep==undefined){
-        $scope.currentStep = $routeParams.step;
-    }
+
     $scope.numberOfSteps = 3;
     $scope.toJump = 0;
 	$scope.successShow = false;
-
-    $scope.previousButton = false;
-    $scope.saveDraftButton = userService.isAuth();
-    $scope.nextButton = true;
-    $scope.previewButton = true;
-    $scope.publishButton = false;
     $scope.collapsed = false;
 
     $scope.setShowButtons = function(step){
@@ -135,9 +130,16 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             $scope.nextButton = false;
             $scope.previewButton = false;
             $scope.publishButton = true;
+        } else { // default
+            $scope.previousButton = false;
+            $scope.saveDraftButton = userService.isAuth();
+            $scope.nextButton = true;
+            $scope.previewButton = true;
+            $scope.publishButton = false;
         }
 
     }
+    $scope.setShowButtons($scope.currentStep);
     /*$scope.needType = function($routeParams){
         if($routeParams.needType == "want"){
             return "DEMAND";
@@ -182,6 +184,15 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         }
 
     }
+    $scope.getNeed = function() {
+        if ($scope.draftURI == null) {
+            return $scope.getCleanNeed();
+        } else {
+            var needFromDraft =  applicationStateService.getDraft($scope.draftURI);
+            needFromDraft.needURI = $scope.draftURI;
+            return needFromDraft;
+        }
+    }
 
     $scope.getCleanNeed = function() {
         return {
@@ -205,7 +216,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         };
     };
 
-	$scope.need = $scope.getCleanNeed();
+	$scope.need = $scope.getNeed();
     $scope.need.basicNeedType = $scope.needType();
 
 	$scope.onClickMap = function($event, $params) {
@@ -305,9 +316,11 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
         // building need as JSON object
         var draftJson = draftBuilderObject.build();
-        var draftURI =  wonService.getDefaultWonNodeUri() + "/need/" + utilService.getRandomInt(1,9223372036854775807);
-        draftJson['@graph'][0]['@graph'][0]['@id'] = draftURI;
-        var createDraftObject = {"draftURI":draftURI,"draft":JSON.stringify(draftJson)};
+        if ($scope.need.needURI == null || 0 === $scope.need.needURI.length) {
+            $scope.need.needURI =  wonService.getDefaultWonNodeUri() + "/need/" + utilService.getRandomInt(1,9223372036854775807);
+            draftJson['@graph'][0]['@graph'][0]['@id'] = $scope.need.needURI;
+        }
+        var createDraftObject = {"draftURI":$scope.need.needURI,"draft":JSON.stringify(draftJson)};
 
         needService.saveDraft(createDraftObject).then(function(draftURI){
            $scope.successShow = true;
@@ -349,6 +362,10 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         return need.latitude != '' && need.longitude != null;
     }
 
+    function hasUri(need) {
+        return need.needURI != '' && need.needURI != null;
+    }
+
 	$scope.publish = function () {
         //TODO logic
 		/*needService.save($scope.need).then(function() {
@@ -385,17 +402,25 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
             needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
         }
 
+        if (hasUri($scope.need)) {
+            needBuilderObject.uri($scope.need.needURI);
+        }
+
         // building need as JSON object
         var needJson = needBuilderObject.build();
 
         //console.log(needJson);
         var newNeedUriPromise = wonService.createNeed(needJson);
+
+        if ($scope.draftURI != null) {
+            userService.removeDraft($scope.draftURI);
+            $scope.draftURI = null;
+        }
         //console.log('promised uri: ' + newNeedUriPromise);
 
         //$scope.need = $scope.getCleanNeed();      TODO decide what to do
         $scope.successShow = true;
 	};
-
 
 	$scope.cancel = function () {
 		$location.path("/");

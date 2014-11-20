@@ -60,7 +60,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         privateData.currentEvent = null;
         //all needs are stored in this array (in the form returned by linkedDataService.getNeed(uri)
         utilService.removeAllProperties(privateData.allNeeds);
-        privateData.allDrafts.splice(0,privateData.allDrafts.length);
+        utilService.removeAllProperties(privateData.allDrafts);
 
         utilService.removeAllProperties(privateData.unreadEventsByNeedByType);
 
@@ -69,7 +69,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     }
     applicationStateService.init = function(){
         privateData.allNeeds = {}
-        privateData.allDrafts = [];
+        privateData.allDrafts = {};
         privateData.currentNeedURI = null;
         privateData.currentEvent = null;
 
@@ -349,6 +349,23 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     }
 
     /**
+     * Gets the draft by its URI.
+     * @param draftURI
+     * @returns draft
+     */
+    applicationStateService.getDraft = function(draftURI){
+        return privateData.allDrafts[draftURI].draft;
+    }
+
+    /**
+     * Removes the draft by its URI.
+     * @param draftURI
+     */
+    applicationStateService.removeDraft = function(draftURI){
+        delete privateData.allDrafts[draftURI];
+    }
+
+    /**
      * Gets a promise to the current need, if one is currently set. If no need is set,
      * the promise is rejected.
      */
@@ -398,8 +415,8 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         var menuposition = draftBuilderObject.getCurrentMenuposition();
         var currentStep = draftBuilderObject.getCurrentStep();
         var draftObj = draftBuilderObject.getDraftObject();
-        var draftObjWithMetaInfo = {"draftURI":draft.draftURI,"currentStep":currentStep,"draft":draftObj};
-        privateData.allDrafts.push(draftObjWithMetaInfo);
+        var draftObjWithMetaInfo = {"draftURI":draft.draftURI,"currentStep":currentStep,"menuposition":menuposition,"draft":draftObj};
+        privateData.allDrafts[draft.draftURI] = draftObjWithMetaInfo;
 
     }
     applicationStateService.addNeeds = function(needs){
@@ -424,7 +441,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return utilService.getKeySize(privateData.allNeeds);
     }
     applicationStateService.getAllDraftsCount = function(){
-        return privateData.allDrafts.length;
+        return utilService.getKeySize(privateData.allDrafts);
     }
     /**
      * Fetches the unreadObjects structure, rebuilding it if it is dirty.

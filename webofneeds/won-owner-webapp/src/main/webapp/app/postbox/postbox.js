@@ -34,7 +34,6 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
     }
 
     $scope.recordsToDisplay = 4;
-    $scope.displayConfirmationDialog = false;
 
 	$scope.search = '';
 

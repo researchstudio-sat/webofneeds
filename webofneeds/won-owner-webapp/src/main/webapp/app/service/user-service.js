@@ -1,4 +1,4 @@
-angular.module('won.owner').factory('userService', function ($window, $http, $log, $rootScope, applicationStateService, utilService) {
+angular.module('won.owner').factory('userService', function ($window, $http, $log, $q, $rootScope, applicationStateService, utilService) {
 
 
     var userService = {};
@@ -71,6 +71,33 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
             }
         )
         //}
+    }
+
+    userService.removeDraft = function(draftURI) {
+        $http.delete(
+            '/owner/rest/needs/drafts/draft/?uri=' + encodeURIComponent(draftURI),
+            privateData.user
+        ).then(
+            function success(response) {
+                applicationStateService.removeDraft(draftURI);
+                // TODO broadcast success notification?
+            },
+            function error(response) {
+                var errorResponse = {};
+                errorResponse.message = "getting drafts of a user failed";
+                switch(response.status) {
+                    case 403:
+                        // normal error
+                        errorResponse.status = "ERROR";
+
+                    default:
+                        // system error
+                        errorResponse.status = "FATAL_ERROR";
+                        break;
+                }
+                // TODO broadcast error notification?
+            }
+        )
     }
 
     userService.verifyAuth = function() {
