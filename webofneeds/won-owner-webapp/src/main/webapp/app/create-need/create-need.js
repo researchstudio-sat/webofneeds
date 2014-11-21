@@ -411,6 +411,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         //console.log(needJson);
         var newNeedUriPromise = wonService.createNeed(needJson);
 
+        // TODO: should the draft removing part be changed to run only on success from newNeedUriPromise?
         if ($scope.draftURI != null) {
             userService.removeDraft($scope.draftURI);
             $scope.draftURI = null;

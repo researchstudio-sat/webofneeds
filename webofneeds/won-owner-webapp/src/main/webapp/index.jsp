@@ -140,9 +140,15 @@
 						<li class="dropdown-submenu top-layer"ng-show="!showPublic()">
 							<a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
 							<ul class="dropdown-menu" ng-controller="DraftCtrl"  >
-								<li ng-repeat="draft in allDrafts | orderBy: '-datetime' | limitTo: recordsToDisplay">
+								<li
+                                        ng-repeat="draft in allDrafts | orderObjectBy:'timestamp':true | limitTo: recordsToDisplay">
                                     <a href ng-click="clickOnDraft(draft)">
-                                        <i class="fa fa-file-o fa-lg" ng-bind="draft.draft.title"> &nbsp;</i></a></li>
+                                    <span style="display: none;">{{draft.draft.basicNeedType}}</span>
+                                    <img ng-src="{{getTypePicURI(draft.draft.basicNeedType)}}"/>
+                                     &nbsp;
+                                     <span ng-bind="draft.draft.title"> &nbsp;</span>
+                                    </a>
+                                </li>
 								<li class="divider"></li>
 								<li><a href="#/postbox"><i class="fa fa-list fa-lg"></i>&nbsp;II Others (go to full list)</a></li>
 							</ul>
