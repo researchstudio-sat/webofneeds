@@ -154,13 +154,13 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
     $scope.needType = function(){
         if($scope.menuposition == 0){
-            return "DEMAND";
+            return won.WON.BasicNeedTypeDemand;
         }else if($scope.menuposition == 1){
-            return "SUPPLY";
+            return won.WON.BasicNeedTypeSupply;
         } else if($scope.menuposition == 2){
-            return "DO_TOGETHER";
+            return won.WON.BasicNeedTypeDotogether;
         } else if($scope.menuposition == 3){
-            return "CRITIQUE";
+            return won.WON.BasicNeedTypeCritique;
         }
     }
 
@@ -188,9 +188,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         if ($scope.draftURI == null) {
             return $scope.getCleanNeed();
         } else {
-            var needFromDraft =  applicationStateService.getDraft($scope.draftURI);
-            needFromDraft.needURI = $scope.draftURI;
-            return needFromDraft;
+            return  applicationStateService.getDraft($scope.draftURI);
         }
     }
 
@@ -286,12 +284,13 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
         draftBuilderObject.setCurrentStep($scope.currentStep);
         draftBuilderObject.setCurrentMenuposition($scope.menuposition);
         draftBuilderObject.setDraftObject($scope.need);
+        draftBuilderObject.setLastSavedTimestamp(new Date().getTime());
 
-        if ($scope.need.basicNeedType == 'DEMAND') {
+        if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
             draftBuilderObject.demand();
-        } else if ($scope.need.basicNeedType == 'SUPPLY') {
+        } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
             draftBuilderObject.supply();
-        } else if ($scope.need.basicNeedType == 'DO_TOGETHER') {
+        } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDotogether) {
             draftBuilderObject.doTogether();
         } else {
             draftBuilderObject.critique();
@@ -375,11 +374,11 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
         // creating need object
         var needBuilderObject = new window.won.NeedBuilder().setContext();
-        if ($scope.need.basicNeedType == 'DEMAND') {
+        if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
             needBuilderObject.demand();
-        } else if ($scope.need.basicNeedType == 'SUPPLY') {
+        } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
             needBuilderObject.supply();
-        } else if ($scope.need.basicNeedType == 'DO_TOGETHER') {
+        } else if ($scope.need.basicNeedType ==  won.WON.BasicNeedTypeDotogether) {
             needBuilderObject.doTogether();
         } else {
             needBuilderObject.critique();

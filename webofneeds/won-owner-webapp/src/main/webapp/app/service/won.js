@@ -618,16 +618,16 @@
                 return this;
             },
             supply: function () {
-                return this.basicNeedType("won:Supply");
+                return this.basicNeedType(won.WON.BasicNeedTypeSupplyCompacted);
             },
             demand: function () {
-                return this.basicNeedType("won:Demand");
+                return this.basicNeedType(won.WON.BasicNeedTypeDemandCompacted);
             },
             doTogether: function () {
-                return this.basicNeedType("won:DoTogether");
+                return this.basicNeedType(won.WON.BasicNeedTypeDotogetherCompacted);
             },
             critique: function () {
-                return this.basicNeedType("won:Critique");
+                return this.basicNeedType(won.WON.BasicNeedTypeCritiqueCompacted);
             },
             basicNeedType: function (type) {
                 this.getContext()["won:hasBasicNeedType"]= {
@@ -842,6 +842,10 @@
             this.getMetaNode()["won:isInStep"]=currentStep;
             return this;
         }
+        won.DraftBuilder.prototype.setLastSavedTimestamp = function(timestamp){
+            this.getMetaNode()["won:lastSavedTimestamp"]=timestamp;
+            return this;
+        }
         won.DraftBuilder.prototype.setCurrentMenuposition = function(menuposition){
             this.getMetaNode()["won:hasMenuposition"]=menuposition;
             return this;
@@ -855,6 +859,9 @@
         }
         won.DraftBuilder.prototype.getCurrentStep = function(){
             return this.getMetaNode()["won:isInStep"];
+        }
+        won.DraftBuilder.prototype.getLastSavedTimestamp = function(){
+            return this.getMetaNode()["won:lastSavedTimestamp"];
         }
         won.DraftBuilder.prototype.getCurrentMenuposition = function(){
             return this.getMetaNode()["won:hasMenuposition"];
