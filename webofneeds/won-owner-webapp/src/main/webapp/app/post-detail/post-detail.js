@@ -255,7 +255,7 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     }
 });
 
-angular.module('won.owner').directive('wonContact',function factory(userService){
+angular.module('won.owner').directive('wonContact',function factory(userService, wonService){
     return {
         restrict: 'AE',
         templateUrl : "app/post-detail/contact.html",
@@ -266,11 +266,57 @@ angular.module('won.owner').directive('wonContact',function factory(userService)
             $scope.email = '';
             $scope.postTitle = 'LG TV 40"';//todo set value normaly
             $scope.privateLink = 'https://won.com/la3f#private';//todo set value normaly
+            $scope.dummyUri = '';
 
             $scope.sendMessage = function() {
                 //TODO Put here logic
-                if(!$scope.sendStatus)$scope.sendStatus = true;
+                // creating need object
+                var needBuilderObject = new window.won.NeedBuilder().setContext();
+                if ($scope.need.basicNeedType == 'DEMAND') {
+                    needBuilderObject.supply;
+                } else if ($scope.need.basicNeedType == 'SUPPLY') {
+                    needBuilderObject.demand();
+                } else if ($scope.need.basicNeedType == 'DO_TOGETHER') {
+                    needBuilderObject.doTogether();
+                } else {
+                    needBuilderObject.critique();
+                }
+
+                needBuilderObject.title('Request for converstion to'+$scope.need.title)
+                    .ownerFacet()               // mandatory
+                    .description('')
+                    .hasTag('')
+                    .hasContentDescription('')    // mandatory
+                    //.hasPriceSpecification("EUR",5.0,10.0)
+                    .active()                   // mandatory: active or inactive
+
+                if (hasLocationSpecification($scope.need)) {
+                    // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
+                    needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
+                }
+
+                if (hasTimeSpecification($scope.need)) {
+                    needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
+                }
+
+                // building need as JSON object
+                var needJson = needBuilderObject.build();
+
+                //console.log(needJson);
+                var newNeedUriPromise = wonService.createNeed(needJson);
+                //console.log('promised uri: ' + newNeedUriPromise);
+
+                newNeedUriPromise.then(function(uri){
+                    wonService.connect(uri, $scope.need.uri);
+                })
+
+                //$scope.need = $scope.getCleanNeed();      TODO decide what to do
+                $scope.successShow = true;
+              //  if(!$scope.sendStatus)$scope.sendStatus = true;
             };
+
+
+
             $scope.copyLinkToClipboard = function() {
                 //todo maybe we can use http://zeroclipboard.org/
             };
