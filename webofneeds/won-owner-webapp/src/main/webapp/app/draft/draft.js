@@ -23,6 +23,8 @@ angular.module('won.owner').controller("DraftCtrl", function($scope,$location, a
     $scope.recordsToDisplay = 4;
     $scope.displayConfirmation = false;
     $scope.chosenDraftUri = null;
+    $scope.draftsSortedField = 'timestamp';
+    $scope.draftsReversedSort = true;
 
     $scope.clickOnDraft = function(draft){
         //$location.path("create-need/"+draft.currentStep+"/"+draft.menuposition);
@@ -55,5 +57,14 @@ angular.module('won.owner').controller("DraftCtrl", function($scope,$location, a
 
     $scope.hasDrafts = function () {
         return applicationStateService.getAllDraftsCount() > 0;
+    }
+
+    $scope.setSortParams = function(fieldName) {
+        if ($scope.draftsSortedField == fieldName) {
+            $scope.draftsReversedSort = !$scope.draftsReversedSort;
+        } else {
+            $scope.draftsReversedSort = false;
+            $scope.draftsSortedField = fieldName;
+        }
     }
 })
