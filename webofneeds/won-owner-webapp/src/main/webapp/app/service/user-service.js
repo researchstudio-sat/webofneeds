@@ -1,4 +1,4 @@
-angular.module('won.owner').factory('userService', function ($window, $http, $log, $rootScope, applicationStateService, utilService) {
+angular.module('won.owner').factory('userService', function ($window, $http, $log, $q, $rootScope, applicationStateService, utilService) {
 
 
     var userService = {};
@@ -47,31 +47,57 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         )
         //}
         //if(applicationStateService.getAllDraftsCount()>=0){
-        // TODO uncomment when bug with needs redirected after logout-login is fixed
-//        $http.get(
-//            '/owner/rest/needs/drafts/',
-//            privateData.user
-//        ).then(
-//            function (drafts) {
-//                if(drafts.data.length>0){
-//                    applicationStateService.addDrafts(drafts)
-//                }
-//                // success
-//                return {status:"OK"};
-//            },
-//            function (response) {
-//                switch(response.status) {
-//                    case 403:
-//                        // normal error
-//                        return {status: "ERROR", message: "getting drafts of a user failed"};
-//                    default:
-//                        // system error
-//                        return {status:"FATAL_ERROR", message: "getting drafts of a user failed"};
-//                        break;
-//                }
-//            }
-//        )
+        $http.get(
+            '/owner/rest/needs/drafts/',
+            privateData.user
+        ).then(
+            function (drafts) {
+                if(drafts.data.length>0){
+                    applicationStateService.addDrafts(drafts)
+                }
+                // success
+                return {status:"OK"};
+            },
+            function (response) {
+                switch(response.status) {
+                    case 403:
+                        // normal error
+                        return {status: "ERROR", message: "getting drafts of a user failed"};
+                    default:
+                        // system error
+                        return {status:"FATAL_ERROR", message: "getting drafts of a user failed"};
+                        break;
+                }
+            }
+        )
         //}
+    }
+
+    userService.removeDraft = function(draftURI) {
+        $http.delete(
+            '/owner/rest/needs/drafts/draft/?uri=' + encodeURIComponent(draftURI),
+            privateData.user
+        ).then(
+            function success(response) {
+                applicationStateService.removeDraft(draftURI);
+                // TODO broadcast success notification?
+            },
+            function error(response) {
+                var errorResponse = {};
+                errorResponse.message = "getting drafts of a user failed";
+                switch(response.status) {
+                    case 403:
+                        // normal error
+                        errorResponse.status = "ERROR";
+
+                    default:
+                        // system error
+                        errorResponse.status = "FATAL_ERROR";
+                        break;
+                }
+                // TODO broadcast error notification?
+            }
+        )
     }
 
     userService.verifyAuth = function() {
@@ -86,16 +112,17 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
                 return false;
             }
         );//.done() make sure exceptions aren't lost?
-        return privateData.user.isAuth //TODO bad as it can return before the http request resolves (see "TODO fix bug" below)
+        return promise
+        //return privateData.user.isAuth //TODO bad as it can return before the http request resolves (see "TODO fix bug" below)
     };
     
     // TODO fix bug: looks like a bug: returns before userService.verifyAuth() returns
     // ^--> make isAuth always return a future
     userService.isAuth = function () {
-        if(privateData.user.isAuth == false && privateData.verifiedOnce == false) {
+        /*if(privateData.user.isAuth == false && privateData.verifiedOnce == false) {
             userService.verifyAuth();
             privateData.verifiedOnce = true;
-        }
+        }*/
         return (privateData.user.isAuth == true);
     };
     userService.setAuth = function(username) { //TODO deletme?
@@ -171,6 +198,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
                 '/owner/rest/users/signout'
         ).then(
             function (data, status) {
+                userService.resetAuth();
                 $rootScope.$broadcast(won.EVENT.USER_SIGNED_OUT);
                 return {status:"OK"};
             },
@@ -179,20 +207,14 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
             }
         );
 	};
-    //TODO implement fetching posts on page reload
-    /*init = function () {
-     if(userService.verifyAuth()) {
-     userService.fetchPostsAndDrafts()
-     $location.path('/postbox');
-     }
-     }
-     init()*/
-     //TODO fetches a lot of needs (13k) if called while logged out (?)
 
-    if(userService.isAuth()) {
-        //reload while signed in
-        userService.fetchPostsAndDrafts();
-    }
+    var verified = userService.verifyAuth(); //checking login status
+    verified.then(function reloadWhileLoggedIn(loggedIn){
+        if(loggedIn) {
+            userService.fetchPostsAndDrafts();
+        }
+        $rootScope.$apply()
+    });
     return userService;
 
 });

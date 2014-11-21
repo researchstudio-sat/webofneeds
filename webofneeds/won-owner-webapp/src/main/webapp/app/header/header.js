@@ -77,7 +77,6 @@ angular.module('won.owner').controller("HeaderCtrl",
 
 	onResponseSignOut = function (result) {
 		if (result.status == 'OK') {
-			userService.resetAuth();
 			$location.path("/");
 		}
 	};

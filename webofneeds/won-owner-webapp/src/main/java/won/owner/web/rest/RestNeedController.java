@@ -24,7 +24,6 @@ import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.pojo.ConnectionPojo;
 import won.owner.pojo.CreateDraftPojo;
-import won.owner.pojo.DraftPojo;
 import won.owner.pojo.NeedPojo;
 import won.owner.repository.DraftRepository;
 import won.owner.service.impl.DataReloadService;
@@ -51,6 +50,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 
 import javax.ws.rs.core.MediaType;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -243,51 +243,55 @@ public class RestNeedController {
 
   @ResponseBody
   @RequestMapping(
-    value ="/drafts/{draftId}",
+    value ="/drafts/draft",
     produces = MediaType.APPLICATION_JSON,
     method = RequestMethod.GET
   )
-  public DraftPojo getDraft(@PathVariable("draftId") long draftId){
-    logger.debug("getting draft: "+draftId);
-
-    List<Need> draftList = needRepository.findById(draftId);
-    Need need = draftList.get(0);
-
-    DraftPojo draftPojo = new DraftPojo(need.getNeedURI(),rdfStorage.loadModel(need.getNeedURI()),
-                                        draftRepository.findByDraftURI(need.getNeedURI()).get(0));
-    draftPojo.setNeedURI(need.getNeedURI().toString());
+  public CreateDraftPojo getDraft(@RequestParam("uri") String uri) {
+    logger.debug("getting draft: "+ uri);
+    URI draftURI = null;
+    CreateDraftPojo draftPojo = null;
+    try {
+      draftURI = new URI(uri);
+      Draft draft = draftRepository.findOneByDraftURI(draftURI);
+      if (draft == null) {
+        logger.warn("draft requested for delete was not found: " + uri);
+      } else {
+        draftPojo = new CreateDraftPojo(draft.getDraftURI().toString(), draft.getContent());
+      }
+    } catch (URISyntaxException e) {
+      logger.warn("draft uri problem.", e);
+    }
     return draftPojo;
   }
 
   @ResponseBody
   @RequestMapping(
-    value ="/drafts/{draftId}",
+    value ="/drafts/draft",
     method = RequestMethod.DELETE
   )
-  public ResponseEntity deleteDraft(@PathVariable long draftId){
-    logger.debug("deleting draft: "+draftId);
+  public ResponseEntity<String> deleteDraft(@RequestParam("uri") String uri) {
 
-    List<Need> draftList = needRepository.findById(draftId);
-    if (draftList.size()==0){
-      return new ResponseEntity(HttpStatus.CONFLICT);
-    }
-    Need need = draftList.get(0);
+    logger.debug("deleting draft: "+ uri);
+    URI draftURI = null;
+    CreateDraftPojo draftPojo = null;
     User user = getCurrentUser();
 
-    try{
-      /*
-      user.removeNeeds(draftList);
+    try {
+      draftURI = new URI(uri);
+      user.getDraftURIs().remove(draftURI);
       wonUserDetailService.save(user);
-      List<Draft> draftStates = draftStateRepository.findByDraftURI(need.getNeedURI());
-      needRepository.delete(draftId);
-      draftStateRepository.delete(draftStates);
-      rdfStorage.removeContent(need.getNeedURI());     */
-    }catch (Exception e){
-      return new ResponseEntity(HttpStatus.CONFLICT);
+      Draft draft = draftRepository.findOneByDraftURI(draftURI);
+      if (draft == null) {
+        logger.warn("draft requested for delete was not found: " + uri);
+      } else {
+        draftRepository.delete(draft);
+      }
+      return ResponseEntity.ok().body("deleted draft: " + uri);
+    } catch (URISyntaxException e) {
+      logger.warn("draft uri problem.", e);
+      return ResponseEntity.badRequest().body("draft uri problem");
     }
-    return new ResponseEntity(HttpStatus.OK);
-
-
   }
 
 

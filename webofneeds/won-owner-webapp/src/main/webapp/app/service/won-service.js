@@ -213,10 +213,13 @@ angular.module('won.owner').factory('wonService', function (
         var needData = won.clone(needAsJsonLd);
         //TODO: Fix hard-coded URIs here!
         var eventUri = privateData.defaultWonNodeUri + "/event/" + utilService.getRandomInt(1,9223372036854775807);
-        var needUri =  privateData.defaultWonNodeUri + "/need/" + utilService.getRandomInt(1,9223372036854775807);
+        var needUri = needData['@graph'][0]['@graph'][0]['@id'];
+        if (needUri == null || 0 === needUri.length) {
+            needUri =  privateData.defaultWonNodeUri + "/need/" + utilService.getRandomInt(1,9223372036854775807);
+            needData['@graph'][0]['@graph'][0]['@id'] = needUri;
+        }
         var wonNode = privateData.defaultWonNodeUri;
         needData['@graph'][0]['@id'] = needUri + "/core/#data";
-        needData['@graph'][0]['@graph'][0]['@id'] = needUri;
         var message = new won.MessageBuilder(won.WONMSG.createMessage, needData)
             .eventURI(eventUri)
             .hasReceiverNode(wonNode)

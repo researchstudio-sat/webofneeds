@@ -613,6 +613,10 @@
                 return this.data["@graph"][0]["@graph"][0];
             },
 
+            uri: function (needURI) {
+                this.data["@graph"][0]["@graph"][0]['@id'] = needURI;
+                return this;
+            },
             supply: function () {
                 return this.basicNeedType("won:Supply");
             },
