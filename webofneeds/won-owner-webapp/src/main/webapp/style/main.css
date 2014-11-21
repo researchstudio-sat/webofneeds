@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-
+#copyImg .fa-copy {display:block; width:16px; height:16px;}
 table.tableSection {
     display: table;
     width: 100%;

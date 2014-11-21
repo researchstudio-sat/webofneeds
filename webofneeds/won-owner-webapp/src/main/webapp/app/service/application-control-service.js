@@ -44,5 +44,17 @@ angular.module('won.owner').factory('applicationControlService', function (appli
         else if(type==won.WON.BasicNeedTypeSupply) return "/owner/images/type_posts/offer.png";
         else return "/owner/images/type_posts/todo.png";
     };
+    applicationControlService.getMenuPositionForNeedType = function(needType){
+        switch (needType){
+            case won.WON.BasicNeedTypeDemand:
+                return 1;
+            case won.WON.BasicNeedTypeSupply:
+                return 2;
+            case won.WON.BasicNeedTypeDotogether:
+                return 3;
+            case won.WON.BasicNeedTypeCritique:
+                return 4;
+        }
+    }
     return applicationControlService;
 });

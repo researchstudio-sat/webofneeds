@@ -140,17 +140,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
 
     }
     $scope.setShowButtons($scope.currentStep);
-    /*$scope.needType = function($routeParams){
-        if($routeParams.needType == "want"){
-            return "DEMAND";
-        }else if($routeParams.needType == "offer"){
-            return "SUPPLY";
-        } else if($routeParams.needType == "activity"){
-            return "DO_TOGETHER";
-        } else if($routeParams.needType == "critique"){
-            return "CRITIQUE";
-        }
-    }       */
 
     $scope.needType = function(){
         if($scope.menuposition == 0){
@@ -366,11 +355,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     }
 
 	$scope.publish = function () {
-        //TODO logic
-		/*needService.save($scope.need).then(function() {
-			$scope.need = $scope.getCleanNeed();
-			$scope.successShow = true;
-		}); */
 
         // creating need object
         var needBuilderObject = new window.won.NeedBuilder().setContext();
@@ -664,14 +648,6 @@ angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  
         if($scope.menuposition == 3) return "Where did the problem occur / where have things to be changed?";
     }
 
-    /* static text used for all offer types
-    $scope.getTimeComment = function() {
-        if($scope.menuposition == 0) return "Do you need it during a limited time intervall / at certain times or up till a deadline?...";
-        if($scope.menuposition == 1) return "Is it only available during a limited time intervall or up till a deadline?...";
-        if($scope.menuposition == 2) return "When's the action happing / the event?...";
-        if($scope.menuposition == 3) return "When did the thing happen you want to change or when does it happen?...";
-    }
-    */
 });
 
 

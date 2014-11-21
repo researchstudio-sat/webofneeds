@@ -5,6 +5,7 @@
  * Time: 8:08 AM
  * To change this template use File | Settings | File Templates.
  */
+
 angular.module('won.owner')
     .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, applicationStateService, linkedDataService, wonService) {
 

@@ -21,16 +21,58 @@
  * Time: 10:01 AM
  * To change this template use File | Settings | File Templates.
  */
+angular.module('won.owner')
+    .directive('starFavourite', function factory(){
+        return {
+            restrict : 'E',
+            templateUrl : 'app/post-detail/favourite.html',
+            scope : {
+                showPublic: '&'
+            },
+            priority: 1,
+            link : function(scope, elem, attrs){
 
-angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams, applicationStateService) {
+                scope.hoverStarToolTip = 'save post as favourite';
+                scope.activeState= false;
+                scope.hoverState = false;
+            },
+            controller : function($scope, userService){
+
+                $scope.changeHoverState = function(){
+                    $scope.hoverState = !$scope.hoverState;
+                }
+                $scope.getStar = function(){
+                    if($scope.activeState == false && $scope.hoverState==false){
+                        return 'glyphicon glyphicon-star-empty';
+                    }else{
+                        return 'glyphicon glyphicon-star';
+                    }
+                }
+                $scope.changeActiveState = function($event){
+                    $scope.activeState = !$scope.activeState;
+                }
+            }
+        }
+    });
+angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams,applicationControlService, applicationStateService, userService) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
+    $scope.showPublic = function(){
+        return userService.isAuth();
+    }
+    $scope.clickOnCopy = function(){
+        $location.path("create-need/1/"+applicationControlService.getMenuPositionForNeedType($scope.need.basicNeedType));
+    }
 
+    $scope.hoverCopyToolTip ="I want this too";
     //$scope.need = $scope.$parent.need;
     $scope.need = {};
+
     linkedDataService.getNeed(applicationStateService.getCurrentNeedURI()).then(function(need){
+        $scope.need.uri = need['uri'];
         $scope.need.title = need['title'];
         $scope.need.tags = need['tags'];
+        $scope.need.basicNeedType = need['basicNeedType'];
         $scope.need.textDescription = need['textDescription'];
         $scope.need.creationDate = need['creationDate'];
         $scope.need.longitude = need['longitude'];
@@ -214,22 +256,61 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     }
 });
 
-angular.module('won.owner').directive('wonContact',function factory(userService){
+angular.module('won.owner').directive('wonContact',function factory(userService, wonService){
     return {
         restrict: 'AE',
         templateUrl : "app/post-detail/contact.html",
-        scope: {},
+        scope: {
+            need : '='
+        },
         controller : function($scope){
             $scope.message = '';
             $scope.sendStatus = false; //todo refresh this var each time when we click on show contact form
             $scope.email = '';
             $scope.postTitle = 'LG TV 40"';//todo set value normaly
             $scope.privateLink = 'https://won.com/la3f#private';//todo set value normaly
+            $scope.dummyUri = '';
 
             $scope.sendMessage = function() {
                 //TODO Put here logic
-                if(!$scope.sendStatus)$scope.sendStatus = true;
+                // creating need object
+                var needBuilderObject = new window.won.NeedBuilder().setContext();
+                if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
+                    needBuilderObject.supply;
+                } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
+                    needBuilderObject.demand();
+                } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDotogether) {
+                    needBuilderObject.doTogether();
+                } else {
+                    needBuilderObject.critique();
+                }
+
+                needBuilderObject.title('Request for converstion to '+$scope.need.title)
+                    .ownerFacet()               // mandatory
+                    .description('')
+                    .hasTag('')
+                    .hasContentDescription('')    // mandatory
+                    //.hasPriceSpecification("EUR",5.0,10.0)
+                    .active()                   // mandatory: active or inactive
+
+                // building need as JSON object
+                var needJson = needBuilderObject.build();
+
+                //console.log(needJson);
+                var newNeedUriPromise = wonService.createNeed(needJson);
+                //console.log('promised uri: ' + newNeedUriPromise);
+
+                newNeedUriPromise.then(function(uri){
+                    wonService.connect(uri, $scope.need.uri, $scope.message);
+                })
+
+                //$scope.need = $scope.getCleanNeed();      TODO decide what to do
+                $scope.successShow = true;
+              //  if(!$scope.sendStatus)$scope.sendStatus = true;
             };
+
+
+
             $scope.copyLinkToClipboard = function() {
                 //todo maybe we can use http://zeroclipboard.org/
             };

@@ -18,16 +18,18 @@
     <div class="row">
         <div class="col-md-12">
             <div class="row">
-                <div class="inline"><i class="fa fa-star fa-lg"></i></div>
-                <div class="inline"><i class="fa fa-circle fa-lg"></i></div>
+                <div class="inline" ><star-favourite show-public="showPublic()"></star-favourite></div>
+                <div class="inline"><img ng-src="{{getTypePicURI(need.basicNeedType)}}" tooltip="need type"/></div>
                 <div class="inline" style="font-size: 1.8em;" ng-bind="need.title" ></div>
-                <div class="inline pull-right"><i class="fa fa-copy fa-lg"></i></div>
             </div>
             <div class="row">
-                <div class="inline"><i class="fa fa-star fa-lg"></i></div>
-                <div class="inline"><i class="fa fa-circle fa-lg"></i></div>
-                <div class="inline" style="font-size: 1.8em;" ng-bind="need.creationDate"></div>
-                <div class="inline pull-right"><i class="fa fa-copy fa-lg"></i></div>
+                <div class="inline" style="font-size: 1.8em;" ng-bind="need.creationDate | date:'yy/MM/dd HH:mm'"></div>
+                <div id="copyImg" ng-show="showPublic()" class="inline pull-right">
+                    <span   ng-click="clickOnCopy()" class="fa fa-copy fa-lg" tooltip="{{hoverCopyToolTip}}"
+                            tooltip-trigger="mouseenter">
+                    </span>
+
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
@@ -140,7 +142,7 @@
             </div>
 
             <div class="div-table-row pull-right" ng-show="contactFormActiv">
-                <won-contact/>
+                <won-contact need="need"/>
             </div>
 
         </div>
