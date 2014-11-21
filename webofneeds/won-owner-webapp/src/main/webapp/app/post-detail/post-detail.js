@@ -302,6 +302,8 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
 
                 newNeedUriPromise.then(function(uri){
                     wonService.connect(uri, $scope.need.uri, $scope.message);
+                }).then(function(){
+                    $scope.sendStatus= true;
                 })
 
                 //$scope.need = $scope.getCleanNeed();      TODO decide what to do

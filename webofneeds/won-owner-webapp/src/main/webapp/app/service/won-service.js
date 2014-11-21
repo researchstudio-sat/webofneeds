@@ -290,7 +290,7 @@ angular.module('won.owner').factory('wonService', function (
      * @param need2
      */
     wonService.connect = function(need1, need2, textMessage){
-
+        var deferred = $q.defer();
         var sendConnect = function(need1, need2, wonNodeUri1, wonNodeUri2, textMessage) {
             //TODO: use event URI pattern specified by WoN node
             var envelopeData = {};
@@ -332,6 +332,40 @@ angular.module('won.owner').factory('wonService', function (
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
+                setTimeout(
+                    function(){
+                        //linkedDataService.fetch(connection.uri);
+                        //console.log("publishing angular event");
+                        //$rootScope.$broadcast(won.EVENT.CLOSE_SENT, eventData);
+                        var messageTemp = new won.MessageBuilder(won.WONMSG.connectSentMessage)
+                            .eventURI(eventUri)
+                            .forEnvelopeData(envelopeData)
+                            .hasFacet(won.WON.OwnerFacet)
+                            .hasRemoteFacet(won.WON.OwnerFacet)
+                            .build();
+                        var eventData = getEventData(messageTemp);
+                        //  eventData.eventType = messageTypeToEventType[eventData.hasMessageType];
+                        eventData.eventType = won.EVENT.CONNECT_SENT;
+                        eventData.commState = won.COMMUNUCATION_STATE.PENDING;
+                        linkedDataService.fetch(eventData.hasSender)
+                            .then(
+                            function (value) {
+                                linkedDataService.fetch(eventUri)
+                                    .then(
+                                    function(value2) {
+                                        console.log("publishing angular event");
+
+                                        //eventData.eventType = won.EVENT.CLOSE_SENT;
+                                        eventData.timestamp = new Date().getTime();
+                                        $rootScope.$broadcast(won.EVENT.CONNECT_SENT, eventData);
+                                        //$rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
+
+                                    }, won.reportError("cannot fetch closed event " + eventUri)
+                                );
+                            }, won.reportError("cannot fetch closed connection " +eventUri)
+                        );
+
+                    }, 3000);
             } catch (e) {
                console.log("could not connect " + need1 + " and " + need2 + ". Reason" + e);
             }

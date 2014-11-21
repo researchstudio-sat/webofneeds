@@ -51,7 +51,8 @@
         <div ng-show="sendStatus">
             <div class="col-md-12" style="font-size: 1.6em;">
                 <strong>Your message was sent!</strong><span class="glyphicon glyphicon-ok" style="color: green;"></span><br/>
-                You can see your conversations with <bold>{{postTitle}}</bold> in your <a href="TODO PUT HERE LINK">Postbox Page</a>.
+                You can see your conversations with <bold>{{need.title}}</bold> in your <a href="#/postbox">Postbox
+                Page</a>.
             </div>
         </div>
     </div>
@@ -97,7 +98,8 @@
                 <div class="col-md-10">
                     <strong>Your message was sent!</strong><span class="glyphicon glyphicon-ok" style="color: green;"></span><br/>
                     <span class="glyphicon glyphicon-lock"></span>Private link<br/>
-                    The private link for your conversation with <bold>{{postTitle}}</bold> was sent to {{email}}.<br/><br/>
+                    The private link for your conversation with <bold>{{need.title}}</bold> was sent to
+                    {{email}}.<br/><br/>
                     Access it to see your messages with the owner of this post. You shouldn’t give it away.
                 </div>
                 <div class="col-md-2">
