@@ -69,6 +69,7 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     $scope.need = {};
 
     linkedDataService.getNeed(applicationStateService.getCurrentNeedURI()).then(function(need){
+        $scope.need.uri = need['uri'];
         $scope.need.title = need['title'];
         $scope.need.tags = need['tags'];
         $scope.need.basicNeedType = need['basicNeedType'];
@@ -259,7 +260,9 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
     return {
         restrict: 'AE',
         templateUrl : "app/post-detail/contact.html",
-        scope: {},
+        scope: {
+            need : '='
+        },
         controller : function($scope){
             $scope.message = '';
             $scope.sendStatus = false; //todo refresh this var each time when we click on show contact form
@@ -272,32 +275,23 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                 //TODO Put here logic
                 // creating need object
                 var needBuilderObject = new window.won.NeedBuilder().setContext();
-                if ($scope.need.basicNeedType == 'DEMAND') {
+                if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
                     needBuilderObject.supply;
-                } else if ($scope.need.basicNeedType == 'SUPPLY') {
+                } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
                     needBuilderObject.demand();
-                } else if ($scope.need.basicNeedType == 'DO_TOGETHER') {
+                } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDotogether) {
                     needBuilderObject.doTogether();
                 } else {
                     needBuilderObject.critique();
                 }
 
-                needBuilderObject.title('Request for converstion to'+$scope.need.title)
+                needBuilderObject.title('Request for converstion to '+$scope.need.title)
                     .ownerFacet()               // mandatory
                     .description('')
                     .hasTag('')
                     .hasContentDescription('')    // mandatory
                     //.hasPriceSpecification("EUR",5.0,10.0)
                     .active()                   // mandatory: active or inactive
-
-                if (hasLocationSpecification($scope.need)) {
-                    // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
-                    needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
-                }
-
-                if (hasTimeSpecification($scope.need)) {
-                    needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
-                }
 
                 // building need as JSON object
                 var needJson = needBuilderObject.build();
@@ -307,7 +301,7 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                 //console.log('promised uri: ' + newNeedUriPromise);
 
                 newNeedUriPromise.then(function(uri){
-                    wonService.connect(uri, $scope.need.uri);
+                    wonService.connect(uri, $scope.need.uri, $scope.message);
                 })
 
                 //$scope.need = $scope.getCleanNeed();      TODO decide what to do

@@ -289,18 +289,26 @@ angular.module('won.owner').factory('wonService', function (
      * @param need1
      * @param need2
      */
-    wonService.connect = function(need1, need2){
+    wonService.connect = function(need1, need2, textMessage){
 
-        var sendConnect = function(need1, need2, wonNodeUri1, wonNodeUri2) {
+        var sendConnect = function(need1, need2, wonNodeUri1, wonNodeUri2, textMessage) {
             //TODO: use event URI pattern specified by WoN node
-            var eventUri = wonNodeUri1+ "/event/" +  utilService.getRandomInt(1,9223372036854775807);
-            var message = new won.MessageBuilder(won.WONMSG.connectionMessage)
+            var envelopeData = {};
+            envelopeData[won.WONMSG.hasSenderNeed] = need1;
+            envelopeData[won.WONMSG.hasSenderNode] = wonNodeUri1;
+            envelopeData[won.WONMSG.hasReceiverNeed] = need2;
+            envelopeData[won.WONMSG.hasReceiverNode] = wonNodeUri2;
+            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  utilService.getRandomInt(1,9223372036854775807);
+
+            var message = new won.MessageBuilder(won.WONMSG.connectMessage)
                 .eventURI(eventUri)
-                .hasSenderNeed(need1)
-                .hasSenderNode(wonNodeUri1)
-                .hasReceiverNeed(need2)
-                .hasReceiverNode(wonNodeUri2)
+                .forEnvelopeData(envelopeData)
+                .hasFacet(won.WON.OwnerFacet)
+                .hasRemoteFacet(won.WON.OwnerFacet)
+                .hasTextMessage(textMessage)
                 .build();
+
+
             var callback = new messageService.MessageCallback(
                 function (event, msg) {
                     //check if the message we got (the create need response message) indicates that all went well
