@@ -294,6 +294,7 @@ angular.module('won.owner').factory('wonService', function (
         var sendConnect = function(need1, need2, wonNodeUri1, wonNodeUri2, textMessage) {
             //TODO: use event URI pattern specified by WoN node
             var envelopeData = {};
+            envelopeData[won.WONMSG.hasSender]=need1;
             envelopeData[won.WONMSG.hasSenderNeed] = need1;
             envelopeData[won.WONMSG.hasSenderNode] = wonNodeUri1;
             envelopeData[won.WONMSG.hasReceiverNeed] = need2;
@@ -356,6 +357,7 @@ angular.module('won.owner').factory('wonService', function (
                                         console.log("publishing angular event");
 
                                         //eventData.eventType = won.EVENT.CLOSE_SENT;
+                                        deferred.resolve(eventUri);
                                         eventData.timestamp = new Date().getTime();
                                         $rootScope.$broadcast(won.EVENT.CONNECT_SENT, eventData);
                                         //$rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
@@ -367,6 +369,7 @@ angular.module('won.owner').factory('wonService', function (
 
                     }, 3000);
             } catch (e) {
+                deferred.reject(e);
                console.log("could not connect " + need1 + " and " + need2 + ". Reason" + e);
             }
         }
@@ -382,7 +385,7 @@ angular.module('won.owner').factory('wonService', function (
             },
             won.reportError("cannot connect need " + need1 + " and " + need2)
         );
-
+        return deferred.promise;
     }
     //TODO: only added for testing, remove it afterwards
     var getEventData = function(json) {

@@ -263,48 +263,65 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
         scope: {
             need : '='
         },
-        controller : function($scope){
+        controller : function($scope, applicationStateService){
             $scope.message = '';
             $scope.sendStatus = false; //todo refresh this var each time when we click on show contact form
             $scope.email = '';
             $scope.postTitle = 'LG TV 40"';//todo set value normaly
             $scope.privateLink = 'https://won.com/la3f#private';//todo set value normaly
             $scope.dummyUri = '';
-
+            $scope.post = null;//the post that is selected to connect with the current post. if no post is selected, a dummy post will be created
+            $scope.allNeeds = applicationStateService.getAllNeeds();
+            $scope.dropdownText = 'Select your post'
+            $scope.clickOnPost = function(post){
+                $scope.dropdownText = post.title;
+                $scope.post = $scope.allNeeds[post.uri];
+            }
             $scope.sendMessage = function() {
+                var needBuilderObject = new window.won.NeedBuilder().setContext();
+                if($scope.post == undefined){
+                    if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
+                        needBuilderObject.supply;
+                    } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
+                        needBuilderObject.demand();
+                    } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDotogether) {
+                        needBuilderObject.doTogether();
+                    } else {
+                        needBuilderObject.critique();
+                    }
+                    needBuilderObject.title('Request for converstion to '+$scope.need.title)
+                        .ownerFacet()               // mandatory
+                        .description('')
+                        .hasTag('')
+                        .hasContentDescription('')    // mandatory
+                        //.hasPriceSpecification("EUR",5.0,10.0)
+                        .active()                   // mandatory: active or inactive
+                }
                 //TODO Put here logic
                 // creating need object
-                var needBuilderObject = new window.won.NeedBuilder().setContext();
-                if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
-                    needBuilderObject.supply;
-                } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
-                    needBuilderObject.demand();
-                } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDotogether) {
-                    needBuilderObject.doTogether();
-                } else {
-                    needBuilderObject.critique();
-                }
 
-                needBuilderObject.title('Request for converstion to '+$scope.need.title)
-                    .ownerFacet()               // mandatory
-                    .description('')
-                    .hasTag('')
-                    .hasContentDescription('')    // mandatory
-                    //.hasPriceSpecification("EUR",5.0,10.0)
-                    .active()                   // mandatory: active or inactive
+
+
 
                 // building need as JSON object
                 var needJson = needBuilderObject.build();
 
-                //console.log(needJson);
-                var newNeedUriPromise = wonService.createNeed(needJson);
-                //console.log('promised uri: ' + newNeedUriPromise);
+                if($scope.post == undefined){
+                    var newNeedUriPromise = wonService.createNeed(needJson);
+                    //console.log('promised uri: ' + newNeedUriPromise);
 
-                newNeedUriPromise.then(function(uri){
-                    wonService.connect(uri, $scope.need.uri, $scope.message);
-                }).then(function(){
-                    $scope.sendStatus= true;
-                })
+                    newNeedUriPromise.then(function(uri){
+                        wonService.connect(uri, $scope.need.uri, $scope.message);
+                    }).then(function(){
+                        $scope.sendStatus= true;
+                    })
+                }
+
+                wonService.connect($scope.post.uri, $scope.need.uri, $scope.message).then(function(){
+                    $scope.sendStatus = true;
+                });
+                //console.log(needJson);
+
 
                 //$scope.need = $scope.getCleanNeed();      TODO decide what to do
                 $scope.successShow = true;

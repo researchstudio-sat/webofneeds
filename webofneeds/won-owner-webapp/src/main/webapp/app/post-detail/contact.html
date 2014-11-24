@@ -26,10 +26,14 @@
                             </div>
                             <div class="pull-left">
                                 <button type="button" class="btn dropdown-toggle" id="selectYourPost"
-                                        data-toggle="dropdown">Select your post<span class="caret"></span>
+                                        data-toggle="dropdown">{{dropdownText}}<span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="choosePost">
-                                    <li role="presentation">
+                                    <li role="presentation" ng-repeat="post in allNeeds | orderBy:post.creationDate">
+                                        <a role="menuitem" tabindex="0" href="" ng-click="clickOnPost(post)">{{post
+                                            .title}}</a>
+                                    </li>
+                                    <!--li role="presentation">
                                         <a role="menuitem" tabindex="0" href="" onclick="changeSortBy()">Post 1</a>
                                     </li>
                                     <li role="presentation">
@@ -37,7 +41,7 @@
                                     </li>
                                     <li role="presentation">
                                         <a role="menuitem" tabindex="2" href="">Post 3</a>
-                                    </li>
+                                    </li-->
                                 </ul>
                             </div>
                             <div class="pull-right">

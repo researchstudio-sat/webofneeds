@@ -61,7 +61,7 @@
                     <tbody>
                         <tr
                                 ng-show="hasNeeds()"
-                                ng-repeat="post in allNeeds() | orderObjectBy:sortedField:reversedSort |filter: search">
+                                ng-repeat="post in allNeeds | orderObjectBy:sortedField:reversedSort |filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{post.basicNeedType}}</span>
                                 <img ng-src="{{getTypePicURI(post.basicNeedType)}}"
