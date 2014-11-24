@@ -414,8 +414,9 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         var draftBuilderObject = new window.won.DraftBuilder(draftLd).setContext();
         var menuposition = draftBuilderObject.getCurrentMenuposition();
         var currentStep = draftBuilderObject.getCurrentStep();
+        var timestamp = draftBuilderObject.getLastSavedTimestamp();
         var draftObj = draftBuilderObject.getDraftObject();
-        var draftObjWithMetaInfo = {"draftURI":draft.draftURI,"currentStep":currentStep,"menuposition":menuposition,"draft":draftObj};
+        var draftObjWithMetaInfo = {"draftURI":draft.draftURI,"currentStep":currentStep,"menuposition":menuposition,"timestamp":timestamp,"draft":draftObj};
         privateData.allDrafts[draft.draftURI] = draftObjWithMetaInfo;
 
     }

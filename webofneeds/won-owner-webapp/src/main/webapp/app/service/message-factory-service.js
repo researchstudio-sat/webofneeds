@@ -24,7 +24,7 @@ angular.module('won.owner').factory('messageBuilderService', function ($http, $q
     wonMessage.messageContent = {};
     wonMessage.messageHeader = {};
 
-    needEnum = {SUPPLY : "Supply", DEMAND: "Demand", DO_TOGETHER: "Do Together", CRITIQUE: "Critique"};
+    //needEnum = {SUPPLY : "Supply", DEMAND: "Demand", DO_TOGETHER: "Do Together", CRITIQUE: "Critique"};
 
     messageGeneratorService.generateCreateNeedMessage = function(need){
         wonMessage.messageEvent = {messageURI:"",messageType:"CreateMessage",hasContent:"",signatures:""};

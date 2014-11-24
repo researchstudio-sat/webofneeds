@@ -144,8 +144,8 @@
                         <thead>
                         <tr>
                             <th st-sort="type">Type</th>
-                            <th st-sort="title">Title</th>
-                            <th st-sort="datetime">
+                            <th ng-click="setSortParams('draft.title')">Title</th>
+                            <th ng-click="setSortParams('timestamp')">
                                 Created on
                             </th>
                             <th></th>
@@ -153,7 +153,8 @@
                         </thead>
                         <tbody>
 
-                        <tr ng-show="hasDrafts()" ng-repeat="draft in allDrafts | filter: search">
+                        <tr ng-show="hasDrafts()"
+                            ng-repeat="draft in allDrafts | orderObjectBy:draftsSortedField:draftsReversedSort | filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{draft.draft.basicNeedType}}</span>
                                 <img ng-src="{{getTypePicURI(draft.draft.basicNeedType)}}"
@@ -162,7 +163,7 @@
                             <!-- TODO step in create need needs to be specified -->
                             <td><a href="" ng-click="clickOnDraft(draft);" style="font-weight:bold;">{{draft.draft
                                 .title}}</a></td>
-                            <td>{{draft.datetime | date}}</td>
+                            <td>{{draft.timestamp | date}}</td>
                             <td><a href="" ng-click="clickOnRemoveButton(draft);"><i class
                                                                                          ="fa fa-times-circle-o fa-lg"></i></a></td>
                         </tr>
