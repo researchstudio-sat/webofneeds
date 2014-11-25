@@ -246,7 +246,7 @@ angular.module('won.owner').factory('wonService', function (
                         eventData.needURI = needURI;
                         linkedDataService.getNeed(needURI)
                             .then(function(need){
-                                applicationStateService.addNeed(need)
+                                applicationStateService.addNeed(need);
                                 $rootScope.$broadcast(won.EVENT.NEED_CREATED, eventData);
                                 deferred.resolve(needURI);
                             });
@@ -293,6 +293,7 @@ angular.module('won.owner').factory('wonService', function (
         var deferred = $q.defer();
         var sendConnect = function(need1, need2, wonNodeUri1, wonNodeUri2, textMessage) {
             //TODO: use event URI pattern specified by WoN node
+            applicationStateService.setCurrentNeedURI(need1);
             var envelopeData = {};
             envelopeData[won.WONMSG.hasSender]=need1;
             envelopeData[won.WONMSG.hasSenderNeed] = need1;
@@ -348,6 +349,7 @@ angular.module('won.owner').factory('wonService', function (
                         //  eventData.eventType = messageTypeToEventType[eventData.hasMessageType];
                         eventData.eventType = won.EVENT.CONNECT_SENT;
                         eventData.commState = won.COMMUNUCATION_STATE.PENDING;
+
                         linkedDataService.fetch(eventData.hasSender)
                             .then(
                             function (value) {
@@ -359,7 +361,11 @@ angular.module('won.owner').factory('wonService', function (
                                         //eventData.eventType = won.EVENT.CLOSE_SENT;
                                         deferred.resolve(eventUri);
                                         eventData.timestamp = new Date().getTime();
-                                        $rootScope.$broadcast(won.EVENT.CONNECT_SENT, eventData);
+                                        linkedDataService.invalidateCacheForNeed(eventData.hasSender).then(function(){
+                                            $rootScope.$broadcast(won.EVENT.CONNECT_SENT, eventData);
+
+                                        });
+
                                         //$rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
 
                                     }, won.reportError("cannot fetch closed event " + eventUri)

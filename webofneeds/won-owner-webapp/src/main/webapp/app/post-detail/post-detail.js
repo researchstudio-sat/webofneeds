@@ -281,7 +281,7 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                 var needBuilderObject = new window.won.NeedBuilder().setContext();
                 if($scope.post == undefined){
                     if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
-                        needBuilderObject.supply;
+                        needBuilderObject.supply();
                     } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
                         needBuilderObject.demand();
                     } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDotogether) {
@@ -315,11 +315,13 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                     }).then(function(){
                         $scope.sendStatus= true;
                     })
+                } else{
+                    wonService.connect($scope.post.uri, $scope.need.uri, $scope.message).then(function(){
+                        $scope.sendStatus = true;
+                    });
                 }
 
-                wonService.connect($scope.post.uri, $scope.need.uri, $scope.message).then(function(){
-                    $scope.sendStatus = true;
-                });
+
                 //console.log(needJson);
 
 
@@ -328,9 +330,12 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
               //  if(!$scope.sendStatus)$scope.sendStatus = true;
             };
 
+            $scope.clickHandler = function(e){
+                e.target.dispatchEvent(new DataTrans("copy"));
+            }
 
-
-            $scope.copyLinkToClipboard = function() {
+            $scope.copyHandler = function(e) {
+                e.clipboardData.setData("text/plain",$scope.privateLink);
                 //todo maybe we can use http://zeroclipboard.org/
             };
             $scope.showPublic = function() {
@@ -340,6 +345,9 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
 
         } ,
         link: function(scope, element, attrs){
+            var btn = document.getElementById("copy-button");
+            btn.addEventListener("click",scope.clickHandler, false);
+            btn.addEventListener("copy", scope.copyHandler, false);
             console.log("Contact form");
         }
     }
