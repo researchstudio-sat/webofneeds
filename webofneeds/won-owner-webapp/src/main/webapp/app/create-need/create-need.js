@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $location, $http, $routeParams, needService,applicationStateService, mapService, userService, utilService, wonService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $timeout, $location, $http, $routeParams, needService,applicationStateService, mapService, userService, utilService, wonService) {
     $scope.currentStep = $routeParams.step;
     $scope.menuposition = $routeParams.menuposition;
     $scope.title = $routeParams.title;
@@ -353,57 +353,63 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope,  $
     function hasUri(need) {
         return need.needURI != '' && need.needURI != null;
     }
-
+    var lock = false;
 	$scope.publish = function () {
+        if(lock== false){
+            lock = true;
+            // creating need object
+            var needBuilderObject = new window.won.NeedBuilder().setContext();
+            if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
+                needBuilderObject.demand();
+            } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
+                needBuilderObject.supply();
+            } else if ($scope.need.basicNeedType ==  won.WON.BasicNeedTypeDotogether) {
+                needBuilderObject.doTogether();
+            } else {
+                needBuilderObject.critique();
+            }
 
-        // creating need object
-        var needBuilderObject = new window.won.NeedBuilder().setContext();
-        if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
-            needBuilderObject.demand();
-        } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
-            needBuilderObject.supply();
-        } else if ($scope.need.basicNeedType ==  won.WON.BasicNeedTypeDotogether) {
-            needBuilderObject.doTogether();
-        } else {
-            needBuilderObject.critique();
+            needBuilderObject.title($scope.need.title)
+                .ownerFacet()               // mandatory
+                .description($scope.need.textDescription)
+                .hasTag($scope.need.tags)
+                .hasContentDescription()    // mandatory
+                //.hasPriceSpecification("EUR",5.0,10.0)
+                .active()                   // mandatory: active or inactive
+
+            if (hasLocationSpecification($scope.need)) {
+                // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
+                needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
+            }
+
+            if (hasTimeSpecification($scope.need)) {
+                needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
+            }
+
+            if (hasUri($scope.need)) {
+                needBuilderObject.uri($scope.need.needURI);
+            }
+
+            // building need as JSON object
+            var needJson = needBuilderObject.build();
+
+            //console.log(needJson);
+            var newNeedUriPromise = wonService.createNeed(needJson);
+
+            // TODO: should the draft removing part be changed to run only on success from newNeedUriPromise?
+            if ($scope.draftURI != null) {
+                userService.removeDraft($scope.draftURI);
+                $scope.draftURI = null;
+            }
+            //console.log('promised uri: ' + newNeedUriPromise);
+
+            //$scope.need = $scope.getCleanNeed();      TODO decide what to do
+            $scope.successShow = true;
+            newNeedUriPromise.then(function(){
+                lock=false;
+            });
         }
 
-        needBuilderObject.title($scope.need.title)
-            .ownerFacet()               // mandatory
-            .description($scope.need.textDescription)
-            .hasTag($scope.need.tags)
-            .hasContentDescription()    // mandatory
-            //.hasPriceSpecification("EUR",5.0,10.0)
-            .active()                   // mandatory: active or inactive
-
-        if (hasLocationSpecification($scope.need)) {
-            // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
-            needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
-        }
-
-        if (hasTimeSpecification($scope.need)) {
-            needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
-        }
-
-        if (hasUri($scope.need)) {
-            needBuilderObject.uri($scope.need.needURI);
-        }
-
-        // building need as JSON object
-        var needJson = needBuilderObject.build();
-
-        //console.log(needJson);
-        var newNeedUriPromise = wonService.createNeed(needJson);
-
-        // TODO: should the draft removing part be changed to run only on success from newNeedUriPromise?
-        if ($scope.draftURI != null) {
-            userService.removeDraft($scope.draftURI);
-            $scope.draftURI = null;
-        }
-        //console.log('promised uri: ' + newNeedUriPromise);
-
-        //$scope.need = $scope.getCleanNeed();      TODO decide what to do
-        $scope.successShow = true;
 	};
 
 	$scope.cancel = function () {
