@@ -49,7 +49,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
     }
 
     $scope.resizableColumns = function (id) {
-        var pressed = false;
+       /* var pressed = false;
         var start = undefined;
         var startX, startWidth;
 
@@ -72,7 +72,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
                 $(start).removeClass("resizing");
                 pressed = false;
             }
-        });
+        });         */
     }
 
 
