@@ -180,4 +180,25 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         messageService.reconnect();
     });
 
+    $scope.$on(won.EVENT.WEBSOCKET_CLOSED_UNEXPECTED, function(event){
+        // if the gui part thinks we are authenticated but the server says not,
+        // it most probably means there was a session timeout.
+        // TODO: possible handling is asking user to re-login
+        userService.verifyAuth().then(function handleUnexpectedWebsocketClose(authenticated){
+            if (authenticated) {
+                console.log("WEBSOCKET CLOSED code 1011, but user is still authenticated");
+                messageService.reconnect();
+            } else if (userService.isAuth()) {
+                userService.resetAuth();
+                userService.logOut().then(onResponseSignOut);
+            } else {
+                messageService.reconnect();
+            }
+        });
+    });
+
+    var onResponseSignOut = function (result) {
+       $location.url("/");
+    };
+
 });

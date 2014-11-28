@@ -234,6 +234,8 @@
         won.EVENT.NOT_TRANSMITTED = "NotTransmittedErrorEvent";
         won.EVENT.USER_SIGNED_IN = "UserSignedInEvent";
         won.EVENT.USER_SIGNED_OUT = "UserSignedOutEvent";
+        //TODO: this temp event, before we find out how to deal with session timeout
+        won.EVENT.WEBSOCKET_CLOSED_UNEXPECTED = "WebSocketClosedUnexpected";
 
         won.COMMUNUCATION_STATE = {};
         won.COMMUNUCATION_STATE.NOT_CONNECTED = "NoConnectionEvent";
