@@ -264,51 +264,12 @@ public class LinkedDataServiceImpl implements LinkedDataService
                                         RDFS.member,
                                         model.getResource(event.getMessageURI().toString())));
       }
-
-      //add event members and attach them
-      for (ConnectionEvent e : events) {
-        Resource eventMember = model.createResource(this.uriService.createEventURI(connection,e).toString(),WON.toResource(e.getType()));
-        if (e.getOriginatorUri() != null)
-          eventMember.addProperty(WON.HAS_ORIGINATOR, model.createResource(e.getOriginatorUri().toString()));
-  
-        if (e.getCreationDate() != null)
-          eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.toLiteral(e.getCreationDate(), model));
-  
-        addAdditionalData(model, this.uriService.createEventURI(connection,e), eventMember);
-        model.add(model.createStatement(eventContainer, RDFS.member, eventMember));
-      }
     }
 
     return DatasetFactory.create(model);
   }
 
-  /**
-   * Returns the rdf model for the event.
-   * @param eventURI
-   * @return null if no event is found.
-   * @throws NoSuchConnectionException
-   */
-  @Override
-  public Model getEventModel(final URI eventURI)
-  {
-    ConnectionEvent event = needInformationService.readEvent(eventURI);
-    if (event == null) return null;
-    Model model = ModelFactory.createDefaultModel();
-    setNsPrefixes(model);
-    //model.setNsPrefix("",eventURI.toString());
 
-    Resource eventMember = model.createResource(eventURI.toString(),WON.toResource(event.getType()));
-    if (event.getOriginatorUri() != null) {
-      eventMember.addProperty(WON.HAS_ORIGINATOR, model.createResource(event.getOriginatorUri().toString()));
-    }
-
-    if (event.getCreationDate() != null) {
-      eventMember.addProperty(WON.HAS_TIME_STAMP, DateTimeUtils.toLiteral(event.getCreationDate(), model));
-    }
-
-    addAdditionalData(model, eventURI, eventMember);
-    return model;
-  }
 
   public Dataset getEventDataset(URI eventURI) {
     Dataset result = rdfStorage.loadDataset(eventURI);
