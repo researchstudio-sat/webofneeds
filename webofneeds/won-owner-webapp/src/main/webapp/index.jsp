@@ -208,7 +208,9 @@
 
 		<div ng-view id="content" class="container">
 		</div>
-		
+
+		<!--actually there's a footer html tag for this use-case-->
+		<!--also we should get rid of these nested divs--->
 <nav class="navbar navbar-default navbar-bottom" role="navigation">
 	<div class="container" style="padding:0">
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
