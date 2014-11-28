@@ -35,19 +35,27 @@ public class WONMSG
   public static final Resource TYPE_HINT = m.createResource(BASE_URI + "HintMessage");
 
   // notification types
+  //TODO: delete if not needed
   public static final Resource TYPE_HINT_NOTIFICATION = m.createResource(BASE_URI + "HintNotificationMessage");
+  //TODO: delete if not needed
   public static final Resource TYPE_NEED_CREATED_NOTIFICATION = m.createResource(BASE_URI +
     "NeedCreatedNotificationMessage");
 
   // response types
+  //TODO: delete if not needed
   public static final Resource TYPE_CREATE_RESPONSE = m.createResource(BASE_URI + "CreateResponseMessage");
+  //TODO: delete if not needed
   public static final Resource TYPE_CONNECT_RESPONSE = m.createResource(BASE_URI + "ConnectResponseMessage");
+  //TODO: delete if not needed
   public static final Resource TYPE_NEED_STATE_RESPONSE = m.createResource(BASE_URI + "NeedStateResponseMessage");
+  //TODO: delete if not needed
   public static final Resource TYPE_CLOSE_RESPONSE = m.createResource(BASE_URI + "CloseResponseMessage");
+  //TODO: delete if not needed
   public static final Resource TYPE_OPEN_RESPONSE = m.createResource(BASE_URI + "OpenResponseMessage");
+  //TODO: delete if not needed
   public static final Resource TYPE_CONNECTION_MESSAGE_RESPONSE =
       m.createResource(BASE_URI + "ConnectionMessageResponseMessage");
-
+  //TODO: delete if not needed
   public static boolean isResponseMessageType(Resource resource) {
     if (resource.equals(TYPE_CREATE_RESPONSE) ||
       resource.equals(TYPE_CONNECT_RESPONSE) ||
@@ -63,13 +71,16 @@ public class WONMSG
   // response states
   public static final Resource TYPE_RESPONSE_STATE_SUCCESS = m.createResource(BASE_URI + "SuccessResponse");
   public static final Resource TYPE_RESPONSE_STATE_FAILURE = m.createResource(BASE_URI + "FailureResponse");
+  //TODO: delete if not needed
   public static final Resource TYPE_RESPONSE_STATE_DUPLICATE_NEED_ID =
     m.createResource(BASE_URI + "DuplicateNeedIdResponse");
+  //TODO: delete if not needed
   public static final Resource TYPE_RESPONSE_STATE_DUPLICATE_CONNECTION_ID =
     m.createResource(BASE_URI + "DuplicateConnectionIdResponse");
+  //TODO: delete if not needed
   public static final Resource TYPE_RESPONSE_STATE_DUPLICATE_MESSAGE_ID =
     m.createResource(BASE_URI + "DuplicateMessageIdResponse");
-
+  //TODO: delete if not needed
   public static final Property HAS_RESPONSE_STATE_PROPERTY =
     m.createProperty(BASE_URI + "hasResponseStateProperty"); //TODO rename!
 

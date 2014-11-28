@@ -14,6 +14,7 @@ import won.protocol.model.Facet;
 import won.protocol.model.NeedState;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -101,7 +102,7 @@ public class WonRdfUtils
     public static Model genericMessage(Property predicate, Resource object) {
       Model messageModel = createModelWithBaseResource();
       Resource baseRes = RdfUtils.getBaseResource(messageModel);
-      baseRes.addProperty(RDF.type, WON.MESSAGE);
+      baseRes.addProperty(RDF.type, WONMSG.TYPE_CONNECTION_MESSAGE);
       baseRes.addProperty(predicate, object);
       return messageModel;
     }
