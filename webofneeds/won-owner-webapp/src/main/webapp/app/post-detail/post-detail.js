@@ -54,7 +54,7 @@ angular.module('won.owner')
             }
         }
     });
-angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $location, mapService, $compile, $routeParams,applicationControlService, applicationStateService, userService) {
+angular.module('won.owner').controller('PostDetailCtrl', function ($scope,$log, $location, mapService, $compile, $routeParams,applicationControlService, applicationStateService, userService) {
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
     $scope.showPublic = function(){
@@ -108,7 +108,7 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     $('#obr').attr('src', $scope.images[0].url);
 
     $scope.clickOnThumbnail = function(index) {
-        console.log('img' + index);
+        $log.debug('img' + index);
         if (index >= 0 && index <= $scope.images.length) {
             //$scope.bigImage = $scope.images[index];
 
@@ -195,13 +195,11 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
     $scope.locationOutputFieldCollapsed = true;
     $scope.outputLocationCollapseClick = function () {
         $scope.locationOutputFieldCollapsed = !$scope.locationOutputFieldCollapsed;
-        // console.log('location toggle');
     };
 
     $scope.timeInputFieldCollapsed = true;
     $scope.timeInputFieldCollapsedClick = function () {
         $scope.timeInputFieldCollapsed = !$scope.timeInputFieldCollapsed;
-        // console.log('time toggle ' + $scope.timeInputFieldCollapsed);
     };
 
     /*
@@ -231,7 +229,7 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope, $loca
 
     $scope.contactFormActiv = false;
     $scope.clickOnContact = function(){
-        console.log('contact clicked');
+        $log.debug('contact clicked');
         $scope.contactFormActiv = !$scope.contactFormActiv;
     }
 
@@ -308,7 +306,6 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
 
                 if($scope.post == undefined){
                     var newNeedUriPromise = wonService.createNeed(needJson);
-                    //console.log('promised uri: ' + newNeedUriPromise);
 
                     newNeedUriPromise.then(function(uri){
                         wonService.connect(uri, $scope.need.uri, $scope.message);
@@ -322,7 +319,6 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                 }
 
 
-                //console.log(needJson);
 
 
                 //$scope.need = $scope.getCleanNeed();      TODO decide what to do

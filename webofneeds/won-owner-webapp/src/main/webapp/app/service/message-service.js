@@ -17,7 +17,7 @@
 /**
  * Created by syim on 08.08.2014.
  */
-angular.module('won.owner').factory('messageService', function ($http, $q, $rootScope, $interval, $location) {
+angular.module('won.owner').factory('messageService', function ($http, $q,$log, $rootScope, $interval, $location) {
     //the service object we're constructing here
     var messageService = {};
 
@@ -39,13 +39,13 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
                 function (data, status, headers, config) {
                     privateData.httpHeartbeatPending = false;
                     if (status != 200){
-                        console.log("warn: successful http heartbeat returned status " + status);
+                        $log.debug("warn: successful http heartbeat returned status " + status);
                     }
                 })
                 .error(
                 function(data, status, headers, config){
                     privateData.httpHeartbeatPending = false;
-                    console.log("warn: failed http heartbeat returned status " + status);
+                    console.error("warn: failed http heartbeat returned status " + status);
                 });
         }
     }
@@ -62,7 +62,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
 
 
     var getEventData = function(json){
-        console.log("getting data from jsonld message");
+        $log.debug("getting data from jsonld message");
         var eventData = {};
         //call handler if there is one - it may modify the event object
         //frame the incoming jsonld to get the data that interest us
@@ -93,7 +93,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         */
         eventData.uri = won.getSafeJsonLdValue(framedMessage);
         eventData.framedMessage = framedMessage;
-        console.log("done copying the data to the event object, returning the result");
+        $log.debug("done copying the data to the event object, returning the result");
 
         return eventData;
     }
@@ -103,11 +103,11 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
 
     var enqueueMessage = function(msg) {
         if (isConnected()) {
-            console.log("sending message instead of enqueueing");
+            $log.debug("sending message instead of enqueueing");
             //just to be sure, test if the connection is established now and send instead of enqueue
             privateData.socket.send(msg);
         } else {
-            console.log("socket not connected yet, enqueueing");
+            $log.warn("socket not connected yet, enqueueing");
             privateData.pendingOutMessages.push(msg);
         }
     }
@@ -116,11 +116,11 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
 
         newsocket.onopen = function () {
             $rootScope.$apply(function() {
-                console.log("SockJS connection has been established!");
+                $log.debug("SockJS connection has been established!");
                 var i = 0;
                 while (privateData.pendingOutMessages.length > 0) {
                     var msg = privateData.pendingOutMessages.shift();
-                    console.log("sending pending message no " + (++i));
+                    $log.debug("sending pending message no " + (++i));
                     privateData.socket.send(msg);
                 }
             });
@@ -130,19 +130,19 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             $rootScope.$apply(function() {
                 //first, run callbacks registered inside the service:
                 var jsonld = JSON.parse(msg.data);
-                console.log("SockJS message received")
+                $log.debug("SockJS message received")
                 var event = getEventData(jsonld);
                 //call all registered callbacks
-                console.log("SockJS message is of type " + event.hasMessageType + ", starting to process callbacks");
+                $log.debug("SockJS message is of type " + event.hasMessageType + ", starting to process callbacks");
                 for (var i = 0; i < privateData.callbacks.length; i++) {
-                    console.log("processing messaging callback " + (i + 1) + " of " + privateData.callbacks.length);
+                    $log.debug("processing messaging callback " + (i + 1) + " of " + privateData.callbacks.length);
                     try {
                         var myJsonld = JSON.parse(JSON.stringify(jsonld));
                         var myEvent = JSON.parse(JSON.stringify(event));
                         var callback = privateData.callbacks[i];
                         callback.handleMessage(myEvent, myJsonld);
                     } catch(e) {
-                        console.log("error processing messaging callback " + i + ": " + JSON.stringify(e));
+                        $log.error("error processing messaging callback " + i + ": " + JSON.stringify(e));
                     }
                     try {
                         if (callback.shouldUnregister(myEvent, myJsonld)) {
@@ -151,16 +151,16 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
                             i--;
                         }
                     } catch (e) {
-                        console.log("error while deciding whether to unregister callback " + i + ": "+ JSON.stringify(e));
+                        $log.error("error while deciding whether to unregister callback " + i + ": "+ JSON.stringify(e));
                     }
-                    console.log("done processing callback ");
+                    $log.debug("done processing callback ");
                 }
-                console.log("done processing all callbacks ");
+                $log.debug("done processing all callbacks ");
             });
         };
 
         newsocket.onclose = function (e) {
-            console.log("SockJS connection closed");
+            $log.debug("SockJS connection closed");
             //TODO: reconnect when connection is lost?
             if (e.code === 1011) { // unexpected server condition - happens when the user's session times out
                 $rootScope.$apply(function () {
@@ -206,13 +206,13 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
 
     messageService.closeConnection = function () {
         if (privateData.socket != null && ! isClosingOrClosed()) {
-            console.log("closing Websocket via messageService.closeConnection()");
+            $log.debug("closing Websocket via messageService.closeConnection()");
             privateData.socket.close();
         }
     }
 
     messageService.reconnect = function(){
-        console.log("reconnecting Websocket");
+        $log.debug("reconnecting Websocket");
         messageService.closeConnection();
         createSocket();
     }
@@ -236,7 +236,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         }
         for (key in privateData.callbacks){
             if (callback.equals(privateData.callbacks[key])){
-                console.log("prevented duplicate callback registration");
+                $log.debug("prevented duplicate callback registration");
                 return;
             }
         }
@@ -266,16 +266,16 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
         constructor: messageService.MessageCallback,
         shouldHandle: function(event, msg) {
             var ret = this.shouldHandleTest(event, msg);
-            console.log("interested in message: " + ret)
+            $log.debug("interested in message: " + ret)
             return ret;
         },
         performAction: function(event, msg) {
-            console.log("performing action for message " + event.uri);
+            $log.debug("performing action for message " + event.uri);
             this.action(event, msg);
         },
         shouldUnregister: function(event, msg) {
             var ret = this.shouldUnregisterTest(event, msg);
-            console.log("should unregister: " + ret);
+            $log.debug("should unregister: " + ret);
             return ret;
         },
         handleMessage: function(event, msg) {

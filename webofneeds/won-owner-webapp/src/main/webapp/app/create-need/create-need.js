@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $timeout, $location, $http, $routeParams, needService,applicationStateService, mapService, userService, utilService, wonService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $timeout, $location,$log, $http, $routeParams, needService,applicationStateService, mapService, userService, utilService, wonService) {
     $scope.currentStep = $routeParams.step;
     $scope.menuposition = $routeParams.menuposition;
     $scope.title = $routeParams.title;
@@ -257,7 +257,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
 
     }
     $scope.jumpToStep = function(num){
-        console.log(num);
+        $log.debug(num);
         if(num<=$scope.numberOfSteps){
             $scope.currentStep = num;
             $scope.successShow = false;
@@ -393,7 +393,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
             // building need as JSON object
             var needJson = needBuilderObject.build();
 
-            //console.log(needJson);
             var newNeedUriPromise = wonService.createNeed(needJson);
 
             // TODO: should the draft removing part be changed to run only on success from newNeedUriPromise?
@@ -401,7 +400,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
                 userService.removeDraft($scope.draftURI);
                 $scope.draftURI = null;
             }
-            //console.log('promised uri: ' + newNeedUriPromise);
 
             //$scope.need = $scope.getCleanNeed();      TODO decide what to do
             $scope.successShow = true;
@@ -488,7 +486,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
     }
 
 });
-angular.module('won.owner').directive('wonProgressTracker',function factory(){
+angular.module('won.owner').directive('wonProgressTracker',function factory($log){
     return {
         restrict: 'AE',
         templateUrl : "app/create-need/progress-tracker.html",
@@ -548,7 +546,7 @@ angular.module('won.owner').directive('wonProgressTracker',function factory(){
             })
         } ,
         link: function(scope, element, attrs){
-            console.log("Progress Tracker");
+            $log.debug("Progress Tracker");
         }
     }
 })
@@ -565,7 +563,7 @@ angular.module('won.owner').directive('wonGallery', function factory() {
 				angular.element("#photo-form").scope().submit();
 			});
 		},
-		controller : function($scope, $location) {
+		controller : function($scope, $location,$log) {
 			$scope.selectedPhoto = 0;
 			$scope.getCleanPhotos = function() {
 				return [
@@ -578,7 +576,7 @@ angular.module('won.owner').directive('wonGallery', function factory() {
 
 			$scope.onClickPhoto = function(num) {
 				$scope.selectedPhoto = num;
-				console.log($scope.selectedPhoto);
+                $log.debug($scope.selectedPhoto);
 			};
 			$scope.$on('fileuploadsubmit', function (e, data) {
 				var filename = data.files[0].name;

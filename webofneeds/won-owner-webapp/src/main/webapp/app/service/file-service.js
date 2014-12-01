@@ -17,7 +17,7 @@
 /**
  * Created by syim on 08.08.2014.
  */
-angular.module('won.owner').factory('fileService', function ($http, $q,messageService) {
+angular.module('won.owner').factory('fileService', function ($http, $q,messageService,$log) {
     /*var reader = new FileReader();
 
 
@@ -43,7 +43,7 @@ angular.module('won.owner').factory('fileService', function ($http, $q,messageSe
                 {
                     var allText = rawFile.responseText;
                     jsonLD.fromRDF(allText,{format:'application/trig'},function(err,doc){
-                        console.log(doc);
+                        $log.debug(doc);
                     });
 
                 }

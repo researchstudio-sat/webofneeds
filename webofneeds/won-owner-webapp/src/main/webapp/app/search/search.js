@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('SearchCtrl', function ($scope, $location, mapService) {
+angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log, mapService) {
     $scope.results = [
         {id:1},
         {id:2},
@@ -34,7 +34,7 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
     }
 });
 
-angular.module('won.owner').directive('wonPostDetail', function factory() {
+angular.module('won.owner').directive('wonPostDetail', function factory($log) {
     return {
         scope:{
             need: '=need'
@@ -42,7 +42,7 @@ angular.module('won.owner').directive('wonPostDetail', function factory() {
         restrict:'AE',
         templateUrl:"app/post-detail/post-detail.html",
         link: function(scope, element, attrs){
-            console.log("wonPostDetail");
+            $log.debug("wonPostDetail");
         }//,
         //scope:{},
     }

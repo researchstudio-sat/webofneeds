@@ -26,7 +26,7 @@
  // * managing events (as an event-queue)
  // * managing information about the currently viewed need (that's what we've got a browser/routing for)
  // * holding information about the loaded needs/drafts (we got a user object elsewhere for that)
-angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope, $q) {
+angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope, $q,$log) {
 
     //the service
     var applicationStateService = {}
@@ -301,7 +301,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     }
 
     applicationStateService.removeEvent=function (unreadEventType, connectionURI){
-        console.log("removing Event");
+        $log.debug("removing Event");
         if(unreadEventType == undefined){
             unreadEventType = applicationStateService.getUnreadEventTypeFromHasMessageType(event.event.hasMessageType);
         }
@@ -319,7 +319,6 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     }
     /*
     applicationStateService.removeEvent=function (event){
-        console.log("removing Event");
         var allEventsOfTypeOfNeed=privateData.unreadEventsByNeedByType[privateData.currentNeedURI][getUnreadEventTypeFromHasMessageType(event.event.hasMessageType)].events;
         for(var i =0; i<allEventsOfTypeOfNeed.length;i++){
             if(allEventsOfTypeOfNeed[i].uri == event.event.uri){

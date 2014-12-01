@@ -48,7 +48,7 @@ angular.module('won.owner')
         }
     })
 angular.module('won.owner')
-    .directive('conversation', function factory(){
+    .directive('conversation', function factory($log){
         return{
             restrict: 'AE',
             templateUrl : 'app/conversation/conversation.html',
@@ -56,11 +56,11 @@ angular.module('won.owner')
                 chosenMessage: '='
             },
 
-            controller : function($scope, $location, $anchorScroll, $rootScope, wonService){
+            controller : function($scope, $location, $log,$anchorScroll, $rootScope, wonService){
                 $scope.newMessage = '';
                 $scope.showConversations = function() {
                     if($scope.chosenMessage != null){
-                        console.log("checking show conversations") ;
+                        $log.debug("checking show conversations") ;
                         if($scope.chosenMessage.typeText == 'Conversation'
                             || ($scope.chosenMessage.typeText == "Incoming Closed" && $scope.showPublic())
                             || $scope.chosenMessage.typeText == "Outgoing Closed" && $scope.showPublic()) return true;
@@ -95,33 +95,32 @@ angular.module('won.owner')
                     $anchorScroll();
                 };
                 $scope.clickOnLeaveConversation = function() {
-                    console.log('leave conversation clicked');
+                    $log.debug('leave conversation clicked');
                     $scope.showConfirmationDialogForLeaveConversation = true;
                 };
                 $scope.clickOnNoForLeaveConversation = function() {
-                    console.log('no');
+                    $log.debug('no');
                     $scope.showConfirmationDialogForLeaveConversation = false;
                 }
 
                 $scope.clickOnYesForLeaveConversation = function() {
-                    console.log('yes');
+                    $log.debug('yes');
                     $scope.showConfirmationDialogForLeaveConversation = false;
                     wonService.closeConnection($scope.chosenMessage, $scope.newMessage);
                     // clean textarea
                     $scope.newMessage = "";
-                    //console.log('redirect: /private-link');
                     //$location.path('/private-link');
                 }
 
             },
             link: function(scope, element, attrs){
-                console.log("conversation container");
+               $log.debug("conversation container");
             }
 
         }
     })
 angular.module('won.owner')
-    .directive('notifyRenderFinished', function factory($timeout) {
+    .directive('notifyRenderFinished', function factory($timeout,$log) {
         return{
             restrict: 'A',
             controller: function($scope, $rootScope,$anchorScroll,$location){
@@ -137,7 +136,8 @@ angular.module('won.owner')
 
             },
             link: function(scope, element, attrs){
-                console.log('notify render finished directive') ;
+
+                $log.debug('notify render finished directive') ;
                 if (scope.$last){
                     $timeout(function(){
                             scope.$emit('RenderFinishedEvent', element, attrs);

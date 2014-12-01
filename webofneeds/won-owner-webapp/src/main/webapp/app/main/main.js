@@ -175,7 +175,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         userService.fetchPostsAndDrafts();
     });
     $scope.$on('RenderFinishedEvent', function(event){
-       console.log("render finished event") ;
+        $log.debug("render finished event") ;
     });
     $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
         messageService.reconnect();
@@ -191,13 +191,13 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         var wasAuth = userService.isAuth();
         userService.verifyAuth().then(function handleUnexpectedWebsocketClose(authenticated){
             if (authenticated) {
-                console.log("WEBSOCKET CLOSED code 1011, user is still authenticated. Reconnecting.");
+                $log.warn("WEBSOCKET CLOSED code 1011, user is still authenticated. Reconnecting.");
                 messageService.reconnect();
             } else if (wasAuth) {
-                console.log("WEBSOCKET CLOSED code 1011, user was authenticated. Logging out.");
+                $log.warn("WEBSOCKET CLOSED code 1011, user was authenticated. Logging out.");
                 userService.logOut().then(onResponseSignOut);
             } else {
-                console.log("WEBSOCKET CLOSED code 1011, user was not authenticated. Reconnecting.");
+                $log.warn("WEBSOCKET CLOSED code 1011, user was not authenticated. Reconnecting.");
                 messageService.reconnect();
             }
         });

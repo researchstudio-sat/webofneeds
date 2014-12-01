@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('NeedListCtrl', function ($scope, $location, $http, $q, needService, connectionService) {
+angular.module('won.owner').controller('NeedListCtrl', function ($scope,$log, $location, $http, $q, needService, connectionService) {
 
 	NeedListPage = function() {
 		this.btnConversations = 0;
@@ -79,7 +79,7 @@ angular.module('won.owner').controller('NeedListCtrl', function ($scope, $locati
 				categorizedNeeds.merge(catNeed);
 			}
 		});
-		console.log(categorizedNeeds);
+        $log.debug(categorizedNeeds);
 		$scope.model.categorizedNeeds = categorizedNeeds;
 		$scope.model.startup();
 	};

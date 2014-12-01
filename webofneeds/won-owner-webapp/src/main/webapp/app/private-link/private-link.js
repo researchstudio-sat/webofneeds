@@ -7,7 +7,7 @@
  */
 
 angular.module('won.owner')
-    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, applicationStateService, linkedDataService, wonService) {
+    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, $log,applicationStateService, linkedDataService, wonService) {
 
     // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
@@ -15,7 +15,7 @@ angular.module('won.owner')
     $scope.$watch('lastEventOfEachConnectionOfCurrentNeed', function(newValue, oldValue){
         var newCnt = newValue != null ? newValue.length : "null";
         var oldCnt = oldValue != null ? oldValue.length : "null";
-        console.log("events changed! now have " + newCnt + " events!" + " had: " + oldCnt +"...");
+        $log.debug("events changed! now have " + newCnt + " events!" + " had: " + oldCnt +"...");
         //if chosen message not null then use connection uri to find and update
         updateChosenMessageIfAny();
     });
@@ -209,7 +209,7 @@ angular.module('won.owner')
                 toggleEventTypes([won.WONMSG.hintMessage]);
                 break;
             default:
-                console.log("not handling message button id " + buttonId)  ;
+                $log.debug("not handling message button id " + buttonId)  ;
         }
         $scope.changeEventTypeButtonsDisplay(buttonId);
     }
@@ -315,29 +315,29 @@ angular.module('won.owner')
 
     // Incoming Requests
     $scope.clickOnDeclineForInRequest = function() {
-        console.log('decline clicked');
+        $log.debug('decline clicked');
         $scope.showConfirmationDialogForDeclineRequest = true;
     }
 
     $scope.clickOnAcceptForInRequest = function() {
-        console.log('accept clicked');
+        $log.debug('accept clicked');
         // TODO add parameter for displaying specific stuff on private-link page
         wonService.open($scope.chosenMessage, $scope.newMessage);
         //$scope.prevMessageId = null;
         //$scope.chosenMessage = null;
         //clean textarea
         $scope.newMessage = "";
-        console.log('redirect: /private-link');
+        $log.debug('redirect: /private-link');
         $location.path('/private-link');
     }
 
     $scope.clickOnNoForDeclineRequest = function() {
-        console.log('no');
+        $log.debug('no');
         $scope.showConfirmationDialogForDeclineRequest = false;
     }
 
     $scope.clickOnYesForDeclineRequest = function() {
-        console.log('yes');
+        $log.debug('yes');
         $scope.showConfirmationDialogForDeclineRequest = false;
         // TODO add parameter for displaying specific stuff on private-link page
         wonService.closeConnection($scope.chosenMessage, $scope.newMessage);
@@ -345,29 +345,29 @@ angular.module('won.owner')
         //$scope.chosenMessage = null;
         // clean textarea
         $scope.newMessage = "";
-        console.log('redirect: /private-link');
+        $log.debug('redirect: /private-link');
         $location.path('/private-link');
     }
 
     // Outgoing Requests
     $scope.clickOnCancelRequest = function() {
-        console.log('cancel clicked');
+        $log.debug('cancel clicked');
         $scope.showConfirmationDialogForCancelRequest = true;
     }
 
     $scope.clickOnNoForCancelRequest = function() {
-        console.log('no');
+        $log.debug('no');
         $scope.showConfirmationDialogForCancelRequest = false;
     }
 
     $scope.clickOnYesForCancelRequest = function() {
-        console.log('yes');
+        $log.debug('yes');
         $scope.showConfirmationDialogForCancelRequest = false;
         // TODO add parameter for displaying specific stuff on private-link page
         wonService.closeConnection($scope.chosenMessage);
         $scope.prevMessageId = null;
         $scope.chosenMessage = null;
-        console.log('redirect: /private-link');
+        $log.debug('redirect: /private-link');
         $location.path('/private-link');
     }
 
@@ -388,7 +388,7 @@ angular.module('won.owner')
 
     $scope.clickOnFinishedWhenEdit = function() {
         // TODO send a new request
-        console.log('send a new request');
+        $log.debug('send a new request');
         $('#textboxInRequest').attr('disabled', '');
         $scope.showEditButtons = false;
     }
@@ -396,30 +396,30 @@ angular.module('won.owner')
     // Matches
 
     $scope.clickOnRemoveMatch = function() {
-        console.log('remove clicked');
+        $log.debug('remove clicked');
         $scope.showConfirmationDialogForRemoveMatch = true;
 
     }
 
     $scope.clickOnNoForRemoveMatch = function() {
-        console.log('no');
+        $log.debug('no');
         $scope.showConfirmationDialogForRemoveMatch = false;
     }
 
     $scope.clickOnYesForRemoveMatch = function() {
-        console.log('yes');
+        $log.debug('yes');
         $scope.showConfirmationDialogForRemoveMatch = false;
         wonService.closeConnection($scope.chosenMessage);
         $scope.prevMessageId = null;
         $scope.chosenMessage = null;
         // TODO add parameter for displaying specific stuff on private-link page
-        console.log('redirect: /private-link');
+        $log.debug('redirect: /private-link');
         $location.path('/private-link');
     }
 
 
     $scope.clickOnRequestConversation = function() {
-        console.log('request conversation');
+        $log.debug('request conversation');
         if ($scope.rateValue > 0) {
             $scope.showMatchControl = true;
             $scope.showWarningForRating = false;
@@ -429,7 +429,7 @@ angular.module('won.owner')
     }
 
     $scope.clickOnSendRequestMessage = function() {
-        console.log('send request message');
+        $log.debug('send request message');
         //wonService.open($scope.chosenMessage.connection.uri);
         wonService.openSuggestedConnection($scope.chosenMessage.connection.uri, $scope.textboxInMatchModel);
         $scope.showMatchControl = false;
@@ -440,7 +440,7 @@ angular.module('won.owner')
         //$scope.chosenMessage = null;
         //$scope.prevMessageId = null;
         // TODO add parameter for displaying specific stuff on private-link page
-        console.log('redirect: /private-link');
+        $log.debug('redirect: /private-link');
         $location.path('/private-link');
     }
 

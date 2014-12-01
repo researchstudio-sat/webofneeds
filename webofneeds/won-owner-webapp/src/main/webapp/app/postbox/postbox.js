@@ -22,7 +22,71 @@
  * To change this template use File | Settings | File Templates.
  */
 angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval, $location, userService, applicationStateService, applicationControlService) {
+    $scope.countOfAllUnreadMatchEvents = 0;
+    // TODO if we want to remember the last sortedField selected by the user,
+    // we should store it in e.g. applicationStateService
+    $scope.sortedField = 'creationDate';
+    $scope.reversedSort = true;
 
+
+    $scope.hasNeeds = function () {
+        return applicationStateService.getAllNeedsCount() > 0;
+    }
+
+    $scope.recordsToDisplay = 4;
+
+    $scope.search = '';
+
+    /* onClick Handlers */
+    $scope.clickOnDraft = function(draft){
+        //$location.path("create-need/"+draft.currentStep+"/"+draft.menuposition);
+        $location.path("create-need/"+draft.currentStep+"/"+draft.menuposition+"/"+draft.draft.title).search({"draft": draft.draftURI});
+    }
+    $scope.setSortParams = function(fieldName) {
+        if ($scope.sortedField == fieldName) {
+            $scope.reversedSort = !$scope.reversedSort;
+        } else {
+            $scope.reversedSort = false;
+            $scope.sortedField = fieldName;
+        }
+    }
+
+    // TODO call backend method here
+    //need to fetch: need type, need title, need close date
+
+
+
+    $scope.clickOnMessage = function () {
+        //TODO Put here logic
+    };
+
+    $scope.clickOnMegaphone = function () {
+        //TODO Put here logic
+    };
+
+    $scope.clickOnPuzzle = function () {
+        //TODO Put here logic
+    };
+
+    $scope.showPublic = function () {
+        return userService.isAuth();
+    };
+
+    $scope.inboxCollapsed = false;
+    $scope.inboxCollapseClick = function () {
+        $scope.inboxCollapsed = !$scope.inboxCollapsed;
+    };
+
+
+    $scope.closedCollapsed = true;
+    $scope.closedCollapseClick = function () {
+        $scope.closedCollapsed = !$scope.closedCollapsed;
+    };
+
+    $scope.clickOnNeedPrivateLink = function(clickedNeed) {
+        applicationStateService.setCurrentNeedURI(clickedNeed.uri);
+        $location.path("/private-link")
+    }
 });
 angular.module('won.owner').directive('removeControlData',function factory(){
     return {
@@ -64,7 +128,7 @@ angular.module('won.owner').directive('inboxTable',function factory(){
             templateUrl:'@'
         },
         template:'<div ng-attr-id="id" class="row col-lg-12" ng-include="templateUrl"></div>',
-        controller: function($scope){
+        controller: function($scope,$log){
             $scope.postsSortedField = 'timestamp';
             $scope.postsReversedSort = true;
             $scope.clickOn=function(item){
@@ -73,7 +137,7 @@ angular.module('won.owner').directive('inboxTable',function factory(){
                 $scope.clickOnItem();
             }
             $scope.isCollapsed = function(){
-                console.log("type: "+$scope.type + "collapsed: "+$scope.collapsed);
+                $log.debug("type: "+$scope.type + "collapsed: "+$scope.collapsed);
                 return $scope.collapsed;
             }
             $scope.clickOnRemove=function(item){
@@ -84,9 +148,9 @@ angular.module('won.owner').directive('inboxTable',function factory(){
             $scope.sortedField = 'timestamp';
             $scope.reversedSort = true;
             $scope.collapseClick = function(){
-                console.log("before click: "+$scope.collapsed) ;
+                $log.debug("before click: "+$scope.collapsed) ;
                 $scope.collapsed = !$scope.collapsed;
-                console.log("after click: "+$scope.collapsed) ;
+                $log.debug("after click: "+$scope.collapsed) ;
             }
             $scope.setSortParams = function(fieldName) {
                 if ($scope.sortedField == fieldName) {

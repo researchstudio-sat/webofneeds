@@ -26,7 +26,7 @@ angular.module('won.owner').directive('applicationControl', function factory(){
         }
     }
 })
-angular.module('won.owner').factory('applicationControlService', function (applicationStateService, $location) {
+angular.module('won.owner').factory('applicationControlService', function (applicationStateService,$log, $location) {
 
     //the service
     var applicationControlService = {};
@@ -40,7 +40,7 @@ angular.module('won.owner').factory('applicationControlService', function (appli
      */
     applicationControlService.openNeedDetailView = function openNeedDetailView(needURI){
         if (typeof needURI === 'undefined') {
-            console.log("needURI must be defined!");
+            $log.warn("needURI must be defined!");
             return;
         }
         applicationStateService.setCurrentNeedURI(needURI);

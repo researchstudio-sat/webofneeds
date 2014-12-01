@@ -7,9 +7,8 @@
  */
 
 //TODO use MainCtrls scope instead of rootScope to prevent js library name-clashes
-app.directive(('notifDropdown'), function notifDropdownFct() { //TODO $rootScope is very hacky for a directive (reduces reusability)
-        console.log("registering directive: notifDropdown");
-        //console.log($rootScope.unreadEventsByNeedByType);
+app.directive(('notifDropdown'), function notifDropdownFct($log) { //TODO $rootScope is very hacky for a directive (reduces reusability)
+        $log.debug("registering directive: notifDropdown");
         var dtv = {
             restrict: 'A',
             scope: {
@@ -23,8 +22,8 @@ app.directive(('notifDropdown'), function notifDropdownFct() { //TODO $rootScope
             link: function notifDropDownLink(scope,elem, attr) {
                 scope.eventType = attr.eventType;
                 scope.setData();
-                console.log("notif dropdown link ----------");
-                console.log(scope.unreadEventsByTypeByNeed);
+                $log.debug("notif dropdown link ----------");
+                $log.debug(scope.unreadEventsByTypeByNeed);
             },
             controller: function ($scope, applicationStateService, applicationControlService) {
                 $scope.setData = function(){

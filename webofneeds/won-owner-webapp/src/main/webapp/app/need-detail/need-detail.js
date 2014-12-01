@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('NeedDetailCtrl', function ($scope, $location, $http, $routeParams, needService,mapService) {
+angular.module('won.owner').controller('NeedDetailCtrl', function ($scope, $log,$location, $http, $routeParams, needService,mapService) {
 	$scope.mapOptions = {
 		center: mapService.getInitialLocation(),//new google.maps.LatLng(35.784, -78.670),
 		zoom:15,
@@ -45,7 +45,7 @@ angular.module('won.owner').controller('NeedDetailCtrl', function ($scope, $loca
 				map : $scope.myMap
 			});
 		}
-		console.log(response);
+        $log.debug(response);
 	});
 
 	$scope.toogleActive = function () {

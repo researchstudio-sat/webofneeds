@@ -287,7 +287,7 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
 		} else if (response.status == "ERROR") {
 			$scope.error = response.message;
 		} else {
-            console.log(response.messsage);
+            $log.debug(response.messsage);
         }
 	}
 
@@ -340,7 +340,7 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
         } else if (response.status == "ERROR") {
             $scope.error = response.message;
         } else {
-            console.log(response.messsage);
+            $log.debug(response.messsage);
         }
     }
 

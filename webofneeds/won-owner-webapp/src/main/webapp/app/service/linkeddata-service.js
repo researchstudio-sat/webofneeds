@@ -18,7 +18,7 @@
  * Created by fkleedorfer on 05.09.2014.
  */
 
-angular.module('won.owner').factory('linkedDataService', function ($q, $rootScope, utilService) {
+angular.module('won.owner').factory('linkedDataService', function ($q, $rootScope,$log, utilService) {
     linkedDataService = {};
 
     var privateData = {};
@@ -71,7 +71,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 results[key] = value;
                 if (!(--counter)) deferred.resolve(results);
             }, function(reason) {
-                console.log("warning: promise failed. Reason " + JSON.stringify(reason));
+                $log.error("warning: promise failed. Reason " + JSON.stringify(reason));
                 if (results.hasOwnProperty(key)) return;
                 results[key] = null;
                 handler(key, reason);
@@ -113,13 +113,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             var deferred = $q.defer();
             if (this.updateInProgress || this.blockedUpdaters.length > 0){
                 //updates are already in progress or are waiting. block.
-                console.log("rul:read:block:  " + this.uri);
+                $log.debug("rul:read:block:  " + this.uri);
                 this.blockedReaders.push(deferred);
             } else {
                 //nobody wishes to update the resource, the caller may read it
                 //add the deferred execution to the blocked list, just in case
                 //there are others blocket there, and then grant access to all
-                console.log("rul:read:grant:  " + this.uri);
+                $log.debug("rul:read:grant:  " + this.uri);
                 this.blockedReaders.push(deferred);
                 this.grantLockToReaders();
             }
@@ -132,10 +132,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             var deferred = $q.defer();
             if (this.activeReaderCount > 0 ) {
                 //readers are present, we have to wait till they are done
-                console.log("rul:updt:block:  " + this.uri);
+                $log.debug("rul:updt:block:  " + this.uri);
                 this.blockedUpdaters.push(deferred);
             } else {
-                console.log("rul:updt:grant:  " + this.uri);
+                $log.debug("rul:updt:grant:  " + this.uri);
                 //add the deferred update to the list of blocked updates just
                 //in case there are more, then grant the lock to all of them
                 this.blockedUpdaters.push(deferred);
@@ -154,7 +154,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         },
         grantLockToUpdaters: function() {
             if (this.blockedUpdaters.length > 0 && ! this.updateInProgress) {
-                console.log("rul:updt:all:    " + this.uri + "(unblocking " + this.blockedUpdaters.length +")");
+                $log.debug("rul:updt:all:    " + this.uri + "(unblocking " + this.blockedUpdaters.length +")");
                 //there are blocked updaters. let them proceed.
                 this.updateInProgress = true;
                 var updatePromise = null;
@@ -192,7 +192,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         },
         grantLockToReaders: function() {
             if (this.blockedReaders.length > 0) {
-                console.log("rul:readers:all: " + this.uri + "(unblocking " + this.blockedReaders.length +")");
+                $log.debug("rul:readers:all: " + this.uri + "(unblocking " + this.blockedReaders.length +")");
                 //there are blocked readers. let them proceed.
                 for (var i = 0; i < this.blockedReaders.length; i++) {
                     var deferredRead = this.blockedReaders[i];
@@ -209,14 +209,14 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     var CACHE_DIRTY = -1;
 
     linkedDataService.cacheItemInsertOrOverwrite = function(uri){
-        console.log("add to cache:    " + uri);
+        $log.debug("add to cache:    " + uri);
         privateData.cacheStatus[uri] = new Date().getTime();
     }
 
     linkedDataService.cacheItemIsLoaded = function(uri){
         var ret = typeof privateData.cacheStatus[uri] !== 'undefined';
         var retStr = (ret + "     ").substr(0,5);
-        console.log("inCache: " + retStr + "   " + uri);
+        $log.debug("inCache: " + retStr + "   " + uri);
         return ret;
     }
 
@@ -235,7 +235,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             ret = lastAccess == CACHE_DIRTY;
         }
         var retStr = (ret + "     ").substr(0,5);
-        console.log("isDirty: " + retStr + "   " + uri);
+        $log.debug("isDirty: " + retStr + "   " + uri);
         return ret;
     }
 
@@ -253,7 +253,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             ret = lastAccess != CACHE_DIRTY;
         }
         var retStr = (ret + "     ").substr(0,5);
-        console.log("isCacheOk: " + retStr + " " + uri);
+        $log.debug("isCacheOk: " + retStr + " " + uri);
         return ret;
     }
 
@@ -264,7 +264,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         } else if (lastAccess === CACHE_DIRTY){
             throw {message : "Trying to mark uri " + uri +" as accessed, but it is already dirty"}
         }
-        console.log("mark accessed:   " + uri);
+        $log.debug("mark accessed:   " + uri);
         privateData.cacheStatus[uri] = new Date().getTime();
     }
 
@@ -273,7 +273,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof lastAccess === 'undefined') {
             return;
         }
-        console.log("mark dirty:      " + uri);
+        $log.debug("mark dirty:      " + uri);
         privateData.cacheStatus[uri] = CACHE_DIRTY;
     }
 
@@ -367,7 +367,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             errorMessage = "More than one result found.";
         }
         if (errorMessage != null){
-            console.log(errorMessage);
+            $log.error(errorMessage);
             $q.reject(options.message + " " + errorMessage);
             return true;
         }
@@ -387,14 +387,14 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "fetch: uri must not be null"};
         }
-        console.log("fetch announced: " + uri);
+        $log.debug("fetch announced: " + uri);
         return getReadUpdateLockPerUri(uri)
             .runAsUpdate(
                 function() {
                     var deferred = $q.defer();
-                    console.log("updating:        " + uri);
+                    $log.debug("updating:        " + uri);
                     try {
-                        console.log("deleting :       " + uri);
+                        $log.debug("deleting :       " + uri);
                         var query = "delete where {<" + uri + "> ?anyP ?anyO}";
                         var failed = {};
                         privateData.store.execute(query, function (success, graph) {
@@ -402,17 +402,17 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 failed.failed = true;
                                 return;
                             }
-                            console.log("deleted:         " + uri)
+                            $log.debug("deleted:         " + uri)
                         });
                         if (failed.failed) {
                             return deferred.promise;
                         }
                         //the execute call above is not asynchronous, so we can safely continue outside the callback.
-                        console.log("fetching:        " + uri);
+                        $log.debug("fetching:        " + uri);
                         privateData.store.load('remote', uri, function (success, results) {
                             $rootScope.$apply(function () {
                                 if (success) {
-                                    console.log("fetched:         " + uri)
+                                    $log.debug("fetched:         " + uri)
                                     linkedDataService.cacheItemInsertOrOverwrite(uri);
                                     deferred.resolve(uri);
                                 } else {
@@ -439,7 +439,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "ensureLoaded: uri must not be null"};
         }
-        console.log("ensuring loaded: " +uri);
+        $log.debug("ensuring loaded: " +uri);
         if (linkedDataService.cacheItemIsOk(uri)){
             var deferred = $q.defer();
             linkedDataService.cacheItemMarkAccessed(uri);
@@ -1081,12 +1081,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 var lock = getReadUpdateLockPerUri(uri);
                 return lock.acquireReadLock().then(
                     function() {
-                        console.log("getNodeWithAttrs:" + uri);
+                        $log.debug("getNodeWithAttrs:" + uri);
                         try {
                             var node = {};
                             privateData.store.node(uri, function (success, graph) {
                                 if (graph.length == 0){
-                                    console.log("warn: could not load any attributes for node with uri: " + uri);
+                                    $log.error("warn: could not load any attributes for node with uri: " + uri);
                                 }
                                 if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
                                     return;
@@ -1116,7 +1116,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "deleteNode: uri must not be null"};
         }
-        console.log("deleting node:   " + uri);
+        $log.debug("deleting node:   " + uri);
         var deferred = $q.defer();
         var query = "delete where {<"+uri+"> ?anyP ?anyO}";
         //var query = "select ?anyO where {<"+uri+"> ?anyP ?anyO}";
