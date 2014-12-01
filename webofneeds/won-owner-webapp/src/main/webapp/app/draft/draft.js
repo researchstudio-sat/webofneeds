@@ -56,7 +56,7 @@ angular.module('won.owner').directive('inboxTable',function factory(){
         restrict: 'E',
         scope:{
             items: '=',
-            collapsed: '@',
+
             clickOnItem: '&',
             removeItem:'&',
             hasItems:'&',
@@ -99,7 +99,8 @@ angular.module('won.owner').directive('inboxTable',function factory(){
         },
         link: function(scope, elem, attr){
             scope.type = attr.type;
-            scope.collapsed = (scope.collapsed === 'true')
+            scope.collapsed = false;
+            //scope.collapsed = (scope.collapsed === 'true')
         }
     }
 })

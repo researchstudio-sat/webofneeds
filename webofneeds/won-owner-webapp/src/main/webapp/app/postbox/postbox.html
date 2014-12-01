@@ -32,7 +32,7 @@
 		<div>
             <!--Inbox-->
             <div ng-controller="PostInboxCtrl">
-                <inbox-table items="allNeeds" collapsed="true" click-on-item="clickOnPost" type="inbox"
+                <inbox-table items="allNeeds"  click-on-item="clickOnPost" type="inbox"
                              has-items="hasPosts()" control-data="postData"
                              template-url="{{templateUrl}}"></inbox-table>
             </div>
@@ -42,7 +42,7 @@
                                      remove-item="removeDraft(draftURI)"
                                      display-confirmation="displayConfirmation"
                                      chosen-item="draftData"></remove-control-data>
-                <inbox-table items="allDrafts" collapsed="true" click-on-item="clickOnDraft()" type="Drafts"
+                <inbox-table items="allDrafts" click-on-item="clickOnDraft()" type="Drafts"
                              remove-item="clickOnRemoveButton(draft)" has-items="hasDrafts()"
                              control-data="draftData" template-url="{{templateUrl}}">
                 </inbox-table>
