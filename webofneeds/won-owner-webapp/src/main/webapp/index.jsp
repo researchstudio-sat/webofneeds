@@ -142,11 +142,11 @@
 							<ul class="dropdown-menu" ng-controller="DraftCtrl"  >
 								<li
                                         ng-repeat="draft in allDrafts | orderObjectBy:'timestamp':true | limitTo: recordsToDisplay">
-                                    <a href ng-click="clickOnDraft(draft)">
-                                    <span style="display: none;">{{draft.draft.basicNeedType}}</span>
-                                    <img ng-src="{{getTypePicURI(draft.draft.basicNeedType)}}"/>
+                                    <a href ng-click="clickOn(draft.uri)">
+                                    <span style="display: none;">{{draft.basicNeedType}}</span>
+                                    <img ng-src="{{getTypePicURI(draft.basicNeedType)}}"/>
                                      &nbsp;
-                                     <span ng-bind="draft.draft.title"> &nbsp;</span>
+                                     <span ng-bind="draft.title"> &nbsp;</span>
                                     </a>
                                 </li>
 								<li class="divider"></li>

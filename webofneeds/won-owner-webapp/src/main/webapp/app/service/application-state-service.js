@@ -46,7 +46,6 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     privateData.filters[won.UNREAD.TYPE.CONNECT] = { 'eventType' : won.EVENT.CONNECT_RECEIVED };
     privateData.filters[won.UNREAD.TYPE.CLOSE] =   { 'eventType' : won.EVENT.CLOSE_RECEIVED };
 
-
     /**
     * Empties the current lists of needs, drafts and events (call e.g. when logging out so no data's left)
     * (or creates those if they didn't exist before for some reason)
@@ -70,6 +69,12 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.init = function(){
         privateData.allNeeds = {}
         privateData.allDrafts = {};
+
+        privateData.allClosed = [
+            {type:'Want', title:'Playing soccer together', datetime: new Date('2014-08-23')},
+            {type:'Change', title:'Looking for a flatscreen TV', datetime: new Date('2014-08-20')},
+            {type:'Together', title:'Go to the cinema', datetime: new Date('2014-07-14')}
+        ];
         privateData.currentNeedURI = null;
         privateData.currentEvent = null;
 
@@ -400,7 +405,9 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.getAllDrafts = function(){
         return privateData.allDrafts;
     }
-
+    applicationStateService.getAllClosed = function(){
+        return privateData.allClosed;
+    }
     /**
      * Adds a need.
      * @param need

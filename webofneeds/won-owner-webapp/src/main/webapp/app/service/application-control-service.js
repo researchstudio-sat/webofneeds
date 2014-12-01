@@ -18,6 +18,14 @@
  * Provides high-level application control functions that change application state and view.
  *
  */
+angular.module('won.owner').directive('applicationControl', function factory(){
+    return {
+        restrict: 'A',
+        controller: function($scope, applicationControlService){
+            $scope.getTypePicURI = applicationControlService.getTypePicURI;
+        }
+    }
+})
 angular.module('won.owner').factory('applicationControlService', function (applicationStateService, $location) {
 
     //the service
