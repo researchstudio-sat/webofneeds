@@ -32,7 +32,7 @@
 		<div>
             <!--Inbox-->
             <div ng-controller="PostInboxCtrl">
-                <inbox-table items="allNeeds"  click-on-item="clickOnPost" type="inbox"
+                <inbox-table items="allNeeds"  click-on-item="clickOnPost()" type="inbox"
                              has-items="hasPosts()" control-data="postData"
                              template-url="{{templateUrl}}"></inbox-table>
             </div>
