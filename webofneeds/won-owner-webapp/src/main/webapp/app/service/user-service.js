@@ -22,7 +22,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
             // to check if the response data is not a string (we except array here).
             if(utilService.isString(needs.data)) {
                 // unexpected response data, probably a redirect to another web-page
-                console.error("ERROR: unexpected response data for /owner/rest/needs/");
+                $log.error("ERROR: unexpected response data for /owner/rest/needs/");
                 return {status: "ERROR", message: "unexpected response data"};
             } else {
                 if (needs.data.length>0){
@@ -201,13 +201,15 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         return $http.post(
                 '/owner/rest/users/signout'
         ).then(
-            function (data, status) {
+            function success(data, status) {
+                $log.debug("Successfully logged-out");
                 userService.resetAuth();
                 $rootScope.$broadcast(won.EVENT.USER_SIGNED_OUT);
                 return {status:"OK"};
             },
-            function (data, status) {
-                console.log("FATAL ERROR");
+            function error(data, status) {
+                $log.error("ERROR: failed to log-out");
+                return {status:"FATAL_ERROR"};
             }
         );
 	};

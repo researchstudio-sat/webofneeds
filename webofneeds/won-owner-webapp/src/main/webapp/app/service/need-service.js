@@ -77,7 +77,7 @@ CategorizedNeeds = function() {
 	}
 }
 
-angular.module('won.owner').factory('needService', function ($http, $q, applicationStateService) {
+angular.module('won.owner').factory('needService', function ($http, $q, applicationStateService, $log) {
 
 	var needService = {};
 
@@ -168,8 +168,8 @@ angular.module('won.owner').factory('needService', function ($http, $q, applicat
 			}
 		}).then(
 			findNeedsToConnections,
-			function() {
-				console.log("FATAL ERROR")
+			function error() {
+                $log.error('Error accessing connections of need ' + dataNeedUri);
 			}
 		);
 	};
@@ -185,6 +185,8 @@ angular.module('won.owner').factory('needService', function ($http, $q, applicat
 		});
 	}
 
+
+    // TODO overlaps with user-service
 	needService.getAllNeeds = function() {
 		return $http.get('/owner/rest/needs/').then(
 			function(response) {
@@ -196,27 +198,28 @@ angular.module('won.owner').factory('needService', function ($http, $q, applicat
 		);
 	}
 
+
     needService.saveDraft = function(draft){
         var draftToSave = angular.copy(draft);
         return $http({
             method:'POST',
             url:'/owner/rest/needs/drafts',
-            data:JSON.stringify(draftToSave),
-            success:function(content){
-                console.log(content);
-            }
+            data:JSON.stringify(draftToSave)
         }).then(
-            function (draft) {
+            function success(draft) {
+                $log.debug("Successfully saved draft " + draftToSave.draftURI);
                 applicationStateService.addDraft(draft.data);
-                // success
                 return {status:"OK"};
             },
-            function (response) {
-                console.log("FATAL ERROR");
+            function error(response) {
+                $log.error("Error saving draft " + draftToSave.draftURI);
+                return {status:"ERROR"};
             }
         );
     }
 
+    /*
+    //this is not used any more
 	needService.save = function(need) {
 		var needToSave = angular.copy(need);
 		needToSave.tags = need.tags.join(",");
@@ -234,20 +237,20 @@ angular.module('won.owner').factory('needService', function ($http, $q, applicat
 		return $http({
 			method:'POST',
 			url:'/owner/rest/needs/',
-			data:needToSave,
-			success:function (content) {
-				console.log(content);
-			}
+			data:needToSave
 		}).then(
 				function () {
 					// success
+                    $log.debug("Successfully saved need");
 					return {status:"OK"};
 				},
 				function (response) {
-					console.log("FATAL ERROR");
+                    $log.error("Error saving need");
+                    return {status:"ERROR"};
 				}
 		);
 	};
+	*/
 
 	return needService;
 });

@@ -24,7 +24,7 @@ app = angular.module('won.owner',
         , 'ngScrollbar'
         , 'scrollable-table'
         ]
-    ).config(function ($routeProvider, $httpProvider, $provide) {//, $log) {
+    ).config(function ($routeProvider, $httpProvider, $provide) {
         $httpProvider.responseInterceptors.push('redirectInterceptor');
 	    $routeProvider.
             when('/create-need/:step/:menuposition/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).

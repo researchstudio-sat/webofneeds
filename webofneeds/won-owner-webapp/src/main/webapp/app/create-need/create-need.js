@@ -310,9 +310,12 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         }
         var createDraftObject = {"draftURI":$scope.need.needURI,"draft":JSON.stringify(draftJson)};
 
-        needService.saveDraft(createDraftObject).then(function(draftURI){
-           $scope.successShow = true;
-
+        needService.saveDraft(createDraftObject).then(function(saveDraftResponse){
+            if (saveDraftResponse.status === "OK") {
+                $scope.successShow = true;
+            } else {
+                // TODO inform about an error
+            }
         });
     }
 
