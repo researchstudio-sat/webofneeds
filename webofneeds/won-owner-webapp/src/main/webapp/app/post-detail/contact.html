@@ -26,10 +26,14 @@
                             </div>
                             <div class="pull-left">
                                 <button type="button" class="btn dropdown-toggle" id="selectYourPost"
-                                        data-toggle="dropdown">Select your post<span class="caret"></span>
+                                        data-toggle="dropdown">{{dropdownText}}<span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="choosePost">
-                                    <li role="presentation">
+                                    <li role="presentation" ng-repeat="post in allNeeds | orderBy:post.creationDate">
+                                        <a role="menuitem" tabindex="0" href="" ng-click="clickOnPost(post)">{{post
+                                            .title}}</a>
+                                    </li>
+                                    <!--li role="presentation">
                                         <a role="menuitem" tabindex="0" href="" onclick="changeSortBy()">Post 1</a>
                                     </li>
                                     <li role="presentation">
@@ -37,7 +41,7 @@
                                     </li>
                                     <li role="presentation">
                                         <a role="menuitem" tabindex="2" href="">Post 3</a>
-                                    </li>
+                                    </li-->
                                 </ul>
                             </div>
                             <div class="pull-right">
@@ -51,7 +55,9 @@
         <div ng-show="sendStatus">
             <div class="col-md-12" style="font-size: 1.6em;">
                 <strong>Your message was sent!</strong><span class="glyphicon glyphicon-ok" style="color: green;"></span><br/>
-                You can see your conversations with <bold>{{postTitle}}</bold> in your <a href="TODO PUT HERE LINK">Postbox Page</a>.
+                You can see your conversations with <b ng-bind="need.title"></b> in your <a id="postboxLink"
+                    href="#/postbox">Postbox
+                Page</a>.
             </div>
         </div>
     </div>
@@ -95,13 +101,21 @@
         <div ng-show="sendStatus">
             <div class="col-md-12" style="font-size: 1.6em;">
                 <div class="col-md-10">
-                    <strong>Your message was sent!</strong><span class="glyphicon glyphicon-ok" style="color: green;"></span><br/>
-                    <span class="glyphicon glyphicon-lock"></span>Private link<br/>
-                    The private link for your conversation with <bold>{{postTitle}}</bold> was sent to {{email}}.<br/><br/>
-                    Access it to see your messages with the owner of this post. You shouldn’t give it away.
+                    <div class="row col-md-12">
+                    <strong>Your message was sent!</strong>
+                    <span class="glyphicon glyphicon-ok" style="color: green;"></span>
+                    </div>
+                    <div class="row col-md-12">
+                        <span class="glyphicon glyphicon-lock"></span>Private link<br/>
+                        The private link for your conversation with <b ng-bind="need.title"></b> was sent to
+                        {{email}}.<br/><br/>
+                        Access it to see your messages with the owner of this post. You shouldn’t give it away.
+                    </div>
+
                 </div>
                 <div class="col-md-2">
-                    <img src="/owner/images/messageWasSent.PNG"/>
+                    <span style="font-size:200px"class="fa fa-exclamation"></span>
+                    <!--img src="/owner/images/messageWasSent.PNG"/-->
                 </div>
 
             </div>
@@ -110,7 +124,8 @@
                     <input type="text" class="form-control" name="privateLink" id="privateLink" ng-model="privateLink" readonly>
                 </div>
                 <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary" ng-click="copyLinkToClipboard()"><!--<span class="glyphicon glyphicon-floppy-disk"></span>--><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Copy link</button>
+                    <button id="copy-button" type="submit" class="btn btn-primary"
+                            ng-click="copyLinkToClipboard()"><!--<span class="glyphicon glyphicon-floppy-disk"></span>--><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Copy link</button>
                 </div>
             </div>
         </div>

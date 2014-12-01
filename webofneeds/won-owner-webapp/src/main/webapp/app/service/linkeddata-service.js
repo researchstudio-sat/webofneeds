@@ -321,6 +321,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         }
         return $q.when(true); //return a promise for chaining
     }
+    linkedDataService.invalidateCacheForNeed = function(needUri){
+        if (needUri != null) {
+            linkedDataService.cacheItemMarkDirty(needUri);
+            linkedDataService.cacheItemMarkDirty(needUri+'/connections/')
+        }
+        return $q.when(true); //return a promise for chaining
+    }
 
 
 
@@ -402,7 +409,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         }
                         //the execute call above is not asynchronous, so we can safely continue outside the callback.
                         console.log("fetching:        " + uri);
-                        privateData.store.load('remote', tempUri, function (success, results) {
+                        privateData.store.load('remote', uri, function (success, results) {
                             $rootScope.$apply(function () {
                                 if (success) {
                                     console.log("fetched:         " + uri)

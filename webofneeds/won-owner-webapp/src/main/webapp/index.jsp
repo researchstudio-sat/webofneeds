@@ -26,12 +26,12 @@
 		<link rel="stylesheet" href="style/bootstrap.min.css" />
 		<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>
 		<link rel="stylesheet" href="style/main.css"/>
-	<link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
-	<link rel="stylesheet" href="style/datepicker.css"/>
-	<link rel="stylesheet" href="font-awesome-4.1.0/css/font-awesome.min.css">
-	<link rel="stylesheet" href="style/lightbox.css"/>
-	<link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
-    <link rel="stylesheet" href="style/star-rating.css"/>
+	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
+	    <link rel="stylesheet" href="style/datepicker.css"/>
+	    <link rel="stylesheet" href="font-awesome-4.1.0/css/font-awesome.min.css">
+	    <link rel="stylesheet" href="style/lightbox.css"/>
+	    <link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
+        <link rel="stylesheet" href="style/star-rating.css"/>
         <link rel="stylesheet" href="scripts/angular-scrollable-table/scrollable-table.css"/>
 
         <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.min.css"/>
@@ -208,7 +208,9 @@
 
 		<div ng-view id="content" class="container">
 		</div>
-		
+
+		<!--actually there's a footer html tag for this use-case-->
+		<!--also we should get rid of these nested divs--->
 <nav class="navbar navbar-default navbar-bottom" role="navigation">
 	<div class="container" style="padding:0">
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">

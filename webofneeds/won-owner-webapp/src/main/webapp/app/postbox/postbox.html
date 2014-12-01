@@ -48,8 +48,7 @@
             </div>
             <div id="inboxArea" ng-show="!inboxCollapsed" class="div-table col-lg-12">
                 <table id="post-table"
-                       class="table table-hover table-striped"
-                       ng-init="resizableColumns('post-table');">
+                       class="table table-hover table-striped">
                     <thead>
                         <tr>
                             <th>Type</th>
@@ -61,15 +60,16 @@
                     <tbody>
                         <tr
                                 ng-show="hasNeeds()"
-                                ng-repeat="post in allNeeds() | orderObjectBy:sortedField:reversedSort |filter: search">
+                                ng-repeat="post in allNeeds | orderObjectBy:sortedField:reversedSort |filter: search">
                             <td class="col-lg-1">
                                 <span style="display: none;">{{post.basicNeedType}}</span>
                                 <img ng-src="{{getTypePicURI(post.basicNeedType)}}"
                                      tooltip="{{post.basicNeedType}} (click to filter)"/>
                             </td>
-                            <td><a style="font-weight:bold;" href ng-click="clickOnNeedPrivateLink(post)">{{post
+                            <td class="col-lg-7"><a style="font-weight:bold;" href
+                                             ng-click="clickOnNeedPrivateLink(post)">{{post
                                 .title}}</a></td>
-                            <td>
+                            <td class="col-lg-2">
                                 <span>
                                     <span style="display: none;">{{unreadEventsByNeedByType}}</span>
                                     <i
@@ -88,13 +88,14 @@
                                             ng-bind-template="{{unreadEventsByNeedByType[post.uri].hint.count}}"/>
                                 </span>
                             </td>
-                            <td>{{post.creationDate | date}}</td>
+                            <td class="col-lg-2">{{post.creationDate | date}}</td>
                         </tr>
                         <tr ng-show="!hasNeeds()">
                         <!--<tr ng-show="applicationStateService.getAllNeedsCount()<1">-->
                             <td class="col-lg-1">
                             </td>
-                            <td>You don't have posts yet. Fill it by <a style="font-weight:bold;" href="#/home">creating new
+                            <td>You don't have posts yet. Fill it by <a style="font-weight:bold;"
+                                                                        href="#/create-need/1">creating new
                                 posts</a></td>
                             <td>
                             </td>
@@ -140,7 +141,7 @@
                     </div>
                 </div>
                 <div id="draftsArea" ng-show="!draftsCollapsed" class="div-table col-lg-12">
-                    <table id="draft-table" st-table="drafts" class="table table-hover table-striped" ng-init="resizableColumns('draft-table');">
+                    <table id="draft-table" st-table="drafts" class="table table-hover table-striped">
                         <thead>
                         <tr>
                             <th st-sort="type">Type</th>
@@ -198,7 +199,7 @@
                 </div>
             </div>
             <div id="closedArea" ng-show="!closedCollapsed" class="div-table col-lg-12">
-                <table id="closed-table" st-table="closedList" class="table table-hover table-striped" ng-init="resizableColumns('closed-table');">
+                <table id="closed-table" st-table="closedList" class="table table-hover table-striped">
                     <thead>
                     <tr>
                         <th st-sort="type">Type</th>
