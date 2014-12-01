@@ -345,10 +345,7 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
 
         } ,
         link: function(scope, element, attrs){
-            var btn = document.getElementById("copy-button");
-            btn.addEventListener("click",scope.clickHandler, false);
-            btn.addEventListener("copy", scope.copyHandler, false);
-            console.log("Contact form");
+
         }
     }
 });

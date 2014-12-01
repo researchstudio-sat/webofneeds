@@ -163,7 +163,9 @@ angular.module('won.owner').factory('messageService', function ($http, $q, $root
             console.log("SockJS connection closed");
             //TODO: reconnect when connection is lost?
             if (e.code === 1011) { // unexpected server condition - happens when the user's session times out
-                $rootScope.$broadcast(won.EVENT.WEBSOCKET_CLOSED_UNEXPECTED);
+                $rootScope.$apply(function () {
+                    $rootScope.$broadcast(won.EVENT.WEBSOCKET_CLOSED_UNEXPECTED);
+                });
             }
         };
 
