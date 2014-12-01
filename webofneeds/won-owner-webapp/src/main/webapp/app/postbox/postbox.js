@@ -37,8 +37,11 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 
 	$scope.search = '';
 
-
-
+    /* onClick Handlers */
+    $scope.clickOnDraft = function(draft){
+        //$location.path("create-need/"+draft.currentStep+"/"+draft.menuposition);
+        $location.path("create-need/"+draft.currentStep+"/"+draft.menuposition+"/"+draft.draft.title).search({"draft": draft.draftURI});
+    }
     $scope.setSortParams = function(fieldName) {
         if ($scope.sortedField == fieldName) {
             $scope.reversedSort = !$scope.reversedSort;
@@ -47,35 +50,6 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
             $scope.sortedField = fieldName;
         }
     }
-
-    $scope.resizableColumns = function (id) {
-       /* var pressed = false;
-        var start = undefined;
-        var startX, startWidth;
-
-        $('#' + id + ' th').mousedown(function(e) {
-            start = $(this);
-            pressed = true;
-            startX = e.pageX;
-            startWidth = $(this).width();
-            $(start).addClass("resizing");
-        });
-
-        $(document).mousemove(function(e) {
-            if(pressed) {
-                $(start).width(startWidth+(e.pageX-startX));
-            }
-        });
-
-        $(document).mouseup(function() {
-            if(pressed) {
-                $(start).removeClass("resizing");
-                pressed = false;
-            }
-        });         */
-    }
-
-
 
     // TODO call backend method here
     //need to fetch: need type, need title, need close date
