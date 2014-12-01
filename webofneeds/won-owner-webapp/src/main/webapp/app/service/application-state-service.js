@@ -354,7 +354,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * @returns draft
      */
     applicationStateService.getDraft = function(draftURI){
-        return privateData.allDrafts[draftURI].draft;
+        return privateData.allDrafts[draftURI];
     }
 
     /**
@@ -416,7 +416,13 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         var currentStep = draftBuilderObject.getCurrentStep();
         var timestamp = draftBuilderObject.getLastSavedTimestamp();
         var draftObj = draftBuilderObject.getDraftObject();
-        var draftObjWithMetaInfo = {"draftURI":draft.draftURI,"currentStep":currentStep,"menuposition":menuposition,"timestamp":timestamp,"draft":draftObj};
+        var draftObjWithMetaInfo = draftObj;
+        draftObjWithMetaInfo.uri = draft.draftURI;
+        draftObjWithMetaInfo.meta = {}
+        draftObjWithMetaInfo.meta.uri = draft.draftURI;
+        draftObjWithMetaInfo.meta.menuposition = menuposition;
+        draftObjWithMetaInfo.meta.currentStep = currentStep;
+        draftObjWithMetaInfo.meta.timestamp = timestamp;
         privateData.allDrafts[draft.draftURI] = draftObjWithMetaInfo;
 
     }

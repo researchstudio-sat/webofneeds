@@ -73,13 +73,15 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         //}
     }
 
-    userService.removeDraft = function(draftURI) {
+    userService.removeDraft = function(draftUri) {
+        var deferred = $q.defer();
         $http.delete(
-            '/owner/rest/needs/drafts/draft/?uri=' + encodeURIComponent(draftURI),
+            '/owner/rest/needs/drafts/draft/?uri=' + encodeURIComponent(draftUri),
             privateData.user
         ).then(
             function success(response) {
-                applicationStateService.removeDraft(draftURI);
+                applicationStateService.removeDraft(draftUri);
+                deferred.resolve(draftUri);
                 // TODO broadcast success notification?
             },
             function error(response) {
@@ -89,15 +91,17 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
                     case 403:
                         // normal error
                         errorResponse.status = "ERROR";
-
+                        deferred.reject(errorResponse);
                     default:
                         // system error
                         errorResponse.status = "FATAL_ERROR";
+                        deferred.reject(errorResponse);
                         break;
                 }
                 // TODO broadcast error notification?
             }
         )
+        return deferred.promise;
     }
 
     userService.verifyAuth = function() {

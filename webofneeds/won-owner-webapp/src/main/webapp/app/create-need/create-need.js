@@ -405,7 +405,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
 
             //$scope.need = $scope.getCleanNeed();      TODO decide what to do
             $scope.successShow = true;
-            newNeedUriPromise.then(function(){
+            newNeedUriPromise['finally'](function(){
                 lock=false;
             });
         }
