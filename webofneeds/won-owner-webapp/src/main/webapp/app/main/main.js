@@ -181,4 +181,30 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         messageService.reconnect();
     });
 
+    // This is probably a temporary solution for socket disconnecting with code 1011,
+    // which includes session timeout reason. Probably the right way
+    // would be that the server-side handles redirect to a timeout page...
+    $scope.$on(won.EVENT.WEBSOCKET_CLOSED_UNEXPECTED, function(event){
+        // if the gui part thinks we are authenticated but the server says not,
+        // it most probably means there was a session timeout.
+        // TODO: possible handling is asking user to re-login
+        var wasAuth = userService.isAuth();
+        userService.verifyAuth().then(function handleUnexpectedWebsocketClose(authenticated){
+            if (authenticated) {
+                console.log("WEBSOCKET CLOSED code 1011, user is still authenticated. Reconnecting.");
+                messageService.reconnect();
+            } else if (wasAuth) {
+                console.log("WEBSOCKET CLOSED code 1011, user was authenticated. Logging out.");
+                userService.logOut().then(onResponseSignOut);
+            } else {
+                console.log("WEBSOCKET CLOSED code 1011, user was not authenticated. Reconnecting.");
+                messageService.reconnect();
+            }
+        });
+    });
+
+    var onResponseSignOut = function (result) {
+       $location.url("/");
+    };
+
 });

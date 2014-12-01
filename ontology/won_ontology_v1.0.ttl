@@ -72,8 +72,6 @@ xsd:duration rdf:type rdfs:Datatype .
                    
                    rdfs:comment "Contains additional information in form of an RDF graph about an event."^^xsd:string ;
                    
-                   rdfs:domain :Event ;
-                   
                    rdfs:range owl:Thing .
 
 
@@ -267,9 +265,7 @@ xsd:duration rdf:type rdfs:Datatype .
 :hasOriginator rdf:type owl:InverseFunctionalProperty ,
                         owl:ObjectProperty ;
                
-               rdfs:comment "The entity (Need, Connection, or Service - eg. matching service) that originated the event." ;
-               
-               rdfs:range :Event .
+               rdfs:comment "The entity (Need, Connection, or Service - eg. matching service) that originated the event." .
 
 
 
@@ -576,8 +572,6 @@ xsd:duration rdf:type rdfs:Datatype .
               
               rdfs:comment "The time and date when the event occurred." ;
               
-              rdfs:domain :Event ;
-              
               rdfs:range xsd:dateTimeStamp .
 
 
@@ -659,14 +653,6 @@ xsd:duration rdf:type rdfs:Datatype .
 
 
 
-###  http://purl.org/webofneeds/model#Event
-
-:Event rdf:type owl:Class ;
-       
-       rdfs:comment "Events that can change connection state." .
-
-
-
 ###  http://purl.org/webofneeds/model#EventContainer
 
 :EventContainer rdf:type owl:Class ;
@@ -682,16 +668,6 @@ xsd:duration rdf:type rdfs:Datatype .
 :Facet rdf:type owl:Class ;
        
        rdfs:comment "Facets are behaviours a Need can choose to support. Connections have a Facet; Needs can be connected through multiple Connections if they have different Facets." .
-
-
-
-###  http://purl.org/webofneeds/model#Hint
-
-:Hint rdf:type owl:Class ;
-      
-      rdfs:subClassOf :Event ;
-      
-      rdfs:comment "The Hint event. Creates a new Connection in Suggested state." .
 
 
 
@@ -718,7 +694,7 @@ It specifies a content - what the need is about, which may be something that is 
 
 :NeedContent rdf:type owl:Class ;
              
-             rdfs:comment "The thing the Need is about." .
+             rdfs:comment "Whatever the Need is about." .
 
 
 
@@ -735,68 +711,6 @@ It specifies a content - what the need is about, which may be something that is 
 :NeedState rdf:type owl:Class ;
            
            rdfs:comment "The Need's state." .
-
-
-
-###  http://purl.org/webofneeds/model#OwnerClose
-
-:OwnerClose rdf:type owl:Class ;
-            
-            rdfs:subClassOf :Event ;
-            
-            rdfs:comment "Close event caused by the owner (local end of the connection). Changes the Connection state to Closed." .
-
-
-
-###  http://purl.org/webofneeds/model#OwnerMessage
-
-:OwnerMessage rdf:type owl:Class ;
-              
-              rdfs:subClassOf :Event ;
-              
-              rdfs:comment "A general-purpose message sent by the owner (the local end of the connection). Does not change Connection state." .
-
-
-
-###  http://purl.org/webofneeds/model#OwnerOpen
-
-:OwnerOpen rdf:type owl:Class ;
-           
-           rdfs:subClassOf :Event ;
-           
-           rdfs:comment """Open event caused by the owner (local end of the connection). 
-The connection is created in state RequestSent if it doesn't exist or enters the RequestSent state if it was in state Suggested or changes to the Connected state if it was in state RequestReceived.""" .
-
-
-
-###  http://purl.org/webofneeds/model#PartnerClose
-
-:PartnerClose rdf:type owl:Class ;
-              
-              rdfs:subClassOf :Event ;
-              
-              rdfs:comment "Close event caused by the partner (remote end of the connection). Changes the Connection state to Closed." .
-
-
-
-###  http://purl.org/webofneeds/model#PartnerMessage
-
-:PartnerMessage rdf:type owl:Class ;
-                
-                rdfs:subClassOf :Event ;
-                
-                rdfs:comment "A general-purpose message sent by the partner (the remote end of the connection).  Does not change Connection state." .
-
-
-
-###  http://purl.org/webofneeds/model#PartnerOpen
-
-:PartnerOpen rdf:type owl:Class ;
-             
-             rdfs:subClassOf :Event ;
-             
-             rdfs:comment """Open event caused by the partner (remote end of the connection). 
-The connection is created in state RequestReceived if it doesn't exist or enters the RequestReceived state if it was in state Suggested or changes to the Connected state if it was in state RequestSent.""" .
 
 
 
@@ -838,7 +752,7 @@ The connection is created in state RequestReceived if it doesn't exist or enters
 
 :WonOverSoapWs rdf:type owl:Class ;
                
-               rdfs:subClassOf :WonProtocol ;
+               rdfs:subClassOf gr:WarrantyPromise ;
                
                rdfs:comment "The Web of Needs Protocol implelementation that uses SOAP Webservices." .
 
@@ -864,6 +778,12 @@ sioc:Tag rdf:type owl:Class .
 <http://www.w3.org/2003/01/geo/wgs84_pos#Point> rdf:type owl:Class ;
                                                 
                                                 rdfs:subClassOf :LocationSpecification .
+
+
+
+###  http://www.w3.org/ns/ldp#CompositeContainer
+
+<http://www.w3.org/ns/ldp#CompositeContainer> rdf:type owl:Class .
 
 
 
