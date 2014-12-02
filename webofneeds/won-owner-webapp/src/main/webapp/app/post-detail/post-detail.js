@@ -61,7 +61,7 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope,$log, 
         return userService.isAuth();
     }
     $scope.clickOnCopy = function(){
-        $location.path("create-need/1/"+applicationControlService.getMenuPositionForNeedType($scope.need.basicNeedType));
+        $location.url("create-need/1/"+applicationControlService.getMenuPositionForNeedType($scope.need.basicNeedType));
     }
 
     $scope.hoverCopyToolTip ="I want this too";

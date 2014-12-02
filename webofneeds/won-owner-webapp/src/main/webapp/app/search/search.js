@@ -30,7 +30,7 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
 
     $scope.createNewPost = function () {
         //TODO put title from search
-        $location.path('/create-need/1//' + $scope.searching.title);
+        $location.url('/create-need/1//' + $scope.searching.title);
     }
 });
 

@@ -190,7 +190,7 @@ angular.module('won.owner')
                 if ($scope.chosenMessage != null && $scope.chosenMessage.event.hasMessageType == elem) {
                     // then set the chosen message to null and reload the page
                     $scope.chosenMessage = null;
-                    $location.path('/private-link');
+                    $location.url('/private-link');
                 }
                 list.splice(pos,1);
             }
@@ -328,7 +328,7 @@ angular.module('won.owner')
         //clean textarea
         $scope.newMessage = "";
         $log.debug('redirect: /private-link');
-        $location.path('/private-link');
+        $location.url('/private-link');
     }
 
     $scope.clickOnNoForDeclineRequest = function() {
@@ -346,7 +346,7 @@ angular.module('won.owner')
         // clean textarea
         $scope.newMessage = "";
         $log.debug('redirect: /private-link');
-        $location.path('/private-link');
+        $location.url('/private-link');
     }
 
     // Outgoing Requests
@@ -368,7 +368,7 @@ angular.module('won.owner')
         $scope.prevMessageId = null;
         $scope.chosenMessage = null;
         $log.debug('redirect: /private-link');
-        $location.path('/private-link');
+        $location.url('/private-link');
     }
 
     // for editable text box
@@ -414,7 +414,7 @@ angular.module('won.owner')
         $scope.chosenMessage = null;
         // TODO add parameter for displaying specific stuff on private-link page
         $log.debug('redirect: /private-link');
-        $location.path('/private-link');
+        $location.url('/private-link');
     }
 
 
@@ -441,7 +441,7 @@ angular.module('won.owner')
         //$scope.prevMessageId = null;
         // TODO add parameter for displaying specific stuff on private-link page
         $log.debug('redirect: /private-link');
-        $location.path('/private-link');
+        $location.url('/private-link');
     }
 
     $scope.openFacebook = function() {

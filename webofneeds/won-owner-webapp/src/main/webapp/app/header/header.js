@@ -48,12 +48,8 @@ angular.module('won.owner').controller("HeaderCtrl",
                    + " to "  + JSON.stringify(to)
         )});
 
-    $scope.redirectHome= function(){
-        $location.path("/home");
-    }
-
     $scope.goLandingPage = function() {
-        $location.path("/");
+        $location.url("/");
     }
 
 	$scope.showPublic = function() {
@@ -77,7 +73,7 @@ angular.module('won.owner').controller("HeaderCtrl",
 
 	onResponseSignOut = function (result) {
 		if (result.status == 'OK') {
-			$location.path("/");
+			$scope.goLandingPage();
 		}
 	};
 

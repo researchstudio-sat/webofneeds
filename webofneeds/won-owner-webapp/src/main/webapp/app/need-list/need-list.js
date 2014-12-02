@@ -98,7 +98,7 @@ angular.module('won.owner').controller('NeedListCtrl', function ($scope,$log, $l
 	});
 
 	$scope.goToDetail = function($id) {
-		$location.path("/need-detail/" + $id);
+        $location.url("/need-detail/" + $id);
 	};
 
 	$scope.showMatches = function($event) {

@@ -85,7 +85,7 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 
     $scope.clickOnNeedPrivateLink = function(clickedNeed) {
         applicationStateService.setCurrentNeedURI(clickedNeed.uri);
-        $location.path("/private-link")
+        $location.url("/private-link")
     }
 });
 angular.module('won.owner').directive('removeControlData',function factory(){
@@ -129,8 +129,11 @@ angular.module('won.owner').directive('inboxTable',function factory(){
         },
         template:'<div ng-attr-id="id" class="row col-lg-12" ng-include="templateUrl"></div>',
         controller: function($scope,$log){
-            $scope.postsSortedField = 'timestamp';
-            $scope.postsReversedSort = true;
+            //$scope.postsSortedField = 'timestamp';
+            //$scope.postsReversedSort = true;
+            $scope.recordsToDisplay = 4;
+            $scope.sortedField = 'timestamp';
+            $scope.reversedSort = true;
             $scope.clickOn=function(item){
                 $scope.controlData.uri =item.uri;
                 //  $scope.chosenItemUri=item.uri;
@@ -144,9 +147,7 @@ angular.module('won.owner').directive('inboxTable',function factory(){
                 $scope.controlData.uri = item.uri;
                 $scope.removeItem();
             }
-            $scope.recordsToDisplay = 4;
-            $scope.sortedField = 'timestamp';
-            $scope.reversedSort = true;
+
             $scope.collapseClick = function(){
                 $log.debug("before click: "+$scope.collapsed) ;
                 $scope.collapsed = !$scope.collapsed;
@@ -158,14 +159,6 @@ angular.module('won.owner').directive('inboxTable',function factory(){
                 } else {
                     $scope.reversedSort = false;
                     $scope.sortedField = fieldName;
-                }
-            }
-            $scope.setSortParams = function(fieldName) {
-                if ($scope.postsSortedField == fieldName) {
-                    $scope.postsReversedSort = !$scope.postsReversedSort;
-                } else {
-                    $scope.postsReversedSort = false;
-                    $scope.postsSortedField = fieldName;
                 }
             }
 
@@ -186,7 +179,7 @@ angular.module('won.owner').controller("ClosedInboxCtrl",function($scope,$locati
     $scope.clickOnClosed = function(){
         $scope.closedData.chosenPost = $scope.allClosed[$scope.closedData.uri];
         applicationStateService.setCurrentNeedURI($scope.closedData.uri);
-        $location.path("/private-link");
+        $location.url("/private-link");
         $scope.hasClosed = function(){
             return applicationStateService.getAllClosedCount()>0;
 
@@ -205,7 +198,7 @@ angular.module('won.owner').controller("PostInboxCtrl", function($scope,$locatio
         //$location.path("create-need/"+draft.currentStep+"/"+draft.menuposition);
         $scope.postData.chosenPost = $scope.allNeeds[$scope.postData.uri];
         applicationStateService.setCurrentNeedURI($scope.postData.uri);
-        $location.path("/private-link")
+        $location.url("/private-link")
 
     }
 

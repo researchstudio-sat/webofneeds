@@ -24,7 +24,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
     $scope.$on(won.EVENT.NEED_CREATED, onNeedCreated = function(event, eventData){
         $scope.needURI = eventData.needURI;
         applicationStateService.setCurrentNeedURI($scope.needURI);
-        $location.path("/private-link").search("draft", null);
+        $location.url("/private-link");
     });
 
     /*Block for working with checking another post type */
@@ -414,7 +414,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
 	};
 
 	$scope.cancel = function () {
-		$location.path("/");
+		$location.url("/");
 	};
 
     $scope.validatePostForm = function() {

@@ -57,7 +57,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     }
 
     $scope.goHome = function(){
-        $location.path("/home");
+        $location.url("/home");
     }
 
     var reloadCurrentNeedData = function(){

@@ -80,8 +80,8 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
             privateData.user
         ).then(
             function success(response) {
-                applicationStateService.removeDraft(draftri);
-                deferred.resolve(draft.uri);
+                applicationStateService.removeDraft(draftUri);
+                deferred.resolve(draftUri);
                 // TODO broadcast success notification?
             },
             function error(response) {

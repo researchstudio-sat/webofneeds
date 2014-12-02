@@ -52,7 +52,7 @@ angular.module('won.owner').controller('NeedDetailCtrl', function ($scope, $log,
 	}
 
 	$scope.back = function () {
-		$location.path("/need-list");
+        $location.url("/need-list");
 	}
 
 });

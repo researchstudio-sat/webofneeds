@@ -44,7 +44,7 @@ angular.module('won.owner').factory('applicationControlService', function (appli
             return;
         }
         applicationStateService.setCurrentNeedURI(needURI);
-        $location.path("/private-link");
+        $location.url("/private-link");
     }
     applicationControlService.getTypePicURI = function (type) {
         if(type==won.WON.BasicNeedTypeDemand) return "/owner/images/type_posts/want.png";

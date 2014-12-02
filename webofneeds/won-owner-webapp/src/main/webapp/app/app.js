@@ -230,7 +230,7 @@ app.factory('redirectInterceptor', ['$location', '$q', function($location, $q) {
         function(response) {
             if (response.status == 401 && $location.path()=="/postbox") {
 
-                $location.path("/signin");
+                $location.url("/signin");
             }
             return $q.reject(response);
         }

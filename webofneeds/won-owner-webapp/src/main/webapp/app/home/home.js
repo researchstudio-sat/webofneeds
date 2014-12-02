@@ -27,18 +27,18 @@ angular.module('won.owner').controller('HomeCtrl',
 
 	$scope.goToNewNeed = function() {
 		if(userService.isAuth()) {
-			$location.path("/create-need");
+			$location.url("/create-need");
 		} else {
-			$location.path("/signin");
+            $location.url("/signin");
 		}
 	}
 
 	$scope.goToAllNeeds = function () {
 
 		if (userService.isAuth()) {
-			$location.path("/need-list");
+            $location.url("/need-list");
 		} else {
-			$location.path("/signin");
+            $location.url("/signin");
 		}
 	}
 
@@ -211,7 +211,7 @@ angular.module('won.owner').controller('HomeCtrl',
         if ($scope.iNewPost.$valid && validPanel) {
             //userService.registerUser($scope.registerUser).then(onRegisterResponse);
 
-            $location.path('/create-need/1/'+$scope.iPost.menuposition+'/'+$scope.iPost.title);
+            $location.url('/create-need/1/'+$scope.iPost.menuposition+'/'+$scope.iPost.title);
         }
     }
 
@@ -264,7 +264,7 @@ angular.module('won.owner').controller('HomeCtrl',
 
         if ($scope.otherNewSearch.$valid && validPanel) {
             //userService.registerUser($scope.registerUser).then(onRegisterResponse);
-            $location.path('/search');
+            $location.url('/search');
         }
     }
 
@@ -283,7 +283,7 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
     //TODO move to userService.login
 	onLoginResponse = function(response) {
 		if (response.status == "OK") {
-			$location.path('/postbox');
+            $location.url('/postbox');
 		} else if (response.status == "ERROR") {
 			$scope.error = response.message;
 		} else {
@@ -323,7 +323,7 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
     $scope.mail_s = false;
 
     onLoginSuccessful = function() {
-        $location.path("/postbox");
+        $location.url("/postbox");
     }
 
     onLoginError = function(response) {
