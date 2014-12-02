@@ -1044,18 +1044,6 @@
                 return this.data;
             }
         };
-
-
-
-            
-
-
-
-
-
-
-
-
         return won;
     };
     var factory = function() {

@@ -35,23 +35,25 @@
         <link rel="stylesheet" href="scripts/angular-scrollable-table/scrollable-table.css"/>
 
         <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.min.css"/>
-		<script src="scripts/jquery.10.2.js"></script>
-	<script src="scripts/jquery.fs.scroller.min.js"></script>
-		<script src="bower_components/angular/angular.js"></script>
+
+
+        <script src="scripts/jquery.10.2.js"></script>
+        <script src="scripts/jquery.fs.scroller.min.js"></script>
+        <script src="bower_components/angular/angular.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-mocks/angular-mocks.js"></script>
-		<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+        <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
-		<script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
-		<script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
-		<script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
+        <script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
+        <script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
+        <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
         <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>
-		<script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
-		<script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
-		<script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
-		<script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
-		<script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
+        <script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
+        <script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
+        <script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
+        <script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
         <script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
         <script type="text/javascript" src="scripts/lightbox.min.js"></script>
         <script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
@@ -64,14 +66,14 @@
         <script type="text/javascript" src="scripts/star-rating.min.js"></script>
 
 
-		<script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/won.js"/>"></script>
 
         <script type="text/javascript" src="<c:url value="/app/service/application-state-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/application-control-service.js"/>"></script>
-		<script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
-		<script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/won-service.js"/>"></script>
@@ -79,8 +81,8 @@
         <script type="text/javascript" src="<c:url value="/app/service/message-factory-service.js"/>"></script>
 
 
-		<script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
-		<script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/header/notification-dropdown.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/faq/faq.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/impressum/impressum.js"/>"></script>
@@ -89,17 +91,17 @@
         <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/conversation/conversation.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/draft/draft.js"/>"></script>
-		<script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
-		<script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/need-detail/need-detail.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
 
-	<script type="text/javascript" src="<c:url value="/app/why-use/why-use.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/forgot-pwd/forgot-pwd.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/forgot-pwd/enter-new-pwd.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/postbox/postbox.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/private-link/private-link.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/why-use/why-use.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/forgot-pwd/forgot-pwd.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/forgot-pwd/enter-new-pwd.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/postbox/postbox.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/private-link/private-link.js"/>"></script>
 
-	<script type="text/javascript" src="<c:url value="/app/search/search.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/app/post-detail/post-detail.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/search/search.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/post-detail/post-detail.js"/>"></script>
 
 	</head>
 	<body ng-controller="MainCtrl">
@@ -223,21 +225,22 @@
 	</div>
 </nav>
 
-		<script type="text/javascript">
-			window.user = {
-				<sec:authorize access="isAuthenticated()">
-				username : '<sec:authentication property="principal.username" />',
-				isAuth : true
-				</sec:authorize>
-				<sec:authorize access="!isAuthenticated()">
-				isAuth : false
-				</sec:authorize>
-			};
 
-			function onGoogleReady() {
-				angular.bootstrap(document.getElementsByTagName("html")[0], ['won.owner']);
-			}
-		</script>
+        <script type="text/javascript">
+            window.user = {
+                <sec:authorize access="isAuthenticated()">
+                username : '<sec:authentication property="principal.username" />',
+                isAuth : true
+                </sec:authorize>
+                <sec:authorize access="!isAuthenticated()">
+                isAuth : false
+                </sec:authorize>
+            };
+
+            function onGoogleReady() {
+                angular.bootstrap(document.getElementsByTagName("html")[0], ['won.owner']);
+            }
+        </script>
 	</body>
 </html>
 
