@@ -55,21 +55,21 @@
                     .title}}</a></td>
                 <td class="col-lg-2">
                                     <span>
-                                        <span style="display: none;">{{unreadEventsByNeedByType}}</span>
+                                        <span style="display: none;">{{controlData.unreadEventsByNeedByType}}</span>
                                         <i
-                                                class="fa fa-comment-o fa-lg"></i>&nbsp;{{unreadEventsByNeedByType[item.uri].message.count}}
+                                                class="fa fa-comment-o fa-lg"></i>&nbsp;{{controlData.unreadEventsByNeedByType[item.uri].message.count}}
                                     </span>
                                     <span>
                                         <span style="display: none;">{{item.msg.reqText}}</span>
                                         <i
-                                                class="fa fa-male fa-lg"></i>&nbsp;{{unreadEventsByNeedByType[item.uri].connect.count}}
+                                                class="fa fa-male fa-lg"></i>&nbsp;{{controlData.unreadEventsByNeedByType[item.uri].connect.count}}
                                     </span>
                                     <span>
                                         <span style="display: none;">{{item.msg.matchText}}</span>
                                         <i
                                                 class="fa fa-puzzle-piece fa-lg"></i>&nbsp;
                                         <span
-                                                ng-bind-template="{{unreadEventsByNeedByType[item.uri].hint.count}}"/>
+                                                ng-bind-template="{{controlData.unreadEventsByNeedByType[item.uri].hint.count}}"/>
                                     </span>
                 </td>
                 <td class="col-lg-2">{{item.creationDate | date}}</td>
