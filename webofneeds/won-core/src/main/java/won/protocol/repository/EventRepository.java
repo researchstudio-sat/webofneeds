@@ -16,7 +16,6 @@
 
 package won.protocol.repository;
 
-import org.springframework.transaction.annotation.Transactional;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
 
