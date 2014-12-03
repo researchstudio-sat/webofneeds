@@ -472,11 +472,10 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
     }
 
     //TODO remove all those cases of double negatives (ng-disabled -> ng-show)
-    //$scope.goToPreviewButtonDisabled = function() {
     $scope.goToPreviewButtonDisabled = function() {
-        switch ($scope.currentStep) {
-            case "1": return !$scope.validatePostForm() || !$scope.validateDateTimeRange();
-            case "2": return !$scope.validateDateTimeRange();
+        switch (parseInt($scope.currentStep)) {
+            case 1: return !$scope.validatePostForm() || !$scope.validateDateTimeRange();
+            case 2: return !$scope.validateDateTimeRange();
             default: return true;
         }
     }
