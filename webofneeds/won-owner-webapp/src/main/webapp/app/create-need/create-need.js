@@ -59,6 +59,14 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         }
     }
 
+    var typeIcons = ["want", "offer", "todo", "change"].map(function(t){
+        return "/owner/images/type_posts/" + t + ".png";
+    })
+
+    $scope.currentTypeIcon = function() {
+        return typeIcons[$scope.selectedType];
+    }
+
     $scope.tooltipText = 'Required so other people can find the post.';
 
     var titlePlaceholder = [
