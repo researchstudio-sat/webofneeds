@@ -445,8 +445,8 @@
 		</button>
 		<button ng-show="nextButton" type="button" class="btn btn-success" ng-disabled="!validatePostForm()" ng-click="nextStep()">
             <i class="fa fa-chevron-right fa-lg"></i>&nbsp;Next</button>
-		<button ng-show="previewButton" type="button" class="btn btn-primary" ng-disabled="skipToPreviewButtonDisabled()" ng-click="jumpToStep(3)">
-            <i class="fa fa-chevron-right fa-lg"></i><i class="fa fa-chevron-right fa-lg"></i>&nbsp;Skip to Preview
+		<button ng-show="previewButton" type="button" class="btn btn-primary" ng-disabled="goToPreviewButtonDisabled()" ng-click="jumpToStep(3)">
+            <i class="fa fa-chevron-right fa-lg"></i><i class="fa fa-chevron-right fa-lg"></i>&nbsp;{{gotoPreviewButtonText()}}
 		</button>
 		<button ng-show="publishButton" type="button" class="btn btn-success" ng-click="publish()">
             <i class="fa fa-check fa-lg"></i>&nbsp;Publish</button>

@@ -471,12 +471,19 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         }
     }
 
-    $scope.skipToPreviewButtonDisabled = function() {
-        if ($scope.currentStep == 1) {
-            return !$scope.validatePostForm() || !$scope.validateDateTimeRange();
-        } else if ($scope.currentStep == 2) {
-            return !$scope.validateDateTimeRange();
+    //TODO remove all those cases of double negatives (ng-disabled -> ng-show)
+    //$scope.goToPreviewButtonDisabled = function() {
+    $scope.goToPreviewButtonDisabled = function() {
+        switch ($scope.currentStep) {
+            case "1": return !$scope.validatePostForm() || !$scope.validateDateTimeRange();
+            case "2": return !$scope.validateDateTimeRange();
+            default: return true;
         }
+    }
+
+    var previewButtonText = ["Skip to Preview", "Preview", ""]
+    $scope.gotoPreviewButtonText = function() {
+        return previewButtonText[$scope.currentStep - 1];
     }
 
     $scope.allDay = false;
