@@ -39,8 +39,8 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
 
     /* onClick Handlers */
     $scope.clickOnDraft = function(draft){
-        //$location.path("create-need/"+draft.currentStep+"/"+draft.menuposition);
-        $location.path("create-need/"+draft.currentStep+"/"+draft.menuposition+"/"+draft.draft.title).search({"draft": draft.draftURI});
+        //$location.path("create-need/"+draft.currentStep+"/"+draft.selectedType);
+        $location.path("create-need/"+draft.currentStep+"/"+draft.selectedType+"/"+draft.draft.title).search({"draft": draft.draftURI});
     }
     $scope.setSortParams = function(fieldName) {
         if ($scope.sortedField == fieldName) {
@@ -196,7 +196,7 @@ angular.module('won.owner').controller("PostInboxCtrl", function($scope,$locatio
     $scope.templateUrl = 'app/postbox/post-inbox-table.html';
     $scope.allNeeds = applicationStateService.getAllNeeds();
     $scope.clickOnPost = function(){
-        //$location.path("create-need/"+draft.currentStep+"/"+draft.menuposition);
+        //$location.path("create-need/"+draft.currentStep+"/"+draft.selectedType);
         $scope.postData.chosenPost = $scope.allNeeds[$scope.postData.uri];
         applicationStateService.setCurrentNeedURI($scope.postData.uri);
         $location.url("/private-link")

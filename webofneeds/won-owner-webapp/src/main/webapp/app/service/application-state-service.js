@@ -426,7 +426,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         draftObjWithMetaInfo.uri = draft.draftURI;
         draftObjWithMetaInfo.meta = {}
         draftObjWithMetaInfo.meta.uri = draft.draftURI;
-        draftObjWithMetaInfo.meta.menuposition = menuposition;
+        draftObjWithMetaInfo.meta.selectedType = menuposition;
         draftObjWithMetaInfo.meta.currentStep = currentStep;
         draftObjWithMetaInfo.meta.timestamp = timestamp;
         privateData.allDrafts[draft.draftURI] = draftObjWithMetaInfo;

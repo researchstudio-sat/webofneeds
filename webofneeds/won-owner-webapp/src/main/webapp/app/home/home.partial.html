@@ -64,7 +64,7 @@
                        </h4>
                    </a>
                </div>
-               <div><span class="label label-warning" ng-show="iPost.menuposition < 0 && !iPost.firstattempt">{{iMenuValidationMessage}}</span></div>
+               <div><span class="label label-warning" ng-show="iPost.selectedType < 0 && !iPost.firstattempt">{{iMenuValidationMessage}}</span></div>
            </div>
            <div class="col-md-6">
                <form class="form-inline container" novalidate name="iNewPost" ng-submit="onClickOnNewPost()">
@@ -129,7 +129,7 @@
                            <!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/owner/images/type_posts/change.png"/>&nbsp;<strong>Others</strong> {{othersMenu.item3}}
                        </h4>
                    </a>
-                   <div><span class="label label-warning" ng-show="othersPost.menuposition < 0 && !othersPost.firstattempt">{{othersMenuValidationMessage}}</span></div>
+                   <div><span class="label label-warning" ng-show="othersPost.selectedType < 0 && !othersPost.firstattempt">{{othersMenuValidationMessage}}</span></div>
               <!-- </div>  -->
            </div>
        </div>

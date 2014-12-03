@@ -16,7 +16,7 @@
 
 angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $timeout, $location,$log, $http, $routeParams, needService,applicationStateService, mapService, userService, utilService, wonService) {
     $scope.currentStep = $routeParams.step;
-    $scope.menuposition = $routeParams.menuposition;
+    $scope.selectedType = $routeParams.selectedType;
     $scope.title = $routeParams.title;
     // we pass draft uri in query param "draft". Care should be taken to remove this param when redirecting with location.path(...).search("draft", null)
     $scope.draftURI = $routeParams.draft;
@@ -27,29 +27,34 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         $location.url("/private-link");
     });
 
-    /*Block for working with checking another post type */
-    $scope.getCurrentTypeOfOffer = function(){
-        if($scope.menuposition == 0) return "Want - I'm looking for...";
-        if($scope.menuposition == 1) return "Offer - I'm offering...";
-        if($scope.menuposition == 2) return "Together - Looking for people to...";
-        if($scope.menuposition == 3) return "Change - Let's do something about...";
-    }
-
-    $scope.showPublicChangeTypeOfNeed = false;
+    $scope.showChangeType = false;
     $scope.clickOnChangeTypeOfNeed = function(){
-        $scope.showPublicChangeTypeOfNeed = !$scope.showPublicChangeTypeOfNeed;
-        $('#changePostMenuItem' + $scope.menuposition).addClass('active');
+        $scope.showChangeType = !$scope.showChangeType;
+        $('#changePostMenuItem' + $scope.selectedType).addClass('active');
+    }
+    /*Block for working with checking another post type */
+    var typeStrings = [
+         "Want - I'm looking for...",
+         "Offer - I'm offering...",
+         "Together - Looking for people to...",
+         "Change - Let's do something about..." ]
+    $scope.getCurrentTypeOfOffer = function() {
+        if ($scope.selectedType == undefined || $scope.selectedType < 0
+                || $scope.selectedType >= typeStrings.length)
+            $scope.showChangeType = true;
+        else
+            return typeStrings[$scope.selectedType];
     }
 
     $scope.onClickChangePostMenuItem = function(item) {
         if(item > -1){
-            if($scope.menuposition > -1){
-                $('#changePostMenuItem' + $scope.menuposition).removeClass('active');
+            if($scope.selectedType > -1){
+                $('#changePostMenuItem' + $scope.selectedType).removeClass('active');
             }
-            $scope.menuposition = item;
-            $('#changePostMenuItem' + $scope.menuposition).addClass('active');
-            $scope.showPublicChangeTypeOfNeed = false;
-            $scope.menuposition = item;
+            $scope.selectedType = item;
+            $('#changePostMenuItem' + $scope.selectedType).addClass('active');
+            $scope.showChangeType = false;
+            $scope.selectedType = item;
             $scope.need.basicNeedType = $scope.needType();
         }
     }
@@ -63,7 +68,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         'Roughly, what are you pointing out and want to change?'];
 
     $scope.getTitlePlaceholder = function() {
-        return titlePlaceholder[$scope.menuposition];
+        return titlePlaceholder[$scope.selectedType];
     }
 
     var descriptionPlaceholder = [
@@ -73,7 +78,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         '...for specifying when and where the thing you want to change occurred.'];
 
     $scope.getDescriptionPlaceholder = function() {
-        return descriptionPlaceholder[$scope.menuposition];
+        return descriptionPlaceholder[$scope.selectedType];
     }
 
     var tagsPlaceholder = [
@@ -83,7 +88,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
     'FML, Clean Park Initiative, Recycling, Occupy Wallstreet, Privacy, ... '];
 
     $scope.getTagsPlaceholder = function() {
-        return tagsPlaceholder[$scope.menuposition];
+        return tagsPlaceholder[$scope.selectedType];
     }
 
 
@@ -142,13 +147,13 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
     $scope.setShowButtons($scope.currentStep);
 
     $scope.needType = function(){
-        if($scope.menuposition == 0){
+        if($scope.selectedType == 0){
             return won.WON.BasicNeedTypeDemand;
-        }else if($scope.menuposition == 1){
+        }else if($scope.selectedType == 1){
             return won.WON.BasicNeedTypeSupply;
-        } else if($scope.menuposition == 2){
+        } else if($scope.selectedType == 2){
             return won.WON.BasicNeedTypeDotogether;
-        } else if($scope.menuposition == 3){
+        } else if($scope.selectedType == 3){
             return won.WON.BasicNeedTypeCritique;
         }
     }
@@ -262,7 +267,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
             $scope.currentStep = num;
             $scope.successShow = false;
             $scope.setShowButtons($scope.currentStep);
-         //   var newPath = '/create-need/'+$scope.currentStep+'/'+$scope.iPost.menuposition+'/'+$scope.need.title;
+         //   var newPath = '/create-need/'+$scope.currentStep+'/'+$scope.iPost.selectedType+'/'+$scope.need.title;
          //   $location.path(newPath);
 
         }
@@ -271,7 +276,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
     $scope.saveDraft = function(){
         var draftBuilderObject = new window.won.DraftBuilder().setContext();
         draftBuilderObject.setCurrentStep($scope.currentStep);
-        draftBuilderObject.setCurrentMenuposition($scope.menuposition);
+        draftBuilderObject.setCurrentMenuposition($scope.selectedType);
         draftBuilderObject.setDraftObject($scope.need);
         draftBuilderObject.setLastSavedTimestamp(new Date().getTime());
 
@@ -642,17 +647,17 @@ angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  
     };
 
     $scope.getImagesComment = function(){
-        if($scope.menuposition == 0) return "Add photos of similar things or sketches to give people a better idea what you have in mind."
-        if($scope.menuposition == 1) return "Add photos or sketches to give people a better idea what you're offering.";
-        if($scope.menuposition == 2) return "If you want you can add an image or photo here to illustrate the activity.";
-        if($scope.menuposition == 3) return "Add a photo, sketch (or screenshot) of the problem you want to point out.";
+        if($scope.selectedType == 0) return "Add photos of similar things or sketches to give people a better idea what you have in mind."
+        if($scope.selectedType == 1) return "Add photos or sketches to give people a better idea what you're offering.";
+        if($scope.selectedType == 2) return "If you want you can add an image or photo here to illustrate the activity.";
+        if($scope.selectedType == 3) return "Add a photo, sketch (or screenshot) of the problem you want to point out.";
     }
 
     $scope.getLocationComment = function() {
-        if($scope.menuposition == 0) return "Where should the thing be available? i.e. where would you pick it up or where should it be delivered to?"
-        if($scope.menuposition == 1) return "Where\'s your offer available? i.e. where can people pick it up or where would you deliver it too?";
-        if($scope.menuposition == 2) return "Where's the action happening?";
-        if($scope.menuposition == 3) return "Where did the problem occur / where have things to be changed?";
+        if($scope.selectedType == 0) return "Where should the thing be available? i.e. where would you pick it up or where should it be delivered to?"
+        if($scope.selectedType == 1) return "Where\'s your offer available? i.e. where can people pick it up or where would you deliver it too?";
+        if($scope.selectedType == 2) return "Where's the action happening?";
+        if($scope.selectedType == 3) return "Where did the problem occur / where have things to be changed?";
     }
 
 });

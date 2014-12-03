@@ -27,8 +27,8 @@ app = angular.module('won.owner',
     ).config(function ($routeProvider, $httpProvider, $provide) {
         $httpProvider.responseInterceptors.push('redirectInterceptor');
 	    $routeProvider.
-            when('/create-need/:step/:menuposition/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
-            when('/create-need/:step/:menuposition', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
+            when('/create-need/:step/:selectedType/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
+            when('/create-need/:step/:selectedType', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
             when('/create-need/:step', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
 			when('/', {controller : 'HomeCtrl', templateUrl:'app/home/welcome.html'}).
             when('/home', {controller : 'HomeCtrl', templateUrl: 'app/home/home.partial.html'}).
