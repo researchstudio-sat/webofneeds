@@ -162,7 +162,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
     //asynchronously wait for the result and update the local database.
     //meanwhile, create our own ListenableFuture to pass the result back
     final SettableFuture<URI> result = SettableFuture.create();
-    executor.execute(
+    uri.addListener(
       new Runnable()
       {
         @Override
@@ -188,8 +188,8 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
           }
 
         }
-      }
-    );
+      }, executor);
+
     return result;
   }
 
@@ -213,7 +213,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
 
     //now perform the connection state change or the creation of a new connection object
     //locally.
-    this.executor.execute(new Runnable(){
+    uri.addListener(new Runnable(){
       @Override
       public void run() {
         //find out the facet to connect with
@@ -264,7 +264,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
           result.cancel(true);
         }
       }
-    });
+    }, this.executor);
 
     return result;
   }

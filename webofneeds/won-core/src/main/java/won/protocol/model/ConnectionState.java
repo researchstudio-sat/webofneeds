@@ -106,6 +106,10 @@ public enum ConnectionState
     return this;   //none of the above applies: the state does not change
   }
 
+  public static boolean closeOnNeedDeactivate(ConnectionState state){
+    return state == CONNECTED || state == REQUEST_RECEIVED || state == REQUEST_SENT;
+  }
+
   public URI getURI()
   {
     return URI.create(WON.BASE_URI + name);

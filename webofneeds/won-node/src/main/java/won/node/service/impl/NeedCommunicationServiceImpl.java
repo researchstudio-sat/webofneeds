@@ -182,12 +182,12 @@ public class NeedCommunicationServiceImpl implements
       URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
 
       //create Connection in Database
-      Connection con =  dataService.createConnection(senderNeedURI, receiverNeedURI, null, facetURI,
+      final Connection con =  dataService.createConnection(senderNeedURI, receiverNeedURI, null, facetURI,
                                                      ConnectionState.REQUEST_SENT,
                                                      ConnectionEventType.OWNER_OPEN);
 
       // add the connectionID to the wonMessage
-      WonMessage newWonMessage = WonMessageBuilder.wrapOutboundWonMessageForLocalStorage(con.getConnectionURI(),
+      final WonMessage newWonMessage = WonMessageBuilder.wrapOutboundWonMessageForLocalStorage(con.getConnectionURI(),
         wonMessage);
 
       messageEventRepository.save(
@@ -202,7 +202,6 @@ public class NeedCommunicationServiceImpl implements
       //reg.get(con).connectFromOwner(con, content);
 
       return con.getConnectionURI();
-
   }
 
   @Override

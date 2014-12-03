@@ -46,6 +46,8 @@ import won.protocol.service.NeedManagementService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -85,6 +87,9 @@ public class NeedManagementServiceImpl implements NeedManagementService
   private LinkedDataService linkedDataService;
   @Autowired
   private WonNodeInformationService wonNodeInformationService;
+  @Autowired
+  private LinkedDataSource linkedDataSource;
+
 
 
   //TODO: remove 'active' parameter, make need active by default, and look into RDF for an optional 'isInState' triple.
@@ -243,7 +248,9 @@ public class NeedManagementServiceImpl implements NeedManagementService
       for (URI connURI : connectionURIs) {
         try {
           WonMessage closeWonMessage = createCloseWonMessage(connURI);
-          ownerFacingConnectionCommunicationService.close(connURI, null, closeWonMessage);
+          if (closeWonMessage != null) {
+            ownerFacingConnectionCommunicationService.close(connURI, null, closeWonMessage);
+          }
         } catch (IllegalMessageForConnectionStateException e) {
           logger.warn("wrong connection state", e);
         } catch (WonMessageBuilderException e) {
@@ -311,19 +318,35 @@ public class NeedManagementServiceImpl implements NeedManagementService
       throw new IllegalArgumentException("no or too many connections found for ID " + connectionURI.toString());
 
     Connection connection = connections.get(0);
-    Need need = needRepository.findByNeedURI(connection.getNeedURI()).get(0);
-    Need remoteNeed = needRepository.findByNeedURI(connection.getRemoteNeedURI()).get(0);
+    if (!ConnectionState.closeOnNeedDeactivate(connection.getState())) return null;
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder.setMessagePropertiesForClose(
-      wonNodeInformationService.generateEventURI(),
-      connection.getConnectionURI(),
-      connection.getNeedURI(),
-      need.getWonNodeURI(),
-      connection.getRemoteConnectionURI(),
-      connection.getRemoteNeedURI(),
-      remoteNeed.getWonNodeURI())
-      .build();
+    URI localWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(connection.getConnectionURI(),
+                                                                         linkedDataSource);
+    URI remoteWonNodeUri = null;
+    if (connection.getRemoteConnectionURI() != null) {
+      remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(connection.getRemoteConnectionURI(),
+                                                                                    linkedDataSource);
+      WonMessageBuilder builder = new WonMessageBuilder();
+      return builder.setMessagePropertiesForClose(
+        wonNodeInformationService.generateEventURI(),
+        connection.getConnectionURI(),
+        connection.getNeedURI(),
+        localWonNodeUri,
+        connection.getRemoteConnectionURI(),
+        connection.getRemoteNeedURI(),
+        remoteWonNodeUri)
+                    .build();
+    } else {
+      WonMessageBuilder builder = new WonMessageBuilder();
+      return builder.setMessagePropertiesForLocalOnlyClose(
+        wonNodeInformationService.generateEventURI(),
+        connection.getConnectionURI(),
+        connection.getNeedURI(),
+        localWonNodeUri)
+                    .build();
+
+    }
+
 
   }
 }

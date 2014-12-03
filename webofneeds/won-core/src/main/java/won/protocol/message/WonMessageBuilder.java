@@ -296,6 +296,23 @@ public class WonMessageBuilder
     return this;
   }
 
+  public WonMessageBuilder setMessagePropertiesForLocalOnlyClose(
+    URI messageURI,
+    URI localConnection,
+    URI localNeed,
+    URI localWonNode
+    ) {
+
+    this
+      .setMessageURI(messageURI)
+      .setWonMessageType(WonMessageType.CLOSE)
+      .setSenderURI(localConnection)
+      .setSenderNeedURI(localNeed)
+      .setSenderNodeURI(localWonNode)
+      .setTimestampToNow();
+    return this;
+  }
+
   public WonMessageBuilder setMessagePropertiesForNeedState(
     URI messageURI,
     NeedState needState,
@@ -676,6 +693,7 @@ public class WonMessageBuilder
     final URI remoteConnectionURI, final URI remoteNeedURI, final URI remoteWonNodeUri) {
     WonMessageBuilder builder = new WonMessageBuilder()
       .setMessageURI(newMessageUri)
+      .setWonMessageType(wonMessage.getMessageType())
       .forward(wonMessage)
       .copyContentFromMessageReplacingMessageURI(wonMessage)
       .setTimestamp(System.currentTimeMillis())

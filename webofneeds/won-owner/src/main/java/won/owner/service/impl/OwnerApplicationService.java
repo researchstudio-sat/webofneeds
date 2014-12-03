@@ -20,8 +20,6 @@ import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
@@ -50,11 +48,6 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
   private OwnerApplicationServiceCallback ownerApplicationServiceCallbackToClient =
     new NopOwnerApplicationServiceCallback();
 
-  @Autowired
-  private ConnectionRepository connectionRepository;
-
-  @Autowired
-  private NeedRepository needRepository;
 
   @Autowired
   private Executor executor;

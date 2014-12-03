@@ -140,6 +140,7 @@ public abstract class AbstractFacet implements Facet
   public void closeFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
+    //TODO: don't inform the other side if there is none (suggested, request_sent states)
     if (con.getRemoteConnectionURI() != null) {
       executorService.execute(new Runnable()
       {
