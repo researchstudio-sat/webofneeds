@@ -34,9 +34,9 @@ angular.module('won.owner').controller("DraftCtrl", function($scope,$location, a
         $scope.clickOnDraft();
     }
     $scope.clickOnDraft = function(){
-        //$location.path("create-need/"+draft.currentStep+"/"+draft.menuposition);
+        //$location.path("create-need/"+draft.currentStep+"/"+draft.selectedType);
         $scope.draftData.chosenDraft = $scope.allDrafts[$scope.draftData.uri];
-        $location.path("create-need/"+$scope.draftData.chosenDraft.meta.currentStep+"/"+$scope.draftData.chosenDraft.meta.menuposition+"/"+$scope.draftData.chosenDraft.title).search({"draft": $scope.draftData.chosenDraft.uri});
+        $location.path("create-need/"+$scope.draftData.chosenDraft.meta.currentStep+"/"+$scope.draftData.chosenDraft.meta.selectedType+"/"+$scope.draftData.chosenDraft.title).search({"draft": $scope.draftData.chosenDraft.uri});
 
     }
     $scope.allDrafts = applicationStateService.getAllDrafts();

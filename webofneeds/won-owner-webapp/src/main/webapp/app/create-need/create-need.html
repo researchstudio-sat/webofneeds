@@ -79,12 +79,12 @@
 				<label class="col-lg-2 col-lg-offset-2" tooltip="{{tooltipText}}">Type *</label>
 
 				<div class="row">
-					<div class="col-lg-8 col-lg-offset-2">
+					<div class="col-lg-8 col-lg-offset-2" ng-show="!showChangeType">
 						{{getCurrentTypeOfOffer()}}
 						<a ng-click="clickOnChangeTypeOfNeed()">(change)</a>
 					</div>
 				</div>
-				<div ng-show="showPublicChangeTypeOfNeed" class="col-lg-8 col-lg-offset-2">
+				<div ng-show="showChangeType" class="col-lg-8 col-lg-offset-2">
 					<div>
 						<a href="" id="changePostMenuItem0"
                            class="list-group-item list-group-item-info i_panel_menu_item"

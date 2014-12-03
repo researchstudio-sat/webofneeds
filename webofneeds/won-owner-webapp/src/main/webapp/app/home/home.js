@@ -154,23 +154,23 @@ angular.module('won.owner').controller('HomeCtrl',
     $scope.iPostBtnText = 'New post';
     $scope.iPost = new function(){
         this.reset = function() {
-            if(this.menuposition > -1){
-                $('#IMenuItem' + this.menuposition).removeClass('active');
+            if(this.selectedType > -1){
+                $('#IMenuItem' + this.selectedType).removeClass('active');
             }
             this.title = '';
-            this.menuposition = -1;
+            this.selectedType = -1;
             this.firstattempt = true;
         }
 
         this.reset();
     };
 
-    $scope.iPost.menuposition = -1;
+    $scope.iPost.selectedType = -1;
     $scope.$watch('selectedType', function(newVal,oldVal){
         if(newVal != oldVal ){
             $scope.onClickIMenuItem(newVal, oldVal);
-        } else if(oldVal != $scope.iPost.menuposition){
-            $scope.onClickIMenuItem(newVal, $scope.iPost.menuposition);
+        } else if(oldVal != $scope.iPost.selectedType){
+            $scope.onClickIMenuItem(newVal, $scope.iPost.selectedType);
         }
     });
     //$('#IMenuItem' + $scope.selectedType).addClass('active');
@@ -186,7 +186,7 @@ angular.module('won.owner').controller('HomeCtrl',
                     $('#IMenuItem' +  oldVal).removeClass('active');
                 }
                 $scope.$parent.selectedType = item;
-                $scope.iPost.menuposition = $scope.selectedType;
+                $scope.iPost.selectedType = $scope.selectedType;
 
                 $('#IMenuItem' +  item).addClass('active');
             }
@@ -204,14 +204,14 @@ angular.module('won.owner').controller('HomeCtrl',
             validPanel = false;
         }
 
-        if($scope.iPost.menuposition < 0){
+        if($scope.iPost.selectedType < 0){
             validPanel = false;
         }
 
         if ($scope.iNewPost.$valid && validPanel) {
             //userService.registerUser($scope.registerUser).then(onRegisterResponse);
 
-            $location.url('/create-need/1/'+$scope.iPost.menuposition+'/'+$scope.iPost.title);
+            $location.url('/create-need/1/'+$scope.iPost.selectedType+'/'+$scope.iPost.title);
         }
     }
 
@@ -224,11 +224,11 @@ angular.module('won.owner').controller('HomeCtrl',
     $scope.othersSearchBtnText = 'Search';
     $scope.othersPost = new function(){
         this.reset = function() {
-            if(this.menuposition > -1){
-                $('#othersMenuItem' + this.menuposition).removeClass('active');
+            if(this.selectedType > -1){
+                $('#othersMenuItem' + this.selectedType).removeClass('active');
             }
             this.searchText = '';
-            this.menuposition = -1;
+            this.selectedType = -1;
             this.firstattempt = true;
         }
 
@@ -236,15 +236,15 @@ angular.module('won.owner').controller('HomeCtrl',
     };
     $scope.onClickOthersMenuItem = function(item) {
         if(item > -1){
-            if($scope.othersPost.menuposition == item){
-                $('#othersMenuItem' + $scope.othersPost.menuposition).removeClass('active');
-                $scope.othersPost.menuposition = -1;
+            if($scope.othersPost.selectedType == item){
+                $('#othersMenuItem' + $scope.othersPost.selectedType).removeClass('active');
+                $scope.othersPost.selectedType = -1;
             }else{
-                if($scope.othersPost.menuposition > -1){
-                    $('#othersMenuItem' + $scope.othersPost.menuposition).removeClass('active');
+                if($scope.othersPost.selectedType > -1){
+                    $('#othersMenuItem' + $scope.othersPost.selectedType).removeClass('active');
                 }
-                $scope.othersPost.menuposition = item;
-                $('#othersMenuItem' + $scope.othersPost.menuposition).addClass('active');
+                $scope.othersPost.selectedType = item;
+                $('#othersMenuItem' + $scope.othersPost.selectedType).addClass('active');
             }
         }
     }
@@ -258,7 +258,7 @@ angular.module('won.owner').controller('HomeCtrl',
             validPanel = false;
         }
 
-        if($scope.othersPost.menuposition < 0){
+        if($scope.othersPost.selectedType < 0){
             validPanel = false;
         }
 
