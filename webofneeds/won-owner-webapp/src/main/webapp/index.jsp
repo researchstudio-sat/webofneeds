@@ -214,15 +214,12 @@
 		<!--actually there's a footer html tag for this use-case-->
 		<!--also we should get rid of these nested divs--->
 <nav class="navbar navbar-default navbar-bottom" role="navigation">
-	<div class="container" style="padding:0">
-		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
-			<ul class="nav navbar-nav">
-				<li><a href="#/why-use">&nbsp;Why use the Web of Needs</a></li>
-				<li><a href="#/faq">&nbsp;FAQ</a></li>
-				<li><a href="#/impressum">&nbsp;Impressum</a></li>
-			</ul>
-		</div>
-	</div>
+	<!--<div class="container" style="padding:0"> <div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">-->
+    <ul class="nav navbar-nav">
+        <li><a href="#/why-use">&nbsp;Why use the Web of Needs</a></li>
+        <li><a href="#/faq">&nbsp;FAQ</a></li>
+        <li><a href="#/impressum">&nbsp;Impressum</a></li>
+    </ul>
 </nav>
 
 
