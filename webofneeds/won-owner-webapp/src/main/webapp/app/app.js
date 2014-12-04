@@ -35,7 +35,7 @@ app = angular.module('won.owner',
 			when('/signin', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
 			when('/register', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
             when('/need-list', {controller : 'NeedListCtrl', templateUrl:'app/need-list/need-list.partial.html'}).
-			when('/need-detail/:needId', {controller:'NeedDetailCtrl', templateUrl:'app/need-detail/need-detail.partial.html'}).
+			//when('/need-detail/:needId', {controller:'NeedDetailCtrl', templateUrl:'app/need-detail/need-detail.partial.html'}).
             when('/why-use', {controller:'WhyUseCtrl', templateUrl:'app/why-use/why-use.html'}).
             when('/impressum', {controller:'ImpressumCtrl', templateUrl:'app/impressum/impressum.html'}).
             when('/search', {controller:'SearchCtrl', templateUrl:'app/search/search.html'}).
