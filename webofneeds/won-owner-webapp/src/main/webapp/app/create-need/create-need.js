@@ -514,7 +514,7 @@ angular.module('won.owner').directive('wonProgressTracker',function factory($log
         templateUrl : "app/create-need/progress-tracker.html",
         scope : {
             numberOfSteps : '=numberOfSteps',
-            currentStep : '=currentStep',
+            currentStep : '=currentStep', //TODO bind this as integer
             jumpToStep : '&'
         } ,
         controller : function($scope){
