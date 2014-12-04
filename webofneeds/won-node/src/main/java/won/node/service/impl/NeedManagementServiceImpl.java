@@ -249,6 +249,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
         try {
           WonMessage closeWonMessage = createCloseWonMessage(connURI);
           if (closeWonMessage != null) {
+            //TODO: shouldn't this be done in a more centralized way? What about calling the facet implementation?
             ownerFacingConnectionCommunicationService.close(connURI, null, closeWonMessage);
           }
         } catch (IllegalMessageForConnectionStateException e) {

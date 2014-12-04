@@ -25,16 +25,11 @@ import won.protocol.model.ConnectionState;
 import won.protocol.model.NeedState;
 
 /**
- * WON vocabulary.
- * <p/>
- * User: fkleedorfer                     public Model showNodeInformation(final int page)
- * Date: 20.11.12
+ * WoN Vocabulary
  */
 public class WON
 {
   public static final String BASE_URI = "http://purl.org/webofneeds/model#";
-
-
 
   private static Model m = ModelFactory.createDefaultModel();
 
