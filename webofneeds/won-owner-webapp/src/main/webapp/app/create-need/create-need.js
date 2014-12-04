@@ -81,24 +81,23 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
 
     var descriptionPlaceholder = [
         'And now with details! (By the way, there\'s specialised textboxes for specifying a pickup adress and time of availability)',
-        'As demand, but "delivery adress" instead of "pickup adress"',
-        'As demand but ending in "...for specifying an event location and time"',
-        '...for specifying when and where the thing you want to change occurred.'];
+        'And now with details! (By the way, there\'s specialised textboxes for specifying a delivery adress and time of availability)',
+        'And now with details! (By the way, there\'s specialised textboxes for specifying an event location and time)',
+        'And now with details! (By the way, there\'s specialised textboxes for specifying when and where the thing you want to change occurred).'];
 
     $scope.getDescriptionPlaceholder = function() {
         return descriptionPlaceholder[$scope.selectedType];
     }
 
     var tagsPlaceholder = [
-    'Shoes, Entertainment, Suited For Small Children, ... ',
-    'As demand',
+    'Shoes, Entertainment, For Children, ... ',
+    'Shoes, Entertainment, For Children, ... ',
     'Soccer, Party, Discussion Group, Food Coop ...',
-    'FML, Clean Park Initiative, Recycling, Occupy Wallstreet, Privacy, ... '];
+    'Clean Park Initiative, Recycling, Occupy, Privacy, FML, ... '];
 
     $scope.getTagsPlaceholder = function() {
         return tagsPlaceholder[$scope.selectedType];
     }
-
 
 	$scope.uploadOptions = {
 		maxFileSize:5000000,
