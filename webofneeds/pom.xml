@@ -20,7 +20,9 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Web of Needs Main</name>
-
+    <scm>
+        <connection>scm:git:https://github.com/researchstudio-sat/webofneeds.git</connection>
+    </scm>
     <modules>
         <module>won-core</module>
         <module>won-node-webapp</module>
