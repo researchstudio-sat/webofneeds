@@ -14,6 +14,59 @@
   ~    limitations under the License.
   -->
 
+<!--        Title
+        (Pics)
+        Tagged With {{tags}}
+        Description
+        (Location)
+        (Date)
+        Interested in this post? Contact-->
+
+<!--<div class="inline"><img ng-src="{{getTypePicURI(need.basicNeedType)}}" tooltip="need type"/></div>-->
+
+        <p>NEED: {{need}}</p>
+        <p>TYPE: {{need.basicNeedType}}<p/>
+        <p>URL: {{getTypePicURI(need.basicNeedType)}}<p/>
+<img ng-src="{{getTypePicURI(need.basicNeedType)}}" tooltip="need type"/>
+
+
+
+<!--TODO images, already bound as : images[?].url-->
+<!-- and bigImage for the title pic -->
+
+<h1>{{need.title}}</h1>
+<!--<div class="inline" style="font-size: 1.8em;" ng-bind="need.title" ></div>-->
+<!-- TODO drop padding on sides (and part of the border top/bottom) on smaller screens -->
+<p class="" style="border: 1px solid rgba(86, 61, 124, 0.2); padding: 1em;">
+    {{need.textDescription}}
+</p>
+<div ng-show="need.tags.length > 0">
+    <h2 style="font-size: 1em">
+        Tagged with:
+    </h2>
+    <!--TODO refactor the below (move the whole parsing to the .js file)-->
+    <span style="margin-right:5px;cursor:pointer;"
+          class="label label-primary btnTag"
+          ng-repeat="tag in need.tags.split(', ')"
+          ng-bind="need.tags.split(',')[$index]">
+    </span>
+</div>
+<div class="pull-right">
+    Interested in this post?
+    <button type="button" ng-disabled="previewRegime" class="btn btn-default" ng-click="clickOnContact()">Contact</button>
+</div>
+
+<!--
+<div class="div-table-row pull-right">
+    <div class="pull-left" style="font-size: 1.6em;">
+        Interested in this post?&nbsp;
+    </div>
+    <div class="pull-right">
+        <button type="button" ng-disabled="previewRegime" class="btn btn-default" ng-click="clickOnContact()">Contact</button>
+    </div>
+</div>
+-->
+-----------------------------------------------------------------------------------------
 <div style="padding-top: 40px;padding-bottom: 8em;">
     <div class="row">
         <div class="col-md-12">
@@ -87,10 +140,6 @@
 
                     <div class="div-table-row">
                         <section id="map" class="col-lg-8 col-lg-offset-2">
-                            <!--
-                            <div ui-map="myMap" ui-options="mapOptions" class="map-canvas"
-                                 ui-event="{'map-click' : 'onClickMap($event, $params, $myMap)'}"></div>
-                            -->
                         </section>
                     </div>
                 </div>
@@ -122,16 +171,6 @@
                 </div>
             </div>
 
-
-            <!--<div class="row">
-                              <div class="text-center">
-                                  <div class="btn-group btn-group-lg">
-                                      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-up"></span>&nbsp;Connect with existing post</button>
-                                      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;Create new post</button>
-                                      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-down"></span>&nbsp;Just connect</button>
-                                  </div>
-                              </div>
-                          </div> -->
             <div class="div-table-row pull-right">
                 <div class="pull-left" style="font-size: 1.6em;">
                     Interested in this post?&nbsp;

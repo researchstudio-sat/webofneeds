@@ -50,7 +50,11 @@ angular.module('won.owner').factory('applicationControlService', function (appli
         if(type==won.WON.BasicNeedTypeDemand) return "/owner/images/type_posts/want.png";
         else if(type==won.WON.BasicNeedTypeCritique) return "/owner/images/type_posts/change.png";
         else if(type==won.WON.BasicNeedTypeSupply) return "/owner/images/type_posts/offer.png";
-        else return "/owner/images/type_posts/todo.png";
+        else if(type==won.WON.BasicNeedTypeDotogether) return "/owner/images/type_posts/todo.png";
+        else {
+            $log.error("Tried to get icon url with the invalid type: " + type)
+            return ""
+        }
     };
     applicationControlService.getMenuPositionForNeedType = function(needType){
         switch (needType){
