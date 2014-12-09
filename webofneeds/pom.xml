@@ -37,6 +37,7 @@
         <module>won-facets</module>
         <module>won-cryptography</module>
         <module>won-utils</module>
+        <module>won-vocab</module>
     </modules>
 
     <dependencyManagement>
