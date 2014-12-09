@@ -184,6 +184,10 @@ angular.module('won.owner').factory('wonService', function (
             if (typeof messageType === 'undefined') return false;
             var eventTypeConfig = messageTypeToEventType[messageType];
             if (typeof eventTypeConfig === 'undefined') return false;
+            // YP: the next line is added, so that the incoming message is ignored in case it refers to a local need
+            // that the local application state doesn't know about (e.g., see issue #196). This line can be removed
+            // if we change the notification handling to insure that the user's needs are synced between his sessions
+            if (!(event.hasReceiverNeed in applicationStateService.getAllNeeds())) return false;
             return true;
         };
         //never unregister
