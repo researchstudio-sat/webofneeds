@@ -24,6 +24,7 @@ angular.module('won.owner').controller("DraftCtrl", function($scope,$location, a
     $scope.draftData = {};
     $scope.recordsToDisplay = 4;
     $scope.displayConfirmation = false;
+    $scope.draftSortedField = "meta.timestamp";
     $scope.templateUrl='app/postbox/draft-inbox-table.html';
 
     $scope.removeDraft = function(){

@@ -25,8 +25,8 @@ angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval
     $scope.countOfAllUnreadMatchEvents = 0;
     // TODO if we want to remember the last sortedField selected by the user,
     // we should store it in e.g. applicationStateService
-    $scope.sortedField = 'creationDate';
-    $scope.reversedSort = true;
+    //$scope.sortedField = 'creationDate';
+    //$scope.reversedSort = true;
 
 
     $scope.hasNeeds = function () {
@@ -125,6 +125,7 @@ angular.module('won.owner').directive('inboxTable',function factory(){
             hasItems:'&',
             clickOnRemove:'&',
             controlData:'=',
+            sortedField:'=',
             templateUrl:'@'
         },
         template:'<div ng-attr-id="id" class="row col-lg-12" ng-include="templateUrl"></div>',
@@ -132,7 +133,7 @@ angular.module('won.owner').directive('inboxTable',function factory(){
             //$scope.postsSortedField = 'timestamp';
             //$scope.postsReversedSort = true;
             $scope.recordsToDisplay = 4;
-            $scope.sortedField = 'timestamp';
+            //$scope.sortedField = 'timestamp';
             $scope.reversedSort = true;
             $scope.clickOn=function(item){
                 $scope.controlData.uri =item.uri;
@@ -189,6 +190,7 @@ angular.module('won.owner').controller("ClosedInboxCtrl",function($scope,$locati
 })
 angular.module('won.owner').controller("PostInboxCtrl", function($scope,$location, applicationStateService, applicationControlService, userService) {
     $scope.postData = {};
+    $scope.postSortedField = "creationDate";
     $scope.recordsToDisplay = 4;
     $scope.displayConfirmation = false;
     $scope.postData.unreadEventsByNeedByType =    applicationStateService.getUnreadEventsByNeedByType();

@@ -119,11 +119,29 @@ app.directive('header', function(){
     .filter('orderObjectBy', function() {
         return function(items, field, reverse) {
             var filtered = [];
+            var path = field.split(".");
             angular.forEach(items, function(item) {
                 filtered.push(item);
             });
+            //filtered.sort(function (a, b) {
+            //    return (a[field] > b[field] ? 1 : -1);
+            //});
+            var getFieldValue = function(a, path) {
+                var value = a;
+                var i;
+                for (i = 0; i < path.length; i++) {
+                    if (value[path[i]] == undefined) {
+                        return undefined;
+                    } else {
+                        value = value[path[i]];
+                    }
+                }
+                return value;
+            }
             filtered.sort(function (a, b) {
-                return (a[field] > b[field] ? 1 : -1);
+                var avalue = getFieldValue(a, path);
+                var bvalue = getFieldValue(b, path);
+                return (avalue > bvalue ? 1 : -1);
             });
             if(reverse) {
                 filtered.reverse();
