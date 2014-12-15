@@ -21,7 +21,7 @@
     <packaging>pom</packaging>
     <name>Web of Needs Main</name>
     <scm>
-        <connection>scm:git:https://github.com/researchstudio-sat/webofneeds.git</connection>
+        <developerConnection>scm:git:https://github.com/researchstudio-sat/webofneeds.git</developerConnection>
     </scm>
     <modules>
         <module>won-core</module>
