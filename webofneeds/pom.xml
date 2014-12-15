@@ -752,21 +752,6 @@
 
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <!--
-                    Yuck! we're disabling the deploy plugin because we
-                    abuse the maven lifecycle. This way, mvn deploy deploys our artifact via cargo.
-                -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-
-        </plugins>
     </build>
     <repositories>
         <repository>
