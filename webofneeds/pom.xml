@@ -20,7 +20,9 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Web of Needs Main</name>
-
+    <scm>
+        <developerConnection>scm:git:ssh://git@github.com/researchstudio-sat/webofneeds.git</developerConnection>
+    </scm>
     <modules>
         <module>won-core</module>
         <module>won-node-webapp</module>
@@ -35,6 +37,7 @@
         <module>won-facets</module>
         <module>won-cryptography</module>
         <module>won-utils</module>
+        <module>won-vocab</module>
     </modules>
 
     <dependencyManagement>
@@ -702,7 +705,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.0</version>
+                    <version>2.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
