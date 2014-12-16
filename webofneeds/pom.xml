@@ -17,13 +17,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>webofneeds</groupId>
     <artifactId>webofneeds</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Web of Needs Main</name>
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/researchstudio-sat/webofneeds.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+    </scm>
     <modules>
         <module>won-core</module>
         <module>won-node-webapp</module>
@@ -945,7 +944,7 @@
         <repository>
             <id>sat-maven-repository</id>
             <name>satsrv03-releases</name>
-            <url>&gt;http://satsrv03:8080/artifactory/libs-release-local</url>
+            <url>>http://satsrv03:8080/artifactory/libs-release-local</url>
         </repository>
     </distributionManagement>
 
