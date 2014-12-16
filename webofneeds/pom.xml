@@ -774,6 +774,7 @@
     </repositories>
 
     <properties>
+        <solr.upload.dest>${project.build.directory}</solr.upload.dest>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compile.compilerargs>
             -Xlint:deprecation,fallthrough,finally,path,serial,unchecked
