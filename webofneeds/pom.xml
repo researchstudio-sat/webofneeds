@@ -17,12 +17,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>webofneeds</groupId>
     <artifactId>webofneeds</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
     <name>Web of Needs Main</name>
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/researchstudio-sat/webofneeds.git</developerConnection>
-    </scm>
+      <tag>1.0</tag>
+  </scm>
     <modules>
         <module>won-core</module>
         <module>won-node-webapp</module>
