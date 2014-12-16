@@ -958,7 +958,7 @@
             <id>sat-maven-repository</id>
             <name>satsrv03-snapshot-releases</name>
             <url>http://satsrv03:8080/artifactory/libs-snapshot-local</url>
-            <layout>legacy</layout>
+            <layout>default</layout>
         </snapshotRepository>
     </distributionManagement>
 
