@@ -940,5 +940,12 @@
             </properties>
         </profile>
     </profiles>
+    <distributionManagement>
+        <repository>
+            <id>sat-maven-repository</id>
+            <name>satsrv03-releases</name>
+            <url>>http://satsrv03:8080/artifactory/libs-release-local</url>
+        </repository>
+    </distributionManagement>
 
 </project>
