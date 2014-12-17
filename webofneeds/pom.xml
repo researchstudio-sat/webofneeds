@@ -17,12 +17,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>webofneeds</groupId>
     <artifactId>webofneeds</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
     <name>Web of Needs Main</name>
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/researchstudio-sat/webofneeds.git</developerConnection>
-    </scm>
+      <tag>1.0</tag>
+  </scm>
     <modules>
         <module>won-core</module>
         <module>won-node-webapp</module>
@@ -681,6 +682,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>2.5</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.wagon</groupId>
+                            <artifactId>wagon-http</artifactId>
+                            <version>2.8</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -752,21 +760,6 @@
 
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <!--
-                    Yuck! we're disabling the deploy plugin because we
-                    abuse the maven lifecycle. This way, mvn deploy deploys our artifact via cargo.
-                -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-
-        </plugins>
     </build>
     <repositories>
         <repository>
@@ -782,6 +775,7 @@
     </repositories>
 
     <properties>
+        <solr.upload.dest>${project.build.directory}</solr.upload.dest>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compile.compilerargs>
             -Xlint:deprecation,fallthrough,finally,path,serial,unchecked
@@ -955,5 +949,19 @@
             </properties>
         </profile>
     </profiles>
+    <distributionManagement>
+        <repository>
+            <id>sat-maven-repository</id>
+            <name>satsrv03-releases</name>
+            <url>http://satsrv03:8080/artifactory/libs-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>sat-maven-repository</id>
+            <name>satsrv03-snapshot-releases</name>
+            <url>http://satsrv03:8080/artifactory/libs-snapshot-local</url>
+            <layout>default</layout>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
