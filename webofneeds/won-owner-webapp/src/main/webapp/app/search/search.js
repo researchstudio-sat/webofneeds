@@ -34,16 +34,3 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
     }
 });
 
-angular.module('won.owner').directive('wonPostDetail', function factory($log) {
-    return {
-        scope:{
-            need: '=need'
-        },
-        restrict:'AE',
-        templateUrl:"app/post-detail/post-detail.html",
-        link: function(scope, element, attrs){
-            $log.debug("wonPostDetail");
-        }//,
-        //scope:{},
-    }
-});

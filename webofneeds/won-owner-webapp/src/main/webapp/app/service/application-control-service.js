@@ -47,10 +47,26 @@ angular.module('won.owner').factory('applicationControlService', function (appli
         $location.url("/private-link");
     }
     applicationControlService.getTypePicURI = function (type) {
-        if(type==won.WON.BasicNeedTypeDemand) return "/owner/images/type_posts/want.png";
-        else if(type==won.WON.BasicNeedTypeCritique) return "/owner/images/type_posts/change.png";
-        else if(type==won.WON.BasicNeedTypeSupply) return "/owner/images/type_posts/offer.png";
-        else return "/owner/images/type_posts/todo.png";
+        switch(type) {
+            case won.WON.BasicNeedTypeDemand: return "/owner/images/type_posts/want.png";
+            case won.WON.BasicNeedTypeCritique: return "/owner/images/type_posts/change.png";
+            case won.WON.BasicNeedTypeSupply: return "/owner/images/type_posts/offer.png";
+            case won.WON.BasicNeedTypeDotogether: return "/owner/images/type_posts/todo.png";
+            default:
+                $log.error("Tried to get icon url with the invalid type: " + type)
+                return ""
+        }
+    };
+    applicationControlService.humanReadableType = function (type) {
+        switch(type) {
+            case won.WON.BasicNeedTypeDemand: return "Demand";
+            case won.WON.BasicNeedTypeCritique: return "Critique";
+            case won.WON.BasicNeedTypeSupply: return "Supply";
+            case won.WON.BasicNeedTypeDotogether: return "Together";
+            default:
+                $log.error("Tried to get icon url with the invalid type: " + type)
+                return ""
+        }
     };
     applicationControlService.getMenuPositionForNeedType = function(needType){
         switch (needType){
