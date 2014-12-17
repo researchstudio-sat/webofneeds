@@ -55,7 +55,9 @@ angular.module('won.owner')
         }
     });
 
-angular.module('won.owner').directive('wonPostDetail', function factory($log, applicationContr) {
+angular.module('won.owner')
+    .directive('wonPostDetail',
+    function postDetailFactory($log, applicationControlService) {
 
     var directive =  {
         scope:{
@@ -65,19 +67,10 @@ angular.module('won.owner').directive('wonPostDetail', function factory($log, ap
         templateUrl:"app/post-detail/post-detail.html",
         link: function(scope, element, attrs){
             $log.debug("wonPostDetail");
+            scope.getTypePicURI = applicationControlService.getTypePicURI
         }//,
         //scope:{},
    }
-    //TODO pass getTypePicURI to the template
-    // https://docs.angularjs.org/guide/directive#creating-a-directive-that-manipulates-the-dom
-    //$scope.getTypePicURI = applicationControlService.getTypePicURI
-
-    /*directive.scope.getTypePicURI = function(str) {
-        console.log("IN TYPE PIC URI")
-    }
-    $scope.getTypePicURI = function(str) {
-        console.log("IN TYPE PIC URI")
-    }*/
 
     return directive
 });
