@@ -19,6 +19,7 @@ package won.node.service.impl;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 
@@ -35,6 +36,12 @@ public class URIService
   private String needResourceURIPrefix;
   //prefix of a connection resource
   private String connectionResourceURIPrefix;
+  //prefix of an event resource
+  private String eventResourceURIPrefix;
+  //prefix of a messageEvent resource
+  private String messageEventResourceURIInfix;
+  //need meta information suffix
+  private String needMetaInformationURISuffix;
   //prefix for URISs of RDF data
   private String dataURIPrefix;
   //prefix for URIs referring to real-world things
@@ -103,11 +110,15 @@ public class URIService
   }
 
   public URI createNeedURIForId(String id) {
-    return URI.create(needResourceURIPrefix.toString() + "/"   + id);
+    return URI.create(needResourceURIPrefix.toString() + "/" + id);
   }
 
   public URI createConnectionURIForId(String id) {
     return URI.create(connectionResourceURIPrefix.toString() + "/"   + id);
+  }
+
+  public URI createEventURIForId(String id) {
+    return URI.create(eventResourceURIPrefix.toString() + "/"   + id);
   }
 
   public URI createNeedURI(Need need)
@@ -128,6 +139,19 @@ public class URIService
   public void setConnectionResourceURIPrefix(final String connectionResourceURIPrefix)
   {
     this.connectionResourceURIPrefix = connectionResourceURIPrefix;
+  }
+
+  public void setEventResourceURIPrefix(final String eventResourceURIPrefix)
+  {
+    this.eventResourceURIPrefix = eventResourceURIPrefix;
+  }
+
+  public void setMessageEventResourceURIInfix(final String messageEventResourceURIInfix) {
+    this.messageEventResourceURIInfix = messageEventResourceURIInfix;
+  }
+
+  public void setNeedMetaInformationURISuffix(final String needMetaInformationURISuffix) {
+    this.needMetaInformationURISuffix = needMetaInformationURISuffix;
   }
 
   public void setDataURIPrefix(final String dataURIPrefix)
@@ -152,12 +176,11 @@ public class URIService
 
   public URI createEventURI(final Connection con, final ConnectionEvent event)
   {
-    return URI.create(con.getConnectionURI()+"/event/"+event.getId());
+    return createEventURIForId(event.getId().toString());
   }
 
-  public URI createEventURI(final URI connectionURI, final String eventId)
-  {
-    return URI.create(connectionURI.toString()+"/event/"+eventId);
+  public URI createNeedMetaInformationURI(final URI needURI) {
+    return URI.create(needURI.toString() + needMetaInformationURISuffix + WonRdfUtils.NAMED_GRAPH_SUFFIX);
   }
 
   /**

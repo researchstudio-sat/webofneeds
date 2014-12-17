@@ -1,0 +1,583 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<div style="padding-top: 40px;padding-bottom: 8em;" xmlns="http://www.w3.org/1999/html"
+     xmlns="http://www.w3.org/1999/html">
+    <div >
+        <div style="font-size: 1.8em; text-align: center ;">
+            <img ng-show="!postClosed" src="{{img_path}}" alt="Generic placeholder thumbnail" style="z-index: 0">
+            <!--TODO put here second layer on the first layer picture--><img ng-show="postClosed" src="/owner/images/closed.PNG" alt="Generic placeholder thumbnail">
+            <strong>{{currentNeed.title}}</strong>
+        </div>
+        <div style="text-align: center ;">
+            <a href="#/post-detail/">Go to full description</a>
+            <!-- TODO link needs to be extended by parameters -->
+        </div>
+
+        <!--Messages Area-->
+        <div id="messagsAreaCollapse" class="well div-table col-lg-12">
+            <div class="div-table-row">
+                <div class="div-table-cell pull-left additional-info-title">Messaging</br>View all messages concerning this post and use filters to refine</div>
+                <div class="div-table-cell pull-right">
+                    <span >
+                        <a href="" ng-show="mesagesCollapsed" class="glyphicon glyphicon-chevron-down"
+                           ng-click="messagesCollapseClick()"></a>
+                    </span>
+                    <span >
+                        <a href="" ng-show="!mesagesCollapsed" class="glyphicon glyphicon-chevron-up"
+                           ng-click="messagesCollapseClick()"></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="messageArea" ng-show="!mesagesCollapsed" class="div-table col-lg-12">
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-12">
+                    <div class="row col-lg-12 text-center">
+                        <!--<div class="panel panel-default"> -->
+                            <div class="btn-group">
+                                <button id="1" ng-click="clickOnMessageButton(1)" type="button"
+                                        class="btn btn-success"><img src="/owner/images/conversations.svg">Conversations</button>
+                                <button id="2" ng-click="clickOnMessageButton(2)" type="button"
+                                        class="btn btn-success"><img src="/owner/images/requests.svg">Requests</button>
+                                <button id="3" ng-click="clickOnMessageButton(3)" type="button"
+                                        class="btn btn-success"><img src="/owner/images/matches.svg">Matches</button>
+                            </div>
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th ng-click="setSortParams('remoteNeed.title')">Title</th>
+                                        <th  ng-click="setSortParams('event.hasTimestamp')">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="event in lastEventOfEachConnectionOfCurrentNeed | messageTypeFilter:currentEventType | orderBy:sortedField:reversedSort">
+                                        <td>
+                                            <span style="display: none;">{{event.typeText}}</span>
+                                            <i ng-class="getIconClass(event.typeText)" tooltip="{{event.typeText}}"/>
+                                        </td>
+                                        <td><a style="font-weight:bold;" href=""
+                                               ng-click="clickOnMessage(event)">{{event
+                                            .remoteNeed.title}}</a></td>
+                                        <td>{{event.event.hasTimestamp | date}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        <!--</div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-12">
+                    <div class="row col-lg-12 text-center">
+                       <conversation chosen-message='chosenMessage'>
+                       </conversation>
+
+                        <!-- Incoming requests -->
+                        <div class="panel panel-default" ng-show="showIncomingRequests()">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
+                                    <h3 class="panel-title col-md-9" >Request from <span ng-bind="chosenMessage.remoteNeed.title"></span> </h3>
+                                    <div class="col-md-2">{{chosenMessage.event.hasTimestamp | date}}</div>
+                                </div>
+                            </div>
+                            <div class="row col-lg-12">
+                                <p class="row col-lg-11 text-justify">
+                                    {{chosenMessage.event.hasTextMessage}}
+                                </p>
+                                <!--<textarea id="incomingRequestMessage" class="col-lg-12" style="resize: none;" rows=8
+                                          disabled>{{chosenMessage.event.hasTextMessage}}
+                                </textarea>-->
+                            </div>
+
+
+                            <!-- Confirmation dialog for declining a request -->
+                            <div ng-show="showConfirmationDialogForDeclineRequest">
+                                <form class="form-horizontal container">
+                                    <div class="col-md-5 col-md-offset-4">
+                                        <div class="well">
+                                            <fieldset>
+                                                <legend>Do you really want to decline this conversation request?</legend>
+                                                <div class="row col-lg-12">
+                                                    <button type="button" ng-click="clickOnNoForDeclineRequest()" class="btn btn-primary col-lg-6">No</button>
+                                                    <button type="button" ng-click="clickOnYesForDeclineRequest()" class="btn btn-primary col-lg-6">Yes</button>
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Post exists IMPLICITLY DISPLAYED -->
+                            <div ng-show="true" class="col-lg-12 " >
+                                <div class="row col-lg-12 panel">
+                                    <div class = "row " >
+                                        <div class="col-lg-3">
+                                            Thumbnail placeholder
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <div class="row">
+                                                <div class="col-lg-6"
+                                                     ng-bind="chosenMessage.remoteNeed.title"></div>
+                                                <div class="col-lg-3"
+                                                     ng-bind="chosenMessage.event.hasTimeStamp|date"></div>
+                                            </div>
+                                            <div class="row col-lg-12" ng-bind="chosenMessage.remoteNeed.textDescription">
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="row col-lg-12 ">
+                                    <form class="form-horizontal container" novalidate name="sendMessageForm" ng-submit="sendMessage()">
+                                        <fieldset>
+                                            <div class="form-group ">
+                                                <div class="col-md-12 panel">
+                                                    <textarea style="resize: none;" class="form-control" rows="8" id="textMessage" name="textMessage"
+                                                              ng-model="newMessage"
+                                                              placeholder="Write a reply..."
+                                                              required>
+                                                    </textarea>
+                                                    <!--<span class="label label-warning" ng-show="contactAuthForm.textMessage.$invalid">Please write a message</span>  -->
+                                                </div>
+                                                <!--<span class="help-block">Message mustn't be empty</span> -->
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-3 pull-left">
+                                                    <button class="btn btn-default" ng-click="clickOnDeclineForInRequest()">Decline</button>
+                                                </div>
+                                                <div class="col-lg-9"></div>
+                                                <div class="col-lg-3 pull-right">
+                                                    <button class="btn btn-primary " type="submit"
+                                                            ng-click="clickOnAcceptForInRequest()">Accept</button>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </div>
+
+                            </div>
+
+                            <!-- Post does not exist NOT DISPLAYED NOW -->
+                            <div ng-show="false" class="col-lg-12">
+                                <div class="row col-lg-12">
+                                    <h4 class="pull-left">Re:&nbsp;{{chosenMessage.remoteNeed.title}}&nbsp;has sent you a request:</h4>
+                                </div>
+
+                                <div class="row col-lg-12">
+                                    <p class="text-justify">
+                                        Vestibulum id condimentum nulla. Aenean sagittis at ligula ultricies aliquet. Suspendisse accumsan iaculis feugiat.
+                                        Etiam condimentum hendrerit nunc, eu posuere libero pulvinar quis. Quisque commodo lacus nec diam faucibus
+                                        pellentesque. Donec id elit cursus, sollicitudin ligula sed, elementum neque. Quisque iaculis ullamcorper scelerisque.
+                                    </p>
+                                </div>
+
+                                <div class="row col-lg-12">
+                                    <p class="text-center">What to do with this conversation request?</p>
+                                </div>
+                                <div class="row col-lg-12">
+                                    <!-- TODO make the buttons working -->
+                                    <div class="text-center">
+                                        <button class="btn btn-default" ng-click="clickOnDeclineForInRequest()">Decline</button>
+                                        <button class="btn btn-default" ng-click="clickOnAcceptForInRequest()">Accept</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Outgoing requests -->
+                        <div class="panel panel-default" ng-show="showOutgoingRequests()">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
+                                    <h3 class="panel-title col-md-9">Request for conversation with <a href="#/post-detail"
+                                                                                                      class="underline">{{chosenMessage
+                                        .remoteNeed.title}}</a></h3>
+                                    <div  class="col-md-2" ng-bind=eventCommState[chosenMessage.event.uri]></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-lg-8">
+                                    <h4 class="pull-left">{{chosenMessage.event.hasTimestamp|date}}</h4>
+                                </div>
+
+                                <div class ="col-lg-4">
+                                    <a href="#/post-detail"
+                                       class="underline">{{applicationStateService.getAllNeeds()[chosenMessage.connection.belongsToNeed].title}}</a></h4>
+                                </div>
+                             </div>
+
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <h4 class="pull-left">{{chosenMessage.event.timestamp}}</h4>
+                                </div>
+
+                                <div class ="col-lg-4">
+                                    <a href="#/post-detail"
+                                       class="underline">{{chosenMessage.need.title}}</a></h4>
+                                </div>
+                            </div>
+                            <div class = "row">
+                                <div class = "col-lg-8">{{chosenMessage.need.hasDescription}}</div>
+                                <div class = "col-lg-4">Thumbnail</div>
+                            </div>
+                                <div class="row col-lg-12">
+                                    <h4 class="pull-left">Waiting for reply from&nbsp;<a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a></h4>
+                                </div>
+
+                                <div class="row col-lg-12">
+                                    <a id="pencil" href="" ng-click="changeToEditable()" ng-show="showPencil"><i class="fa fa-pencil pull-right"></i></a>
+                                    <textarea id="textboxInRequest" class="col-lg-12" style="resize: none;" rows=8 disabled>{{chosenMessage.event.hasTextMessage}}
+                                    </textarea>
+                                </div>
+
+                                <div id="edit-buttons" class="row col-lg-12" ng-show="showEditButtons">
+                                    <button type="button" class="btn btn-default" ng-click="clickOnCancelWhenEdit()">Cancel</button>
+                                    <button type="button" class="btn btn-default" ng-click="clickOnFinishedWhenEdit()">Finished editing</button>
+                                </div>
+
+                                <div class="row col-lg-12">
+                                    <h4 class="pull-left">You want to connect with this post:</h4>
+                                </div>
+
+                                <div class="row col-lg-12">
+                                    <div class="media">
+                                        <img class="thumbnail thumbnail-size media-object pull-left" src="/owner/images/need.jpg"/>
+                                        <div class="media-body">
+                                            <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.remoteNeed.title}}</a>
+                                            <p class="text-justify">
+                                                {{chosenMessage.remoteNeed.textDescription}}(<a href="#/post-detail/">go to full description</a>).
+                                                <!-- TODO link needs to be extended by parameters -->
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Confirmation dialog for canceling a request -->
+                                <div ng-show="showConfirmationDialogForCancelRequest">
+                                    <form class="form-horizontal container">
+                                        <div class="col-md-5 col-md-offset-4">
+                                            <div class="well">
+                                                <fieldset>
+                                                    <legend>Do you really want to cancel this conversation request?</legend>
+                                                    <div class="row col-lg-12">
+                                                        <button type="button" ng-click="clickOnNoForCancelRequest()" class="btn btn-primary col-lg-6">No</button>
+                                                        <button type="button" ng-click="clickOnYesForCancelRequest()" class="btn btn-primary col-lg-6">Yes</button>
+                                                    </div>
+                                                </fieldset>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="row col-lg-12">
+                                    <button class="btn btn-default" ng-click="clickOnCancelRequest()">Cancel Request</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Matches -->
+                        <div class="panel panel-default" ng-show="showMatches()">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
+                                    <h3 class="panel-title col-md-9">New match found!</h3>
+                                    <div class="col-md-2">{{chosenMessage.event.timeStamp | date}}</div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="media">
+                                    <img class="thumbnail thumbnail-size media-object pull-left" src="/owner/images/need.jpg"/>
+                                    <div class="media-body">
+                                        <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.remoteNeed.title}}</a>
+                                        <p class="text-justify">
+                                            {{chosenMessage.remoteNeed.textDescription}} (<a href="#/post-detail/">go
+                                            to
+                                            full description</a>).
+                                            <!-- TODO link needs to be extended by parameters -->
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="row col-lg-12">
+                                    <h4 class="pull-left">Match rating</h4>
+                                </div>
+
+                                <div id="rating-warning" class="row col-lg-12">
+                                    <p class="pull-left">Please rate how good this match is so we can provide you the best possible matches:<p>
+                                </div>
+
+                                <div class="row col-lg-12">
+                                    <div class="pull-left">
+                                        <input id="rater" ng-init="initRater()" type="number" class="rating" min="0" max="5" step="1" data-size="xs"
+                                               data-symbol="&#x2605;">
+                                    </div>
+                                </div>
+                                <div class="row col-lg-12">
+                                    <p class="text-warning pull-left" ng-show="showWarningForRating">Please give rating.</p>
+                                </div>
+
+                                <!-- Confirmation dialog for removing a match -->
+                                <div ng-show="showConfirmationDialogForRemoveMatch">
+                                    <form class="form-horizontal container">
+                                        <div class="col-md-5 col-md-offset-4">
+                                            <div class="well">
+                                                <fieldset>
+                                                    <legend>Do you really want to remove this match?</legend>
+                                                    <div class="row col-lg-12">
+                                                        <button type="button" ng-click="clickOnNoForRemoveMatch()" class="btn btn-primary col-lg-6">No</button>
+                                                        <button type="button" ng-click="clickOnYesForRemoveMatch()" class="btn btn-primary col-lg-6">Yes</button>
+                                                    </div>
+                                                </fieldset>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="row col-lg-12">
+                                    <p class="text-center">What to do with this match?</p>
+                                </div>
+
+                                <div class="row col-lg-12">
+                                    <div class="text-center">
+                                        <button class="btn btn-default" ng-click="clickOnRemoveMatch()">Remove</button>
+                                        <button class="btn btn-default" ng-click="clickOnRequestConversation()">Request  conversation</button>
+                                    </div>
+                                </div>
+
+                                <div id="matchControl" ng-show="showMatchControl">
+                                    <textarea id="textboxInMatch"
+                                              ng-model="textboxInMatchModel"
+                                              class="col-lg-12"
+                                              style="resize: none;" rows="8"
+                                              placeholder="Write your message here ..."
+                                              required></textarea>
+                                    <div class="row col-lg-12">
+                                        <button class="btn btn-default pull-right" ng-click="clickOnSendRequestMessage()">Send message</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Settings Area-->
+        <div id="settingsAreaCollapse" class="well div-table col-lg-12">
+            <div class="div-table-row">
+                <div class="div-table-cell pull-left additional-info-title">Settings</div>
+                <div class="div-table-cell pull-right">
+                    <span >
+                        <a href="" ng-show="settingsCollapsed" class="glyphicon glyphicon-chevron-down"
+                           ng-click="settingsCollapseClick()"></a>
+                    </span>
+                    <span >
+                        <a href="" ng-show="!settingsCollapsed" class="glyphicon glyphicon-chevron-up"
+                           ng-click="settingsCollapseClick()"></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div id="settingsArea" ng-show="!settingsCollapsed" class="div-table col-lg-12">
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-6">
+                    <div class="row col-lg-12">
+                        <div class="col-lg-11 pull-left">
+                            <span class="glyphicon glyphicon-lock"></span><strong>Private link:</strong><br/>
+                            Bookmark or otherwise save this link. Access it to chat or browse matches to your post. You shouldn’t give it away.
+                        </div>
+                        <div class="col-lg-1 pull-right">
+                            <img src="/owner/images/messageWasSent.PNG"/>
+                        </div>
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-11">
+                            <input type="text" class="form-control" name="privateLink" id="privateLink" ng-model="privateLink" readonly>
+                        </div>
+                        <div class="col-lg-1">
+                            <!--<span class="glyphicon glyphicon-floppy-disk" style="font-size: 2.8em;" data-toggle="copy link to clipboard"></span>-->
+                            <i class="fa fa-file-text-o fa-lg" style="font-size: 2.8em;"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="div-table-cell col-lg-6">
+                </div>
+            </div>
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-12">
+                    <br/><br/>
+                </div>
+            </div>
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-6">
+                    <div class="row col-lg-12">
+                            <span class="glyphicon glyphicon-envelope"></span><strong> Email Notifications:</strong><br/>
+                            We’ll send you a link to this page and notifications for:
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-1">
+                            <input type="checkbox" id='emailNotif1'>
+                        </div>
+                        <div class="col-lg-11">
+                            new conversation messages
+                        </div>
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-1">
+                            <input type="checkbox" id='emailNotif2'>
+                        </div>
+                        <div class="col-lg-11">
+                            new conversation requests
+                        </div>
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-1">
+                            <input type="checkbox" id='emailNotif3'>
+                        </div>
+                        <div class="col-lg-11">
+                            new matches (~ search results)
+                        </div>
+                    </div>
+                    <form ng-show="!notificationEmailValide" class="form-horizontal container col-lg-12" novalidate name="validateEmail" ng-submit="notifyMe()">
+                        <fieldset>
+                            <div class="row col-lg-12">
+                                <div class="col-lg-1 pull-left">to: </div>
+                                <div class="col-lg-11 pull-right">
+                                    <input type="email" class="form-control col-lg-8" name="notificationInput" id="notificationInput" ng-model="notificationEmail" required>
+                                    <span class="label label-warning" ng-show="validateEmail.notificationInput.$invalid">Please write valid email address</span>
+                                </div>
+                            </div>
+                            <div class="row col-lg-12">
+                                <div class="col-lg-12">
+                                    <button ng-disabled="validateEmail.$invalid" type="submit" class="btn btn-primary pull-right">Notify me!</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <div ng-show="notificationEmailValide" class="row col-lg-12">
+                        <div class="col-lg-12">
+                            to: {{notificationEmail}} <a href="" ng-click="changeEmailAddress()">change email address</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="div-table-cell col-lg-6">
+                    <div class="row col-lg-12">
+                        <span class=""><!--TODO put here sharing icon--></span><strong>Public Link (Sharing):</strong><br/>
+                        This link is what other people will see of your post on the web of needs. Use the sharing options to spread it beyond that.
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-11">
+                            <input type="text" class="form-control" name="publicLink" id="publicLink" ng-model="publicLink" readonly>
+                        </div>
+                        <div class="col-lg-1">
+                            <!--<span class="glyphicon glyphicon-floppy-disk" style="font-size: 2.8em;" data-toggle="copy link to clipboard"></span>-->
+                            <i class="fa fa-file-text-o fa-lg" style="font-size: 2.8em;"></i>
+                        </div>
+                    </div>
+                    <div class="row col-lg-12">
+                        <br/>
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-1">
+                            <!--<img src="/images/social_icons_32x32/32-facebook.png" href="" facebook class="facebookShare" data-url='http://google.com' data-shares='shares'/>     -->
+                            <!--<a facebook     class="facebookShare" data-url='http://google.com' data-shares='shares'></a> -->
+
+                            <a href="">
+                                <img src="/owner/images/social_icons_32x32/32-facebook.png"
+                                   ng-click="openFacebook()">
+                            </a>
+                        </div>
+                        <!--<div class="col-lg-1">
+                            <img src="/images/social_icons_32x32/32-twitter.png" href=""/>
+                        </div>  -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Post Options Area-->
+        <div id="postOptionsAreaCollapse" class="well div-table col-lg-12">
+            <div class="div-table-row">
+                <div class="div-table-cell pull-left additional-info-title">Post Options</div>
+                <div class="div-table-cell pull-right">
+                    <span >
+                        <a href="" ng-show="postOptionsCollapsed" class="glyphicon glyphicon-chevron-down"
+                           ng-click="postOptionsCollapseClick()"></a>
+                    </span>
+                    <span >
+                        <a href="" ng-show="!postOptionsCollapsed" class="glyphicon glyphicon-chevron-up"
+                           ng-click="postOptionsCollapseClick()"></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div id="postOptionsArea" ng-show="!postOptionsCollapsed" class="div-table col-lg-12">
+            <div class="div-table-row col-lg-12">
+                <div class="div-table-cell col-lg-6">
+                    <div class="row col-lg-12 text-center" ng-show="!postClosed">
+                        <strong>Close Post</strong><br/>
+                        If you don’t want to receive matches or messages for this post any longer, you can close it. If you need the post again, you can reopen it here anytime.
+                    </div>
+                    <div class="row col-lg-12 text-center" ng-show="postClosed">
+                        <strong>Reopen Post</strong><br/>
+                        If you want to receive matches or messages for this post, you can reopen it again
+                    </div>
+                    <div class="row col-lg-12">
+                        <button type="button" ng-show="!postClosed" ng-click="onClosePostClick()" class="btn btn-primary col-lg-12">Close Post</button>
+                        <button type="button" ng-show="postClosed" ng-click="onReopenPostClick()" class="btn btn-primary col-lg-12">Reopen Post</button>
+                    </div>
+                </div>
+                <div class="div-table-cell col-lg-6">
+                    <div class="row col-lg-12 text-center">
+                        <strong>Copy & Publish Post</strong><br/>
+                        If you have or want something similar to this post, you can copy the information from this post and publish it as new post.
+                    </div>
+                    <div class="row col-lg-12">
+                        <button type="button" ng-click="onCopyAndPublishPostClick()" class="btn btn-primary col-lg-12">Copy & Publish Post</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="panel-register" ng-controller="CloseAndReopenPostCtrl" ng-show="postShouldBeClosed || postShouldBeReopened">
+    <form class="form-horizontal container">
+        <div class="col-md-5 col-md-offset-4">
+            <div class="well">
+                <fieldset>
+                    <legend ng-show="postShouldBeClosed && !postShouldBeReopened">Close this post?</legend>
+                    <legend ng-show="!postShouldBeClosed && postShouldBeReopened">Reopen this post?</legend>
+                    <div class="row col-lg-12">
+                        <button type="button" ng-click="onClickNo()" class="btn btn-primary col-lg-6">No</button>
+                        <button type="button" ng-click="onClickYes()" class="btn btn-primary col-lg-6">Yes</button>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </form>
+</div>

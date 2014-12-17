@@ -8,19 +8,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import won.protocol.model.Need;
 
 import javax.persistence.*;
+import java.net.URI;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
- * I used wonuser as table name because user is Postgres keyword - http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
- *
+ * 'wonuser' used as table name because 'user' is a Postgres keyword
+ * see http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
  */
 @Entity
 @Table(
-		name = "wonUser",
+		name = "wonuser", //don't use 'user' - see above
 		uniqueConstraints = @UniqueConstraint(columnNames = {"username"})
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,21 +32,20 @@ public class User implements UserDetails{
 	@Column(name = "id")
 	private Long id;
 
+  @Column(name = "username")
 	private String username;
 
+  @Column(name = "password")
 	private String password;
 
 
+  @OneToMany(fetch = FetchType.EAGER)
+  private List<UserNeed> userNeeds;
 
   //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
   //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-	private List<Need> needs;
-
-  //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
-  //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
- // @OneToMany( fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
- // private List<Need> drafts;
+  @ElementCollection( fetch = FetchType.EAGER)
+  private Set<URI> draftURIs;
 
 	@Transient
 	private Collection<SimpleGrantedAuthority> authorities;
@@ -110,19 +110,40 @@ public class User implements UserDetails{
 		return username;
 	}
 
+  public void setUsername(final String username) {
+    this.username = username;
+  }
+
+  public void setPassword(final String password) {
+    this.password = password;
+  }
+
+  /*
 	public List<Need> getNeeds() {
 		return needs;
-	}
-  /*
-  public List<Need> getDrafts(){
-    return drafts;
+	}          */
+
+  public void addNeedUri(UserNeed userNeed){
+    this.userNeeds.add(userNeed);
   }
-	public void setNeeds(final List<Need> needs) {
+
+  public List<UserNeed> getUserNeeds() {
+    return userNeeds;
+  }
+
+  public void setUserNeeds(final List<UserNeed> userNeeds) {
+    this.userNeeds = userNeeds;
+  }
+
+  public Set<URI> getDraftURIs(){
+    return draftURIs;
+  }
+	/*public void setNeeds(final List<Need> needs) {
 		this.needs = needs;
-	}
-  public void setDrafts(final List<Need> drafts) {
-    this.drafts = drafts;
-  }    */
+	}     */
+  public void setDrafts(final Set<URI> draftURIs) {
+    this.draftURIs = draftURIs;
+  }
 
 	@Override
 	public boolean equals(final Object o) {
@@ -132,7 +153,7 @@ public class User implements UserDetails{
 		final User user = (User) o;
 
 		if (id != null ? !id.equals(user.id) : user.id != null) return false;
-		if (needs != null ? !needs.equals(user.needs) : user.needs != null) return false;
+		if (userNeeds != null ? !userNeeds.equals(user.userNeeds) : user.userNeeds != null) return false;
 		if (password != null ? !password.equals(user.password) : user.password != null) return false;
 		if (username != null ? !username.equals(user.username) : user.username != null) return false;
 
@@ -144,7 +165,7 @@ public class User implements UserDetails{
 		int result = id != null ? id.hashCode() : 0;
 		result = 31 * result + (username != null ? username.hashCode() : 0);
 		result = 31 * result + (password != null ? password.hashCode() : 0);
-		result = 31 * result + (needs != null ? needs.hashCode() : 0);
+		result = 31 * result + (userNeeds != null ? userNeeds.hashCode() : 0);
 		return result;
 	}
 }

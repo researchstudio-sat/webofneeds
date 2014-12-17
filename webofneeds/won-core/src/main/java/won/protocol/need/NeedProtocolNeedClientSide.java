@@ -18,7 +18,7 @@ package won.protocol.need;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 
 import java.net.URI;
@@ -30,14 +30,22 @@ import java.net.URI;
 public interface NeedProtocolNeedClientSide   //extends ConnectionCommunicationService
 {
 
-  public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws Exception;
+  public ListenableFuture<URI> connect(
+          final URI needUri,
+          final URI otherNeedUri,
+          final URI otherConnectionUri,
+          final Model content,
+          final WonMessage wonMessage) throws Exception;
 
 
-  public void open(final Connection connection, final Model content) throws Exception;
+  public void open(final Connection connection, final Model content, final WonMessage wonMessage)
+          throws Exception;
 
-  public void close(final Connection connection, final Model content) throws Exception;
+  public void close(final Connection connection, final Model content, final WonMessage wonMessage)
+          throws Exception;
 
-  public void textMessage(final Connection connection, final Model message) throws Exception;
+  public void sendMessage(final Connection connection, final Model message, final WonMessage wonMessage)
+          throws Exception;
 
 
 

@@ -1,0 +1,15 @@
+{
+  "name": "ng-scrollbar",
+  "version": "0.0.5",
+  "dependencies": {
+  },
+  "main": [
+    "./dist/ng-scrollbar.js", 
+    "./dist/ng-scrollbar.css"
+  ],
+  "devDependencies": {
+    "angular": "latest",
+    "angular-mocks": "latest",
+    "jquery": "latest"
+  }
+}

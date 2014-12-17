@@ -17,10 +17,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>webofneeds</groupId>
     <artifactId>webofneeds</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
     <name>Web of Needs Main</name>
-
+    <scm>
+        <developerConnection>scm:git:ssh://git@github.com/researchstudio-sat/webofneeds.git</developerConnection>
+      <tag>1.0</tag>
+  </scm>
     <modules>
         <module>won-core</module>
         <module>won-node-webapp</module>
@@ -33,6 +36,9 @@
         <module>won-ontology-validator</module>
         <module>won-bot</module>
         <module>won-facets</module>
+        <module>won-cryptography</module>
+        <module>won-utils</module>
+        <module>won-vocab</module>
     </modules>
 
     <dependencyManagement>
@@ -213,17 +219,28 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <!-- JSON-LD / Jena -->
+
             <dependency>
                 <groupId>com.github.jsonld-java</groupId>
-                <artifactId>jsonld-java-jena</artifactId>
+                <artifactId>jsonld-java</artifactId>
                 <version>${com.github.jsonld-java.version}</version>
+            </dependency>
+
+
+            <!-- Signingframework - doesn't exist in the public repository -->
+            <dependency>
+                <groupId>de.uni_koblenz.aggrimm.icp</groupId>
+                <artifactId>signingframework</artifactId>
+                <version>${de.uni_koblenz.aggrimm.icp.version}</version>
             </dependency>
 
             <!-- Servlet API -->
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
-                <version>2.5</version>
+                <version>3.0-alpha-1</version>
             </dependency>
 
             <dependency>
@@ -255,7 +272,21 @@
                 </exclusions>
             </dependency>
 
+            <!-- security related stuff -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+
             <!-- spring stuff -->
+
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
@@ -269,7 +300,17 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
+                <artifactId>spring-messaging</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-websocket</artifactId>
                 <version>${org.springframework.version}</version>
             </dependency>
             <dependency>
@@ -320,7 +361,7 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-commons-core</artifactId>
+                <artifactId>spring-data-commons</artifactId>
                 <version>${org.springframework.data.commons.version}</version>
             </dependency>
             <dependency>
@@ -449,13 +490,6 @@
                 <version>${org.hsqldb.version}</version>
             </dependency>
 
-
-            <dependency>
-                <groupId>com.github.jsonld-java</groupId>
-                <artifactId>jsonld-java</artifactId>
-                <version>${com.github.jsonld-java.version}</version>
-            </dependency>
-
             <!-- dreaded XML stuff -->
             <dependency>
                 <groupId>xml-apis</groupId>
@@ -542,6 +576,11 @@
                 <version>1.7.3</version>
             </dependency>
             <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.3</version>
+            </dependency>
+            <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
                 <version>${org.quartz-scheduler.version}</version>
@@ -556,11 +595,6 @@
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
                 <version>${commons-fileupload.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commons-io.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -648,6 +682,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>2.5</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.wagon</groupId>
+                            <artifactId>wagon-http</artifactId>
+                            <version>2.8</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -672,7 +713,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.0</version>
+                    <version>2.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -687,7 +728,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>2.17</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -719,21 +760,6 @@
 
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <!--
-                    Yuck! we're disabling the deploy plugin because we
-                    abuse the maven lifecycle. This way, mvn deploy deploys our artifact via cargo.
-                -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-
-        </plugins>
     </build>
     <repositories>
         <repository>
@@ -749,6 +775,7 @@
     </repositories>
 
     <properties>
+        <solr.upload.dest>${project.build.directory}</solr.upload.dest>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compile.compilerargs>
             -Xlint:deprecation,fallthrough,finally,path,serial,unchecked
@@ -764,10 +791,12 @@
         <dependencies.scope>compile</dependencies.scope>
         <!-- versions for various dependencies -->
         <aspectj.version>1.5.4</aspectj.version>
+        <bouncycastle.version>1.50</bouncycastle.version>
         <commons-collections.version>3.2.1</commons-collections.version>
         <commons-fileupload.version>1.2.2</commons-fileupload.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <commons-io.version>2.4</commons-io.version>
+        <de.uni_koblenz.aggrimm.icp.version>1.0</de.uni_koblenz.aggrimm.icp.version>
         <solr.version>3.5.0</solr.version>
         <camel.version>2.12.1</camel.version>
         <qpid.version>0.24</qpid.version>
@@ -777,11 +806,10 @@
         <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed-->
         <siren.version>0.2.3-RC2</siren.version>
         <cglib.version>2.2.2</cglib.version>
-        <com.github.jsonld-java.version>0.3-SNAPSHOT</com.github.jsonld-java.version>
         <com.google.guava.version>15.0</com.google.guava.version>
         <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
         <com.fasterxml.classmate.version>1.0.0</com.fasterxml.classmate.version>
-        <com.github.jsonld-java.version>0.3</com.github.jsonld-java.version>
+        <com.github.jsonld-java.version>0.5.0</com.github.jsonld-java.version>
         <com.mchange.c3p0.version>0.9.5-pre8</com.mchange.c3p0.version>
         <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
         <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
@@ -790,17 +818,18 @@
         <junit.version>4.11</junit.version>
         <org.apache.commons.email.version>1.3.1</org.apache.commons.email.version>
         <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
-        <org.apache.jena.version>2.11.0</org.apache.jena.version>
+        <org.apache.jena.version>2.12.0</org.apache.jena.version>
         <org.apache.jena-tdb.version>1.0.0</org.apache.jena-tdb.version>
-        <org.hibernate.version>4.3.5.Final</org.hibernate.version>
-        <org.hibernate.hibernate-validator.version>5.1.0.Final</org.hibernate.hibernate-validator.version>
+        <org.hibernate.version>4.3.6.Final</org.hibernate.version>
+        <org.hibernate.hibernate-validator.version>5.1.3.Final</org.hibernate.hibernate-validator.version>
         <org.javasimon.version>3.4.0</org.javasimon.version>
         <org.jboss.jandex.version>1.1.0.Final</org.jboss.jandex.version>
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
         <org.springframework.boot.version>1.0.2.RELEASE</org.springframework.boot.version>
-        <org.springframework.data.commons.version>1.4.0.RELEASE</org.springframework.data.commons.version>
-        <org.springframework.data.jpa.version>1.2.0.RELEASE</org.springframework.data.jpa.version>
-        <org.springframework.version>4.0.4.RELEASE</org.springframework.version>
+        <org.springframework.data.commons-core.version>1.4.1.RELEASE</org.springframework.data.commons-core.version>
+        <org.springframework.data.commons.version>1.9.0.RELEASE</org.springframework.data.commons.version>
+        <org.springframework.data.jpa.version>1.7.0.RELEASE</org.springframework.data.jpa.version>
+        <org.springframework.version>4.1.1.RELEASE</org.springframework.version>
         <org.springframework.security.version>3.1.3.RELEASE</org.springframework.security.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
         <org.hsqldb.version>2.3.2</org.hsqldb.version>
@@ -903,7 +932,7 @@
                                     <!--
                                         reasons for exclusions: see config of profile 'copy-module-dependencies'
                                     -->
-                                    <excludeGroupIds>webofneeds,org.sindice.siren</excludeGroupIds>
+                                    <excludeGroupIds>webofneeds,org.sindice.siren, org.apache.lucene</excludeGroupIds>
                                     <excludeArtifactIds>servlet-api</excludeArtifactIds>
                                 </configuration>
                             </execution>
@@ -919,32 +948,20 @@
                 <dependencies.scope>provided</dependencies.scope>
             </properties>
         </profile>
-
-        <profile>
-            <id>jrebel</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.zeroturnaround</groupId>
-                        <artifactId>jrebel-maven-plugin</artifactId>
-                        <version>${jrebel.version}</version>
-                        <executions>
-                            <execution>
-                                <id>generate-rebel-xml</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>generate</goal>
-                                </goals>
-                                <configuration>
-                                    <rootPath>${project.basedir}</rootPath>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
     </profiles>
+    <distributionManagement>
+        <repository>
+            <id>sat-maven-repository</id>
+            <name>satsrv03-releases</name>
+            <url>http://satsrv03:8080/artifactory/libs-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>sat-maven-repository</id>
+            <name>satsrv03-snapshot-releases</name>
+            <url>http://satsrv03:8080/artifactory/libs-snapshot-local</url>
+            <layout>default</layout>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>

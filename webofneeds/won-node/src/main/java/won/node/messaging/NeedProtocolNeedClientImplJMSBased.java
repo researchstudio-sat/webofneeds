@@ -20,12 +20,15 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MessagingService;
 import won.protocol.jms.NeedProtocolCommunicationService;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.util.RdfUtils;
@@ -49,14 +52,17 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
     private String connectStartingEndpoint;
     private String openStartingEndpoint;
     private String closeStartingEndpoint;
-    private String textMessageStartingEndpoint;
+    private String sendMessageStartingEndpoint;
 
     @Autowired
     private NeedProtocolCommunicationService protocolCommunicationService;
 
     //TODO: debugging needed. when a established connection is closed then reconnected, both connections are in state "request sent"
   @Override
-  public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws Exception {
+  public ListenableFuture<URI> connect(
+          final URI needUri, final URI otherNeedUri,
+          final URI otherConnectionUri, final Model content,
+          final WonMessage wonMessage) throws Exception {
 
 
 
@@ -71,46 +77,57 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
       headerMap.put("otherNeedURI", otherNeedUri.toString());
       headerMap.put("otherConnectionURI", otherConnectionUri.toString()) ;
       headerMap.put("content",RdfUtils.toString(content));
+      headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
       headerMap.put("methodName","connect");
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
 
       return messagingService.sendInOutMessageGeneric(null,headerMap,null,connectStartingEndpoint);
   }
 
-    public void open(final Connection connection, final Model content) throws Exception {
-        CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),openStartingEndpoint);
+    public void open(final Connection connection, final Model content, final WonMessage wonMessage)
+            throws Exception {
+        CamelConfiguration camelConfiguration = protocolCommunicationService
+          .configureCamelEndpoint(wonMessage.getSenderNeedURI(),
+                                  wonMessage.getReceiverNeedURI(),
+                                  openStartingEndpoint);
         Map headerMap = new HashMap<String, String>();
-        headerMap.put("protocol","NeedProtocol");
-        headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
+        headerMap.put("protocol", "NeedProtocol");
+        headerMap.put("connectionURI", wonMessage.getReceiverURI().toString());
         headerMap.put("content", RdfUtils.toString(content));
-        headerMap.put("methodName","open");
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+        headerMap.put("methodName", "open");
         headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-        messagingService.sendInOnlyMessage(null,headerMap,null, openStartingEndpoint );
+        messagingService.sendInOnlyMessage(null, headerMap, null, openStartingEndpoint);
     }
 
 
-  public void close(final Connection connection, final Model content) throws Exception {
+  public void close(final Connection connection, final Model content, final WonMessage wonMessage)
+          throws Exception {
       CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),closeStartingEndpoint);
       Map headerMap = new HashMap<String, String>();
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
       headerMap.put("content", RdfUtils.toString(content));
+      headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
       headerMap.put("methodName","close");
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
       messagingService.sendInOnlyMessage(null,headerMap,null, closeStartingEndpoint ) ;
   }
 
 
-  public void textMessage(final Connection connection, final Model message) throws Exception {
+  public void sendMessage(final Connection connection, final Model message, final WonMessage wonMessage)
+          throws Exception {
       String messageConvert = RdfUtils.toString(message);
-      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),textMessageStartingEndpoint);
+      CamelConfiguration camelConfiguration = protocolCommunicationService.configureCamelEndpoint(connection.getNeedURI(),connection.getRemoteNeedURI(),
+                                                                                                  sendMessageStartingEndpoint);
       Map headerMap = new HashMap<String, String>();
       headerMap.put("protocol","NeedProtocol");
       headerMap.put("connectionURI", connection.getRemoteConnectionURI().toString()) ;
       headerMap.put("content", messageConvert);
-      headerMap.put("methodName","textMessage");
+      headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+      headerMap.put("methodName","sendMessage");
       headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-      messagingService.sendInOnlyMessage(null,headerMap,null, textMessageStartingEndpoint );
+      messagingService.sendInOnlyMessage(null,headerMap,null, sendMessageStartingEndpoint);
   }
 
 
@@ -140,8 +157,8 @@ public class NeedProtocolNeedClientImplJMSBased implements NeedProtocolNeedClien
         this.closeStartingEndpoint = closeStartingEndpoint;
     }
 
-    public void setTextMessageStartingEndpoint(String textMessageStartingEndpoint) {
-        this.textMessageStartingEndpoint = textMessageStartingEndpoint;
+    public void setSendMessageStartingEndpoint(String sendMessageStartingEndpoint) {
+        this.sendMessageStartingEndpoint = sendMessageStartingEndpoint;
     }
 
 }

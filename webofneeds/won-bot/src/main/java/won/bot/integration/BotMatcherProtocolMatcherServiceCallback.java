@@ -16,7 +16,7 @@
 
 package won.bot.integration;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
@@ -91,7 +91,7 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
   }
 
   @Override
-  public void onNewNeed(final URI wonNodeURI, final URI needURI, final Model content) {
+  public void onNewNeed(final URI wonNodeURI, final URI needURI, final Dataset content) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {

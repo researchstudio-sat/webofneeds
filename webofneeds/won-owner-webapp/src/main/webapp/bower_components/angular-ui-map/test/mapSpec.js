@@ -70,7 +70,7 @@ describe('uiMap', function () {
       var content = angular.element('<h1>Hi</h1>');
       createWindow({ zIndex: 5 }, {}, content);
       expect(scope.ginfo.getZIndex()).toBe(5);
-      expect(scope.ginfo.getContent().innerHTML)
+      expect(scope.ginfo.getContentNode().innerHTML)
         .toBe(angular.element('<div>').append(content).html());
     });
 

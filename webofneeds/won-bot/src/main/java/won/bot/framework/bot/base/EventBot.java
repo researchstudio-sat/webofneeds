@@ -16,6 +16,7 @@
 
 package won.bot.framework.bot.base;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.BotContext;
@@ -31,11 +32,13 @@ import won.bot.framework.events.listener.BaseEventListener;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.protocol.message.WonMessage;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.model.Match;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
 import java.net.URI;
@@ -92,50 +95,50 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final Model content) throws Exception
+  public void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final WonMessage wonMessage) throws Exception
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new MessageFromOtherNeedEvent(con, message, content));
+      eventBus.publish(new MessageFromOtherNeedEvent(con, message, wonMessage));
     } else {
       logger.info("not publishing event for call to onMessageFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public void onHintFromMatcher(final Match match, final Model content) throws Exception
+  public void onHintFromMatcher(final Match match, final WonMessage wonMessage) throws Exception
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new HintFromMatcherEvent(match, content));
+      eventBus.publish(new HintFromMatcherEvent(match, wonMessage));
     } else {
       logger.info("not publishing event for call to onHintFromMatcher() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public void onCloseFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage) throws Exception
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new CloseFromOtherNeedEvent(con, content));
+      eventBus.publish(new CloseFromOtherNeedEvent(con, wonMessage));
     } else {
       logger.info("not publishing event for call to onClose() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public void onOpenFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage) throws Exception
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new OpenFromOtherNeedEvent(con, content));
+      eventBus.publish(new OpenFromOtherNeedEvent(con, wonMessage));
     } else {
       logger.info("not publishing event for call to onOpenFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
   @Override
-  public void onConnectFromOtherNeed(final Connection con, final Model content) throws Exception
+  public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage) throws Exception
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new ConnectFromOtherNeedEvent(con, content));
+      eventBus.publish(new ConnectFromOtherNeedEvent(con, wonMessage));
     } else {
       logger.info("not publishing event for call to onConnectFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
@@ -151,7 +154,7 @@ public class EventBot extends TriggeredBot
     }
   }
   @Override
-  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri, final Model needModel)
+  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri, final Dataset needModel)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new NeedCreatedEventForMatcher(needUri, needModel));
@@ -254,6 +257,10 @@ public class EventBot extends TriggeredBot
       return EventBot.this.getNodeURISource();
     }
 
+    public URI getSolrServerURI(){
+      return EventBot.this.getSolrServerURI();
+    }
+
     @Override
     public MatcherNodeURISource getMatcherNodeURISource() {
       return EventBot.this.getMatcheNodeURISource();
@@ -310,6 +317,11 @@ public class EventBot extends TriggeredBot
     public LinkedDataSource getLinkedDataSource()
     {
       return EventBot.this.getLinkedDataSource();
+    }
+
+    @Override
+    public WonNodeInformationService getWonNodeInformationService() {
+      return EventBot.this.getWonNodeInformationService();
     }
   }
 

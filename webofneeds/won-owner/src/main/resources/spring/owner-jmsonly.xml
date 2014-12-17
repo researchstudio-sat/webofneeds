@@ -20,4 +20,7 @@
     <import resource="classpath:/spring/component/camel/owner-camel.xml" />
     <import resource="classpath:/spring/component/ownerProtocolNeedServiceClient/ownerProtocolNeedServiceClient-jmsonly.xml" />
 
+    <import resource="classpath:/spring/component/cryptographyServices.xml" />
+    <import resource="classpath:/spring/component/wonNodeInformationService.xml" />
+
 </beans>

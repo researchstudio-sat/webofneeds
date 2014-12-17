@@ -77,12 +77,12 @@ CategorizedNeeds = function() {
 	}
 }
 
-angular.module('won.owner').factory('needService', function ($http, $q, connectionService) {
+angular.module('won.owner').factory('needService', function ($http, $q, applicationStateService, $log) {
 
 	var needService = {};
 
 	needService.getNeedById = function (needId) {
-		return $http.get('/owner/rest/need/' + needId);
+		return $http.get('/owner/rest/needs/' + needId);
 	};
 
 	needService.getIdFromUri = function(needUri) {
@@ -134,7 +134,7 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 				angular.forEach(responses, function (response) {
 					if(response.status == 200) {
 						var need = new NeeLD(response.config.url, response.data);
-						needs[need.needURI] = need;
+						needs[need.uri] = need;
 					}
 				});
 				return needs;
@@ -168,8 +168,8 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 			}
 		}).then(
 			findNeedsToConnections,
-			function() {
-				console.log("FATAL ERROR")
+			function error() {
+                $log.error('Error accessing connections of need ' + dataNeedUri);
 			}
 		);
 	};
@@ -185,8 +185,10 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 		});
 	}
 
+
+    // TODO overlaps with user-service
 	needService.getAllNeeds = function() {
-		return $http.get('/owner/rest/need/').then(
+		return $http.get('/owner/rest/needs/').then(
 			function(response) {
 				return response.data;
 			},
@@ -196,30 +198,28 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 		);
 	}
 
-    needService.saveDraft = function(need, currentStep,userName){
-        var needToSave = angular.copy(need);
-        needToSave.currentStep = currentStep+'';
-        needToSave.userName = userName;
-        needToSave.tags = need.tags.join(",");
-        delete needToSave.binaryFolder;
+
+    needService.saveDraft = function(draft){
+        var draftToSave = angular.copy(draft);
         return $http({
             method:'POST',
-            url:'/owner/rest/need/create/saveDraft',
-            data:needToSave,
-            success:function(content){
-                console.log(content);
-            }
+            url:'/owner/rest/needs/drafts',
+            data:JSON.stringify(draftToSave)
         }).then(
-            function () {
-                // success
+            function success(draft) {
+                $log.debug("Successfully saved draft " + draftToSave.draftURI);
+                applicationStateService.addDraft(draft.data);
                 return {status:"OK"};
             },
-            function (response) {
-                console.log("FATAL ERROR");
+            function error(response) {
+                $log.error("Error saving draft " + draftToSave.draftURI);
+                return {status:"ERROR"};
             }
         );
     }
 
+    /*
+    //this is not used any more
 	needService.save = function(need) {
 		var needToSave = angular.copy(need);
 		needToSave.tags = need.tags.join(",");
@@ -236,21 +236,21 @@ angular.module('won.owner').factory('needService', function ($http, $q, connecti
 		delete needToSave.binaryFolder;
 		return $http({
 			method:'POST',
-			url:'/owner/rest/need/create',
-			data:needToSave,
-			success:function (content) {
-				console.log(content);
-			}
+			url:'/owner/rest/needs/',
+			data:needToSave
 		}).then(
 				function () {
 					// success
+                    $log.debug("Successfully saved need");
 					return {status:"OK"};
 				},
 				function (response) {
-					console.log("FATAL ERROR");
+                    $log.error("Error saving need");
+                    return {status:"ERROR"};
 				}
 		);
 	};
+	*/
 
 	return needService;
 });

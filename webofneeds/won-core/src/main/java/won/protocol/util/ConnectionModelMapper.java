@@ -4,6 +4,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.vocabulary.RDF;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WON;
@@ -25,7 +26,7 @@ public class ConnectionModelMapper implements ModelMapper<Connection>
     Resource connectionMember = model.createResource(connection.getConnectionURI().toString())
         .addProperty(WON.HAS_CONNECTION_STATE, WON.toResource(connection.getState()))
         .addProperty(WON.BELONGS_TO_NEED, model.createResource(connection.getNeedURI().toString()));
-
+    connectionMember.addProperty(RDF.type, WON.CONNECTION);
     if (connection.getRemoteConnectionURI() != null) {
       Resource remoteConnection = model.createResource(connection.getRemoteConnectionURI().toString());
       connectionMember.addProperty(WON.HAS_REMOTE_CONNECTION, remoteConnection);

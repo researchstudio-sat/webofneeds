@@ -20,6 +20,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessage;
 import won.protocol.service.ConnectionCommunicationService;
 
 import java.net.URI;
@@ -38,7 +39,8 @@ public interface OwnerProtocolOwnerServiceClientSide extends ConnectionCommunica
    *@param score
    * @param originatorUri  @throws won.protocol.exception.NoSuchNeedException if ownNeedURI is not a known need URI
    */
-  public void hint(URI ownNeedUri, URI otherNeedUri, double score, URI originatorUri, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException;
+  public void hint(URI ownNeedUri, URI otherNeedUri, double score, URI originatorUri, Model content, WonMessage wonMessage)
+          throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
   /**
    * Informs the owner of a connection initiated by the need identified by otherNeedURI to the
@@ -58,7 +60,8 @@ public interface OwnerProtocolOwnerServiceClientSide extends ConnectionCommunica
    * @throws won.protocol.exception.ConnectionAlreadyExistsException
    *                             if the two needs are already connected
    */
-  public void connect(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI, Model content) throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
+  public void connect(URI ownNeedURI, URI otherNeedURI, URI ownConnectionURI, Model content, WonMessage wonMessage)
+          throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException;
 
   //TODO move to another interface maybe?
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns:util="http://www.springframework.org/schema/util"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-         version="2.4">
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
 
     <display-name>WON Owner Webapp</display-name>
 
@@ -18,14 +18,16 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>WEB-INF/spring-ws-servlet.xml
             classpath:/spring/owner-jmsonly.xml
-	        classpath:owner-security.xml
+	        classpath:/spring/owner-security.xml
+            classpath:/spring/owner-context.xml
         </param-value>
     </context-param>
 
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-	</filter>
+        <async-supported>true</async-supported>
+    </filter>
 
 	<filter-mapping>
 		<filter-name>springSecurityFilterChain</filter-name>
@@ -55,6 +57,7 @@
 		<servlet-name>dispatcher</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
+        <async-supported>true</async-supported>
 	</servlet>
 
 	<servlet-mapping>
@@ -68,5 +71,10 @@
         <welcome-file>index.jsp</welcome-file>
 	    <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+
+    <!-- for testing closing websocket connection purposes -->
+    <!--session-config>
+        <session-timeout>1</session-timeout>
+    </session-config-->
 
 </web-app>

@@ -4,8 +4,11 @@
 
 package won.owner.repository;
 
+import org.springframework.data.jpa.repository.Query;
 import won.owner.model.User;
 import won.protocol.repository.WonRepository;
+
+import java.net.URI;
 
 /**
  * User: t.kozel
@@ -15,5 +18,8 @@ public interface UserRepository extends WonRepository<User> {
 
 	public User findByUsername(String username);
 
-	public User findByUsernameAndPassword(String username, String password);
+  //for the syntax, this helps: http://en.wikibooks.org/wiki/Java_Persistence/Querying#JPQL
+  @Query(value = "SELECT u from User u JOIN u.userNeeds n where n.uri = ?1")
+  public User findByNeedUri(URI needUri);
+
 }

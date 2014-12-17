@@ -6,11 +6,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -33,7 +37,8 @@ public class GroupFacetImpl extends AbstractFacet
   }
 
   @Override
-  public void textMessageFromNeed(final Connection con, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void sendMessageFromNeed(final Connection con, final Model message, final WonMessage wonMessage)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     final List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
       ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
       //inform the other side
@@ -43,7 +48,13 @@ public class GroupFacetImpl extends AbstractFacet
           for (final Connection c : cons) {
             try {
               if(! c.equals(con)) {
-                needFacingConnectionClient.textMessage(c, message);
+                URI forwardedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
+                URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(con.getRemoteConnectionURI(),
+                  linkedDataSource);
+                WonMessage newWonMessage = WonMessageBuilder.forwardReceivedWonMessage(forwardedMessageURI, wonMessage,
+                  con.getConnectionURI(), con.getNeedURI(), wonMessage.getReceiverNodeURI(),
+                  con.getRemoteConnectionURI(), con.getRemoteNeedURI(), remoteWonNodeUri);
+                needFacingConnectionClient.sendMessage(c, message, newWonMessage);
               }
           } catch (Exception e) {
             logger.warn("caught Exception:", e);

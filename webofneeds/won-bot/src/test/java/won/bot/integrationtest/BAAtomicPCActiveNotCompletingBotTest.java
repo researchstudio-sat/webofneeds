@@ -1,7 +1,6 @@
 package won.bot.integrationtest;
 
 import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import org.junit.AfterClass;
@@ -17,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import won.bot.PropertyPathConfigurator;
 import won.bot.framework.events.event.impl.WorkDoneEvent;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
@@ -231,8 +231,10 @@ public class BAAtomicPCActiveNotCompletingBotTest
 
       List<URI> crawled = new ArrayList<>();
 
-      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,4);
-
+      Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0),
+        PropertyPathConfigurator
+          .configurePropertyPaths
+            (), 300, 4, true);
       logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
 
       String queryString = sparqlPrefix +
@@ -282,7 +284,10 @@ public class BAAtomicPCActiveNotCompletingBotTest
 
       List<URI> crawled = new ArrayList<>();
 
-      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,4);
+      Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0),
+        PropertyPathConfigurator
+          .configurePropertyPaths
+            (), 300, 4, true);
 
       logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
 

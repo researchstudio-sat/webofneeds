@@ -4,10 +4,13 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.Exchange;
 import org.apache.camel.Header;
 import org.apache.camel.ProducerTemplate;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDecoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
@@ -57,38 +60,65 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
         return ownerApplicationId;
     }
 
+    // ToDo (FS): remove "wonMessage == null" checks after complete restructuring
     public URI createNeed(
-            @Header("ownerURI") String ownerURI,
             @Header("model") String content,
             @Header("activate") boolean activate,
             @Header("ownerApplicationID") String ownerApplicationID,
+            @Header("wonMessage") String wonMessageString,
             Exchange exchange) throws IllegalNeedContentException, JMSException {
 
         URI needURI = null;
-        URI ownerURIconvert = URI.create(ownerURI);
         Model contentconvert = RdfUtils.toModel(content);
-
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
         logger.debug("createNeed: message received: {} with ownerApp ID {}", content,ownerApplicationID);
-        needURI = delegate.createNeed(ownerURIconvert, contentconvert, activate,ownerApplicationID );
+        String debugString;
+
+        if (wonMessage == null)
+          debugString = content;
+        else
+          debugString = RdfUtils.toString(wonMessage.getMessageContent());
+        logger.debug("createNeed: message event received: {} with ownerApp ID {}",
+                     debugString,
+                     ownerApplicationID);
+
+        needURI = delegate.createNeed(
+          contentconvert,
+          activate,
+          ownerApplicationID,
+          wonMessage);
+       // if (wonMessage != null)
+       // needURI = wonMessage.getMessageURI();
         exchange.getOut().setBody(needURI);
 
-       return needURI;
+     // if (wonMessage == null)
+        return needURI;
+    //  else
+    //    return wonMessage.getMessageURI();
     }
 
     public void activate(
-            @Header("needURI") String needURI) throws NoSuchNeedException {
+            @Header("needURI") String needURI,
+            @Header("wonMessage") String wonMessageString)
+            throws NoSuchNeedException {
         logger.debug("activateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
-        delegate.activate(needURIconvert);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
+
+        delegate.activate(needURIconvert, wonMessage);
     }
 
     public void deactivate(
-            @Header("needURI") String needURI) throws NoSuchNeedException, NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            @Header("needURI") String needURI,
+            @Header("wonMessage") String wonMessageString)
+            throws NoSuchNeedException, NoSuchConnectionException, IllegalMessageForConnectionStateException {
         logger.debug("deactivateNeed: message received: {}", needURI);
 
         URI needURIconvert = URI.create(needURI);
-        delegate.deactivate(needURIconvert);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
+
+        delegate.deactivate(needURIconvert, wonMessage);
     }
 
     //@Override
@@ -148,40 +178,58 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
 
     public void open(
             @Header("connectionURI")String connectionURI,
-            @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            @Header("content")String content,
+            @Header("wonMessage") String wonMessageString)
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
+
         URI connectionURIConvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(content);
-        delegate.open(connectionURIConvert, contentConvert);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
+
+        delegate.open(connectionURIConvert, contentConvert, wonMessage);
     }
 
     public void close(
             @Header("connectionURI")String connectionURI,
-            @Header("content")String content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            @Header("content")String content,
+            @Header("wonMessage") String wonMessageString)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
         URI connectionURIConvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(content);
-        delegate.close(connectionURIConvert, contentConvert);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
+
+        delegate.close(connectionURIConvert, contentConvert, wonMessage);
     }
 
-    public void textMessage(
-            @Header("connectionURI") String connectionURI,
-            @Header("message")String message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void sendMessage(
+      @Header("connectionURI") String connectionURI,
+      @Header("message") String message,
+      @Header("wonMessage") String wonMessageString)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
         URI connectionURIconvert = URI.create(connectionURI);
         Model contentConvert = RdfUtils.toModel(message);
-        delegate.textMessage(connectionURIconvert, contentConvert);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
+
+        delegate.sendMessage(connectionURIconvert, contentConvert, wonMessage);
     }
 
     public URI connect(
             @Header("needURI") String needURI,
             @Header("otherNeedURI") String otherNeedURI,
-            @Header("content") String content, Exchange exchange) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+            @Header("content") String content, Exchange exchange,
+            @Header("wonMessage") String wonMessageString)
+            throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
         logger.debug("connectNeed: message received: {}", content);
 
         URI result = null;
         URI needURIConvert = URI.create(needURI);
         URI otherNeedURIConvert = URI.create(otherNeedURI);
         Model contentConvert = RdfUtils.toModel(content);
-        result = delegate.connect(needURIConvert,otherNeedURIConvert,contentConvert);
+        WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,wonMessageString);
+
+        result = delegate.connect(needURIConvert,otherNeedURIConvert,contentConvert, wonMessage);
        // result = needCommunicationService.connect(needURIConvert, otherNeedURIConvert, contentConvert);
 
         return result;

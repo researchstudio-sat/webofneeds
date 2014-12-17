@@ -32,11 +32,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import won.bot.PropertyPathConfigurator;
 import won.bot.framework.events.event.impl.WorkDoneEvent;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.CommentBot;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
@@ -123,14 +125,9 @@ public class CommentBotTest
     logger.info("finishing test case testCommentBot");
   }
 
-  @Test
-  public void testCommentRDF(){
-    logger.info("starting test case testCommentRDF");
-    bot.executeCommentRDFValidationAssert();
-    //Model commentModel = bot.executeCommentRDFValidationAsserts();
-    //Model needModel = bot.executeNeedRDFValidationAsserts();
-    //bot.executeNeedCommentConnectionRDFValidationAsserts(needModel,commentModel);
-  }
+
+
+
 
   /**
    * We create a subclass of the bot we want to test here so that we can
@@ -186,7 +183,6 @@ public class CommentBotTest
     public void executeAsserts()
     {
       //1 act events
-      Assert.assertEquals(1, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
       //1 create need events
       Assert.assertEquals(1, this.commentFacetCreator.getEventCount());
@@ -198,10 +194,6 @@ public class CommentBotTest
       Assert.assertEquals(2, this.autoOpener.getEventCount());
       Assert.assertEquals(0, this.autoOpener.getExceptionCount());
       //10 messages
-      Assert.assertEquals(2, this.connectionCloser.getEventCount());
-      Assert.assertEquals(0, this.connectionCloser.getExceptionCount());
-      //2 close (one sent, one received - but for sending we create no event)
-
       Assert.assertEquals(1,this.allNeedsDeactivator.getEventCount());
       Assert.assertEquals(0, this.allNeedsDeactivator.getExceptionCount());
 
@@ -215,6 +207,15 @@ public class CommentBotTest
       // --> pull it from the needURI/ConnectionURI and check contents
       //* what does the database look like?      */
     }
+
+    @Override
+    protected void executeAssertionsForEstablishedConnection() {
+      logger.info("starting test case testCommentRDF");
+      bot.executeCommentRDFValidationAssert();
+    }
+
+
+
     public void  executeCommentRDFValidationAssert(){
 
       List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(NAME_COMMENTS);
@@ -232,18 +233,30 @@ public class CommentBotTest
 
       List<URI> crawled = new ArrayList<>();
 
-      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,30,8);
+      ((CachingLinkedDataSource) linkedDataSource).clear();
 
-      logger.debug("crawled dataset: {}",RdfUtils.toString(dataModel));
+      Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0), PropertyPathConfigurator
+          .configurePropertyPaths(), 30,
+        8, true);
+
+      logger.debug("crawled dataset with property path: {}",RdfUtils.toString(dataModel));
 
       String queryString = sparqlPrefix +
         "SELECT ?need ?connection ?need2 WHERE {" +
-        "?need won:hasConnections ?connections."+
-        "?connections rdfs:member ?connection."+
+        //"GRAPH ?g1 {" +
+        "   ?need won:hasConnections ?connections ." +
+        //"} ." +
+        //"GRAPH ?g2 {" +
+        "   ?need sioc:hasReply ?need2 ." +
+        //"} ." +
+        //"GRAPH ?g3 {" +
+        "?connections rdfs:member ?connection ." +
+        //"} ."+
+        //"Graph ?g4 {" +
         "?connection won:hasFacet won:CommentFacet."+
         "?connection won:hasRemoteConnection ?connection2."+
-        "?connection2 won:belongsToNeed ?need2."+
-        "?need sioc:hasReply ?need2."+
+        "?connection2 won:belongsToNeed ?need2 ." +
+        //"} ."+
         "}";
 
       Query query = QueryFactory.create(queryString);
@@ -256,15 +269,15 @@ public class CommentBotTest
         actualList.add(soln.toString());
         RDFNode node = soln.get("?connection");
       }
-      assertTrue("wrong number of results", actualList.size() >= 1);
+      assertEquals("wrong number of results", 1, actualList.size());
       qExec.close();
 
     }
 
-    public Model executeNeedRDFValidationAsserts(){
+    public Dataset executeNeedRDFValidationAsserts(){
 
       List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(NAME_NEEDS);
-      Model needModel = getEventListenerContext().getLinkedDataSource().getModelForResource(needs.get(0));
+      Dataset needModel = getEventListenerContext().getLinkedDataSource().getDataForResource(needs.get(0));
       System.out.println("executing queries...");
       String queryString = sparqlPrefix +
         "SELECT ?need WHERE {" +
@@ -285,9 +298,9 @@ public class CommentBotTest
       //assertThat(actualList, hasItems(expected1));
       return needModel;
     }
-    public Model executeCommentRDFValidationAsserts(){
+    public Dataset executeCommentRDFValidationAsserts(){
       List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(NAME_COMMENTS);
-      Model commentModel = getEventListenerContext().getLinkedDataSource().getModelForResource(needs.get(0));
+      Dataset commentModel = getEventListenerContext().getLinkedDataSource().getDataForResource(needs.get(0));
       System.out.println("executing queries...");
       String queryString = sparqlPrefix +
         "SELECT ?need WHERE {" +
@@ -344,7 +357,8 @@ public class CommentBotTest
       qExec.close();
       assertTrue("wrong number of results", actualList.size() >= 1);
 
-      Model needConnections = getEventListenerContext().getLinkedDataSource().getModelForResource(needConnectionCollectionURI);
+      Dataset needConnections = getEventListenerContext().getLinkedDataSource().getDataForResource(
+        needConnectionCollectionURI);
       String queryString2 = sparqlPrefix+
         "SELECT ?connection WHERE {" +
         "?connections rdfs:member ?connection"+
@@ -367,7 +381,7 @@ public class CommentBotTest
       qExec2.close();
       assertTrue("wrong number of results", actualList2.size() >= 1);
 
-      Model needConnection = getEventListenerContext().getLinkedDataSource().getModelForResource(needConnectionURI);
+      Dataset needConnection = getEventListenerContext().getLinkedDataSource().getDataForResource(needConnectionURI);
       String queryString3 = sparqlPrefix +
         "SELECT ?remoteConnection WHERE {" +
         "?connection won:hasRemoteConnection ?remoteConnection"+
@@ -387,7 +401,8 @@ public class CommentBotTest
       }
       assertTrue("wrong number of results", actualList3.size() >= 1);
 
-      Model remoteConnections = getEventListenerContext().getLinkedDataSource().getModelForResource(commentConnectionsURI);
+      Dataset remoteConnections = getEventListenerContext().getLinkedDataSource().getDataForResource(
+        commentConnectionsURI);
       String queryString4 = sparqlPrefix +
         "SELECT ?remoteConnection WHERE {" +
         "?connection won:hasRemoteConnection ?remoteConnection"+

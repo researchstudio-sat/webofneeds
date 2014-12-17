@@ -16,15 +16,16 @@
 
 package won.node.service;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.node.service.impl.URIService;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 
 import java.net.URI;
 import java.util.Collection;
@@ -45,6 +46,7 @@ public interface DataAccessService
    * @return
    */
   URI getFacet(Model content);
+  URI getFacet(Dataset content);
 
   /**
    * Adds a triple to the model of the form <> won:hasFacet [facetURI].
@@ -57,7 +59,7 @@ public interface DataAccessService
       throws ConnectionAlreadyExistsException;
 
   public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
-    final Model content, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
+    final URI facet, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
     throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
   ConnectionEvent createConnectionEvent(URI connectionURI, URI originator,

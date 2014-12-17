@@ -18,6 +18,7 @@ package won.owner.messaging;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -26,9 +27,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import won.protocol.exception.*;
+import won.protocol.exception.CamelConfigurationFailedException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MessagingService;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.WonNode;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.WonNodeRepository;
@@ -47,7 +51,11 @@ import java.util.concurrent.Future;
  * Date: 17.10.13
  */
 
-public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContextAware,ApplicationListener<ContextRefreshedEvent>,OwnerProtocolNeedServiceClientSide {
+public class OwnerProtocolNeedServiceClientJMSBased
+        implements ApplicationContextAware,
+        ApplicationListener<ContextRefreshedEvent>,
+        OwnerProtocolNeedServiceClientSide {
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private boolean onApplicationRun = false;
     //private CamelContext camelContext;
@@ -104,7 +112,8 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content) throws Exception {
+    public ListenableFuture<URI> connect(URI needURI, URI otherNeedURI, Model content, WonMessage wonMessage)
+            throws Exception {
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithNeedUri(needURI);
         logger.debug("OwnerProtocol: sending connect for need {} and other need {} call to node", needURI, otherNeedURI);
@@ -116,12 +125,13 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","connect");
         headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         return messagingService.sendInOutMessageGeneric(null,headerMap,null,startingEndpoint);
     }
 
     @Override
-    public void deactivate(URI needURI) throws Exception {
+    public void deactivate(URI needURI, WonMessage wonMessage) throws Exception {
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithNeedUri(needURI);
 
@@ -131,13 +141,14 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("needURI",needURI.toString());
         headerMap.put("methodName","deactivate");
         headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending deactivate message: " + needURI.toString());
     }
 
     @Override
-    public void activate(URI needURI) throws Exception {
+    public void activate(URI needURI, WonMessage wonMessage) throws Exception {
 
         URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithNeedUri(needURI);
         List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
@@ -148,12 +159,14 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("needURI",needURI.toString());
         headerMap.put("methodName","activate");
         headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending activate message: " + needURI.toString());
 
     }
-    /**
+
+  /**
      * registers the owner application at a won node.
      *
      * @return ownerApplicationId
@@ -220,16 +233,17 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
     }
 
     @Override
-    public ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate) throws Exception {
+    public ListenableFuture<URI> createNeed(Model content, boolean activate, WonMessage wonMessage)
+            throws Exception {
 
-        return createNeed(ownerURI, content, activate,defaultNodeURI);
+        return createNeed(content, activate, defaultNodeURI, wonMessage);
     }
 
     @Override
-    public void textMessage(URI connectionURI, Model message) throws Exception {
+    public void sendConnectionMessage(URI connectionURI, Model message, WonMessage wonMessage) throws Exception {
         String messageConvert = RdfUtils.toString(message);
 
-        URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithConnectionUri(connectionURI);
+        URI wonNodeUri = wonMessage.getSenderNodeURI();
 
         CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
         String endpoint = camelConfiguration.getEndpoint();
@@ -237,17 +251,18 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         Map<String, Object> headerMap = new HashMap<>();
         headerMap.put("connectionURI",connectionURI.toString());
         headerMap.put("message",messageConvert);
-        headerMap.put("methodName","textMessage");
+        headerMap.put("methodName","sendMessage");
         headerMap.put("remoteBrokerEndpoint", endpoint);
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending text message: ");
     }
 
     @Override
-    public void close(URI connectionURI, Model content) throws Exception {
+    public void close(URI connectionURI, Model content, WonMessage wonMessage) throws Exception {
 
-        URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithConnectionUri(connectionURI);
+        URI wonNodeUri = wonMessage.getSenderNodeURI();
 
         CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
         String endpoint = camelConfiguration.getEndpoint();
@@ -257,15 +272,16 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","close");
         headerMap.put("remoteBrokerEndpoint", endpoint);
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
 
         messagingService.sendInOnlyMessage(null,headerMap,null,startingEndpoint);
         logger.debug("sending close message: ");
     }
 
     @Override
-    public void open(URI connectionURI, Model content) throws Exception {
+    public void open(URI connectionURI, Model content, WonMessage wonMessage) throws Exception {
 
-        URI wonNodeUri = ownerProtocolCommunicationServiceImpl.getWonNodeUriWithConnectionUri(connectionURI);
+        URI wonNodeUri = wonMessage.getSenderNodeURI();
 
         CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
         String endpoint = camelConfiguration.getEndpoint();
@@ -275,13 +291,38 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("methodName","open");
         headerMap.put("remoteBrokerEndpoint", endpoint);
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+
         messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
         logger.debug("sending open message: ");
 
     }
 
+  public void sendWonMessage(WonMessage wonMessage) throws Exception
+  {
+    // ToDo (FS): change it to won node URI and create method in the MessageEvent class
+    URI wonNodeUri = wonMessage.getSenderURI();
+
+    CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
+    String endpoint = camelConfiguration.getEndpoint();
+
+    Map<String, Object> headerMap = new HashMap<>();
+    // ToDo (FS): make Lang.x configurable
+    headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+    headerMap.put("methodName", "wonMessage");
+    headerMap.put("remoteBrokerEndpoint", endpoint);
+
+    messagingService.sendInOnlyMessage(null, headerMap, null, startingEndpoint);
+    logger.debug("sending WonMessage: ");
+  }
+
     @Override
-    public synchronized ListenableFuture<URI> createNeed(URI ownerURI, Model content, boolean activate, URI wonNodeUri) throws Exception {
+    public synchronized ListenableFuture<URI> createNeed(
+            Model content,
+            boolean activate,
+            URI wonNodeUri,
+            WonMessage wonMessage)
+            throws Exception {
 
         //camelContext.getShutdownStrategy().setSuppressLoggingOnTimeout(true);
         /**
@@ -313,25 +354,31 @@ public class OwnerProtocolNeedServiceClientJMSBased implements ApplicationContex
             //camelContext.getComponent()
             ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
         }
+
         Map<String, Object> headerMap = new HashMap<>();
-        headerMap.put("ownerUri", ownerURI.toString());
         headerMap.put("model", RdfUtils.toString(content));
         headerMap.put("activate",activate);
         headerMap.put("methodName","createNeed");
         headerMap.put("remoteBrokerEndpoint",wonNodeList.get(0).getOwnerProtocolEndpoint());
         headerMap.put("ownerApplicationID",ownerApplicationId);
+        headerMap.put("wonMessage",WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+
         return messagingService.sendInOutMessageGeneric(null, headerMap,null,startingEndpoint);
     }
+
     public void setMessagingService(MessagingService messagingService) {
         this.messagingService = messagingService;
     }
+
     public void setDefaultNodeURI(URI defaultNodeURI) {
         this.defaultNodeURI = defaultNodeURI;
     }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.ownerApplicationContext = applicationContext;
     }
+
     public void setStartingEndpoint(String startingEndpoint) {
         this.startingEndpoint = startingEndpoint;
     }

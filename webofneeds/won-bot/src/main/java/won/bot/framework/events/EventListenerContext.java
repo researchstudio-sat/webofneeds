@@ -25,8 +25,9 @@ import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
-
+import java.net.URI;
 import java.util.concurrent.Executor;
 
 /**
@@ -41,6 +42,7 @@ public interface EventListenerContext
    */
   public TaskScheduler getTaskScheduler();
 
+  public URI getSolrServerURI();
   /**
    * Returns the bot's NodeURISource. Used to obtain WON_BA node URIs.
    * @return
@@ -103,5 +105,11 @@ public interface EventListenerContext
    * @return
    */
   public LinkedDataSource getLinkedDataSource();
+
+  /**
+   * Returns a WonNodeInformationService.
+   * @return
+   */
+  public WonNodeInformationService getWonNodeInformationService();
 
 }

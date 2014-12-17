@@ -32,6 +32,7 @@ import java.util.Stack;
  * Time: 14:07
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class OwnerProtocolNeedReadServiceImpl implements OwnerProtocolNeedReadService {
    // private OwnerProtocolNeedServiceClientSide ownerService;
     private static final String NEED_URI_PATH_PREFIX = "/data/need";
@@ -127,7 +128,7 @@ public class OwnerProtocolNeedReadServiceImpl implements OwnerProtocolNeedReadSe
     @Override
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException {
         logger.debug("need-facing: READ_CONNECTION_CONTENT called for connection {}", connectionURI);
-        return linkedDataSource.getModelForResource(connectionURI);
+        return linkedDataSource.getDataForResource(connectionURI).getDefaultModel();
     }
     private Collection<URI> getHardcodedCollectionResource(URI needURI, String res) throws NoSuchNeedException {
         Model mUris = getHardcodedNeedResource(needURI, res);
@@ -153,14 +154,15 @@ public class OwnerProtocolNeedReadServiceImpl implements OwnerProtocolNeedReadSe
 
     private Model getHardcodedNeedResource(URI needURI, String res) throws NoSuchNeedException {
         if (res.equals(""))
-            return linkedDataSource.getModelForResource(needURI);
+            return linkedDataSource.getDataForResource(needURI).getDefaultModel();
         else
-            return linkedDataSource.getModelForResource(URI.create(needURI.toString() + res));
+            return linkedDataSource.getDataForResource(URI.create(needURI.toString() + res)).getDefaultModel();
     }
 
     private Model getHardcodedResource(String res) {
-        return linkedDataSource.getModelForResource(
-            URI.create(this.uriService.getDefaultOwnerProtocolNeedServiceEndpointURI().toString() + res));
+        return linkedDataSource.getDataForResource(
+          URI.create(this.uriService.getDefaultOwnerProtocolNeedServiceEndpointURI().toString() + res))
+                               .getDefaultModel();
     }
 
   public void setLinkedDataSource(final LinkedDataSource linkedDataSource)

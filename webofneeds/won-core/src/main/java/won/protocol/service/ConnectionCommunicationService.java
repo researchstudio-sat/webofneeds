@@ -17,7 +17,10 @@
 package won.protocol.service;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.exception.*;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
+import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.message.WonMessage;
 
 import java.net.URI;
 
@@ -37,7 +40,8 @@ public interface ConnectionCommunicationService
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void open(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void open(URI connectionURI, Model content, WonMessage wonMessage)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException;
 
   /**
    * Closes the connection identified by the specified URI.
@@ -48,7 +52,8 @@ public interface ConnectionCommunicationService
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void close(URI connectionURI, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void close(URI connectionURI, Model content, WonMessage wonMessage)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
   /**
    * Sends a chat message via the local connection identified by the specified connectionURI
@@ -58,11 +63,13 @@ public interface ConnectionCommunicationService
    * the feedback is processed.
    *
    *
+   *
    * @param connectionURI the local connection
    * @param message       the chat message
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
-  public void textMessage(URI connectionURI, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  public void sendMessage(URI connectionURI, Model message, WonMessage wonMessage)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
 }

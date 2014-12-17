@@ -25,18 +25,26 @@
        context that combines components to provide an environment for running bots
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/bot.properties" ignore-unresolvable="true"/>
-    <import resource="classpath:/spring/component/monitoring/bot-monitoring-jmx.xml" />  <!-- this has to be before bot-monitoring.xml -->
+
+
     <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml" />
     <import resource="classpath:/spring/component/scheduling/scheduling.xml" />
     <import
     resource="classpath:/spring/component/ownerProtocolOwnerServiceHandler/ownerProtocolOwnerServiceHandler.xml" />
     <import resource="classpath:/spring/component/matcherProtocolMatcherServiceHandler/matcherProtocolMatcherServiceHandler.xml"/>
     <import resource="classpath:/spring/component/botManager/botManager.xml" />
-    <import resource="classpath:/spring/component/needproducer/needproducer-mails.xml" />
+    <!--<import resource="classpath:/spring/component/needproducer/needproducer-mails.xml" />-->
+    <!--<import resource="classpath:/spring/component/needproducer/needproducer-trig.xml" />-->
+    <import resource="classpath:/spring/component/needproducer/needproducer-mixed.xml" />
     <import resource="classpath:/spring/component/nodeurisource/nodeurisource-roundrobin.xml" />
     <import resource="classpath:/spring/owner-jmsonly.xml" />
+    <!-- monitoring -->
+    <!--
+    <import resource="classpath:/spring/component/monitoring/bot-monitoring-jmx.xml" />
     <import resource="classpath:/spring/component/monitoring/bot-monitoring.xml" />
+    -->
     <import resource="classpath:/spring/component/monitoring/monitoring-recorder.xml" />
     <import resource="classpath:/spring/matcher-jmsonly.xml"/>
+    <import resource="classpath:/spring/component/wonNodeInformationService.xml"/>
 
 </beans>

@@ -203,51 +203,5 @@ public class GroupingBotTest
       // --> pull it from the needURI/ConnectionURI and check contents
       //* what does the database look like?      */
     }
-       /*
-    public void executeGroupRDFValidationAssert(){
-
-      List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(NAME_GROUPS);
-
-      LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
-
-      List<URI> properties = new ArrayList<>();
-      List<URI> objects = new ArrayList<>();
-
-      properties.add(URI.create(WON.HAS_CONNECTIONS.getURI()));
-      //properties.add(RDF.type);
-      properties.add(URI.create(WON.HAS_REMOTE_CONNECTION.toString()));
-      properties.add(URI.create(WON.HAS_REMOTE_NEED.toString()));
-      properties.add(URI.create(RDFS.member.toString()));
-
-      List<URI> crawled = new ArrayList<>();
-
-      Model dataModel = linkedDataSource.getModelForResource(needs.get(0),properties,objects,300,20);
-
-      logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
-
-      String queryString = sparqlPrefix +
-        "SELECT ?need ?connection ?need2 WHERE {" +
-        "?need won:hasConnections ?connections."+
-        "?connections rdfs:member ?connection."+
-        "?connection won:hasFacet won:CommentFacet."+
-        "?connection won:hasRemoteConnection ?connection2."+
-        "?connection2 won:belongsToNeed ?need2."+
-        "?need sioc:hasReply ?need2."+
-        "}";
-
-      Query query = QueryFactory.create(queryString);
-      QueryExecution qExec = QueryExecutionFactory.create(query, dataModel);
-      ResultSet results = qExec.execSelect();
-
-      List<String> actualList = new ArrayList<>();
-      for (; results.hasNext(); ) {
-        QuerySolution soln = results.nextSolution();
-        actualList.add(soln.toString());
-        RDFNode node = soln.get("?connection");
-      }
-      assertTrue("wrong number of results", actualList.size() >= 1);
-      qExec.close();
-
-    }     */
   }
 }

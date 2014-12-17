@@ -1,13 +1,13 @@
 package won.node.facet.impl;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.util.RdfUtils;
@@ -30,38 +30,61 @@ public class CommentFacet extends AbstractFacet
     return FacetType.CommentFacet;
   }
 
+
+
   @Override
-  public void connectFromNeed(final Connection con, final Model content) throws NoSuchNeedException,
-    IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-
-
-    super.connectFromNeed(con, content);
-    addLinkedDataStatements(con, content);
-    // Model content = rdfStorageService.loadContent(con.getNeedURI());
-
-
+  public void closeFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    super.closeFromNeed(con, content, wonMessage);
+    removeDataManagedByFacet(con);
   }
+
   @Override
-  public void connectFromOwner(final Connection con, final Model content) throws NoSuchNeedException,
-    IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    super.connectFromOwner(con, content);
-    addLinkedDataStatements(con, content);
+  public void closeFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    super.closeFromOwner(con, content, wonMessage);
+    removeDataManagedByFacet(con);
   }
-  private void addLinkedDataStatements(final Connection con, final Model content){
+
+  @Override
+  public void openFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    super.openFromOwner(con, content, wonMessage);
+    addDataManagedByFacet(con);
+  }
+
+  @Override
+  public void openFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    super.openFromNeed(con, content, wonMessage);
+    addDataManagedByFacet(con);
+  }
+
+  private void addDataManagedByFacet(final Connection con){
+    Dataset needContent = rdfStorageService.loadDataset(con.getNeedURI());
+    Model facetManagedGraph = getFacetManagedGraph(con.getNeedURI(), needContent);
+
     List<URI> properties = new ArrayList<>();
 
     PrefixMapping prefixMapping = PrefixMapping.Factory.create();
 //    prefixMapping.setNsPrefix(SIOC.getURI(),"sioc");
-    content.withDefaultMappings(prefixMapping);
-    content.setNsPrefix("sioc", SIOC.getURI());
-    Resource post = content.createResource(con.getNeedURI().toString(), SIOC.POST);
-    Resource reply = content.createResource(con.getRemoteNeedURI().toString(),SIOC.POST);
-    content.add(content.createStatement(content.getResource(con.getNeedURI().toString()), SIOC.HAS_REPLY,
-                                        content.getResource(con.getRemoteNeedURI().toString())));
+    facetManagedGraph.withDefaultMappings(prefixMapping);
+    facetManagedGraph.setNsPrefix("sioc", SIOC.getURI());
+    Resource post = facetManagedGraph.createResource(con.getNeedURI().toString(), SIOC.POST);
+    Resource reply = facetManagedGraph.createResource(con.getRemoteNeedURI().toString(),SIOC.POST);
+    facetManagedGraph.add(facetManagedGraph
+      .createStatement(facetManagedGraph.getResource(con.getNeedURI().toString()), SIOC.HAS_REPLY,
+        facetManagedGraph.getResource(con.getRemoteNeedURI().toString())));
 
     // add WON node link
-    logger.debug("linked data:"+ RdfUtils.toString(content));
-    rdfStorageService.storeContent(con.getNeedURI(),content);
+    logger.debug("linked data:"+ RdfUtils.toString(facetManagedGraph));
+    rdfStorageService.storeDataset(con.getNeedURI(), needContent);
+  }
+
+  private void removeDataManagedByFacet(final Connection con){
+    Dataset needContent = rdfStorageService.loadDataset(con.getNeedURI());
+    removeFacetManagedGraph(con.getNeedURI(), needContent);
+    rdfStorageService.storeDataset(con.getNeedURI(), needContent);
   }
 
 }

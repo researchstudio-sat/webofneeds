@@ -57,7 +57,7 @@ public class OwnerEmulatingNeedConsumer implements NeedConsumer
       logger.debug("creating need on won node {} with content {} ", nodeURI, StringUtils.abbreviate(RdfUtils.toString(need),50));
     }
     try {
-      Future<URI> needURI = ownerService.createNeed(URI.create("not:needed.any/more"), need, true, nodeURI);
+      Future<URI> needURI = ownerService.createNeed(need, true, nodeURI, null);
     } catch (Exception e) {
       logger.info("could not create need", e);
     }

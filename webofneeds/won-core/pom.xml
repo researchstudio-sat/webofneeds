@@ -15,17 +15,15 @@
   ~ limitations under the License.
   -->
 
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>webofneeds</groupId>
         <artifactId>webofneeds</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
     <artifactId>won-core</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>Core</name>
 
     <dependencies>
@@ -109,7 +107,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-commons-core</artifactId>
+            <artifactId>spring-data-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -160,7 +158,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.jsonld-java</groupId>
-            <artifactId>jsonld-java-jena</artifactId>
+            <artifactId>jsonld-java</artifactId>
         </dependency>
         <dependency>
             <groupId>xml-apis</groupId>
@@ -223,5 +221,13 @@
             <groupId>net.sf.supercsv</groupId>
             <artifactId>super-csv</artifactId>
         </dependency>
+
+        <!-- jena uses this to read/write Json-Ld -->
+        <dependency>
+            <groupId>com.github.jsonld-java</groupId>
+            <artifactId>jsonld-java</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+        
     </dependencies>
 </project>

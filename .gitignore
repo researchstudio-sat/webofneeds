@@ -25,6 +25,9 @@ mvn.properties
 .checkstyle
 maven-ant-tasks-*.jar
 
+#protege
+**/catalog-v001.xml
+
 # General
 logs
 output

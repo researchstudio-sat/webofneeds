@@ -29,7 +29,8 @@
 
     <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" destroy-method="destroy">
         <property name="configLocation" value="classpath:/matcher-ehcache.xml" />
-        <property name="shared" value="true" />
+        <property name="shared" value="false" />
+        <property name="cacheManagerName" value="matcherCacheManager" />
     </bean>
 
 </beans>

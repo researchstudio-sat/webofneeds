@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <artifactId>webofneeds</artifactId>
+        <groupId>webofneeds</groupId>
+        <version>1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>won-cryptography</artifactId>
+    <version>1.0</version>
+    <name>Cryptography</name>
+
+    <repositories>
+        <repository>
+            <id>signingframework-repo-local</id>
+            <name>repository for signingframework</name>
+            <url>file:${project.basedir}/signingframework-repo</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- tools -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+
+        <!-- doesn't exist in the public repository -->
+        <dependency>
+            <groupId>de.uni_koblenz.aggrimm.icp</groupId>
+            <artifactId>signingframework</artifactId>
+        </dependency>
+
+        <!-- jena uses this to read/write Json-Ld -->
+        <dependency>
+            <groupId>com.github.jsonld-java</groupId>
+            <artifactId>jsonld-java</artifactId>
+        </dependency>
+
+    </dependencies>
+
+
+</project>

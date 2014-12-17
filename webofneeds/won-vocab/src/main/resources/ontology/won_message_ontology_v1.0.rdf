@@ -1,0 +1,324 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY dc "http://purl.org/dc/elements/1.1/" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://purl.org/webofneeds/message#"
+     xml:base="http://purl.org/webofneeds/message"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about="http://purl.org/webofneeds/message">
+        <dc:date rdf:datatype="&xsd;date">2013-12-13</dc:date>
+        <dc:creator>Yana Panchenko</dc:creator>
+        <dc:creator>Fabian Salcher</dc:creator>
+        <dc:creator>Florian Kleedorfer</dc:creator>
+        <rdfs:comment xml:lang="en">Ontology for describing messages in the Web of Needs project.</rdfs:comment>
+        <dc:title xml:lang="en">Web of Needs Ontology</dc:title>
+        <owl:versionIRI rdf:resource="http://purl.org/webofneeds/message/1.0"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/webofneeds/message#hasContent -->
+
+    <owl:ObjectProperty rdf:about="http://purl.org/webofneeds/message#hasContent">
+        <rdfs:comment xml:lang="en">Points to an RDF graph URI that contains the message payload.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#hasMessageType -->
+
+    <owl:ObjectProperty rdf:about="http://purl.org/webofneeds/message#hasMessageType">
+        <rdfs:comment xml:lang="en">Indicates the type of the message.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#hasReceiver -->
+
+    <owl:ObjectProperty rdf:about="http://purl.org/webofneeds/message#hasReceiver">
+        <rdfs:comment xml:lang="en">Indicates the receiver of the message, either Facet or Connection.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#hasReceiverNeed -->
+
+    <owl:ObjectProperty rdf:about="http://purl.org/webofneeds/message#hasReceiverNeed">
+        <rdfs:comment xml:lang="en">Indicates the Need that &apos;contains&apos; the receiver of the message.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#hasReceiverNode -->
+
+    <owl:ObjectProperty rdf:about="http://purl.org/webofneeds/message#hasReceiverNode">
+        <rdfs:comment xml:lang="en">Indicates the WoN Node the message recipient is hosted on.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#hasResponseStateProperty -->
+
+    <owl:ObjectProperty rdf:about="http://purl.org/webofneeds/message#hasResponseStateProperty">
+        <rdfs:comment xml:lang="en">Indicates the response state of a message.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+        <rdfs:range rdf:resource="http://purl.org/webofneeds/message#ResponseState"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#hasSender -->
+
+    <owl:ObjectProperty rdf:about="http://purl.org/webofneeds/message#hasSender">
+        <rdfs:comment xml:lang="en">Indicates the sender of the message.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#hasSenderNeed -->
+
+    <owl:ObjectProperty rdf:about="http://purl.org/webofneeds/message#hasSenderNeed">
+        <rdfs:comment xml:lang="en">Indicates the Need that &apos;contains&apos; the sender of the message.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#hasSenderNode -->
+
+    <owl:ObjectProperty rdf:about="http://purl.org/webofneeds/message#hasSenderNode">
+        <rdfs:comment xml:lang="en">Indicates the WoN Node the message sender is hosted on.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#newNeedState -->
+
+    <owl:ObjectProperty rdf:about="http://purl.org/webofneeds/message#newNeedState">
+        <rdfs:comment xml:lang="en">Used in an Activate/Deactivate message to indicate the new state the need is to be moved to.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#refersTo -->
+
+    <owl:ObjectProperty rdf:about="http://purl.org/webofneeds/message#refersTo">
+        <rdfs:comment xml:lang="en">Points to another message. Messages always exist in two copies: one on the sender&apos;s WoN node and one on the receiver&apos;s WoN node. The receiver&apos;s WoN node copies the message, mints a new URI for it and points to the original message using &apos;msg:refersTo&apos;. In case of a forwarded message, this property points to the original message.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/webofneeds/message#hasTimestamp -->
+
+    <owl:DatatypeProperty rdf:about="http://purl.org/webofneeds/message#hasTimestamp">
+        <rdfs:comment xml:lang="en">Holds the timestamp assigned when the WoN node created the message.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/webofneeds/message#ActivateMessage -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#ActivateMessage">
+        <rdfs:subClassOf rdf:resource="http://purl.org/webofneeds/message#MessageType"/>
+        <rdfs:comment xml:lang="en">Type of message that activates a Need.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#CloseMessage -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#CloseMessage">
+        <rdfs:subClassOf rdf:resource="http://purl.org/webofneeds/message#MessageType"/>
+        <rdfs:comment xml:lang="en">Type of message that closes a Connection.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#ConnectMessage -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#ConnectMessage">
+        <rdfs:subClassOf rdf:resource="http://purl.org/webofneeds/message#MessageType"/>
+        <rdfs:comment xml:lang="en">Type of message that is sent from Need A to Need B in order to create a new Connection.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#ConnectionMessage -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#ConnectionMessage">
+        <rdfs:subClassOf rdf:resource="http://purl.org/webofneeds/message#MessageType"/>
+        <rdfs:comment xml:lang="en">Message sent via an established connection. This type is to be used in Facet-specific protocols.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#CreateMessage -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#CreateMessage">
+        <rdfs:subClassOf rdf:resource="http://purl.org/webofneeds/message#MessageType"/>
+        <rdfs:comment xml:lang="en">Type of message sent to a WoN Node in order to create a new Need.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#DeactivateMessage -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#DeactivateMessage">
+        <rdfs:subClassOf rdf:resource="http://purl.org/webofneeds/message#MessageType"/>
+        <rdfs:comment xml:lang="en">Type of message that deactivates a Need.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#EnvelopeGraph -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#EnvelopeGraph">
+        <rdfs:comment xml:lang="en">Used to define the type of an RDF graph URI so as to explicitly mark it as an envelope graph. An Envelope contains the addressing information.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#ForwardedEnvelopeGraph -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#ForwardedEnvelopeGraph">
+        <rdfs:subClassOf rdf:resource="http://purl.org/webofneeds/message#EnvelopeGraph"/>
+        <rdfs:comment xml:lang="en">Used to define the type of an RDF graph URI so as to explicitly mark it as a forwarded envelope graph. The graph is expected to contain the original addressing information of a forwarded message.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#HintMessage -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#HintMessage">
+        <rdfs:subClassOf rdf:resource="http://purl.org/webofneeds/message#MessageType"/>
+        <rdfs:comment xml:lang="en">Type of message sent by a matching service to a Need in order to inform its owner of other Needs possibly interesting for establishing a connection.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#MessageType -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#MessageType">
+        <rdfs:comment xml:lang="en">Superclass of all WoN messages</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#OpenMessage -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#OpenMessage">
+        <rdfs:subClassOf rdf:resource="http://purl.org/webofneeds/message#MessageType"/>
+        <rdfs:comment xml:lang="en">Type of Message used to (re)open an existing Connection.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#ResponseState -->
+
+    <owl:Class rdf:about="http://purl.org/webofneeds/message#ResponseState">
+        <rdfs:comment xml:lang="en">Indicates the (success/error) state of a response message.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/webofneeds/message#FailureResponse -->
+
+    <owl:NamedIndividual rdf:about="http://purl.org/webofneeds/message#FailureResponse">
+        <rdf:type rdf:resource="http://purl.org/webofneeds/message#ResponseState"/>
+        <rdfs:comment xml:lang="en">Indicates an error occurred while processing the message.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://purl.org/webofneeds/message#SuccessResponse -->
+
+    <owl:NamedIndividual rdf:about="http://purl.org/webofneeds/message#SuccessResponse">
+        <rdf:type rdf:resource="http://purl.org/webofneeds/message#ResponseState"/>
+        <rdfs:comment xml:lang="en">Indicates that the message was processed successfully.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/message"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+

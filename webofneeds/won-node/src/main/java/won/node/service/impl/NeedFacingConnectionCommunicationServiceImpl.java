@@ -18,26 +18,28 @@ package won.node.service.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.facet.impl.FacetRegistry;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.node.service.DataAccessService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
+import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.*;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.ConnectionCommunicationService;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 
-import java.io.StringWriter;
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
 
@@ -66,40 +68,75 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   private NeedRepository needRepository;
   @Autowired
   private URIService uriService;
+  @Autowired
+  private MessageEventRepository messageEventRepository;
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
   @Override
-  public void open(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_OPEN);
-    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_OPEN);
-    dataService.saveAdditionalContentForEvent(content, con, event);
-    //invoke facet implementation
-    reg.get(con).openFromNeed(con, content);
+  public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+      URI newMessageURI = this.wonNodeInformationService.generateEventURI();
+      WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
+        newMessageURI, connectionURI, wonMessage);
+      logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+      rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(newWonMessage));
+
+      URI connectionURIFromWonMessage = newWonMessage.getReceiverURI();
+
+      Connection con = dataService.nextConnectionState(connectionURIFromWonMessage,
+                                                       ConnectionEventType.PARTNER_OPEN);
+
+      messageEventRepository.save(new MessageEventPlaceholder(
+        connectionURIFromWonMessage, newWonMessage));
+      //invoke facet implementation
+      reg.get(con).openFromNeed(con, content, newWonMessage);
   }
 
   @Override
-  public void close(final URI connectionURI, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    Connection con = dataService.nextConnectionState(connectionURI, ConnectionEventType.PARTNER_CLOSE);
-    ConnectionEvent event = dataService.createConnectionEvent(connectionURI, con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_CLOSE);
-    dataService.saveAdditionalContentForEvent(content, con, event);
-    //invoke facet implementation
-    reg.get(con).closeFromNeed(con, content);
+  public void close(final URI connectionURI, final Model content, WonMessage wonMessage)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
+      URI newMessageURI = this.wonNodeInformationService.generateEventURI();
+      WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
+        newMessageURI, connectionURI, wonMessage);
+      logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+      rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+                                     WonMessageEncoder.encodeAsDataset(newWonMessage));
+
+      URI connectionURIFromWonMessage = newWonMessage.getReceiverURI();
+      Connection con = dataService.nextConnectionState(
+        connectionURIFromWonMessage, ConnectionEventType.PARTNER_CLOSE);
+
+      messageEventRepository.save(new MessageEventPlaceholder(
+        connectionURIFromWonMessage, newWonMessage));
+
+      //invoke facet implementation
+      reg.get(con).closeFromNeed(con, content, newWonMessage);
+
   }
     @Override
-    public void textMessage(final URI connectionURI, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-        String textMessage = null;
-        //create ConnectionEvent in Database
-        ConnectionEvent event = dataService.createConnectionEvent(con.getConnectionURI(), con.getRemoteConnectionURI(), ConnectionEventType.PARTNER_MESSAGE);
-        replaceBaseURIWithEventURI(message, con, event);
-        //create rdf content for the ConnectionEvent and save it to disk
-        dataService.saveAdditionalContentForEvent(message, con, event, null);
-        if (logger.isDebugEnabled()){
-          StringWriter writer = new StringWriter();
-          RDFDataMgr.write(writer, message, Lang.TTL);
-          logger.debug("message after saving:\n{}",writer.toString());
-        }
+    public void sendMessage(final URI connectionURI, final Model message, WonMessage wonMessage)
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+        URI newMessageURI = this.wonNodeInformationService.generateEventURI();
+        WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
+          newMessageURI, connectionURI, wonMessage);
+        logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
+        rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+                                       WonMessageEncoder.encodeAsDataset(newWonMessage));
+
+        URI connectionURIFromWonMessage = newWonMessage.getReceiverURI();
+
+        Connection con = DataAccessUtils.loadConnection(
+          connectionRepository, connectionURIFromWonMessage);
+
+        messageEventRepository.save(new MessageEventPlaceholder(
+          connectionURIFromWonMessage, newWonMessage));
+
         //invoke facet implementation
-        reg.get(con).textMessageFromNeed(con, message);
+        reg.get(con).sendMessageFromNeed(con, message, newWonMessage);
+
     }
 
   private void replaceBaseURIWithEventURI(final Model message, final Connection con, final ConnectionEvent event) {

@@ -16,12 +16,16 @@
 
 package won.protocol.repository.rdfstorage.impl;
 
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.protocol.repository.rdfstorage.RDFStorageService;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.protocol.model.ConnectionEvent;
-import won.protocol.model.ModelHolder;
-import won.protocol.repository.ModelHolderRepostory;
+import won.protocol.model.DatasetHolder;
+import won.protocol.repository.DatasetHolderRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 
 import java.net.URI;
 
@@ -32,33 +36,65 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
 {
 
   @Autowired
-  private ModelHolderRepostory modelHolderRepostory;
+  private DatasetHolderRepository datasetHolderRepository;
 
+  @Transactional(propagation = Propagation.SUPPORTS)
   @Override
-  public void storeContent(final ConnectionEvent event, final Model graph) {
-    storeContent(createEventURI(event), graph);
+  public void storeModel(final ConnectionEvent event, final Model graph) {
+    storeModel(createEventURI(event), graph);
   }
 
+  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
   @Override
-  public Model loadContent(final ConnectionEvent event) {
-    return loadContent(createEventURI(event));
+  public Model loadModel(final ConnectionEvent event) {
+    return loadModel(createEventURI(event));
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   @Override
-  public void storeContent(final URI resourceURI, final Model model) {
-    ModelHolder modelHolder = modelHolderRepostory.findOne(resourceURI);
-    if (modelHolder!=null){
-      modelHolder.setModel(model);
+  public void storeModel(final URI resourceURI, final Model model) {
+    Dataset dataset = DatasetFactory.createMem();
+    dataset.setDefaultModel(model);
+
+    storeDataset(resourceURI, dataset);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED)
+  @Override
+  public void storeDataset(final URI resourceURI, final Dataset dataset) {
+    DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
+    if (datasetHolder!=null){
+      datasetHolder.setDataset(dataset);
     } else{
-      modelHolder = new ModelHolder(resourceURI, model);
+      datasetHolder = new DatasetHolder(resourceURI, dataset);
     }
-    modelHolderRepostory.save(modelHolder);
+    datasetHolderRepository.save(datasetHolder);
   }
 
+  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
   @Override
-  public Model loadContent(final URI resourceURI) {
-    ModelHolder modelHolder = modelHolderRepostory.findOne(resourceURI);
-    return modelHolder == null ? null : modelHolder.getModel();
+  public Model loadModel(final URI resourceURI) {
+    DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
+    return datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel();
+  }
+
+
+  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+  @Override
+  public Dataset loadDataset(final URI resourceURI) {
+    DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
+    return datasetHolder == null ? null : datasetHolder.getDataset();
+  }
+
+  @Transactional(propagation = Propagation.SUPPORTS)
+  @Override
+  public boolean removeContent(final URI resourceURI) {
+    try{
+      datasetHolderRepository.delete(resourceURI);
+    }catch (Exception e){
+      return false;
+    }
+    return true;
   }
 
   /**

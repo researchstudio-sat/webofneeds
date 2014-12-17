@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.protocol.impl.NeedProtocolNeedClientFactory;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.util.RdfUtils;
@@ -48,7 +49,10 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   private NeedProtocolNeedClientFactory clientFactory;
 
   @Override
-  public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri, final URI otherConnectionUri, final Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
+  public ListenableFuture<URI> connect(final URI needUri, final URI otherNeedUri,
+                                       final URI otherConnectionUri, final Model content,
+                                       final WonMessage wonMessage)
+          throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException
   {
     try {
       //TODO: make asynchronous
@@ -68,7 +72,8 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   }
 
     @Override
-    public void open(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+    public void open(final Connection connection, final Model content, final WonMessage wonMessage)
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
         try {
             NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
             proxy.open(connection.getRemoteConnectionURI(), RdfUtils.toString(content));
@@ -82,7 +87,8 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
     }
 
   @Override
-  public void close(final Connection connection, final Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void close(final Connection connection, final Model content, final WonMessage wonMessage)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
@@ -97,12 +103,13 @@ public class NeedProtocolNeedClientImplWSBased implements NeedProtocolNeedClient
   }
 
   @Override
-  public void textMessage(final Connection connection, final Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException
+  public void sendMessage(final Connection connection, final Model message, final WonMessage wonMessage)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException
   {
     try {
       NeedProtocolNeedWebServiceEndpoint proxy = clientFactory.getNeedProtocolEndpointForConnection(connection.getRemoteConnectionURI());
       String messageConvert = RdfUtils.toString(message);
-      proxy.textMessage(connection.getRemoteConnectionURI(), messageConvert);
+      proxy.sendMessage(connection.getRemoteConnectionURI(), messageConvert);
     } catch (MalformedURLException e) {
       logger.warn("couldn't create URL for needProtocolEndpoint", e);
     } catch (IllegalMessageForConnectionStateFault illegalMessageForConnectionStateFault) {

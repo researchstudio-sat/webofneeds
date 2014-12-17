@@ -1,5 +1,6 @@
 package won.protocol.repository.rdfstorage;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.model.ConnectionEvent;
 
@@ -20,16 +21,41 @@ public interface RDFStorageService
    * @param event
    * @param graph
    */
-  public void storeContent(ConnectionEvent event, Model graph);
+  public void storeModel(ConnectionEvent event, Model graph);
 
-  public Model loadContent(ConnectionEvent event);
+  public Model loadModel(ConnectionEvent event);
 
   /**
    * Stores a copy of the specified model, iff it contains at least one triple.
+   * The model is stored as the default model of a dataset.
+   *
    * @param resourceURI
    * @param model
    */
-  public void storeContent(URI resourceURI, Model model);
+  public void storeModel(URI resourceURI, Model model);
 
-  public Model loadContent(URI resourceURI);
+  /**
+   * Stores a copy of the specified dataset.
+   *
+   * @param resourceURI
+   * @param dataset
+   */
+  public void storeDataset(URI resourceURI, Dataset dataset);
+
+  /**
+   * Loads the default model of the stored dataset with the specified URL
+   *
+   * @param resourceURI
+   * @return
+   */
+  public Model loadModel(URI resourceURI);
+
+  /**
+   * Loads the dataset with the specified URL
+   * @param resourceURI
+   * @return
+   */
+  public Dataset loadDataset(URI resourceURI);
+
+  public boolean removeContent(URI resourceURI);
 }

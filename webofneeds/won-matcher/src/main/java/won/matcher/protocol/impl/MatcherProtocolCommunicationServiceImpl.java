@@ -54,7 +54,7 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
       {
         camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.getEndpoint(needBrokerUri));
       } else {
-        //matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,needBrokerUri);
+        matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,needBrokerUri);
         matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(needUri);
         camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(needBrokerUri,
                                                                                                          matcherProtocolQueueName));
@@ -68,7 +68,7 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
 
       matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
       camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(brokerUri,matcherProtocolQueueName));
-      //matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,brokerUri);
+      matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,brokerUri);
       camelConfiguration.setBrokerComponentName(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
       ActiveMQComponent activeMQComponent = (ActiveMQComponent)matcherProtocolCamelConfigurator.getCamelContext().getComponent(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
       logger.info("ActiveMQ Service Status : {}",activeMQComponent.getStatus().toString());

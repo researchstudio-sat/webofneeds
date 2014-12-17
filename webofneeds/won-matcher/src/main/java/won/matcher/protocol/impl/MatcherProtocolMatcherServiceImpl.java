@@ -1,6 +1,6 @@
 package won.matcher.protocol.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class MatcherProtocolMatcherServiceImpl implements MatcherProtocolMatcher
   }
 
   @Override
-  public void onNewNeed(final URI wonNodeURI, URI needURI, Model content) {
+  public void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content) {
       logger.debug("matcher from need: need created event for needURI {}",needURI);
       if (needURI == null) throw new IllegalArgumentException("needURI is not set");
       matcherServiceCallback.onNewNeed(wonNodeURI , needURI, content);

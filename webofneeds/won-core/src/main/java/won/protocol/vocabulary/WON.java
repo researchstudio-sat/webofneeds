@@ -21,21 +21,15 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import won.protocol.model.BasicNeedType;
-import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.NeedState;
 
 /**
- * WON vocabulary.
- * <p/>
- * User: fkleedorfer                     public Model showNodeInformation(final int page)
- * Date: 20.11.12
+ * WoN Vocabulary
  */
 public class WON
 {
   public static final String BASE_URI = "http://purl.org/webofneeds/model#";
-
-
 
   private static Model m = ModelFactory.createDefaultModel();
 
@@ -54,6 +48,10 @@ public class WON
   public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedDeactivatedTopicName");
   public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED_TOPIC_NAME = m.createProperty
     (BASE_URI, "hasActiveMQMatcherProtocolOutMatcherRegisteredTopicName");
+  public static final Property HAS_URI_PATTERN_SPECIFICATION = m.createProperty(BASE_URI, "hasUriPrefixSpecification");
+  public static final Property HAS_NEED_URI_PREFIX = m.createProperty(BASE_URI, "hasNeedUriPrefix");
+  public static final Property HAS_CONNECTION_URI_PREFIX = m.createProperty(BASE_URI, "hasConnectionUriPrefix");
+  public static final Property HAS_EVENT_URI_PREFIX = m.createProperty(BASE_URI, "hasEventUriPrefix");
 
 
   public static final Property EMBED_SPIN_ASK = m.createProperty(BASE_URI, "embedSpinAsk");
@@ -68,7 +66,8 @@ public class WON
 
   public static final Property HAS_CONTENT = m.createProperty(BASE_URI, "hasContent");
 
-  public static final Resource TEXT_MESSAGE = m.createResource(BASE_URI + "TextMessage");
+
+
   public static final Property HAS_TEXT_MESSAGE = m.createProperty(BASE_URI + "hasTextMessage");
   public static final Resource MESSAGE = m.createResource(BASE_URI + "Message");
   public static final Property HAS_FEEDBACK = m.createProperty(BASE_URI, "hasFeedback");
@@ -106,7 +105,7 @@ public class WON
 
   public static final Property HAS_EVENT_CONTAINER = m.createProperty(BASE_URI, "hasEventContainer");
   public static final Resource EVENT_CONTAINER = m.createResource(BASE_URI + "EventContainer");
-  public static final Resource EVENT = m.createResource(BASE_URI + "Event");
+
   public static final Property HAS_TIME_STAMP = m.createProperty(BASE_URI, "hasTimeStamp");
   public static final Property HAS_ORIGINATOR = m.createProperty(BASE_URI, "hasOriginator");
 
@@ -114,6 +113,7 @@ public class WON
   public static final Resource ADDITIONAL_DATA_CONTAINER = m.createResource(BASE_URI + "AdditionalDataContainer");
 
   public static final Property HAS_MATCH_SCORE = m.createProperty(BASE_URI, "hasMatchScore");
+  public static final Property HAS_MATCH_COUNTERPART = m.createProperty(BASE_URI, "hasMatchCounterpart");
 
   public static final Property HAS_NEED_MODALITY = m.createProperty(BASE_URI, "hasNeedModality");
   public static final Resource NEED_MODALITY = m.createResource(BASE_URI + "NeedModality");
@@ -139,13 +139,6 @@ public class WON
   public static final Property HAS_RECUR_INFINITE_TIMES = m.createProperty(BASE_URI, "hasRecurInfiniteTimes");
 
   // Resource individuals
-  public static final Resource EVENT_TYPE_OWNER_CLOSE = m.createResource(ConnectionEventType.OWNER_CLOSE.getURI().toString());
-  public static final Resource EVENT_TYPE_OWNER_OPEN = m.createResource(ConnectionEventType.OWNER_OPEN.getURI().toString());
-  public static final Resource EVENT_TYPE_PARTNER_CLOSE = m.createResource(ConnectionEventType.PARTNER_CLOSE.getURI().toString());
-  public static final Resource EVENT_TYPE_PARTNER_OPEN = m.createResource(ConnectionEventType.PARTNER_OPEN.getURI().toString());
-  public static final Resource EVENT_TYPE_PARTNER_MESSAGE = m.createResource(ConnectionEventType.PARTNER_MESSAGE.getURI().toString());
-  public static final Resource EVENT_TYPE_OWNER_MESSAGE = m.createResource(ConnectionEventType.OWNER_MESSAGE.getURI().toString());
-  public static final Resource EVENT_TYPE_HINT = m.createResource(ConnectionEventType.MATCHER_HINT.getURI().toString());
 
   public static final Resource BASIC_NEED_TYPE_DO_TOGETHER = m.createResource(BasicNeedType.DO_TOGETHER.getURI().toString());
   public static final Resource BASIC_NEED_TYPE_SUPPLY = m.createResource(BasicNeedType.SUPPLY.getURI().toString());
@@ -161,9 +154,12 @@ public class WON
   public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
   public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
 
+  public static final Property HAS_GRAPH = m.createProperty(BASE_URI,"hasGraph");
+
   //search result model
   public static final Property SEARCH_RESULT_URI = m.createProperty(BASE_URI,"uri");
   public static final Property SEARCH_RESULT_PREVIEW = m.createProperty(BASE_URI, "preview");
+
 
   /**
    * Returns the base URI for this schema.
@@ -215,33 +211,6 @@ public class WON
     }
   }
 
-  /**
-   * Converts the EventType Enum to a Resource.
-   *
-   * @param type
-   * @return
-   */
-  public static Resource toResource(ConnectionEventType type)
-  {
-    switch (type) {
-      case OWNER_CLOSE:
-        return EVENT_TYPE_OWNER_CLOSE;
-      case PARTNER_CLOSE:
-        return EVENT_TYPE_PARTNER_CLOSE;
-      case MATCHER_HINT:
-        return EVENT_TYPE_HINT;
-      case OWNER_OPEN:
-        return EVENT_TYPE_OWNER_OPEN;
-      case PARTNER_OPEN:
-        return EVENT_TYPE_PARTNER_OPEN;
-      case OWNER_MESSAGE:
-        return EVENT_TYPE_OWNER_MESSAGE;
-      case PARTNER_MESSAGE:
-        return EVENT_TYPE_PARTNER_MESSAGE;
-      default:
-        throw new IllegalStateException("No such case specified for " + type.name());
-    }
-  }
 
   /**
    * Converts the ConnectionState Enum to a Resource.

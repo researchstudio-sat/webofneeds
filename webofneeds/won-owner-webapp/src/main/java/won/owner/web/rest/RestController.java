@@ -46,6 +46,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/rest")
+@Deprecated
 public class RestController
 {
 
@@ -139,7 +140,7 @@ public class RestController
     logger.info("Found need in DB: ");
     Need need = needs.get(0);
 
-    NeedPojo fullNeed = new NeedPojo(need.getNeedURI(), linkedDataSource.getModelForResource(need.getNeedURI()));
+    NeedPojo fullNeed = new NeedPojo(need.getNeedURI(), linkedDataSource.getDataForResource(need.getNeedURI()).getDefaultModel());
 
     //NeedPojo fullNeed = NeedFetcher.getNeedInfo(need);
 
@@ -162,7 +163,8 @@ public class RestController
         logger.debug("found {} needs for uri {} in repo", matchNeeds.size(), matchUri);
         logger.debug("matchUri:{}, needURi:{}", matchUri, matchNeeds.get(0));
         logger.debug("fetching need {} from WON node", matchUri);
-        matchedNeed = new NeedPojo(matchNeeds.get(0).getNeedURI(), linkedDataSource.getModelForResource(matchNeeds.get(0).getNeedURI()));
+        matchedNeed = new NeedPojo(matchNeeds.get(0).getNeedURI(), linkedDataSource.getDataForResource(
+          matchNeeds.get(0).getNeedURI()).getDefaultModel());
         //matchedNeed = new NeedPojo(matchUri, linkedDataRestClient.readResourceData(matchUri));
         //NeedPojo matchedNeed = NeedFetcher.getNeedInfo(matchNeeds.get(0));
         this.cachedNeeds.put(matchUri, matchedNeed);
@@ -213,7 +215,7 @@ public class RestController
 
     Iterable<Need> needs = needRepository.findAll();
     for (Need need : needs) {
-      NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataSource.getModelForResource(need.getNeedURI()));
+      NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataSource.getDataForResource(need.getNeedURI()).getDefaultModel());
       needPojo.setNeedId(need.getId());
       returnList.add(needPojo);
     }
@@ -235,7 +237,7 @@ public class RestController
 		Iterable<Need> needs = needRepository.findById(needId);
 		Need need = needs.iterator().next();
 
-		NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()));
+		NeedPojo needPojo = new NeedPojo(need.getNeedURI(), linkedDataRestClient.readResourceData(need.getNeedURI()).getDefaultModel());
 		needPojo.setNeedId(need.getId());
 
 		return needPojo;
@@ -250,7 +252,7 @@ public class RestController
 		  if (!needs.isEmpty()) {
 		    logger.warn("Deactivating old need");
 		    try {
-		      ownerService.deactivate(needs.get(0).getNeedURI());
+		      ownerService.deactivate(needs.get(0).getNeedURI(), null);
 		    } catch (Exception e) {
 		      logger.warn("Could not deactivate old Need: " + needs.get(0).getNeedURI());
 		    }
@@ -329,18 +331,18 @@ public class RestController
 
         //TODO: here, need creation is synchronous. Make asynchronous.
 		    if (needPojo.getWonNode().equals("")) {
-			    needURI = ownerService.createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE).get();
+			    needURI = ownerService.createNeed(needModel, needPojo.getState() == NeedState.ACTIVE, null).get();
 		    } else {
 			    needURI = ((OwnerProtocolNeedServiceClient) ownerService)
-					    .createNeed(ownerURI, needModel, needPojo.getState() == NeedState.ACTIVE,
-                URI.create(needPojo.getWonNode())).get();
+					    .createNeed(needModel, needPojo.getState() == NeedState.ACTIVE,
+                URI.create(needPojo.getWonNode()), null).get();
 		    }
 
 		    List<Need> needs = needRepository.findByNeedURI(needURI);
 
 
 			LinkedDataRestClient linkedDataRestClient = new LinkedDataRestClient();
-			NeedPojo fullNeed = new NeedPojo(needURI, linkedDataRestClient.readResourceData(needs.get(0).getNeedURI()));
+			NeedPojo fullNeed = new NeedPojo(needURI, linkedDataRestClient.readResourceData(needs.get(0).getNeedURI()).getDefaultModel());
 			fullNeed.setNeedId(needs.get(0).getId());
 
 			//NeedPojo fullNeed = NeedFetcher.getNeedInfo(needs.get(0));
@@ -425,7 +427,7 @@ public class RestController
           WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(
             FacetType.OwnerFacet.getURI(),
             FacetType.OwnerFacet.getURI());
-				ownerService.connect(match.getFromNeed(), match.getToNeed(), facetModel);
+				ownerService.connect(match.getFromNeed(), match.getToNeed(), facetModel, null);
 			}
 		} catch (ConnectionAlreadyExistsException e) {
 			logger.warn("caught ConnectionAlreadyExistsException:", e);
@@ -537,7 +539,10 @@ public class RestController
 		Connection con = cons.get(0);
 
 		try {
-			ownerService.textMessage(con.getConnectionURI(), WonRdfUtils.MessageUtils.textMessage(text));
+			ownerService.sendConnectionMessage(
+        con.getConnectionURI(),
+        WonRdfUtils.MessageUtils.textMessage(text),
+        null);
 		} catch (Exception e) {
 			logger.warn("error sending text message");
 			return "error sending text message: " + e.getMessage();
@@ -560,7 +565,7 @@ public class RestController
 		try {
       //changed from connect to open as we already have a connection object.
 			//ownerService.connect(con.getNeedURI(), con.getRemoteNeedURI(), facetModel);
-      ownerService.open(con.getConnectionURI(),null);
+      ownerService.open(con.getConnectionURI(),null, null);
 		} catch (Exception e) {
 			logger.warn("error during accept", e);
 			return "error during accept: " + e.getMessage();
@@ -579,7 +584,7 @@ public class RestController
 			return "noNeedFound";
 		Connection con = cons.get(0);
 		try {
-			ownerService.close(con.getConnectionURI(), null);
+			ownerService.close(con.getConnectionURI(), null, null);
 		} catch (Exception e) {
 			logger.warn("error during deny", e);
 			return "error during deny: " + e.getMessage();
@@ -598,7 +603,7 @@ public class RestController
 			return "noNeedFound";
 		Connection con = cons.get(0);
 		try {
-			ownerService.close(con.getConnectionURI(), null);
+			ownerService.close(con.getConnectionURI(), null, null);
 		} catch (Exception e) {
 			logger.warn("error during close", e);
 			return "error during close: " + e.getMessage();

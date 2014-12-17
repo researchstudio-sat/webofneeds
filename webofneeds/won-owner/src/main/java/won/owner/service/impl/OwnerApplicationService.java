@@ -1,0 +1,288 @@
+package won.owner.service.impl;
+
+import com.google.common.util.concurrent.ListenableFuture;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import won.cryptography.service.SecureRandomNumberServiceImpl;
+import won.owner.service.OwnerApplicationServiceCallback;
+import won.owner.service.OwnerProtocolOwnerServiceCallback;
+import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDecoder;
+import won.protocol.message.WonMessageType;
+import won.protocol.model.ChatMessage;
+import won.protocol.model.Connection;
+import won.protocol.model.Match;
+import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WONMSG;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+
+/**
+ * User: fsalcher
+ * Date: 18.08.2014
+ */
+public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallback
+{
+
+  private static final Logger logger = LoggerFactory.getLogger(OwnerApplicationService.class);
+
+  @Autowired
+  @Qualifier("default")
+  private OwnerProtocolNeedServiceClientSide ownerProtocolService;
+
+  //when the callback is a bean in a child context, it sets itself as a dependency here
+  @Autowired(required = false)
+  private OwnerApplicationServiceCallback ownerApplicationServiceCallbackToClient =
+    new NopOwnerApplicationServiceCallback();
+
+
+  @Autowired
+  private Executor executor;
+
+  @Autowired
+  private SecureRandomNumberServiceImpl randomNumberService;
+
+  final private Map<URI, WonMessage> wonMessageMap = new HashMap<>();
+
+  // ToDo (FS): add security layer
+
+  public void handleMessageEventFromClient(Dataset wonMessage) {
+    handleMessageEventFromClient(WonMessageDecoder.decodeFromDataset(wonMessage));
+  }
+
+  public void handleMessageEventFromClient(WonMessage wonMessage) {
+
+    // ToDo (FS): don't convert messages to the old protocol interfaces instead use the new message format
+
+    WonMessageType wonMessageType = wonMessage.getMessageType();
+
+    switch (wonMessageType) {
+      case CREATE_NEED:
+
+        Dataset messageContent = wonMessage.getMessageContent();
+
+        URI senderNeedURI = wonMessage.getSenderNeedURI();
+        if (senderNeedURI == null){
+          throw new IllegalArgumentException("no sender need URI found!");
+        }
+        // get the core graph of the message for the need model
+
+        //TODO:this is only for old messaging style. Remove when switched
+        Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+        RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
+
+        // ToDo (FS): this should be encapsulated in an own subclass of WonMessage
+        // get the active status
+        boolean active = false;
+        switch (WonRdfUtils.NeedUtils.queryActiveStatus(
+          messageContent, wonMessage.getSenderNeedURI())) {
+          case ACTIVE:
+            active = true;
+            break;
+          case INACTIVE:
+            active = false;
+            break;
+        }
+
+
+        // get the wonNodeURI
+        URI wonNodeURI = null;
+        wonNodeURI = WonRdfUtils.NeedUtils.queryWonNode(messageContent);
+
+        final ListenableFuture<URI> newNeedURI;
+        try {
+          wonMessageMap.put(wonMessage.getSenderNeedURI(), wonMessage);
+          newNeedURI = ownerProtocolService.createNeed(content, active, wonNodeURI,wonMessage);
+
+          newNeedURI.addListener(new Runnable()
+          {
+            @Override
+            public void run() {
+              // ToDo (FS): WON Node should return the response message
+              try {
+                if (newNeedURI.isDone()) {
+                  sendBackResponseMessageToClient(
+                    wonMessageMap.get(newNeedURI.get()), WONMSG.TYPE_RESPONSE_STATE_SUCCESS);
+                } else if (newNeedURI.isCancelled()) {
+                  sendBackResponseMessageToClient(
+                    wonMessageMap.get(newNeedURI.get()), WONMSG.TYPE_RESPONSE_STATE_FAILURE);
+                }
+              } catch (InterruptedException e) {
+                logger.warn("caught InterruptedException:", e);
+              } catch (ExecutionException e) {
+                logger.warn("caught ExecutionException:", e);
+              }
+            }
+          }, executor);
+        } catch (Exception e) {
+          logger.warn("caught Exception:", e);
+        }
+        
+        break;
+
+      case CONNECT:
+        try {
+          URI needURI;
+          URI otherNeedURI;
+
+          needURI = wonMessage.getSenderNeedURI();
+          otherNeedURI = wonMessage.getReceiverNeedURI();
+
+          content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
+
+          final ListenableFuture<URI> newConnectionURI;
+
+          wonMessageMap.put(wonMessage.getSenderNeedURI(), wonMessage);
+          newConnectionURI = ownerProtocolService.connect(needURI, otherNeedURI, content, wonMessage);
+
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
+        break;
+
+      case ACTIVATE:
+        try {
+          URI needURI;
+          needURI = wonMessage.getSenderNeedURI();
+          ownerProtocolService.activate(needURI, wonMessage);
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
+        break;
+
+      case DEACTIVATE:
+        try {
+          URI needURI;
+          needURI = wonMessage.getSenderNeedURI();
+          ownerProtocolService.deactivate(needURI, wonMessage);
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
+        break;
+
+      case OPEN:
+        try {
+          URI connectionURI = wonMessage.getSenderURI();
+          content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
+          ownerProtocolService.open(connectionURI, content, wonMessage);
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
+        break;
+
+      case CLOSE:
+        try {
+          URI connectionURI = wonMessage.getSenderURI();
+          content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
+          ownerProtocolService.close(connectionURI, content, wonMessage);
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
+        break;
+
+      case CONNECTION_MESSAGE:
+        try {
+
+          URI connectionURI = wonMessage.getSenderURI();
+          content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
+          RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
+          ownerProtocolService.sendConnectionMessage(connectionURI, content, wonMessage);
+        } catch (Exception e) {
+          logger.warn("caught Exception", e);
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  public void handleMessageEventFromWonNode(Dataset wonMessage) {
+    handleMessageEventFromWonNode(WonMessageDecoder.decodeFromDataset(wonMessage));
+  }
+
+  public void handleMessageEventFromWonNode(WonMessage wonMessage) {
+
+    // ToDo (FS): handle messages
+
+    ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+
+  }
+
+  // ToDo (FS): most (all?) of the response messages should be send back from the WON node (this is only temporary)
+  // this is only a CREATE RESPONSE
+  private void sendBackResponseMessageToClient(WonMessage wonMessage, Resource responseType) {
+
+    try {
+      URI responseMessageURI = URI.create(wonMessage.getSenderNeedURI().toString() +
+                                            "/event/" +
+                                            randomNumberService
+                                              .generateRandomString(9));
+
+      WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+      WonMessage responseWonMessage = wonMessageBuilder
+        .setWonMessageType(WonMessageType.CREATE_RESPONSE)
+        .setMessageURI(responseMessageURI)
+        .setSenderNodeURI(wonMessage.getReceiverNodeURI())
+        .setReceiverNeedURI(wonMessage.getSenderNeedURI())
+        .setResponseMessageState(responseType)
+        .addRefersToURI(wonMessage.getMessageURI())
+        .build();
+
+      ownerApplicationServiceCallbackToClient.onMessage(responseWonMessage);
+    } catch (WonMessageBuilderException e) {
+      logger.warn("caught WonMessageBuilderException:", e);
+    }
+  }
+
+
+  // ToDo (FS): methods only used until the messaging system is completely refactored then only one callback method will be used
+  @Override
+  public void onHint(final Match match, final Model content, final WonMessage wonMessage) {
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+  }
+
+  @Override
+  public void onConnect(final Connection con, final Model content, final WonMessage wonMessage) {
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+  }
+
+  @Override
+  public void onOpen(final Connection con, final Model content, final WonMessage wonMessage) {
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+  }
+
+  @Override
+  public void onClose(final Connection con, final Model content, final WonMessage wonMessage) {
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+  }
+
+  @Override
+  public void onTextMessage(final Connection con, final ChatMessage message,
+                            final Model content, final WonMessage wonMessage) {
+      ownerApplicationServiceCallbackToClient.onMessage(wonMessage);
+  }
+
+  public void setOwnerApplicationServiceCallbackToClient(final OwnerApplicationServiceCallback ownerApplicationServiceCallbackToClient) {
+    this.ownerApplicationServiceCallbackToClient = ownerApplicationServiceCallbackToClient;
+  }
+
+
+
+}

@@ -17,12 +17,15 @@
 package won.matcher.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MatcherProtocolCommunicationService;
 import won.protocol.jms.MessagingService;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
@@ -43,7 +46,7 @@ public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocol
     private String startingEndpoint;
 
   @Override
-  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content)
+  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content, WonMessage wonMessage)
           throws Exception {
         logger.info("need-facing: HINT called for needURI {} and otherNeed {} " +
                 "with score {} from originator {}.", new Object[]{needURI, otherNeed, score, originator});
@@ -58,6 +61,7 @@ public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocol
         headerMap.put("score",String.valueOf(score));
         headerMap.put("originator",originator.toString());
         headerMap.put("content",RdfUtils.toString(content));
+        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
         headerMap.put("remoteBrokerEndpoint", endpoint);
         headerMap.put("methodName","hint");
 

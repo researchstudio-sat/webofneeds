@@ -3,15 +3,16 @@ package won.matcher.solr;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.SolrEventListener;
 import org.apache.solr.search.SolrIndexSearcher;
-import org.apache.xbean.spring.context.ClassPathXmlApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import won.matcher.Matcher;
 import won.matcher.processor.HintSender;
 import won.matcher.service.ScoreTransformer;
 import won.protocol.Config;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.protocol.service.WonNodeInformationService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,7 @@ public class UpdateListener implements SolrEventListener
   private DocumentStorage documentStorage;
   private URI originatorURI;
   private MatcherProtocolNeedServiceClientSide client;
+  private WonNodeInformationService wonNodeInformationService;
 
   @Override
   public void init(NamedList namedList)
@@ -68,9 +70,11 @@ public class UpdateListener implements SolrEventListener
         }
       };
 
+
       //setup matcher client
       this.client = (MatcherProtocolNeedServiceClientSide) ctx.getBean("matcherProtocolNeedServiceClient");
       this.client.initializeDefault();
+      this.wonNodeInformationService = (WonNodeInformationService) ctx.getBean("wonNodeInformationService");
     } catch (Exception e) {
       logger.warn("could not set up matcher client",e);
     }
@@ -94,7 +98,7 @@ public class UpdateListener implements SolrEventListener
     logger.debug("newSearcher called");
 
     Matcher matcher = new Matcher(solrIndexSearcher, new ScoreTransformer(), this.originatorURI);
-    matcher.addMatchProcessor(new HintSender(this.client));
+    matcher.addMatchProcessor(new HintSender(this.client, this.wonNodeInformationService));
 
     while (documentStorage.hasNext())
       try {

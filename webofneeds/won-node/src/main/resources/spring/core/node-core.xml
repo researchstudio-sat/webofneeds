@@ -39,6 +39,9 @@
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
         <property name="dataURIPrefix" value="${uri.prefix.data}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
+        <property name="eventResourceURIPrefix" value="${uri.prefix.event}" />
+        <property name="messageEventResourceURIInfix" value="${uri.infix.messageEvent}" />
+        <property name="needMetaInformationURISuffix" value="${uri.suffix.needMetaInformation}" />
         <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
         <property name="pageURIPrefix" value="${uri.prefix.page}" />
         <property name="generalURIPrefix" value="${uri.prefix}" />
@@ -66,6 +69,7 @@
         <property name="dataURIPrefix" value="${uri.prefix.data}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
         <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
+        <property name="eventResourceURIPrefix" value="${uri.prefix.event}" />
         <property name="pageURIPrefix" value="${uri.prefix.page}" />
         <property name="needProtocolEndpoint" value="${uri.protocol.need}" />
         <property name="matcherProtocolEndpoint" value="${uri.protocol.matcher}" />
@@ -153,6 +157,7 @@
     <bean id="needProtocolNeedService" class="won.node.protocol.impl.NeedProtocolNeedServiceImpl">
         <property name="connectionCommunicationService" ref="needFacingConnectionCommunicationService"/>
         <property name="needFacingNeedCommunicationService" ref="needCommunicationService"/>
+        <property name="needFacingConnectionClient"    ref="needProtocolNeedClient"/>
     </bean>
 
     <bean name="ownerProtocolOwnerClient" class="won.node.protocol.impl.OwnerProtocolOwnerClient">

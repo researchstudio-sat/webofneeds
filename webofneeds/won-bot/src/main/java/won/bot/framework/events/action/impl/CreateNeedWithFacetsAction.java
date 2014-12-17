@@ -10,7 +10,11 @@ import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.NeedCreationFailedEvent;
 import won.bot.framework.events.event.impl.NeedCreatedEvent;
 import won.bot.framework.events.event.impl.NeedProducerExhaustedEvent;
+import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.FacetType;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
@@ -71,7 +75,8 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
         }
         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
-        final ListenableFuture<URI> futureNeedUri = getEventListenerContext().getOwnerService().createNeed(URI.create("we://dont.need.this/anymore"), needModel, true, wonNodeUri);
+        final ListenableFuture<URI> futureNeedUri = getEventListenerContext().getOwnerService().createNeed(
+          needModel, true, wonNodeUri, createWonMessage(wonNodeUri, needModel));
         //add a listener that adds the need URI to the botContext
         futureNeedUri.addListener(new Runnable()
         {
@@ -98,4 +103,25 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
             }
         }, getEventListenerContext().getExecutor());
     }
+
+  private WonMessage createWonMessage(URI wonNodeURI, Model needModel)
+    throws WonMessageBuilderException {
+
+    WonNodeInformationService wonNodeInformationService =
+      getEventListenerContext().getWonNodeInformationService();
+
+    URI needURI = wonNodeInformationService.generateNeedURI(wonNodeURI);
+
+    RdfUtils.replaceBaseURI(needModel,needURI.toString());
+
+    WonMessageBuilder builder = new WonMessageBuilder();
+    return builder
+      .setMessagePropertiesForCreate(
+        wonNodeInformationService.generateEventURI(
+          wonNodeURI),
+        needURI,
+        wonNodeURI)
+      .addContent(URI.create(needURI.toString()), needModel, null)
+      .build();
+  }
 }

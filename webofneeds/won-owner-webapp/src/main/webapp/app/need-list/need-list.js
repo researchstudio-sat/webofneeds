@@ -1,4 +1,20 @@
-angular.module('won.owner').controller('NeedListCtrl', function ($scope, $location, $http, $q, needService, connectionService) {
+/*
+ * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+angular.module('won.owner').controller('NeedListCtrl', function ($scope,$log, $location, $http, $q, needService, connectionService) {
 
 	NeedListPage = function() {
 		this.btnConversations = 0;
@@ -63,7 +79,7 @@ angular.module('won.owner').controller('NeedListCtrl', function ($scope, $locati
 				categorizedNeeds.merge(catNeed);
 			}
 		});
-		console.log(categorizedNeeds);
+        $log.debug(categorizedNeeds);
 		$scope.model.categorizedNeeds = categorizedNeeds;
 		$scope.model.startup();
 	};
@@ -72,7 +88,7 @@ angular.module('won.owner').controller('NeedListCtrl', function ($scope, $locati
 		$scope.model.myNeeds = needs;
 		var allConnsRequests = [];
 		angular.forEach(needs, function (need) {
-			allConnsRequests.push(needService.getNeedConnections(need.needURI));
+			allConnsRequests.push(needService.getNeedConnections(need.uri));
 		});
 		$q.allSettled(allConnsRequests).then(function(responses) {
 			categorizeNeeds(responses);
@@ -82,7 +98,7 @@ angular.module('won.owner').controller('NeedListCtrl', function ($scope, $locati
 	});
 
 	$scope.goToDetail = function($id) {
-		$location.path("/need-detail/" + $id);
+        $location.url("/need-detail/" + $id);
 	};
 
 	$scope.showMatches = function($event) {

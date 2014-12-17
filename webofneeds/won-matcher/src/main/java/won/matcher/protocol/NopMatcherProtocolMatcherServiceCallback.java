@@ -16,7 +16,7 @@
 
 package won.matcher.protocol;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.query.Dataset;
 
 import java.net.URI;
 
@@ -33,7 +33,7 @@ public class NopMatcherProtocolMatcherServiceCallback implements MatcherProtocol
   }
 
   @Override
-  public void onNewNeed(final URI wonNodeURI, URI needURI, Model content) {
+  public void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content) {
       //To change body of implemented methods use File | Settings | File Templates.
   }
 

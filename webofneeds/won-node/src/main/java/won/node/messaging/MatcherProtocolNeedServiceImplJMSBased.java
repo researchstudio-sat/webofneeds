@@ -17,10 +17,13 @@
 package won.node.messaging;
 
 import org.apache.camel.Header;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import won.protocol.matcher.MatcherProtocolNeedService;
+import won.protocol.message.WonMessageDecoder;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
@@ -35,8 +38,18 @@ public class MatcherProtocolNeedServiceImplJMSBased// implements MatcherProtocol
   private Logger logger = LoggerFactory.getLogger(this.getClass());
   private MatcherProtocolNeedService delegate;
 
-  public void hint(@Header("needURI")final String needURI,@Header("otherNeedURI") final String  otherNeedURI, @Header("score")final String score, @Header("originator")final String originator, @Header("content") final String content) throws Exception {
-    delegate.hint(URI.create(needURI), URI.create(otherNeedURI), Double.valueOf(score), URI.create(originator), RdfUtils.toModel(content));
+  public void hint(
+          @Header("needURI")final String needURI,
+          @Header("otherNeedURI") final String  otherNeedURI,
+          @Header("score")final String score,
+          @Header("originator")final String originator,
+          @Header("content") final String content,
+          @Header("wonMessage") final String wonMessage)
+        throws Exception {
+
+    delegate.hint(URI.create(needURI), URI.create(otherNeedURI),
+            Double.valueOf(score), URI.create(originator),
+            RdfUtils.toModel(content), WonMessageDecoder.decode(Lang.TRIG, wonMessage));
   }
 
     public void setDelegate(MatcherProtocolNeedService delegate) {

@@ -16,7 +16,7 @@
 
 package won.bot.framework.events.action.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.query.Dataset;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
@@ -28,29 +28,44 @@ import won.bot.framework.events.event.impl.NeedCreatedEventForMatcher;
 import won.matcher.solr.NeedSolrInputDocumentBuilder;
 import won.protocol.util.NeedModelBuilder;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.MalformedURLException;
 
 //import org.apache.solr.common.SolrInputDocument;
 
 /**
-* User: fkleedorfer
-* Date: 28.03.14
-*/
+ * Action that sends the need data from a NeedSpecificEvent to solr based matcher.
+ * By default, will not to commit if subsequent calls are made within a certain minimal time
+ * span (1s), this is intended for bulk operations. In that case, the server is expected to
+ * perform a commit from time to time.
+ *
+ */
 public class IndexNeedAction extends BaseEventBotAction
 {
   private String uriListName;
   private SolrServer server;
+  private transient long lastInvocation = 0;
+  private boolean suppressCommitsInBulkOperation = true;
 
-  public IndexNeedAction(final EventListenerContext eventListenerContext)
+  //if the last run was less than this value ago (in millis), don't commit.
+  //thus, we can avoid committing all the time during bulk creation.
+  private long SUPPRESS_COMMIT_TIMESPAN=1000;
+
+  public IndexNeedAction(final EventListenerContext eventListenerContext){
+    this(eventListenerContext, false);
+  }
+
+    public IndexNeedAction(final EventListenerContext eventListenerContext, boolean suppressCommitsInBulkOperation)
   {
     this(eventListenerContext, null);
+    this.suppressCommitsInBulkOperation = suppressCommitsInBulkOperation;
     init();
   }
 
   private void init(){
     try {
-      this.server = new CommonsHttpSolrServer("http://sat001:8080/siren");
+      this.server = new CommonsHttpSolrServer(getEventListenerContext().getSolrServerURI().toString());
     } catch (MalformedURLException e) {
       logger.warn("could not create solr server",e);
     }
@@ -67,13 +82,14 @@ public class IndexNeedAction extends BaseEventBotAction
   {
     logger.debug("adding need {} to solr server", ((NeedCreatedEventForMatcher) event).getNeedURI());
     NeedCreatedEventForMatcher needEvent = (NeedCreatedEventForMatcher) event;
-    Model needModel = needEvent.getNeedModel();
+    Dataset needDataset = needEvent.getNeedData();
+    //this dataset contains the complete need data
     NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
     NeedModelBuilder needModelBuilder = new NeedModelBuilder();
-    needModelBuilder.copyValuesFromProduct(needModel);
+    needModelBuilder.copyValuesFromProduct(WonRdfUtils.NeedUtils.getNeedModelFromNeedDataset(needDataset));
     needModelBuilder.copyValuesToBuilder(builder);
     if (logger.isDebugEnabled()){
-      logger.debug("got this model from won node: {}", RdfUtils.toString(needModel));
+      logger.debug("got this model from won node: {}", RdfUtils.toString(needDataset));
       logger.debug("writing this solrInputDocument to siren: {}", builder.build());
     }
 
@@ -82,9 +98,15 @@ public class IndexNeedAction extends BaseEventBotAction
     SolrInputDocument doc = builder.build();
 
     server.add(doc);
-    server.commit();
+    long now = System.currentTimeMillis();
+
+    if (!suppressCommitsInBulkOperation || Math.abs(now - lastInvocation) > SUPPRESS_COMMIT_TIMESPAN){
+      server.commit();
+    }
+    this.lastInvocation = now;
+
     getEventListenerContext().getEventBus().publish(new NeedAddedToSolrEvent(((NeedCreatedEventForMatcher) event)
-                                                                               .getNeedURI(),((NeedCreatedEventForMatcher) event).getNeedModel()));
+      .getNeedURI()));
     logger.debug("need {} added to solr", ((NeedCreatedEventForMatcher) event).getNeedURI());
   }
 

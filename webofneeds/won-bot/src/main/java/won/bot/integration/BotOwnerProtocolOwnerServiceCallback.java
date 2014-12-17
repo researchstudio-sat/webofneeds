@@ -7,6 +7,7 @@ import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
+import won.protocol.message.WonMessage;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -25,12 +26,12 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   TaskScheduler taskScheduler;
 
   @Override
-  public void onClose(final Connection con, final Model content) {
+  public void onClose(final Connection con, final Model content, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
             logger.debug("onClose received for connection {} ",con);
-          getBotForNeedUri(con.getNeedURI()).onCloseFromOtherNeed(con, content);
+          getBotForNeedUri(con.getNeedURI()).onCloseFromOtherNeed(con, wonMessage);
         } catch (Exception e) {
           logger.warn("error while handling onClose()",e);
         }
@@ -39,11 +40,11 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   }
 
   @Override
-  public void onHint(final Match match, final Model content) {
+  public void onHint(final Match match, final Model content, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
-          getBotForNeedUri(match.getFromNeed()).onHintFromMatcher(match, content);
+          getBotForNeedUri(match.getFromNeed()).onHintFromMatcher(match, wonMessage);
         } catch (Exception e) {
           logger.warn("error while handling onHint()",e);
         }
@@ -52,12 +53,12 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   }
 
   @Override
-  public void onConnect(final Connection con, final Model content) {
+  public void onConnect(final Connection con, final Model content, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
           logger.debug("onConnect called for connection {} ",con.getConnectionURI());
-          getBotForNeedUri(con.getNeedURI()).onConnectFromOtherNeed(con, content);
+          getBotForNeedUri(con.getNeedURI()).onConnectFromOtherNeed(con, wonMessage);
         } catch (Exception e) {
           logger.warn("error while handling onConnect()",e);
         }
@@ -66,11 +67,11 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   }
 
   @Override
-  public void onOpen(final Connection con, final Model content) {
+  public void onOpen(final Connection con, final Model content, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
-          getBotForNeedUri(con.getNeedURI()).onOpenFromOtherNeed(con, content);
+          getBotForNeedUri(con.getNeedURI()).onOpenFromOtherNeed(con, wonMessage);
         } catch (Exception e) {
           logger.warn("error while handling onOpen()",e);
         }
@@ -79,12 +80,13 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
   }
 
   @Override
-  public void onTextMessage(final Connection con, final ChatMessage message, final Model content) {
+  public void onTextMessage(final Connection con, final ChatMessage message,
+                            final Model content, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
           logger.debug("onTextMessage for Connection {} ",con.getConnectionURI());
-          getBotForNeedUri(con.getNeedURI()).onMessageFromOtherNeed(con, message, content);
+          getBotForNeedUri(con.getNeedURI()).onMessageFromOtherNeed(con, message, wonMessage);
         } catch (Exception e) {
           logger.warn("error while handling onTextMessage()",e);
         }

@@ -18,10 +18,13 @@ package won.node.protocol.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.Header;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDecoder;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.service.NeedFacingNeedCommunicationService;
 import won.protocol.util.RdfUtils;
@@ -42,42 +45,71 @@ public class NeedProtocolNeedServiceImplJMSBased
   protected NeedFacingConnectionCommunicationServiceImpl connectionCommunicationService;
   protected NeedProtocolNeedService delegate;
 
-  public URI connect(@Header("needURI") final String needURI, @Header(
-    "otherNeedURI") final String otherNeedURI, @Header("otherConnectionURI") final String otherConnectionURI, @Header(
-    "content") final String content)
+  public URI connect(
+          @Header("needURI") final String needURI,
+          @Header("otherNeedURI") final String otherNeedURI,
+          @Header("otherConnectionURI") final String otherConnectionURI,
+          @Header("content") final String content,
+          @Header("wonMessage") final String wonMessageString)
     throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+
     logger.debug("NODE2: connect received for need {], otherNeed{},connectionURI {}, content {}");
+
     URI needURIConvert = URI.create(needURI);
     URI otherNeedURIConvert = URI.create(otherNeedURI);
     URI otherConnectionURIConvert = URI.create(otherConnectionURI);
     Model contentConvert = RdfUtils.toModel(content);
+    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
+    return this.delegate.connect(
+      needURIConvert,
+      otherNeedURIConvert,
+      otherConnectionURIConvert,
+      contentConvert,
+      wonMessage);
 
-    return this.delegate.connect(needURIConvert, otherNeedURIConvert, otherConnectionURIConvert, contentConvert);
   }
 
-  public void open(@Header("connectionURI") final String connectionURI, @Header("content") final String content)
-    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    logger.debug("NODE2: open received for need {], otherNeed{},connectionURI {}, content {}");
+  public void open(
+          @Header("connectionURI") final String connectionURI,
+          @Header("content") final String content,
+          @Header("wonMessage") String wonMessageString)
+    throws NoSuchConnectionException, IllegalMessageForConnectionStateException, IllegalMessageForNeedStateException {
+
+    logger.debug("NODE2: open received for need {}, otherNeed{},connectionURI {}, content {}");
+
     URI connectionURIConvert = URI.create(connectionURI);
     Model contentConvert = RdfUtils.toModel(content);
-    delegate.open(connectionURIConvert, contentConvert);
+    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
+    delegate.open(connectionURIConvert, contentConvert, wonMessage);
+
   }
 
-  public void close(@Header("connectionURI") final String connectionURI, @Header("content") final String content)
+  public void close(
+          @Header("connectionURI") final String connectionURI,
+          @Header("content") final String content,
+          @Header("wonMessage") String wonMessageString)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
     logger.debug("NODE2: close received for need {], otherNeed{},connectionURI {}, content {}");
+
     URI connectionURIConvert = URI.create(connectionURI);
     Model contentConvert = RdfUtils.toModel(content);
-    delegate.close(connectionURIConvert, contentConvert);
+    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
+    delegate.close(connectionURIConvert, contentConvert, wonMessage);
   }
 
-  public void textMessage(@Header("connectionURI") final String connectionURI, @Header("content") final String message)
+  public void sendMessage(
+          @Header("connectionURI") final String connectionURI,
+          @Header("content") final String message,
+          @Header("wonMessage") String wonMessageString)
     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+
     logger.debug("NODE2: text message received for connection {], message {}", connectionURI, message);
+
     URI connectionURIConvert = URI.create(connectionURI);
     Model messageConvert = RdfUtils.toModel(message);
-    delegate.textMessage(connectionURIConvert, messageConvert);
+    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, wonMessageString);
+    delegate.sendMessage(connectionURIConvert, messageConvert, wonMessage);
   }
 
   public void setNeedFacingNeedCommunicationService(final NeedFacingNeedCommunicationService needFacingNeedCommunicationService) {

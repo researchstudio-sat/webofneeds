@@ -18,6 +18,7 @@ package won.node.facet.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 
@@ -32,22 +33,30 @@ public interface Facet
 
   FacetType getFacetType();
 
-  void openFromOwner(Connection con, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  void openFromOwner(Connection con, Model content, WonMessage wonMessage)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void closeFromOwner(Connection con, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  void closeFromOwner(Connection con, Model content, WonMessage wonMessage)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void textMessageFromOwner(Connection con, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  void sendMessageFromOwner(Connection con, Model message, WonMessage wonMessage)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void openFromNeed(Connection con, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  void openFromNeed(Connection con, Model content, WonMessage wonMessage)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void closeFromNeed(Connection con, Model content) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  void closeFromNeed(Connection con, Model content, WonMessage wonMessage)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void textMessageFromNeed(Connection con, Model message) throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
+  void sendMessageFromNeed(Connection con, Model message, WonMessage wonMessage)
+          throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
-  void hint(Connection con, double score, URI originator, Model content)
+  void hint(Connection con, double score, URI originator, Model content, WonMessage wonMessage)
       throws NoSuchNeedException, IllegalMessageForNeedStateException;
 
-  void connectFromNeed(Connection con, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+  void connectFromNeed(Connection con, Model content, WonMessage wonMessage)
+          throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
-  void connectFromOwner(Connection con, Model content) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+  void connectFromOwner(Connection con, Model content, WonMessage wonMessage)
+          throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 }

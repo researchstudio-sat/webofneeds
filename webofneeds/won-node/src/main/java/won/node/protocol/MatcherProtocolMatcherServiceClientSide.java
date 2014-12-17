@@ -17,6 +17,7 @@
 package won.node.protocol;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import won.protocol.message.WonMessage;
 
 import java.net.URI;
 
@@ -27,11 +28,11 @@ import java.net.URI;
 public interface MatcherProtocolMatcherServiceClientSide
 {
 
-  public void matcherRegistered(final URI wonNodeURI);
+  public void matcherRegistered(final URI wonNodeURI, final WonMessage wonMessage);
 
-  public void needCreated(final URI needURI, final Model content);
+  public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage);
 
-  public void needActivated(final URI needURI);
+  public void needActivated(final URI needURI, final WonMessage wonMessage);
 
-  public void needDeactivated(final URI needURI);
+  public void needDeactivated(final URI needURI, final WonMessage wonMessage);
 }
