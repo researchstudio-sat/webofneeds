@@ -68,6 +68,7 @@ angular.module('won.owner')
         link: function(scope, element, attrs){
             $log.debug("wonPostDetail");
             scope.getTypePicURI = applicationControlService.getTypePicURI
+            scope.humanReadableType = applicationControlService.humanReadableType
         }//,
         //scope:{},
    }

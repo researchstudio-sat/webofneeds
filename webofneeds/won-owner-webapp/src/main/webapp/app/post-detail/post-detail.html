@@ -25,9 +25,10 @@
 <!--<div class="inline"><img ng-src="{{getTypePicURI(need.basicNeedType)}}" tooltip="need type"/></div>-->
 
         <p>NEED: {{need}}</p>
-        <p>TYPE: {{need.basicNeedType}}<p/>
+        <!--<p>TYPE: {{need.basicNeedType}}<p/>
         <p>URL: {{getTypePicURI(need.basicNeedType)}}<p/>
-<img ng-src="{{getTypePicURI(need.basicNeedType)}}" tooltip="need type"/>
+        <p>TypeHR: {{humanReadableType(need.basicNeedType)}}<p/>-->
+<img ng-src="{{getTypePicURI(need.basicNeedType)}}" tooltip="{{humanReadableType(need.basicNeedType)}}"/>
 
 
 
