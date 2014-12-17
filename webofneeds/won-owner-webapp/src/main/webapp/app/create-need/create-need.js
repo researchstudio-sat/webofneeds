@@ -14,7 +14,19 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $timeout, $location,$log, $http, $routeParams, needService,applicationStateService, mapService, userService, utilService, wonService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function
+    ($scope
+        , $timeout
+        , $location
+        , $log
+        , $http
+        , $routeParams
+        , needService
+        , applicationStateService
+        , mapService
+        , userService
+        , utilService
+        , wonService) {
     $scope.currentStep = $routeParams.step;
     $scope.selectedType = $routeParams.selectedType;
     $scope.title = $routeParams.title;
