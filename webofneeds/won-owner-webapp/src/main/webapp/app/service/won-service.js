@@ -330,14 +330,16 @@ angular.module('won.owner').factory('wonService', function (
 
                 });
             callback.done = false;
-            callback.shouldHandleTest = function (msg) {
-                return true;
+            callback.shouldHandleTest = function (event, msg) {
+                var ret = event.refersTo == this.msgURI;
+                $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
+                return ret;
             };
             callback.shouldUnregisterTest = function(msg) {
                 return this.done;
             };
-
-            messageService.addMessageCallback(callback);
+            //TODO uncomment when notification for this message is implemented
+            //messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
                 setTimeout(
@@ -454,14 +456,17 @@ angular.module('won.owner').factory('wonService', function (
 
                 });
             callback.done = false;
-            callback.shouldHandleTest = function (msg) {
-                return true;
+            callback.shouldHandleTest = function (event, msg) {
+                var ret = event.refersTo == this.msgURI;
+                $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
+                return ret;
             };
             callback.shouldUnregisterTest = function(msg) {
                 return this.done;
             };
 
-            messageService.addMessageCallback(callback);
+            //TODO uncomment when notification for this message is implemented
+            //messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
                 // ideally should be in callback, but since there is no response coming,
@@ -558,14 +563,17 @@ angular.module('won.owner').factory('wonService', function (
 
                 });
             callback.done = false;
-            callback.shouldHandleTest = function (msg) {
-                return true;
+            callback.shouldHandleTest = function (event, msg) {
+                var ret = event.refersTo == this.msgURI;
+                $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
+                return ret;
             };
             callback.shouldUnregisterTest = function(msg) {
                 return this.done;
             };
 
-            messageService.addMessageCallback(callback);
+            //TODO uncomment when notification for this message is implemented
+            //messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
 
@@ -651,7 +659,7 @@ angular.module('won.owner').factory('wonService', function (
                     // it is 'close sent response success received' event...)
                     $q.all([uriOfUpdatedConnectionPromise, uriOfCloseEventPromise])
                         .then(function(result) {
-                            linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
+                            linkedDataService.invalidateCacheForNewMessage(eventDataToClose.hasSender);
                             $log.debug("Broadcasting angular event " + won.EVENT.CLOSE_SENT);
                             $rootScope.$broadcast(won.EVENT.CLOSE_SENT, eventDataToClose);
                         },
@@ -660,14 +668,18 @@ angular.module('won.owner').factory('wonService', function (
                         });
                 });
             callback.done = false;
-            callback.shouldHandleTest = function (msg) {
-                return true;
+            callback.msgURI = eventUri;
+            callback.shouldHandleTest = function (event, msg) {
+                var ret = event.refersTo == this.msgURI;
+                $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
+                return ret;
             };
             callback.shouldUnregisterTest = function(msg) {
                 return this.done;
             };
 
-            messageService.addMessageCallback(callback);
+            //TODO uncomment when notification for this message is implemented
+            //messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
                 // ideally should be in callback, but since there is no response coming,
@@ -738,14 +750,17 @@ angular.module('won.owner').factory('wonService', function (
 
                 });
             callback.done = false;
-            callback.shouldHandleTest = function (msg) {
-                return true;
+            callback.shouldHandleTest = function (event, msg) {
+                var ret = event.refersTo == this.msgURI;
+                $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
+                return ret;
             };
             callback.shouldUnregisterTest = function(msg) {
                 return this.done;
             };
 
-            messageService.addMessageCallback(callback);
+            //TODO uncomment when notification for this message is implemented
+            //messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
                 setTimeout(

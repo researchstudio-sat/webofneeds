@@ -142,7 +142,7 @@
 							<a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
 							<ul class="dropdown-menu" ng-controller="DraftCtrl"  >
 								<li
-                                        ng-repeat="draft in allDrafts | orderObjectBy:'timestamp':true | limitTo: recordsToDisplay">
+                                        ng-repeat="draft in allDrafts | orderObjectBy:'meta.timestamp':true | limitTo: recordsToDisplay">
                                     <a href ng-click="clickOn(draft.uri)">
                                     <span style="display: none;">{{draft.basicNeedType}}</span>
                                     <img ng-src="{{getTypePicURI(draft.basicNeedType)}}"/>

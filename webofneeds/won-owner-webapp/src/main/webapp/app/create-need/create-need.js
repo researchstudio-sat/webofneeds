@@ -325,6 +325,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         needService.saveDraft(createDraftObject).then(function(saveDraftResponse){
             if (saveDraftResponse.status === "OK") {
                 $scope.successShow = true;
+                $scope.draftURI = $scope.need.needURI;
             } else {
                 // TODO inform about an error
             }
