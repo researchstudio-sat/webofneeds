@@ -245,28 +245,75 @@
 		</div>
 	</div>
 </div>
+	-----------------
+<div class="panel panel-default">
+    <div class="panel-heading">
+
+        <!--	class="well div-table col-lg-12"> -->
+        <div class="div-table-row">
+            <div class="col-lg-3 div-table-cell centered-text additional-info-title">Location</div>
+            <div class="col-lg-8">{{getLocationComment()}}
+            </div>
+            <div class="col-lg-1 div-table-cell centered-text">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        FORM CONTENT HERE. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+        <!-- all about forms: http://getbootstrap.com/css/#forms -->
+        <!-- TODO use these?: http://getbootstrap.com/components/#input-groups -->
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+		<h2 class="panel-title" style="display: inline">Location</h2>
+		<span>{{getLocationComment()}}</span>
+		<span class="glyphicon glyphicon-chevron-right"></span>
+    </div>
+    <div class="panel-body">
+        FORM CONTENT HERE. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+        <!-- all about forms: http://getbootstrap.com/css/#forms -->
+        <!-- TODO use these?: http://getbootstrap.com/components/#input-groups -->
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+		<div class="row">
+            <div class="col-md-1"><h2 class="panel-title">Location</h2></div>
+            <div class="col-md-1">UNDER CONSTRUCTION {{getLocationComment()}}</div>
+            <div class="col-md-1 glyphicon glyphicon-chevron-right"></div>
+		</div>
+    </div>
+    <div class="panel-body">
+		FORM CONTENT HERE. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+		<!-- all about forms: http://getbootstrap.com/css/#forms -->
+		<!-- TODO use these?: http://getbootstrap.com/components/#input-groups -->
+    </div>
+</div>
+	-----------------
 
 <div id="locationInfoCollapsed" ng-show="locationInputFieldCollapsed"
-     class="well div-table col-lg-12">
+     class="well" ng-click="locationCollapseClick()">
+	<!--	class="well div-table col-lg-12"> -->
 	<div class="div-table-row">
 		<div class="col-lg-3 div-table-cell centered-text additional-info-title">Location</div>
 		<div class="col-lg-8">{{getLocationComment()}}
 		</div>
 		<div class="col-lg-1 div-table-cell centered-text">
-                                    <span><a href="" class="glyphicon glyphicon-chevron-right"
-                                             ng-click="locationCollapseClick()"></a></span>
+        	<span class="glyphicon glyphicon-chevron-right"></span>
 		</div>
 	</div>
 
 </div>
 
 <div id="locationInfoTitleWell" ng-show="!locationInputFieldCollapsed"
-     class="well div-table col-lg-12">
+     class="well" ng-click="locationCollapseClick()">
 	<div class="div-table-row">
 		<div class="col-lg-3 div-table-cell centered-text additional-info-title">Location</div>
 		<div class="col-lg-1 col-lg-offset-8 div-table-cell centered-text">
-                                    <span><a href="" class="glyphicon glyphicon-chevron-down"
-                                             ng-click="locationCollapseClick()"></a></span>
+        	<span class="glyphicon glyphicon-chevron-down"></span>
 		</div>
 
 	</div>
