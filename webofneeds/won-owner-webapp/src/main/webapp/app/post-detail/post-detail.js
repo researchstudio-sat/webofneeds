@@ -54,7 +54,41 @@ angular.module('won.owner')
             }
         }
     });
-angular.module('won.owner').controller('PostDetailCtrl', function ($scope,$log, $location, mapService, $compile, $routeParams,applicationControlService, applicationStateService, userService) {
+
+angular.module('won.owner')
+    .directive('wonPostDetail',
+    function postDetailFactory($log, applicationControlService) {
+
+    var directive =  {
+        scope:{
+            need: '=need'
+        },
+        restrict:'AE',
+        templateUrl:"app/post-detail/post-detail.html",
+        link: function(scope, element, attrs){
+            $log.debug("wonPostDetail");
+            scope.getTypePicURI = applicationControlService.getTypePicURI
+            scope.humanReadableType = applicationControlService.humanReadableType
+        }//,
+        //scope:{},
+   }
+
+    return directive
+});
+angular.module('won.owner').controller('PostDetailCtrl',
+    function
+        ( $scope
+        , $log
+        , $location
+        , mapService
+        , $compile
+        , $routeParams
+        , applicationControlService
+        , applicationStateService
+        , userService
+        )
+    {
+
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
     $scope.showPublic = function(){
@@ -83,6 +117,19 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope,$log, 
         $scope.need.startTime = need['startTime'];
     });
 
+    //TODO move these to a service
+    /*var validTypes = ["want", "offer", "todo", "change"]
+    validType = function (type) {
+        return validTypes.indexOf(type) > 0
+    }
+    typeIcon = function(type) {
+        if(validType(type))
+            return "/owner/images/type_posts/" + type + ".png"
+        else {
+            $log.error("Tried to get icon url with the invalid type: " + type)
+            return ""
+        }
+    }*/
 
     //TODO: location, date, needCreated date
 

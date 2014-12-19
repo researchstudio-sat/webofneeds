@@ -21,8 +21,8 @@
 		<div ng-cloak class="alert alert-dismissible alert-success" ng-show="successShow"
 		     style="margin-top:10px; margin-bottom: 10px;" data-dismiss="alert">
 			<span class="close" data-ng-click="successShow=false">&times;</span>
-			<button type="button" class="close" data-ng-click="successShow=false">×</button>
-			Need has been successfully saved
+			<!--<button type="button" class="close" data-ng-click="successShow=false">×</button>-->
+			Need has been successfully saved. Redirecting...
 		</div>
 		<div ng-cloak class="alert alert-dismissable alert-error" ng-show="error" style="margin-top:10px; margin-bottom: 10px;">
 			Error occurred during saving of need
@@ -423,6 +423,7 @@
     </div>
 
     <div class="col-md-12 well">
+		<!--TODO controller should be specified in the directive-->
         <won-Post-Detail need="need"></won-Post-Detail>
         <!--deactivate conatct, map and calendar-->
     </div>

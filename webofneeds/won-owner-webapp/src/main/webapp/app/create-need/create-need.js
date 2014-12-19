@@ -14,7 +14,19 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $timeout, $location,$log, $http, $routeParams, needService,applicationStateService, mapService, userService, utilService, wonService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function
+    ($scope
+        , $timeout
+        , $location
+        , $log
+        , $http
+        , $routeParams
+        , needService
+        , applicationStateService
+        , mapService
+        , userService
+        , utilService
+        , wonService) {
     $scope.currentStep = $routeParams.step;
     $scope.selectedType = $routeParams.selectedType;
     $scope.title = $routeParams.title;
@@ -325,6 +337,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         needService.saveDraft(createDraftObject).then(function(saveDraftResponse){
             if (saveDraftResponse.status === "OK") {
                 $scope.successShow = true;
+                $scope.draftURI = $scope.need.needURI;
             } else {
                 // TODO inform about an error
             }
