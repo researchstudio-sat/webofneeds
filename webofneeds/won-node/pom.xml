@@ -5,12 +5,12 @@
     <parent>
         <groupId>webofneeds</groupId>
         <artifactId>webofneeds</artifactId>
-        <version>0.1</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
 
     <groupId>webofneeds</groupId>
     <artifactId>won-node</artifactId>
-    <version>0.1</version>
+    <version>0.2-SNAPSHOT</version>
     <name>Node</name>
     <url>http://maven.apache.org</url>
 
