@@ -56,8 +56,8 @@ angular.module('won.owner')
 
 
     //settings
-    $scope.privateLink = 'https://won.com/la3f#private'; //todo set value normaly
-    $scope.publicLink = 'http://www.webofneeds.org/'; //todo set value normaly;
+    $scope.privateLink = applicationStateService.getPrivateLink($scope.currentNeed.uri);
+    $scope.publicLink = applicationStateService.getPublicLink($scope.currentNeed.uri);
     $scope.notificationEmail = '';
     $scope.notificationEmailValide = false;
     $scope.notificationChecks = {
@@ -450,6 +450,10 @@ angular.module('won.owner')
             'facebook-share-dialog',
             'width=626,height=436');
         return false;
+    }
+
+    $scope.clickOnPostDetail = function(needUri) {
+        applicationStateService.goToNeedDetailView(needUri);
     }
 
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {

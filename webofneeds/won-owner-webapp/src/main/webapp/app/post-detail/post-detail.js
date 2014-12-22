@@ -102,7 +102,9 @@ angular.module('won.owner').controller('PostDetailCtrl',
     //$scope.need = $scope.$parent.need;
     $scope.need = {};
 
-    linkedDataService.getNeed(applicationStateService.getCurrentNeedURI()).then(function(need){
+    //linkedDataService.getNeed(applicationStateService.getCurrentNeedURI()).then(function(need){
+    linkedDataService.getNeed($routeParams.need).then(function(need){
+        $scope.need = need;
         $scope.need.uri = need['uri'];
         $scope.need.title = need['title'];
         $scope.need.tags = need['tags'];

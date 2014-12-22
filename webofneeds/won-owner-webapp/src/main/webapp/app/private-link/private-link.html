@@ -23,8 +23,7 @@
             <strong>{{currentNeed.title}}</strong>
         </div>
         <div style="text-align: center ;">
-            <a href="#/post-detail/">Go to full description</a>
-            <!-- TODO link needs to be extended by parameters -->
+            <a href="" ng-click="clickOnPostDetail(currentNeed.uri)">Go to full description</a>
         </div>
 
         <!--Messages Area-->
@@ -86,7 +85,7 @@
             <div class="div-table-row col-lg-12">
                 <div class="div-table-cell col-lg-12">
                     <div class="row col-lg-12 text-center">
-                       <conversation chosen-message='chosenMessage'>
+                       <conversation chosen-message='chosenMessage' click-on-post-link='clickOnPostDetail(needUri)'>
                        </conversation>
 
                         <!-- Incoming requests -->
@@ -195,7 +194,6 @@
                                     <p class="text-center">What to do with this conversation request?</p>
                                 </div>
                                 <div class="row col-lg-12">
-                                    <!-- TODO make the buttons working -->
                                     <div class="text-center">
                                         <button class="btn btn-default" ng-click="clickOnDeclineForInRequest()">Decline</button>
                                         <button class="btn btn-default" ng-click="clickOnAcceptForInRequest()">Accept</button>
@@ -209,9 +207,11 @@
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
-                                    <h3 class="panel-title col-md-9">Request for conversation with <a href="#/post-detail"
-                                                                                                      class="underline">{{chosenMessage
-                                        .remoteNeed.title}}</a></h3>
+                                    <h3 class="panel-title col-md-9">Request for conversation with
+                                        <a href="" class="underline"
+                                           ng-click="clickOnPostDetail(chosenMessage.remoteNeed.uri)"
+                                           ng-bind="chosenMessage.remoteNeed.title"></a>
+                                    </h3>
                                     <div  class="col-md-2" ng-bind=eventCommState[chosenMessage.event.uri]></div>
                                 </div>
                             </div>
@@ -223,8 +223,9 @@
                                 </div>
 
                                 <div class ="col-lg-4">
-                                    <a href="#/post-detail"
-                                       class="underline">{{applicationStateService.getAllNeeds()[chosenMessage.connection.belongsToNeed].title}}</a></h4>
+                                    <a href="" class="underline" ng-click="clickOnPostDetail(chosenMessage.need.uri)"
+                                       ng-bind="chosenMessage.need.title"></a>
+                                    </h4>
                                 </div>
                              </div>
 
@@ -234,8 +235,9 @@
                                 </div>
 
                                 <div class ="col-lg-4">
-                                    <a href="#/post-detail"
-                                       class="underline">{{chosenMessage.need.title}}</a></h4>
+                                    <a href="" class="underline" ng-click="clickOnPostDetail(chosenMessage.need.uri)"
+                                       ng-bind="chosenMessage.need.title"></a>
+                                    </h4>
                                 </div>
                             </div>
                             <div class = "row">
@@ -243,7 +245,11 @@
                                 <div class = "col-lg-4">Thumbnail</div>
                             </div>
                                 <div class="row col-lg-12">
-                                    <h4 class="pull-left">Waiting for reply from&nbsp;<a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a></h4>
+                                    <h4 class="pull-left">Waiting for reply from&nbsp;
+                                        <a href="" class="underline"
+                                           ng-click="clickOnPostDetail(chosenMessage.remoteNeed.uri)"
+                                           ng-bind="chosenMessage.remoteNeed.title"></a>
+                                    </h4>
                                 </div>
 
                                 <div class="row col-lg-12">
@@ -265,10 +271,14 @@
                                     <div class="media">
                                         <img class="thumbnail thumbnail-size media-object pull-left" src="/owner/images/need.jpg"/>
                                         <div class="media-body">
-                                            <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.remoteNeed.title}}</a>
+                                            <a href="" class="media-heading pull-left
+                                            underline" ng-click="clickOnPostDetail(chosenMessage.remoteNeed.uri)"
+                                               ng-bind="chosenMessage.remoteNeed.title"></a>
                                             <p class="text-justify">
-                                                {{chosenMessage.remoteNeed.textDescription}}(<a href="#/post-detail/">go to full description</a>).
-                                                <!-- TODO link needs to be extended by parameters -->
+                                                {{chosenMessage.remoteNeed.textDescription}}(
+                                                <a href="" ng-click="clickOnPostDetail(chosenMessage.remoteNeed.uri)"
+                                                >go to full description</a>
+                                                ).
                                             </p>
                                         </div>
                                     </div>
@@ -311,12 +321,13 @@
                                 <div class="media">
                                     <img class="thumbnail thumbnail-size media-object pull-left" src="/owner/images/need.jpg"/>
                                     <div class="media-body">
-                                        <a href="#/post-detail" class="media-heading pull-left underline">{{chosenMessage.remoteNeed.title}}</a>
+                                        <a href="" class="media-heading pull-left
+                                            underline" ng-click="clickOnPostDetail(chosenMessage.remoteNeed.uri)"
+                                           ng-bind="chosenMessage.remoteNeed.title"></a>
                                         <p class="text-justify">
-                                            {{chosenMessage.remoteNeed.textDescription}} (<a href="#/post-detail/">go
-                                            to
-                                            full description</a>).
-                                            <!-- TODO link needs to be extended by parameters -->
+                                            {{chosenMessage.remoteNeed.textDescription}} (
+                                            <a href="" ng-click="clickOnPostDetail(chosenMessage.remoteNeed.uri)">go to full description</a>
+                                            ).
                                         </p>
                                     </div>
                                 </div>
@@ -492,7 +503,8 @@
                     </div>
                     <div class="row col-lg-12">
                         <div class="col-lg-11">
-                            <input type="text" class="form-control" name="publicLink" id="publicLink" ng-model="publicLink" readonly>
+                            <input type="text" class="form-control" name="publicLink" id="publicLink"
+                                   ng-model="publicLink" readonly>
                         </div>
                         <div class="col-lg-1">
                             <!--<span class="glyphicon glyphicon-floppy-disk" style="font-size: 2.8em;" data-toggle="copy link to clipboard"></span>-->

@@ -25,6 +25,7 @@ angular.module('won.owner')
             scope : {
                 chosenMessage: '=',
                 message: '=',
+                clickOnSenderLink: '&',
                 id: '@'
             },
             link: function(scope, element, attrs) {
@@ -37,7 +38,7 @@ angular.module('won.owner')
             template: '<div ng-attr-id="id" class="row col-lg-12" ng-include="getContentUrl()"></div>',
             controller : function($scope){
 
-                $scope.getImageForMessage = function(message){
+                $scope.getImageForMessage = function(message) {
                     if(message.senderNeed == $scope.chosenMessage.connection.belongsToNeed){
                         return "/owner/images/house.gif";
                     }else return "/owner/images/User-blue-icon.png";
@@ -53,7 +54,8 @@ angular.module('won.owner')
             restrict: 'AE',
             templateUrl : 'app/conversation/conversation.html',
             scope : {
-                chosenMessage: '='
+                chosenMessage: '=',
+                clickOnPostLink: '&'
             },
 
             controller : function($scope, $location, $log,$anchorScroll, $rootScope, wonService){

@@ -26,13 +26,19 @@
  // * managing events (as an event-queue)
  // * managing information about the currently viewed need (that's what we've got a browser/routing for)
  // * holding information about the loaded needs/drafts (we got a user object elsewhere for that)
-angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope, $q,$log) {
+angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope, $q,$log, $location) {
 
     //the service
     var applicationStateService = {}
 
     //private data only used inside the service
     var privateData = {};
+
+    // base url of the application (with # added, e.g. http://localhost:8080/owner/#)
+    var baseUrl = $location.absUrl().substring(0, $location.absUrl().length - $location.url().length);
+    if (baseUrl.indexOf('#', baseUrl.length - 1) == -1) {
+        baseUrl = baseUrl + '#';
+    }
 
     //filter for event types - used by the 'myfilter' method
     //the filter is a dictionary that is compared with elements of an array
@@ -486,6 +492,22 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
                 deferred.reject(reason);
             });
         return deferred.promise;
+    }
+
+    applicationStateService.goToNeedDetailView = function(needUri){
+        $location.url("/post-detail").search({"need": needUri});
+    }
+
+    applicationStateService.getBaseUrl = function(){
+        return baseUrl;
+    }
+
+    applicationStateService.getPublicLink = function(needUri){
+        return applicationStateService.getBaseUrl() + '/post-detail?need=' + encodeURIComponent(needUri);
+    }
+
+    applicationStateService.getPrivateLink = function(needUri){
+        return applicationStateService.getBaseUrl() + '/private'; //todo set value normaly
     }
 
     return applicationStateService;
