@@ -7,7 +7,7 @@
  */
 
 angular.module('won.owner')
-    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, $log,applicationStateService, linkedDataService, wonService) {
+    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, $log,applicationStateService, applicationControlService, linkedDataService, wonService) {
 
     // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
@@ -453,7 +453,7 @@ angular.module('won.owner')
     }
 
     $scope.clickOnPostDetail = function(needUri) {
-        applicationStateService.goToNeedDetailView(needUri);
+        applicationControlService.goToNeedDetailView(needUri);
     }
 
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {

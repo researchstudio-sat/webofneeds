@@ -46,6 +46,8 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     //allow acces to service methods from angular expressions:
     $scope.openNeedDetailView = applicationControlService.openNeedDetailView;
     $scope.getTypePicURI = applicationControlService.getTypePicURI;
+    $scope.clickOnGetStarted = applicationControlService.goHome;
+    $scope.clickOnWon = applicationControlService.goHome;
     $scope.currentNeed = {};
     $scope.lastEventOfEachConnectionOfCurrentNeed = [];
     $scope.eventCommState = {};
@@ -55,10 +57,6 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         if (uriOfChangeNeed == null || currentNeedURI === uriOfChangeNeed){
             reloadCurrentNeedData();
         }
-    }
-
-    $scope.goHome = function(){
-        $location.url("/home");
     }
 
     var reloadCurrentNeedData = function(){

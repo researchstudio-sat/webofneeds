@@ -494,10 +494,6 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return deferred.promise;
     }
 
-    applicationStateService.goToNeedDetailView = function(needUri){
-        $location.url("/post-detail").search({"need": needUri});
-    }
-
     applicationStateService.getBaseUrl = function(){
         return baseUrl;
     }

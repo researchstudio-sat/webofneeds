@@ -34,6 +34,15 @@ angular.module('won.owner').factory('applicationControlService', function (appli
         //private data only used inside the service
     var privateData = {};
 
+    applicationControlService.goToNeedDetailView = function(needUri){
+        $location.url("/post-detail").search({"need": needUri});
+    }
+
+    applicationControlService.goHome = function(){
+        $location.url("/home");
+    }
+
+
     /**
      * Sets the currentNeedURI in the applicationStateService and opens the private-link page.
      * @param needURI
