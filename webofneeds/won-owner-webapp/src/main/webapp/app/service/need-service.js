@@ -208,7 +208,6 @@ angular.module('won.owner').factory('needService', function ($http, $q, applicat
         }).then(
             function success(draft) {
                 $log.debug("Successfully saved draft " + draftToSave.draftURI);
-                applicationStateService.addDraft(draft.data);
                 return {status:"OK"};
             },
             function error(response) {

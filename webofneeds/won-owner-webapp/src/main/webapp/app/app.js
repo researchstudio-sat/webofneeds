@@ -274,5 +274,5 @@ angular.resetForm = function (scope, formName, defaults) {
 	}
 };
 app.config(['$logProvider', function($logProvider){
-    $logProvider.debugEnabled(false);
+    $logProvider.debugEnabled(true);
 }])
