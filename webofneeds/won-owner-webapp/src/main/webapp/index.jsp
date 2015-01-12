@@ -135,7 +135,7 @@
                                 src="/owner/images/type_posts/todo.png"/>&nbsp;I
 							want to do something <strong>together</strong></a></li>
 						<li class="divider"></li>
-						<li class="top-layer"><a href="#/create-need/1/3/title"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
                                 src="/owner/images/type_posts/change.png"/>&nbsp;I
 							want to <strong>change</strong> something</a></li>
 						<li class="divider" ng-show="!showPublic()"></li>
