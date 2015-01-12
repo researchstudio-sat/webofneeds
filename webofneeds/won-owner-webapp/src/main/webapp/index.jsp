@@ -23,7 +23,7 @@
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- see http://getbootstrap.com/css/#overview-mobile -->
-		<title>Web Of Needs</title>
+		<title ng-bind="'Web Of Needs - '+$root.title">Web Of Needs</title>
 		<link rel="stylesheet" href="style/bootstrap.min.css" />
 		<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>
 		<link rel="stylesheet" href="style/main.css"/>

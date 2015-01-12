@@ -36,6 +36,9 @@
 angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $rootScope, $log, messageService, wonService, userService) {
     //we use the messageService dependency in order to force websocket creation from the very beginning
     //we use the wonService dependency because it initializes messageService's callback (addMessageCallback)
+    $rootScope.$on("$routeChangeSuccess", function(event, currentRoute, previousRoute) {
+        $rootScope.title = currentRoute.title;
+    });
     $scope.selectedType = -1;
     $scope.applicationStateService = applicationStateService;
     $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();

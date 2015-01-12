@@ -27,33 +27,32 @@ app = angular.module('won.owner',
     ).config(function ($routeProvider, $httpProvider, $provide) {
         $httpProvider.responseInterceptors.push('redirectInterceptor');
 	    $routeProvider.
-            when('/create-need/:step/:selectedType/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
-            when('/create-need/:step/:selectedType', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
-            when('/create-need/:step', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html'}).
-			when('/', {controller : 'HomeCtrl', templateUrl:'app/home/welcome.html'}).
-            when('/home', {controller : 'HomeCtrl', templateUrl: 'app/home/home.partial.html'}).
-			when('/signin', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
-			when('/register', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html'}).
-            when('/need-list', {controller : 'NeedListCtrl', templateUrl:'app/need-list/need-list.partial.html'}).
+            when('/create-need/:step/:selectedType/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html',title:'Create Need'}).
+            when('/create-need/:step/:selectedType', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html',title:'Create Need'}).
+            when('/create-need/:step', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html',title:'Create Need'}).
+			when('/', {controller : 'HomeCtrl', templateUrl:'app/home/welcome.html',title:'Welcome'}).
+            when('/home', {controller : 'HomeCtrl', templateUrl: 'app/home/home.partial.html',title:'Home'}).
+			when('/signin', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html',title:'Sign in'}).
+			when('/register', {controller:'HomeCtrl', templateUrl:'app/home/home.partial.html',title:'Register'}).
+            when('/need-list', {controller : 'NeedListCtrl', templateUrl:'app/need-list/need-list.partial.html',title:'Post List'}).
 			//when('/need-detail/:needId', {controller:'NeedDetailCtrl', templateUrl:'app/need-detail/need-detail.partial.html'}).
-            when('/why-use', {controller:'WhyUseCtrl', templateUrl:'app/why-use/why-use.html'}).
-            when('/impressum', {controller:'ImpressumCtrl', templateUrl:'app/impressum/impressum.html'}).
-            when('/search', {controller:'SearchCtrl', templateUrl:'app/search/search.html'}).
-            when('/faq', {controller:'FaqCtrl', templateUrl:'app/faq/faq.html'}).
-            when('/forgot-pwd', {controller:'ForgotPwdCtrl', templateUrl:'app/forgot-pwd/forgot-pwd.html'}).
-            when('/new-pwd', {controller:'EnterNewPwdCtrl', templateUrl:'app/forgot-pwd/enter-new-pwd.html'}).
-            when('/postbox', {controller:'PostBoxCtrl', templateUrl:'app/postbox/postbox.html'}).
-            when('/private-link', {controller:'PrivateLinkCtrl', templateUrl:'app/private-link/private-link.html'}).
-            when('/post-detail', {controller:'PostDetailCtrl', templateUrl:'app/post-detail/post-detail.html'}).
+            when('/why-use', {controller:'WhyUseCtrl', templateUrl:'app/why-use/why-use.html', title:'Why use Web of Needs?'}).
+            when('/impressum', {controller:'ImpressumCtrl', templateUrl:'app/impressum/impressum.html',title:'Impressum'}).
+            when('/search', {controller:'SearchCtrl', templateUrl:'app/search/search.html',title:'Search'}).
+            when('/faq', {controller:'FaqCtrl', templateUrl:'app/faq/faq.html',title:'FAQ'}).
+            when('/forgot-pwd', {controller:'ForgotPwdCtrl', templateUrl:'app/forgot-pwd/forgot-pwd.html',title:'Forgot Password'}).
+            when('/new-pwd', {controller:'EnterNewPwdCtrl', templateUrl:'app/forgot-pwd/enter-new-pwd.html',title:'New Password'}).
+            when('/postbox', {controller:'PostBoxCtrl', templateUrl:'app/postbox/postbox.html',title:'Postbox'}).
+            when('/private-link', {controller:'PrivateLinkCtrl', templateUrl:'app/private-link/private-link.html',title:'Private Link'}).
+            when('/post-detail', {controller:'PostDetailCtrl', templateUrl:'app/post-detail/post-detail.html', title:'Post Detail'}).
 			otherwise({redirectTo : '/home'});
     //TODO add access control / error handling (e.g. trying to bring up /postbox while not logged in)
-
-app.directive('header', function(){
-    return {
-        restrict: 'A',
-        replace: true,
-        templateUrl:'templates/header.html'
-    }
+    app.directive('header', function(){
+        return {
+            restrict: 'A',
+            replace: true,
+            templateUrl:'templates/header.html'
+        }
 })
 
 	/* http://stackoverflow.com/questions/18888104/angularjs-q-wait-for-all-even-when-1-rejected */
