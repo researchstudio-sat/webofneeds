@@ -14,7 +14,7 @@
   ~    limitations under the License.
   -->
 
-<div xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<div id="createNeed" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <div class="col-lg-12">
 <div id="needSaveAlert" class="row top-buffer">
 	<div class="col-lg-8 col-lg-offset-2">
@@ -190,8 +190,7 @@
      class="well div-table col-lg-12">
 	<div class="div-table-row">
 		<div class="col-lg-3 div-table-cell centered-text additional-info-title">Images</div>
-		<div class="col-lg-8 div-table-cell">{{getImagesComment()}}
-		</div>
+		<div class="col-lg-8 div-table-cell">{{getImagesComment()}}</div>
 		<div class="col-lg-1 div-table-cell centered-text">
                                         <span>
                                             <a href="" class="glyphicon glyphicon-chevron-right"
@@ -246,127 +245,74 @@
 	</div>
 </div>
 	-----------------
-<div class="panel panel-default">
-    <div class="panel-heading">
+	<div id="locationInfo"  class="panel panel-default">
+		<div class="panel-heading" ng-click="locationCollapseClick()">
+			<div class="div-table-row">
+                <div class="col-lg-3 div-table-cell centered-text additional-info-title">
+					<h2 class="panel-title">Location</h2>
+				</div>
+                <div class="col-lg-8">
+					{{getLocationComment()}}
+				</div>
+                <div class="col-lg-1 div-table-cell centered-text">
+					<!--TODO: code duplication-->
+                    <span class="glyphicon glyphicon-chevron-right" ng-show="locationInputFieldCollapsed"/>
+					<span class="glyphicon glyphicon-chevron-down" ng-show="!locationInputFieldCollapsed"/>
+                </div>
+			</div>
+		</div>
+		<div class="panel-body" ng-show="!locationInputFieldCollapsed">
+			<!-- all about forms: http://getbootstrap.com/css/#forms -->
+			<!-- TODO use these?: http://getbootstrap.com/components/#input-groups -->
 
-        <!--	class="well div-table col-lg-12"> -->
-        <div class="div-table-row">
-            <div class="col-lg-3 div-table-cell centered-text additional-info-title">Location</div>
-            <div class="col-lg-8">{{getLocationComment()}}
-            </div>
-            <div class="col-lg-1 div-table-cell centered-text">
-                <span class="glyphicon glyphicon-chevron-right"></span>
+
+            <div id="locationInfoInputFields" ng-show="!locationInputFieldCollapsed"
+                 class="div-table col-lg-12">
+                <div class="div-table-row">
+                    <div class="col-lg-10 col-lg-offset-1">
+                        <div>
+                            Enter as many of these as you wish (e.g. only "Austria" works as well).
+                        </div>
+
+                        <label for="country" class="col-lg-10 col-lg-offset-1">Country</label>
+                        <div class="col-lg-10 col-lg-offset-1">
+                            <input type="text" class="form-control" id="country"
+                                   placeholder="Austria" required/>
+                        </div>
+
+                        <label for="postal" class="col-lg-5 col-lg-offset-1">Postal</label>
+                        <label for="city" class="col-lg-5">City</label>
+
+                        <div class="col-lg-5 col-lg-offset-1">
+                            <input type="text" class="form-control" id="postal"
+                                   placeholder="1010" required/>
+                        </div>
+                        <div class="col-lg-5">
+                            <input type="text" class="form-control" id="city"
+                                   placeholder="Vienna" required/>
+                        </div>
+
+
+
+                        <label for="street" class="col-lg-10 col-lg-offset-1">Street</label>
+                        <div class="col-lg-10 col-lg-offset-1">
+                            <input type="text" class="form-control" id="street"
+                                placeholder="Yellowbrick road" required/>
+                        </div>
+
+                        <div class="col-lg-10 col-lg-offset-1">
+                            <strong>Showing:&nbsp;</strong><span>Yellowbrick road, Vienna, Austria</span>
+                            <section id="map">
+                                <div ui-map="myMap" ui-options="mapOptions" class="map-canvas"
+                                     ui-event="{'map-click' : 'onClickMap($event, $params, $myMap)'}"></div>
+                            </section>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
-    <div class="panel-body">
-        FORM CONTENT HERE. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-        <!-- all about forms: http://getbootstrap.com/css/#forms -->
-        <!-- TODO use these?: http://getbootstrap.com/components/#input-groups -->
-    </div>
-</div>
-
-<div class="panel panel-default">
-    <div class="panel-heading">
-		<h2 class="panel-title" style="display: inline">Location</h2>
-		<span>{{getLocationComment()}}</span>
-		<span class="glyphicon glyphicon-chevron-right"></span>
-    </div>
-    <div class="panel-body">
-        FORM CONTENT HERE. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-        <!-- all about forms: http://getbootstrap.com/css/#forms -->
-        <!-- TODO use these?: http://getbootstrap.com/components/#input-groups -->
-    </div>
-</div>
-<div class="panel panel-default">
-    <div class="panel-heading">
-		<div class="row">
-            <div class="col-md-1"><h2 class="panel-title">Location</h2></div>
-            <div class="col-md-1">UNDER CONSTRUCTION {{getLocationComment()}}</div>
-            <div class="col-md-1 glyphicon glyphicon-chevron-right"></div>
-		</div>
-    </div>
-    <div class="panel-body">
-		FORM CONTENT HERE. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-		<!-- all about forms: http://getbootstrap.com/css/#forms -->
-		<!-- TODO use these?: http://getbootstrap.com/components/#input-groups -->
-    </div>
-</div>
-	-----------------
-
-<div id="locationInfoCollapsed" ng-show="locationInputFieldCollapsed"
-     class="well" ng-click="locationCollapseClick()">
-	<!--	class="well div-table col-lg-12"> -->
-	<div class="div-table-row">
-		<div class="col-lg-3 div-table-cell centered-text additional-info-title">Location</div>
-		<div class="col-lg-8">{{getLocationComment()}}
-		</div>
-		<div class="col-lg-1 div-table-cell centered-text">
-        	<span class="glyphicon glyphicon-chevron-right"></span>
-		</div>
-	</div>
-
-</div>
-
-<div id="locationInfoTitleWell" ng-show="!locationInputFieldCollapsed"
-     class="well" ng-click="locationCollapseClick()">
-	<div class="div-table-row">
-		<div class="col-lg-3 div-table-cell centered-text additional-info-title">Location</div>
-		<div class="col-lg-1 col-lg-offset-8 div-table-cell centered-text">
-        	<span class="glyphicon glyphicon-chevron-down"></span>
-		</div>
-
-	</div>
-</div>
-
-<div id="locationInfoInputFields" ng-show="!locationInputFieldCollapsed"
-     class="div-table col-lg-12">
-	<div class="div-table-row">
-		<div class="col-lg-10 col-lg-offset-1">
-            <div>
-                {{getLocationComment()}}
-            </div>
-            <div>
-                Enter as many of these as you wish (e.g. only "Austria" works as well).
-            </div>
-
-            <label for="country" class="col-lg-10 col-lg-offset-1">Country</label>
-            <div class="col-lg-10 col-lg-offset-1">
-                <input type="text" class="form-control" id="country"
-                       placeholder="Austria" required/>
-            </div>
-
-            <label for="postal" class="col-lg-5 col-lg-offset-1">Postal</label>
-            <label for="city" class="col-lg-5">City</label>
-
-            <div class="col-lg-5 col-lg-offset-1">
-                <input type="text" class="form-control" id="postal"
-                       placeholder="1010" required/>
-            </div>
-            <div class="col-lg-5">
-                <input type="text" class="form-control" id="city"
-                       placeholder="Vienna" required/>
-            </div>
-
-
-
-            <label for="street" class="col-lg-10 col-lg-offset-1">Street</label>
-            <div class="col-lg-10 col-lg-offset-1">
-                <input type="text" class="form-control" id="street"
-                    placeholder="Yellowbrick road" required/>
-            </div>
-
-            <div class="col-lg-10 col-lg-offset-1">
-                <strong>Showing:&nbsp;</strong><span>Yellowbrick road, Vienna, Austria</span>
-                <section id="map">
-                    <div ui-map="myMap" ui-options="mapOptions" class="map-canvas"
-                         ui-event="{'map-click' : 'onClickMap($event, $params, $myMap)'}"></div>
-                </section>
-            </div>
-		</div>
-
-	</div>
-</div>
 
 <div id="timeInfoCollapsed" ng-show="timeInputFieldCollapsed" class="well div-table col-lg-12">
 	<div class="div-table-row">
