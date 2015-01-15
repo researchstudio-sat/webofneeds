@@ -91,6 +91,7 @@ public class SearchService
       BooleanQuery combinedQuery = new BooleanQuery();
       if (keywords != null && keywords.length() > 0) {
         combinedQuery.add(createKeywordQuery(keywords), BooleanClause.Occur.MUST);
+        combinedQuery.add(createTitleQuery(keywords), BooleanClause.Occur.MUST);
       }
       if (needModel != null && needModel.size() > 0) {
         NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
@@ -114,7 +115,11 @@ public class SearchService
   }
 
 
-
+  private Query createTitleQuery(final String title) throws ParseException{
+    Analyzer analyzer = this.solrIndexSearcher.getSchema().getField(SolrFields.TITLE).getType().getQueryAnalyzer();
+    QueryParser parser = new QueryParser(Version.LUCENE_35,SolrFields.TITLE,analyzer);
+    return parser.parse(title);
+  }
   private Query createKeywordQuery(final String keywords) throws ParseException
   {
     Analyzer analyzer = this.solrIndexSearcher.getSchema().getField(SolrFields.KEYWORD_SEARCH).getType().getQueryAnalyzer();

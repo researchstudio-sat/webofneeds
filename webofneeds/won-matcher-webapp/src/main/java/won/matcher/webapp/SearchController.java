@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import won.matcher.service.SearchResultModelMapper;
 import won.matcher.service.SearchService;
+import won.protocol.util.RdfUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,13 +36,15 @@ public class SearchController
    */
   @RequestMapping(value="search",
       method = RequestMethod.GET,
-      produces={"application/rdf+xml","application/x-turtle","text/turtle","text/rdf+n3","application/ld+json"})
+      produces={"text/html","application/xhtml+xml","application/xml","application/rdf+xml","application/x-turtle",
+                "text/turtle","text/rdf+n3", "application/ld+json"})
   @ResponseBody
-  public Model search(
+  public String search(
       @RequestParam(value="q", required = true) final String keywords,
       @RequestParam(value="n", required = false, defaultValue = DEFAULT_NUM_RESULTS) final int numResults)
   {
-    return searchResultModelMapper.toModel(searchService.search(keywords, numResults));
+    Model model = searchResultModelMapper.toModel(searchService.search(keywords, numResults));
+    return RdfUtils.toString(model);
   }
 
   /**
