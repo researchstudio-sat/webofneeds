@@ -31,6 +31,7 @@
         <property name="configLocation" value="classpath:/matcher-ehcache.xml" />
         <property name="shared" value="false" />
         <property name="cacheManagerName" value="matcherCacheManager" />
+        <property name="acceptExisting" value="true"/>
     </bean>
 
 </beans>
