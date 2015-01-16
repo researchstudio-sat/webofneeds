@@ -46,33 +46,7 @@
         <div id="createNeedContent" class="row top-buffer">
             <div class="col-lg-12">
                 <form class="form-horizontal">
-                    <!--<div ng-show="showPublic(1)" class="col-lg-6 col-lg-offset-3">
-                                            <fieldset>
-                                                <div class="form-group">
-                                                    <div class="btn-group-vertical col-lg-12">
-                                                        <button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
-                                                                btn-radio="'DEMAND'" ng-click="nextStep()">Want: I'm looking for
-                                                        </button>
-                                                        <button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
-                                                                btn-radio="'OFFER'" ng-click="nextStep()">Offer: I'm offering
-                                                        </button>
-                                                        <button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
-                                                                btn-radio="'DO_TOGETHER'" ng-click="nextStep()">Activity: Looking for
-                                                            people
-                                                            to
-                                                        </button>
-                                                        <button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
-                                                                btn-radio="'CRITIQUE'" ng-click="nextStep()">Critique: Let's do something
-                                                            about
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                            </fieldset>
-
-                                        </div>  -->
                     <div ng-show="showPublic(1)" class="col-lg-8 col-lg-offset-2">
-
                         <div class="well">
                             <form id="post-form" name="postForm" novalidate>
                                 <fieldset>
@@ -306,9 +280,53 @@
                                     <input type="button" value="Encode" onclick="markAddresses()">
                                 </div>-->
 
-                                <input type="text" class="form-control" id="addresstest"
-                                       placeholder="Thurngasse 8, Vienna, Austria" required/>
+                                <!--TODO: below is a script to trigger an action when typing is paused-->
+                                <!--
+                                <script>
+                                    //setup before functions
+                                    var typingTimer;                //timer identifier
+                                    var doneTypingInterval = 1500;  //time in ms, 5 second for example
 
+                                    //on keyup, start the countdown
+                                    $('#addresstest').keyup(function(){
+                                        clearTimeout(typingTimer);
+                                        typingTimer = setTimeout(doneTyping, doneTypingInterval);
+                                    });
+
+                                    //on keydown, clear the countdown
+                                    $('#addresstest').keydown(function(){
+                                        clearTimeout(typingTimer);
+                                    });
+
+                                    //user is "finished typing," do something
+                                    function doneTyping () {
+                                        var locationString = $('#addresstest').val()
+                                        //alert(encodeURIComponent(locationString));
+                                        //do something
+                                    }
+                                </script>-->
+
+                                <form novalidate>
+                                    <input type="text" class="form-control" id="addresstest"
+                                           ng-model="addressTestText"
+                                           placeholder="Thurngasse 8, Vienna, Austria"
+                                           value="Testroad, testington, testcountry[["/>
+                                    <input type="submit" value="Search" ng-click="onAddressTestSubmit(addressTestText)">
+                                </form>
+                                <h3>Did you mean:</h3>
+                                <ul ng-repeat="adr in addressSearchResults">
+                                    <!--TODO make sure json-structure actually is as assumed (in case of API changes) or clean up beforehand -->
+                                    <li ng-click="selectAddress(adr)">{{adr.display_name}}</li>
+                                </ul>
+                                <h3>Selected:</h3>
+                                <ul>
+                                    <li>Address: {{selectedAddress.display_name}} </li>
+                                    <li>Latitude: {{selectedAddress.lat}}</li>
+                                    <li>Longtitude: {{selectedAddress.lon}}</li>
+                                </ul>
+
+                                <h3>The Unfiltered Response:</h3>
+                                <pre>{{addressSearchResults | json}}</pre>
                                 <div id="locationInfoInputFields" ng-show="!locationInputFieldCollapsed"
                                      class="div-table col-lg-12">
                                     <div class="div-table-row">

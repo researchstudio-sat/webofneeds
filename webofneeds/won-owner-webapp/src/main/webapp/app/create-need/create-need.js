@@ -653,13 +653,20 @@ angular.module('won.owner').directive('wonGallery', function factory() {
     };
 });
 angular.module('won.owner').controller('AdditionalInfoCtrl',
-    function ($scope, $location, $http, needService, mapService, userService) {
+    function ($scope, $location, $http, needService, mapService, osmService, userService) {
         $scope.imageInputFieldCollapsed = true;
         $scope.locationInputFieldCollapsed = true;
         $scope.timeInputFieldCollapsed = true;
 
-        $scope.onAddressSubmit = function () {
-            alert("address submit working");
+        $scope.onAddressTestSubmit = function (addressQuery) {
+            osmService.getLocations(addressQuery, function(resp) {
+                $scope.addressSearchResults = resp;
+            })
+        }
+
+        $scope.selectedAddress = {}
+        $scope.selectAddress = function (address) {
+            $scope.selectedAddress = address;
         }
 
 

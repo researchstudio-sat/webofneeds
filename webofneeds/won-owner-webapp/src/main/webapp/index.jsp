@@ -74,6 +74,7 @@
         <script type="text/javascript" src="<c:url value="/app/service/application-control-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/osm-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
