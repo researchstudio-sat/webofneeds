@@ -658,9 +658,10 @@ angular.module('won.owner').controller('AdditionalInfoCtrl',
         $scope.locationInputFieldCollapsed = true;
         $scope.timeInputFieldCollapsed = true;
 
-        $scope.onAddressTestSubmit = function (addressQuery) {
-            osmService.getLocations(addressQuery, function(resp) {
+        $scope.onAddressTestSubmit = function (address) {
+            osmService.matchingLocations(address, function handler(resp) {
                 $scope.addressSearchResults = resp;
+                //TODO trigger a digest cycle so the results get displayed
             })
         }
 
