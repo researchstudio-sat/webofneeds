@@ -59,7 +59,8 @@ Directive-Content:
           ng-bind="need.tags.split(',')[$index]">
     </span>
 </div>
-<div style="text-align: right">
+
+<div ng-show="canBeContacted()" style="text-align: right">
     Interested in this post?
     <button type="button" ng-disabled="previewRegime" class="btn btn-default" ng-click="clickOnContact()">Contact</button>
 </div>

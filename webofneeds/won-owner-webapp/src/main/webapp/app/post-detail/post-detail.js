@@ -98,6 +98,19 @@ angular.module('won.owner').controller('PostDetailCtrl',
         $location.url("create-need/1/"+applicationControlService.getMenuPositionForNeedType($scope.need.basicNeedType));
     }
 
+    $scope.canBeContacted = function(){
+
+        // if it is own need, cannot be contacted
+        if (applicationStateService.getAllNeeds()[$routeParams.need]) {
+            return false;
+        }
+        // TODO check with storyboard people:
+        // if it is another need, but communication already established,
+        // probably also should not be contacted?
+
+        return true;
+    }
+
     $scope.hoverCopyToolTip ="I want this too";
     //$scope.need = $scope.$parent.need;
     $scope.need = {};
