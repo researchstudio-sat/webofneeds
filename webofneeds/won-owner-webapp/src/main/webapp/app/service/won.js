@@ -219,6 +219,7 @@
 
         won.EVENT = {};
         won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
+        won.EVENT.WON_SEARCH_RECEIVED = "SearchReceivedEvent";
         won.EVENT.NEED_CREATED = "NeedCreatedEvent";
         won.EVENT.HINT_RECEIVED = "HintReceivedEvent";
         won.EVENT.CONNECT_SENT ="ConnectSentEvent";

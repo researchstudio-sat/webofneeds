@@ -102,6 +102,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
     });
+
     $scope.$on(won.EVENT.CONNECT_SENT, function(ngEvent, eventData) {
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
@@ -183,6 +184,9 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     });
     $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
         messageService.reconnect();
+    });
+    $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
+       $log.debug("search received");
     });
 
     // This is probably a temporary solution for socket disconnecting with code 1011,

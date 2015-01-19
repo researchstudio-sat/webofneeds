@@ -69,6 +69,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.init = function(){
         privateData.allNeeds = {}
         privateData.allDrafts = {};
+        privateData.searchResults = [];
 
         privateData.allClosed = [
             {type:'Want', title:'Playing soccer together', datetime: new Date('2014-08-23')},
@@ -487,6 +488,19 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             });
         return deferred.promise;
     }
-
+    applicationStateService.addSearchResults = function(searchResults,promises){
+        var deferred = $q.defer();
+        $q.all(promises).then(function(searchResults){
+            angular.forEach(searchResults,function(result){
+                result.data = linkedDataService.getNeed(result['matchURI']);
+            })
+        })
+        privateData.searchResults = searchResults;
+        deferred.resolve(privateData.searchResults);
+        return deferred.promise;
+    }
+    applicationStateService.getSearchResults = function(){
+        return privateData.searchResults;
+    }
     return applicationStateService;
 });

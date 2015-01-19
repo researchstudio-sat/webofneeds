@@ -14,14 +14,13 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log, mapService) {
-    $scope.results = [
-        {id:1},
-        {id:2},
-        {id:3}
-    ];
+angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log, mapService, applicationStateService) {
 
-
+    $scope.results = applicationStateService.getSearchResults();
+    $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
+        event.data = linkedDataService.getNeed(event.matchUrl());
+        $scope.results.push(event);
+    })
     // TODO LOGIC
     $scope.relatedTags = ['Sony', 'Tv', 'Samsung', 'LCD'];
 
