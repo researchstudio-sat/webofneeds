@@ -7,9 +7,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import pojo.SearchResultPojo;
+import won.matcher.service.SearchResult;
 import won.matcher.service.SearchResultModelMapper;
 import won.matcher.service.SearchService;
 import won.protocol.util.RdfUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,6 +50,32 @@ public class SearchController
   {
     Model model = searchResultModelMapper.toModel(searchService.search(keywords, numResults));
     return RdfUtils.toString(model);
+  }
+
+  /**
+   * takes keywords and number of results to be returned and performs the search.
+   * @param keywords keywords to search
+   * @param numResults number of results to be returned
+   * @return RDF model of search results
+   */
+  @RequestMapping(value="searchJson",
+    method = RequestMethod.GET,
+    produces={"application/ld+json"})
+  @ResponseBody
+  public List<SearchResultPojo> searchJson(
+    @RequestParam(value="q", required = true) final String keywords,
+    @RequestParam(value="n", required = false, defaultValue = DEFAULT_NUM_RESULTS) final int numResults)
+  {
+    List<SearchResultPojo> searchResultPojos = new ArrayList<>();
+
+    SearchResult searchResult = searchService.search(keywords,numResults);
+
+    for (int i = 0; i<searchResult.getItems().size();i++){
+      SearchResultPojo searchResultPojo = new SearchResultPojo(searchResult.getItems().get(i).getUri().toString(),searchResult
+        .getItems().get(i).getScore());
+      searchResultPojos.add(searchResultPojo);
+    }
+    return searchResultPojos;
   }
 
   /**
