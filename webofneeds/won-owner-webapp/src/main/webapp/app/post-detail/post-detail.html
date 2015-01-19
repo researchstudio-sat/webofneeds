@@ -64,6 +64,9 @@ Directive-Content:
     Interested in this post?
     <button type="button" ng-disabled="previewRegime" class="btn btn-default" ng-click="clickOnContact()">Contact</button>
 </div>
+<div  style="text-align: center" ng-show="contactFormActiv">
+    <won-contact need="need" allNeeds="allNeeds"/>
+</div>
 
 
 <!-- SNIPPETS for LOCATION, TIME and GALLERY. TODO: These need serious refactoring before they can be used
