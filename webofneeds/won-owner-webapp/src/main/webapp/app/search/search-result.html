@@ -1,6 +1,6 @@
 <div class="container col-md-12">
     <div class="well col-md-4">
-        <div ng-repeat="row in results">
+        <div ng-repeat="row in preparedResults">
             <div class="row">
                 <div class="col-md-6" ng-repeat="result in row">
                     <a href="#/search/1" class="thumbnail">
@@ -10,10 +10,6 @@
                 </div>
             </div>
         </div>
-
-
     </div>
-
-
     <won-Post-Detail class="col-md-8" ng-controller="PostDetailCtrl"></won-Post-Detail>
 </div>
