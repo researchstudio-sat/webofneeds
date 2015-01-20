@@ -17,6 +17,7 @@
 angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log, mapService, applicationStateService) {
 
     $scope.results = applicationStateService.getSearchResults();
+    $scope.columnNum = 2;
     $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
         event.data = linkedDataService.getNeed(event.matchUrl());
         $scope.results.push(event);
@@ -32,4 +33,36 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
         $location.url('/create-need/1//' + $scope.searching.title);
     }
 });
+app.directive(('searchResult'), function searchResultFct(){
+    var dtv = {
+        restrict: 'E',
+        scope : {
+            results : '=',
+            columnNum : '@'
+        },
+        templateUrl: "app/search/search-result.html",
+        link: function(scope, elem, attr){
+            scope.counter = 0;
+            scope.preparedResults = [];
+            var prepareResults = function(){
+                var rowCount = 0;
+                for(var i = 0;i<scope.results.length;i++){
+                    if(i%scope.columnNum==0){
+                        rowCount = rowCount+1;
+                        var row = [];
+                        row.push(scope.results[i]);
+                        scope.preparedResults.push(row);
+                    }else{
+                        scope.preparedResults[scope.preparedResults.length-1].push(scope.results[i]);
+                    }
+                }
+            }
+            prepareResults();
+        },
+        controller: function($scope){
+
+        }
+    }
+    return dtv;
+})
 

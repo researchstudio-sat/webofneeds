@@ -124,7 +124,6 @@ angular.module('won.owner')
         return{
             restrict: 'A',
             controller: function($scope, $rootScope,$anchorScroll,$location){
-
                 $scope.$on('RenderFinishedEvent', function(scope, element, attrs){
                     $timeout(function(){
                         var old = $location.hash();
@@ -133,7 +132,6 @@ angular.module('won.owner')
                         $location.hash(old);
                     },200)
                 });
-
             },
             link: function(scope, element, attrs){
 
