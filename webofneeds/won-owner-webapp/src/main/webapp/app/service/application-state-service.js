@@ -108,10 +108,15 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return privateData.currentEvent;
     }
     applicationStateService.processEventAndUpdateUnreadEventObjects = function(eventData){
-        var eventType = eventData.eventType;
-        var needURI = eventData.hasReceiverNeed;
-        updateUnreadEventsByNeedByType(needURI, eventType, eventData);
-        updateUnreadEventsByTypeByNeed(needURI, eventType, eventData);
+        if (eventData.matchCounterpartURI in privateData.allNeeds || eventData.hasSenderNeed in privateData.allNeeds) {
+            // ignore events of connections that connect to my own need
+            return;
+        } else {
+            var eventType = eventData.eventType;
+            var needURI = eventData.hasReceiverNeed;
+            updateUnreadEventsByNeedByType(needURI, eventType, eventData);
+            updateUnreadEventsByTypeByNeed(needURI, eventType, eventData);
+        }
     };
 
     // now just updates the counters,
@@ -486,7 +491,15 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         }
         linkedDataService.getLastEventOfEachConnectionOfNeed(applicationStateService.getCurrentNeedURI())
             .then(function(events){
-                privateData.lastEventOfEachConnectionOfCurrentNeed = events;
+                privateData.lastEventOfEachConnectionOfCurrentNeed = [];
+                var index;
+                for	(index = 0; index < events.length; index++) {
+                    if (events[index].connection.hasRemoteNeed in privateData.allNeeds) {
+                        // ignore events of connections that connect to my own need
+                    } else {
+                        privateData.lastEventOfEachConnectionOfCurrentNeed.push(events[index]);
+                    }
+                }
                 deferred.resolve(privateData.lastEventOfEachConnectionOfCurrentNeed)
             }, function(reason){
                 deferred.reject(reason);
