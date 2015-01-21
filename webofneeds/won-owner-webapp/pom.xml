@@ -170,7 +170,7 @@
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <version>${cargo.version}</version>
                 <configuration>
-                    <skip>true</skip>
+                    <skip>false</skip>
                     <container>
                         <containerId>tomcat7x</containerId>
                         <type>remote</type>
