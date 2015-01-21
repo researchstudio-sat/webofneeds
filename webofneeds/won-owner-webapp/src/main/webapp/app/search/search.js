@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log, mapService, applicationStateService) {
+angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams, mapService, applicationStateService) {
 
     $scope.results = applicationStateService.getSearchResults();
     $scope.columnNum = 2;
@@ -24,6 +24,9 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
     })
     // TODO LOGIC
     $scope.relatedTags = ['Sony', 'Tv', 'Samsung', 'LCD'];
+    $scope.search = {};
+    $scope.search.title = $routeParams.term;
+    $scope.search.type = $routeParams.type;
 
     //TODO LOGIC
     $scope.searching = {type:'others offer', title:'Frilly pink cat unicorn'};

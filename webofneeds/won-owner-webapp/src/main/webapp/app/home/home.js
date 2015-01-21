@@ -264,7 +264,7 @@ angular.module('won.owner').controller('HomeCtrl',
 
         if ($scope.otherNewSearch.$valid && validPanel) {
             //userService.registerUser($scope.registerUser).then(onRegisterResponse);
-            searchService.search($scope.othersPost.searchText);
+            searchService.search($scope.othersPost.selectedType, $scope.othersPost.searchText);
             //$location.url('/search');
         }
     }

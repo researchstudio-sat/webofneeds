@@ -2,7 +2,7 @@ angular.module('won.owner').factory('searchService', function ($window, $http, $
     var searchService = {};
 
 
-    searchService.search = function(searchText){
+    searchService.search = function(type,searchText){
         $http.get(
             '/matcher/search/',
             {
@@ -13,7 +13,7 @@ angular.module('won.owner').factory('searchService', function ($window, $http, $
             }
         ).then(
             function (results) {
-                var frame = {
+                var frame = [{
                     "@context": {
                         "dc": "http://purl.org/dc/elements/1.1/",
                         "ex": "http://example.org/vocab#",
@@ -21,23 +21,18 @@ angular.module('won.owner').factory('searchService', function ($window, $http, $
                         "won":"http://purl.org/webofneeds/model#"
                     },
                     "@type": "won:Match"
-                }
+                }]
 
                 var framedResult = jsonld.frame(results.data, frame);
-                var eventData = {};
-                for (key in framedResult){
-                    var propName = won.getLocalName(key);
-                    if (propName != null && ! won.isJsonLdKeyword(propName)) {
-                        eventData[propName] = won.getSafeJsonLdValue(framedResult[key]);
-                    }
-                }
+
+
                 var promises = [];
-                angular.forEach(results.data,function(result){
-                    promises.push(linkedDataService.invalidateCacheForNeed(result['matchURI']));
+                angular.forEach(framedResult,function(res){
+                    promises.push(linkedDataService.invalidateCacheForNeed(res['won:uri']));
                 })
-                applicationStateService.addSearchResults(results.data,promises);
-                $location.url('search');
-                $rootScope.$broadcast(won.EVENT.WON_SEARCH_RECEIVED, results.data);
+                applicationStateService.addSearchResults(framedResult,promises);
+                $location.url('search/'+type+'/'+searchText);
+                $rootScope.$broadcast(won.EVENT.WON_SEARCH_RECEIVED, framedResult);
 
 
             },

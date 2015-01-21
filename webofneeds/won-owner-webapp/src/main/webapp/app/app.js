@@ -38,7 +38,7 @@ app = angular.module('won.owner',
 			//when('/need-detail/:needId', {controller:'NeedDetailCtrl', templateUrl:'app/need-detail/need-detail.partial.html'}).
             when('/why-use', {controller:'WhyUseCtrl', templateUrl:'app/why-use/why-use.html', title:'Why use Web of Needs?'}).
             when('/impressum', {controller:'ImpressumCtrl', templateUrl:'app/impressum/impressum.html',title:'Impressum'}).
-            when('/search', {controller:'SearchCtrl', templateUrl:'app/search/search.html',title:'Search'}).
+            when('/search/:type/:term', {controller:'SearchCtrl', templateUrl:'app/search/search.html',title:'Search'}).
             when('/faq', {controller:'FaqCtrl', templateUrl:'app/faq/faq.html',title:'FAQ'}).
             when('/forgot-pwd', {controller:'ForgotPwdCtrl', templateUrl:'app/forgot-pwd/forgot-pwd.html',title:'Forgot Password'}).
             when('/new-pwd', {controller:'EnterNewPwdCtrl', templateUrl:'app/forgot-pwd/enter-new-pwd.html',title:'New Password'}).
