@@ -37,6 +37,10 @@
 
         <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.min.css"/>
 
+        <!--leaflet.js provides us with a map-widget which can display map material from different sources-->
+        <script type="text/javascript" src="resources/leaflet-0.7.3/leaflet.js"></script>
+        <link rel="stylesheet" href="resources/leaflet-0.7.3/leaflet.css"/>
+
 
         <script src="scripts/jquery.10.2.js"></script>
         <script src="scripts/jquery.fs.scroller.min.js"></script>
@@ -55,6 +59,7 @@
         <script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
+        <%--<script type="text/javascript" src="scripts/osm/angular-leaflet-directive.min.js"></script>--%>
         <script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
         <script type="text/javascript" src="scripts/lightbox.min.js"></script>
         <script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>

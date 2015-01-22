@@ -178,6 +178,40 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
     }
 
+    // <leaflet-map>
+    var marker;
+    var map;
+    $scope.mapInit = function () {
+        // -------- snippet from leafletjs.com ----------
+        // create a map in the "map" div, set the view to a given place and zoom
+        map = L.map('leaflet-canvas')
+        map.fitWorld()
+
+        // add an OpenStreetMap tile layer
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // add a marker in the given location, attach some popup content to it and open the popup
+        marker = L.marker([51.5, -0.09])
+        marker.addTo(map)
+            .bindPopup('A pretty CSS3 popup. <br> Easily customizable.')
+            .openPopup();
+    }
+    $scope.mapInit();
+    $scope.setMapLocation = function (lat, lon, adr) { //TODO not in $scope but only usable here in link?
+        map.removeLayer(marker); // remove the previous marker //TODO does this delete the popup as well?
+        marker = L.marker([lat, lon]);
+        marker.addTo(map).bindPopup(adr);
+
+        //TODO base zoomlevel (L.latLng(lat, lon, alt(!))) on size of the selected area
+        map.setView([lat, lon], 13);
+
+        marker.openPopup();
+    }
+    // </leaflet-map>
+
+    // <oldmap>
     $scope.marker = null;
 
     $scope.getMapOptions = function () {
@@ -202,6 +236,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         $scope.need.latitude = $params[0].latLng.lat();
         $scope.need.longitude = $params[0].latLng.lng();
     };
+    //</oldmap>
 
     $scope.showPublic = function (num) {
         if (num == $scope.currentStep) {
@@ -668,6 +703,7 @@ angular.module('won.owner').controller('AdditionalInfoCtrl',
         $scope.selectedAddress = {}
         $scope.selectAddress = function (address) {
             $scope.selectedAddress = address;
+            $scope.setMapLocation(address.lat, address.lon, address.display_name);
         }
 
 

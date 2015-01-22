@@ -326,8 +326,14 @@
                                     <li>Longtitude: {{selectedAddress.lon}}</li>
                                 </ul>
 
+                                <h3>Playing around with leaflet:</h3>
+                                <div id="leaflet-canvas" style="width: 480px; height: 480px;"></div>
+
                                 <h3>The Unfiltered Response:</h3>
                                 <pre>{{addressSearchResults | json}}</pre>
+
+                                <!--<leaflet height="480px" width="640px"></leaflet>-->
+
                                 <div id="locationInfoInputFields" ng-show="!locationInputFieldCollapsed"
                                      class="div-table col-lg-12">
                                     <div class="div-table-row">
