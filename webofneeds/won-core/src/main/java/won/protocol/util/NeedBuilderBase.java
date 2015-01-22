@@ -429,6 +429,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
 
   protected Interval parseDateInterval(String interval, String separator)
   {
+    if (interval == null ) return null;
     String[] parts = interval.split(separator);
     if (parts.length != 2)
       throw new IllegalArgumentException("There should be exactly two parts. Found " + parts.length);

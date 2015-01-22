@@ -19,7 +19,6 @@ angular.module('won.owner').controller('ForgotPwdCtrl', function ($scope, $locat
 		email:''
 	};
 	$scope.sendStatus = false;
-
 	$scope.send = function () {
 		//TODO Put here logic
 		if (!$scope.sendStatus)$scope.sendStatus = true;

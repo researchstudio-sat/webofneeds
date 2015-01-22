@@ -221,6 +221,10 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
   public void afterPropertiesSet() throws Exception
   {
     Ehcache baseCache = cacheManager.getCacheManager().getCache(CACHE_NAME);
+    if (baseCache == null) {
+      throw new IllegalArgumentException(String.format("could not find a cache with name '%s' in ehcache config",
+                                                    CACHE_NAME));
+    }
     this.cache = new SelfPopulatingCache(baseCache, new LinkedDataCacheEntryFactory());
   }
 

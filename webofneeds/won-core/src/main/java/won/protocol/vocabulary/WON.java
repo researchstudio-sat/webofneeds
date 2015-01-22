@@ -157,6 +157,7 @@ public class WON
   public static final Property HAS_GRAPH = m.createProperty(BASE_URI,"hasGraph");
 
   //search result model
+  public static final Resource Match = m.createResource(BASE_URI + "Match");
   public static final Property SEARCH_RESULT_URI = m.createProperty(BASE_URI,"uri");
   public static final Property SEARCH_RESULT_PREVIEW = m.createProperty(BASE_URI, "preview");
 

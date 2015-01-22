@@ -28,7 +28,7 @@
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" ignore-unresolvable="true"/>
     <import resource="classpath:/spring/component/matcherProtocolNeedServiceClient/matcherProtocolNeedServiceClient-ws.xml" />
-    <import resource="classpath:/spring/component/ehcache/matcher-ehcache.xml" />
+    <import resource="classpath:/spring/component/ehcache/spring-matcher-ehcache.xml" />
     <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml" />
 
 </beans>

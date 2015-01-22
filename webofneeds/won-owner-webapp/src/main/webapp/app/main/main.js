@@ -36,6 +36,9 @@
 angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $rootScope, $log, messageService, wonService, userService) {
     //we use the messageService dependency in order to force websocket creation from the very beginning
     //we use the wonService dependency because it initializes messageService's callback (addMessageCallback)
+    $rootScope.$on("$routeChangeSuccess", function(event, currentRoute, previousRoute) {
+        $rootScope.title = currentRoute.title;
+    });
     $scope.selectedType = -1;
     $scope.applicationStateService = applicationStateService;
     $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
@@ -97,6 +100,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
     });
+
     $scope.$on(won.EVENT.CONNECT_SENT, function(ngEvent, eventData) {
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
@@ -178,6 +182,9 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     });
     $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
         messageService.reconnect();
+    });
+    $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
+       $log.debug("search received");
     });
 
     // This is probably a temporary solution for socket disconnecting with code 1011,

@@ -144,6 +144,10 @@
         won.WON.hasTextMessage= won.WON.baseUri + "hasTextMessage";
         won.WON.hasTextMessageCompacted= won.WON.prefix + ":hasTextMessage";
 
+        won.WON.searchResultURI =  won.WON.baseUri + "uri";
+        won.WON.searchResultPreview =  won.WON.baseUri + "preview";
+        //todo: change to SearchResult
+        won.WON.searchResult =  won.WON.baseUri + "Match";
 
 
 
@@ -219,6 +223,7 @@
 
         won.EVENT = {};
         won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
+        won.EVENT.WON_SEARCH_RECEIVED = "SearchReceivedEvent";
         won.EVENT.NEED_CREATED = "NeedCreatedEvent";
         won.EVENT.HINT_RECEIVED = "HintReceivedEvent";
         won.EVENT.CONNECT_SENT ="ConnectSentEvent";
@@ -258,6 +263,7 @@
         won.UNREAD.GROUP = {};
         won.UNREAD.GROUP.ALL="all";
         won.UNREAD.GROUP.BYNEED="byNeed";
+
 
         //UTILS
         var UNSET_URI= "no:uri";

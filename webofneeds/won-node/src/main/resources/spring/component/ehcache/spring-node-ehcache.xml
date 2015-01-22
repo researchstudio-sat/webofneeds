@@ -13,7 +13,6 @@
   ~    See the License for the specific language governing permissions and
   ~    limitations under the License.
   -->
-
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
@@ -27,10 +26,10 @@
         <property name="cacheManager" ref="ehcache"/>
     </bean>
 
-    <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" destroy-method="destroy">
-        <property name="configLocation" value="classpath:/matcher-ehcache.xml" />
+    <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="classpath:/node-ehcache.xml" />
         <property name="shared" value="false" />
-        <property name="cacheManagerName" value="matcherCacheManager" />
+        <property name="cacheManagerName" value="nodeCacheManager" />
     </bean>
 
 </beans>

@@ -13,6 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+.bottom-overlap {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	height: 20%;
+	padding: 15px;
+}
 #postboxLink {
     text-decoration: underline;
 }

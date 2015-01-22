@@ -14,16 +14,19 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log, mapService) {
-    $scope.results = [
-        {id:1},
-        {id:2},
-        {id:3}
-    ];
+angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams, mapService, applicationStateService, applicationControlService) {
 
-
+    $scope.results = applicationStateService.getSearchResults();
+    $scope.columnNum = 2;
+    $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
+        event.data = linkedDataService.getNeed(event.matchUrl());
+        $scope.results.push(event);
+    })
     // TODO LOGIC
     $scope.relatedTags = ['Sony', 'Tv', 'Samsung', 'LCD'];
+    $scope.search = {};
+    $scope.search.title = $routeParams.term;
+    $scope.search.type = $routeParams.type;
 
     //TODO LOGIC
     $scope.searching = {type:'others offer', title:'Frilly pink cat unicorn'};
@@ -33,4 +36,46 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
         $location.url('/create-need/1//' + $scope.searching.title);
     }
 });
+angular.module('won.owner').controller('SearchResultCtrl', function($scope, $log){
+    $scope.res = {}
+    $scope.init = function (result){
+        $scope.res.title = result[won.WON.searchResultPreview][won.WON.hasContent][won.defaultContext.dc+"title"]["@value"];
+        $scope.res.type = result[won.WON.searchResultPreview][won.WON.hasBasicNeedType]['@id'];
+
+    }
+})
+app.directive(('searchResult'), function searchResultFct(applicationControlService){
+    var dtv = {
+        restrict: 'E',
+        scope : {
+            results : '=',
+            columnNum : '@'
+        },
+        templateUrl: "app/search/search-result.html",
+        link: function(scope, elem, attr){
+            scope.counter = 0;
+            scope.preparedResults = [];
+            var prepareResults = function(){
+                var rowCount = 0;
+                for(var i = 0;i<scope.results.length;i++){
+                    if(i%scope.columnNum==0){
+                        rowCount = rowCount+1;
+                        var row = [];
+                        row.push(scope.results[i]);
+                        scope.preparedResults.push(row);
+                    }else{
+                        scope.preparedResults[scope.preparedResults.length-1].push(scope.results[i]);
+                    }
+                }
+
+            }
+            prepareResults();
+        },
+        controller: function($scope, applicationControlService){
+
+
+        }
+    }
+    return dtv;
+})
 

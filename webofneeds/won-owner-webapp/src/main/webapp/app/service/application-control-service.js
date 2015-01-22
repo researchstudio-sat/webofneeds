@@ -89,5 +89,13 @@ angular.module('won.owner').factory('applicationControlService', function (appli
                 return 4;
         }
     }
+    applicationControlService.getNeedType = function(typeNum){
+        switch (typeNum){
+            case 0: return won.WON.BasicNeedTypeDemand;
+            case 1: return won.WON.BasicNeedTypeSupply;
+            case 2: return won.WON.BasicNeedTypeDotogether;
+            case 3: return won.WON.BasicNeedTypeCritique;
+        }
+    }
     return applicationControlService;
 });
