@@ -24,11 +24,11 @@ angular.module('won.owner').factory('searchService', function ($window, $http, $
                 }]
 
                 var framedResult = jsonld.frame(results.data, frame);
-
+                framedResult = jsonld.expand(framedResult);
 
                 var promises = [];
                 angular.forEach(framedResult,function(res){
-                    promises.push(linkedDataService.invalidateCacheForNeed(res['won:uri']));
+                    promises.push(linkedDataService.invalidateCacheForNeed(res[won.WON.searchResultURI]));
                 })
                 applicationStateService.addSearchResults(framedResult,promises);
                 $location.url('search/'+type+'/'+searchText);

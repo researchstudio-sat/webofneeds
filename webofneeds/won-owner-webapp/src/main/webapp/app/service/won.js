@@ -144,6 +144,10 @@
         won.WON.hasTextMessage= won.WON.baseUri + "hasTextMessage";
         won.WON.hasTextMessageCompacted= won.WON.prefix + ":hasTextMessage";
 
+        won.WON.searchResultURI =  won.WON.baseUri + "uri";
+        won.WON.searchResultPreview =  won.WON.baseUri + "preview";
+        //todo: change to SearchResult
+        won.WON.searchResult =  won.WON.baseUri + "Match";
 
 
 
@@ -259,6 +263,7 @@
         won.UNREAD.GROUP = {};
         won.UNREAD.GROUP.ALL="all";
         won.UNREAD.GROUP.BYNEED="byNeed";
+
 
         //UTILS
         var UNSET_URI= "no:uri";

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams, mapService, applicationStateService) {
+angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams, mapService, applicationStateService, applicationControlService) {
 
     $scope.results = applicationStateService.getSearchResults();
     $scope.columnNum = 2;
@@ -36,7 +36,7 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
         $location.url('/create-need/1//' + $scope.searching.title);
     }
 });
-app.directive(('searchResult'), function searchResultFct(){
+app.directive(('searchResult'), function searchResultFct(applicationControlService){
     var dtv = {
         restrict: 'E',
         scope : {
@@ -59,11 +59,16 @@ app.directive(('searchResult'), function searchResultFct(){
                         scope.preparedResults[scope.preparedResults.length-1].push(scope.results[i]);
                     }
                 }
+
             }
             prepareResults();
         },
-        controller: function($scope){
+        controller: function($scope, applicationControlService){
 
+            $scope.getPostType = function(result){
+                return result[won.WON.searchResultPreview][won.WON.hasBasicNeedType]['@id'];
+
+            }
         }
     }
     return dtv;
