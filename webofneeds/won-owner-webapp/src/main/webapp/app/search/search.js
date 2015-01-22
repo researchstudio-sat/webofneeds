@@ -36,6 +36,14 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
         $location.url('/create-need/1//' + $scope.searching.title);
     }
 });
+angular.module('won.owner').controller('SearchResultCtrl', function($scope, $log){
+    $scope.res = {}
+    $scope.init = function (result){
+        $scope.res.title = result[won.WON.searchResultPreview][won.WON.hasContent][won.defaultContext.dc+"title"]["@value"];
+        $scope.res.type = result[won.WON.searchResultPreview][won.WON.hasBasicNeedType]['@id'];
+
+    }
+})
 app.directive(('searchResult'), function searchResultFct(applicationControlService){
     var dtv = {
         restrict: 'E',
@@ -65,10 +73,7 @@ app.directive(('searchResult'), function searchResultFct(applicationControlServi
         },
         controller: function($scope, applicationControlService){
 
-            $scope.getPostType = function(result){
-                return result[won.WON.searchResultPreview][won.WON.hasBasicNeedType]['@id'];
 
-            }
         }
     }
     return dtv;
