@@ -184,23 +184,18 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     $scope.mapInit = function () {
         // -------- snippet from leafletjs.com ----------
         // create a map in the "map" div, set the view to a given place and zoom
-        map = L.map('leaflet-canvas')
-        map.fitWorld()
+        map = L.map('leaflet-canvas');
+        map.fitWorld().zoomIn(); // zoom=0 isn't rectangular (-> gray letterboxing) -> zoomIn to fix this
 
-        // add an OpenStreetMap tile layer
+        // add an OpenStreetMap tile layer with attributions
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
-
-        // add a marker in the given location, attach some popup content to it and open the popup
-        marker = L.marker([51.5, -0.09])
-        marker.addTo(map)
-            .bindPopup('A pretty CSS3 popup. <br> Easily customizable.')
-            .openPopup();
     }
     $scope.mapInit();
     $scope.setMapLocation = function (lat, lon, adr) { //TODO not in $scope but only usable here in link?
-        map.removeLayer(marker); // remove the previous marker //TODO does this delete the popup as well?
+        if(marker != undefined)
+            map.removeLayer(marker); // remove the previous marker //TODO does this delete the popup as well?
         marker = L.marker([lat, lon]);
         marker.addTo(map).bindPopup(adr);
 
@@ -688,16 +683,17 @@ angular.module('won.owner').directive('wonGallery', function factory() {
     };
 });
 angular.module('won.owner').controller('AdditionalInfoCtrl',
-    function ($scope, $location, $http, needService, mapService, osmService, userService) {
+    function ($scope, $location, $http, $log, needService, mapService, osmService, userService) {
         $scope.imageInputFieldCollapsed = true;
         $scope.locationInputFieldCollapsed = true;
         $scope.timeInputFieldCollapsed = true;
 
         $scope.onAddressTestSubmit = function (address) {
-            osmService.matchingLocations(address, function handler(resp) {
+            osmService.matchingLocations(address).then(function(resp){
                 $scope.addressSearchResults = resp;
-                //TODO trigger a digest cycle so the results get displayed
-            })
+            }, function failed(){
+                $log.error("Address resolution failed.");
+            });
         }
 
         $scope.selectedAddress = {}

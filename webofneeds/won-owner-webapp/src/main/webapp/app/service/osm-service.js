@@ -6,12 +6,14 @@
 
 
 
-angular.module('won.owner').factory('osmService', function () {
-    var osm = {}
+angular.module('won.owner').factory('osmService', function ($http, $q) {
+    var osm = {};
     //TODO rewrite to use futures
-    osm.getMostLikelyLocation = function (locationStr, handler) {
-        this.getLocations(locationStr, function(response) {return handler(response[0]) })
+    /*see osm.matchingLocations(). This method returns the best match from the query-results */
+    osm.getMostLikelyLocation = function (address, handler) {
+        this.getLocations(address, function(response) {return handler(response[0]) })
     }
+
     /* If address is a string it will be taken as is and queried with.
     If it's an object of the form of
 
@@ -26,38 +28,58 @@ angular.module('won.owner').factory('osmService', function () {
      if you don't want to include them in the query
 
      */
-    osm.matchingLocations = function (address, handler) {
-        var req = new XMLHttpRequest();
-        req.onload = function(){
-            handler(JSON.parse(this.responseText))
-        };
+    osm.matchingLocations = function(address) {
+        var dfr = $q.defer();
+        $q.all()
+        var paramStr;
+        var errorStr = "unspecified error";
+        if(typeof address === 'string') {
+            paramStr = "q=" + address;
+            errorStr = "matchingLocations@osm-service.js: address-string was empty.";
+        } else { //address object
+            paramStr = osm.adrObjToParamString(address);
+            errorStr = "matchingLocations@osm-service.js: address wasn't " +
+                "an object or didn't contain any of the following: street, " +
+                "city, county, state, country, postalcode";
+        }
+        if(paramStr === "")
+            dfr.reject(errorStr);
+
         //for the nominatim docu see here: http://wiki.openstreetmap.org/wiki/Nominatim
         //adding &polygon_svg=1 to the request would give us the bounding polygon
-        if(typeof address === 'string') {
-            req.open("GET", "http://nominatim.openstreetmap.org/search/" + address + "?format=json&addressdetails=1", true);
-            req.send()
-        } else {
-            adrStr = ""
-
-            if (addressObj.street != undefined)
-                adrStr + "street=" + addressObj.street //<housenumber> <streetname>
-            if (addressObj.city != undefined)
-                adrStr + "city=" + addressObj.city //<city>
-            if (addressObj.county != undefined)
-                adrStr + "county=" + addressObj.county //<county>
-            if (addressObj.state != undefined)
-                adrStr + "state=" + addressObj.state //<state>
-            if (addressObj.country != undefined)
-                adrStr + "country=" + addressObj.country //<country>
-            if (addressObj.postalcode != undefined)
-                adrStr + "postalcode=" + addressObj.postalcode //<postalcode>
-
-            if (adrStr != "") {
-                req.open("GET", "http://nominatim.openstreetmap.org/search/" + adrStr + "?format=json&addressdetails=1", true);
-                req.send();
+        $http.get("http://nominatim.openstreetmap.org/search?" + paramStr + "&format=json&addressdetails=1").then(
+            function success(resp, status, headers, config) {
+                dfr.resolve(resp.data)
+            },
+            function error(resp, status, headers, config) {
+                dfr.reject(resp, status, headers, config)
             }
-        }
+        )
+        return dfr.promise;
     }
+
+    osm.adrObjToParamString = function(addressObj) {
+        var adrStr = ""
+
+        if (addressObj.street != undefined)
+            adrStr += "&street=" + addressObj.street; //<housenumber> <streetname>
+        if (addressObj.city != undefined)
+            adrStr += "&city=" + addressObj.city; //<city>
+        if (addressObj.county != undefined)
+            adrStr += "&county=" + addressObj.county; //<county>
+        if (addressObj.state != undefined)
+            adrStr += "&state=" + addressObj.state; //<state>
+        if (addressObj.country != undefined)
+            adrStr += "&country=" + addressObj.country; //<country>
+        if (addressObj.postalcode != undefined)
+            adrStr += "&postalcode=" + addressObj.postalcode; //<postalcode>
+
+        if (adrStr != "")
+            adrStr = adrStr.substr(1); //remove leading ampersand
+
+        return adrStr;
+    }
+
     return osm;
 })
     /*osm.geocodeResponse = function () {

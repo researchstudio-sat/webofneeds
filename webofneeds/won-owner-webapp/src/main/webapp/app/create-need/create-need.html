@@ -306,15 +306,44 @@
                                     }
                                 </script>-->
 
-                                <form novalidate>
+                                <!--
+
+                            <form novalidate class="form-inline input-group">
+                                <input type="text" class="form-control" id="addresstest"
+                                       ng-model="addressTestText"
+                                       placeholder="Thurngasse 8, Vienna, Austria"
+                                       value="Testroad, testington, testcountry[["/>
+                                <input type="submit" class="btn btn-primary input-group-addon glyphicon glyphicon-search"
+                                       value="Search" ng-click="onAddressTestSubmit(addressTestText)">
+                            </form> -->
+                                <!-- from bootstrap page:
+                                <form class="form-inline">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">$</div>
+                                            <input type="text" class="form-control" id="exampleInputAmount" placeholder="Amount">
+                                            <div class="input-group-addon">.00</div>
+                                            <button type="submit" class="btn btn-default input-group-addon">Foo</button>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-default">Transfer cash</button>
+                                </form>-->
+                                <!-- http://jsfiddle.net/1hm7thq5/ -->
+                                <form novalidate class="">
                                     <input type="text" class="form-control" id="addresstest"
                                            ng-model="addressTestText"
                                            placeholder="Thurngasse 8, Vienna, Austria"
                                            value="Testroad, testington, testcountry[["/>
-                                    <input type="submit" value="Search" ng-click="onAddressTestSubmit(addressTestText)">
+                                    <!--<input type="submit" class="btn btn-primary glyphicon glyphicon-search"
+                                           value="Search" ng-click="onAddressTestSubmit(addressTestText)">-->
+                                    <button type="submit" class="btn btn-default" ng-click="onAddressTestSubmit(addressTestText)" aria-label="Search">
+                                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                    </button>
                                     <!--<input type="submit" value="Search" ng-click="onAddressTestSubmit({city='Wien', country='Austria'})">-->
                                 </form>
                                 <h3>Did you mean:</h3>
+                                <!-- TODO filter for duplicates -->
+                                <!-- TODO hide results with a really score behind a "show more"-fold? (to filter bogus results) -->
                                 <ul ng-repeat="adr in addressSearchResults">
                                     <!--TODO make sure json-structure actually is as assumed (in case of API changes) or clean up beforehand -->
                                     <li ng-click="selectAddress(adr)">{{adr.display_name}}</li>
@@ -326,6 +355,7 @@
                                     <li>Longtitude: {{selectedAddress.lon}}</li>
                                 </ul>
 
+                                <!-- TODO fix graphical glitch that occurs when popup get's shown (and push to leaflet code-base)-->
                                 <h3>Playing around with leaflet:</h3>
                                 <div id="leaflet-canvas" style="width: 480px; height: 480px;"></div>
 
