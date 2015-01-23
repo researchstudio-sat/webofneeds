@@ -688,7 +688,7 @@ angular.module('won.owner').controller('AdditionalInfoCtrl',
         $scope.locationInputFieldCollapsed = true;
         $scope.timeInputFieldCollapsed = true;
 
-        $scope.onAddressTestSubmit = function (address) {
+        $scope.onAddressQuerySubmit = function (address) {
             osmService.matchingLocations(address).then(function(resp){
                 $scope.addressSearchResults = resp;
             }, function failed(){
@@ -700,6 +700,7 @@ angular.module('won.owner').controller('AdditionalInfoCtrl',
         $scope.selectAddress = function (address) {
             $scope.selectedAddress = address;
             $scope.setMapLocation(address.lat, address.lon, address.display_name);
+            $scope.addressText = address.display_name;
         }
 
 
