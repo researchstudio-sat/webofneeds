@@ -271,15 +271,6 @@
                                 </div>
                             </div>
                             <div class="panel-body" ng-show="!locationInputFieldCollapsed">
-                                <!-- all about forms: http://getbootstrap.com/css/#forms -->
-                                <!-- TODO use these?: http://getbootstrap.com/components/#input-groups -->
-
-                                <!--<div onload="mapInitialize()" id="map-canvas" style="width: 480px; height: 480px;"></div>
-                                <div>
-                                    <input id="address" type="textbox" value="Vienna, Austria">
-                                    <input type="button" value="Encode" onclick="markAddresses()">
-                                </div>-->
-
                                 <!--TODO: below is a script to trigger an action when typing is paused-->
                                 <!--
                                 <script>
@@ -306,36 +297,11 @@
                                     }
                                 </script>-->
 
-                                <!--
-                                <div class="btn-group-vertical role="group" aria-label="..."></div>
-                                -->
-
-                                <!--
-                                <div class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li><a href="#">Action</a></li>
-                                        <li><a href="#">Another action</a></li>
-                                        <li><a href="#">Something else here</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="#">Separated link</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="#">One more separated link</a></li>
-                                    </ul>
-                                </div>-->
-
-
-
                                 <form class="input-group">
                                     <input type="text" class="form-control" id="addressTextField"
                                            ng-model="addressText"
                                            placeholder="e.g. Thurngasse 8, Vienna, Austria"/>
 
-                                    <!-- TODO show spinner in folded out drop-down while http-request is loading -->
-                                    <!-- TODO bind down button to open the dropdown (to prevent the browser's own autocompletion from showing/overlapping -->
-                                    <!-- TODO filter for duplicates -->
-                                    <!-- TODO hide results with a really score behind a "show more"-fold? (to filter bogus results) -->
-                                    <!--TODO make sure json-structure actually is as assumed (in case of API changes) or clean up beforehand -->
                                     <ul class="dropdown-menu" role="menu" >
                                         <li ng-click="selectAddress(adr)" ng-repeat="adr in addressSearchResults"><a href="javascript:void(0)">{{adr.display_name}}</a></li>
                                     </ul>
@@ -355,15 +321,10 @@
                                     <li>Longtitude: {{selectedAddress.lon}}</li>
                                 </ul>
 
-                                <!-- TODO show all results (which are also shown in the drop-down).
-                                Highlight the ones over which the mouse hovers / zoom there -->
-                                <!-- TODO fix graphical glitch that occurs when popup get's shown (and push to leaflet code-base)-->
                                 <div id="leaflet-canvas" style="width: 480px; height: 480px;"></div>
 
                                 <h3>The Unfiltered Response:</h3>
                                 <pre>{{addressSearchResults | json}}</pre>
-
-                                <!--<leaflet height="480px" width="640px"></leaflet>-->
 
                                 <div id="locationInfoInputFields" ng-show="!locationInputFieldCollapsed"
                                      class="div-table col-lg-12">
