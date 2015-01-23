@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams, linkedDataService, mapService, applicationStateService, applicationControlService) {
+angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams,$window, linkedDataService, mapService, applicationStateService, applicationControlService) {
 
     $scope.results = applicationStateService.getSearchResults();
     $scope.columnNum = 2;
@@ -33,8 +33,11 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
 
     $scope.createNewPost = function () {
         //TODO put title from search
-        $location.url('/create-need/1//' + $scope.searching.title);
+        $location.url('/create-need/1/' + $scope.searching.title);
     }
+    $scope.redirectToCreatePost = function(){
+        $window.open('/create-need/1/'+$scope.search.title, '_blank');
+    };
 });
 angular.module('won.owner').controller('SearchResultCtrl', function($scope, $log,applicationStateService){
     $scope.res = {};
@@ -75,12 +78,8 @@ app.directive(('searchResult'), function searchResultFct(applicationStateService
 
             }
             prepareResults();
-            //applicationStateService.setCurrentNeedURI(scope.preparedResults[0][0][won.WON.searchResultURI]['@id']);
-            //scope.selectedNeed = linkedDataService.getNeed(scope.preparedResults[0][0][won.WON.searchResultURI]['@id'])
-
         },
         controller: function($scope){
-            $scope.dirNeed = {title:"test"};
             var selectedResult = 0;//default
             $scope.selectedNeed = {};
             $scope.getCurrentNeed=function(){

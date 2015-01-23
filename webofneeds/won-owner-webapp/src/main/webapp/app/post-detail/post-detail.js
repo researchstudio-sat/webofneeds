@@ -133,18 +133,6 @@ angular.module('won.owner').controller('PostDetailCtrl',
     });
 
     //TODO move these to a service
-    /*var validTypes = ["want", "offer", "todo", "change"]
-    validType = function (type) {
-        return validTypes.indexOf(type) > 0
-    }
-    typeIcon = function(type) {
-        if(validType(type))
-            return "/owner/images/type_posts/" + type + ".png"
-        else {
-            $log.error("Tried to get icon url with the invalid type: " + type)
-            return ""
-        }
-    }*/
 
     //TODO: location, date, needCreated date
 
@@ -227,21 +215,6 @@ angular.module('won.owner').controller('PostDetailCtrl',
     $scope.createPaginatedGallery(imagesPerPage);
 
     // TODO fix start and end date
-    /*
-    $('#time_from').datepicker({
-        format:'dd.mm.yyyy',
-        todayHighlight:true,
-        changeMonth:true,
-        changeYear:true,
-        startDate: $scope.need.startDate
-    });
-    $('#time_to').datepicker({
-        format:'dd.mm.yyyy',
-        changeMonth:true,
-        changeYear:true,
-        endDate:$scope.need.endDate
-    }); */
-
     // TODO fix when date is empty
     $scope.toDateString = function(date) {
         var d = date.split('-');
@@ -264,30 +237,6 @@ angular.module('won.owner').controller('PostDetailCtrl',
         $scope.timeInputFieldCollapsed = !$scope.timeInputFieldCollapsed;
     };
 
-    /*
-    $scope.getMapOptions = function(){
-
-        return {
-            center:mapService.getGeolocation(),
-            zoom:15,
-            mapTypeId:google.maps.MapTypeId.ROADMAP
-        };
-    }
-    $scope.mapOptions = $scope.getMapOptions();
-
-    $scope.onClickMap = function($event, $params) {
-        if (this.marker == null) {
-            this.marker = new google.maps.Marker({
-                position : $params[0].latLng,
-                map : this.myMap
-            });
-        } else {
-            this.marker.setPosition($params[0].latLng);
-        }
-        $scope.need.latitude = $params[0].latLng.lat();
-        $scope.need.longitude = $params[0].latLng.lng();
-    };
-    */
 
     $scope.contactFormActiv = false;
     $scope.clickOnContact = function(){
@@ -295,20 +244,6 @@ angular.module('won.owner').controller('PostDetailCtrl',
         $scope.contactFormActiv = !$scope.contactFormActiv;
     }
 
-
-    /*$scope.mapOptions = $scope.getMapOptions()
-     $scope.onClickMap = function($event, $params) {
-     if (this.marker == null) {
-     this.marker = new google.maps.Marker({
-     position : $params[0].latLng,
-     map : this.myMap
-     });
-     } else {
-     this.marker.setPosition($params[0].latLng);
-     }
-     $scope.need.latitude = $params[0].latLng.lat();
-     $scope.need.longitude = $params[0].latLng.lng();
-     };      */
 
     $scope.previewRegime = false;
     $scope.previewRegimeOn = function(){
