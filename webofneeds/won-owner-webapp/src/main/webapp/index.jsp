@@ -114,7 +114,7 @@
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
 
 			<ul class="nav navbar-nav">
-				<li ng-class="isActive()"><a href="" ng-click="goHome()">
+				<li ng-class="isActive()"><a href="" ng-click="clickOnWon()">
 					<i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
 				</li>
 			</ul>

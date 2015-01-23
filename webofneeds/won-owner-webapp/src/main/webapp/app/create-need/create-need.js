@@ -21,6 +21,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         , $log
         , $http
         , $routeParams
+        , $anchorScroll
         , needService
         , applicationStateService
         , mapService
@@ -201,7 +202,13 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         if ($scope.draftURI == null) {
             return $scope.getCleanNeed();
         } else {
-            return  applicationStateService.getDraft($scope.draftURI);
+            var localDraft = applicationStateService.getDraft($scope.draftURI);
+            if (localDraft == null) { // can happen if someone enters create-need-preview url without any of previous steps
+                $scope.draftURI == null
+                return $scope.getCleanNeed();
+            } else {
+                return localDraft;
+            }
         }
     }
 
@@ -226,6 +233,8 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             binaryFolder        :md5((new Date().getTime() + Math.random(1)).toString())
         };
     };
+
+
 
 	$scope.need = $scope.getNeed();
     $scope.need.basicNeedType = $scope.needType();
@@ -256,42 +265,31 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 		$scope.need.tags.splice($scope.need.tags.indexOf(tagName),1);
 	};
 
-    /*$scope.saveDraft = function () {
-      //  needService.saveDraft($scope.need);
-        if($scope.currentStep <= $scope.numberOfSteps) {
-            $scope.currentStep ++;
-        }
-    };  */
+
     $scope.nextStep = function(){
         if($scope.currentStep <= $scope.numberOfSteps) {
-
-            $scope.currentStep ++;
-            $scope.successShow = false;
-            $scope.setShowButtons($scope.currentStep);
+            // -(-1) instead of +1 is just a hack to interpret currentStep as int and not as string
+            $scope.jumpToStep( $scope.currentStep - (-1));
         }
 
     }
     $scope.previousStep = function(){
         if($scope.currentStep >=1) {
-
-            $scope.currentStep --;
-            $scope.successShow = false;
-            $scope.setShowButtons($scope.currentStep);
+            $scope.jumpToStep( $scope.currentStep - 1)
         }
-
     }
+
     $scope.jumpToStep = function(num){
         $log.debug(num);
+        $scope.saveDraft();
         if(num<=$scope.numberOfSteps){
             $scope.currentStep = num;
-            $scope.successShow = false;
-            $scope.setShowButtons($scope.currentStep);
-         //   var newPath = '/create-need/'+$scope.currentStep+'/'+$scope.iPost.selectedType+'/'+$scope.need.title;
-         //   $location.path(newPath);
+            $location.url("create-need/"+$scope.currentStep+"/"+$scope.selectedType +"/"+$scope.need.title).search({"draft": $scope.draftURI});
 
         }
 
     }
+
     $scope.saveDraft = function(){
         var draftBuilderObject = new window.won.DraftBuilder().setContext();
         draftBuilderObject.setCurrentStep($scope.currentStep);
@@ -334,14 +332,32 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
         var createDraftObject = {"draftURI":$scope.need.needURI,"draft":JSON.stringify(draftJson)};
 
-        needService.saveDraft(createDraftObject).then(function(saveDraftResponse){
-            if (saveDraftResponse.status === "OK") {
-                $scope.successShow = true;
-                $scope.draftURI = $scope.need.needURI;
-            } else {
-                // TODO inform about an error
+        // save locally
+        applicationStateService.addDraft(createDraftObject);
+        $scope.draftURI = $scope.need.needURI;
+
+        // save to the server if the user is logged in
+        if (userService.isAuth()) {
+            needService.saveDraft(createDraftObject).then(function(saveDraftResponse){
+                if (saveDraftResponse.status === "OK") {
+                    $scope.successShow = true;
+                } else {
+                    // TODO inform about an error
+                }
+            });
+        }
+    }
+
+    $scope.validStep = function() {
+        if($scope.currentStep > 1) { // after the first step, the need is required to have title, type, description and tags
+            if (!$scope.need.basicNeedType || !$scope.need.title || !$scope.need.textDescription || !$scope.need.tags) {
+                return false;
             }
-        });
+        }
+        return true;
+    };
+    if (!$scope.validStep()) {
+        $scope.jumpToStep(1);
     }
 
     // TODO does not update models
@@ -437,6 +453,12 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
 
 	};
+
+    $scope.goToDetailPostPreview = function() {
+        var detailPreviewElementId = 'detail-preview';
+        $location.hash(detailPreviewElementId);
+        $anchorScroll();
+    }
 
 	$scope.cancel = function () {
 		$location.url("/");

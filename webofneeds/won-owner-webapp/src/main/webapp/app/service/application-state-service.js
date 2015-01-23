@@ -26,13 +26,19 @@
  // * managing events (as an event-queue)
  // * managing information about the currently viewed need (that's what we've got a browser/routing for)
  // * holding information about the loaded needs/drafts (we got a user object elsewhere for that)
-angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope, $q,$log) {
+angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope, $q,$log, $location) {
 
     //the service
     var applicationStateService = {}
 
     //private data only used inside the service
     var privateData = {};
+
+    // base url of the application (with # added, e.g. http://localhost:8080/owner/#)
+    var baseUrl = $location.absUrl().substring(0, $location.absUrl().length - $location.url().length);
+    if (baseUrl.indexOf('#', baseUrl.length - 1) == -1) {
+        baseUrl = baseUrl + '#';
+    }
 
     //filter for event types - used by the 'myfilter' method
     //the filter is a dictionary that is compared with elements of an array
@@ -103,10 +109,15 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return privateData.currentEvent;
     }
     applicationStateService.processEventAndUpdateUnreadEventObjects = function(eventData){
-        var eventType = eventData.eventType;
-        var needURI = eventData.hasReceiverNeed;
-        updateUnreadEventsByNeedByType(needURI, eventType, eventData);
-        updateUnreadEventsByTypeByNeed(needURI, eventType, eventData);
+        if (eventData.matchCounterpartURI in privateData.allNeeds || eventData.hasSenderNeed in privateData.allNeeds) {
+            // ignore events of connections that connect to my own need
+            return;
+        } else {
+            var eventType = eventData.eventType;
+            var needURI = eventData.hasReceiverNeed;
+            updateUnreadEventsByNeedByType(needURI, eventType, eventData);
+            updateUnreadEventsByTypeByNeed(needURI, eventType, eventData);
+        }
     };
 
     // now just updates the counters,
@@ -481,12 +492,32 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         }
         linkedDataService.getLastEventOfEachConnectionOfNeed(applicationStateService.getCurrentNeedURI())
             .then(function(events){
-                privateData.lastEventOfEachConnectionOfCurrentNeed = events;
+                privateData.lastEventOfEachConnectionOfCurrentNeed = [];
+                var index;
+                for	(index = 0; index < events.length; index++) {
+                    if (events[index].connection.hasRemoteNeed in privateData.allNeeds) {
+                        // ignore events of connections that connect to my own need
+                    } else {
+                        privateData.lastEventOfEachConnectionOfCurrentNeed.push(events[index]);
+                    }
+                }
                 deferred.resolve(privateData.lastEventOfEachConnectionOfCurrentNeed)
             }, function(reason){
                 deferred.reject(reason);
             });
         return deferred.promise;
+    }
+
+    applicationStateService.getBaseUrl = function(){
+        return baseUrl;
+    }
+
+    applicationStateService.getPublicLink = function(needUri){
+        return applicationStateService.getBaseUrl() + '/post-detail?need=' + encodeURIComponent(needUri);
+    }
+
+    applicationStateService.getPrivateLink = function(needUri){
+        return applicationStateService.getBaseUrl() + '/private'; //todo set value normaly
     }
     applicationStateService.addSearchResults = function(searchResults,promises){
         var deferred = $q.defer();

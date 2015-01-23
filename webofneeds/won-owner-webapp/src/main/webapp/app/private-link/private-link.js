@@ -7,7 +7,7 @@
  */
 
 angular.module('won.owner')
-    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, $log,applicationStateService, linkedDataService, wonService) {
+    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, $log,applicationStateService, applicationControlService, linkedDataService, wonService) {
 
     // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
@@ -56,8 +56,8 @@ angular.module('won.owner')
 
 
     //settings
-    $scope.privateLink = 'https://won.com/la3f#private'; //todo set value normaly
-    $scope.publicLink = 'http://www.webofneeds.org/'; //todo set value normaly;
+    $scope.privateLink = applicationStateService.getPrivateLink($scope.currentNeed.uri);
+    $scope.publicLink = applicationStateService.getPublicLink($scope.currentNeed.uri);
     $scope.notificationEmail = '';
     $scope.notificationEmailValide = false;
     $scope.notificationChecks = {
@@ -450,6 +450,10 @@ angular.module('won.owner')
             'facebook-share-dialog',
             'width=626,height=436');
         return false;
+    }
+
+    $scope.clickOnPostDetail = function(needUri) {
+        applicationControlService.goToNeedDetailView(needUri);
     }
 
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {
