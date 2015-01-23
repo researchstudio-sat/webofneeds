@@ -13,6 +13,32 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+.thumbnail-selected {
+	display: inline-block;
+	display: block;
+	height: 100px;
+	max-width: 100%;
+	padding: 4px;
+	line-height: 1.428571429;
+	background-color: #fff;
+	border: 1px solid black;
+	border-radius: 4px;
+	-webkit-transition: all .2s ease-in-out;
+	transition: all .2s ease-in-out
+}
+.thumbnail-non-selected {
+	display: inline-block;
+	display: block;
+	height: 100px;
+	max-width: 100%;
+	padding: 4px;
+	line-height: 1.428571429;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	-webkit-transition: all .2s ease-in-out;
+	transition: all .2s ease-in-out
+}
 .bottom-overlap {
 	position: absolute;
 	width: 100%;

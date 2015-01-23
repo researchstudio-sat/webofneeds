@@ -2,10 +2,11 @@
     <div class="col-md-6">
         <div ng-repeat="row in preparedResults">
             <div class="row">
-                <div class="col-md-6 container"  ng-repeat="result in row">
-                    <a href="#/search/1" class="thumbnail">
-                        <div class="col-md-12" ng-controller="SearchResultCtrl"
-                             ng-init="init(result)">
+                <div class="col-md-6 container "  ng-repeat="result in row">
+                    <a ng-class="selected(result.id)" ng-click="select(result.id)">
+                        <div
+                             class="col-md-12"
+                             ng-controller="SearchResultCtrl">
                             <img application-control
                                  ng-src="{{getTypePicURI(res.type)}}"
                                  alt="Generic placeholder thumbnail"/>
@@ -18,5 +19,5 @@
             </div>
         </div>
     </div>
-    <won-Post-Detail class="col-md-6 well " ng-controller="PostDetailCtrl"></won-Post-Detail>
+    <won-Post-Detail class="col-md-6 well" need="dirNeed" ng-controller="PostDetailCtrl"></won-Post-Detail>
 </div>

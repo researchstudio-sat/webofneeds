@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams, mapService, applicationStateService, applicationControlService) {
+angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams, linkedDataService, mapService, applicationStateService, applicationControlService) {
 
     $scope.results = applicationStateService.getSearchResults();
     $scope.columnNum = 2;
@@ -36,15 +36,19 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
         $location.url('/create-need/1//' + $scope.searching.title);
     }
 });
-angular.module('won.owner').controller('SearchResultCtrl', function($scope, $log){
-    $scope.res = {}
-    $scope.init = function (result){
-        $scope.res.title = result[won.WON.searchResultPreview][won.WON.hasContent][won.defaultContext.dc+"title"]["@value"];
-        $scope.res.type = result[won.WON.searchResultPreview][won.WON.hasBasicNeedType]['@id'];
+angular.module('won.owner').controller('SearchResultCtrl', function($scope, $log,applicationStateService){
+    $scope.res = {};
 
-    }
+
+    $scope.res.uri = $scope.result[won.WON.searchResultURI]['@id'];
+    $scope.res.title = $scope.result[won.WON.searchResultPreview][won.WON.hasContent][won.defaultContext.dc+"title"]["@value"];
+    $scope.res.type = $scope.result[won.WON.searchResultPreview][won.WON.hasBasicNeedType]['@id'];
+    //$scope.res.need = linkedDataService.getNeed($scope.res.uri);
+
+
 })
-app.directive(('searchResult'), function searchResultFct(applicationControlService){
+app.directive(('searchResult'), function searchResultFct(applicationStateService){
+
     var dtv = {
         restrict: 'E',
         scope : {
@@ -58,6 +62,7 @@ app.directive(('searchResult'), function searchResultFct(applicationControlServi
             var prepareResults = function(){
                 var rowCount = 0;
                 for(var i = 0;i<scope.results.length;i++){
+                    scope.results[i].id = i;
                     if(i%scope.columnNum==0){
                         rowCount = rowCount+1;
                         var row = [];
@@ -70,10 +75,30 @@ app.directive(('searchResult'), function searchResultFct(applicationControlServi
 
             }
             prepareResults();
+            //applicationStateService.setCurrentNeedURI(scope.preparedResults[0][0][won.WON.searchResultURI]['@id']);
+            //scope.selectedNeed = linkedDataService.getNeed(scope.preparedResults[0][0][won.WON.searchResultURI]['@id'])
+
         },
-        controller: function($scope, applicationControlService){
+        controller: function($scope){
+            $scope.dirNeed = {title:"test"};
+            var selectedResult = 0;//default
+            $scope.selectedNeed = {};
+            $scope.getCurrentNeed=function(){
+                return applicationStateService.getCurrentNeed();
+            }
+            $scope.selected = function(num) {
+                if (selectedResult == num){
+                    return "thumbnail-selected"
+                }else return "thumbnail-non-selected"
+            }
+            $scope.select=function(num){
+                selectedResult = num;
+                applicationStateService.setCurrentNeedURI($scope.results[selectedResult][won.WON.searchResultURI]['@id']);
+                linkedDataService.getNeed($scope.results[selectedResult][won.WON.searchResultURI]['@id']).then(function(need){
+                    $scope.selectedNeed = need;
 
-
+                })
+            }
         }
     }
     return dtv;
