@@ -64,12 +64,36 @@ angular.module('won.owner')
             need: '=need'
         },
         restrict:'AE',
-        templateUrl:"app/post-detail/post-detail.html",
+        templateUrl:"app/post-detail/post-detail-content.html",
         link: function(scope, element, attrs){
             $log.debug("wonPostDetail");
             scope.getTypePicURI = applicationControlService.getTypePicURI
             scope.humanReadableType = applicationControlService.humanReadableType
-        }//,
+        },//,
+        controller: function($scope,applicationStateService){
+            $scope.contactFormActiv = false;
+            $scope.showPublic = function(){
+                return userService.isAuth();
+            }
+            $scope.canBeContacted = function(){
+
+                // if it is own need, cannot be contacted
+                if (applicationStateService.getAllNeeds()[$scope.need.uri]) {
+                    return false;
+                }
+                // TODO check with storyboard people:
+                // if it is another need, but communication already established,
+                // probably also should not be contacted?
+
+                return true;
+            }
+            $scope.clickOnContact = function(){
+                $log.debug('contact clicked');
+                $scope.contactFormActiv = !$scope.contactFormActiv;
+            }
+
+        }
+
         //scope:{},
    }
 
@@ -91,25 +115,11 @@ angular.module('won.owner').controller('PostDetailCtrl',
 
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
-    $scope.showPublic = function(){
-        return userService.isAuth();
-    }
+
     $scope.clickOnCopy = function(){
         $location.url("create-need/1/"+applicationControlService.getMenuPositionForNeedType($scope.need.basicNeedType));
     }
 
-    $scope.canBeContacted = function(){
-
-        // if it is own need, cannot be contacted
-        if (applicationStateService.getAllNeeds()[$routeParams.need]) {
-            return false;
-        }
-        // TODO check with storyboard people:
-        // if it is another need, but communication already established,
-        // probably also should not be contacted?
-
-        return true;
-    }
 
     $scope.hoverCopyToolTip ="I want this too";
     //$scope.need = $scope.$parent.need;
@@ -238,11 +248,7 @@ angular.module('won.owner').controller('PostDetailCtrl',
     };
 
 
-    $scope.contactFormActiv = false;
-    $scope.clickOnContact = function(){
-        $log.debug('contact clicked');
-        $scope.contactFormActiv = !$scope.contactFormActiv;
-    }
+
 
 
     $scope.previewRegime = false;
