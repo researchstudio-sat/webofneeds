@@ -57,7 +57,7 @@ angular.module('won.owner')
 
 angular.module('won.owner')
     .directive('wonPostDetail',
-    function postDetailFactory($log, applicationControlService) {
+    function postDetailFactory($log, applicationControlService,userService) {
 
     var directive =  {
         scope:{

@@ -33,10 +33,10 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
 
     $scope.createNewPost = function () {
         //TODO put title from search
-        $location.url('/create-need/1/' + $scope.searching.title);
+        $location.url('/create-need/1/-1/' + $scope.search.title);
     }
     $scope.redirectToCreatePost = function(){
-        $window.open('/create-need/1/'+$scope.search.title, '_blank');
+        $window.open('/create-need/1/-1/'+$scope.search.title, '_blank');
     };
 });
 angular.module('won.owner').controller('SearchResultCtrl', function($scope, $log,applicationStateService){

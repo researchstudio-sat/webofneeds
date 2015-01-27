@@ -79,9 +79,10 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         privateData.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
 
         privateData.allClosed = [
-            {type:'Want', title:'Playing soccer together', datetime: new Date('2014-08-23')},
-            {type:'Change', title:'Looking for a flatscreen TV', datetime: new Date('2014-08-20')},
-            {type:'Together', title:'Go to the cinema', datetime: new Date('2014-07-14')}
+            {type:won.WON.BasicNeedTypeDemand, title:'Playing soccer together', datetime: new Date('2014-08-23')},
+            {type:won.WON.BasicNeedTypeSupply, title: 'Samsung television', datetime: new Date('2015-01-01')},
+            {type:won.WON.BasicNeedTypeDotogether, title:'Looking for a flatscreen TV', datetime: new Date('2014-08-20')},
+            {type:won.WON.BasicNeedTypeCritique, title:'Go to the cinema', datetime: new Date('2014-07-14')}
         ];
         privateData.currentNeedURI = null;
         privateData.currentEvent = null;
