@@ -76,6 +76,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         privateData.allNeeds = {}
         privateData.allDrafts = {};
         privateData.searchResults = [];
+        privateData.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
 
         privateData.allClosed = [
             {type:'Want', title:'Playing soccer together', datetime: new Date('2014-08-23')},
@@ -104,6 +105,9 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.init();
     applicationStateService.setCurrentConnectionURI= function (connectionURI){
         privateData.currentEvent = connectionURI;
+    }
+    applicationStateService.getMatcherURI = function getMatcherURI(){
+        return privateData.matcherURI;
     }
     applicationStateService.getCurrentConnectionURI = function(){
         return privateData.currentEvent;
