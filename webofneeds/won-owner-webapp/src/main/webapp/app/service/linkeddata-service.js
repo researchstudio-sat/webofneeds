@@ -75,7 +75,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 if (results.hasOwnProperty(key)) return;
                 results[key] = null;
                 handler(key, reason);
-                if (!(--counter)) deferred.reject("all promises failed");
+                if (!(--counter)) deferred.resolve(results);
             });
         });
 
@@ -416,7 +416,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                     linkedDataService.cacheItemInsertOrOverwrite(uri);
                                     deferred.resolve(uri);
                                 } else {
-                                    $q.reject("failed to load " + uri);
+                                    deferred.reject("failed to load " + uri);
                                 }
                             });
                         });
