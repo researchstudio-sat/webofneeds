@@ -4,9 +4,7 @@ angular.module('won.owner').factory('searchService', function ($window, $http, $
 
     searchService.search = function(type,searchText){
         $http.get(
-            '/matcher/search/',
-            // for server deployment:
-            //'http://sat001.researchstudio.at:8080/matcher/search/',
+            applicationStateService.getMatcherURI(),
             {
                 headers : {
                     'Accept' : 'application/ld+json'

@@ -87,8 +87,8 @@ app.directive(('searchResult'), function searchResultFct(applicationStateService
             }
             $scope.selected = function(num) {
                 if (selectedResult == num){
-                    return "thumbnail-selected"
-                }else return "thumbnail-non-selected"
+                    return "col-md-12 thumbnail-selected"
+                }else return "col-md-12 thumbnail-non-selected"
             }
             $scope.select=function(num){
                 selectedResult = num;
