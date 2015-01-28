@@ -60,28 +60,27 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      */
     var somePromises = function(promises, errorHandler){
         var deferred = $q.defer(),
-            counter = 0,
+            numPromises = promises.length,
+            successes = 0,
+            failures = 0,
             results = angular.isArray(promises) ? [] : {},
             handler = typeof errorHandler === 'function' ? errorHandler : function(x,y){};
 
         angular.forEach(promises, function(promise, key) {
-            counter++;
             promise.then(function(value) {
-                if (results.hasOwnProperty(key)) return;
+                successes++;
+                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
                 results[key] = value;
-                if (!(--counter)) deferred.resolve(results);
+                if (failures + successes >= numPromises) deferred.resolve(results);
             }, function(reason) {
+                failures ++;
                 $log.error("warning: promise failed. Reason " + JSON.stringify(reason));
-                if (results.hasOwnProperty(key)) return;
+                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
                 results[key] = null;
                 handler(key, reason);
-                if (!(--counter)) deferred.resolve(results);
+                if (failures >= numPromises) deferred.reject(results);
             });
         });
-
-        if (counter === 0) {
-            deferred.resolve(results);
-        }
 
         return deferred.promise;
     }
@@ -684,8 +683,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     }
                     return somePromises(promises, function(key, reason){
                         won.reportError("could not fetch last event of connection " + conUris[key], reason);
-                    }).then(function(val) { return won.deleteWhereNull(val)});
+                    }).then(function(val) {
+                        return won.deleteWhereNull(val)
+                    });
                 } catch (e) {
+                    //TODO: probably, 'return $q.reject(...)' would be correct here... check and correct all
+                    //occurrences if so
                     $q.reject("could not get last event of connection " + uri + ". Reason: " + e);
                 }
             }

@@ -68,8 +68,10 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
                 $scope.currentNeed = need;
             });
         applicationStateService.getLastEventOfEachConnectionOfCurrentNeed()
-            .then(function (events) {
+            .then(function success(events) {
                 $scope.lastEventOfEachConnectionOfCurrentNeed = events;
+            },function error(events) {
+                $scope.lastEventOfEachConnectionOfCurrentNeed = [];
             });
     }
 
