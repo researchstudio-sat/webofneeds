@@ -528,6 +528,8 @@ angular.module('won.owner').factory('wonService', function (
             .then(function(envelopeData){
                 sendOpen(envelopeData);
             },
+            // TODO the ux needs to react to such errors. E.g. now, if the user tries to
+            // send a request conversation message, this error occurs, but in the gui nothing happens
             won.reportError("cannot open suggested connection " + connectionUri)
         );
 
