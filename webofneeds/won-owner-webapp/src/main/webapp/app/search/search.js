@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams,$window, linkedDataService, mapService, applicationStateService, applicationControlService) {
+angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams,$window,searchService, linkedDataService, mapService, applicationStateService, applicationControlService) {
 
     $scope.results = applicationStateService.getSearchResults();
     $scope.search = {};
@@ -59,6 +59,11 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
 
         return $scope.relatedSearchTerms;
     }
+    $scope.newSearch = function(term){
+        $scope.search.title = term;
+        searchService.search($scope.search.type, term,$scope.search.type);
+    }
+
 });
 angular.module('won.owner').controller('SearchResultCtrl', function($scope, $log,applicationStateService){
     $scope.res = {};
@@ -75,7 +80,8 @@ app.directive(('relatedSearches'), function relatedSearchesFct(){
     var dtv = {
         restrict: 'E',
         scope : {
-            terms : '='
+            terms : '=',
+            clickOnItem : '&'
         },
         templateUrl: "app/search/related-searches.html",
         controller: function($scope){

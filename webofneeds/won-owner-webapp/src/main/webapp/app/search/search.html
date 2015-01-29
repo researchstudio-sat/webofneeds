@@ -21,7 +21,7 @@
                 <strong>What others offer:</strong> {{search.title}}
             </p>
         </div>
-        <related-searches terms = "getRelatedSearches()"></related-searches>
+        <related-searches terms = "getRelatedSearches()" click-on-item = "newSearch(term)"></related-searches>
 
         <div class="row">
             <div class="pull-left">
@@ -61,7 +61,7 @@
             </div>
         </div>
 
-        <search-result results="results" column-num="2">
+        <search-result results="results" column-num="2" >
 
         </search-result>
     </div>
