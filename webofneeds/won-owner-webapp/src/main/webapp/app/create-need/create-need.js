@@ -15,18 +15,21 @@
  */
 
 angular.module('won.owner').controller('CreateNeedCtrlNew', function
-    ($scope
-        , $timeout
-        , $location
-        , $log
-        , $http
-        , $routeParams
-        , needService
-        , applicationStateService
-        , mapService
-        , userService
-        , utilService
-        , wonService) {
+    ( $scope
+    , $timeout
+    , $location
+    , $log
+    , $http
+    , $routeParams
+    , needService
+    , applicationStateService
+    , mapService
+    , userService
+    , utilService
+    , wonService
+    //, uiKeyup
+    //, uiEvent
+    ) {
     $scope.currentStep = $routeParams.step;
     $scope.selectedType = $routeParams.selectedType;
     $scope.title = $routeParams.title;
@@ -204,34 +207,17 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
         marker.openPopup();
     }
-    // </leaflet-map>
-
-    // <oldmap>
-    $scope.marker = null;
-
-    $scope.getMapOptions = function () {
-
-        return {
-            center: mapService.getGeolocation(),
-            zoom: 15,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
+    //TODO start searching as soon as the user pauses/presses down, (followed by: select choice, press enter)
+    //TODO enter selects the first entry? shows an error popup and asks to select a correct location (same on focus loss)? enter jumps to first line of dropdown?
+    $scope.onArrowDownInSearchField = function (event) { //TODO DELETEME
+        // TODO only go into list if there are search results
+        console.log("In onArrowDownInSearchField. Event: " + JSON.stringify(event));
+        $scope.locationResultsVisible = true;
     }
-    $scope.mapOptions = $scope.getMapOptions();
-
-    $scope.onClickMap = function ($event, $params) {
-        if (this.marker == null) {
-            this.marker = new google.maps.Marker({
-                position: $params[0].latLng,
-                map: this.myMap
-            });
-        } else {
-            this.marker.setPosition($params[0].latLng);
-        }
-        $scope.need.latitude = $params[0].latLng.lat();
-        $scope.need.longitude = $params[0].latLng.lng();
-    };
-    //</oldmap>
+    $scope.onArrowUpInSearchField = function (event) { //TODO DELETEME
+        console.log("In onArrowUpInSearchField. Event: " + JSON.stringify(event));
+    }
+    // </leaflet-map>
 
     $scope.showPublic = function (num) {
         if (num == $scope.currentStep) {

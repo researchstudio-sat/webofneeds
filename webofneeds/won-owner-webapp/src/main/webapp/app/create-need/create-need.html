@@ -245,12 +245,6 @@
                                 </div>
                             </div>
                         </div>
-                        -----------------
-                        <!--<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.2/leaflet.css" />-->
-                        <!--&lt;!&ndash;[if lte IE 8]>-->
-                        <!--<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.2/leaflet.ie.css" />-->
-                        <!--<![endif]&ndash;&gt;-->
-                        <!--<script src="http://cdn.leafletjs.com/leaflet-0.6.2/leaflet.js"></script>-->
 
                         <div id="locationInfo" class="panel panel-default">
                             <div class="panel-heading" ng-click="locationCollapseClick()">
@@ -297,12 +291,17 @@
                                     }
                                 </script>-->
 
-                                <form class="input-group">
+                                <form class="input-group" id="locationForm">
                                     <input type="text" class="form-control" id="addressTextField"
                                            ng-model="addressText"
-                                           placeholder="e.g. Thurngasse 8, Vienna, Austria"/>
+                                           placeholder="e.g. Thurngasse 8, Vienna, Austria"
+                                           ui-keypress="{down:'onArrowDownInSearchField()', up: 'onArrowUpInSearchField()'}"
+                                           autocomplete="off"/> <!--@a.c.=off: we'll use our own dropdown/auto-complete-->
+
+
 
                                     <ul class="dropdown-menu" role="menu" >
+                                        <li ng-hide="addressSearchResults && addressSearchResults.length > 0">Loading address results...  [REPLACE WITH SPINNER]</li>
                                         <li ng-click="selectAddress(adr)" ng-repeat="adr in addressSearchResults"><a href="javascript:void(0)">{{adr.display_name}}</a></li>
                                     </ul>
 
@@ -310,7 +309,7 @@
                                         <button type="submit" class="btn btn-default" ng-click="onAddressQuerySubmit(addressText)" aria-label="Search">
                                             <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                                         </button>
-                                        <!-- TODO add a 'x' button to clear input -->
+                                        <!-- TODO add a 'x' button to clear input (replace search-button?)-->
                                     </span>
                                 </form><!-- /input-group -->
 
@@ -325,53 +324,6 @@
 
                                 <h3>The Unfiltered Response:</h3>
                                 <pre>{{addressSearchResults | json}}</pre>
-
-                                <div id="locationInfoInputFields" ng-show="!locationInputFieldCollapsed"
-                                     class="div-table col-lg-12">
-                                    <div class="div-table-row">
-                                        <div class="col-lg-10 col-lg-offset-1">
-                                            <div>
-                                                Enter as many of these as you wish (e.g. only "Austria" works as well).
-                                            </div>
-
-                                            <label for="country" class="col-lg-10 col-lg-offset-1">Country</label>
-
-                                            <div class="col-lg-10 col-lg-offset-1">
-                                                <input type="text" class="form-control" id="country"
-                                                       placeholder="Austria" required/>
-                                            </div>
-
-                                            <label for="postal" class="col-lg-5 col-lg-offset-1">Postal</label>
-                                            <label for="city" class="col-lg-5">City</label>
-
-                                            <div class="col-lg-5 col-lg-offset-1">
-                                                <input type="text" class="form-control" id="postal"
-                                                       placeholder="1010" required/>
-                                            </div>
-                                            <div class="col-lg-5">
-                                                <input type="text" class="form-control" id="city"
-                                                       placeholder="Vienna" required/>
-                                            </div>
-
-
-                                            <label for="street" class="col-lg-10 col-lg-offset-1">Street</label>
-
-                                            <div class="col-lg-10 col-lg-offset-1">
-                                                <input type="text" class="form-control" id="street"
-                                                       placeholder="Yellowbrick road" required/>
-                                            </div>
-
-                                            <div class="col-lg-10 col-lg-offset-1">
-                                                <strong>Showing:&nbsp;</strong><span>Yellowbrick road, Vienna, Austria</span>
-                                                <section id="map">
-                                                    <div ui-map="myMap" ui-options="mapOptions" class="map-canvas"
-                                                         ui-event="{'map-click' : 'onClickMap($event, $params, $myMap)'}"></div>
-                                                </section>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
                             </div>
                         </div>
 

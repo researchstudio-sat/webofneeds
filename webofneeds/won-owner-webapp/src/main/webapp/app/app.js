@@ -17,12 +17,14 @@
 app = angular.module('won.owner',
         [ 'ui.bootstrap'
         , 'ngRoute'
-        , 'ui.map'
         , 'blueimp.fileupload'
         , 'ngMockE2E'
         , 'smart-table'
         , 'ngScrollbar'
         , 'scrollable-table'
+        , 'ui.utils'
+        //, 'ui.event'
+        //, 'ui.keypress'
         ]
     ).config(function ($routeProvider, $httpProvider, $provide) {
         $httpProvider.responseInterceptors.push('redirectInterceptor');
