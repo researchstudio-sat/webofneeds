@@ -17,27 +17,48 @@
 angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams,$window, linkedDataService, mapService, applicationStateService, applicationControlService) {
 
     $scope.results = applicationStateService.getSearchResults();
+    $scope.search = {};
+    $scope.search.title = $routeParams.term;
+    $scope.search.type = parseInt($routeParams.type);
+
     $scope.columnNum = 2;
     $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
         event.data = linkedDataService.getNeed(event.matchUrl());
         $scope.results.push(event);
     })
     // TODO LOGIC
-    $scope.relatedTags = ['Sony', 'Tv', 'Samsung', 'LCD'];
-    $scope.search = {};
-    $scope.search.title = $routeParams.term;
-    $scope.search.type = $routeParams.type;
+    $scope.relatedSearchTerms = {};
+    $scope.extractRelatedSearches = function(){
+        angular.forEach($scope.results,function(res){
+            var tags = res[won.WON.searchResultPreview][won.WON.hasContent][won.WON.hasTag]['@value'].split(" ");
+            for(var i = 0;i<tags.length;i++){
+                var tag = tags[i];
+                if(tag in $scope.relatedSearchTerms){
+                    $scope.relatedSearchTerms[tag]= $scope.relatedSearchTerms[tag] +1;
+                }else{
+                    $scope.relatedSearchTerms[tag]=0;
+                }
+            }
 
-    //TODO LOGIC
-    $scope.searching = {type:'others offer', title:'Frilly pink cat unicorn'};
+
+        })
+
+
+    }
+    $scope.extractRelatedSearches();
+
 
     $scope.createNewPost = function () {
         //TODO put title from search
         $location.url('/create-need/1/-1/' + $scope.search.title);
     }
     $scope.redirectToCreatePost = function(){
-        $window.open('/create-need/1/-1/'+$scope.search.title, '_blank');
+        $window.open('./#/create-need/1/-1/'+$scope.search.title, '_blank');
     };
+    $scope.getRelatedSearches = function(){
+
+        return $scope.relatedSearchTerms;
+    }
 });
 angular.module('won.owner').controller('SearchResultCtrl', function($scope, $log,applicationStateService){
     $scope.res = {};
@@ -49,6 +70,20 @@ angular.module('won.owner').controller('SearchResultCtrl', function($scope, $log
     //$scope.res.need = linkedDataService.getNeed($scope.res.uri);
 
 
+})
+app.directive(('relatedSearches'), function relatedSearchesFct(){
+    var dtv = {
+        restrict: 'E',
+        scope : {
+            terms : '='
+        },
+        templateUrl: "app/search/related-searches.html",
+        controller: function($scope){
+
+        }
+
+    }
+    return dtv;
 })
 app.directive(('searchResult'), function searchResultFct(applicationStateService){
 

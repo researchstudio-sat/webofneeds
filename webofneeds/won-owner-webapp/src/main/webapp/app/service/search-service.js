@@ -53,7 +53,9 @@ angular.module('won.owner').factory('searchService', function ($window, $http, $
                 }
             }
         )
+
     }
+
     return searchService;
 });
 

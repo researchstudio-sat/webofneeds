@@ -23,6 +23,8 @@ angular.module('won.owner').directive('applicationControl', function factory(){
         restrict: 'A',
         controller: function($scope, applicationControlService){
             $scope.getTypePicURI = applicationControlService.getTypePicURI;
+            $scope.humanReadableType = applicationControlService.humanReadableType;
+            $scope.getNeedType= applicationControlService.getNeedType;
         }
     }
 })
