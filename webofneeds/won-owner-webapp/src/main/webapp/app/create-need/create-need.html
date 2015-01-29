@@ -291,6 +291,7 @@
                                     }
                                 </script>-->
 
+                                <p>Boostrap:</p>
                                 <form class="input-group" id="locationForm">
                                     <input type="text" class="form-control" id="addressTextField"
                                            ng-model="addressText"
@@ -298,20 +299,36 @@
                                            ui-keypress="{down:'onArrowDownInSearchField()', up: 'onArrowUpInSearchField()'}"
                                            autocomplete="off"/> <!--@a.c.=off: we'll use our own dropdown/auto-complete-->
 
-
-
-                                    <ul class="dropdown-menu" role="menu" >
+                                    <ul class="dropdown-menu" role="menu">
                                         <li ng-hide="addressSearchResults && addressSearchResults.length > 0">Loading address results...  [REPLACE WITH SPINNER]</li>
                                         <li ng-click="selectAddress(adr)" ng-repeat="adr in addressSearchResults"><a href="javascript:void(0)">{{adr.display_name}}</a></li>
                                     </ul>
 
-                                    <span class="input-group-btn dropdown-toggle" data-dropdown="dropdown">
+                                    <span id="locationDropDownToggle" class="input-group-btn dropdown-toggle" data-dropdown="dropdown">
                                         <button type="submit" class="btn btn-default" ng-click="onAddressQuerySubmit(addressText)" aria-label="Search">
                                             <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                                         </button>
                                         <!-- TODO add a 'x' button to clear input (replace search-button?)-->
                                     </span>
                                 </form><!-- /input-group -->
+
+                                <hr>
+                                <p>angular.ui.bootstrap:</p>
+                                <div class="btn-group dropdown" dropdown is-open="isopen">
+                                    <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle>
+                                        Button dropdown <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Action</a></li>
+                                        <li><a href="#">Another action</a></li>
+                                        <li><a href="#">Something else here</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Separated link</a></li>
+                                    </ul>
+                                </div>
+                                <button type="button" class="btn btn-default btn-sm" ng-click="toggleDropdown($event)">Toggle button dropdown</button>
+
+                                <hr>
 
                                 <h3>Selected:</h3>
                                 <ul>

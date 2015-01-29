@@ -27,6 +27,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     , userService
     , utilService
     , wonService
+    , osmService
     //, uiKeyup
     //, uiEvent
     ) {
@@ -181,8 +182,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
     }
 
-    // <leaflet-map>
-    var marker;
+    // <leaflet-map> -----------------------------------
     var map;
     $scope.mapInit = function () {
         // -------- snippet from leafletjs.com ----------
@@ -196,28 +196,74 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }).addTo(map);
     }
     $scope.mapInit();
+    map.removeCstmMarker = function() {
+        if(map.cstmMarker != undefined)
+            map.removeLayer(map.cstmMarker); // remove the previous marker //TODO does this delete the popup as well?
+    }
     $scope.setMapLocation = function (lat, lon, adr) { //TODO not in $scope but only usable here in link?
-        if(marker != undefined)
-            map.removeLayer(marker); // remove the previous marker //TODO does this delete the popup as well?
-        marker = L.marker([lat, lon]);
-        marker.addTo(map).bindPopup(adr);
+        map.removeCstmMarker()
+
+        map.cstmMarker = L.marker([lat, lon]);
+        map.cstmMarker.addTo(map).bindPopup(adr);
 
         //TODO base zoomlevel (L.latLng(lat, lon, alt(!))) on size of the selected area
         map.setView([lat, lon], 13);
 
-        marker.openPopup();
+        map.cstmMarker.openPopup();
     }
     //TODO start searching as soon as the user pauses/presses down, (followed by: select choice, press enter)
     //TODO enter selects the first entry? shows an error popup and asks to select a correct location (same on focus loss)? enter jumps to first line of dropdown?
     $scope.onArrowDownInSearchField = function (event) { //TODO DELETEME
         // TODO only go into list if there are search results
         console.log("In onArrowDownInSearchField. Event: " + JSON.stringify(event));
-        $scope.locationResultsVisible = true;
+        $scope.locationResultsVisible = true; //doesn't work(?)
+        //$('#locationDropDownToggle').dropdown();
+        console.log($('#locationDropDownToggle'));
+        console.log($('.dropDownToggle'));
+        $("#locationForm").addClass('open'); //TODO not very stable (e.g. if class name changes)
     }
     $scope.onArrowUpInSearchField = function (event) { //TODO DELETEME
         console.log("In onArrowUpInSearchField. Event: " + JSON.stringify(event));
+        $("#locationForm").removeClass('open'); //TODO not very stable (e.g. if class name changes)
     }
-    // </leaflet-map>
+    $scope.isopen = true;
+    $scope.toggleDropdown = function($event) {
+        console.log("in toggleDropdown. isopen = " + $scope.isopen);
+        $event.preventDefault();
+        $event.stopPropagation();
+        $scope.isopen = !$scope.isopen;
+    };
+    $scope.onLocationDropdownToggle = function() {
+        console.log("Toggled dropdown.");
+    }
+    $scope.onAddressQuerySubmit = function (address) {
+        if(!address || address === "" || address === {}) {
+            map.removeCstmMarker();
+            map.fitWorld().zoomIn(); // TODO a good idea ux-wise?
+            $scope.selectedAddress = {}
+            $scope.addressSearchResults = undefined;
+            //TODO handle invalid input
+        } else {
+            osmService.matchingLocations(address).then(function(resp){
+                $scope.addressSearchResults = resp;
+            }, function failed(){
+                $log.error("Address resolution failed.");
+            });
+        }
+    }
+
+    $scope.selectedAddress = {}
+    $scope.selectAddress = function (address) {
+        $scope.selectedAddress = address;
+        $scope.setMapLocation(address.lat, address.lon, address.display_name);
+        $scope.addressText = address.display_name;
+    }
+
+
+
+    // </leaflet-map> --------------------------
+
+
 
     $scope.showPublic = function (num) {
         if (num == $scope.currentStep) {
@@ -669,27 +715,10 @@ angular.module('won.owner').directive('wonGallery', function factory() {
     };
 });
 angular.module('won.owner').controller('AdditionalInfoCtrl',
-    function ($scope, $location, $http, $log, needService, mapService, osmService, userService) {
+    function ($scope, $location, $http, $log, needService, mapService, userService) {
         $scope.imageInputFieldCollapsed = true;
         $scope.locationInputFieldCollapsed = true;
         $scope.timeInputFieldCollapsed = true;
-
-        $scope.onAddressQuerySubmit = function (address) {
-            osmService.matchingLocations(address).then(function(resp){
-                $scope.addressSearchResults = resp;
-            }, function failed(){
-                $log.error("Address resolution failed.");
-            });
-        }
-
-        $scope.selectedAddress = {}
-        $scope.selectAddress = function (address) {
-            $scope.selectedAddress = address;
-            $scope.setMapLocation(address.lat, address.lon, address.display_name);
-            $scope.addressText = address.display_name;
-        }
-
-
 
         $scope.imageCollapseClick = function () {
             $scope.imageInputFieldCollapsed = !$scope.imageInputFieldCollapsed;
