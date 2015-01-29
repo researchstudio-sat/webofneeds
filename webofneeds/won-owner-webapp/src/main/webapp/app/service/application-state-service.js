@@ -76,8 +76,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         privateData.allNeeds = {}
         privateData.allDrafts = {};
         privateData.searchResults = [];
-        privateData.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
-
+        //privateData.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
         privateData.allClosed = [
             {type:won.WON.BasicNeedTypeDemand, title:'Playing soccer together', datetime: new Date('2014-08-23')},
             {type:won.WON.BasicNeedTypeSupply, title: 'Samsung television', datetime: new Date('2015-01-01')},

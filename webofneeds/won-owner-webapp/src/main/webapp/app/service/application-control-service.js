@@ -73,7 +73,7 @@ angular.module('won.owner').factory('applicationControlService', function (appli
             case won.WON.BasicNeedTypeSupply: return "Supply";
             case won.WON.BasicNeedTypeDotogether: return "Together";
             default:
-                $log.error("Tried to get icon url with the invalid type: " + type)
+                $log.error("Tried to get human readable need type with the invalid type: " + type)
                 return ""
         }
     };
