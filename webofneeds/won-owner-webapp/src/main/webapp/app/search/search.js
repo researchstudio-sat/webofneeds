@@ -144,6 +144,7 @@ app.directive(('searchResult'), function searchResultFct(applicationStateService
         controller: function($scope){
             var selectedResult = 0;//default
             $scope.selectedNeed = {};
+
             $scope.getCurrentNeed=function(){
                 return applicationStateService.getCurrentNeed();
             }
@@ -160,6 +161,7 @@ app.directive(('searchResult'), function searchResultFct(applicationStateService
 
                 })
             }
+            $scope.select(selectedResult);
         }
     }
     return dtv;
