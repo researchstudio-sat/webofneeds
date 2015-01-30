@@ -27,17 +27,38 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
         $scope.results.push(event);
     })
     // TODO LOGIC
-    $scope.relatedSearchTerms = {};
+    $scope.relatedSearchTerms = [];
     $scope.extractRelatedSearches = function(){
         angular.forEach($scope.results,function(res){
-            var tags = res[won.WON.searchResultPreview][won.WON.hasContent][won.WON.hasTag]['@value'].split(" ");
-            for(var i = 0;i<tags.length;i++){
-                var tag = tags[i];
-                if(tag in $scope.relatedSearchTerms){
-                    $scope.relatedSearchTerms[tag]= $scope.relatedSearchTerms[tag] +1;
-                }else{
-                    $scope.relatedSearchTerms[tag]=0;
+            if(res[won.WON.searchResultPreview][won.WON.hasContent][won.WON.hasTag]!= undefined){
+                var tags = res[won.WON.searchResultPreview][won.WON.hasContent][won.WON.hasTag]['@value'].split(" ");
+
+                for(var i = 0;i<tags.length;i++){
+                    var tag = tags[i];
+
+                    var contains = false;
+                    for(var j = 0; j<$scope.relatedSearchTerms.length;j++){
+                        if($scope.relatedSearchTerms[j][0]==tag){
+                            $scope.relatedSearchTerms[j][1]=$scope.relatedSearchTerms+1;
+                            contains = true;
+                            break;
+                        }
+                    }
+                    if(contains == false){
+                        $scope.relatedSearchTerms.push([tag,0]);
+                    }
+
+                    /*iif(tag in $scope.relatedSearchTerms){
+                     $scope.relatedSearchTerms[tag]= $scope.relatedSearchTerms[tag] +1;
+                     }else{
+                     $scope.relatedSearchTerms[tag]=0;
+                     }*/
                 }
+                $scope.relatedSearchTerms.sort(function(a,b){
+                    a = a[1];
+                    b = b[1];
+                    return a < b ? -1 : (a > b ? 1 : 0);
+                })
             }
 
 

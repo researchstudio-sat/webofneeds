@@ -149,6 +149,7 @@ app = angular.module('won.owner',
         };
     })
 
+
     .filter('messageTypeFilter', function(){
         var getTypeText = function(lastConEvent) {
             switch (lastConEvent.event.hasMessageType) {
