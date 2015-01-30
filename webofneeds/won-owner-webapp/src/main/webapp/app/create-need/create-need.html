@@ -291,7 +291,7 @@
                                     }
                                 </script>-->
 
-                                <p>Boostrap:</p>
+                                <!--<p>Boostrap:</p>-->
                                 <form class="input-group" id="locationForm">
                                     <input type="text" class="form-control" id="addressTextField"
                                            ng-model="addressText"
@@ -312,35 +312,34 @@
                                     </span>
                                 </form><!-- /input-group -->
 
-                                <hr>
-                                <p>angular.ui.bootstrap:</p>
-                                <div class="btn-group dropdown" dropdown is-open="isopen">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle>
-                                        Button dropdown <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li><a href="#">Action</a></li>
-                                        <li><a href="#">Another action</a></li>
-                                        <li><a href="#">Something else here</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="#">Separated link</a></li>
-                                    </ul>
-                                </div>
-                                <button type="button" class="btn btn-default btn-sm" ng-click="toggleDropdown($event)">Toggle button dropdown</button>
+                                <!--<hr>-->
+                                <!--<p>angular.ui.bootstrap:</p>-->
+                                <!--<div class="btn-group dropdown" dropdown is-open="isopen">-->
+                                    <!--<button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle>-->
+                                        <!--Button dropdown <span class="caret"></span>-->
+                                    <!--</button>-->
+                                    <!--<ul class="dropdown-menu" role="menu">-->
+                                        <!--<li><a href="#">Action</a></li>-->
+                                        <!--<li><a href="#">Another action</a></li>-->
+                                        <!--<li><a href="#">Something else here</a></li>-->
+                                        <!--<li class="divider"></li>-->
+                                        <!--<li><a href="#">Separated link</a></li>-->
+                                    <!--</ul>-->
+                                <!--</div>-->
+                                <!--<button type="button" class="btn btn-default btn-sm" ng-click="toggleDropdown($event)">Toggle button dropdown</button>-->
+                                <!--<hr>-->
 
-                                <hr>
+                                <!--<h3>Selected:</h3>-->
+                                <!--<ul>-->
+                                    <!--<li>Address: {{selectedAddress.display_name}} </li>-->
+                                    <!--<li>Latitude: {{selectedAddress.lat}}</li>-->
+                                    <!--<li>Longtitude: {{selectedAddress.lon}}</li>-->
+                                <!--</ul>-->
 
-                                <h3>Selected:</h3>
-                                <ul>
-                                    <li>Address: {{selectedAddress.display_name}} </li>
-                                    <li>Latitude: {{selectedAddress.lat}}</li>
-                                    <li>Longtitude: {{selectedAddress.lon}}</li>
-                                </ul>
+                                <div id="leaflet-canvas" style="width: 480px; height: 480px; margin-top: 2em"></div>
 
-                                <div id="leaflet-canvas" style="width: 480px; height: 480px;"></div>
-
-                                <h3>The Unfiltered Response:</h3>
-                                <pre>{{addressSearchResults | json}}</pre>
+                                <!--<h3>The Unfiltered Response:</h3>-->
+                                <!--<pre>{{addressSearchResults | json}}</pre>-->
                             </div>
                         </div>
 

@@ -196,9 +196,33 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }).addTo(map);
     }
     $scope.mapInit();
+
     map.removeCstmMarker = function() {
         if(map.cstmMarker != undefined)
             map.removeLayer(map.cstmMarker); // remove the previous marker //TODO does this delete the popup as well?
+    }
+
+    $scope.onAddressQuerySubmit = function (address) {
+        if(!address || address === "" || address === {}) {
+            map.removeCstmMarker();
+            map.fitWorld().zoomIn(); // TODO a good idea ux-wise?
+            $scope.selectedAddress = {}
+            $scope.addressSearchResults = undefined;
+            //TODO handle invalid input
+        } else {
+            osmService.matchingLocations(address).then(function(resp){
+                $scope.addressSearchResults = resp;
+            }, function failed(){
+                $log.error("Address resolution failed.");
+            });
+        }
+    }
+
+    $scope.selectedAddress = {}
+    $scope.selectAddress = function (address) {
+        $scope.selectedAddress = address;
+        $scope.setMapLocation(address.lat, address.lon, address.display_name);
+        $scope.addressText = address.display_name;
     }
     $scope.setMapLocation = function (lat, lon, adr) { //TODO not in $scope but only usable here in link?
         map.removeCstmMarker()
@@ -235,28 +259,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     };
     $scope.onLocationDropdownToggle = function() {
         console.log("Toggled dropdown.");
-    }
-    $scope.onAddressQuerySubmit = function (address) {
-        if(!address || address === "" || address === {}) {
-            map.removeCstmMarker();
-            map.fitWorld().zoomIn(); // TODO a good idea ux-wise?
-            $scope.selectedAddress = {}
-            $scope.addressSearchResults = undefined;
-            //TODO handle invalid input
-        } else {
-            osmService.matchingLocations(address).then(function(resp){
-                $scope.addressSearchResults = resp;
-            }, function failed(){
-                $log.error("Address resolution failed.");
-            });
-        }
-    }
-
-    $scope.selectedAddress = {}
-    $scope.selectAddress = function (address) {
-        $scope.selectedAddress = address;
-        $scope.setMapLocation(address.lat, address.lon, address.display_name);
-        $scope.addressText = address.display_name;
     }
 
 
