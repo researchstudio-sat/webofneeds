@@ -545,3 +545,7 @@ table th.resizing {
     width: 150px;
     height: 150px;"
 }
+
+#createNeed .panel-title {
+	font-size: large;
+}
