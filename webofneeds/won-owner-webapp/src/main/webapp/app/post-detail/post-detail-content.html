@@ -60,7 +60,7 @@ Directive-Content:
     <!--TODO refactor the below (move the whole parsing to the .js file)-->
     <span style="margin-right:5px;cursor:pointer;"
           class="label label-primary btnTag"
-          ng-repeat="tag in need.tags.split(', ')"
+          ng-repeat="tag in need.tags.split(',')"
           ng-bind="need.tags.split(',')[$index]">
     </span>
 </div>

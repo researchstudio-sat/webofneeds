@@ -31,7 +31,7 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
     $scope.extractRelatedSearches = function(){
         angular.forEach($scope.results,function(res){
             if(res[won.WON.searchResultPreview][won.WON.hasContent][won.WON.hasTag]!= undefined){
-                var tags = res[won.WON.searchResultPreview][won.WON.hasContent][won.WON.hasTag]['@value'].split(" ");
+                var tags = res[won.WON.searchResultPreview][won.WON.hasContent][won.WON.hasTag]['@value'].split(",");
 
                 for(var i = 0;i<tags.length;i++){
                     var tag = tags[i];
@@ -39,7 +39,7 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
                     var contains = false;
                     for(var j = 0; j<$scope.relatedSearchTerms.length;j++){
                         if($scope.relatedSearchTerms[j][0]==tag){
-                            $scope.relatedSearchTerms[j][1]=$scope.relatedSearchTerms+1;
+                            $scope.relatedSearchTerms[j][1]=$scope.relatedSearchTerms[j]+1;
                             contains = true;
                             break;
                         }
@@ -82,7 +82,7 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
     }
     $scope.newSearch = function(term){
         $scope.search.title = term;
-        searchService.search($scope.search.type, term,$scope.search.type);
+        searchService.search($scope.search.type, term,applicationControlService.getNeedType($scope.search.type));
     }
 
 });
@@ -112,7 +112,7 @@ app.directive(('relatedSearches'), function relatedSearchesFct(){
     }
     return dtv;
 })
-app.directive(('searchResult'), function searchResultFct(applicationStateService){
+app.directive(('searchResult'), function searchResultFct($log, applicationStateService){
 
     var dtv = {
         restrict: 'E',
@@ -155,11 +155,17 @@ app.directive(('searchResult'), function searchResultFct(applicationStateService
             }
             $scope.select=function(num){
                 selectedResult = num;
-                applicationStateService.setCurrentNeedURI($scope.results[selectedResult][won.WON.searchResultURI]['@id']);
-                linkedDataService.getNeed($scope.results[selectedResult][won.WON.searchResultURI]['@id']).then(function(need){
-                    $scope.selectedNeed = need;
+                try{
+                    applicationStateService.setCurrentNeedURI($scope.results[selectedResult][won.WON.searchResultURI]['@id']);
 
-                })
+
+                    linkedDataService.getNeed($scope.results[selectedResult][won.WON.searchResultURI]['@id']).then(function(need){
+                        $scope.selectedNeed = need;
+
+                    })
+                }catch (e){
+                    $log.debug("failed to set current need uri. probably there's no search result")
+                }
             }
             $scope.select(selectedResult);
         }
