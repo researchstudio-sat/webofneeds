@@ -58,7 +58,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * each rejected promise.
      * @param promises
      */
-    var somePromises = function(promises, errorHandler){
+    linkedDataService.somePromises = function(promises, errorHandler){
         var deferred = $q.defer(),
             numPromises = promises.length,
             successes = 0,
@@ -692,7 +692,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     for (var conKey in conUris) {
                         promises.push(linkedDataService.getLastEventOfConnection(conUris[conKey]));
                     }
-                    return somePromises(promises, function(key, reason){
+                    return linkedDataService.somePromises(promises, function(key, reason){
                         won.reportError("could not fetch last event of connection " + conUris[key], reason);
                     }).then(function(val) {
                         return won.deleteWhereNull(val)

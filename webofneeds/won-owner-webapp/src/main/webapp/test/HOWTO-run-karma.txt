@@ -1,0 +1,34 @@
+------------------------------------
+In order to run the tests with karma:
+-------------------------------------
+
+--------------------
+Generally:
+--------------------
+1. install node.js on your computer: http://nodejs.org/
+// e.g. for Windows, run the installer
+2. install karma on your computer (globally):
+// e.g. from  Cygwin terminal run as admin:
+// nmp install -g karma
+// npm install -g karma-cli
+// npm install -g karma-jasmine
+// npm install -g karma-chrome-launcher
+2.5 make sure karma is accessible in your path (e.g. run which karma)
+// for me it was not, so I had to add to path variable the path to nmp: C:\Users\install\AppData\Roaming\npm
+
+---------------------
+This project specific:
+---------------------
+3. I've created karma configuration files in web-app's test folder
+// i.e. in /webofneeds/won-owner-webapp/src/main/webapp/test:
+// karma-shared.conf.js for main configuration
+// karma-unit.conf.js for additional specific to unit test configurations (basically where to find tests that need to be run)
+// see there links to web pages that explain some example configurations
+4. run the configuration file (karma start YOUR_CONF_FILE.conf.js)
+// e.g. if I want to run unit tests I would run, from the terminal, (cd to the corresponding location first):
+// karma start karma-unit.conf.js
+
+
+---------------------
+It is also possible to run karma tests directly in intellij, see:
+https://www.jetbrains.com/idea/help/running-unit-tests-on-karma.html
