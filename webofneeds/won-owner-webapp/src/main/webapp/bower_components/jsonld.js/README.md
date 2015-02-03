@@ -8,7 +8,10 @@ jsonld.js
 Introduction
 ------------
 
-JSON, as specified in [RFC4627][], is a simple language for representing
+This library is an implementation of the [JSON-LD][] specification in
+JavaScript.
+
+JSON, as specified in [RFC7159][], is a simple language for representing
 objects on the Web. Linked Data is a way of describing content across
 different documents or Web sites. Web resources are described using
 IRIs, and typically are dereferencable entities that may be used to find
@@ -16,12 +19,9 @@ more information, creating a "Web of Knowledge". [JSON-LD][] is intended
 to be a simple publishing method for expressing not only Linked Data in
 JSON, but for adding semantics to existing JSON.
 
-This library is an implementation of the [JSON-LD][] specification in
-JavaScript.
-
 JSON-LD is designed as a light-weight syntax that can be used to express
 Linked Data. It is primarily intended to be a way to express Linked Data
-in Javascript and other Web-based programming environments. It is also
+in JavaScript and other Web-based programming environments. It is also
 useful when building interoperable Web Services and when storing Linked
 Data in JSON-based document storage engines. It is practical and
 designed to be as simple as possible, utilizing the large number of JSON
@@ -37,6 +37,42 @@ systems running on JSON, but provide a smooth migration path from JSON
 to JSON with added semantics. Finally, the format is intended to be fast
 to parse, fast to generate, stream-based and document-based processing
 compatible, and require a very small memory footprint in order to operate.
+
+## Requiring jsonld.js:
+
+### node.js + npm
+
+```
+npm install jsonld
+```
+
+```js
+var jsonld = require('jsonld');
+```
+
+### Browser (AMD) + bower
+
+```
+bower install jsonld
+```
+
+```js
+require.config({
+  paths: {
+    jsonld: 'bower_components/jsonld/js/jsonld'
+  }
+});
+define(['jsonld'], function(jsonld) { ... });
+```
+
+### Browser + script tag
+
+```html
+<!-- For legacy browsers include a Promise polyfill like
+  es6-promise before including jsonld.js -->
+<script src="//cdn.jsdelivr.net/g/es6-promise@1.0.0"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jsonld/0.3.15/jsonld.js"></script>
+```
 
 ## Quick Examples
 
@@ -125,7 +161,7 @@ jsonld.registerRDFParser = function(contentType, function(input) {
 });
 
 // use the promises API
-var promises = jsonld.promises();
+var promises = jsonld.promises;
 
 // compaction
 var promise = promises.compact(doc, context);
@@ -160,6 +196,41 @@ jsonld.registerRDFParser = function(contentType, function(input) {
   // parse input into a jsonld.js RDF dataset object...
   return new Promise(...);
 });
+
+// how to override the default document loader with a custom one -- for
+// example, one that uses pre-loaded contexts:
+
+// define a mapping of context URL => context doc
+var CONTEXTS = {
+  "http://example.com": {
+    "@context": ...
+  }, ...
+};
+
+// grab the built-in node.js doc loader
+var nodeDocumentLoader = jsonld.documentLoaders.node();
+// or grab the XHR one: jsonld.documentLoaders.xhr()
+// or grab the jquery one: jsonld.documentLoaders.jquery()
+
+// change the default document loader using the callback API
+// (you can also do this using the promise-based API, return a promise instead
+// of using a callback)
+var customLoader = function(url, callback) {
+  if(url in CONTEXTS) {
+    return callback(
+      null, {
+        contextUrl: null, // this is for a context via a link header
+        document: CONTEXTS[url], // this is the actual document that was loaded
+        documentUrl: url // this is the actual context URL after redirects
+      });
+  }
+  nodeDocumentLoader(url, callback);
+};
+jsonld.documentLoader = customLoader;
+
+// alternatively, pass the custom loader for just a specific call:
+jsonld.compact(doc, context, {documentLoader: customLoader},
+  function(err, compacted) { ... });
 ```
 
 Using the Command-line Tool
@@ -200,7 +271,7 @@ Commercial Support
 ------------------
 
 Commercial support for this library is available upon request from
-Digital Bazaar: support@digitalbazaar.com
+[Digital Bazaar][]: support@digitalbazaar.com
 
 Source
 ------
@@ -217,7 +288,7 @@ This library includes a sample testing utility which may be used to verify
 that changes to the processor maintain the correct output.
 
 To run the sample tests you will need to get the test suite files by cloning
-the [json-ld.org repository][json-ld.org] hosted on GitHub.
+the [json-ld.org repository][json-ld.org] hosted on GitHub:
 
 https://github.com/json-ld/json-ld.org
 
@@ -229,9 +300,15 @@ If you installed the test suite elsewhere:
 
     make test JSONLD_TEST_SUITE={PATH_TO_YOUR_JSON_LD_ORG}/test-suite}
 
-Code coverage output can be generated in `coverage.html`:
+The standard tests will run node and browser tests. Just one type can also
+be run:
 
-    make test-cov
+    make test-node
+    make test-browser
+
+Code coverage of node tests can be generated in `coverage/`:
+
+    make test-coverage
 
 The Mocha output reporter can be changed to min, dot, list, nyan, etc:
 
@@ -252,11 +329,10 @@ To generate earl reports:
     # generate the earl report for the browser
     ./node_modules/.bin/phantomjs tests/test.js --earl earl-browser.jsonld
 
-
+[Digital Bazaar]: http://digitalbazaar.com/
 [JSON-LD]: http://json-ld.org/
-[json-ld.org]: https://github.com/json-ld/json-ld.org
-[RDFa]: http://www.w3.org/TR/rdfa-core/
 [Microdata]: http://www.w3.org/TR/microdata/
 [Microformats]: http://microformats.org/
-[RFC4627]: http://www.ietf.org/rfc/rfc4627.txt
-
+[RDFa]: http://www.w3.org/TR/rdfa-core/
+[RFC7159]: http://tools.ietf.org/html/rfc7159
+[json-ld.org]: https://github.com/json-ld/json-ld.org

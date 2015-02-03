@@ -472,6 +472,17 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         if (lock == false) {
             lock = true;
             // creating need object
+            if($scope.need.tags.length>0){
+                var concTags ='';
+                for(var i = 0;i<$scope.need.tags.length;i++){
+                    if(i==0){
+                        concTags = $scope.need.tags[i].text;
+                    }else{
+                        concTags = concTags + ','+ $scope.need.tags[i].text;
+                    }
+                }
+                $scope.need.tags = concTags;
+            }
             var needBuilderObject = new window.won.NeedBuilder().setContext();
             if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
                 needBuilderObject.demand();

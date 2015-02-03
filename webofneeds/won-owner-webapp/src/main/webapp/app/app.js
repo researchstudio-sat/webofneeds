@@ -23,6 +23,7 @@ app = angular.module('won.owner',
         , 'ngScrollbar'
         , 'scrollable-table'
         , 'ui.utils'
+        , 'ngTagsInput'
         //, 'ui.event'
         //, 'ui.keypress'
         ]

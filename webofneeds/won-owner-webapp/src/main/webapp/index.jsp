@@ -34,6 +34,9 @@
 	    <link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
         <link rel="stylesheet" href="style/star-rating.css"/>
         <link rel="stylesheet" href="scripts/angular-scrollable-table/scrollable-table.css"/>
+        <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css"/>
+        <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.bootstrap.css"/>
+
 
         <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.min.css"/>
 
@@ -50,7 +53,8 @@
         <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
         <script type="text/javascript" src="bower_components/angular-ui-utils/ui-utils.js"></script> <!-- to include all ui-utils TODO deleteme-->
-        <script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
+        <script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
+        <script type="text/javascript" src="bower_components/angular-ui-map/ui-map.js"></script>
         <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
         <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>
@@ -126,7 +130,7 @@
 			</ul>
 			<ul class="nav navbar-nav">
                 <li class="dropdown" ng-class="isActive('create-need')" ng-cloak>
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					<a href="" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
 					</a>
 					<ul class="dropdown-menu">

@@ -3,21 +3,25 @@ REPORTER = spec
 
 all:
 
-test:
-	@NODE_ENV=test ./node_modules/.bin/mocha \
-	  -A \
-	  --reporter $(REPORTER) \
-	  $(TESTS) && ./node_modules/.bin/phantomjs tests/test.js
+test: test-node test-browser test-local-node test-local-browser
 
-	@#--require should
+test-node:
+	@NODE_ENV=test ./node_modules/.bin/mocha -A -R $(REPORTER) $(TESTS)
 
-js-cov:
-	./node_modules/visionmedia-jscoverage/jscoverage js js-cov
+test-browser:
+	@NODE_ENV=test ./node_modules/.bin/phantomjs $(TESTS)
 
-test-cov: js-cov
-	$(MAKE) test JSDIR=js-cov REPORTER=html-cov > coverage.html
+test-local-node:
+	@NODE_ENV=test JSONLD_TEST_SUITE=./tests/new-embed-api ./node_modules/.bin/mocha -A -R $(REPORTER) $(TESTS); 
+
+test-local-browser:
+	@NODE_ENV=test JSONLD_TEST_SUITE=./tests/new-embed-api ./node_modules/.bin/phantomjs $(TESTS)
+
+test-coverage:
+	./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- \
+		-u exports -R $(REPORTER) $(TESTS)
 
 clean:
-	rm -fr js-cov
+	rm -rf coverage
 
-.PHONY: test test-cov clean
+.PHONY: test test-node test-browser test-local-node test-local-browser test-coverage clean

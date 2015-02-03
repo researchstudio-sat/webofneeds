@@ -1,29 +1,19 @@
 {
-  "author": "AngularUI",
   "name": "angular-ui-map",
-  "version": "0.0.2",
-  "homepage": "http://angular-ui.github.com",
-  "keywords": [
-    "angular",
-    "angularui",
-    "map"
-  ],
-  "main": "./src/map.js",
+  "version": "0.0.3",
+  "main": "./ui-map.js",
   "dependencies": {
-    "angular": ">= 1.0.2",
-    "angular-ui-utils": "latest"
+    "angular": "1.x",
+    "angular-ui-utils": "0.x"
   },
-  "devDependencies": {
-    "angular-mocks": ">= 1.0.2"
-  },
-  "_release": "0.0.2",
+  "homepage": "https://github.com/angular-ui/ui-map",
+  "_release": "0.0.3",
   "_resolution": {
     "type": "version",
-    "tag": "v0.0.2",
-    "commit": "be3c9c51bf8c22f1286b8afe94f61f8c48c92b5e"
+    "tag": "v0.0.3",
+    "commit": "b74dc79c7cc3d61f35a3e2f1387960fdc5032613"
   },
   "_source": "git://github.com/angular-ui/ui-map.git",
   "_target": "~0.0.2",
-  "_originalSource": "angular-ui-map",
-  "_direct": true
+  "_originalSource": "angular-ui-map"
 }

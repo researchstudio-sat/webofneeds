@@ -148,11 +148,18 @@
                                             </div>
                                         </div>
                                         -->
-                                        <div class="row">
+                                        <!--div class="row">
                                             <div class="col-lg-8 col-lg-offset-2">
                                                 <input type="text" class="form-control" id="inputTagName" name="tags"
                                                        ng-model="need.tags"
                                                        placeholder="{{getTagsPlaceholder()}}" required>
+                                            </div>
+                                        </div-->
+                                        <div class="row">
+                                            <div class="col-lg-8 col-lg-offset-2">
+                                                <tags-input id="inputTagName" ng-model="need.tags" addOnComma="true"
+                                                            class="ti-input-sm"
+                                                            placeholder="Shoes, Entertainment, For Children, etc.."></tags-input>
                                             </div>
                                         </div>
                                     </div>
