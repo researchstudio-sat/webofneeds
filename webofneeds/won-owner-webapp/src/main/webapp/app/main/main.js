@@ -64,12 +64,22 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
 
     var reloadCurrentNeedData = function(){
         applicationStateService.getCurrentNeed()
-            .then(function (need) {
+            .then(
+            function success(need) {
                 $scope.currentNeed = need;
+            },
+            function error(respond) {
+                //TODO error notification?
+                $scope.currentNeed = {};
             });
         applicationStateService.getLastEventOfEachConnectionOfCurrentNeed()
-            .then(function (events) {
+            .then(
+            function success(events) {
                 $scope.lastEventOfEachConnectionOfCurrentNeed = events;
+            },
+            function error(respond) {
+                //TODO error notification?
+                $scope.lastEventOfEachConnectionOfCurrentNeed = [];
             });
     }
 
@@ -181,6 +191,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         $log.debug("render finished event") ;
     });
     $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
+        reloadCurrentNeedData();
         messageService.reconnect();
     });
     $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
