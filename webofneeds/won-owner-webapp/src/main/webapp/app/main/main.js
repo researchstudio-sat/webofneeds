@@ -55,15 +55,9 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.lastEventOfEachConnectionOfCurrentNeed = [];
     $scope.eventCommState = {};
 
-    var createNeedDropdownOpen = false;
 
-    $scope.clickOnCreateNeedDropdown = function(){
-        if(createNeedDropdownOpen == false){
-            $("#createNeedDropdown").addClass('open'); //TODO not very stable (e.g. if class name changes)
-        }else{
-            $("#locationForm").removeClass('open'); //TODO not very stable (e.g. if class name changes)
-        }
-    }
+
+
     var reloadCurrentNeedDataIfNecessary = function(uriOfChangeNeed){
         var currentNeedURI = applicationStateService.getCurrentNeedURI()
         if (currentNeedURI == null ) return; //can't update: no need selected

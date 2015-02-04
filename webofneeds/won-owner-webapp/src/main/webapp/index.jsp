@@ -129,7 +129,7 @@
 				</li>
 			</ul>
 			<ul class="nav navbar-nav">
-                <li id="createNeedDropdown" ng-click="clickOnCreateNeedDropdown()" class="dropdown"
+                <li class="dropdown"
                     ng-class="isActive('create-need')"
                     ng-cloak>
 					<a href="" class="dropdown-toggle" data-toggle="dropdown">
