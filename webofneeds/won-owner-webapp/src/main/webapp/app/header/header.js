@@ -57,7 +57,7 @@ angular.module('won.owner').controller("HeaderCtrl",
 	};
 
     $scope.checkRegistered = function(){
-        return userService.getRegistered();
+        return userService.isRegistered();
     };
     $scope.userdata = { username : userService.getUnescapeUserName()};
 
@@ -79,7 +79,6 @@ angular.module('won.owner').controller("HeaderCtrl",
 
 	$scope.onClickSignOut = function() {
 		applicationStateService.reset();
-		linkedDataService.reset();
 		userService.logOut().then(onResponseSignOut);
 	};
 

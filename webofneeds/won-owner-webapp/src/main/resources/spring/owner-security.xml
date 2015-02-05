@@ -16,6 +16,7 @@
 	<http auto-config="true" use-expressions="true" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint">
         <intercept-url pattern="/msg" access="isAnonymous()"/>
         <intercept-url pattern="/rest/users/" access="isAnonymous()"/>
+        <intercept-url pattern="/rest/users/private" access="isAnonymous()"/>
         <intercept-url pattern="/rest/users/ping/" access="permitAll()"/>
 		<intercept-url pattern="/rest/users/signout" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/users/isSignedIn" access="permitAll()"/>

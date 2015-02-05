@@ -67,18 +67,19 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
             .then(
             function success(need) {
                 $scope.currentNeed = need;
+                applicationStateService.getLastEventOfEachConnectionOfCurrentNeed()
+                    .then(
+                    function success(events) {
+                        $scope.lastEventOfEachConnectionOfCurrentNeed = events;
+                    },
+                    function error(respond) {
+                        //TODO error notification?
+                        $scope.lastEventOfEachConnectionOfCurrentNeed = [];
+                    });
             },
             function error(respond) {
                 //TODO error notification?
                 $scope.currentNeed = {};
-            });
-        applicationStateService.getLastEventOfEachConnectionOfCurrentNeed()
-            .then(
-            function success(events) {
-                $scope.lastEventOfEachConnectionOfCurrentNeed = events;
-            },
-            function error(respond) {
-                //TODO error notification?
                 $scope.lastEventOfEachConnectionOfCurrentNeed = [];
             });
     }
@@ -183,17 +184,39 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     });
 
     $scope.$on(won.EVENT.USER_SIGNED_IN, function(event){
-       messageService.reconnect();
         applicationStateService.reset();
-        userService.fetchPostsAndDrafts();
+        if (userService.isPrivate()) {
+            userService.fetchPosts().then(
+                function() {
+                    var keys = Object.keys(applicationStateService.getAllNeeds());
+                    if (keys.length == 1) {
+                        applicationStateService.setCurrentNeedURI(keys[0]);
+                        // the above line will also trigger reloadCurrentNeedData();
+                        //$location.url('/private-link').replace();
+                    } else {
+                        //TODO error
+                        $log.debug("Wrong number of needs for private link " + keys);
+                    }
+
+                }
+            );
+
+        } else {
+            reloadCurrentNeedData();
+            userService.fetchPostsAndDrafts();
+        }
+
     });
+
     $scope.$on('RenderFinishedEvent', function(event){
         $log.debug("render finished event") ;
     });
+
     $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
+        applicationStateService.reset();
         reloadCurrentNeedData();
-        messageService.reconnect();
     });
+
     $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
        $log.debug("search received");
     });

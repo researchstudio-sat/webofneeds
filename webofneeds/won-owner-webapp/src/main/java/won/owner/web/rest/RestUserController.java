@@ -36,6 +36,7 @@ import won.owner.model.User;
 import won.owner.pojo.UserPojo;
 import won.owner.service.impl.WONUserDetailService;
 import won.owner.web.validator.UserRegisterValidator;
+import won.protocol.util.CheapInsecureRandomString;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -103,6 +104,47 @@ public class RestUserController
       return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
     }
     return new ResponseEntity("New user was created", HttpStatus.CREATED);
+  }
+
+  /**
+   * registers user
+   *
+   * @param user   registration data of a user
+   * @param errors
+   * @return ResponseEntity with Http Status Code
+   */
+  @ResponseBody
+  @RequestMapping(
+    value = "/private",
+    method = RequestMethod.POST
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity registerPrivateLinkAsUser(@RequestBody UserPojo user, Errors errors) {
+    String todoPrivateLink = null;
+    try {
+      System.out.println(user.getUsername() + "  " + user.getPassword() + " " +  user.getPasswordAgain());
+      todoPrivateLink = (new CheapInsecureRandomString()).nextString(7) + "@TODO.ua";
+      System.out.println(todoPrivateLink);
+      user.setUsername(todoPrivateLink);
+      userRegisterValidator.validate(user, errors);
+      if (errors.hasErrors()) {
+        if (errors.getFieldErrorCount() > 0) {
+          // someone trying to go around js validation
+          return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+        } else {
+          // username is already in database
+          return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+        }
+      } else {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        wonUserDetailService.save(new User(user.getUsername(), passwordEncoder.encode(user.getPassword())));
+      }
+    } catch (DataIntegrityViolationException e) {
+      // username is already in database
+      return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+    }
+    return new ResponseEntity(todoPrivateLink, HttpStatus.CREATED);
   }
 
   /**

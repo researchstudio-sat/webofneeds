@@ -27,7 +27,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         , mapService
         , userService
         , utilService
-        , wonService) {
+        , wonService
+        , $q
+        ) {
     $scope.currentStep = $routeParams.step;
     $scope.selectedType = $routeParams.selectedType;
     $scope.title = $routeParams.title;
@@ -337,7 +339,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         $scope.draftURI = $scope.need.needURI;
 
         // save to the server if the user is logged in
-        if (userService.isAuth()) {
+        if (userService.isAuth() && !userService.isPrivate()) {
             needService.saveDraft(createDraftObject).then(function(saveDraftResponse){
                 if (saveDraftResponse.status === "OK") {
                     $scope.successShow = true;
@@ -397,47 +399,21 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     function hasUri(need) {
         return need.needURI != '' && need.needURI != null;
     }
+
+
     var lock = false;
-	$scope.publish = function () {
+    $scope.publishClicked = function () {
         if(lock== false){
             lock = true;
-            // creating need object
-            var needBuilderObject = new window.won.NeedBuilder().setContext();
-            if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
-                needBuilderObject.demand();
-            } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
-                needBuilderObject.supply();
-            } else if ($scope.need.basicNeedType ==  won.WON.BasicNeedTypeDotogether) {
-                needBuilderObject.doTogether();
-            } else {
-                needBuilderObject.critique();
-            }
+            var needJson = $scope.buildNeedJson();
 
-            needBuilderObject.title($scope.need.title)
-                .ownerFacet()               // mandatory
-                .description($scope.need.textDescription)
-                .hasTag($scope.need.tags)
-                .hasContentDescription()    // mandatory
-                //.hasPriceSpecification("EUR",5.0,10.0)
-                .active()                   // mandatory: active or inactive
-
-            if (hasLocationSpecification($scope.need)) {
-                // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
-                needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
-            }
-
-            if (hasTimeSpecification($scope.need)) {
-                needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
-            }
-
-            if (hasUri($scope.need)) {
-                needBuilderObject.uri($scope.need.needURI);
-            }
-
-            // building need as JSON object
-            var needJson = needBuilderObject.build();
-
-            var newNeedUriPromise = wonService.createNeed(needJson);
+            // make sure the user is registered (either with account or private link),
+            // then publish the need, so that it is under that account
+            var newNeedUriPromise = setUpRegistration().then(
+                function() {
+                     return wonService.createNeed(needJson);
+                }
+            );
 
             // TODO: should the draft removing part be changed to run only on success from newNeedUriPromise?
             if ($scope.draftURI != null) {
@@ -445,12 +421,88 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
                 $scope.draftURI = null;
             }
 
-            //$scope.need = $scope.getCleanNeed();      TODO decide what to do
             $scope.successShow = true;
+
             newNeedUriPromise['finally'](function(){
                 lock=false;
             });
         }
+    }
+
+
+    var setUpRegistration = function () {
+        if (userService.isAuth() && !userService.isPrivate()) {
+            // do nothing: sign-in user wants to publish another need - OK
+            var deferred = $q.defer();
+            deferred.resolve("OK");
+            return deferred.promise;
+        } else if (userService.isAuth() && userService.isPrivate()) {
+            // sign-out the current private link user, then register
+            // and sign-in a new need with new private link
+            //TODO error handling
+
+            return userService.logOut()
+                .then(
+                function(data) {
+                    return  userService.registerPrivateLinkUser();
+                })
+                .then(
+                function(data) {
+                    return userService.logIn({username:data.privateLink, password:'dummy'}, true);
+                }
+            );
+        } else {
+            //register private link user account and sign him in
+            //TODO error handling
+
+            return userService.registerPrivateLinkUser().then(
+                function(data) {
+                    return userService.logIn({username:data.privateLink, password:'dummy'}, true);
+                }
+            );
+        }
+    }
+
+
+	$scope.buildNeedJson = function () {
+
+        // creating need object
+        var needBuilderObject = new window.won.NeedBuilder().setContext();
+        if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
+            needBuilderObject.demand();
+        } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
+            needBuilderObject.supply();
+        } else if ($scope.need.basicNeedType ==  won.WON.BasicNeedTypeDotogether) {
+            needBuilderObject.doTogether();
+        } else {
+            needBuilderObject.critique();
+        }
+
+        needBuilderObject.title($scope.need.title)
+            .ownerFacet()               // mandatory
+            .description($scope.need.textDescription)
+            .hasTag($scope.need.tags)
+            .hasContentDescription()    // mandatory
+            //.hasPriceSpecification("EUR",5.0,10.0)
+            .active()                   // mandatory: active or inactive
+
+        if (hasLocationSpecification($scope.need)) {
+            // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
+            needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
+        }
+
+        if (hasTimeSpecification($scope.need)) {
+            needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
+        }
+
+        if (hasUri($scope.need)) {
+            needBuilderObject.uri($scope.need.needURI);
+        }
+
+        // building need as JSON object
+        var needJson = needBuilderObject.build();
+
+        return needJson;
 
 	};
 

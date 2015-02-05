@@ -1,12 +1,55 @@
-angular.module('won.owner').factory('userService', function ($window, $http, $log, $q, $rootScope, applicationStateService, utilService) {
+angular.module('won.owner').factory('userService', function ($window
+    , $http
+    , $log
+    , $q
+    , $rootScope
+    , applicationStateService
+    , utilService
+    , messageService) {
 
 
     var userService = {};
     var privateData = {
         registered:false,
+        private:false,
         user : $window.user
     }
     privateData.verifiedOnce = false; //gets reset on reload, will be set true after verifying the session cookie with the server
+
+    userService.fetchPosts = function() {
+        return $http.get(
+            '/owner/rest/needs/',
+            privateData.user
+        ).then(
+            function (needs) {
+                if(utilService.isString(needs.data)) {
+                    // unexpected response data, probably a redirect to another web-page
+                    $log.error("ERROR: unexpected response data for /owner/rest/needs/");
+                    return {status: "ERROR", message: "unexpected response data"};
+                } else {
+                    if (needs.data.length>0){
+                        return applicationStateService.addNeeds(needs);
+                    }
+                    // success
+                    //return {status:"OK", "data": needs.data};
+                }
+
+            },
+            function (response) {
+                switch(response.status) {
+                    case 403:
+                        // normal error
+                        return {status: "ERROR", message: "getting needs of a user failed"};
+                    default:
+                        // system error
+                        return {status:"FATAL_ERROR", message: "getting needs of a user failed"};
+                        break;
+                }
+            }
+        )
+
+    }
+
 
     userService.fetchPostsAndDrafts = function() {
         //if(applicationStateService.getAllNeedsCount()>=0){
@@ -140,21 +183,26 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
         if(privateData.user.username != null) return privateData.user.username.replace("&#64;", '@').replace("&#46;", '.');
         else return null;
     };
-    userService.getRegistered = function (){
+    userService.isRegistered = function (){
         return privateData.registered;
+    };
+    userService.isPrivate = function (){
+        return privateData.private;
     };
     userService.resetAuth = function () {
         //TODO also deactive session at server
         privateData.user = {
             isAuth : false
         }
+        privateData.registered = false
+        privateData.private = false
     };
     userService.registerUser = function(user) {
         return $http.post(
                 '/owner/rest/users/',
                 user
         ).then(
-            function() {
+            function(response) {
                 // success
                 privateData.registered = true;
                 return {status : "OK"};
@@ -173,7 +221,35 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
             }
         );
     };
-    userService.logIn = function(user) {
+    userService.registerPrivateLinkUser = function() {
+        var user = {};
+        user.username = 'temp';
+        user.password = 'dummy';
+        user.passwordAgain = 'dummy';
+        return $http.post(
+            '/owner/rest/users/private',
+            user
+        ).then(
+            function(response) {
+                // success
+                privateData.registered = true;
+                return {status : "OK", privateLink: response.data};
+            },
+            function(response) {
+                switch (response.status) {
+                    case 409:
+                        // normal error
+                        return {status:"ERROR", message: "Email address already in use."};
+                        break;
+                    default:
+                        // system error
+                        return {status:"FATAL_ERROR", message: "Unknown error occured."};
+                        break;
+                }
+            }
+        );
+    };
+    userService.logIn = function(user, asPrivateLink) {
         return $http.post(
                 '/owner/rest/users/signin',
                 user
@@ -181,8 +257,13 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
             function () {
                 // success
                 userService.setAuth(user.username);
+                privateData.registered = true;
+                if (asPrivateLink == true) {
+                    privateData.private = true;
+                }
+                messageService.reconnect();
                 $rootScope.$broadcast(won.EVENT.USER_SIGNED_IN);
-                return {status:"OK"};
+                return {status:"OK"}
             },
             function (response) {
                 switch(response.status) {
@@ -197,6 +278,8 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
             }
         );
     };
+
+
     userService.logOut = function() { //TODO directly pass promise
         return $http.post(
                 '/owner/rest/users/signout'
@@ -204,6 +287,7 @@ angular.module('won.owner').factory('userService', function ($window, $http, $lo
             function success(data, status) {
                 $log.debug("Successfully logged-out");
                 userService.resetAuth();
+                messageService.reconnect();
                 $rootScope.$broadcast(won.EVENT.USER_SIGNED_OUT);
                 return {status:"OK"};
             },

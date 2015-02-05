@@ -60,6 +60,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * @param needURIs any needs from previous sessions, fetched from the server
      */
     applicationStateService.reset = function() {
+        linkedDataService.reset();
         //if we have a current need, that's its URI
         privateData.currentNeedURI = null;
         privateData.currentEvent = null;
@@ -455,7 +456,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
                 })
             )
         }
-        $q.all(needURIPromises);
+        return $q.all(needURIPromises);
     }
     applicationStateService.addDrafts = function(drafts){
         for(var i = 0; i<drafts.data.length;i++){
@@ -516,9 +517,10 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return applicationStateService.getBaseUrl() + '/post-detail?need=' + encodeURIComponent(needUri);
     }
 
-    applicationStateService.getPrivateLink = function(needUri){
-        return applicationStateService.getBaseUrl() + '/private'; //todo set value normaly
+    applicationStateService.getPrivateLink = function(needLink){
+        return applicationStateService.getBaseUrl() + '/private-link?id=' + encodeURIComponent(needLink);
     }
+
     applicationStateService.addSearchResults = function(searchResults,promises){
         var deferred = $q.defer();
         $q.all(promises).then(function(searchResults){
