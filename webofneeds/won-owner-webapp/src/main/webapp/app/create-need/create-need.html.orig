@@ -268,6 +268,27 @@
                                 <!--TODO: below is a script to trigger an action when typing is paused-->
                                 <!--
                                 <script>
+                                    //setup before functions
+                                    var typingTimer;                //timer identifier
+                                    var doneTypingInterval = 1500;  //time in ms, 5 second for example
+
+                                    //on keyup, start the countdown
+                                    $('#addresstest').keyup(function(){
+                                        clearTimeout(typingTimer);
+                                        typingTimer = setTimeout(doneTyping, doneTypingInterval);
+                                    });
+
+                                    //on keydown, clear the countdown
+                                    $('#addresstest').keydown(function(){
+                                        clearTimeout(typingTimer);
+                                    });
+
+                                    //user is "finished typing," do something
+                                    function doneTyping () {
+                                        var locationString = $('#addresstest').val()
+                                        //alert(encodeURIComponent(locationString));
+                                        //do something
+                                    }
                                 </script>-->
 
                                 <!--<p>Boostrap:</p>-->
@@ -284,7 +305,7 @@
                                     </ul>
 
                                     <span id="locationDropDownToggle" class="input-group-btn dropdown-toggle" data-dropdown="dropdown">
-                                        <button type="submit" class="btn btn-default" ng-click="submitAddressQuery(addressText)" aria-label="Search">
+                                        <button type="submit" class="btn btn-default" ng-click="onAddressQuerySubmit(addressText)" aria-label="Search">
                                             <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                                         </button>
                                         <!-- TODO add a 'x' button to clear input (replace search-button?)-->
@@ -448,7 +469,19 @@
 
         </div>
 
-
+<<<<<<< HEAD
+    <div class="row">
+        <div class="media well">
+            <img class="thumbnail thumbnail-size media-object pull-left" src="/owner/images/need.jpg"/>
+            <div class="media-body">
+                <h4 class="media-heading">{{need.title}}{{need.uri}}</h4>
+                <p class="text-justify">
+                    <!-- TODO shorten the text description -->
+                    {{need.textDescription}} (<a href="" ng-click="goToDetailPostPreview()">go to
+                    full description</a>).
+                    <!-- TODO link needs to be extended by parameters -->
+                </p>
+=======
         <div class="row top-buffer">
             <div class="col-lg-6 col-lg-offset-3"
                  style="text-align:center;margin-top:15px;">
@@ -470,8 +503,18 @@
                 <button ng-show="publishButton" type="button" class="btn btn-success" ng-click="publish()">
                     <i class="fa fa-check fa-lg"></i>&nbsp;Publish
                 </button>
-
+>>>>>>> feat-createneed-location
             </div>
         </div>
+
+
+<<<<<<< HEAD
+    <div id="detail-preview" class="col-md-12 well">
+		<!--TODO controller should be specified in the directive-->
+        <won-Post-Detail need="need"></won-Post-Detail>
+        <!--deactivate conatct, map and calendar-->
+=======
+>>>>>>> feat-createneed-location
     </div>
+
 </div>

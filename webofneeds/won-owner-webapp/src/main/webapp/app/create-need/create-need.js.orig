@@ -15,6 +15,21 @@
  */
 
 angular.module('won.owner').controller('CreateNeedCtrlNew', function
+<<<<<<< HEAD
+    ($scope
+        , $timeout
+        , $location
+        , $log
+        , $http
+        , $routeParams
+        , $anchorScroll
+        , needService
+        , applicationStateService
+        , mapService
+        , userService
+        , utilService
+        , wonService) {
+=======
     ( $scope
     , $timeout
     , $location
@@ -31,6 +46,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     //, uiKeyup
     //, uiEvent
     ) {
+>>>>>>> feat-createneed-location
     $scope.currentStep = $routeParams.step;
     $scope.selectedType = $routeParams.selectedType;
     $scope.title = $routeParams.title;
@@ -167,7 +183,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             $scope.publishButton = false;
         }
 
-    };
+    }
     $scope.setShowButtons($scope.currentStep);
 
     $scope.needType = function () {
@@ -194,24 +210,22 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
-    };
+    }
     $scope.mapInit();
 
     map.removeCstmMarker = function() {
-        if(map.cstmMarker != undefined) {
+        if(map.cstmMarker != undefined)
             map.removeLayer(map.cstmMarker); // remove the previous marker //TODO does this delete the popup as well?
-        }
-    };
+    }
 
-    $scope.submitAddressQuery = function (address) {
-         //clear old results
-        $scope.addressSearchResults = undefined;
-        $scope.selectedAddress = {}
-        map.removeCstmMarker();
-        //map.fitWorld().zoomIn(); // TODO a good idea ux-wise? or just stay at the previous location?
-
-        if(address && address !== "" && address !== {}) {
-            $("#locationForm").addClass('open'); //show drop-down //TODO hackish
+    $scope.onAddressQuerySubmit = function (address) {
+        if(!address || address === "" || address === {}) {
+            map.removeCstmMarker();
+            map.fitWorld().zoomIn(); // TODO a good idea ux-wise?
+            $scope.selectedAddress = {}
+            $scope.addressSearchResults = undefined;
+            //TODO handle invalid input
+        } else {
             osmService.matchingLocations(address).then(function(resp){
                 $scope.addressSearchResults = resp;
             }, function failed(){
@@ -220,15 +234,14 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
     }
 
-    $scope.selectedAddress = {};
+    $scope.selectedAddress = {}
     $scope.selectAddress = function (address) {
-        $("#locationForm").removeClass('open'); //hide drop-down //TODO hackish
         $scope.selectedAddress = address;
         $scope.setMapLocation(address.lat, address.lon, address.display_name);
         $scope.addressText = address.display_name;
-    };
+    }
     $scope.setMapLocation = function (lat, lon, adr) { //TODO not in $scope but only usable here in link?
-        map.removeCstmMarker();
+        map.removeCstmMarker()
 
         map.cstmMarker = L.marker([lat, lon]);
         map.cstmMarker.addTo(map).bindPopup(adr);
@@ -237,7 +250,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         map.setView([lat, lon], 13);
 
         map.cstmMarker.openPopup();
-    };
+    }
     //TODO start searching as soon as the user pauses/presses down, (followed by: select choice, press enter)
     //TODO enter selects the first entry? shows an error popup and asks to select a correct location (same on focus loss)? enter jumps to first line of dropdown?
     $scope.onArrowDownInSearchField = function (event) { //TODO DELETEME
@@ -248,11 +261,11 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         console.log($('#locationDropDownToggle'));
         console.log($('.dropDownToggle'));
         $("#locationForm").addClass('open'); //TODO not very stable (e.g. if class name changes)
-    };
+    }
     $scope.onArrowUpInSearchField = function (event) { //TODO DELETEME
         console.log("In onArrowUpInSearchField. Event: " + JSON.stringify(event));
         $("#locationForm").removeClass('open'); //TODO not very stable (e.g. if class name changes)
-    };
+    }
     $scope.isopen = true;
     $scope.toggleDropdown = function($event) {
         console.log("in toggleDropdown. isopen = " + $scope.isopen);
@@ -262,31 +275,10 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     };
     $scope.onLocationDropdownToggle = function() {
         console.log("Toggled dropdown.");
-    };
+    }
 
-    (function() { // <anonymous wrapper>
-        //setup before functions
-        var typingTimer;                //timer identifier
-        var doneTypingInterval = 1500;  //time in ms, 5 second for example
 
-        //on keyup, start the countdown
-        $('#addressTextField').keyup(function(){
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(doneTyping, doneTypingInterval);
-        });
 
-        //on keydown, clear the countdown
-        $('#addressTextField').keydown(function(){
-            clearTimeout(typingTimer);
-        });
-
-        //user is "finished typing," do something
-        function doneTyping () {
-            var address = $('#addressTextField').val();
-            //alert(encodeURIComponent(address));
-            $scope.submitAddressQuery(address);
-        }
-    })(); // </anonymous wrapper>
     // </leaflet-map> --------------------------
 
 
@@ -303,6 +295,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         if ($scope.draftURI == null) {
             return $scope.getCleanNeed();
         } else {
+<<<<<<< HEAD
             var localDraft = applicationStateService.getDraft($scope.draftURI);
             if (localDraft == null) { // can happen if someone enters create-need-preview url without any of previous steps
                 $scope.draftURI == null
@@ -310,6 +303,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             } else {
                 return localDraft;
             }
+=======
+            return applicationStateService.getDraft($scope.draftURI);
+>>>>>>> feat-createneed-location
         }
     }
 
@@ -335,10 +331,29 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         };
     };
 
+<<<<<<< HEAD
+
+
+	$scope.need = $scope.getNeed();
+=======
     $scope.need = $scope.getNeed();
+>>>>>>> feat-createneed-location
     $scope.need.basicNeedType = $scope.needType();
 
 
+<<<<<<< HEAD
+
+    $scope.nextStep = function(){
+        if($scope.currentStep <= $scope.numberOfSteps) {
+            // -(-1) instead of +1 is just a hack to interpret currentStep as int and not as string
+            $scope.jumpToStep( $scope.currentStep - (-1));
+        }
+
+    }
+    $scope.previousStep = function(){
+        if($scope.currentStep >=1) {
+            $scope.jumpToStep( $scope.currentStep - 1)
+=======
     $scope.addTag = function () {
         var tags = $scope.need.tags;
         var tagName = $("#inputTagName").val();
@@ -360,16 +375,23 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
      };  */
     $scope.nextStep = function () {
         if ($scope.currentStep <= $scope.numberOfSteps) {
-			// -(-1) instead of +1 is just a hack to interpret currentStep as int and not as string
-            $scope.jumpToStep( $scope.currentStep - (-1));
+
+            $scope.currentStep++;
+            $scope.successShow = false;
+            $scope.setShowButtons($scope.currentStep);
         }
 
     }
     $scope.previousStep = function () {
         if ($scope.currentStep >= 1) {
-			$scope.jumpToStep( $scope.currentStep - 1)
+
+            $scope.currentStep--;
+            $scope.successShow = false;
+            $scope.setShowButtons($scope.currentStep);
+>>>>>>> feat-createneed-location
         }
     }
+<<<<<<< HEAD
 
     $scope.jumpToStep = function(num){
         $log.debug(num);
@@ -377,12 +399,26 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         if(num<=$scope.numberOfSteps){
             $scope.currentStep = num;
             $location.url("create-need/"+$scope.currentStep+"/"+$scope.selectedType +"/"+$scope.need.title).search({"draft": $scope.draftURI});
+=======
+    $scope.jumpToStep = function (num) {
+        $log.debug(num);
+        if (num <= $scope.numberOfSteps) {
+            $scope.currentStep = num;
+            $scope.successShow = false;
+            $scope.setShowButtons($scope.currentStep);
+            //   var newPath = '/create-need/'+$scope.currentStep+'/'+$scope.iPost.selectedType+'/'+$scope.need.title;
+            //   $location.path(newPath);
+>>>>>>> feat-createneed-location
 
         }
 
     }
+<<<<<<< HEAD
 
+    $scope.saveDraft = function(){
+=======
     $scope.saveDraft = function () {
+>>>>>>> feat-createneed-location
         var draftBuilderObject = new window.won.DraftBuilder().setContext();
         draftBuilderObject.setCurrentStep($scope.currentStep);
         draftBuilderObject.setCurrentMenuposition($scope.selectedType);
@@ -424,6 +460,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
         var createDraftObject = {"draftURI": $scope.need.needURI, "draft": JSON.stringify(draftJson)};
 
+<<<<<<< HEAD
         // save locally
         applicationStateService.addDraft(createDraftObject);
         $scope.draftURI = $scope.need.needURI;
@@ -444,7 +481,14 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         if($scope.currentStep > 1) { // after the first step, the need is required to have title, type, description and tags
             if (!$scope.need.basicNeedType || !$scope.need.title || !$scope.need.textDescription || !$scope.need.tags) {
                 return false;
-
+=======
+        needService.saveDraft(createDraftObject).then(function (saveDraftResponse) {
+            if (saveDraftResponse.status === "OK") {
+                $scope.successShow = true;
+                $scope.draftURI = $scope.need.needURI;
+            } else {
+                // TODO inform about an error
+>>>>>>> feat-createneed-location
             }
         }
         return true;
@@ -455,15 +499,15 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
     // TODO does not update models
     /*
-    $('#start_date').datepicker({
-        format:'dd.mm.yyyy',
-        autoclose: true
-    });
+     $('#start_date').datepicker({
+     format:'dd.mm.yyyy',
+     autoclose: true
+     });
 
-    $('#end_date').datepicker({
-        format:'dd.mm.yyyy',
-        autoclose: true
-    }); */
+     $('#end_date').datepicker({
+     format:'dd.mm.yyyy',
+     autoclose: true
+     }); */
 
     function createISODateTimeString(date, time) {
         var d = date.split('-');
@@ -548,7 +592,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
     };
 
-
+<<<<<<< HEAD
     $scope.goToDetailPostPreview = function() {
         var detailPreviewElementId = 'detail-preview';
         $location.hash(detailPreviewElementId);
@@ -558,7 +602,11 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 	$scope.cancel = function () {
 		$location.url("/");
 	};
-
+=======
+    $scope.cancel = function () {
+        $location.url("/");
+    };
+>>>>>>> feat-createneed-location
 
     $scope.validatePostForm = function () {
         var result = ($scope.need.basicNeedType != 'undefined' && $scope.need.basicNeedType != null && $scope.need.basicNeedType != '') &&
