@@ -1,4 +1,6 @@
 <!--<p>Boostrap:</p>-->
+<style>#location-suggestions { z-index: 9999 }</style> <!-- TODO a bit dirty imho just to make sure it's above the map. Maybe the map-controls could be moved to a lower index-->
+
 <form class="input-group" id="locationForm">
     <input type="text" class="form-control" id="addressTextField"
            ng-model="addressText"
@@ -6,7 +8,7 @@
            ui-keypress="{down:'onArrowDownInSearchField()', up: 'onArrowUpInSearchField()'}"
            autocomplete="off"/> <!--@a.c.=off: we'll use our own dropdown/auto-complete-->
 
-    <ul class="dropdown-menu" role="menu">
+    <ul id="location-suggestions" class="dropdown-menu" role="menu">
         <li ng-hide="addressSearchResults && addressSearchResults.length > 0">Loading address results...  [REPLACE WITH SPINNER]</li>
         <li ng-click="selectAddress(adr)" ng-repeat="adr in addressSearchResults"><a href="javascript:void(0)">{{adr.display_name}}</a></li>
     </ul>
