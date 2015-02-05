@@ -23,6 +23,7 @@ app = angular.module('won.owner',
         , 'ngScrollbar'
         , 'scrollable-table'
         , 'ui.utils'
+        , 'ngTagsInput'
         //, 'ui.event'
         //, 'ui.keypress'
         ]
@@ -150,6 +151,7 @@ app = angular.module('won.owner',
             return filtered;
         };
     })
+
 
     .filter('messageTypeFilter', function(){
         var getTypeText = function(lastConEvent) {

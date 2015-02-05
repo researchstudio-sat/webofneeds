@@ -1,0 +1,169 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<!--
+Directive-Content:
+    * Type
+    * ((state of activity)) TODO
+    * Title
+    * ((posted on)) TODO
+    * (Pics)
+    * Tagged With {{tags}}
+    * Description
+    * (Location) TODO
+    * (Date) TODO
+    * Interested in this post? Contact
+-->
+
+<!--
+<p>NEED: {{need}}</p>
+<p>TYPE: {{need.basicNeedType}}<p/>
+<p>URL: {{getTypePicURI(need.basicNeedType)}}<p/>
+<p>TypeHR: {{humanReadableType(need.basicNeedType)}}<p/>
+<p>startDate: {{need.startDate}}</p>
+<p>startTime: {{need.startTime}}</p>
+<p>endDate: {{need.endDate}}</p>
+<p>endTime: {{need.endTime}}</p>
+-->
+<h1>
+    <star-favourite show-public="showPublic()"></star-favourite>
+<img class="glyphicon" ng-src="{{getTypePicURI(need.basicNeedType)}}" tooltip="{{humanReadableType(need.basicNeedType)}}"/>
+{{need.title}}</h1>
+<div id="copyImg" ng-show="showPublic()" class="inline pull-right">
+                    <span   ng-click="clickOnCopy()" class="fa fa-copy fa-lg" tooltip="{{hoverCopyToolTip}}"
+                            tooltip-trigger="mouseenter">
+                    </span>
+
+</div>
+<!--<div class="inline" style="font-size: 1.8em;" ng-bind="need.title" ></div>-->
+<!-- TODO drop padding on sides (and part of the border top/bottom) on smaller screens -->
+<p class="" style="border: 1px solid rgba(86, 61, 124, 0.2); padding: 1em;">
+    {{need.textDescription}}
+</p>
+<div ng-show="need.tags.length > 0">
+    <h2 style="font-size: 1em">
+        Tagged with:
+    </h2>
+    <!--TODO refactor the below (move the whole parsing to the .js file)-->
+    <span style="margin-right:5px;cursor:pointer;"
+          class="label label-primary btnTag"
+          ng-repeat="tag in need.tags.split(',')"
+          ng-bind="need.tags.split(',')[$index]">
+    </span>
+</div>
+
+<div ng-show="canBeContacted()" style="text-align: right">
+    Interested in this post?
+    <button type="button" ng-disabled="previewRegime" class="btn btn-default" ng-click="clickOnContact()">Contact</button>
+</div>
+<div  style="text-align: center" ng-show="contactFormActiv">
+    <won-contact need="need" allNeeds="allNeeds"/>
+</div>
+
+
+<!-- SNIPPETS for LOCATION, TIME and GALLERY. TODO: These need serious refactoring before they can be used
+    <!--TODO images, already bound as : images[?].url-->
+    <!-- and bigImage for the title pic -->
+<!--
+<div class="row">
+    <div id="locationInfoCollapsed" class="well div-table col-lg-12">
+        <div class="div-table-row">
+            <div class="col-lg-8 div-table centered-text additional-info-title">{{location}}</div>
+            <div class="col-lg-1 div-table-cell centered-text pull-right">
+                            <span ng-show="locationOutputFieldCollapsed">
+                                <a href="" class="glyphicon glyphicon-chevron-right" ng-click="outputLocationCollapseClick()"></a>
+                            </span>
+                            <span ng-show="!locationOutputFieldCollapsed">
+                                <a href="" class="glyphicon glyphicon-chevron-down" ng-click="outputLocationCollapseClick()"></a>
+                            </span>
+            </div>
+        </div>
+    </div>
+
+    <div id="locationInfoOutputFields" ng-show="!locationOutputFieldCollapsed"
+         class="div-table col-lg-12">
+
+        <div class="div-table-row">
+            <section id="map" class="col-lg-8 col-lg-offset-2">
+            </section>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div id="timeInfoCollapsed" class="well div-table col-lg-12">
+        <div class="div-table-row">
+            <div class="col-lg-8 div-table centered-text additional-info-title">{{need.startDate}} -
+                {{need.endDate}}</div>
+            <div class="col-lg-1 div-table-cell centered-text pull-right">
+                            <span ng-show="timeInputFieldCollapsed">
+                                <a href="" class="glyphicon glyphicon-chevron-right" ng-click="timeInputFieldCollapsedClick()"></a>
+                            </span>
+                            <span ng-show="!timeInputFieldCollapsed">
+                                <a href="" class="glyphicon glyphicon-chevron-down" ng-click="timeInputFieldCollapsedClick()"></a>
+                            </span>
+            </div>
+        </div>
+    </div>
+
+    <div id="timeInputFields" ng-show="!timeInputFieldCollapsed" class="div-table col-lg-12">
+        <div class="div-table-row">
+            TODO
+            <div id="time_from"
+                 class="col-lg-4 col-lg-offset-2"></div>
+            <div id="time_to" class="col-lg-4"></div>
+        </div>
+    </div>
+</div>
+
+<div style="padding-top: 40px;padding-bottom: 8em;">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="inline" ><star-favourite show-public="showPublic()"></star-favourite></div>
+                <div class="inline"><img ng-src="{{getTypePicURI(need.basicNeedType)}}" tooltip="need type"/></div>
+                <div class="inline" style="font-size: 1.8em;" ng-bind="need.title" ></div>
+            </div>
+            <div class="row">
+                <div class="inline" style="font-size: 1.8em;" ng-bind="need.creationDate | date:'yy/MM/dd HH:mm'"></div>
+                <div id="copyImg" ng-show="showPublic()" class="inline pull-right">
+                    <span   ng-click="clickOnCopy()" class="fa fa-copy fa-lg" tooltip="{{hoverCopyToolTip}}"
+                            tooltip-trigger="mouseenter">
+                    </span>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div id="bigImageArea" class="text-center">
+                        <a id="bigImage" data-lightbox="roadtrip">
+                            <img id="obr" alt="Big picture" />
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div>
+                            <p class="gallery">
+
+                            </p>
+                            <p class="pager "></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            -->

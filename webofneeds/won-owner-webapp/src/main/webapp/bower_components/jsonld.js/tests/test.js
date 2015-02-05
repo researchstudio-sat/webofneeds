@@ -101,7 +101,7 @@ var TEST_TYPES = {
     fn: 'fromRDF',
     params: [
       readTestNQuads('input'),
-      createTestOptions({format: 'application/nquads'}),
+      createTestOptions({format: 'application/nquads'})
     ],
     compare: compareExpectedJson
   },
@@ -138,7 +138,11 @@ describe('JSON-LD', function() {
   }
 
   // run Web IDL tests
-  if(!_nodejs) {
+  // FIXME: hack to prevent Web IDL tests from running when running
+  // local manifest tests that aren't part of the main JSON-LD test suite;
+  // testing arch needs to be reworked to better support local tests and
+  // separate them from official ones and what goes into EARL report, etc.
+  if(!_nodejs && ROOT_MANIFEST_DIR.indexOf('json-ld.org/test-suite') !== -1) {
     require('./webidl/testharness.js');
     require('./webidl/WebIDLParser.js');
     require('./webidl/idlharness.js');
@@ -212,12 +216,11 @@ function addManifest(manifest) {
     for(var i = 0; i < sequence.length; ++i) {
       var entry = readManifestEntry(manifest, sequence[i]);
 
-      // entry is another manifest
       if(isJsonLdType(entry, 'mf:Manifest')) {
+        // entry is another manifest
         addManifest(entry);
-      }
-      // assume entry is a test
-      else {
+      } else {
+        // assume entry is a test
         addTest(manifest, entry);
       }
     }
@@ -240,7 +243,7 @@ function addTest(manifest, test) {
   var description = number + ' ' + (test.purpose || test.name);
 
   // get appropriate API and run test
-  var api = _nodejs ? jsonld : jsonld.promises();
+  var api = _nodejs ? jsonld : jsonld.promises;
   it(description, function(done) {
     this.timeout(5000);
     var testInfo = TEST_TYPES[getJsonLdTestType(test)];
@@ -261,6 +264,9 @@ function addTest(manifest, test) {
         return done();
       } catch(ex) {
         if(program.bail) {
+          if(ex.name !== 'AssertionError') {
+            console.log('\nError: ', JSON.stringify(ex, null, 2));
+          }
           if(_nodejs) {
             process.exit();
           } else {
@@ -521,15 +527,16 @@ function createDocumentLoader(test) {
       return loader(url, callback);
     }
 
-    // attempt to load locally
     var idx = url.indexOf(base);
-    if(idx === 0) {
+    if(idx === 0 || url.indexOf(':') === -1) {
+      // attempt to load official test-suite files or relative URLs locally
+      var rval;
       try {
-        callback(null, loadLocally(url));
+        rval = loadLocally(url);
       } catch(ex) {
-        callback(ex);
+        return callback(ex);
       }
-      return;
+      return callback(null, rval);
     }
 
     // load remotely
@@ -566,8 +573,14 @@ function createDocumentLoader(test) {
       }
     }
 
-    var filename = joinPath(
-      ROOT_MANIFEST_DIR, doc.documentUrl.substr(base.length));
+    var filename;
+    if(doc.documentUrl.indexOf(':') === -1) {
+      filename = joinPath(ROOT_MANIFEST_DIR, doc.documentUrl);
+      doc.documentUrl = 'file://' + filename;
+    } else {
+      filename = joinPath(
+        ROOT_MANIFEST_DIR, doc.documentUrl.substr(base.length));
+    }
     try {
       doc.document = readJson(filename);
     } catch(ex) {

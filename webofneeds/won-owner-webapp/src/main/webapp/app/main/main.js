@@ -54,6 +54,10 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.currentNeed = {};
     $scope.lastEventOfEachConnectionOfCurrentNeed = [];
     $scope.eventCommState = {};
+
+
+
+
     var reloadCurrentNeedDataIfNecessary = function(uriOfChangeNeed){
         var currentNeedURI = applicationStateService.getCurrentNeedURI()
         if (currentNeedURI == null ) return; //can't update: no need selected

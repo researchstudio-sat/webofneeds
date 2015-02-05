@@ -2,15 +2,20 @@ angular.module('won.owner').factory('searchService', function ($window, $http, $
     var searchService = {};
 
 
-    searchService.search = function(type,searchText){
+    searchService.search = function(type,searchText,t){
+        var header = {};
+        header.headers = {'Accept':'application/ld+json'},
+        header.params = {q:searchText, t:t};
+        /*if(t==undefined||t==""){
+            header.headers = {'Accept':'application/ld+json'},
+            header.params = {q:searchText, t:t};
+        } else{
+            header.headers = {'Accept':'application/ld+json'},
+            header.params = {q:searchText};
+        }*/
         $http.get(
-            applicationStateService.getMatcherURI(),
-            {
-                headers : {
-                    'Accept' : 'application/ld+json'
-                },
-                params:{q:searchText}
-            }
+            won.WON.matcherURI,
+            header
         ).then(
             function (results) {
                 var frame = [{
@@ -48,7 +53,9 @@ angular.module('won.owner').factory('searchService', function ($window, $http, $
                 }
             }
         )
+
     }
+
     return searchService;
 });
 
