@@ -267,7 +267,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     (function() { // <anonymous wrapper>
         //setup before functions
         var typingTimer;                //timer identifier
-        var doneTypingInterval = 1500;  //time in ms, 5 second for example
+        var doneTypingInterval = 1300;  //time in ms
 
         //on keyup, start the countdown
         $('#addressTextField').keyup(function(){
