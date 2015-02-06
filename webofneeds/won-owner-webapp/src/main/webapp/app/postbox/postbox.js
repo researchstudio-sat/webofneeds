@@ -22,6 +22,13 @@
  * To change this template use File | Settings | File Templates.
  */
 angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval, $location, userService, applicationStateService, applicationControlService) {
+
+    //TODO better put redirection in routing?
+    if (userService.isPrivateUser()) {
+       $location.url("/private-link");
+        return;
+    }
+
     $scope.countOfAllUnreadMatchEvents = 0;
     // TODO if we want to remember the last sortedField selected by the user,
     // we should store it in e.g. applicationStateService

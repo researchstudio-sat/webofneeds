@@ -518,7 +518,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     }
 
     applicationStateService.getPrivateLink = function(needLink){
-        return applicationStateService.getBaseUrl() + '/private-link?id=' + encodeURIComponent(needLink);
+        return applicationStateService.getBaseUrl() + '/private-link?id=' + needLink;
     }
 
     applicationStateService.addSearchResults = function(searchResults,promises){

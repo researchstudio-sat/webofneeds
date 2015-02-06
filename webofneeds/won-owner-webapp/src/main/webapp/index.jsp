@@ -161,25 +161,25 @@
 
 
 
-				<li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
+				<li ng-show="showAccountUser()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
 					<i class="fa fa-clipboard fa-lg"></i>&nbsp;Post box</a>
 				</li>
 
-                <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                <li ng-show="showAccountUser()" ng-cloak notif-dropdown
                     event-type = "message"
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"
                     unread-events-by-need-by-type="unreadEventsByNeedByType"
                     on-click="openNeedDetailView(needURI)"
                     get-type-pic-uri = "getTypePicURI(type)">
                 </li>
-                <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                <li ng-show="showAccountUser()" ng-cloak notif-dropdown
                     event-type = "connect"
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"
                     unread-events-by-need-by-type="unreadEventsByNeedByType"
                     on-click="openNeedDetailView(needURI)"
                     get-type-pic-uri = "getTypePicURI(type)">
                 </li>
-                <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                <li ng-show="showAccountUser()" ng-cloak notif-dropdown
                     event-type = "hint"
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"
                     unread-events-by-need-by-type="unreadEventsByNeedByType"

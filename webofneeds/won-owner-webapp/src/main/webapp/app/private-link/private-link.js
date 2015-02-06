@@ -72,9 +72,9 @@ angular.module('won.owner')
 
             //TODO error handling
 
-            return userService.logOut().then(
+            return userService.logOutAndSetUpApplicationState().then(
                 function(data) {
-                    return userService.logIn({username:pLink, password:'dummy'}, true);
+                    return userService.logInAndSetUpApplicationState({username:pLink, password:'dummy'}, true);
                 }
             );
 
@@ -82,45 +82,29 @@ angular.module('won.owner')
             // sign-in with the provided private link
 
             //TODO error handling
-            return userService.logIn({username: pLink, password: 'dummy'}, true);
+            return userService.logInAndSetUpApplicationState({username: pLink, password: 'dummy'}, true);
         }
     }
 
     if ($routeParams.id != null) {
 
         setUpRegistrationForPrivateLink($routeParams.id).then(
-            function() {
-//                return userService.fetchPosts().then(
-//                    function() {
-//                        //setTimeout(function() {
-//                        var keys = Object.keys(applicationStateService.getAllNeeds());//var keys = applicationStateService.getAllNeeds().keys;
-//                        if (keys.length == 1) {
-//                            applicationStateService.setCurrentNeedURI(keys[0]);
-//                        } else {
-//                            //TODO error
-//                            $log.debug("Wrong number of needs for private link " + keys);
-//                        }
-//                        //}, 5000);
-//                        //return;
-//                        $location.replace().url('/private-link');
-//
-//                    }
-//                );
-
+            function success() {
                 // calling replace() removes it from the browser history when clicking back button,
                 // i.e. if I enter a private link A and then change the session (time-out, log-in with
                 // other user account or create a new private link B) clicking 'back' in the browser won't
                 // display my private link A. This is a big plus, but still needs some work: at least in
                 // Chrome, I can still see my private link in the browser history page.
                 // TODO bug: sometimes, when entering the private link page (try 4-10 times in a raw)
+                // connections are not loaded...
                 $location.url('/private-link').replace();
-
             }
+            //TODO error
         );
         return;
     }
 
-    if (userService.isPrivate()) {
+    if (userService.isPrivateUser()) {
         $scope.privateLink = applicationStateService.getPrivateLink(userService.getUserName());
     }
 

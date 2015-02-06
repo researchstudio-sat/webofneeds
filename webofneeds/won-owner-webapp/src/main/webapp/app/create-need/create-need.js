@@ -133,33 +133,33 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }else*/ if(step == 1){//2  ){
             $scope.previousButton = false;
 
-            $scope.saveDraftButton = userService.isAuth();
+            $scope.saveDraftButton = userService.isAccountUser();
             $scope.nextButton = true;
             $scope.previewButton = true;
             $scope.publishButton = false;
         } else if(step == 2){//3){
             if($scope.collapsed == true){
                 $scope.previousButton = true;
-                $scope.saveDraftButton = userService.isAuth();
+                $scope.saveDraftButton = userService.isAccountUser();
                 $scope.nextButton = false;
                 $scope.previewButton = false;
                 $scope.publishButton = true;
             } else {
                 $scope.previousButton = true;
-                $scope.saveDraftButton = userService.isAuth();
+                $scope.saveDraftButton = userService.isAccountUser();
                 $scope.nextButton = false;
                 $scope.previewButton = true;
                 $scope.publishButton = false;
             }
         }else if(step == 3){
             $scope.previousButton = true;
-            $scope.saveDraftButton = userService.isAuth();
+            $scope.saveDraftButton = userService.isAccountUser();
             $scope.nextButton = false;
             $scope.previewButton = false;
             $scope.publishButton = true;
         } else { // default
             $scope.previousButton = false;
-            $scope.saveDraftButton = userService.isAuth();
+            $scope.saveDraftButton = userService.isAccountUser();
             $scope.nextButton = true;
             $scope.previewButton = true;
             $scope.publishButton = false;
@@ -339,7 +339,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         $scope.draftURI = $scope.need.needURI;
 
         // save to the server if the user is logged in
-        if (userService.isAuth() && !userService.isPrivate()) {
+        if (userService.isAccountUser()) {
             needService.saveDraft(createDraftObject).then(function(saveDraftResponse){
                 if (saveDraftResponse.status === "OK") {
                     $scope.successShow = true;
@@ -431,24 +431,24 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
 
     var setUpRegistration = function () {
-        if (userService.isAuth() && !userService.isPrivate()) {
+        if (userService.isAccountUser()) {
             // do nothing: sign-in user wants to publish another need - OK
             var deferred = $q.defer();
             deferred.resolve("OK");
             return deferred.promise;
-        } else if (userService.isAuth() && userService.isPrivate()) {
+        } else if (userService.isPrivateUser()) {
             // sign-out the current private link user, then register
             // and sign-in a new need with new private link
             //TODO error handling
 
-            return userService.logOut()
+            return userService.logOutAndSetUpApplicationState()
                 .then(
                 function(data) {
                     return  userService.registerPrivateLinkUser();
                 })
                 .then(
                 function(data) {
-                    return userService.logIn({username:data.privateLink, password:'dummy'}, true);
+                    return userService.logInAndSetUpApplicationState({username:data.privateLink, password:'dummy'}, true);
                 }
             );
         } else {
@@ -457,7 +457,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
             return userService.registerPrivateLinkUser().then(
                 function(data) {
-                    return userService.logIn({username:data.privateLink, password:'dummy'}, true);
+                    return userService.logInAndSetUpApplicationState({username:data.privateLink, password:'dummy'}, true);
                 }
             );
         }

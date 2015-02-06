@@ -78,7 +78,8 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
                     });
             },
             function error(respond) {
-                //TODO error notification?
+                // TODO error notification, but it is expected in case an applicationstate
+                // gets reset and there is no current need
                 $scope.currentNeed = {};
                 $scope.lastEventOfEachConnectionOfCurrentNeed = [];
             });
@@ -183,38 +184,38 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         reloadCurrentNeedData();
     });
 
-    $scope.$on(won.EVENT.USER_SIGNED_IN, function(event){
-        applicationStateService.reset();
-        if (userService.isPrivate()) {
-            userService.fetchPosts().then(
-                function() {
-                    var keys = Object.keys(applicationStateService.getAllNeeds());
-                    if (keys.length == 1) {
-                        applicationStateService.setCurrentNeedURI(keys[0]);
-                        // the above line will also trigger reloadCurrentNeedData();
-                        //$location.url('/private-link').replace();
-                    } else {
-                        //TODO error
-                        $log.debug("Wrong number of needs for private link " + keys);
-                    }
-
-                }
-            );
-
-        } else {
-            reloadCurrentNeedData();
-            userService.fetchPostsAndDrafts();
-        }
-
-    });
+//    $scope.$on(won.EVENT.USER_SIGNED_IN, function(event){
+//        applicationStateService.reset();
+//        if (userService.isPrivateUser()) {
+//            userService.fetchPosts().then(
+//                function() {
+//                    var keys = Object.keys(applicationStateService.getAllNeeds());
+//                    if (keys.length == 1) {
+//                        applicationStateService.setCurrentNeedURI(keys[0]);
+//                        // the above line will also trigger reloadCurrentNeedData();
+//                        //$location.url('/private-link').replace();
+//                    } else {
+//                        //TODO error
+//                        $log.debug("Wrong number of needs for private link " + keys);
+//                    }
+//
+//                }
+//            );
+//
+//        } else {
+//            reloadCurrentNeedData();
+//            userService.fetchPostsAndDrafts();
+//        }
+//
+//    });
+//
+//    $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
+//        applicationStateService.reset();
+//        reloadCurrentNeedData();
+//    });
 
     $scope.$on('RenderFinishedEvent', function(event){
         $log.debug("render finished event") ;
-    });
-
-    $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
-        applicationStateService.reset();
-        reloadCurrentNeedData();
     });
 
     $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
@@ -235,7 +236,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
                 messageService.reconnect();
             } else if (wasAuth) {
                 $log.warn("WEBSOCKET CLOSED code 1011, user was authenticated. Logging out.");
-                userService.logOut().then(onResponseSignOut);
+                userService.logOutAndSetUpApplicationState().then(onResponseSignOut);
             } else {
                 $log.warn("WEBSOCKET CLOSED code 1011, user was not authenticated. Reconnecting.");
                 messageService.reconnect();

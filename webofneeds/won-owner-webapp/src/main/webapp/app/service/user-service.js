@@ -95,11 +95,17 @@ angular.module('won.owner').factory('userService', function ($window
             privateData.user
         ).then(
             function (drafts) {
-                if(drafts.data.length>0){
-                    applicationStateService.addDrafts(drafts)
+                if(utilService.isString(drafts.data)) {
+                    // unexpected response data, probably a redirect to another web-page
+                    $log.error("ERROR: unexpected response data for /owner/rest/drafts/");
+                    return {status: "ERROR", message: "unexpected response data"};
+                } else {
+                    if(drafts.data.length>0){
+                        applicationStateService.addDrafts(drafts)
+                    }
+                    // success
+                    return {status:"OK"};
                 }
-                // success
-                return {status:"OK"};
             },
             function (response) {
                 switch(response.status) {
@@ -186,9 +192,13 @@ angular.module('won.owner').factory('userService', function ($window
     userService.isRegistered = function (){
         return privateData.registered;
     };
-    userService.isPrivate = function (){
-        return privateData.private;
+    userService.isPrivateUser = function (){
+        return (userService.isAuth() && privateData.private);
     };
+    userService.isAccountUser = function (){
+        return (userService.isAuth() && !privateData.private);
+    };
+
     userService.resetAuth = function () {
         //TODO also deactive session at server
         privateData.user = {
@@ -249,10 +259,13 @@ angular.module('won.owner').factory('userService', function ($window
             }
         );
     };
+
+
     userService.logIn = function(user, asPrivateLink) {
+
         return $http.post(
-                '/owner/rest/users/signin',
-                user
+            '/owner/rest/users/signin',
+            user
         ).then(
             function () {
                 // success
@@ -262,41 +275,88 @@ angular.module('won.owner').factory('userService', function ($window
                     privateData.private = true;
                 }
                 messageService.reconnect();
-                $rootScope.$broadcast(won.EVENT.USER_SIGNED_IN);
-                return {status:"OK"}
+                return {status: "OK"}
             },
             function (response) {
-                switch(response.status) {
+                switch (response.status) {
                     case 403:
                         // normal error
                         return {status: "ERROR", message: "Incorrect email adress or password"};
                     default:
                         // system error
-                        return {status:"FATAL_ERROR", message: "Unknown error occured."};
-                    break;
+                        return {status: "FATAL_ERROR", message: "Unknown error occured."};
+                        break;
                 }
             }
         );
     };
 
+    userService.logInAndSetUpApplicationState = function(user, asPrivateLink) {
+        return userService.logIn(user, asPrivateLink).then(
+            function success(data) {
+                applicationStateService.reset();
+                if (data.status == "OK") {
+                    if (userService.isPrivateUser()) {
+                        return userService.fetchPosts().then(
+                            function () {
+                                var keys = Object.keys(applicationStateService.getAllNeeds());
+                                if (keys.length == 1) {
+                                    applicationStateService.setCurrentNeedURI(keys[0]);
+                                    // the above line will also trigger won.EVENT.APPSTATE_CURRENT_NEED_CHANGED and reloadCurrentNeedData();
+                                    return {status: "OK"};
+                                } else if (keys.length == 0) {
+                                    // also OK if the private link was just registered, the need is not created yet
+                                    $rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
+                                    return {status: "OK"};
+                                } else {
+                                    //TODO error
+                                    $log.debug("Wrong number of needs for private link " + keys);
+                                    return {status: "ERROR"};
+                                }
+                            }
+                        );
+                    } else {
+                        userService.fetchPostsAndDrafts();
+                        $rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
+                        return {status: "OK"};
+                    }
+                } else {
+                    return data;
+                }
+            });
+    };
+
 
     userService.logOut = function() { //TODO directly pass promise
         return $http.post(
-                '/owner/rest/users/signout'
+            '/owner/rest/users/signout'
         ).then(
             function success(data, status) {
                 $log.debug("Successfully logged-out");
                 userService.resetAuth();
                 messageService.reconnect();
-                $rootScope.$broadcast(won.EVENT.USER_SIGNED_OUT);
-                return {status:"OK"};
+                return {status: "OK"};
             },
             function error(data, status) {
                 $log.error("ERROR: failed to log-out");
-                return {status:"FATAL_ERROR"};
+                return {status: "FATAL_ERROR"};
             }
         );
 	};
+
+    userService.logOutAndSetUpApplicationState = function() {
+        return userService.logOut().then(
+            function success(data, status) {
+                applicationStateService.reset();
+                $rootScope.$broadcast(won.EVENT.APPSTATE_CURRENT_NEED_CHANGED);
+                return {status: "OK"};
+            },
+            function error(data, status) {
+                //TODO
+                return {status: "FATAL_ERROR"};
+            }
+        );
+    };
 
     var verified = userService.verifyAuth(); //checking login status
     verified.then(function reloadWhileLoggedIn(loggedIn){
