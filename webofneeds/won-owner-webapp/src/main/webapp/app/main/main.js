@@ -38,6 +38,10 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     //we use the wonService dependency because it initializes messageService's callback (addMessageCallback)
     $rootScope.$on("$routeChangeSuccess", function(event, currentRoute, previousRoute) {
         $rootScope.title = currentRoute.title;
+        if(previousRoute.$$route.originalPath =="/private-link"&&previousRoute.$$route.originalPath != currentRoute.$$route.originalPath){
+            applicationStateService.setCurrentConnectionURI("");
+        }
+       // $log("info: from route "+previousRoute+"to route "+currentRoute)
     });
     $scope.selectedType = -1;
     $scope.applicationStateService = applicationStateService;
