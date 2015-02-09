@@ -230,6 +230,7 @@
             window.user = {
                 <sec:authorize access="isAuthenticated()">
                 username : '<sec:authentication property="principal.username" />',
+                authorities : '<sec:authentication property="principal.authorities" />',
                 isAuth : true
                 </sec:authorize>
                 <sec:authorize access="!isAuthenticated()">

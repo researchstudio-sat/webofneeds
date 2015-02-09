@@ -22,7 +22,8 @@ angular.module('won.owner').controller("HeaderCtrl",
              , applicationStateService
              , $filter
              , $interval
-             , $log
+             , $log,
+               $window
              ) {
 
 

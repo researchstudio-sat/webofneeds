@@ -14,6 +14,10 @@ angular.module('won.owner').factory('userService', function ($window
         private:false,
         user : $window.user
     }
+    if (privateData.user != null
+        && "&#91;ROLE&#95;PRIVATE&#93;" == privateData.user.authorities) {
+        privateData.private = true;
+    }
     privateData.verifiedOnce = false; //gets reset on reload, will be set true after verifying the session cookie with the server
 
     userService.fetchPosts = function() {
@@ -154,9 +158,12 @@ angular.module('won.owner').factory('userService', function ($window
     }
 
     userService.verifyAuth = function() {
-        promise = $http.get('rest/users/isSignedIn').then (
+        promise = $http.get('rest/users/isSignedInRole').then (
 
             function(response){ //success
+                if (angular.isArray(response.data) && response.data.length == 1 && response.data[0].authority  === "ROLE_PRIVATE") {
+                    privateData.private = true;
+                }
                 privateData.user.isAuth = true;
                 return true;
             },

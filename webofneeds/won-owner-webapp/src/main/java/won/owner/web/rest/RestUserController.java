@@ -121,12 +121,11 @@ public class RestUserController
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
   public ResponseEntity registerPrivateLinkAsUser(@RequestBody UserPojo user, Errors errors) {
-    String todoPrivateLink = null;
+    String privateLink = null;
     try {
       System.out.println(user.getUsername() + "  " + user.getPassword() + " " +  user.getPasswordAgain());
-      todoPrivateLink = (new CheapInsecureRandomString()).nextString(7) + "@TODO.ua";
-      System.out.println(todoPrivateLink);
-      user.setUsername(todoPrivateLink);
+      privateLink = (new CheapInsecureRandomString()).nextString(32); // TODO more secure random alphanum string
+      user.setUsername(privateLink);
       userRegisterValidator.validate(user, errors);
       if (errors.hasErrors()) {
         if (errors.getFieldErrorCount() > 0) {
@@ -138,13 +137,14 @@ public class RestUserController
         }
       } else {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        wonUserDetailService.save(new User(user.getUsername(), passwordEncoder.encode(user.getPassword())));
+        User userDetails = new User(user.getUsername(), passwordEncoder.encode(user.getPassword()), "ROLE_PRIVATE");
+        wonUserDetailService.save(userDetails);
       }
     } catch (DataIntegrityViolationException e) {
       // username is already in database
       return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
     }
-    return new ResponseEntity(todoPrivateLink, HttpStatus.CREATED);
+    return new ResponseEntity(privateLink, HttpStatus.CREATED);
   }
 
   /**
@@ -201,6 +201,27 @@ public class RestUserController
       return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
     } else {
       return new ResponseEntity("Current session is still valid. asdf", HttpStatus.OK);
+    }
+  }
+
+  @RequestMapping(
+    value = "/isSignedInRole",
+    method = RequestMethod.GET
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
+  public ResponseEntity isSignedInRole() {
+    // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
+    // code by itself if the session isn't valid any more
+    SecurityContext context = SecurityContextHolder.getContext();
+    //if(context.getAuthentication() )
+    if (context == null || context.getAuthentication() == null) {
+      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+    } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
+      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+    } else {
+      return new ResponseEntity(SecurityContextHolder.getContext().getAuthentication().getAuthorities(), HttpStatus.OK);
     }
   }
 
