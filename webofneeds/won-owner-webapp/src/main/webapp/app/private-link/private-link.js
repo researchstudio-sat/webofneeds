@@ -65,30 +65,10 @@ angular.module('won.owner')
 
 
     //settings
-    var setUpRegistrationForPrivateLink = function (pLink) {
-        if (userService.isAuth()) {
-            // sign-out the current private link/account user, then sign-in with
-            // the provided private link
-
-            //TODO error handling
-
-            return userService.logOutAndSetUpApplicationState().then(
-                function(data) {
-                    return userService.logInAndSetUpApplicationState({username:pLink, password:'dummy'}, true);
-                }
-            );
-
-        } else {
-            // sign-in with the provided private link
-
-            //TODO error handling
-            return userService.logInAndSetUpApplicationState({username: pLink, password: 'dummy'}, true);
-        }
-    }
 
     if ($routeParams.id != null) {
 
-        setUpRegistrationForPrivateLink($routeParams.id).then(
+        userService.setUpRegistrationForUserWithPrivateLink($routeParams.id).then(
             function success() {
                 // calling replace() removes it from the browser history when clicking back button,
                 // i.e. if I enter a private link A and then change the session (time-out, log-in with

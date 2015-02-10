@@ -365,6 +365,56 @@ angular.module('won.owner').factory('userService', function ($window
         );
     };
 
+    userService.setUpRegistrationForUserWithPrivateLink = function (pLink) {
+        if (userService.isAuth()) {
+            // sign-out the current private link/account user, then sign-in with
+            // the provided private link
+            //TODO error handling
+            return userService.logOutAndSetUpApplicationState().then(
+                function(data) {
+                    return userService.logInAndSetUpApplicationState({username:pLink, password:'dummy'}, true);
+                }
+            );
+        } else {
+            // sign-in with the provided private link
+            //TODO error handling
+            return userService.logInAndSetUpApplicationState({username: pLink, password: 'dummy'}, true);
+        }
+    }
+
+    userService.setUpRegistrationForUserPublishingNeed = function () {
+        if (userService.isAccountUser()) {
+            // do nothing: sign-in user wants to publish another need - OK
+            var deferred = $q.defer();
+            deferred.resolve("OK");
+            return deferred.promise;
+        } else if (userService.isPrivateUser()) {
+            // sign-out the current private link user, then register
+            // and sign-in a new need with new private link
+            //TODO error handling
+
+            return userService.logOutAndSetUpApplicationState()
+                .then(
+                function(data) {
+                    return  userService.registerPrivateLinkUser();
+                })
+                .then(
+                function(data) {
+                    return userService.logInAndSetUpApplicationState({username:data.privateLink, password:'dummy'}, true);
+                }
+            );
+        } else {
+            //register private link user account and sign him in
+            //TODO error handling
+
+            return userService.registerPrivateLinkUser().then(
+                function(data) {
+                    return userService.logInAndSetUpApplicationState({username:data.privateLink, password:'dummy'}, true);
+                }
+            );
+        }
+    }
+
     var verified = userService.verifyAuth(); //checking login status
     verified.then(function reloadWhileLoggedIn(loggedIn){
         if(loggedIn) {
