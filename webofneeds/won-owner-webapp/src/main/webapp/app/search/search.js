@@ -14,30 +14,77 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams,$window, linkedDataService, mapService, applicationStateService, applicationControlService) {
+angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams,$window,searchService, linkedDataService, mapService, applicationStateService, applicationControlService) {
 
     $scope.results = applicationStateService.getSearchResults();
+    $scope.search = {};
+    $scope.search.title = $routeParams.term;
+    $scope.search.type = parseInt($routeParams.type);
+
     $scope.columnNum = 2;
     $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
         event.data = linkedDataService.getNeed(event.matchUrl());
         $scope.results.push(event);
     })
     // TODO LOGIC
-    $scope.relatedTags = ['Sony', 'Tv', 'Samsung', 'LCD'];
-    $scope.search = {};
-    $scope.search.title = $routeParams.term;
-    $scope.search.type = $routeParams.type;
+    $scope.relatedSearchTerms = [];
+    $scope.extractRelatedSearches = function(){
+        angular.forEach($scope.results,function(res){
+            if(res[won.WON.searchResultPreview][won.WON.hasContent][won.WON.hasTag]!= undefined){
+                var tags = res[won.WON.searchResultPreview][won.WON.hasContent][won.WON.hasTag]['@value'].split(",");
 
-    //TODO LOGIC
-    $scope.searching = {type:'others offer', title:'Frilly pink cat unicorn'};
+                for(var i = 0;i<tags.length;i++){
+                    var tag = tags[i];
+
+                    var contains = false;
+                    for(var j = 0; j<$scope.relatedSearchTerms.length;j++){
+                        if($scope.relatedSearchTerms[j][0]==tag){
+                            $scope.relatedSearchTerms[j][1]=$scope.relatedSearchTerms[j]+1;
+                            contains = true;
+                            break;
+                        }
+                    }
+                    if(contains == false){
+                        $scope.relatedSearchTerms.push([tag,0]);
+                    }
+
+                    /*iif(tag in $scope.relatedSearchTerms){
+                     $scope.relatedSearchTerms[tag]= $scope.relatedSearchTerms[tag] +1;
+                     }else{
+                     $scope.relatedSearchTerms[tag]=0;
+                     }*/
+                }
+                $scope.relatedSearchTerms.sort(function(a,b){
+                    a = a[1];
+                    b = b[1];
+                    return a < b ? -1 : (a > b ? 1 : 0);
+                })
+            }
+
+
+        })
+
+
+    }
+    $scope.extractRelatedSearches();
+
 
     $scope.createNewPost = function () {
         //TODO put title from search
-        $location.url('/create-need/1/' + $scope.searching.title);
+        $location.url('/create-need/1/-1/' + $scope.search.title);
     }
     $scope.redirectToCreatePost = function(){
-        $window.open('/create-need/1/'+$scope.search.title, '_blank');
+        $window.open('./#/create-need/1/-1/'+$scope.search.title, '_blank');
     };
+    $scope.getRelatedSearches = function(){
+
+        return $scope.relatedSearchTerms;
+    }
+    $scope.newSearch = function(term){
+        $scope.search.title = term;
+        searchService.search($scope.search.type, term,applicationControlService.getNeedType($scope.search.type));
+    }
+
 });
 angular.module('won.owner').controller('SearchResultCtrl', function($scope, $log,applicationStateService){
     $scope.res = {};
@@ -50,7 +97,22 @@ angular.module('won.owner').controller('SearchResultCtrl', function($scope, $log
 
 
 })
-app.directive(('searchResult'), function searchResultFct(applicationStateService){
+app.directive(('relatedSearches'), function relatedSearchesFct(){
+    var dtv = {
+        restrict: 'E',
+        scope : {
+            terms : '=',
+            clickOnItem : '&'
+        },
+        templateUrl: "app/search/related-searches.html",
+        controller: function($scope){
+
+        }
+
+    }
+    return dtv;
+})
+app.directive(('searchResult'), function searchResultFct($log, applicationStateService){
 
     var dtv = {
         restrict: 'E',
@@ -82,22 +144,30 @@ app.directive(('searchResult'), function searchResultFct(applicationStateService
         controller: function($scope){
             var selectedResult = 0;//default
             $scope.selectedNeed = {};
+
             $scope.getCurrentNeed=function(){
                 return applicationStateService.getCurrentNeed();
             }
             $scope.selected = function(num) {
                 if (selectedResult == num){
-                    return "thumbnail-selected"
-                }else return "thumbnail-non-selected"
+                    return "col-md-12 thumbnail-selected"
+                }else return "col-md-12 thumbnail-non-selected"
             }
             $scope.select=function(num){
                 selectedResult = num;
-                applicationStateService.setCurrentNeedURI($scope.results[selectedResult][won.WON.searchResultURI]['@id']);
-                linkedDataService.getNeed($scope.results[selectedResult][won.WON.searchResultURI]['@id']).then(function(need){
-                    $scope.selectedNeed = need;
+                try{
+                    applicationStateService.setCurrentNeedURI($scope.results[selectedResult][won.WON.searchResultURI]['@id']);
 
-                })
+
+                    linkedDataService.getNeed($scope.results[selectedResult][won.WON.searchResultURI]['@id']).then(function(need){
+                        $scope.selectedNeed = need;
+
+                    })
+                }catch (e){
+                    $log.debug("failed to set current need uri. probably there's no search result")
+                }
             }
+            $scope.select(selectedResult);
         }
     }
     return dtv;

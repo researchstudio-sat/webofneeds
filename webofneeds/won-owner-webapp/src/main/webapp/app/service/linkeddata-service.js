@@ -60,28 +60,31 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      */
     var somePromises = function(promises, errorHandler){
         var deferred = $q.defer(),
-            counter = 0,
+            numPromises = promises.length,
+            successes = 0,
+            failures = 0,
             results = angular.isArray(promises) ? [] : {},
             handler = typeof errorHandler === 'function' ? errorHandler : function(x,y){};
 
         angular.forEach(promises, function(promise, key) {
-            counter++;
             promise.then(function(value) {
-                if (results.hasOwnProperty(key)) return;
+                successes++;
+                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
                 results[key] = value;
-                if (!(--counter)) deferred.resolve(results);
+                if (failures + successes >= numPromises) deferred.resolve(results);
             }, function(reason) {
+                failures ++;
                 $log.error("warning: promise failed. Reason " + JSON.stringify(reason));
-                if (results.hasOwnProperty(key)) return;
+                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
                 results[key] = null;
                 handler(key, reason);
-                if (!(--counter)) deferred.reject("all promises failed");
+                if (failures >= numPromises) {
+                    deferred.reject(results);
+                } else if (failures + successes >= numPromises) {
+                    deferred.resolve(results);
+                }
             });
         });
-
-        if (counter === 0) {
-            deferred.resolve(results);
-        }
 
         return deferred.promise;
     }
@@ -366,8 +369,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         } else if (typeof options.allowMultiple !== undefined  && options.allowMultiple == false && data.length > 1){
             errorMessage = "More than one result found.";
         }
-        if (errorMessage != null){
-            $log.error(errorMessage);
+        if (errorMessage != null) {
+            // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
+            // property is really not there (and should not be), so in that case it's not an error...
+            $log.error(options.message + " " + errorMessage);
+            // TODO: this $q.reject seems to have no effect
             $q.reject(options.message + " " + errorMessage);
             return true;
         }
@@ -416,7 +422,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                     linkedDataService.cacheItemInsertOrOverwrite(uri);
                                     deferred.resolve(uri);
                                 } else {
-                                    $q.reject("failed to load " + uri);
+                                    deferred.reject("failed to load " + uri);
                                 }
                             });
                         });
@@ -527,7 +533,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                            });
                            return resultObject;
                        } catch (e) {
-                           $q.reject("could not load need " + uri + ". Reason: " + e);
+                           return $q.reject("could not load need " + uri + ". Reason: " + e);
                        } finally {
                            lock.releaseReadLock();
                        }
@@ -568,11 +574,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return resultData.result;
                         } catch (e) {
-                            $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
+                            return $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
                         } finally {
                             lock.releaseReadLock();
                         }
-                        $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
+                        return $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
                     }
                 );
             })
@@ -585,7 +591,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getUniqueObjectOfProperty(needUri, won.WON.hasWonNode)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
+                function(reason) { return $q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
     }
 
     linkedDataService.getNeedUriOfConnection = function(connectionUri){
@@ -594,8 +600,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         }
         return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.belongsToNeed)
             .then(
-                function(result){return result;},
-                function(reason) { $q.reject("could not get need uri of connection " + connectionUri + ". Reason: " + reason)});
+                function(result) {
+                    return result;
+                },
+                function(reason) {
+                    return $q.reject("could not get need uri of connection " + connectionUri + ". Reason: " + reason)
+                });
     }
 
     linkedDataService.getRemoteConnectionUriOfConnection = function(connectionUri){
@@ -605,7 +615,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteConnection)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get remote connection uri of connection " + connectionUri + ". Reason: " + reason)});
+                function(reason) { return $q.reject("could not get remote connection uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
     linkedDataService.getRemoteneedUriOfConnection = function(connectionUri){
@@ -615,7 +625,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteNeed)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get remote need uri of connection " + connectionUri + ". Reason: " + reason)});
+                function(reason) { return $q.reject("could not get remote need uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
     /**
@@ -684,9 +694,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     }
                     return somePromises(promises, function(key, reason){
                         won.reportError("could not fetch last event of connection " + conUris[key], reason);
-                    }).then(function(val) { return won.deleteWhereNull(val)});
+                    }).then(function(val) {
+                        return won.deleteWhereNull(val)
+                    });
                 } catch (e) {
-                    $q.reject("could not get last event of connection " + uri + ". Reason: " + e);
+                    return $q.reject("could not get last event of connection " + uri + ". Reason: " + e);
                 }
             }
         );
@@ -732,7 +744,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     }
                     return $q.all(eventPromises)
                 } catch (e) {
-                    $q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
+                    return $q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
                 }
             });
     }
@@ -827,7 +839,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return result.result;
                         } catch (e) {
-                            $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
+                            return $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
                         } finally {
                             lock.releaseReadLock();
                         }
@@ -887,7 +899,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                            });
                            return eventUris;
                        } catch (e) {
-                           $q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
+                           return $q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
                        } finally {
                            lock.releaseReadLock();
                        }
@@ -953,7 +965,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return resultObject.eventUri;
                         } catch (e) {
-                            $q.reject("Could not get last connection event URI for connection " + connectionUri + ". Reason: " + e);
+                            return $q.reject("Could not get last connection event URI for connection " + connectionUri + ". Reason: " + e);
                         } finally {
                             lock.releaseReadLock();
                         }
@@ -1007,7 +1019,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return textMessages;
                         } catch (e) {
-                            $q.reject("Could not get connection events' text messages " + connectionUri + ". Reason: " + e);
+                            return $q.reject("Could not get connection events' text messages " + connectionUri + ". Reason: " + e);
                         } finally {
                             lock.releaseReadLock();
                         }
@@ -1057,7 +1069,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return lastEventTypeBeforeTime;
                         } catch (e) {
-                            $q.reject("Could not get connection event type before time " + connectionUri + ". Reason: " + e);
+                            return $q.reject("Could not get connection event type before time " + connectionUri + ". Reason: " + e);
                         } finally {
                             lock.releaseReadLock();
                         }
@@ -1085,7 +1097,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         try {
                             var node = {};
                             privateData.store.node(uri, function (success, graph) {
-                                if (graph.length == 0){
+                                if (graph.length == 0) {
                                     $log.error("warn: could not load any attributes for node with uri: " + uri);
                                 }
                                 if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
@@ -1099,7 +1111,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             node.uri = uri;
                             return node;
                         } catch (e) {
-                            $q.reject("could not get node " + uri + "with attributes: " + e);
+                            return $q.reject("could not get node " + uri + "with attributes: " + e);
                         } finally {
                             lock.releaseReadLock();
                         }

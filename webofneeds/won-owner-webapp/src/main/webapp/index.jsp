@@ -34,8 +34,15 @@
 	    <link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
         <link rel="stylesheet" href="style/star-rating.css"/>
         <link rel="stylesheet" href="scripts/angular-scrollable-table/scrollable-table.css"/>
+        <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css"/>
+        <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.bootstrap.css"/>
+
 
         <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.min.css"/>
+
+        <!--leaflet.js provides us with a map-widget which can display map material from different sources-->
+        <script type="text/javascript" src="resources/leaflet-0.7.3/leaflet.js"></script>
+        <link rel="stylesheet" href="resources/leaflet-0.7.3/leaflet.css"/>
 
 
         <script src="scripts/jquery.10.2.js"></script>
@@ -45,8 +52,9 @@
         <script src="bower_components/angular-mocks/angular-mocks.js"></script>
         <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
-        <script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
-        <script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
+        <script type="text/javascript" src="bower_components/angular-ui-utils/ui-utils.js"></script> <!-- to include all ui-utils TODO deleteme-->
+        <script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
+        <script type="text/javascript" src="bower_components/angular-ui-map/ui-map.js"></script>
         <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
         <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>
@@ -55,6 +63,7 @@
         <script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
+        <%--<script type="text/javascript" src="scripts/osm/angular-leaflet-directive.min.js"></script>--%>
         <script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
         <script type="text/javascript" src="scripts/lightbox.min.js"></script>
         <script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
@@ -74,6 +83,7 @@
         <script type="text/javascript" src="<c:url value="/app/service/application-control-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/osm-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
@@ -91,6 +101,7 @@
         <script type="text/javascript" src="<c:url value="/app/main/main.js"/>"></script>
 
         <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/create-need/location-selector.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/conversation/conversation.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/draft/draft.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
@@ -119,8 +130,10 @@
 				</li>
 			</ul>
 			<ul class="nav navbar-nav">
-                <li class="dropdown" ng-class="isActive('create-need')" ng-cloak>
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <li class="dropdown"
+                    ng-class="isActive('create-need')"
+                    ng-cloak>
+					<a href="" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
 					</a>
 					<ul class="dropdown-menu">

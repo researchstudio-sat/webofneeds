@@ -30,9 +30,11 @@ import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+import won.matcher.query.BasicNeedTypeQueryFactory;
 import won.matcher.solr.NeedSolrInputDocumentBuilder;
 import won.protocol.solr.SolrFields;
 import won.protocol.util.NeedModelBuilder;
+import won.protocol.vocabulary.WON;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
@@ -112,24 +114,46 @@ public class SearchService
   }
 
   public SearchResult search(String keywords, int numResults){
-   return search(keywords, null, numResults);
+   return search(keywords, null, numResults, null);
   }
-
-  public SearchResult search(String keywords, Model needModel, int numResults){
+  public SearchResult search(String keywords, int numResults, String type){
+    return search(keywords, null, numResults, type);
+  }
+  public SearchResult search(String keywords, Model needModel, int numResults, String type){
     SolrIndexSearcher solrIndexSearcher = getSolrIndexSearcher();
     try {
       BooleanQuery combinedQuery = new BooleanQuery();
       if (keywords != null && keywords.length() > 0) {
-        combinedQuery.add(createKeywordQuery(solrIndexSearcher, keywords), BooleanClause.Occur.MUST);
-        combinedQuery.add(createTitleQuery(solrIndexSearcher, keywords), BooleanClause.Occur.MUST);
+
+        combinedQuery.add(createQuery(solrIndexSearcher, SolrFields.KEYWORD_SEARCH, keywords), BooleanClause.Occur
+          .MUST);
+      }
+      if(type !=null&&type.length()>0){
+        NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
+        NeedModelBuilder needModelBuilder = new NeedModelBuilder();
+        needModelBuilder.setBasicNeedType(type);
+        needModelBuilder.setUri(WON.BASE_URI);
+        needModelBuilder.build();
+
+
+
+        needModelBuilder.copyValuesToBuilder(builder);
+        builder.setUri(WON.BASE_URI);
+        SolrInputDocument solrDoc = builder.build();
+        BasicNeedTypeQueryFactory basicNeedTypeQueryFactory = new BasicNeedTypeQueryFactory(BooleanClause.Occur.MUST,
+                                                                                            "basicNeedType",
+                                                                                            true);
+        Query basicNeedTypeQuery = basicNeedTypeQueryFactory.createQuery(solrIndexSearcher, solrDoc);
+        combinedQuery.add(basicNeedTypeQuery,BooleanClause.Occur.MUST);
       }
       if (needModel != null && needModel.size() > 0) {
         NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
         NeedModelBuilder needModelBuilder = new NeedModelBuilder();
+        needModelBuilder.setBasicNeedType(type);
         needModelBuilder.copyValuesFromProduct(needModel);
         needModelBuilder.copyValuesToBuilder(builder);
-        SolrInputDocument solrDoc = builder.build();
 
+        SolrInputDocument solrDoc = builder.build();
       }
       if (combinedQuery.getClauses().length > 0) {
         return createSearchResult(solrIndexSearcher, solrIndexSearcher.search(combinedQuery, numResults), this
@@ -143,10 +167,18 @@ public class SearchService
   }
 
   public SearchResult search(Model needModel, int numResults){
-    return search(null, needModel, numResults);
+    return search(null, needModel, numResults,null);
   }
 
 
+
+  private Query createQuery(SolrIndexSearcher solrIndexSearcher, String solrFieldName, String queryString) throws
+    ParseException {
+    Analyzer analyzer = solrIndexSearcher.getSchema().getField(solrFieldName).getType().getQueryAnalyzer();
+    QueryParser parser = new QueryParser(Version.LUCENE_35,solrFieldName,analyzer);
+    return parser.parse(queryString);
+  }
+  /*
   private Query createTitleQuery(SolrIndexSearcher solrIndexSearcher, final String title) throws ParseException{
     Analyzer analyzer = solrIndexSearcher.getSchema().getField(SolrFields.TITLE).getType().getQueryAnalyzer();
     QueryParser parser = new QueryParser(Version.LUCENE_35,SolrFields.TITLE,analyzer);
@@ -158,7 +190,7 @@ public class SearchService
     QueryParser parser = new QueryParser(Version.LUCENE_35, SolrFields.KEYWORD_SEARCH, analyzer);
     return parser.parse(keywords);
   }
-
+*/
   private SearchResult createSearchResult(SolrIndexSearcher solrIndexSearcher, TopDocs topDocs, URI originatorURI){
     List<SearchResultItem> items = new ArrayList();
     try {
@@ -173,8 +205,11 @@ public class SearchService
           logger.debug("score {} transformed to {}", scoreDoc.score, transformedScore);
           Document doc = indexReader.document(scoreDoc.doc);
           Model resultContent = createSearchResultModel(doc);
-          SearchResultItem item = new SearchResultItem(scoreTransformer.transform(scoreDoc.score),resultContent,URI.create(doc.get(SolrFields.URL)),  null);
-          items.add(item);
+
+              SearchResultItem item = new SearchResultItem(scoreTransformer.transform(scoreDoc.score),resultContent,URI.create(doc.get(SolrFields.URL)),  null);
+              items.add(item);
+
+
         }
       }
     } catch (Throwable t) {

@@ -23,6 +23,8 @@ angular.module('won.owner').directive('applicationControl', function factory(){
         restrict: 'A',
         controller: function($scope, applicationControlService){
             $scope.getTypePicURI = applicationControlService.getTypePicURI;
+            $scope.humanReadableType = applicationControlService.humanReadableType;
+            $scope.getNeedType= applicationControlService.getNeedType;
         }
     }
 })
@@ -73,7 +75,7 @@ angular.module('won.owner').factory('applicationControlService', function (appli
             case won.WON.BasicNeedTypeSupply: return "Supply";
             case won.WON.BasicNeedTypeDotogether: return "Together";
             default:
-                $log.error("Tried to get icon url with the invalid type: " + type)
+                $log.error("Tried to get human readable need type with the invalid type: " + type)
                 return ""
         }
     };

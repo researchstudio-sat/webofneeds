@@ -15,7 +15,7 @@
  */
 
 angular.module('won.owner').controller('HomeCtrl',
-    function ($scope,$routeParams, $location, userService, $log,searchService) {
+    function ($scope,$routeParams, $location, userService, $log,searchService,applicationControlService) {
 
     var firstDisplay = true;
     var time = 400;
@@ -264,7 +264,7 @@ angular.module('won.owner').controller('HomeCtrl',
 
         if ($scope.otherNewSearch.$valid && validPanel) {
             //userService.registerUser($scope.registerUser).then(onRegisterResponse);
-            searchService.search($scope.othersPost.selectedType, $scope.othersPost.searchText);
+            searchService.search($scope.othersPost.selectedType, $scope.othersPost.searchText,applicationControlService.getNeedType($scope.othersPost.selectedType));
             //$location.url('/search');
         }
     }

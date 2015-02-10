@@ -21,14 +21,7 @@
                 <strong>What others offer:</strong> {{search.title}}
             </p>
         </div>
-
-        <div class="row">
-            <h4 class="inline">Related Tags:</h4>
-            <span style="margin-right:5px;cursor:pointer;"
-                  class="label label-primary btnTag"
-                  ng-repeat="tag in relatedTags">{{tag}}
-            </span>
-        </div>
+        <related-searches terms = "getRelatedSearches()" click-on-item = "newSearch(term)"></related-searches>
 
         <div class="row">
             <div class="pull-left">
@@ -59,7 +52,7 @@
             </div>
             <div class="col-md-6">
                 <div class="pull-left">
-                    <button type="button" ng-click="createNewPost()" class="btn btn-primary button-top-margin">Matches are better!</button>
+                    <button type="button" ng-click="redirectToCreatePost()" class="btn btn-primary button-top-margin">Matches are better!</button>
                 </div>
                 <div class="pull-left">
                     <a href="" tooltip="Creating a post will bring you alerts if matches were found: 24/7 and from all connected servers">Why
@@ -68,22 +61,23 @@
             </div>
         </div>
 
-        <search-result results="results" column-num="2">
+        <search-result results="results" column-num="2" >
 
         </search-result>
     </div>
-    <div ng-show="results.length == 0">
-        <div>
-            What {{search.type}}. {{search.title}}
+    <div ng-show="results.length == 0" >
+        <div application-control>
+            What others <span ng-bind="humanReadableType(getNeedType(search.type))"></span>:
+            <span ng-bind="search.title"></span>
         </div>
         <div>
             Sorry, we didn’t find results with this term
         </div>
         <div>
-            But <a href="" ng-click="createNewPost()">create a new post</a> and get matches and notifications!
+            But <a href="" ng-click="redirectToCreatePost()">create a new post</a> and get matches and notifications!
         </div>
         <div>
-            <button type="submit" ng-click="createNewPost()" class="btn btn-primary button-top-margin">Create Post</button>
+            <button type="submit" ng-click="redirectToCreatePost()" class="btn btn-primary button-top-margin">Create Post</button>
         </div>
     </div>
 </div>

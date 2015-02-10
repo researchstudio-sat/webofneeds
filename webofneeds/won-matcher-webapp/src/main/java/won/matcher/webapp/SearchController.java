@@ -38,6 +38,7 @@ public class SearchController
    * @param numResults number of results to be returned
    * @return RDF model of search results
    */
+  /*
   @RequestMapping(value="search",
       method = RequestMethod.GET,
       produces={"text/html","application/xhtml+xml","application/xml","application/rdf+xml","application/x-turtle",
@@ -49,6 +50,20 @@ public class SearchController
   {
 
     return searchResultModelMapper.toModel(searchService.search(keywords, numResults));
+  }
+*/
+  @RequestMapping(value="search",
+    method = RequestMethod.GET,
+    produces={"text/html","application/xhtml+xml","application/xml","application/rdf+xml","application/x-turtle",
+              "text/turtle","text/rdf+n3", "application/ld+json"})
+  @ResponseBody
+  public Model search(
+    @RequestParam(value="q", required = true) final String keywords,
+    @RequestParam(value="n", required = false, defaultValue = DEFAULT_NUM_RESULTS) final int numResults,
+    @RequestParam(value="t", required = false) final String type)
+  {
+
+    return searchResultModelMapper.toModel(searchService.search(keywords, numResults, type));
   }
 
   /**
@@ -63,7 +78,7 @@ public class SearchController
   @ResponseBody
   public List<SearchResultPojo> searchJson(
     @RequestParam(value="q", required = true) final String keywords,
-    @RequestParam(value="n", required = false, defaultValue = DEFAULT_NUM_RESULTS) final int numResults)
+    @RequestParam(value="n", required = false, defaultValue = DEFAULT_NUM_RESULTS) final int numResults )
   {
     List<SearchResultPojo> searchResultPojos = new ArrayList<>();
 
@@ -76,6 +91,7 @@ public class SearchController
     }
     return searchResultPojos;
   }
+
 
   /**
    *
@@ -92,10 +108,13 @@ public class SearchController
   public Model search(
       @RequestParam(value="q", required=false) final String keywords,
       @RequestParam(value="model", required = false) final Model needModel,
-      @RequestParam(value="n", required = false, defaultValue = DEFAULT_NUM_RESULTS) final int numResults)
+      @RequestParam(value="n", required = false, defaultValue = DEFAULT_NUM_RESULTS) final int numResults,
+      @RequestParam(value="t", required = false) final String type)
   {
-    return searchResultModelMapper.toModel(searchService.search(keywords, needModel, numResults));
+    return searchResultModelMapper.toModel(searchService.search(keywords, needModel, numResults, type));
   }
+
+
 
 
   public void notifyOfNewNeed()

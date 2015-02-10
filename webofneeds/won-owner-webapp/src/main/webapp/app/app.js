@@ -17,12 +17,15 @@
 app = angular.module('won.owner',
         [ 'ui.bootstrap'
         , 'ngRoute'
-        , 'ui.map'
         , 'blueimp.fileupload'
         , 'ngMockE2E'
         , 'smart-table'
         , 'ngScrollbar'
         , 'scrollable-table'
+        , 'ui.utils'
+        , 'ngTagsInput'
+        //, 'ui.event'
+        //, 'ui.keypress'
         ]
     ).config(function ($routeProvider, $httpProvider, $provide) {
         $httpProvider.responseInterceptors.push('redirectInterceptor');
@@ -148,6 +151,7 @@ app = angular.module('won.owner',
             return filtered;
         };
     })
+
 
     .filter('messageTypeFilter', function(){
         var getTypeText = function(lastConEvent) {
