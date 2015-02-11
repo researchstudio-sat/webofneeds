@@ -836,6 +836,7 @@
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
+        <mojoexec.version>1.3.2</mojoexec.version>
         <cargo.version>1.4.2</cargo.version>
         <jrebel.version>1.1.3</jrebel.version>
         <wagon.version>1.0-beta-3</wagon.version>
