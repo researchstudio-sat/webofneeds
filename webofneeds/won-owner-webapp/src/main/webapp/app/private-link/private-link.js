@@ -117,6 +117,10 @@ angular.module('won.owner')
         return userService.isAuth();
     };
 
+    $scope.showPrivateUser = function() {
+        return userService.isPrivateUser();
+    };
+
     $scope.settingsCollapseClick= function() {
         $scope.settingsCollapsed = !$scope.settingsCollapsed;
     };
