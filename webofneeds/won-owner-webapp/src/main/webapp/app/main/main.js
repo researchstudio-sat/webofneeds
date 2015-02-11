@@ -55,6 +55,14 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.lastEventOfEachConnectionOfCurrentNeed = [];
     $scope.eventCommState = {};
 
+    $scope.logClipCopied = function() {
+        $log.debug("clip-click works!");
+    };
+
+    $scope.fallbackForClipCopy = function(copy) {
+        window.prompt('Press cmd+c to confirm copy the link.', copy);
+    };
+
 
 
 

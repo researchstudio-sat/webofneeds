@@ -124,8 +124,10 @@
                     <input type="text" class="form-control" name="privateLink" id="privateLink" ng-model="privateLink" readonly>
                 </div>
                 <div class="col-md-2">
-                    <button id="copy-button" type="submit" class="btn btn-primary"
-                            ng-click="copyLinkToClipboard()"><!--<span class="glyphicon glyphicon-floppy-disk"></span>--><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Copy link</button>
+                    <button id="copy-button" class="btn btn-primary"
+                            type="button" clip-copy="privateLink" clip-click-fallback="fallbackForClipCopy(copy)"
+                            clip-click="logClipCopied()"><!--<span class="glyphicon glyphicon-floppy-disk"></span>--><i
+                            class="fa fa-file-text-o fa-lg"></i>&nbsp;Copy link</button>
                 </div>
             </div>
         </div>

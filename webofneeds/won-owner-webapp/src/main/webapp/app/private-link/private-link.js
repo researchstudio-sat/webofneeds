@@ -117,11 +117,6 @@ angular.module('won.owner')
         return userService.isAuth();
     };
 
-    $scope.copyLinkToClipboard = function() {
-        //todo maybe we can use http://zeroclipboard.org/
-    };
-
-
     $scope.settingsCollapseClick= function() {
         $scope.settingsCollapsed = !$scope.settingsCollapsed;
     };

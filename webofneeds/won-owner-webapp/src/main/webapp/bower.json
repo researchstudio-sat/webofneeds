@@ -30,7 +30,8 @@
     "jsonld.js": "https://github.com/digitalbazaar/jsonld.js.git#~0.3.1",
     "ng-scrollbar": "~0.0.6",
     "sockjs": "0.3.4",
-    "ng-tags-input": "2.1.1"
+    "ng-tags-input": "2.1.1",
+    "ng-clip": "0.2.6"
   },
   "resolutions": {
      "angular": "~1.2.28"
