@@ -1,5 +1,5 @@
 <div class="col-lg-12">
-    <div ng-show="showPublic()" class="col-lg-12">
+    <div ng-show="showAccountUser()" class="col-lg-12">
         <form ng-show="!sendStatus" class="form-horizontal container" novalidate name="contactAuthForm" ng-submit="sendMessage()">
             <div class="well">
                 <fieldset>
@@ -61,7 +61,7 @@
             </div>
         </div>
     </div>
-    <div ng-show="!showPublic()" class="col-lg-12">
+    <div ng-show="!showAccountUser()" class="col-lg-12">
         <form ng-show="!sendStatus" class="form-horizontal container" novalidate name="contactNotAuthForm" ng-submit="sendMessage()">
             <div class="well">
                 <fieldset>

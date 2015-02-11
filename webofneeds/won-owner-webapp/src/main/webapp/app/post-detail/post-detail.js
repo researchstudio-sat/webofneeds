@@ -279,6 +279,14 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                 $scope.post = $scope.allNeeds[post.uri];
             }
 
+            // after the request need is created with generated private link account and contact
+            // request has been sent, sign-out that private link account, so that the user is not confused...
+            $scope.$on(won.EVENT.CONNECT_SENT, function(ngEvent, eventData) {
+                if (userService.isPrivateUser()) {
+                    userService.logOutAndSetUpApplicationState();
+                }
+            });
+
             // locks in order to prevent connecting/creating request need > 1 time if user clicks > 1
             var createAndConnectLock = false;
             var connectLock = false;
@@ -352,10 +360,9 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                 e.clipboardData.setData("text/plain",$scope.privateLink);
                 //todo maybe we can use http://zeroclipboard.org/
             };
-            $scope.showPublic = function() {
-                return userService.isAuth();
+            $scope.showAccountUser = function() {
+                return userService.isAccountUser();
             };
-
 
         } ,
         link: function(scope, element, attrs){
