@@ -27,7 +27,6 @@
 		<link rel="stylesheet" href="style/bootstrap.min.css" />
 		<%--<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>--%>
         <link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>
-		<link rel="stylesheet" href="style/main.css"/>
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	    <link rel="stylesheet" href="style/datepicker.css"/>
 	    <link rel="stylesheet" href="font-awesome-4.1.0/css/font-awesome.min.css">
@@ -44,6 +43,10 @@
         <!--leaflet.js provides us with a map-widget which can display map material from different sources-->
         <script type="text/javascript" src="resources/leaflet-0.7.3/leaflet.js"></script>
         <link rel="stylesheet" href="resources/leaflet-0.7.3/leaflet.css"/>
+
+
+        <!-- Our CSS'. Included last so it wins in clashes vs libraries. -->
+        <link rel="stylesheet" href="style/main.css"/>
 
 
         <script src="scripts/jquery.10.2.js"></script>
