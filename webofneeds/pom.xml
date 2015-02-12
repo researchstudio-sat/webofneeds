@@ -755,9 +755,11 @@
                     <artifactId>copy-maven-plugin</artifactId>
                     <version>0.2.5</version>
                 </plugin>
-
-
-
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>0.0.22</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>

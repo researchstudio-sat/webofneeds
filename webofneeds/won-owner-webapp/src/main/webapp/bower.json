@@ -32,5 +32,8 @@
     "sockjs": "0.3.4",
     "ng-tags-input": "2.1.1",
     "bootsketch": "~1.0.0"
+  },
+  "resolutions": {
+    "angular": ">=1.2.1"
   }
 }
