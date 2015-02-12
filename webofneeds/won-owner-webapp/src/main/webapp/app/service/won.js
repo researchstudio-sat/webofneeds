@@ -769,6 +769,9 @@
                 // Convert to number if necessary. Strings, undefined, etc result in them being NaN
                 latitude = +latitude;
                 longitude = +longitude;
+                if(addressStr === undefined) {
+                    addressStr = "";
+                }
 
                 if(!isNaN(latitude) && !isNaN(longitude)) { //check if parsing worked
                     this.getContext()["geo:latitude"] = {
