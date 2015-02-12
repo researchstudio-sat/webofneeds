@@ -179,9 +179,10 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     }
 
     $scope.addressSelected = function(lat, lon, name) {
-        alert("addressSelected");
-        //$scope.need.
-    }
+        $scope.need.latitude = lat;
+        $scope.need.longitude = lon;
+        $scope.need.name = name;
+    };
     $scope.showPublic = function (num) {
         if (num == $scope.currentStep) {
             return true;
@@ -299,7 +300,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             .active()                   // mandatory: active or inactive
 
         // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
-        draftBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
+        draftBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude, $scope.need.name);
 
         if (hasTimeSpecification($scope.need)) {
             draftBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
@@ -411,7 +412,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
                 //.hasPriceSpecification("EUR",5.0,10.0)
                 .active()                   // mandatory: active or inactive
 
-            needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
+            needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude, $scope.need.name);
 
             if (hasTimeSpecification($scope.need)) {
                 needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);

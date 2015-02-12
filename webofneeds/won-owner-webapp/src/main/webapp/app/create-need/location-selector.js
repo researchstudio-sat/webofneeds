@@ -72,9 +72,11 @@ angular.module('won.owner')
                     scope.setMapLocation(address.lat, address.lon, address.display_name);
                     scope.addressText = address.display_name;
 
-                    //TODO publish location data
-                    // http://seanhess.github.io/2013/10/14/angularjs-directive-design.html
-                    scope.addressCallback(address.lat, address.lon, address.display_name);
+                    scope.addressCallback({
+                        lat : address.lat,
+                        lon : address.lon,
+                        name : address.display_name
+                    });
             };
                 scope.setMapLocation = function (lat, lon, adr) { //TODO not in $scope but only usable here in link?
                     map.removeCstmMarker();
