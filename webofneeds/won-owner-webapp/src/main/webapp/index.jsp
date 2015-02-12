@@ -62,7 +62,6 @@
 
         <script type="text/javascript" src="bower_components/angular-ui-utils/ui-utils.js"></script> <!-- to include all ui-utils TODO deleteme-->
         <script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
-        <script type="text/javascript" src="bower_components/angular-ui-map/ui-map.js"></script>
         <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
         <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>
