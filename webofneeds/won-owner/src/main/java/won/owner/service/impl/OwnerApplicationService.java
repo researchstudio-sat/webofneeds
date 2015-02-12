@@ -84,18 +84,6 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
         RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
 
-        // ToDo (FS): this should be encapsulated in an own subclass of WonMessage
-        // get the active status
-        boolean active = false;
-        switch (WonRdfUtils.NeedUtils.queryActiveStatus(
-          messageContent, wonMessage.getSenderNeedURI())) {
-          case ACTIVE:
-            active = true;
-            break;
-          case INACTIVE:
-            active = false;
-            break;
-        }
 
 
         // get the wonNodeURI
@@ -105,7 +93,8 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         final ListenableFuture<URI> newNeedURI;
         try {
           wonMessageMap.put(wonMessage.getSenderNeedURI(), wonMessage);
-          newNeedURI = ownerProtocolService.createNeed(content, active, wonNodeURI,wonMessage);
+
+          newNeedURI = ownerProtocolService.createNeed(content, true, wonNodeURI,wonMessage);
 
           newNeedURI.addListener(new Runnable()
           {

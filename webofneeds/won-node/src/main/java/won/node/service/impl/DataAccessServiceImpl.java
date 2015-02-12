@@ -90,7 +90,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     }
 
     con.setNeedURI(needURI);
-    con.setState(connectionState);
+    con.setState(con.getState().transit(connectionEventType));
     con.setRemoteNeedURI(otherNeedURI);
     con.setRemoteConnectionURI(otherConnectionURI);
     con.setTypeURI(facetURI);

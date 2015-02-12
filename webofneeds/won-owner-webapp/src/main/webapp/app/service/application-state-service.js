@@ -431,6 +431,9 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         updateUnreadEventsByNeedByType(need.uri);
         privateData.allNeeds[need.uri] = need;
     }
+    applicationStateService.updateNeed = function(need){
+        privateData.allNeeds[need.uri] = need;
+    }
     applicationStateService.addDraft = function(draft){
         var draftLd = JSON.parse(draft.draft);
         var draftBuilderObject = new window.won.DraftBuilder(draftLd).setContext();

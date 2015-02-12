@@ -186,6 +186,10 @@
         //message types
         won.WONMSG.createMessage = won.WONMSG.baseUri + "CreateMessage";
         won.WONMSG.createMessageCompacted = won.WONMSG.prefix + ":CreateMessage";
+        won.WONMSG.closeNeedMessage = won.WONMSG.baseUri + "DeactivateMessage";
+        won.WONMSG.closeNeedMessageCompacted = won.WONMSG.prefix + ":DeactivateMessage";
+        won.WONMSG.closeNeedSentMessage = won.WONMSG.baseUri +"DeactivateSentMessage";
+        won.WONMSG.closeNeedSentMessageCompacted = won.WONMSG.prefix +":DeactivateSentMessage";
         won.WONMSG.hintMessage = won.WONMSG.baseUri + "HintMessage";
         won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
         won.WONMSG.connectMessage = won.WONMSG.baseUri + "ConnectMessage";
@@ -233,6 +237,8 @@
         won.EVENT.CONNECT_SENT ="ConnectSentEvent";
         won.EVENT.CONNECT_RECEIVED = "ConnectReceivedEvent";
         won.EVENT.OPEN_SENT = "OpenSentEvent";
+        won.EVENT.CLOSE_NEED_SENT = "DeactivateSentEvent";
+        won.EVENT.CLOSE_NEED_RECEIVED = "Deactivate_Received_Event"
         won.EVENT.OPEN_RECEIVED = "OpenReceivedEvent";
         won.EVENT.CLOSE_SENT = "CloseSentEvent";
         won.EVENT.CLOSE_RECEIVED = "CloseReceivedEvent";
@@ -697,20 +703,6 @@
                         "@type":"@id"
                 },
                 this.getMainNode()["won:hasFacet"]=facetType;
-                return this;
-            },
-            active: function(){
-                return this.inState("won:Active")
-            },
-            inactive: function(){
-                return this.inState("won:Inactive")
-            },
-            inState: function(state){
-                this.getContext()["won:isInState"]={
-                    "@id":"http://purl.org/webofneeds/model#isInState",
-                    "@type":"@id"
-                },
-                this.getMainNode()["won:isInState"] = state;
                 return this;
             },
           /*  facets: function(facets){
