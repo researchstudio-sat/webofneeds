@@ -176,17 +176,15 @@ angular.module('won.owner').controller("ClosedInboxCtrl",function($scope,$locati
     $scope.closedData = {};
 
     $scope.templateUrl = 'app/postbox/closed-inbox-table.html';
-    $scope.allClosed = applicationStateService.getAllClosed();
     $scope.clickOnClosed = function(){
-        $scope.closedData.chosenPost = $scope.allClosed[$scope.closedData.uri];
+        //$scope.closedData.chosenPost = $scope.allClosed[$scope.closedData.uri];
         applicationStateService.setCurrentNeedURI($scope.closedData.uri);
         $location.url("/private-link");
-        $scope.hasClosed = function(){
-            return applicationStateService.getAllClosedCount()>0;
-
-        }
-
     }
+    $scope.hasClosed = function(){
+        return applicationStateService.checkIfThereIsClosedNeed();
+    }
+
 })
 angular.module('won.owner').controller("PostInboxCtrl", function($scope,$location, applicationStateService, applicationControlService, userService) {
     $scope.postData = {};
@@ -196,6 +194,7 @@ angular.module('won.owner').controller("PostInboxCtrl", function($scope,$locatio
     $scope.postData.unreadEventsByNeedByType =    applicationStateService.getUnreadEventsByNeedByType();
     $scope.postData.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
     $scope.templateUrl = 'app/postbox/post-inbox-table.html';
+    //$scope.allNeeds = applicationStateService.getAllNeeds();
     $scope.allNeeds = applicationStateService.getAllNeeds();
     $scope.clickOnPost = function(){
         //$location.path("create-need/"+draft.currentStep+"/"+draft.selectedType);

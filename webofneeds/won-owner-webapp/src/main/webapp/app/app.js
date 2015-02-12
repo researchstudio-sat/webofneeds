@@ -117,7 +117,18 @@ app = angular.module('won.owner',
 		return $q;
 	}]);
 })
+    .filter('filterByNeedState', function(applicationControlService){
+        return function(needs,state){
+            var filtered =[];
+            angular.forEach(needs,function(need){
+                if(need.state == applicationControlService.getMachineReadableNeedState(state)){
+                    filtered.push(need);
+                }
+            })
 
+            return filtered;
+        }
+    })
     .filter('orderObjectBy', function() {
         return function(items, field, reverse) {
             var filtered = [];

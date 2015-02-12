@@ -52,6 +52,11 @@
         won.WON.prefix = "won";
         won.WON.hasWonNode = won.WON.baseUri+"hasWonNode";
         won.WON.hasWonNodeCompacted = won.WON.prefix+":hasWonNode";
+        won.WON.Active = won.WON.baseUri + "Active";
+        won.WON.ActiveCompacted = won.WON.prefix + ":Active";
+
+        won.WON.Inactive = won.WON.baseUri + "Inactive"
+        won.WON.InactiveCompacted = won.WON.prefix + ":Inactive"
 
         won.WON.isInState = won.WON.baseUri+"isInState";
         won.WON.isInStateCompacted = won.WON.prefix+":isInState";

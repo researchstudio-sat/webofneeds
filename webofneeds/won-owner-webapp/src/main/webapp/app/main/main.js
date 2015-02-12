@@ -112,7 +112,11 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     })
 
     $scope.$on(won.EVENT.CLOSE_NEED_SENT, function(ngEvent, eventData) {
-        applicationStateService.updateNeed(linkedDataService.getNeed(eventData.hasSender));
+        linkedDataService.getNeed(eventData.hasSender).then(function(need){
+            applicationStateService.updateNeed(need);
+        })
+
+
     });
 
     $scope.$on(won.EVENT.CONNECT_SENT, function(ngEvent, eventData) {

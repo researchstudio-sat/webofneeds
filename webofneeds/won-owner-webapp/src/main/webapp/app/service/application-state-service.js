@@ -74,15 +74,10 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     }
     applicationStateService.init = function(){
         privateData.allNeeds = {}
+
         privateData.allDrafts = {};
         privateData.searchResults = [];
         //privateData.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
-        privateData.allClosed = [
-            {type:won.WON.BasicNeedTypeDemand, title:'Playing soccer together', datetime: new Date('2014-08-23')},
-            {type:won.WON.BasicNeedTypeSupply, title: 'Samsung television', datetime: new Date('2015-01-01')},
-            {type:won.WON.BasicNeedTypeDotogether, title:'Looking for a flatscreen TV', datetime: new Date('2014-08-20')},
-            {type:won.WON.BasicNeedTypeCritique, title:'Go to the cinema', datetime: new Date('2014-07-14')}
-        ];
         privateData.currentNeedURI = null;
         privateData.currentEvent = null;
 
@@ -420,9 +415,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.getAllDrafts = function(){
         return privateData.allDrafts;
     }
-    applicationStateService.getAllClosed = function(){
-        return privateData.allClosed;
-    }
+
     /**
      * Adds a need.
      * @param need
@@ -433,6 +426,16 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     }
     applicationStateService.updateNeed = function(need){
         privateData.allNeeds[need.uri] = need;
+    }
+    applicationStateService.checkIfThereIsClosedNeed = function(){
+        var check = false;
+        for(var need in privateData.allNeeds){
+            if(privateData.allNeeds[need].state == won.WON.Inactive){
+                check = true;
+                break;
+            }
+        }
+        return check;
     }
     applicationStateService.addDraft = function(draft){
         var draftLd = JSON.parse(draft.draft);
@@ -457,7 +460,10 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             var needURI = needs.data[i];
             needURIPromises.push(linkedDataService.getNeed(needURI).then(
                 function(need){
-                   applicationStateService.addNeed(need)
+
+                       applicationStateService.addNeed(need)
+
+
                    return need;
                 })
             )
