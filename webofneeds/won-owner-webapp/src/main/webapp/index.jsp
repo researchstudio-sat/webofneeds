@@ -29,7 +29,6 @@
 
         <link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>
         <link rel="stylesheet" href="style/bootsketch-patches.css"/>
-        <!-- TODO remove me. just testing stuff -->
         <%--<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"/> --%>
 
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
