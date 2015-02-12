@@ -264,7 +264,7 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
         scope: {
             need : '='
         },
-        controller : function($scope, applicationStateService){
+        controller : function($scope, applicationStateService, $log){
             $scope.message = '';
             $scope.sendStatus = false; //todo refresh this var each time when we click on show contact form
             $scope.email = '';
@@ -352,14 +352,25 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
 
             };
 
-            $scope.clickHandler = function(e){
-                e.target.dispatchEvent(new DataTrans("copy"));
-            }
+//            $scope.clickHandler = function(e){
+//                e.target.dispatchEvent(new DataTrans("copy"));
+//            }
+//
+//            $scope.copyHandler = function(e) {
+//                e.clipboardData.setData("text/plain",$scope.privateLink);
+//                //todo maybe we can use http://zeroclipboard.org/
+//            };
 
-            $scope.copyHandler = function(e) {
-                e.clipboardData.setData("text/plain",$scope.privateLink);
-                //todo maybe we can use http://zeroclipboard.org/
+            // TODO the 2 functions below duplicate those defined in main.js,
+            // how to reuse those without complicating the directive usage?
+            $scope.logClipCopied = function() {
+                $log.debug("clip-click works!");
             };
+            $scope.fallbackForClipCopy = function(copy) {
+                window.prompt('Press cmd+c to confirm copy the link.', copy);
+            };
+
+
             $scope.showAccountUser = function() {
                 return userService.isAccountUser();
             };
