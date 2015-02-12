@@ -26,7 +26,20 @@
 		<title ng-bind="'Web Of Needs - '+$root.title">Web Of Needs</title>
 		<link rel="stylesheet" href="style/bootstrap.min.css" />
 		<%--<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>--%>
+
         <link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>
+        <style>
+            /* bootsketch fix (the alternative is to comment out the second @font-face declaration for the glyphicons in bootsketch.css) */
+            @font-face {
+               font-family: 'Glyphicons Halflings';
+               src: url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.eot");
+               src: url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"),
+                   url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.woff") format("woff"),
+                   url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.ttf") format("truetype"),
+                   url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg")
+           }
+        </style>
+
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	    <link rel="stylesheet" href="style/datepicker.css"/>
 	    <link rel="stylesheet" href="font-awesome-4.1.0/css/font-awesome.min.css">
