@@ -38,7 +38,14 @@
                    url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.ttf") format("truetype"),
                    url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg")
            }
+           /* bootsketch declares absolut px widths for .container, wtf? */
+            .container { width: auto }
+
+            /* fixes search bar in "home >> I mode" for now: */
+            .form-inline .form-control { width: 100% }
         </style>
+        <!-- TODO remove me. just testing stuff -->
+        <%--<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"/> --%>
 
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	    <link rel="stylesheet" href="style/datepicker.css"/>
