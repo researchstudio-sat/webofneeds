@@ -765,36 +765,43 @@
                 }
                 return this;
             },
-            hasLocationSpecification: function(latitude, longitude){
-                this.getContext()["geo:latitude"]={
-                    "@type":"xsd:float"
-                },
-                this.getContext()["geo:latitude"]={
-                    "@type":"xsd:float"
-                },
-                this.getContentDescriptionNode()["won:hasLocationSpecification"]={
-                    "@id":"_:locationSpecification",
-                    "@type":"geo:Point",
-                    "geo:latitude":latitude.toFixed(6),
-                    "geo:longitude":longitude.toFixed(6)
+            hasLocationSpecification: function(latitude, longitude, addressStr){
+                // Convert to number if necessary. Strings, undefined, etc result in them being NaN
+                latitude = +latitude;
+                longitude = +longitude;
+
+                if(!isNaN(latitude) && !isNaN(longitude)) { //check if parsing worked
+                    this.getContext()["geo:latitude"] = {
+                        "@type": "xsd:float"
+                    };
+                    this.getContext()["geo:latitude"] = {
+                        "@type": "xsd:float"
+                    };
+                    this.getContentDescriptionNode()["won:hasLocationSpecification"] = {
+                        "@id": "_:locationSpecification",
+                        "@type": "geo:Point",
+                        "geo:latitude": latitude.toFixed(6),
+                        "geo:longitude": longitude.toFixed(6),
+                        "won:hasAddress" : addressStr //TODO add to onto
+                    };
                 }
-                return this;
+                return this; // to allow cascading calls
             },
             hasTimeSpecification: function(startTime, endTime, recurInfinite, recursIn, recurTimes){
-                this.getContext()["won:hasStartTime"]= {
-                    "@type":"xsd:dateTime"
+                this.getContext()["won:hasStartTime"] = {
+                    "@type": "xsd:dateTime"
                 }
-                this.getContext()["won:hasEndTime"]={
-                    "@type":"xsd:dateTime"
+                this.getContext()["won:hasEndTime"] = {
+                    "@type": "xsd:dateTime"
                 }
-                this.getContentDescriptionNode()["won:hasTimespecification"]={
-                    "@type":"won:TimeSpecification",
-                    "won:hasRecurInfiniteTimes":recurInfinite,
-                    "won:hasRecursIn":recursIn,
-                    "won:hasStartTime":startTime,
-                    "won:hasEndTime":endTime
+                this.getContentDescriptionNode()["won:hasTimespecification"] = {
+                    "@type": "won:TimeSpecification",
+                    "won:hasRecurInfiniteTimes": recurInfinite,
+                    "won:hasRecursIn": recursIn,
+                    "won:hasStartTime": startTime,
+                    "won:hasEndTime": endTime
                 }
-                return this;
+                return this; // to allow cascading calls
             },
             hasTag: function(tags){
                 this.getContentNode()["won:hasTag"] = tags;
