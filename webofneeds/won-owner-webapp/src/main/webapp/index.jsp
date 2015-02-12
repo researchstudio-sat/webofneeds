@@ -28,22 +28,7 @@
 		<%--<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>--%>
 
         <link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>
-        <style>
-            /* bootsketch fix (the alternative is to comment out the second @font-face declaration for the glyphicons in bootsketch.css) */
-            @font-face {
-               font-family: 'Glyphicons Halflings';
-               src: url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.eot");
-               src: url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"),
-                   url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.woff") format("woff"),
-                   url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.ttf") format("truetype"),
-                   url("bower_components/bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg")
-           }
-           /* bootsketch declares absolut px widths for .container, wtf? */
-            .container { width: auto }
-
-            /* fixes search bar in "home >> I mode" for now: */
-            .form-inline .form-control { width: 100% }
-        </style>
+        <link rel="stylesheet" href="style/bootsketch-patches.css"/>
         <!-- TODO remove me. just testing stuff -->
         <%--<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"/> --%>
 
