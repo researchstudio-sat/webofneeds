@@ -3,6 +3,9 @@
  */
 ;
 
+/*
+Allows entering an address. When an address is picked, it's displayed on the map and addressCallback(lat, lon, name) invoked
+ */
 angular.module('won.owner')
     .directive('locationSelector', function factory($log, osmService) {
         return {
@@ -12,6 +15,7 @@ angular.module('won.owner')
             scope : {
                 /*chosenMessage: '=',
                 clickOnPostLink: '&'*/
+                addressCallback: '&addressSelected'
             },
 
             //link: function(scope, element, attrs){
@@ -67,7 +71,11 @@ angular.module('won.owner')
                     scope.selectedAddress = address;
                     scope.setMapLocation(address.lat, address.lon, address.display_name);
                     scope.addressText = address.display_name;
-                };
+
+                    //TODO publish location data
+                    // http://seanhess.github.io/2013/10/14/angularjs-directive-design.html
+                    scope.addressCallback(address.lat, address.lon, address.display_name);
+            };
                 scope.setMapLocation = function (lat, lon, adr) { //TODO not in $scope but only usable here in link?
                     map.removeCstmMarker();
 

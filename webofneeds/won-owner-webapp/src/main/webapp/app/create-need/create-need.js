@@ -178,6 +178,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
     }
 
+    $scope.addressSelected = function(lat, lon, name) {
+        alert("addressSelected");
+    }
     $scope.showPublic = function (num) {
         if (num == $scope.currentStep) {
             return true;
