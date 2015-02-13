@@ -288,8 +288,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             .hasTag($scope.need.tags)
             .hasContentDescription()    // mandatory
             //.hasPriceSpecification("EUR",5.0,10.0)
-            .active()                   // mandatory: active or inactive
-
+        
         if (hasLocationSpecification($scope.need)) {
             // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
             draftBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
@@ -423,8 +422,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             .hasTag($scope.need.tags)
             .hasContentDescription()    // mandatory
             //.hasPriceSpecification("EUR",5.0,10.0)
-            .active()                   // mandatory: active or inactive
-
+        
         if (hasLocationSpecification($scope.need)) {
             // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
             needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);

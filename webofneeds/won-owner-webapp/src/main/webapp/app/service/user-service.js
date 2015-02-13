@@ -336,7 +336,8 @@ angular.module('won.owner').factory('userService', function ($window
 
     userService.logOut = function() { //TODO directly pass promise
         return $http.post(
-            '/owner/rest/users/signout'
+                '/owner/rest/users/signout',
+                {}
         ).then(
             function success(data, status) {
                 $log.debug("Successfully logged-out");

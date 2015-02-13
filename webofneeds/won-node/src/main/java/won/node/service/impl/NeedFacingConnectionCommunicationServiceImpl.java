@@ -113,6 +113,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
         connectionURIFromWonMessage, newWonMessage));
 
       //invoke facet implementation
+
       reg.get(con).closeFromNeed(con, content, newWonMessage);
 
   }

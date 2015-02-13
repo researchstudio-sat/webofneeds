@@ -310,7 +310,6 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                         .hasTag('')
                         .hasContentDescription('')    // mandatory
                         //.hasPriceSpecification("EUR",5.0,10.0)
-                        .active()                   // mandatory: active or inactive
 
                     // building need as JSON object
                     var needJson = needBuilderObject.build();

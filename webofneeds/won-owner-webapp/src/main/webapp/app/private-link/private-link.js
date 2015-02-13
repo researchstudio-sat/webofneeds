@@ -56,10 +56,17 @@ angular.module('won.owner')
      won.WONMSG.hintMessage,
      won.WONMSG.closeMessage];
 
-
+    $rootScope.postClosed=false;
     //$scope.title = 'New Flat, Need Furniture';
+        $scope.need = applicationStateService.getCurrentNeed().then(function(need){
+            $rootScope.postClosed =  applicationStateService.checkIfNeedIsInactive(need);
+        });
+
     $scope.img_path = '/owner/images/thumbnail_demo.jpg';
-    $rootScope.postClosed = false;
+
+
+
+
     $rootScope.postShouldBeClosed = false;
     $rootScope.postShouldBeReopened = false;
 
@@ -496,7 +503,7 @@ angular.module('won.owner')
 
 })
 
-angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService, $rootScope) {
+angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService,applicationStateService, $rootScope,wonService) {
 
     $scope.close = false;
     $scope.reopen = false;
@@ -513,6 +520,13 @@ angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scop
         }
     }     */
 
+    $scope.$on(won.EVENT.CLOSE_NEED_SENT, function(ngEvent, eventData) {
+        linkedDataService.getNeed(eventData.hasSenderNeed).then(function(need){
+            $rootScope.postClosed = applicationStateService.checkIfNeedIsInactive(need);
+        });
+
+    });
+
     $scope.onClickYes = function () {
         $scope.error = '';
 
@@ -521,7 +535,7 @@ angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scop
             //TODO logic
             $scope.close = true;
             $rootScope.postShouldBeClosed = false;
-            $rootScope.postClosed = true;
+            wonService.closeNeed($scope.currentNeed.uri);
         }
 
         //TODO logic

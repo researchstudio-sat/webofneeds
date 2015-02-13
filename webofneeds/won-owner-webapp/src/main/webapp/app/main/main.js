@@ -38,6 +38,10 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     //we use the wonService dependency because it initializes messageService's callback (addMessageCallback)
     $rootScope.$on("$routeChangeSuccess", function(event, currentRoute, previousRoute) {
         $rootScope.title = currentRoute.title;
+        if(previousRoute.$$route.originalPath =="/private-link"&&previousRoute.$$route.originalPath != currentRoute.$$route.originalPath){
+            applicationStateService.setCurrentConnectionURI("");
+        }
+       // $log("info: from route "+previousRoute+"to route "+currentRoute)
     });
     $scope.selectedType = -1;
     $scope.applicationStateService = applicationStateService;
@@ -120,6 +124,14 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
+    })
+
+    $scope.$on(won.EVENT.CLOSE_NEED_SENT, function(ngEvent, eventData) {
+        linkedDataService.getNeed(eventData.hasSender).then(function(need){
+            applicationStateService.updateNeed(need);
+        })
+
+
     });
 
     $scope.$on(won.EVENT.CONNECT_SENT, function(ngEvent, eventData) {
@@ -160,11 +172,16 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
     });
+    $scope.$on(won.EVENT.CLOSE_NEED_SENT, function(ngEvent, eventData) {
+        reloadCurrentNeedDataIfNecessary(eventData.hasSender)
+
+    });
 
     $scope.$on(won.EVENT.CLOSE_SENT, function(ngEvent, eventData) {
         //removeEventFromUnreadAndUpdateUnreadObjects(eventData);
         //applicationStateService.removeEvent(eventData);
         reloadCurrentNeedData();
+
     });
     $scope.checkIfMessageViewIsOpen = function(eventData){
 
