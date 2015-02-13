@@ -81,6 +81,10 @@ angular.module('won.owner')
                 if (applicationStateService.getAllNeeds()[$scope.need.uri]) {
                     return false;
                 }
+                // if it's own draft, cannot be contacted
+                if (applicationStateService.getAllDrafts()[$scope.need.uri]) {
+                    return false;
+                }
                 // TODO check with storyboard people:
                 // if it is another need, but communication already established,
                 // probably also should not be contacted?
@@ -110,6 +114,7 @@ angular.module('won.owner').controller('PostDetailCtrl',
         , applicationControlService
         , applicationStateService
         , userService
+        , utilService
         )
     {
 
@@ -265,6 +270,7 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
             need : '='
         },
         controller : function($scope, applicationStateService, $log){
+
             $scope.message = '';
             $scope.sendStatus = false; //todo refresh this var each time when we click on show contact form
             $scope.email = '';

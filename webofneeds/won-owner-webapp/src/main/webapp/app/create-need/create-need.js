@@ -404,6 +404,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
 	$scope.buildNeedJson = function () {
 
+        //preparing tags:
+        $scope.need.tags = utilService.concatTags($scope.need.tags);
+
         // creating need object
         var needBuilderObject = new window.won.NeedBuilder().setContext();
         if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
