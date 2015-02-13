@@ -437,6 +437,11 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         }
         return check;
     }
+    applicationStateService.checkIfNeedIsInactive = function(need){
+        if(need.state==won.WON.Inactive){
+            return true;
+        }else return false;
+    }
     applicationStateService.checkIfThereIsNeedInInbox = function(){
         var check = false;
         if(Object.keys(privateData.allNeeds).length==0) {
