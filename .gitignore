@@ -44,6 +44,8 @@ bin/setenv.*
 /webofneeds/won-owner/src/main/resources.lan/*
 /webofneeds/won-matcher-solr/overlays/*
 webofneeds/won-matcher-webapp/overlays
-
+/webofneeds/won-owner-webapp/src/main/webapp/bower_components
+/webofneeds/won-owner-webapp/src/main/webapp/node
+/webofneeds/won-owner-webapp/src/main/webapp/node_modules
 #local config
 webofneeds/conf.local
