@@ -205,7 +205,7 @@ angular.module('won.owner').controller("PostInboxCtrl", function($scope,$locatio
     }
 
     $scope.hasPosts = function () {
-        return applicationStateService.getAllNeedsCount() > 0;
+        return applicationStateService.checkIfThereIsNeedInInbox();
     }
 
 })

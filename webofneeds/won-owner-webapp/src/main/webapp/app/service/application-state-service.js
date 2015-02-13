@@ -437,6 +437,22 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         }
         return check;
     }
+    applicationStateService.checkIfThereIsNeedInInbox = function(){
+        var check = false;
+        if(Object.keys(privateData.allNeeds).length==0) {
+            return false;
+        }else {
+            for(var need in privateData.allNeeds){
+                if(privateData.allNeeds[need].state == won.WON.Active){
+                    check = true;
+                    break;
+                }
+
+            }
+        }
+
+        return check;
+    }
     applicationStateService.addDraft = function(draft){
         var draftLd = JSON.parse(draft.draft);
         var draftBuilderObject = new window.won.DraftBuilder(draftLd).setContext();
@@ -475,6 +491,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             applicationStateService.addDraft(drafts.data[i]);
         }
     }
+
     applicationStateService.getAllNeedsCount = function(){
         return utilService.getKeySize(privateData.allNeeds);
     }
