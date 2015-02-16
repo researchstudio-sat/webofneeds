@@ -18,7 +18,7 @@
      xmlns="http://www.w3.org/1999/html">
     <div >
         <div style="font-size: 1.8em; text-align: center ;">
-            <img ng-show="!postClosed" src="{{img_path}}" alt="Generic placeholder thumbnail" style="z-index: 0">
+            <img ng-show="!postClosed" ng-src="{{img_path}}" alt="Generic placeholder thumbnail" style="z-index: 0">
             <!--TODO put here second layer on the first layer picture--><img ng-show="postClosed"
                                                                              src="/owner/images/closed.PNG" alt="Generic placeholder thumbnail">
             <strong>{{currentNeed.title}}</strong>
