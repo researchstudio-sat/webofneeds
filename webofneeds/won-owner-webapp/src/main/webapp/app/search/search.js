@@ -23,7 +23,6 @@ angular.module('won.owner').controller('SearchCtrl', function ($scope, $location
 
     $scope.columnNum = 2;
     $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
-        event.data = linkedDataService.getNeed(event.matchUrl());
         $scope.results.push(event);
     })
     // TODO LOGIC
