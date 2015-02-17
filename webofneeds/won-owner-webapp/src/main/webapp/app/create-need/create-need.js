@@ -228,6 +228,18 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     $scope.need.basicNeedType = $scope.needType();
 
 
+    // previewNeed object is intended for the input to detail preview directive
+    // used in create-need page, because that directive that expects string
+    // as tags value. Additionally,using previewNeed instead of need object avoids
+    // constant calling of the detail preview directive functions due to every
+    // change of need object during its construction
+    $scope.getPreviewNeed = function () {
+        var copy = angular.copy($scope.need);
+        copy.tags = utilService.concatTags($scope.need.tags);
+        return copy;
+    }
+    $scope.previewNeed = $scope.getPreviewNeed();
+
     $scope.addTag = function () {
         var tags = $scope.need.tags;
         var tagName = $("#inputTagName").val();
@@ -404,9 +416,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
 	$scope.buildNeedJson = function () {
 
-        //preparing tags:
-        $scope.need.tags = utilService.concatTags($scope.need.tags);
-
         // creating need object
         var needBuilderObject = new window.won.NeedBuilder().setContext();
         if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
@@ -422,7 +431,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         needBuilderObject.title($scope.need.title)
             .ownerFacet()               // mandatory
             .description($scope.need.textDescription)
-            .hasTag($scope.need.tags)
+            .hasTag(utilService.concatTags($scope.need.tags))
             .hasContentDescription()    // mandatory
             //.hasPriceSpecification("EUR",5.0,10.0)
         
