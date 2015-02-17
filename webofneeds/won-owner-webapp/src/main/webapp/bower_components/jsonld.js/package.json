@@ -1,6 +1,6 @@
 {
   "name": "jsonld",
-  "version": "0.3.20",
+  "version": "0.3.22",
   "description": "A JSON-LD Processor and API implementation in JavaScript.",
   "homepage": "http://github.com/digitalbazaar/jsonld.js",
   "author": {
@@ -78,10 +78,5 @@
     "crypto": "./browser/ignore.js",
     "url": "./browser/ignore.js",
     "http": "./browser/ignore.js"
-  },
-  "browserify": {
-    "transform": [
-      "jsonldify"
-    ]
   }
 }

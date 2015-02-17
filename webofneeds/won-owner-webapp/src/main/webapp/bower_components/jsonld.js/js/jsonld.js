@@ -856,13 +856,22 @@ jsonld.fromRDF = function(dataset, options, callback) {
       };
     }
 
-    // rdf parser may be async or sync, always pass callback
-    dataset = rdfParser(dataset, function(err, dataset) {
-      if(err) {
-        return callback(err);
+    var callbackCalled = false;
+    try {
+      // rdf parser may be async or sync, always pass callback
+      dataset = rdfParser(dataset, function(err, dataset) {
+        callbackCalled = true;
+        if(err) {
+          return callback(err);
+        }
+        fromRDF(dataset, options, callback);
+      });
+    } catch(e) {
+      if(!callbackCalled) {
+        return callback(e);
       }
-      fromRDF(dataset, options, callback);
-    });
+      throw e;
+    }
     // handle synchronous or promise-based parser
     if(dataset) {
       // if dataset is actually a promise
@@ -7261,10 +7270,13 @@ if(!_nodejs && (typeof define === 'function' && define.amd)) {
   // wrap the main jsonld API instance
   wrapper(factory);
 
-  if(_nodejs) {
-    // export nodejs API
+  if(typeof require === 'function' &&
+    typeof module !== 'undefined' && module.exports) {
+    // export CommonJS/nodejs API
     module.exports = factory;
-  } else if(_browser) {
+  }
+
+  if(_browser) {
     // export simple browser API
     if(typeof jsonld === 'undefined') {
       jsonld = jsonldjs = factory;
@@ -7273,5 +7285,7 @@ if(!_nodejs && (typeof define === 'function' && define.amd)) {
     }
   }
 }
+
+return factory;
 
 })();
