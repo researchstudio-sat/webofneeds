@@ -182,8 +182,8 @@
                         <!-- optional: default phase is "generate-resources" -->
                         <phase>generate-resources</phase>
                         <configuration>
-                            <nodeVersion>v0.10.18</nodeVersion>
-                            <npmVersion>1.3.8</npmVersion>
+                            <nodeVersion>v0.12.0</nodeVersion>
+                            <npmVersion>2.6.0</npmVersion>
                         </configuration>
                     </execution>
                     <execution>
@@ -212,7 +212,7 @@
                             "install", so unless you need to run some other bower command,
                             you can remove this whole <configuration> section.
                             -->
-                            <arguments>install -f</arguments>
+                            <arguments>install</arguments>
                         </configuration>
                     </execution>
                 </executions>
