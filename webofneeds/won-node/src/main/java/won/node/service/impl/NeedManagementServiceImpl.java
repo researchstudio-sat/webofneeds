@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.exception.*;
+import won.protocol.message.WonEnvelopeType;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
@@ -69,6 +70,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
   private MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient;
   //used to close connections when a need is deactivated
   private OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
+  private NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService;
+
   private NeedInformationService needInformationService;
   private URIService uriService;
   private RDFStorageService rdfStorage;
@@ -100,7 +103,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
     String ownerApplicationID,
     WonMessage wonMessage) throws IllegalNeedContentException {
 
-      WonMessage newWonMessage = WonMessageBuilder.wrapOwnerToNeedWonMessageForLocalStorage(wonMessage);
+      WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(wonMessage);
       // store the newWonMessage as it is
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorage.storeDataset(newWonMessage.getMessageURI(),
@@ -155,7 +158,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
         WonMessage newNeedNotificationMessage =
           new WonMessageBuilder()
             .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(),
-              need.getNeedURI(), need.getWonNodeURI())
+                                                            need.getNeedURI(), need.getWonNodeURI())
+            .setWonEnvelopeType(WonEnvelopeType.NodeToNode)
             .build(needDataset);
         matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(), newNeedNotificationMessage);
       } catch (Exception e) {
@@ -208,7 +212,8 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
   @Override
   public void activate(final URI needURI, WonMessage wonMessage) throws NoSuchNeedException {
-      WonMessage newWonMessage =  WonMessageBuilder.wrapOwnerToNeedWonMessageForLocalStorage(wonMessage);
+      WonMessage newWonMessage =  WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(
+        wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorage.storeDataset(newWonMessage.getMessageURI(),
                               WonMessageEncoder.encodeAsDataset(newWonMessage));
@@ -229,7 +234,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   public void deactivate(final URI needURI, WonMessage wonMessage)
     throws NoSuchNeedException, NoSuchConnectionException {
 
-      WonMessage newWonMessage = WonMessageBuilder.wrapOwnerToNeedWonMessageForLocalStorage(wonMessage);
+      WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorage.storeDataset(newWonMessage.getMessageURI(),
                               WonMessageEncoder.encodeAsDataset(newWonMessage));
@@ -247,10 +252,18 @@ public class NeedManagementServiceImpl implements NeedManagementService
         (), ConnectionState.CLOSED);
       for (URI connURI : connectionURIs) {
         try {
-          WonMessage closeWonMessage = createCloseWonMessage(connURI);
+          //TODO: actually, the WoN node should create a close event for the connection,
+          //save it (so it can be referenced as linked data) and send that event to local
+          //and remote connection
+          WonMessage closeWonMessage = createCloseWonMessage(connURI,false,wonMessage );
+          WonMessage closeWonMessageOwner = createCloseWonMessage(connURI,true,wonMessage );
           if (closeWonMessage != null) {
-            //TODO: shouldn't this be done in a more centralized way? What about calling the facet implementation?
+            //simulate a call from the owner so as to close the remote connection, too
             ownerFacingConnectionCommunicationService.close(connURI, null, closeWonMessage);
+            //simulate a call from the remote connection so that owner is informed
+            //TODO: in this call, the message is copied (as it is assumed to come from a remote WoN node)
+            //which is redundant and should be solved differently
+            needFacingConnectionCommunicationService.close(connURI,null,closeWonMessageOwner);
           }
         } catch (IllegalMessageForConnectionStateException e) {
           logger.warn("wrong connection state", e);
@@ -275,6 +288,10 @@ public class NeedManagementServiceImpl implements NeedManagementService
 
   public void setOwnerFacingConnectionCommunicationService(final OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService) {
     this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
+  }
+
+  public void setNeedFacingConnectionCommunicationService(final NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService) {
+    this.needFacingConnectionCommunicationService = needFacingConnectionCommunicationService;
   }
 
   public void setNeedInformationService(final NeedInformationService needInformationService) {
@@ -311,7 +328,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
   }
 
   // ToDo (FS): move to more general place where everybody can use the method
-  private WonMessage createCloseWonMessage(URI connectionURI)
+  private WonMessage createCloseWonMessage(URI connectionURI, final boolean fromDeactivate, WonMessage wonMessage)
     throws WonMessageBuilderException {
 
     List<Connection> connections = connectionRepository.findByConnectionURI(connectionURI);
@@ -325,21 +342,38 @@ public class NeedManagementServiceImpl implements NeedManagementService
                                                                          linkedDataSource);
     URI remoteWonNodeUri = null;
     if (connection.getRemoteConnectionURI() != null) {
-      remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(connection.getRemoteConnectionURI(),
-                                                                                    linkedDataSource);
-      WonMessageBuilder builder = new WonMessageBuilder();
-      return builder.setMessagePropertiesForClose(
-        wonNodeInformationService.generateEventURI(),
-        connection.getConnectionURI(),
-        connection.getNeedURI(),
-        localWonNodeUri,
-        connection.getRemoteConnectionURI(),
-        connection.getRemoteNeedURI(),
-        remoteWonNodeUri)
-                    .build();
+      if(fromDeactivate){
+        WonMessageBuilder builder = new WonMessageBuilder();
+        return builder.forward(wonMessage).setMessagePropertiesForClose(
+          wonNodeInformationService.generateEventURI(),
+          connection.getConnectionURI(),
+          connection.getNeedURI(),
+          localWonNodeUri,
+          connection.getConnectionURI(),
+          connection.getNeedURI(),
+          localWonNodeUri)
+          .setWonEnvelopeType(WonEnvelopeType.SystemMsg)
+          .build();
+
+      }else{
+        remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(connection.getRemoteConnectionURI(),
+                                                                                  linkedDataSource);
+        WonMessageBuilder builder = new WonMessageBuilder();
+        return builder.forward(wonMessage).setMessagePropertiesForClose(
+          wonNodeInformationService.generateEventURI(),
+          connection.getConnectionURI(),
+          connection.getNeedURI(),
+          localWonNodeUri,
+          connection.getRemoteConnectionURI(),
+          connection.getRemoteNeedURI(),
+          remoteWonNodeUri)
+          .setWonEnvelopeType(WonEnvelopeType.NodeToNode)
+                      .build();
+      }
+
     } else {
       WonMessageBuilder builder = new WonMessageBuilder();
-      return builder.setMessagePropertiesForLocalOnlyClose(
+      return builder.forward(wonMessage).setMessagePropertiesForLocalOnlyClose(
         wonNodeInformationService.generateEventURI(),
         connection.getConnectionURI(),
         connection.getNeedURI(),

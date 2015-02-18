@@ -185,8 +185,14 @@
         won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
         won.WONMSG.EnvelopeGraph = won.WONMSG.baseUri + "EnvelopeGraph";
         won.WONMSG.EnvelopeGraphCompacted = won.WONMSG.prefix+ ":EnvelopeGraph";
+
         won.WONMSG.hasContent = won.WONMSG.baseUri + "hasContent";
         won.WONMSG.hasContentCompacted = won.WONMSG.prefix+ ":hasContent";
+
+        won.WONMSG.NodeToOwnerEnvelope = won.WONMSG.baseUri + "NodeToOwnerEnvelope";
+        won.WONMSG.OwnerToNodeEnvelope = won.WONMSG.baseUri + "OwnerToNodeEnvelope";
+        won.WONMSG.NodeToNodeEnvelope = won.WONMSG.baseUri + "NodeToNodeEnvelope";
+        won.WONMSG.SystemMessageEnvelope = won.WONMSG.baseUri + "SystemMessageEnvelope"
 
         //message types
         won.WONMSG.createMessage = won.WONMSG.baseUri + "CreateMessage";
@@ -571,6 +577,7 @@
                 "@graph": [
                     {
                         "@id":UNSET_URI,
+                        "@type":won.WONMSG.OwnerToNodeEnvelope,
                         "msg:hasMessageType": {'@id':messageType}
                     }
                 ],

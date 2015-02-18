@@ -12,10 +12,7 @@ import won.cryptography.service.SecureRandomNumberServiceImpl;
 import won.owner.service.OwnerApplicationServiceCallback;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDecoder;
-import won.protocol.message.WonMessageType;
+import won.protocol.message.*;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -232,6 +229,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .setReceiverNeedURI(wonMessage.getSenderNeedURI())
         .setResponseMessageState(responseType)
         .addRefersToURI(wonMessage.getMessageURI())
+        .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
         .build();
 
       ownerApplicationServiceCallbackToClient.onMessage(responseWonMessage);

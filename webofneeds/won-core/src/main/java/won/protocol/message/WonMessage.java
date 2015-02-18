@@ -38,6 +38,7 @@ public class WonMessage implements Serializable
 
   private URI messageURI;
   private WonMessageType messageType; // ConnectMessage, CreateMessage, NeedStateMessage
+  private WonEnvelopeType envelopeType;
   private URI senderURI;
   private URI senderNeedURI;
   private URI senderNodeURI;
@@ -215,6 +216,14 @@ public class WonMessage implements Serializable
       this.messageType = WonMessageType.getWonMessageType(type);
     }
     return this.messageType;
+  }
+
+  public WonEnvelopeType getEnvelopeType() {
+    if (this.envelopeType == null){
+      URI type = getEnvelopePropertyURIValue(RDF.type);
+      this.envelopeType = WonEnvelopeType.getWonEnvelopeType(type);
+    }
+    return this.envelopeType;
   }
 
   public URI getSenderURI() {

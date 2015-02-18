@@ -77,7 +77,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
   public void open(final URI connectionURI, final Model content, WonMessage wonMessage)
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
       URI newMessageURI = this.wonNodeInformationService.generateEventURI();
-      WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
+      WonMessage newWonMessage = WonMessageBuilder.copyInboundNodeToNodeMessageAsNodeToOwnerMessage(
         newMessageURI, connectionURI, wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
@@ -99,7 +99,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
           throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
 
       URI newMessageURI = this.wonNodeInformationService.generateEventURI();
-      WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
+      WonMessage newWonMessage = WonMessageBuilder.copyInboundNodeToNodeMessageAsNodeToOwnerMessage(
         newMessageURI, connectionURI, wonMessage);
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
@@ -121,7 +121,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
     public void sendMessage(final URI connectionURI, final Model message, WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         URI newMessageURI = this.wonNodeInformationService.generateEventURI();
-        WonMessage newWonMessage = WonMessageBuilder.copyInboundWonMessageForLocalStorage(
+        WonMessage newWonMessage = WonMessageBuilder.copyInboundNodeToNodeMessageAsNodeToOwnerMessage(
           newMessageURI, connectionURI, wonMessage);
         logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
         rdfStorageService.storeDataset(newWonMessage.getMessageURI(),

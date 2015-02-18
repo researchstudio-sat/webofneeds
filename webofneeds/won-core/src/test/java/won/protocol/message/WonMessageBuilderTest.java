@@ -205,7 +205,15 @@ public class WonMessageBuilderTest
   @Test
   public void test_copyInboundWonMessageForLocalStorage(){
     WonMessageBuilder msg = this.createMessageWithContent();
-    WonMessage msg2 = WonMessageBuilder.copyInboundWonMessageForLocalStorage(MSG_URI_2, CONNECTION_URI_2, msg.build());
+    WonMessage msg2 = WonMessageBuilder.copyInboundNodeToNodeMessageAsNodeToOwnerMessage(MSG_URI_2, CONNECTION_URI_2,
+                                                                                         msg.build());
+
+  }
+  @Test
+  public void test_envelope_type_exists(){
+    WonMessageBuilder msgbuilder = this.createMessageWithEnvelopeType();
+    WonMessage msg =  msgbuilder.build();
+    Assert.assertEquals(WonEnvelopeType.NodeToNode, msg.getEnvelopeType());
 
   }
 
@@ -219,10 +227,17 @@ public class WonMessageBuilderTest
     Assert.assertEquals("incorrect number of named graphs", names.size(), 2);
   }
 
+  private WonMessageBuilder createMessageWithEnvelopeType(){
+    return new WonMessageBuilder()
+      .setMessageURI(MSG_URI_1)
+      .setWonMessageType(WonMessageType.CLOSE)
+      .setWonEnvelopeType(WonEnvelopeType.NodeToNode);
+  }
   private WonMessageBuilder createMessageWithoutContent(){
     return new WonMessageBuilder()
       .setMessageURI(MSG_URI_1)
-      .setWonMessageType(WonMessageType.HINT_MESSAGE);
+      .setWonMessageType(WonMessageType.HINT_MESSAGE)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode);
   }
 
 
@@ -237,14 +252,16 @@ public class WonMessageBuilderTest
   private WonMessageBuilder wrapMessage(final WonMessage msg1) {
     return new WonMessageBuilder()
       .wrap(msg1)
-      .setReceiverURI(CONNECTION_URI_1);
+      .setReceiverURI(CONNECTION_URI_1)
+      .setWonEnvelopeType(WonEnvelopeType.NodeToOwner);
   }
 
   private WonMessageBuilder createMessageWithContent(){
       return new WonMessageBuilder()
         .setMessageURI(MSG_URI_1)
         .addContent(CONTENT_GRAPH_URI_1, createContent(), null)
-        .setWonMessageType(WonMessageType.HINT_MESSAGE);
+        .setWonMessageType(WonMessageType.HINT_MESSAGE)
+        .setWonEnvelopeType(WonEnvelopeType.OwnerToNode);
   }
 
   private WonMessageBuilder createMessageWithTwoContentGraphs(){
@@ -252,7 +269,8 @@ public class WonMessageBuilderTest
       .setMessageURI(MSG_URI_1)
       .addContent(CONTENT_GRAPH_URI_1, createContent(), null)
       .addContent(CONTENT_GRAPH_URI_2, createDifferentContent(), null)
-      .setWonMessageType(WonMessageType.HINT_MESSAGE);
+      .setWonMessageType(WonMessageType.HINT_MESSAGE)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode);
   }
 
   private WonMessageBuilder copyEnvelopeAndContent(WonMessage msg) {
@@ -261,7 +279,8 @@ public class WonMessageBuilderTest
       .copyEnvelopeFromWonMessage(msg)
       .copyContentFromMessageReplacingMessageURI(msg)
       .setReceiverURI(CONNECTION_URI_1)
-      .addContent(CONTENT_GRAPH_URI_1, createDifferentContent(), null);
+      .addContent(CONTENT_GRAPH_URI_1, createDifferentContent(), null)
+      .setWonEnvelopeType(WonEnvelopeType.NodeToNode);
   }
 
   private Model createContent(){

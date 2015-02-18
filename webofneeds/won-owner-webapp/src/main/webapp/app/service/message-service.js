@@ -66,12 +66,16 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
         var eventData = {};
         //call handler if there is one - it may modify the event object
         //frame the incoming jsonld to get the data that interest us
-        var frame = {"@context" : {
-            "won":"http://purl.org/webofneeds/model#",
-            "msg":"http://purl.org/webofneeds/message#" //message is the default vocabulary
-        },
-            "msg:hasMessageType": { }
-        };
+        var frame = {
+            "@context" : {
+                "won":"http://purl.org/webofneeds/model#",
+                "msg":"http://purl.org/webofneeds/message#"
+            },
+            "@type": "msg:NodeToOwnerEnvelope"
+
+
+        }
+
         //copy data from the framed message to the event object
         var framedMessage = jsonld.frame(json, frame);
         for (key in framedMessage){
