@@ -22,7 +22,8 @@ angular.module('won.owner').controller("HeaderCtrl",
              , applicationStateService
              , $filter
              , $interval
-             , $log
+             , $log,
+               $window
              ) {
 
 
@@ -56,15 +57,30 @@ angular.module('won.owner').controller("HeaderCtrl",
         return !userService.isAuth();
 	};
 
-    $scope.checkRegistered = function(){
-        return userService.getRegistered();
+    $scope.showAccountUser = function() {
+        return userService.isAccountUser();
     };
-    $scope.userdata = { username : userService.getUnescapeUserName()};
+
+    $scope.showPrivateLinkUser = function() {
+        return userService.isPrivateUser();
+    };
+
+    $scope.checkRegistered = function () {
+        return userService.isRegistered();
+    };
+
+    var getDisplayUserName = function () {
+        $scope.userdata = { username: userService.getUnescapeUserName()};
+        if (userService.isPrivateUser()) {
+            $scope.userdata.username = "private user";
+        }
+    }
+    getDisplayUserName();
 
 
     $scope.$watch(userService.isAuth, function(logged_in){
         if(logged_in){
-            $scope.userdata = { username : userService.getUnescapeUserName()};
+            getDisplayUserName();
         }
     })
     $scope.onDropDownClick=function(num){
@@ -79,8 +95,7 @@ angular.module('won.owner').controller("HeaderCtrl",
 
 	$scope.onClickSignOut = function() {
 		applicationStateService.reset();
-		linkedDataService.reset();
-		userService.logOut().then(onResponseSignOut);
+		userService.logOutAndSetUpApplicationState().then(onResponseSignOut);
 	};
 
 });

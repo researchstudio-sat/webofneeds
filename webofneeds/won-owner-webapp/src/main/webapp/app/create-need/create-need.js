@@ -21,15 +21,13 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     , $log
     , $http
     , $routeParams
+    , $anchorScroll
     , needService
     , applicationStateService
-    , mapService
     , userService
     , utilService
     , wonService
-    , osmService
-    //, uiKeyup
-    //, uiEvent
+    , $q
     ) {
     $scope.currentStep = $routeParams.step;
     $scope.selectedType = $routeParams.selectedType;
@@ -135,39 +133,39 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         if (step == 1) {//2  ){
             $scope.previousButton = false;
 
-            $scope.saveDraftButton = userService.isAuth();
+            $scope.saveDraftButton = userService.isAccountUser();
             $scope.nextButton = true;
             $scope.previewButton = true;
             $scope.publishButton = false;
         } else if (step == 2) {//3){
             if ($scope.collapsed == true) {
                 $scope.previousButton = true;
-                $scope.saveDraftButton = userService.isAuth();
+                $scope.saveDraftButton = userService.isAccountUser();
                 $scope.nextButton = false;
                 $scope.previewButton = false;
                 $scope.publishButton = true;
             } else {
                 $scope.previousButton = true;
-                $scope.saveDraftButton = userService.isAuth();
+                $scope.saveDraftButton = userService.isAccountUser();
                 $scope.nextButton = false;
                 $scope.previewButton = true;
                 $scope.publishButton = false;
             }
         } else if (step == 3) {
             $scope.previousButton = true;
-            $scope.saveDraftButton = userService.isAuth();
+            $scope.saveDraftButton = userService.isAccountUser();
             $scope.nextButton = false;
             $scope.previewButton = false;
             $scope.publishButton = true;
         } else { // default
             $scope.previousButton = false;
-            $scope.saveDraftButton = userService.isAuth();
+            $scope.saveDraftButton = userService.isAccountUser();
             $scope.nextButton = true;
             $scope.previewButton = true;
             $scope.publishButton = false;
         }
 
-    }
+    };
     $scope.setShowButtons($scope.currentStep);
 
     $scope.needType = function () {
@@ -181,91 +179,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             return won.WON.BasicNeedTypeCritique;
         }
     }
-
-    // <leaflet-map> -----------------------------------
-    var map;
-    $scope.mapInit = function () {
-        // -------- snippet from leafletjs.com ----------
-        // create a map in the "map" div, set the view to a given place and zoom
-        map = L.map('leaflet-canvas');
-        map.fitWorld().zoomIn(); // zoom=0 isn't rectangular (-> gray letterboxing) -> zoomIn to fix this
-
-        // add an OpenStreetMap tile layer with attributions
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-    }
-    $scope.mapInit();
-
-    map.removeCstmMarker = function() {
-        if(map.cstmMarker != undefined)
-            map.removeLayer(map.cstmMarker); // remove the previous marker //TODO does this delete the popup as well?
-    }
-
-    $scope.onAddressQuerySubmit = function (address) {
-        if(!address || address === "" || address === {}) {
-            map.removeCstmMarker();
-            map.fitWorld().zoomIn(); // TODO a good idea ux-wise?
-            $scope.selectedAddress = {}
-            $scope.addressSearchResults = undefined;
-            //TODO handle invalid input
-        } else {
-            osmService.matchingLocations(address).then(function(resp){
-                $scope.addressSearchResults = resp;
-            }, function failed(){
-                $log.error("Address resolution failed.");
-            });
-        }
-    }
-
-    $scope.selectedAddress = {}
-    $scope.selectAddress = function (address) {
-        $scope.selectedAddress = address;
-        $scope.setMapLocation(address.lat, address.lon, address.display_name);
-        $scope.addressText = address.display_name;
-    }
-    $scope.setMapLocation = function (lat, lon, adr) { //TODO not in $scope but only usable here in link?
-        map.removeCstmMarker()
-
-        map.cstmMarker = L.marker([lat, lon]);
-        map.cstmMarker.addTo(map).bindPopup(adr);
-
-        //TODO base zoomlevel (L.latLng(lat, lon, alt(!))) on size of the selected area
-        map.setView([lat, lon], 13);
-
-        map.cstmMarker.openPopup();
-    }
-    //TODO start searching as soon as the user pauses/presses down, (followed by: select choice, press enter)
-    //TODO enter selects the first entry? shows an error popup and asks to select a correct location (same on focus loss)? enter jumps to first line of dropdown?
-    $scope.onArrowDownInSearchField = function (event) { //TODO DELETEME
-        // TODO only go into list if there are search results
-        console.log("In onArrowDownInSearchField. Event: " + JSON.stringify(event));
-        $scope.locationResultsVisible = true; //doesn't work(?)
-        //$('#locationDropDownToggle').dropdown();
-        console.log($('#locationDropDownToggle'));
-        console.log($('.dropDownToggle'));
-        $("#locationForm").addClass('open'); //TODO not very stable (e.g. if class name changes)
-    }
-    $scope.onArrowUpInSearchField = function (event) { //TODO DELETEME
-        console.log("In onArrowUpInSearchField. Event: " + JSON.stringify(event));
-        $("#locationForm").removeClass('open'); //TODO not very stable (e.g. if class name changes)
-    }
-    $scope.isopen = true;
-    $scope.toggleDropdown = function($event) {
-        console.log("in toggleDropdown. isopen = " + $scope.isopen);
-        $event.preventDefault();
-        $event.stopPropagation();
-        $scope.isopen = !$scope.isopen;
-    };
-    $scope.onLocationDropdownToggle = function() {
-        console.log("Toggled dropdown.");
-    }
-
-
-
-    // </leaflet-map> --------------------------
-
-
 
     $scope.showPublic = function (num) {
         if (num == $scope.currentStep) {
@@ -315,6 +228,18 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     $scope.need.basicNeedType = $scope.needType();
 
 
+    // previewNeed object is intended for the input to detail preview directive
+    // used in create-need page, because that directive that expects string
+    // as tags value. Additionally,using previewNeed instead of need object avoids
+    // constant calling of the detail preview directive functions due to every
+    // change of need object during its construction
+    $scope.getPreviewNeed = function () {
+        var copy = angular.copy($scope.need);
+        copy.tags = utilService.concatTags($scope.need.tags);
+        return copy;
+    }
+    $scope.previewNeed = $scope.getPreviewNeed();
+
     $scope.addTag = function () {
         var tags = $scope.need.tags;
         var tagName = $("#inputTagName").val();
@@ -328,12 +253,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         $scope.need.tags.splice($scope.need.tags.indexOf(tagName), 1);
     };
 
-    /*$scope.saveDraft = function () {
-     //  needService.saveDraft($scope.need);
-     if($scope.currentStep <= $scope.numberOfSteps) {
-     $scope.currentStep ++;
-     }
-     };  */
     $scope.nextStep = function () {
         if ($scope.currentStep <= $scope.numberOfSteps) {
 			// -(-1) instead of +1 is just a hack to interpret currentStep as int and not as string
@@ -343,7 +262,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     }
     $scope.previousStep = function () {
         if ($scope.currentStep >= 1) {
-			$scope.jumpToStep( $scope.currentStep - 1)
+			      $scope.jumpToStep( $scope.currentStep - 1)
         }
     }
 
@@ -381,7 +300,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             .hasTag($scope.need.tags)
             .hasContentDescription()    // mandatory
             //.hasPriceSpecification("EUR",5.0,10.0)
-
+        
         if (hasLocationSpecification($scope.need)) {
             // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
             draftBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
@@ -404,7 +323,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         $scope.draftURI = $scope.need.needURI;
 
         // save to the server if the user is logged in
-        if (userService.isAuth()) {
+        if (userService.isAccountUser()) {
             needService.saveDraft(createDraftObject).then(function(saveDraftResponse){
                 if (saveDraftResponse.status === "OK") {
                     $scope.successShow = true;
@@ -419,7 +338,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         if($scope.currentStep > 1) { // after the first step, the need is required to have title, type, description and tags
             if (!$scope.need.basicNeedType || !$scope.need.title || !$scope.need.textDescription || !$scope.need.tags) {
                 return false;
-
             }
         }
         return true;
@@ -466,57 +384,20 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         return need.needURI != '' && need.needURI != null;
     }
 
+
     var lock = false;
-    $scope.publish = function () {
-        if (lock == false) {
+    $scope.publishClicked = function () {
+        if(lock== false){
             lock = true;
-            // creating need object
-            if($scope.need.tags.length>0){
-                var concTags ='';
-                for(var i = 0;i<$scope.need.tags.length;i++){
-                    if(i==0){
-                        concTags = $scope.need.tags[i].text;
-                    }else{
-                        concTags = concTags + ','+ $scope.need.tags[i].text;
-                    }
+            var needJson = $scope.buildNeedJson();
+
+            // make sure the user is registered (either with account or private link),
+            // then publish the need, so that it is under that account
+            var newNeedUriPromise = userService.setUpRegistrationForUserPublishingNeed().then(
+                function() {
+                     return wonService.createNeed(needJson);
                 }
-                $scope.need.tags = concTags;
-            }
-            var needBuilderObject = new window.won.NeedBuilder().setContext();
-            if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
-                needBuilderObject.demand();
-            } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
-                needBuilderObject.supply();
-            } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDotogether) {
-                needBuilderObject.doTogether();
-            } else {
-                needBuilderObject.critique();
-            }
-
-            needBuilderObject.title($scope.need.title)
-                .ownerFacet()               // mandatory
-                .description($scope.need.textDescription)
-                .hasTag($scope.need.tags)
-                .hasContentDescription()    // mandatory
-                //.hasPriceSpecification("EUR",5.0,10.0)
-
-            if (hasLocationSpecification($scope.need)) {
-                // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
-                needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
-            }
-
-            if (hasTimeSpecification($scope.need)) {
-                needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
-            }
-
-            if (hasUri($scope.need)) {
-                needBuilderObject.uri($scope.need.needURI);
-            }
-
-            // building need as JSON object
-            var needJson = needBuilderObject.build();
-
-            var newNeedUriPromise = wonService.createNeed(needJson);
+            );
 
             // TODO: should the draft removing part be changed to run only on success from newNeedUriPromise?
             if ($scope.draftURI != null) {
@@ -524,15 +405,55 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
                 $scope.draftURI = null;
             }
 
-            //$scope.need = $scope.getCleanNeed();      TODO decide what to do
             $scope.successShow = true;
-            newNeedUriPromise['finally'](function () {
-                lock = false;
+
+            newNeedUriPromise['finally'](function(){
+                lock=false;
             });
         }
+    }
+
+
+	$scope.buildNeedJson = function () {
+
+        // creating need object
+        var needBuilderObject = new window.won.NeedBuilder().setContext();
+        if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
+            needBuilderObject.demand();
+        } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
+            needBuilderObject.supply();
+        } else if ($scope.need.basicNeedType ==  won.WON.BasicNeedTypeDotogether) {
+            needBuilderObject.doTogether();
+        } else {
+            needBuilderObject.critique();
+        }
+
+        needBuilderObject.title($scope.need.title)
+            .ownerFacet()               // mandatory
+            .description($scope.need.textDescription)
+            .hasTag(utilService.concatTags($scope.need.tags))
+            .hasContentDescription()    // mandatory
+            //.hasPriceSpecification("EUR",5.0,10.0)
+        
+        if (hasLocationSpecification($scope.need)) {
+            // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
+            needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
+        }
+
+        if (hasTimeSpecification($scope.need)) {
+            needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
+        }
+
+        if (hasUri($scope.need)) {
+            needBuilderObject.uri($scope.need.needURI);
+        }
+
+        // building need as JSON object
+        var needJson = needBuilderObject.build();
+
+        return needJson;
 
     };
-
 
     $scope.goToDetailPostPreview = function() {
         var detailPreviewElementId = 'detail-preview';
@@ -753,7 +674,7 @@ angular.module('won.owner').directive('wonGallery', function factory() {
     };
 });
 angular.module('won.owner').controller('AdditionalInfoCtrl',
-    function ($scope, $location, $http, $log, needService, mapService, userService) {
+    function ($scope, $location, $http, $log, needService, userService) {
         $scope.imageInputFieldCollapsed = true;
         $scope.locationInputFieldCollapsed = true;
         $scope.timeInputFieldCollapsed = true;

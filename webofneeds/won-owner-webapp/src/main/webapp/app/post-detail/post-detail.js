@@ -81,6 +81,10 @@ angular.module('won.owner')
                 if (applicationStateService.getAllNeeds()[$scope.need.uri]) {
                     return false;
                 }
+                // if it's own draft, cannot be contacted
+                if (applicationStateService.getAllDrafts()[$scope.need.uri]) {
+                    return false;
+                }
                 // TODO check with storyboard people:
                 // if it is another need, but communication already established,
                 // probably also should not be contacted?
@@ -110,6 +114,7 @@ angular.module('won.owner').controller('PostDetailCtrl',
         , applicationControlService
         , applicationStateService
         , userService
+        , utilService
         )
     {
 
@@ -264,7 +269,8 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
         scope: {
             need : '='
         },
-        controller : function($scope, applicationStateService){
+        controller : function($scope, applicationStateService, $log){
+
             $scope.message = '';
             $scope.sendStatus = false; //todo refresh this var each time when we click on show contact form
             $scope.email = '';
@@ -278,9 +284,23 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                 $scope.dropdownText = post.title;
                 $scope.post = $scope.allNeeds[post.uri];
             }
+
+            // after the request need is created with generated private link account and contact
+            // request has been sent, sign-out that private link account, so that the user is not confused...
+            $scope.$on(won.EVENT.CONNECT_SENT, function(ngEvent, eventData) {
+                if (userService.isPrivateUser()) {
+                    userService.logOutAndSetUpApplicationState();
+                }
+            });
+
+            // locks in order to prevent connecting/creating request need > 1 time if user clicks > 1
+            var createAndConnectLock = false;
+            var connectLock = false;
             $scope.sendMessage = function() {
-                var needBuilderObject = new window.won.NeedBuilder().setContext();
-                if($scope.post == undefined){
+
+                if ($scope.post == undefined) { // a special request need has to be created and then connected from
+
+                    var needBuilderObject = new window.won.NeedBuilder().setContext();
                     if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
                         needBuilderObject.supply();
                     } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
@@ -290,56 +310,75 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                     } else {
                         needBuilderObject.critique();
                     }
-                    needBuilderObject.title('Request for converstion to '+$scope.need.title)
+                    needBuilderObject.title('Request for converstion to ' + $scope.need.title)
                         .ownerFacet()               // mandatory
                         .description('')
                         .hasTag('')
                         .hasContentDescription('')    // mandatory
                         //.hasPriceSpecification("EUR",5.0,10.0)
+
+                    // building need as JSON object
+                    var needJson = needBuilderObject.build();
+
+                    if (createAndConnectLock == false) {
+                        createAndConnectLock = true;
+                        // make sure the user is registered (either with account or private link),
+                        // then publish the need, so that it is under that account
+                        var newNeedUriPromise = userService.setUpRegistrationForUserPublishingNeed().then(
+                            function () {
+                                return wonService.createNeed(needJson);
+                            }
+                        );
+                        newNeedUriPromise.then(function (uri) {
+                            $scope.privateLink = applicationStateService.getPrivateLink(userService.getUserName());
+                            wonService.connect(uri, $scope.need.uri, $scope.message);
+                        }).then(function () {
+                            $scope.sendStatus = true;
+                        });
+                        newNeedUriPromise['finally'](function () {
+                            createAndConnectLock = false;
+                        });
+                    }
+                } else { // an existing need has to be connected from
+                    if (connectLock == false) {
+                        connectLock = true;
+                        var newConnectionPromise = wonService.connect($scope.post.uri, $scope.need.uri, $scope.message).then(function () {
+                            $scope.sendStatus = true;
+                        });
+                        newConnectionPromise['finally'](function () {
+                            connectLock = false;
+                        });
+                    }
                 }
-                //TODO Put here logic
-                // creating need object
 
-
-
-
-                // building need as JSON object
-                var needJson = needBuilderObject.build();
-
-                if($scope.post == undefined){
-                    var newNeedUriPromise = wonService.createNeed(needJson);
-
-                    newNeedUriPromise.then(function(uri){
-                        wonService.connect(uri, $scope.need.uri, $scope.message);
-                    }).then(function(){
-                        $scope.sendStatus= true;
-                    })
-                } else{
-                    wonService.connect($scope.post.uri, $scope.need.uri, $scope.message).then(function(){
-                        $scope.sendStatus = true;
-                    });
-                }
-
-
-
-
-                //$scope.need = $scope.getCleanNeed();      TODO decide what to do
+                // TODO errors
                 $scope.successShow = true;
-              //  if(!$scope.sendStatus)$scope.sendStatus = true;
+                //  if(!$scope.sendStatus)$scope.sendStatus = true;
+
             };
 
-            $scope.clickHandler = function(e){
-                e.target.dispatchEvent(new DataTrans("copy"));
-            }
+//            $scope.clickHandler = function(e){
+//                e.target.dispatchEvent(new DataTrans("copy"));
+//            }
+//
+//            $scope.copyHandler = function(e) {
+//                e.clipboardData.setData("text/plain",$scope.privateLink);
+//                //todo maybe we can use http://zeroclipboard.org/
+//            };
 
-            $scope.copyHandler = function(e) {
-                e.clipboardData.setData("text/plain",$scope.privateLink);
-                //todo maybe we can use http://zeroclipboard.org/
+            // TODO the 2 functions below duplicate those defined in main.js,
+            // how to reuse those without complicating the directive usage?
+            $scope.logClipCopied = function() {
+                $log.debug("clip-click works!");
             };
-            $scope.showPublic = function() {
-                return userService.isAuth();
+            $scope.fallbackForClipCopy = function(copy) {
+                window.prompt('Press cmd+c to confirm copy the link.', copy);
             };
 
+
+            $scope.showAccountUser = function() {
+                return userService.isAccountUser();
+            };
 
         } ,
         link: function(scope, element, attrs){

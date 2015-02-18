@@ -14,6 +14,6 @@
     "commit": "b74dc79c7cc3d61f35a3e2f1387960fdc5032613"
   },
   "_source": "git://github.com/angular-ui/ui-map.git",
-  "_target": "~0.0.2",
+  "_target": "~0.0.3",
   "_originalSource": "angular-ui-map"
 }

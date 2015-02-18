@@ -55,7 +55,7 @@
 
                                         <div class="row">
                                             <div class="col-lg-8 col-lg-offset-2" ng-show="!showChangeType">
-                                                <img src="{{currentTypeIcon()}}"/> {{getCurrentTypeOfOffer()}}
+                                                <img ng-src="{{currentTypeIcon()}}"/> {{getCurrentTypeOfOffer()}}
                                                 <a ng-click="clickOnChangeTypeOfNeed()">(change)</a>
                                             </div>
                                         </div>
@@ -272,81 +272,7 @@
                                 </div>
                             </div>
                             <div class="panel-body" ng-show="!locationInputFieldCollapsed">
-                                <!--TODO: below is a script to trigger an action when typing is paused-->
-                                <!--
-                                <script>
-                                    //setup before functions
-                                    var typingTimer;                //timer identifier
-                                    var doneTypingInterval = 1500;  //time in ms, 5 second for example
-
-                                    //on keyup, start the countdown
-                                    $('#addresstest').keyup(function(){
-                                        clearTimeout(typingTimer);
-                                        typingTimer = setTimeout(doneTyping, doneTypingInterval);
-                                    });
-
-                                    //on keydown, clear the countdown
-                                    $('#addresstest').keydown(function(){
-                                        clearTimeout(typingTimer);
-                                    });
-
-                                    //user is "finished typing," do something
-                                    function doneTyping () {
-                                        var locationString = $('#addresstest').val()
-                                        //alert(encodeURIComponent(locationString));
-                                        //do something
-                                    }
-                                </script>-->
-
-                                <!--<p>Boostrap:</p>-->
-                                <form class="input-group" id="locationForm">
-                                    <input type="text" class="form-control" id="addressTextField"
-                                           ng-model="addressText"
-                                           placeholder="e.g. Thurngasse 8, Vienna, Austria"
-                                           ui-keypress="{down:'onArrowDownInSearchField()', up: 'onArrowUpInSearchField()'}"
-                                           autocomplete="off"/> <!--@a.c.=off: we'll use our own dropdown/auto-complete-->
-
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li ng-hide="addressSearchResults && addressSearchResults.length > 0">Loading address results...  [REPLACE WITH SPINNER]</li>
-                                        <li ng-click="selectAddress(adr)" ng-repeat="adr in addressSearchResults"><a href="javascript:void(0)">{{adr.display_name}}</a></li>
-                                    </ul>
-
-                                    <span id="locationDropDownToggle" class="input-group-btn dropdown-toggle" data-dropdown="dropdown">
-                                        <button type="submit" class="btn btn-default" ng-click="onAddressQuerySubmit(addressText)" aria-label="Search">
-                                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                                        </button>
-                                        <!-- TODO add a 'x' button to clear input (replace search-button?)-->
-                                    </span>
-                                </form><!-- /input-group -->
-
-                                <!--<hr>-->
-                                <!--<p>angular.ui.bootstrap:</p>-->
-                                <!--<div class="btn-group dropdown" dropdown is-open="isopen">-->
-                                    <!--<button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle>-->
-                                        <!--Button dropdown <span class="caret"></span>-->
-                                    <!--</button>-->
-                                    <!--<ul class="dropdown-menu" role="menu">-->
-                                        <!--<li><a href="#">Action</a></li>-->
-                                        <!--<li><a href="#">Another action</a></li>-->
-                                        <!--<li><a href="#">Something else here</a></li>-->
-                                        <!--<li class="divider"></li>-->
-                                        <!--<li><a href="#">Separated link</a></li>-->
-                                    <!--</ul>-->
-                                <!--</div>-->
-                                <!--<button type="button" class="btn btn-default btn-sm" ng-click="toggleDropdown($event)">Toggle button dropdown</button>-->
-                                <!--<hr>-->
-
-                                <!--<h3>Selected:</h3>-->
-                                <!--<ul>-->
-                                    <!--<li>Address: {{selectedAddress.display_name}} </li>-->
-                                    <!--<li>Latitude: {{selectedAddress.lat}}</li>-->
-                                    <!--<li>Longtitude: {{selectedAddress.lon}}</li>-->
-                                <!--</ul>-->
-
-                                <div id="leaflet-canvas" style="width: 480px; height: 480px; margin-top: 2em"></div>
-
-                                <!--<h3>The Unfiltered Response:</h3>-->
-                                <!--<pre>{{addressSearchResults | json}}</pre>-->
+                                <location-selector></location-selector>
                             </div>
                         </div>
 
@@ -453,7 +379,7 @@
 
                                     <p class="text-justify">
                                         <!-- TODO shorten the text description -->
-                                        {{need.textDescription}} (<a href="#/post-detail/">go to full description</a>).
+                                        {{need.textDescription}} (<a href="" ng-click="goToDetailPostPreview()">go to full description</a>).
                                         <!-- TODO link needs to be extended by parameters -->
                                     </p>
                                 </div>
@@ -464,9 +390,9 @@
                             And this is how it will look if they view it in greater detail:
                         </div>
 
-                        <div class="col-md-12 well">
+                        <div id="detail-preview" class="col-md-12 well">
                             <!--TODO controller should be specified in the directive-->
-                            <won-Post-Detail need="need"></won-Post-Detail>
+                            <won-Post-Detail need="previewNeed"></won-Post-Detail>
                             <!--deactivate conatct, map and calendar-->
                         </div>
                     </div>
@@ -495,7 +421,7 @@
                         ng-disabled="goToPreviewButtonDisabled()" ng-click="jumpToStep(3)">
                     <i class="fa fa-chevron-right fa-lg"></i><i class="fa fa-chevron-right fa-lg"></i>&nbsp;{{gotoPreviewButtonText()}}
                 </button>
-                <button ng-show="publishButton" type="button" class="btn btn-success" ng-click="publish()">
+                <button ng-show="publishButton" type="button" class="btn btn-success" ng-click="publishClicked()">
                     <i class="fa fa-check fa-lg"></i>&nbsp;Publish
                 </button>
 

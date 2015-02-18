@@ -558,7 +558,7 @@ angular.module('won.owner').factory('wonService', function (
             function (wonNodeUri1) {
                 return linkedDataService.getWonNodeUriOfNeed(need2).then(
                     function(wonNodeUri2){
-                        sendConnect(need1, need2, wonNodeUri1, wonNodeUri2);
+                        sendConnect(need1, need2, wonNodeUri1, wonNodeUri2, textMessage);
                     }
                 );
             },

@@ -37,9 +37,23 @@ angular.module('won.owner').factory('utilService', function ($http, $q) {
         return Math.floor(Math.random()*(max-min+1))+min;
     }
 
+    // TODO angularjs seems to have analogous method, so usage of this one can be replaced by angular's
     utilService.isString = function(o) {
         return typeof o == "string" || (typeof o == "object" && o.constructor === String);
     }
 
+    utilService.concatTags = function(tags) {
+        if(tags.length>0){
+            var concTags ='';
+            for(var i = 0;i<tags.length;i++){
+                if(i==0){
+                    concTags = tags[i].text;
+                }else{
+                    concTags = concTags + ','+ tags[i].text;
+                }
+            }
+            return concTags;
+        }
+    }
     return utilService;
 });

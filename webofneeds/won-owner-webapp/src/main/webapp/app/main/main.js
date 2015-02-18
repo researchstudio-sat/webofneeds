@@ -62,6 +62,14 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.lastEventOfEachConnectionOfCurrentNeed = [];
     $scope.eventCommState = {};
 
+    $scope.logClipCopied = function() {
+        $log.debug("clip-click works!");
+    };
+
+    $scope.fallbackForClipCopy = function(copy) {
+        window.prompt('Press cmd+c to confirm copy the link.', copy);
+    };
+
 
 
 
@@ -75,11 +83,18 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
 
     var reloadCurrentNeedData = function(){
         applicationStateService.getCurrentNeed()
-            .then(function (need) {
+            .then(
+            function success(need) {
                 $scope.currentNeed = need;
+            },
+            function error(respond) {
+                // it is expected in case the applicationstate
+                // gets reset and there is no current need
+                $scope.currentNeed = {};
             });
         applicationStateService.getLastEventOfEachConnectionOfCurrentNeed()
-            .then(function success(events) {
+            .then(
+            function success(events) {
                 $scope.lastEventOfEachConnectionOfCurrentNeed = events;
             },function error(events) {
                 $scope.lastEventOfEachConnectionOfCurrentNeed = [];
@@ -204,17 +219,21 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         reloadCurrentNeedData();
     });
 
-    $scope.$on(won.EVENT.USER_SIGNED_IN, function(event){
-       messageService.reconnect();
-        applicationStateService.reset();
-        userService.fetchPostsAndDrafts();
-    });
+    // This is moved to another function that is a promise function  
+//    $scope.$on(won.EVENT.USER_SIGNED_IN, function(event){
+//       messageService.reconnect();
+//        applicationStateService.reset();
+//        userService.fetchPostsAndDrafts();
+//    });
     $scope.$on('RenderFinishedEvent', function(event){
         $log.debug("render finished event") ;
     });
-    $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
-        messageService.reconnect();
-    });
+
+    // This is moved to another function that is a promise function  
+//    $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
+//        messageService.reconnect();
+//    });
+    
     $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
        $log.debug("search received");
     });
@@ -233,7 +252,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
                 messageService.reconnect();
             } else if (wasAuth) {
                 $log.warn("WEBSOCKET CLOSED code 1011, user was authenticated. Logging out.");
-                userService.logOut().then(onResponseSignOut);
+                userService.logOutAndSetUpApplicationState().then(onResponseSignOut);
             } else {
                 $log.warn("WEBSOCKET CLOSED code 1011, user was not authenticated. Reconnecting.");
                 messageService.reconnect();

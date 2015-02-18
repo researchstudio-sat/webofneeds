@@ -24,6 +24,7 @@ app = angular.module('won.owner',
         , 'scrollable-table'
         , 'ui.utils'
         , 'ngTagsInput'
+        , 'ngClipboard'
         //, 'ui.event'
         //, 'ui.keypress'
         ]
@@ -289,6 +290,9 @@ angular.resetForm = function (scope, formName, defaults) {
 		scope[d] = defaults[d];
 	}
 };
+app.config(['ngClipProvider', function(ngClipProvider){
+    ngClipProvider.setPath("bower_components/zeroclipboard/dist/ZeroClipboard.swf");
+}]);
 app.config(['$logProvider', function($logProvider){
     $logProvider.debugEnabled(true);
 }])

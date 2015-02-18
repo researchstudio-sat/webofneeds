@@ -7,7 +7,16 @@
  */
 
 angular.module('won.owner')
-    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, $log,applicationStateService, applicationControlService, linkedDataService, wonService) {
+    .controller('PrivateLinkCtrl', function ($scope
+        , $location
+        , userService
+        , $rootScope
+        , $log
+        , $routeParams
+        , applicationStateService
+        , applicationControlService
+        , linkedDataService
+        , wonService) {
 
     // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
@@ -63,8 +72,31 @@ angular.module('won.owner')
 
 
     //settings
-    $scope.privateLink = applicationStateService.getPrivateLink($scope.currentNeed.uri);
-    $scope.publicLink = applicationStateService.getPublicLink($scope.currentNeed.uri);
+
+    if ($routeParams.id != null) {
+
+        userService.setUpRegistrationForUserWithPrivateLink($routeParams.id).then(
+            function success() {
+                // calling replace() removes it from the browser history when clicking back button,
+                // i.e. if I enter a private link A and then change the session (time-out, log-in with
+                // other user account or create a new private link B) clicking 'back' in the browser won't
+                // display my private link A. This is a big plus, but still needs some work: at least in
+                // Chrome, I can still see my private link in the browser history page.
+                // TODO bug: sometimes, when entering the private link page (try 4-10 times in a raw)
+                // connections are not loaded...
+                $location.url('/private-link').replace();
+            }
+            //TODO error
+        );
+        return;
+    }
+
+    if (userService.isPrivateUser()) {
+        $scope.privateLink = applicationStateService.getPrivateLink(userService.getUserName());
+    }
+
+    $scope.publicLink = applicationStateService.getPublicLink(applicationStateService.getCurrentNeedURI());
+
     $scope.notificationEmail = '';
     $scope.notificationEmailValide = false;
     $scope.notificationChecks = {
@@ -92,10 +124,9 @@ angular.module('won.owner')
         return userService.isAuth();
     };
 
-    $scope.copyLinkToClipboard = function() {
-        //todo maybe we can use http://zeroclipboard.org/
+    $scope.showPrivateUser = function() {
+        return userService.isPrivateUser();
     };
-
 
     $scope.settingsCollapseClick= function() {
         $scope.settingsCollapsed = !$scope.settingsCollapsed;

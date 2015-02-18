@@ -13,6 +13,7 @@ import javax.persistence.*;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -42,6 +43,9 @@ public class User implements UserDetails{
   @OneToMany(fetch = FetchType.EAGER)
   private List<UserNeed> userNeeds;
 
+  @Column(name = "role")
+  private String role;
+
   //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
   //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
   @ElementCollection( fetch = FetchType.EAGER)
@@ -56,7 +60,14 @@ public class User implements UserDetails{
 	public User(final String username, final String password) {
 		this.username = username;
 		this.password = password;
+    this.role ="ROLE_ACCOUNT";
 	}
+
+  public User(final String username, final String password, String role) {
+    this.username = username;
+    this.password = password;
+    this.role = role;
+  }
 
 	@Override
 	public String toString() {
@@ -64,6 +75,7 @@ public class User implements UserDetails{
 				"id=" + id +
 				", username='" + username + '\'' +
 				", password='" + password + '\'' +
+        ", role='" + role + '\'' +
 				'}';
 	}
 
@@ -97,7 +109,9 @@ public class User implements UserDetails{
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
+    authorities = new ArrayList<SimpleGrantedAuthority>(1);
+    authorities.add(new SimpleGrantedAuthority(role));
+		return authorities;
 	}
 
 	@Override
@@ -135,6 +149,14 @@ public class User implements UserDetails{
     this.userNeeds = userNeeds;
   }
 
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(final String role) {
+    this.role = role;
+  }
+
   public Set<URI> getDraftURIs(){
     return draftURIs;
   }
@@ -156,6 +178,7 @@ public class User implements UserDetails{
 		if (userNeeds != null ? !userNeeds.equals(user.userNeeds) : user.userNeeds != null) return false;
 		if (password != null ? !password.equals(user.password) : user.password != null) return false;
 		if (username != null ? !username.equals(user.username) : user.username != null) return false;
+    if (role != null ? !role.equals(user.role) : user.role != null) return false;
 
 		return true;
 	}
@@ -166,6 +189,7 @@ public class User implements UserDetails{
 		result = 31 * result + (username != null ? username.hashCode() : 0);
 		result = 31 * result + (password != null ? password.hashCode() : 0);
 		result = 31 * result + (userNeeds != null ? userNeeds.hashCode() : 0);
+    result = 31 * result + (role != null ? role.hashCode() : 0);
 		return result;
 	}
 }
