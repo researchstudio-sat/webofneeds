@@ -164,6 +164,12 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         reloadCurrentNeedDataIfNecessary(eventData.hasSender)
 
     });
+    $scope.$on(won.EVENT.ACTIVATE_NEED_SENT, function(ngEvent, eventData) {
+        reloadCurrentNeedDataIfNecessary(eventData.hasSender)
+        linkedDataService.getNeed(eventData.hasSender).then(function(need){
+            applicationStateService.updateNeed(need);
+        })
+    });
 
     $scope.$on(won.EVENT.CLOSE_SENT, function(ngEvent, eventData) {
         //removeEventFromUnreadAndUpdateUnreadObjects(eventData);

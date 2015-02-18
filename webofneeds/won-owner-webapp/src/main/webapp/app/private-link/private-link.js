@@ -495,6 +495,12 @@ angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scop
         });
 
     });
+    $scope.$on(won.EVENT.ACTIVATE_NEED_SENT, function(ngEvent, eventData) {
+        linkedDataService.getNeed(eventData.hasSenderNeed).then(function(need){
+            $rootScope.postClosed = applicationStateService.checkIfNeedIsInactive(need);
+        });
+
+    });
 
     $scope.onClickYes = function () {
         $scope.error = '';
@@ -511,7 +517,7 @@ angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scop
         if($rootScope.postShouldBeReopened){
             $scope.reopen = true;
             $rootScope.postShouldBeReopened = false;
-            $rootScope.postClosed = false;
+            wonService.activateNeed($scope.currentNeed.uri);
         }
     }
 

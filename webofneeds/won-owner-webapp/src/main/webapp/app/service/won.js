@@ -197,6 +197,8 @@
         //message types
         won.WONMSG.createMessage = won.WONMSG.baseUri + "CreateMessage";
         won.WONMSG.createMessageCompacted = won.WONMSG.prefix + ":CreateMessage";
+        won.WONMSG.activateNeedMessage = won.WONMSG.baseUri + "ActivateMessage";
+        won.WONMSG.activateNeedMessageCompacted = won.WONMSG.prefix + ":ActivateMessage"
         won.WONMSG.closeNeedMessage = won.WONMSG.baseUri + "DeactivateMessage";
         won.WONMSG.closeNeedMessageCompacted = won.WONMSG.prefix + ":DeactivateMessage";
         won.WONMSG.closeNeedSentMessage = won.WONMSG.baseUri +"DeactivateSentMessage";
@@ -248,6 +250,8 @@
         won.EVENT.CONNECT_SENT ="ConnectSentEvent";
         won.EVENT.CONNECT_RECEIVED = "ConnectReceivedEvent";
         won.EVENT.OPEN_SENT = "OpenSentEvent";
+        won.EVENT.ACTIVATE_NEED_SENT = "ActivateNeedSentEvent"
+        won.EVENT.ACTIVATE_NEED_RECEIVED = "ActivateNeedReceivedEvent"
         won.EVENT.CLOSE_NEED_SENT = "DeactivateSentEvent";
         won.EVENT.CLOSE_NEED_RECEIVED = "Deactivate_Received_Event"
         won.EVENT.OPEN_RECEIVED = "OpenReceivedEvent";
