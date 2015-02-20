@@ -45,8 +45,8 @@
 
         won.WON = {};
         won.WON.baseUri = "http://purl.org/webofneeds/model#";
-        won.WON.matcherURI = "http://localhost:8080/matcher/search/"
-        //won.WON.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
+        //won.WON.matcherURI = "http://localhost:8080/matcher/search/"
+        won.WON.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
         //privateData.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
 
         won.WON.prefix = "won";
