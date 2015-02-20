@@ -16,6 +16,5 @@
   },
   "_source": "git://github.com/myguidingstar/bower-sockjs.git",
   "_target": "0.3.4",
-  "_originalSource": "sockjs",
-  "_direct": true
+  "_originalSource": "sockjs"
 }

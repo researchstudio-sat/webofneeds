@@ -25,8 +25,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- see http://getbootstrap.com/css/#overview-mobile -->
 		<title ng-bind="'Web Of Needs - '+$root.title">Web Of Needs</title>
 		<link rel="stylesheet" href="style/bootstrap.min.css" />
-		<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>
-		<link rel="stylesheet" href="style/main.css"/>
+		<%--<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>--%>
+
+        <link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>
+        <link rel="stylesheet" href="style/bootsketch-patches.css"/>
+        <%--<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"/> --%>
+
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	    <link rel="stylesheet" href="style/datepicker.css"/>
 	    <link rel="stylesheet" href="font-awesome-4.1.0/css/font-awesome.min.css">
@@ -45,6 +49,10 @@
         <link rel="stylesheet" href="resources/leaflet-0.7.3/leaflet.css"/>
 
 
+        <!-- Our CSS'. Included last so it wins in clashes vs libraries. -->
+        <link rel="stylesheet" href="style/main.css"/>
+
+
         <script src="scripts/jquery.10.2.js"></script>
         <script src="scripts/jquery.fs.scroller.min.js"></script>
         <script src="bower_components/angular/angular.js"></script>
@@ -54,7 +62,6 @@
 
         <script type="text/javascript" src="bower_components/angular-ui-utils/ui-utils.js"></script> <!-- to include all ui-utils TODO deleteme-->
         <script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
-        <script type="text/javascript" src="bower_components/angular-ui-map/ui-map.js"></script>
         <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
         <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>

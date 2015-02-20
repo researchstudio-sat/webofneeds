@@ -180,6 +180,11 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
     }
 
+    $scope.addressSelected = function(lat, lon, name) {
+        $scope.need.latitude = lat;
+        $scope.need.longitude = lon;
+        $scope.need.name = name;
+    };
     $scope.showPublic = function (num) {
         if (num == $scope.currentStep) {
             return true;
@@ -300,11 +305,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             .hasTag($scope.need.tags)
             .hasContentDescription()    // mandatory
             //.hasPriceSpecification("EUR",5.0,10.0)
-        
-        if (hasLocationSpecification($scope.need)) {
-            // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
-            draftBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
-        }
+
+        // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
+        draftBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude, $scope.need.name);
 
         if (hasTimeSpecification($scope.need)) {
             draftBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
@@ -374,10 +377,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
     function hasTimeSpecification(need) {
         return need.startDate != '' && need.startTime != '' && need.endDate != '' && need.endTime != '';
-    }
-
-    function hasLocationSpecification(need) {
-        return need.latitude != '' && need.longitude != null;
     }
 
     function hasUri(need) {

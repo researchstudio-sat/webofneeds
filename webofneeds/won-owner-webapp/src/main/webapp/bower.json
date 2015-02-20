@@ -31,10 +31,11 @@
     "ng-scrollbar": "~0.0.6",
     "sockjs": "0.3.4",
     "ng-tags-input": "2.1.1",
-    "ng-clip": "0.2.6"
+    "ng-clip": "0.2.6",
+    "bootsketch": "~1.0.0"
   },
   "resolutions": {
      "angular": "~1.2.28"
-  }
+  },
 
 }

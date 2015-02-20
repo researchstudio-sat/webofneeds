@@ -5,12 +5,12 @@
     <input type="text" class="form-control" id="addressTextField"
            ng-model="addressText"
            placeholder="e.g. Thurngasse 8, Vienna, Austria"
-           ui-keypress="{down:'onArrowDownInSearchField()', up: 'onArrowUpInSearchField()'}"
+           ui-keypress="{ArrowDown:'onArrowDownInSearchField()', ArrowUp: 'onArrowUpInSearchField()'}"
            autocomplete="off"/> <!--@a.c.=off: we'll use our own dropdown/auto-complete-->
 
-    <ul id="location-suggestions" class="dropdown-menu" role="menu">
-        <li ng-hide="addressSearchResults && addressSearchResults.length > 0">Loading address results...  [REPLACE WITH SPINNER]</li>
-        <li ng-click="selectAddress(adr)" ng-repeat="adr in addressSearchResults"><a href="javascript:void(0)">{{adr.display_name}}</a></li>
+    <ul id="location-suggestions" class="dropdown-menu" role="menu" tabindex="0">
+        <li ng-hide="addressSearchResults && addressSearchResults.length > 0" tabindex="0">Loading address results...  [REPLACE WITH SPINNER]</li>
+        <li ng-click="selectAddress(adr)" ng-repeat="adr in addressSearchResults" tabindex="0"><a href="javascript:void(0)">{{adr.display_name}}</a></li>
     </ul>
 
     <span id="locationDropDownToggle" class="input-group-btn dropdown-toggle" data-dropdown="dropdown">

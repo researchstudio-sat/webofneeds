@@ -755,9 +755,11 @@
                     <artifactId>copy-maven-plugin</artifactId>
                     <version>0.2.5</version>
                 </plugin>
-
-
-
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>0.0.22</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -836,6 +838,7 @@
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
+        <mojoexec.version>1.3.2</mojoexec.version>
         <cargo.version>1.4.2</cargo.version>
         <jrebel.version>1.1.3</jrebel.version>
         <wagon.version>1.0-beta-3</wagon.version>

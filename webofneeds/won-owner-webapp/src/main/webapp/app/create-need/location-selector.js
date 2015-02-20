@@ -3,6 +3,9 @@
  */
 ;
 
+/*
+Allows entering an address. When an address is picked, it's displayed on the map and addressCallback(lat, lon, name) invoked
+ */
 angular.module('won.owner')
     .directive('locationSelector', function factory($log, osmService) {
         return {
@@ -12,6 +15,7 @@ angular.module('won.owner')
             scope : {
                 /*chosenMessage: '=',
                 clickOnPostLink: '&'*/
+                addressCallback: '&addressSelected'
             },
 
             //link: function(scope, element, attrs){
@@ -67,7 +71,13 @@ angular.module('won.owner')
                     scope.selectedAddress = address;
                     scope.setMapLocation(address.lat, address.lon, address.display_name);
                     scope.addressText = address.display_name;
-                };
+
+                    scope.addressCallback({
+                        lat : address.lat,
+                        lon : address.lon,
+                        name : address.display_name
+                    });
+            };
                 scope.setMapLocation = function (lat, lon, adr) { //TODO not in $scope but only usable here in link?
                     map.removeCstmMarker();
 
@@ -79,20 +89,24 @@ angular.module('won.owner')
 
                     map.cstmMarker.openPopup();
                 };
+
                 //TODO start searching as soon as the user pauses/presses down, (followed by: select choice, press enter)
                 //TODO enter selects the first entry? shows an error popup and asks to select a correct location (same on focus loss)? enter jumps to first line of dropdown?
                 scope.onArrowDownInSearchField = function (event) { //TODO DELETEME
                     // TODO only go into list if there are search results
-                    console.log("In onArrowDownInSearchField. Event: " + JSON.stringify(event));
-                    scope.locationResultsVisible = true; //doesn't work(?)
-                    //$('#locationDropDownToggle').dropdown();
-                    console.log($('#locationDropDownToggle'));
-                    console.log($('.dropDownToggle'));
+                    console.log("In onArrowDownInSearchField.");
+                    /* Disabled for now (key-controls don't work in other drop-downs either and are
+                    quite a bit work to implement in a way they work smoothly.
                     $("#locationForm").addClass('open'); //TODO not very stable (e.g. if class name changes)
+                    $("#location-suggestions").focus();
+                    //TODO submit query
+                    */
                 };
                 scope.onArrowUpInSearchField = function (event) { //TODO DELETEME
+                    /* Disabled for now
                     console.log("In onArrowUpInSearchField. Event: " + JSON.stringify(event));
                     $("#locationForm").removeClass('open'); //TODO not very stable (e.g. if class name changes)
+                    */
                 };
                 scope.isopen = true;
                 scope.toggleDropdown = function($event) {
@@ -104,6 +118,8 @@ angular.module('won.owner')
                 scope.onLocationDropdownToggle = function() {
                     console.log("Toggled dropdown.");
                 };
+
+
 
                 (function() { // <anonymous wrapper>
                     //setup before functions

@@ -272,7 +272,7 @@
                                 </div>
                             </div>
                             <div class="panel-body" ng-show="!locationInputFieldCollapsed">
-                                <location-selector></location-selector>
+                                <location-selector address-selected="addressSelected(lat, lon, name)"></location-selector>
                             </div>
                         </div>
 
@@ -375,7 +375,7 @@
                                      src="/owner/images/need.jpg"/>
 
                                 <div class="media-body">
-                                    <h4 class="media-heading">{{need.title}}{{need.uri}}</h4>
+                                    <h4 class="media-heading">{{need.title}}</h4>
 
                                     <p class="text-justify">
                                         <!-- TODO shorten the text description -->
