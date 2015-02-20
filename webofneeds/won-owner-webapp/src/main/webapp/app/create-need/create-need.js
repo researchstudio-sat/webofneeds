@@ -434,10 +434,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             .hasContentDescription()    // mandatory
             //.hasPriceSpecification("EUR",5.0,10.0)
         
-        if (hasLocationSpecification($scope.need)) {
-            // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
-            needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
-        }
+            needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude, $scope.need.name);
 
         if (hasTimeSpecification($scope.need)) {
             needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);

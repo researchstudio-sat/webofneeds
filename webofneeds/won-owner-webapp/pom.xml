@@ -212,7 +212,7 @@
                             "install", so unless you need to run some other bower command,
                             you can remove this whole <configuration> section.
                             -->
-                            <arguments>install -f</arguments>
+                            <arguments>install</arguments>
                         </configuration>
                     </execution>
                 </executions>
