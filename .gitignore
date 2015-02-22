@@ -39,12 +39,14 @@ Thumbs.db
 bin/setenv.*
 
 #application specific
-/needserver/repository
+/webofneeds/won-cryptography/keys.jks
 /webofneeds/won-node/src/main/resources.lan/*
 /webofneeds/won-owner/src/main/resources.lan/*
 /webofneeds/won-matcher-solr/overlays/*
-webofneeds/won-matcher-webapp/overlays
+/webofneeds/won-matcher-webapp/overlays
 /webofneeds/won-owner-webapp/src/main/webapp/node
 /webofneeds/won-owner-webapp/src/main/webapp/node_modules
-#local config
+
+#local config and data
 webofneeds/conf.local
+/webofneeds/data.local
